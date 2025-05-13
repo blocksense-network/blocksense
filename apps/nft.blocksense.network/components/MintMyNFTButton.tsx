@@ -11,7 +11,6 @@ import { mintNFT } from '@/mint';
 import { clearXHandle } from '@/utils';
 import {
   checkParticipant,
-  hasXUserRetweeted,
   generateMintSignature,
   saveParticipant,
 } from 'service/client';
@@ -29,11 +28,8 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
   const {
     xHandle,
     xStatus,
-    xUserId,
     discord,
     discordStatus,
-    retweetCode,
-    setRetweetStatus,
     setAlertMessage,
     mintLoading,
     setMintLoading,
@@ -45,47 +41,8 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
     xStatus.type !== 'success' ||
     discordStatus.type !== 'success' ||
     !xHandle ||
-    !xUserId ||
     !discord ||
-    mintLoading ||
-    !retweetCode;
-
-  const verifyRetweet = async () => {
-    try {
-      if (!xUserId) {
-        setRetweetStatus({ type: 'error', message: 'X user is not found' });
-        return false;
-      }
-
-      const { isRetweeted, isCodeCorrect } = await hasXUserRetweeted(
-        xUserId,
-        retweetCode,
-      );
-
-      if (!isRetweeted) {
-        throw new Error('User has not retweeted');
-      } else if (!isCodeCorrect) {
-        setRetweetStatus({
-          type: 'error',
-          message: 'Your retweet does not contain the correct code',
-        });
-        return false;
-      } else {
-        setRetweetStatus({
-          type: 'success',
-          message: 'You have retweeted our post with the code',
-        });
-        return true;
-      }
-    } catch (err) {
-      console.error(err);
-      setRetweetStatus({
-        type: 'error',
-        message: 'You have not quote retweeted our post with the code',
-      });
-      return false;
-    }
-  };
+    mintLoading;
 
   const onMintClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -95,16 +52,12 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
     setAlertMessage('');
 
     try {
-      const isRetweeted = await verifyRetweet();
-      if (!isRetweeted) return;
-
       const resultXHandle = clearXHandle(xHandle);
 
       const participantsPayload: ParticipantPayload = {
         xHandle: resultXHandle,
         discordUsername: discord,
         walletAddress: account.address,
-        walletSignature: retweetCode,
       };
 
       const { isParticipant, mintingTx: mintingTxFromDB } =
@@ -139,7 +92,6 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
       sendGAEvent('event', 'mintedNFT', {
         xHandle: resultXHandle,
         discord,
-        retweetCode,
         walletAddress: account.address,
       });
 
@@ -163,7 +115,7 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
       onClick={onMintClick}
       isLoading={mintLoading}
       disabled={isMintDisabled}
-      className="mint-form_button w-full md:mt-12 mt-8"
+      className="mint-form_button w-full mt-4"
     >
       Mint My NFT
     </Button>
