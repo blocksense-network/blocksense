@@ -49,17 +49,10 @@ export const Form = () => {
             </motion.div>
           )}
           {showSuccess && (
-            <motion.div
-              className="w-full"
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, delay: 0.2 }}
-            >
-              <SuccessForm
-                mintTransactionUrl={mintTransactionUrl}
-                isAlreadyMinted={isAlreadyMinted}
-              />
-            </motion.div>
+            <SuccessForm
+              mintTransactionUrl={mintTransactionUrl}
+              isAlreadyMinted={isAlreadyMinted}
+            />
           )}
         </MintFormProvider>
       </article>
