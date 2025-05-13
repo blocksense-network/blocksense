@@ -286,7 +286,7 @@ const main = async (): Promise<void> => {
   const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
   const argv = await yargs(hideBin(process.argv))
     .usage(
-      'Usage: $0 --numberOfTransactions <number> [--address <ethereum address>]',
+      'Usage: $0 [--numberOfTransactions <number>] [--address <ethereum address>] [--network <name1,name2,...>] ',
     )
     .option('address', {
       alias: 'a',
@@ -302,8 +302,7 @@ const main = async (): Promise<void> => {
     })
     .option('network', {
       alias: 'n',
-      describe:
-        'Calculate cost only for this network, not all deployed networks',
+      describe: 'Comma-separated list of networks to calculate cost for',
       type: 'string',
       default: '',
     })
@@ -333,7 +332,13 @@ const main = async (): Promise<void> => {
     ),
   );
 
-  const networks = argv.network == '' ? deployedNetworks : [argv.network];
+  const networks =
+    argv.network === ''
+      ? deployedNetworks
+      : argv.network
+          .split(',')
+          .map(n => n.trim())
+          .filter(Boolean);
 
   for (const network of networks) {
     const { transactions, firstTxTime, lastTxTime } =
