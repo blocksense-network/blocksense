@@ -9,13 +9,10 @@ import { FormStepTitle } from './FormStepTitle';
 import { FormStepContainer } from './FormStepContainer';
 import { NetworkLink } from './NetworkLink';
 import { Separator } from './Separator';
-import { RetweetCard } from './RetweetCard';
 import { AlertMessage } from './AlertMessage';
 import { XHandle } from './XHandle';
 import { Discord } from './Discord';
 import { MintMyNFTButton } from './MintMyNFTButton';
-
-const separatorClassName = 'mint-form__separator md:my-8 my-6';
 
 const wallets = [createWallet('io.metamask'), createWallet('walletConnect')];
 
@@ -36,7 +33,7 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
           <NetworkLink type="discord" />
         </section>
       </FormStepContainer>
-      <Separator className={separatorClassName} />
+      <Separator className="mint-form__separator md:my-8 my-6" />
       <FormStepContainer>
         <FormStepTitle
           title="Enter your social handles for verification"
@@ -67,14 +64,6 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
             })}
           />
         </section>
-      </FormStepContainer>
-      <Separator className={separatorClassName} />
-      <FormStepContainer>
-        <FormStepTitle
-          title="Share our announcement with your unique code"
-          number={3}
-        />
-        <RetweetCard />
       </FormStepContainer>
       <MintMyNFTButton onSuccessAction={onSuccessAction} />
       <AlertMessage />

@@ -17,18 +17,11 @@ type MintFormContextType = {
   setXHandle: Dispatch<SetStateAction<string>>;
   xStatus: VerificationStatus;
   setXStatus: Dispatch<SetStateAction<VerificationStatus>>;
-  xUserId: string | null;
-  setXUserId: Dispatch<SetStateAction<string | null>>;
 
   discord: string;
   setDiscord: Dispatch<SetStateAction<string>>;
   discordStatus: VerificationStatus;
   setDiscordStatus: Dispatch<SetStateAction<VerificationStatus>>;
-
-  retweetStatus: VerificationStatus;
-  setRetweetStatus: Dispatch<SetStateAction<VerificationStatus>>;
-  retweetCode: string;
-  setRetweetCode: Dispatch<SetStateAction<string>>;
 
   alertMessage: string;
   setAlertMessage: Dispatch<SetStateAction<string>>;
@@ -46,19 +39,12 @@ export const MintFormProvider = ({ children }: { children: ReactNode }) => {
     type: 'none',
     message: '',
   });
-  const [xUserId, setXUserId] = useState<string | null>(null);
 
   const [discord, setDiscord] = useState('');
   const [discordStatus, setDiscordStatus] = useState<VerificationStatus>({
     type: 'none',
     message: '',
   });
-
-  const [retweetStatus, setRetweetStatus] = useState<VerificationStatus>({
-    type: 'none',
-    message: '',
-  });
-  const [retweetCode, setRetweetCode] = useState('');
 
   const [alertMessage, setAlertMessage] = useState('');
   const [mintLoading, setMintLoading] = useState(false);
@@ -68,18 +54,12 @@ export const MintFormProvider = ({ children }: { children: ReactNode }) => {
       value={{
         xHandle,
         setXHandle,
-        xUserId,
-        setXUserId,
         xStatus,
         setXStatus,
         discord,
         setDiscord,
         discordStatus,
         setDiscordStatus,
-        retweetStatus,
-        setRetweetStatus,
-        retweetCode,
-        setRetweetCode,
         alertMessage,
         setAlertMessage,
         mintLoading,
