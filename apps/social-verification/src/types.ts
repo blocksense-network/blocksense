@@ -33,7 +33,6 @@ export const ParticipantPayloadSchema = S.mutable(
     xHandle: S.String,
     discordUsername: S.String,
     walletAddress: S.String,
-    walletSignature: S.String,
     mintingTx: S.optionalWith(S.String, { nullable: true }),
   }),
 );
