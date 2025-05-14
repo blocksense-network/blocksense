@@ -12,11 +12,10 @@ import {
   ethereumAddress,
   asVarSchema,
   hexDataString,
-  isTestnet,
   networkName,
   DeploymentEnvSchema,
   parseDeploymentEnvConfig,
-  prettyPrintParsedEnvConfig,
+  validateAndPrintDeploymentEnvConfig,
 } from '@blocksense/base-utils';
 
 import type {
@@ -27,20 +26,20 @@ import type {
 } from '../types';
 
 const sharedPerNetworkKind = {
-  DEPLOYER_ADDRESS_IS_LEDGER: asVarSchema(S.BooleanFromString),
-  DEPLOYER_ADDRESS: ethereumAddress,
-  DEPLOYER_PRIVATE_KEY: hexDataString,
+  deployerAddressIsLedger: asVarSchema(S.BooleanFromString),
+  deployerAddress: ethereumAddress,
+  deployerPrivateKey: hexDataString,
 
-  ADFS_UPGRADEABLE_PROXY_SALT: asVarSchema(hexDataString),
+  adfsUpgradeableProxySalt: asVarSchema(hexDataString),
 
-  ADMIN_MULTISIG_THRESHOLD: S.NumberFromString,
-  ADMIN_MULTISIG_OWNERS: fromCommaSeparatedString(ethereumAddress),
+  adminMultisigThreshold: S.NumberFromString,
+  adminMultisigOwners: fromCommaSeparatedString(ethereumAddress),
 
-  SEQUENCER_ADDRESS: ethereumAddress,
+  sequencerAddress: ethereumAddress,
 
-  REPORTER_MULTISIG_ENABLE: asVarSchema(S.BooleanFromString),
-  REPORTER_MULTISIG_THRESHOLD: S.NumberFromString,
-  REPORTER_MULTISIG_SIGNERS: asVarSchema(
+  reporterMultisigEnable: asVarSchema(S.BooleanFromString),
+  reporterMultisigThreshold: S.NumberFromString,
+  reporterMultisigSigners: asVarSchema(
     fromCommaSeparatedString(ethereumAddress),
   ),
 };
@@ -50,41 +49,47 @@ const envSchema = {
     NETWORKS: fromCommaSeparatedString(networkName),
   },
 
-  perNetworkKind: {
-    DEPLOYER_ADDRESS_IS_LEDGER: asVarSchema(S.BooleanFromString),
-    DEPLOYER_ADDRESS: ethereumAddress,
-    DEPLOYER_PRIVATE_KEY: hexDataString,
+  perNetworkKind: sharedPerNetworkKind,
 
-    ADFS_UPGRADEABLE_PROXY_SALT: asVarSchema(hexDataString),
+  perNetworkName: {
+    rpcUrl: S.URL,
+    feedIds: S.Union(S.Literal('all'), fromCommaSeparatedString(S.BigInt)),
 
-    ADMIN_MULTISIG_THRESHOLD: S.NumberFromString,
-    ADMIN_MULTISIG_OWNERS: fromCommaSeparatedString(ethereumAddress),
-
-    SEQUENCER_ADDRESS: ethereumAddress,
-
-    REPORTER_MULTISIG_ENABLE: asVarSchema(S.BooleanFromString),
-    REPORTER_MULTISIG_THRESHOLD: S.NumberFromString,
-    REPORTER_MULTISIG_SIGNERS: asVarSchema(
-      fromCommaSeparatedString(ethereumAddress),
-    ),
+    ...sharedPerNetworkKind,
   },
-
-  perNetworkName: {},
-  //   RPC_URL: S.URL,
-  //   FEED_IDS: S.Union(S.Literal('all'), fromCommaSeparatedString(S.BigInt)),
-
-  //   ...sharedPerNetworkKind,
-  // },
 } satisfies DeploymentEnvSchema;
 
 export async function initChain(
   ethers: typeof _ethers & HardhatEthersHelpers,
   networkName: NetworkName,
 ): Promise<NetworkConfig> {
-  const parsedConfig = parseDeploymentEnvConfig(envSchema, networkName);
-  prettyPrintParsedEnvConfig(parsedConfig);
+  const parsedEnv = parseDeploymentEnvConfig(
+    envSchema,
+    networkName,
+    process.env,
+  );
 
-  const rpc = envConfig.perNetwork.RPC_URL.toString();
+  const parsedConfig = validateAndPrintDeploymentEnvConfig(parsedEnv);
+
+  const {
+    rpcUrl,
+    feedIds,
+
+    deployerAddress,
+    deployerAddressIsLedger,
+    deployerPrivateKey,
+
+    adfsUpgradeableProxySalt,
+
+    reporterMultisigEnable,
+    reporterMultisigSigners,
+    reporterMultisigThreshold,
+
+    adminMultisigOwners,
+    adminMultisigThreshold,
+  } = parsedConfig.mergedConfig;
+
+  const rpc = rpcUrl.toString();
   const provider = new JsonRpcProvider(rpc);
   const network = await withTimeout(
     () => provider.getNetwork(),
@@ -92,28 +97,24 @@ export async function initChain(
     new Error(`Failed to connect to network: '${rpc}'`),
   );
 
-  const adfsUpgradeableProxySalt = isTestnet(networkName)
-    ? envConfig.testnet.ADFS_UPGRADEABLE_PROXY_SALT_TESTNET
-    : envConfig.mainnet.ADFS_UPGRADEABLE_PROXY_SALT_MAINNET;
-
   const baseConfig: NetworkConfigBase = {
     rpc,
     provider,
     network,
     networkName,
-    adfsUpgradeableProxySalt:
-      adfsUpgradeableProxySalt ?? ethers.id('upgradeableProxy'),
+    adfsUpgradeableProxySalt,
+
+    deployWithSequencerMultisig: reporterMultisigEnable,
+
     sequencerMultisig: {
-      owners: envConfig.perNetwork.REPORTER_ADDRESSES,
-      threshold: envConfig.perNetwork.REPORTER_THRESHOLD,
+      owners: reporterMultisigSigners,
+      threshold: reporterMultisigThreshold,
     },
-    deployWithSequencerMultisig:
-      envConfig.perNetwork.DEPLOY_WITH_SEQUENCER_MULTISIG,
     adminMultisig: {
-      owners: envConfig.perNetwork.ADMIN_EXTRA_SIGNERS,
-      threshold: envConfig.perNetwork.ADMIN_THRESHOLD,
+      owners: adminMultisigOwners,
+      threshold: adminMultisigThreshold,
     },
-    feedIds: envConfig.perNetwork.FEED_IDS,
+    feedIds,
     safeAddresses: {
       multiSendAddress: parseEthereumAddress(
         '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526',
@@ -150,27 +151,8 @@ export async function initChain(
     },
   };
 
-  if (isTestnet(networkName)) {
-    const admin = new Wallet(
-      envConfig.testnet.ADMIN_SIGNER_PRIVATE_KEY,
-      provider,
-    );
-    const config: NetworkConfigWithoutLedger = {
-      ...baseConfig,
-      sequencerMultisig: {
-        ...baseConfig.sequencerMultisig,
-        signer: admin,
-      },
-      adminMultisig: {
-        ...baseConfig.adminMultisig,
-        signer: admin,
-      },
-    };
-    return config;
-  } else {
-    const ledgerAccount = await ethers.getSigner(
-      envConfig.mainnet.LEDGER_ACCOUNT,
-    );
+  if (deployerAddressIsLedger) {
+    const ledgerAccount = await ethers.getSigner(deployerAddress);
     const config: NetworkConfigWithLedger = {
       ...baseConfig,
       ledgerAccount,
@@ -181,6 +163,20 @@ export async function initChain(
       adminMultisig: {
         ...baseConfig.adminMultisig,
         signer: undefined,
+      },
+    };
+    return config;
+  } else {
+    const admin = new Wallet(deployerPrivateKey, provider);
+    const config: NetworkConfigWithoutLedger = {
+      ...baseConfig,
+      sequencerMultisig: {
+        ...baseConfig.sequencerMultisig,
+        signer: admin,
+      },
+      adminMultisig: {
+        ...baseConfig.adminMultisig,
+        signer: admin,
       },
     };
     return config;
