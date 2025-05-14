@@ -1,6 +1,6 @@
 export const generateBigEndianConversion = (name: string) => {
   return `
-    // convert to big endian
+    // Convert ${name} to big endian
     {
       ${name} := or(
         or(and(shr(24, ${name}), 0xFF), and(shr(8, ${name}), 0xFF00)),

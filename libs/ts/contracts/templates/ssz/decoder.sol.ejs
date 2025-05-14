@@ -15,8 +15,6 @@ library SSZDecoder {
     bytes memory data
   ) external pure returns (<%= returnType %> memory <%= mainStructName %>) {
     assembly ('memory-safe') {
-      // First 32 bytes are the length of the data
-      let memData := mload(add(data, 32))
       <%= lines.join('\n') %>
     }
   }

@@ -41,32 +41,3 @@ export type Struct = {
   name: string;
   fields: PrimitiveField[];
 };
-
-export type Schema = {
-  isBasic: boolean;
-  isDynamic: boolean;
-  isNested: boolean;
-  type: string;
-  typeName: string;
-  fixedSize: number;
-  fixedEnd: boolean;
-  length?: number;
-  fieldName?: string;
-  fields?: Schema[];
-  isFixedLen?: boolean[];
-  fieldRangesFixedLen?: { start: number; end: number }[];
-  variableOffsetsPosition?: number[];
-  isLastDynamic?: boolean;
-  prevType?: { type: string; length?: number };
-  types: { type: string; length?: number }[];
-};
-
-export type DynamicData = {
-  positionName: string;
-  index: number;
-  level: number;
-  location: string;
-  counter?: string;
-  schema: Schema;
-  isGenerated: boolean;
-};

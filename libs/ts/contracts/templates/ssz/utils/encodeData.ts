@@ -57,7 +57,7 @@ function convertNumberEndianness(
   }
 }
 
-const createSchema = async (
+export const createSchema = async (
   fields: PrimitiveField | TupleField,
 ): Promise<ContainerType<any>> => {
   const ssz = await import('@chainsafe/ssz');
@@ -239,9 +239,10 @@ export const sszSchema = async (
         isNested: extraData?.isNested ?? false,
         typeName: field.typeName,
         fixedSize: field.fixedSize,
+        sszFixedSize: field.fixedSize,
         fixedEnd: field.fixedEnd,
         type: extraData?.type ?? field.type ?? '',
-        fieldName: extraData?.fieldName ?? field.fieldName,
+        fieldName: toLowerFirstLetter(extraData?.fieldName ?? field.fieldName),
         length: field.length,
         prevType: extraData?.prevType,
         types,
@@ -250,8 +251,9 @@ export const sszSchema = async (
       if (field.fields) {
         Object.values(field.fields as Schema[]).forEach(
           (f: Schema, i: number) => {
-            f.fieldName =
-              Object.keys(field.jsonKeyToFieldName)[i] ?? field.fieldName;
+            f.fieldName = toLowerFirstLetter(
+              Object.keys(field.jsonKeyToFieldName)[i] ?? field.fieldName,
+            );
             f.type =
               findFieldTypeByName(inputFields, f.fieldName) ?? field.type;
           },
@@ -261,11 +263,6 @@ export const sszSchema = async (
         data.isDynamic = field.isFixedLen.some((x: boolean) => x === false);
         data.fieldRangesFixedLen = field.fieldRangesFixedLen;
         data.variableOffsetsPosition = field.variableOffsetsPosition;
-
-        // data.fields.forEach((f: Schema, i: number) => {
-        //   f.fieldName = Object.keys(field.jsonKeyToFieldName)[i];
-        //   f.type = findFieldTypeByName(inputFields, f.fieldName);
-        // });
       } else if (
         field.elementType instanceof ssz.VectorCompositeType ||
         field.elementType instanceof ssz.VectorBasicType ||
@@ -292,7 +289,9 @@ export const sszSchema = async (
 
         // data is a primitive type with single dynamic dimension
         const isPrimitiveDynamic = !!(
-          listsLength === 1 && field.typeName.includes('ByteVector')
+          listsLength === 1 &&
+          field.typeName.includes('ByteVector') &&
+          !field.typeName.includes('Container')
         );
         const isContainerDynamic = !!(
           listsLength && field.typeName.includes('Container')
@@ -324,7 +323,7 @@ export const sszSchema = async (
           },
           inputFields,
           {
-            fieldName: field.fieldName ?? data.fieldName,
+            fieldName: toLowerFirstLetter(field.fieldName ?? data.fieldName),
             type,
             isNested: data.isNested,
             prevType: data.types[0],
@@ -352,14 +351,18 @@ export const sszSchema = async (
         if (!data.fixedSize) {
           let size = 0;
           data.fields.forEach((f: Schema, i: number) => {
-            f.fieldName = Object.keys(tuple.jsonKeyToFieldName)[i];
+            f.fieldName = toLowerFirstLetter(
+              Object.keys(tuple.jsonKeyToFieldName)[i],
+            );
             f.type = findFieldTypeByName(inputFields, f.fieldName);
             size += f.fixedSize;
           });
           data.fixedSize = size;
         } else {
           data.fields.forEach((f: Schema, i: number) => {
-            f.fieldName = Object.keys(tuple.jsonKeyToFieldName)[i];
+            f.fieldName = toLowerFirstLetter(
+              Object.keys(tuple.jsonKeyToFieldName)[i],
+            );
             f.type = findFieldTypeByName(inputFields, f.fieldName);
           });
         }
@@ -382,12 +385,17 @@ export const sszSchema = async (
     return result;
   };
 
-  return extractFieldsFromSchema(
+  const schema = extractFieldsFromSchema(
     {
       data: await createSchema(fields),
     },
     fields,
   );
+
+  // needed when decoded data is a dynamic array of the main tuple
+  schema[0].isFirst = true;
+
+  return schema;
 };
 
 const findFieldTypeByName = (
@@ -461,4 +469,9 @@ const parseTypeName = (typeName: string) => {
 
   parse(typeName);
   return result;
+};
+
+const toLowerFirstLetter = (fieldName: string): string => {
+  if (!fieldName) return '';
+  return fieldName.charAt(0).toLowerCase() + fieldName.slice(1);
 };
