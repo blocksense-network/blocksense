@@ -35,3 +35,10 @@ export const geckoTerminalArgsSchema = S.mutable(
     }),
   ),
 );
+
+// `stock-price-feeds` Oracle related Types
+export const stockPriceFeedsArgsSchema = S.mutable(
+  S.Struct({
+    providers: S.Array(S.String),
+  }),
+);
