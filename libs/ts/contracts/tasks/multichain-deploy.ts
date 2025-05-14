@@ -19,6 +19,7 @@ import { readConfig, writeEvmDeployment } from '@blocksense/config-types';
 import { NetworkConfig, ContractNames, DeployContract } from './types';
 import { predictAddress } from './utils';
 import { initChain } from './deployment-utils/init-chain';
+import { setUpAccessControl } from './deployment-utils/access-control';
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
@@ -276,7 +277,9 @@ task('deploy', 'Deploy contracts')
         deployData,
       });
 
-      await run('access-control', {
+      await setUpAccessControl({
+        run,
+        artifacts,
         config,
         deployData,
         adminMultisig,
