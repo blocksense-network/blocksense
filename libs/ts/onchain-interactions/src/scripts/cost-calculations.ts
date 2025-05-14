@@ -18,6 +18,35 @@ import {
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 import chalkTemplate from 'chalk-template';
 import { throwError } from 'libs/ts/base-utils/src/errors';
+import client from 'prom-client';
+import express from 'express';
+
+const balanceGauge = new client.Gauge({
+  name: 'eth_account_balance',
+  help: 'Ethereum account balance in Ether',
+  labelNames: ['network', 'address'],
+});
+
+const daysRemainingGauge = new client.Gauge({
+  name: 'eth_balance_days_remaining',
+  help: 'Estimated days the current ETH balance will last',
+  labelNames: ['network', 'address'],
+});
+
+const startPrometheusServer = (host: string, port: number): void => {
+  const app = express();
+  app.get('/metrics', async (_req, res) => {
+    res.set('Content-Type', client.register.contentType);
+    res.end(await client.register.metrics());
+  });
+  app.listen(port, host, () => {
+    console.log(
+      chalk.blue(
+        `Prometheus metrics exposed at http://${host}:${port}/metrics`,
+      ),
+    );
+  });
+};
 
 function getHourDifference(transactions: Transaction[]): number {
   const txsLen = transactions.length;
@@ -84,6 +113,7 @@ const logGasCosts = async (
   firstTransactionTime: string,
   lastTransactionTime: string,
   hoursBetweenFirstLast: string,
+  prometheus: boolean,
 ): Promise<void> => {
   const { currency } = networkMetadata[network];
 
@@ -102,8 +132,19 @@ const logGasCosts = async (
     if (balance == null) {
       console.error(chalk.red(`Can't calculate balance for ${network}`));
     } else {
-      const daysBalanceWillLast = Number(balance) / (gasCosts.cost1h * 24);
-      const balanceMsg = `  Balance of ${balance} ${currency} will last approximately ${daysBalanceWillLast.toFixed(2)} days based on 24-hour costs.`;
+      const daysBalanceWillLast = Math.floor(
+        Number(balance) / (gasCosts.cost1h * 24),
+      );
+
+      if (prometheus) {
+        balanceGauge.set({ network, address }, Number(balance));
+        daysRemainingGauge.set(
+          { network, address },
+          Number(daysBalanceWillLast),
+        );
+      }
+
+      const balanceMsg = `  Balance of ${balance} ${currency} will last approximately ${daysBalanceWillLast} days based on costs of given transactions.`;
       if (daysBalanceWillLast < 10) {
         console.log(chalk.bold.red(balanceMsg));
       } else if (daysBalanceWillLast >= 10 && daysBalanceWillLast <= 30) {
@@ -286,7 +327,7 @@ const main = async (): Promise<void> => {
   const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
   const argv = await yargs(hideBin(process.argv))
     .usage(
-      'Usage: $0 [--numberOfTransactions <number>] [--address <ethereum address>] [--network <name1,name2,...>] ',
+      'Usage: $0 [--numberOfTransactions <number>] [--address <ethereum address>] [--network <name1,name2,...>] [--prometheus] [--host <host>] [--port <port>]',
     )
     .option('address', {
       alias: 'a',
@@ -318,11 +359,31 @@ const main = async (): Promise<void> => {
       type: 'string',
       default: DEFAULT_LAST_TX_TIME,
     })
+    .option('prometheus', {
+      alias: 'p',
+      describe: 'Enable Prometheus metrics recording',
+      type: 'boolean',
+      default: false,
+    })
+    .option('host', {
+      describe: 'Host to bind Prometheus metrics server',
+      type: 'string',
+      default: '0.0.0.0',
+    })
+    .option('port', {
+      describe: 'Port to expose Prometheus metrics server',
+      type: 'number',
+      default: 9100,
+    })
     .help()
     .alias('help', 'h')
     .parse();
 
   const address = parseEthereumAddress(argv.address);
+
+  if (argv.prometheus) {
+    startPrometheusServer(argv.host, argv.port);
+  }
 
   console.log(
     chalk.cyan(
@@ -397,6 +458,7 @@ const main = async (): Promise<void> => {
           firstTxTime,
           lastTxTime,
           hoursBetweenFirstLastTx,
+          argv.prometheus,
         );
       }
     } else {
