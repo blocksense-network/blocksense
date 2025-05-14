@@ -9,11 +9,7 @@ import { getTxHashExplorerUrl, parseTxHash } from '@blocksense/base-utils/evm';
 
 import { mintNFT } from '@/mint';
 import { clearXHandle } from '@/utils';
-import {
-  checkParticipant,
-  generateMintSignature,
-  saveParticipant,
-} from 'service/client';
+import { checkParticipant, generateMintSignature } from 'service/client';
 import { useMintFormContext } from '../app/contexts/MintFormContext';
 import { Button } from './Button';
 
@@ -102,7 +98,7 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
       );
     } catch (err) {
       console.error(err);
-      setAlertMessage('An error occurred while minting your NFT');
+      setAlertMessage('An error occurred while minting. Try again!');
     } finally {
       setMintLoading(false);
     }
