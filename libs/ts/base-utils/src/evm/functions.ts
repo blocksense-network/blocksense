@@ -3,6 +3,7 @@ import {
   LayeredEnvSchema,
   LayeredEnvSchemaToConfig,
   parseLayeredEnvConfig,
+  validateParsedEnvConfig,
 } from '../env';
 import { kebabToSnakeCase } from '../string';
 import { getNetworkKind, NetworkName } from './networks';
@@ -35,12 +36,38 @@ export function parseDeploymentEnvConfig<
     perNetworkName: kebabToSnakeCase(network),
   };
 
-  return parseLayeredEnvConfig(
+  const parsedConfig = parseLayeredEnvConfig(
     {
-      priority: ['perNetworkName', 'perNetworkKind', 'global'],
+      priority: ['perNetworkName', 'perNetworkKind', 'global'] as const,
       suffixes,
       layers: config,
     },
     env,
   );
+
+  return parsedConfig;
+}
+
+export function validateAndPrintDeploymentEnvConfig<
+  EnvSchemaLayers extends Record<DeploymentEnvPriority[number], EnvSchema>,
+>(
+  parsedConfig: LayeredEnvSchemaToConfig<
+    DeploymentEnvPriority,
+    EnvSchemaLayers,
+    true
+  >,
+): LayeredEnvSchemaToConfig<DeploymentEnvPriority, EnvSchemaLayers, false> {
+  const { isValid, validationMessage } = validateParsedEnvConfig(parsedConfig);
+
+  console.log(validationMessage);
+
+  if (!isValid) {
+    throw new Error('Invalid deployment env variables');
+  }
+
+  return parsedConfig as unknown as LayeredEnvSchemaToConfig<
+    DeploymentEnvPriority,
+    EnvSchemaLayers,
+    false
+  >;
 }
