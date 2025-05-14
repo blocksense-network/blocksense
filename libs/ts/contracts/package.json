@@ -13,6 +13,10 @@
       "require": "./artifacts/docs/abi.json",
       "import": "./artifacts/docs/abi.json"
     },
+    "./typechain": {
+      "types": "./typechain/index.ts",
+      "require": "./dist/typechain/index.js"
+    },
     "./contractsFileStructure.json": {
       "require": "./artifacts/docs/contractsFileStructure.json",
       "import": "./artifacts/docs/contractsFileStructure.json"
