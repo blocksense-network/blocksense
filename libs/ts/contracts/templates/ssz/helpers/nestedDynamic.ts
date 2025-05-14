@@ -1,133 +1,149 @@
-import { DynamicData, Schema } from '../../utils';
+import { Schema, Offset } from '../utils';
 import { generateBigEndianConversion } from './convertToBE';
 
 export const generateNestedDynamic = (
-  currentField: DynamicData,
+  currentSchema: Schema,
+  innerSchema: Schema,
+  location: string,
   index: number,
-  nextField: DynamicData | undefined,
   generateLines: (
-    index: string | undefined,
-    offset: string,
-    location: string,
+    newStart: Offset,
+    newEnd: Offset,
+    newLocation: string,
+    newIndex: number,
   ) => string,
+  start: Offset,
+  end: Offset,
   counter?: string,
-  prevOffset?: string,
 ) => {
-  const name = currentField.positionName + '_' + currentField.level;
-  const firstArrayName = `firstArray_${name}`;
+  let name = `${location}${counter ? '_inner' : ''}_${index}`;
+  const firstArrayName = `${name}_firstOffset`;
   const size = `${name}_size`;
-  const offset = currentField.positionName;
+  const newStart = `${name}_start`;
+  const newEnd = `${name}_end`;
 
-  // schema is a list
-  if (
-    currentField.schema.types[0]?.type === 'List' &&
-    !currentField.schema.type.startsWith('tuple')
-  ) {
+  const fieldName = currentSchema.fieldName
+    ? currentSchema.fieldName
+    : location;
+
+  if (currentSchema.isFirst) {
+    name = location;
+  }
+  if (innerSchema.sszFixedSize) {
     return `
-    // Dynamic
-    {
-      // ${offset} := add(${offset}, ${counter ? prevOffset : 32})
+      // Composite Array Fixed Length for ${fieldName}
+      let ${size} := div(sub(${end}, ${start}), ${innerSchema.sszFixedSize})
+      ${currentSchema.isFirst ? '' : 'let'} ${name} := mload(0x40)
+
       ${
-        counter && currentField.schema.isLastDynamic
-          ? `
-            let nextOffset := 0
-            switch eq(${counter}_i, sub(${counter}_size, 1))
-            case 0 {
-              // not last
-              nextOffset := mload(add(${currentField.location}, add(0x20, mul(add(${counter}_i, 1), 0x20))))
-            }
-            default {
-              // last
-              nextOffset := ${nextField ? nextField.positionName : 'add(32, mload(data))'}
-            }
-          `
-          : ''
+        currentSchema.typeName.startsWith('Vector')
+          ? `mstore(0x40, add(${name}, mul(${size}, 0x20)))`
+          : `
+          mstore(${name}, ${size})
+          mstore(0x40, add(${name}, mul(add(${size}, 1), 0x20)))
+        `
+      }
+      ${
+        counter
+          ? `mstore(add(${location}, mul(${currentSchema.prevType?.type === 'Vector' ? counter : `add(${counter}, 1)`}, 0x20)), ${name})`
+          : currentSchema.isFirst
+            ? ''
+            : `mstore(${index ? `add(${location}, ${index * 32})` : location}, ${name})`
       }
 
+      for {
+        let ${name}_i := 0
+      } lt(${name}_i, ${size}) {
+        ${name}_i := add(${name}_i, 1)
+      } {
+        let ${newStart} := add(${start}, mul(${name}_i, ${innerSchema.sszFixedSize}))
+        let ${newEnd} := add(${start}, mul(add(${name}_i, 1), ${innerSchema.sszFixedSize}))
+        ${generateLines(
+          newStart,
+          newEnd,
+          name,
+          currentSchema.typeName.startsWith('Vector') ? 0 : 1,
+        )}
+      }
+    `;
+  }
 
+  return `
+    // Composite Array Variable Length for ${fieldName}
+    {
       let ${firstArrayName} :=  and(
-          shr(224, mload(add(data, ${offset}))),
+          shr(224, mload(add(data, ${start}))),
           0xFFFFFFFF
         )
       ${generateBigEndianConversion(firstArrayName)}
 
       ${
-        currentField.schema.length
-          ? `let ${size} := ${currentField.schema.length}`
-          : `let ${size} := div(${firstArrayName}, 4)`
-      }
-      let ${name} := mload(0x40)
-      mstore(${name}, ${size})
-      mstore(0x40, add(${name}, mul(add(${size}, 1), 0x20)))
-      ${
-        counter
-          ? `mstore(add(${currentField.location}, mul(add(${counter}_i, 1), 0x20)), ${name})`
-          : `mstore(${index ? `add(${currentField.location}, ${index * 32})` : currentField.location}, ${name})`
+        currentSchema.sszFixedSize
+          ? `
+            ${firstArrayName} := add(${firstArrayName}, ${start})
+            let ${size} := div(sub(${end}, ${firstArrayName}), ${currentSchema.sszFixedSize})
+          `
+          : `
+            let ${size} := div(${firstArrayName}, 4)
+            ${firstArrayName} := add(${firstArrayName}, ${start})
+          `
       }
 
+      ${currentSchema.isFirst ? '' : 'let'} ${name} := mload(0x40)
+
+      ${
+        // currentSchema.sszFixedSize ||
+        currentSchema.typeName.startsWith('Vector')
+          ? `mstore(0x40, add(${name}, mul(${size}, 0x20)))`
+          : `
+          mstore(${name}, ${size})
+          mstore(0x40, add(${name}, mul(add(${size}, 1), 0x20)))
+        `
+      }
+      ${
+        counter
+          ? `mstore(add(${location}, mul(${currentSchema.prevType?.type === 'Vector' ? counter : `add(${counter}, 1)`}, 0x20)), ${name})`
+          : currentSchema.isFirst
+            ? ''
+            : `mstore(${index ? `add(${location}, ${index * 32})` : location}, ${name})`
+      }
+
+      let ${location}_pos := mload(0x40)
+      mstore(0x40, add(${location}_pos, mul(add(${size}, 1), 0x20)))
+
+      // Store first array pos
+      mstore(${location}_pos, ${firstArrayName})
       for {
-        let ${name}_i := 0
+        let ${name}_i := 1
       } lt(${name}_i, ${size}) {
         ${name}_i := add(${name}_i, 1)
       } {
         let innerArrayPos := and(
-          shr(224, mload(add(data, add(${offset}, mul(${name}_i, 4))))),
+          shr(224, mload(add(data, add(${start}, mul(${name}_i, 4))))),
           0xFFFFFFFF
         )
         ${generateBigEndianConversion('innerArrayPos')}
 
-        innerArrayPos := add(innerArrayPos, ${offset})
+        innerArrayPos := add(innerArrayPos, ${start})
 
-        mstore(add(${name}, add(0x20, mul(${name}_i, 0x20))), innerArrayPos)
+        mstore(add(${location}_pos, mul(${name}_i, 0x20)), innerArrayPos)
       }
+      // Store end array pos
+      mstore(add(${location}_pos, mul(${size}, 0x20)), ${end})
 
       for {
         let ${name}_i := 0
       } lt(${name}_i, ${size}) {
         ${name}_i := add(${name}_i, 1)
       } {
-        ${generateLines(name, offset, name)}
-      }
-    }
-  `;
-  }
-
-  // schema is a vector
-  return `
-    // Vector
-    {
-      ${
-        currentField.schema.fixedSize
-          ? `let ${size} := div(sub(${nextField ? nextField.positionName : 'add(mload(data), 0x20)'}, ${offset}), ${currentField.schema.fixedSize})`
-          : ''
-      }
-      // ${offset} := add(${offset}, ${counter ? prevOffset : 32})
-
-      let ${name} := mload(0x40)
-      ${
-        counter
-          ? `mstore(add(${currentField.location}, mul(add(${counter}_i, 1), 0x20)), ${name})`
-          : `mstore(${index ? `add(${currentField.location}, ${index * 32})` : currentField.location}, ${name})`
-      }
-
-      mstore(0x40, add(${name}, ${currentField.schema.fixedSize ? `mul(add(${size}, 1), 0x20)` : currentField.schema.length! * 32}))
-      ${
-        currentField.schema.fixedSize
-          ? `
-          mstore(${name}, ${size})
-          for {
-            let ${name}_i := 0
-          } lt(${name}_i, ${size}) {
-            ${name}_i := add(${name}_i, 1)
-          } {
-            memData := mload(add(data, add(mul(${name}_i, ${currentField.schema.fixedSize}), ${offset})))
-            ${generateLines(name, offset, name)}
-          }
-          `
-          : `
-            memData := mload(add(data, ${offset}))
-            ${generateLines(undefined, offset, name)}
-          `
+        let ${newStart} := mload(add(${location}_pos, mul(${name}_i, 0x20)))
+        let ${newEnd} := mload(add(${location}_pos, mul(add(${name}_i, 1), 0x20)))
+        ${generateLines(
+          newStart,
+          newEnd,
+          name,
+          currentSchema.typeName.startsWith('Vector') ? 0 : 1,
+        )}
       }
     }
   `;

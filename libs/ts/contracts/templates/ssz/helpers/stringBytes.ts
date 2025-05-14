@@ -1,39 +1,34 @@
-import { DynamicData } from '../../utils';
+import { Schema, Offset } from '../utils';
 
 export const generateDecoderStringBytes = (
-  currentField: DynamicData,
+  schema: Schema,
+  location: string,
   index: number,
-  nextField: DynamicData | undefined,
+  start: Offset,
+  end: Offset,
+  counter?: string,
 ) => {
-  const field = currentField.positionName;
-  const fieldName = field.split('_')[0] + '_' + index;
-  currentField.isGenerated = true;
+  const fieldName = schema.fieldName;
 
   return `
+    // String/Bytes for ${fieldName}
     {
+      let ${fieldName}_size := sub(${end}, ${start})
+      let ${fieldName} := mload(0x40)
       ${
-        nextField?.isGenerated
-          ? `
-        ${field} := add(32, ${field})
-        let ${field}_size := sub(${nextField ? nextField.positionName : 'mload(data)'}, ${field})
-        `
-          : `
-        let ${field}_size := sub(${nextField ? nextField.positionName : 'mload(data)'}, ${field})
-        ${field} := add(32, ${field})
-        `
+        counter
+          ? `mstore(add(${location}, mul(${schema.prevType?.type === 'Vector' ? counter : `add(${counter}, 1)`}, 0x20)), ${fieldName})`
+          : `mstore(${index ? `add(${location}, ${index * 0x20})` : location}, ${fieldName})`
       }
 
-      let ${fieldName} := mload(0x40)
-      mstore(${currentField.index ? `add(${currentField.location}, ${currentField.index * 0x20})` : currentField.location}, ${fieldName})
-
       // take a mod of 32 to update the free memory pointer
-      mstore(0x40, add(${fieldName}, and(add(${field}_size, 64), 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFe0)))
-      mstore(${fieldName}, ${field}_size)
+      mstore(0x40, add(${fieldName}, and(add(${fieldName}_size, 64), 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFe0)))
+      mstore(${fieldName}, ${fieldName}_size)
 
       mcopy(
         add(${fieldName}, 32),
-        add(data, ${field}),
-        ${field}_size
+        add(data, ${start}),
+        ${fieldName}_size
       )
     }
   `;
