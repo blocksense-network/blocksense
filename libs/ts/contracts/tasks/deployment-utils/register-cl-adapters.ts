@@ -9,7 +9,7 @@ import {
   OperationType,
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
-import { entries } from '@blocksense/base-utils/array-iter';
+import { entriesOf } from '@blocksense/base-utils/array-iter';
 
 task(
   'register-cl-adapters',
@@ -42,7 +42,7 @@ task(
   const batches: Array<Array<CLAggregatorAdapterData>> = [];
   const filteredData = [];
 
-  for (const [description, data] of entries(deployData.CLAggregatorAdapter)) {
+  for (const [description, data] of entriesOf(deployData.CLAggregatorAdapter)) {
     if (!data.base || !data.quote) {
       console.log(` -> Feed '${description}' has no base or quote`, '\n');
       continue;
