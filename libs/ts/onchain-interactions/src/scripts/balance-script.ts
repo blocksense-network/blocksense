@@ -18,6 +18,10 @@ const balanceGauge = new client.Gauge({
   labelNames: ['chainId', 'address'],
 });
 
+function filterSmallBalance(balance: string, threshold = 1e-6): number {
+  return Number(balance) < threshold ? 0 : Number(balance);
+}
+
 const main = async (): Promise<void> => {
   const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
   const argv = await yargs(hideBin(process.argv))
@@ -86,14 +90,14 @@ const main = async (): Promise<void> => {
       const web3 = new Web3(rpcUrl);
       try {
         const balanceWei = await web3.eth.getBalance(address);
-        const balance = Number(web3.utils.fromWei(balanceWei, 'ether'));
+        const balance = web3.utils.fromWei(balanceWei, 'ether');
 
         const chainId = Number(await web3.eth.net.getId());
         console.log(
           chalk.green(`${balance} (RPC: ${rpcUrl}) (ChainId: ${chainId})`),
         );
         if (argv.prometheus) {
-          balanceGauge.set({ chainId, address }, balance);
+          balanceGauge.set({ chainId, address }, filterSmallBalance(balance));
         }
       } catch (error) {
         console.error(
@@ -113,17 +117,16 @@ const main = async (): Promise<void> => {
       console.log(
         chalk.red(`No rpc url for network ${networkName}. Skipping.`),
       );
-      continue;
     }
     const web3 = new Web3(rpcUrl);
     try {
       const balanceWei = await web3.eth.getBalance(address);
-      const balance = Number(web3.utils.fromWei(balanceWei, 'ether'));
+      const balance = web3.utils.fromWei(balanceWei, 'ether');
       const chainId = networkMetadata[networkName].chainId;
       const { currency } = networkMetadata[networkName];
       console.log(chalk.green(`${networkName}: ${balance} ${currency}`));
       if (argv.prometheus) {
-        balanceGauge.set({ chainId, address }, balance);
+        balanceGauge.set({ chainId, address }, filterSmallBalance(balance));
       }
     } catch (error) {
       console.error(
