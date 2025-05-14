@@ -212,7 +212,7 @@ pub async fn aggregation_batch_consensus_loop(
                                             Bytes::copy_from_slice(&signature_bytes),
                                         );
 
-                                        let receipt_result = if transaction_retries_count == 0 {
+                                        let safe_tx = if transaction_retries_count == 0 {
                                             tx_to_send
                                         } else {
 
@@ -265,10 +265,36 @@ pub async fn aggregation_batch_consensus_loop(
 
                                         };
 
-                                        let receipt = match receipt_result.send().await {
+                                        debug!("Sending price feed update transaction to network `{net}`...");
+                                        let result = match actix_web::rt::time::timeout(
+                                            Duration::from_secs(transaction_retry_timeout_secs),
+                                            safe_tx.send(),
+                                        )
+                                        .await
+                                        {
+                                            Ok(post_tx_res) => post_tx_res,
+                                            Err(err) => {
+                                                warn!("Timed out while trying to post tx to RPC for network {net} and address {safe_address} due to {err}");
+                                                transaction_retries_count += 1;
+                                                continue;
+                                            }
+                                        };
+                                        debug!("Sent price feed update transaction to network `{net}`");
+
+                                        let receipt = match result {
                                             Ok(v) => {
                                                 info!("Posted tx for network {net}, Blocksense block height: {block_height}! Waiting for receipt ...");
-                                                let receipt = v.get_receipt().await;
+                                                let receipt = match actix_web::rt::time::timeout(
+                                                    Duration::from_secs(transaction_retry_timeout_secs),
+                                                    v.get_receipt(),
+                                                ).await {
+                                                    Ok(r) => r,
+                                                    Err(err) => {
+                                                        warn!("Timed out while trying to post tx to RPC for network {net} and address {safe_address} due to {err}");
+                                                        transaction_retries_count += 1;
+                                                        continue;
+                                                    }
+                                                };
 
                                                 let transaction_time = tx_time.elapsed().as_millis();
                                                 info!("Got receipt from network {net} that took {transaction_time}ms for {transaction_retries_count} retries, Blocksense block height: {block_height}! {receipt:?}");
