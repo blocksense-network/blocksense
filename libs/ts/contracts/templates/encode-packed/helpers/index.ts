@@ -14,8 +14,8 @@ export const generateDecoderLines = (
   name: string,
   isMainStructDynamic: boolean,
 ) => {
-  let shouldUpdate = false;
   let shift = false;
+  let isPrevShifted = false;
   const config: GenerateDecoderConfig = {
     wordOffset: 32,
     bitOffset: 0,
@@ -44,18 +44,18 @@ export const generateDecoderLines = (
       ) {
         config.wordOffset += config.prevSize / 8;
         config.bitOffset = field.isDynamic ? 0 : (field.size ?? 0);
-        shouldUpdate = true;
         config.prevSize = 0;
-      }
 
-      if (shouldUpdate && (config.wordOffset > 32 || shift)) {
-        lines.push(`
+        if (!isPrevShifted && (config.wordOffset > 32 || shift)) {
+          lines.push(`
 
-          ${config.wordOffset > 0 ? `// Offset data with ${config.wordOffset} bytes` : ''}
-          memData := mload(add(data, ${shift ? (config.wordOffset > 0 ? `add(shift, ${config.wordOffset})` : 'shift') : config.wordOffset}))
-        `);
-        shouldUpdate = false;
+            ${config.wordOffset > 0 ? `// Offset data with ${config.wordOffset} bytes` : ''}
+            memData := mload(add(data, ${shift ? (config.wordOffset > 0 ? `add(shift, ${config.wordOffset})` : 'shift') : config.wordOffset}))
+          `);
+        }
       }
+      // prevents from loading twice latest memData
+      isPrevShifted = false;
 
       if (Array.isArray(field)) {
         const innerName = name + '_' + index;
@@ -78,6 +78,7 @@ export const generateDecoderLines = (
         lines.push(
           generateDecoderStringBytes({ config, field, location, index }),
         );
+        isPrevShifted = true;
 
         config.wordOffset = 0;
         config.prevSize = 0;
@@ -143,6 +144,7 @@ export const generateDecoderLines = (
               parentIndex,
             ),
           );
+          isPrevShifted = true;
         } else if (isDynamic) {
           lines.push(
             generateDecoderDynamicDataLines(
@@ -163,6 +165,7 @@ export const generateDecoderLines = (
               parentIndex,
             ),
           );
+          isPrevShifted = true;
         }
       }
 
