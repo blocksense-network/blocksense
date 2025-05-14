@@ -78,3 +78,12 @@ export function padNumber(num: number | bigint, size: number, padChar = ' ') {
 export function equalsCaseInsensitive(a: string, b: string) {
   return a.toLowerCase() === b.toLowerCase();
 }
+
+export function envVarNameJoin(
+  ...parts: (string | null | undefined)[]
+): string {
+  return parts
+    .filter(x => x?.length ?? 0 > 0)
+    .map(part => camelCaseSnakeCase(part!))
+    .join('_');
+}
