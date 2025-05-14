@@ -31,6 +31,7 @@ export const geckoTerminalArgsSchema = S.mutable(
       network: S.String,
       pool: S.String,
       reverse: S.Boolean,
+      min_volume_usd: S.Number,
     }),
   ),
 );
