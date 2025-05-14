@@ -67,9 +67,9 @@ task('deploy', 'Deploy contracts')
       const signerBalance = await config.provider.getBalance(signer);
 
       const create2ContractSalts = {
+        upgradeableProxy: config.adfsUpgradeableProxySalt,
         accessControl: ethers.id('accessControl'),
         adfs: ethers.id('aggregatedDataFeedStore'),
-        proxy: config.adfsUpgradeableProxySalt,
         safeGuard: ethers.id('onlySafeGuard'),
         safeModule: ethers.id('adminExecutorModule'),
         clFeedRegistry: ethers.id('registry'),
@@ -100,7 +100,7 @@ task('deploy', 'Deploy contracts')
         );
       }
       console.log(`// `);
-      console.log(`// Create2 salts:`);
+      console.log(`// CREATE2 salts:`);
       for (const [name, salt] of Object.entries(create2ContractSalts)) {
         console.log(`//   | ${name.padStart(17)}| ${salt}`);
       }
@@ -124,7 +124,7 @@ task('deploy', 'Deploy contracts')
         artifacts,
         config,
         ContractNames.UpgradeableProxyADFS,
-        create2ContractSalts.proxy,
+        create2ContractSalts.upgradeableProxy,
         abiCoder.encode(['address'], [adminMultisigAddress]),
       );
 
@@ -147,7 +147,7 @@ task('deploy', 'Deploy contracts')
           name: ContractNames.UpgradeableProxyADFS,
           argsTypes: ['address'],
           argsValues: [adminMultisigAddress],
-          salt: create2ContractSalts.proxy,
+          salt: create2ContractSalts.upgradeableProxy,
           value: 0n,
         },
         {
