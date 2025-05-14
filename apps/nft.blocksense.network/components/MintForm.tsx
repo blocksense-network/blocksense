@@ -36,7 +36,7 @@ export const MintForm = ({ onSuccessAction }: MintFormProps) => {
       <Separator className="mint-form__separator md:my-8 my-6" />
       <FormStepContainer>
         <FormStepTitle
-          title="Enter your social handles for verification"
+          title="Enter your social handles for verification after step 1"
           number={2}
         />
         <section className="flex flex-col md:gap-8 gap-6">
