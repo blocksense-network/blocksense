@@ -2,16 +2,15 @@ import { describe, expect, test } from 'vitest';
 
 import { Schema as S } from 'effect';
 
-import {
-  EnvSchema,
-  asVarSchema,
-  parseEnvConfig,
-  prettyPrintParsedEnvConfig,
-} from '../env/functions';
+import { EnvSchema, asVarSchema, parseEnvConfig } from '../env/functions';
 import { fromCommaSeparatedString } from '../schemas';
 import { ethereumAddress } from './hex-types';
 import { NetworkName } from './networks';
-import { DeploymentEnvSchema, parseDeploymentEnvConfig } from './functions';
+import {
+  DeploymentEnvSchema,
+  parseDeploymentEnvConfig,
+  validateAndPrintDeploymentEnvConfig,
+} from './functions';
 import { kebabToSnakeCase } from '../string';
 
 describe('evm/functions', () => {
@@ -56,13 +55,13 @@ describe('evm/functions', () => {
       },
       perNetworkKind: {
         gasLimit: S.NumberFromString,
-        use_hw_wallet: asVarSchema(S.BooleanFromString),
+        useHwWallet: asVarSchema(S.BooleanFromString),
         deployer: ethereumAddress,
         threshold: S.NumberFromString,
       },
       perNetworkName: {
         gasLimit: S.NumberFromString,
-        use_hw_wallet: asVarSchema(S.BooleanFromString),
+        useHwWallet: asVarSchema(S.BooleanFromString),
         deployer: ethereumAddress,
         threshold: S.NumberFromString,
       },
@@ -107,7 +106,7 @@ describe('evm/functions', () => {
       // prettyPrintParsedEnvConfig(parse('ethereum-sepolia'), false);
       // prettyPrintParsedEnvConfig(parse('ethereum-mainnet'));
       // prettyPrintParsedEnvConfig(parse('arbitrum-sepolia'));
-      prettyPrintParsedEnvConfig(parse('arbitrum-mainnet'));
+      // validateParsedEnvConfig(parse('arbitrum-mainnet'), true);
       // prettyPrintParsedEnvConfig(parse('local'));
 
       const ethSepolia = parse('ethereum-sepolia');
@@ -123,9 +122,9 @@ describe('evm/functions', () => {
           layer: 'perNetworkName',
           schema: deploymentTestSchema.perNetworkName.gasLimit,
         },
-        use_hw_wallet: {
+        useHwWallet: {
           layer: 'perNetworkName',
-          schema: deploymentTestSchema.perNetworkName.use_hw_wallet,
+          schema: deploymentTestSchema.perNetworkName.useHwWallet,
         },
         deployer: {
           layer: 'perNetworkName',
@@ -160,7 +159,7 @@ describe('evm/functions', () => {
         ],
         retries: 3,
         gasLimit: 10e9, // fallback to global
-        use_hw_wallet: false, // fallback to testnet
+        useHwWallet: false, // fallback to testnet
         deployer: '0x2222222222222222222222222222222222222222', // fallback to testnet
         threshold: 3, // network-specific
       });
@@ -180,13 +179,13 @@ describe('evm/functions', () => {
         },
         perNetworkKind: {
           gasLimit: null,
-          use_hw_wallet: false,
+          useHwWallet: false,
           deployer: '0x2222222222222222222222222222222222222222',
           threshold: 2,
         },
         perNetworkName: {
           gasLimit: null,
-          use_hw_wallet: null,
+          useHwWallet: null,
           deployer: null,
           threshold: 3,
         },
@@ -203,7 +202,7 @@ describe('evm/functions', () => {
         ],
         retries: 3,
         gasLimit: 7.5e9, // network-specific
-        use_hw_wallet: true, // network-specific
+        useHwWallet: true, // network-specific
         deployer: '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', // network-specific
         threshold: 4, // network-specific
       });
@@ -219,7 +218,7 @@ describe('evm/functions', () => {
         ],
         retries: 3,
         gasLimit: 25e9, // network-specific
-        use_hw_wallet: false, // network-specific
+        useHwWallet: false, // network-specific
         deployer: '0x0987654321098765432109876543210987654321', // network-specific
         threshold: 5, // network-specific
       });
@@ -235,7 +234,7 @@ describe('evm/functions', () => {
         ],
         retries: 3,
         gasLimit: 10e9, // fallback to network kind
-        use_hw_wallet: null, // not set
+        useHwWallet: null, // not set
         deployer: null, // not set
         threshold: null, // not set
       });
@@ -251,7 +250,7 @@ describe('evm/functions', () => {
         ],
         retries: 3,
         gasLimit: 15e9, // network-specific
-        use_hw_wallet: true, // network-specific
+        useHwWallet: true, // network-specific
         deployer: '0x1111111111111111111111111111111111111111', // network-specific
         threshold: 1, // network-specific
       });
