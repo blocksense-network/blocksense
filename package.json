@@ -15,7 +15,7 @@
     "build-single": "yarn workspace $0 run build",
     "build:recursive": "yarn workspaces foreach --from $0 -Rp --topological-dev run build",
     "build:with-deps": "yarn build:recursive $(jq -r .name $INIT_CWD/package.json)",
-    "build:typecheck": "tsc -p $INIT_CWD/tsconfig.json",
+    "build:typecheck": "rm -rf $INIT_CWD/dist && tsc -p $INIT_CWD/tsconfig.json",
     "build:typecheck-rec": "yarn workspaces foreach -Rp --topological-dev --from $(jq -r .name $INIT_CWD/package.json) run tsc -p $INIT_CWD/tsconfig.json",
     "build:all": "yarn workspaces foreach --all -p --topological-dev run build",
     "test": "yarn workspaces foreach --from $0 -Rp --topological-dev run test",
