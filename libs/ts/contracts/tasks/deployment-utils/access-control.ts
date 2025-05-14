@@ -21,7 +21,7 @@ export type Params = {
   artifacts: Artifacts;
 };
 
-export async function setUpAccessContol({
+export async function setUpAccessControl({
   run,
   artifacts,
   config,
