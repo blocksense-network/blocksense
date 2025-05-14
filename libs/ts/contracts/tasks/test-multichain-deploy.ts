@@ -64,6 +64,10 @@ task(
     config.provider,
   );
 
+  if (!deployment.SequencerMultisig) {
+    throw new Error('Sequencer multisig not found in deployment');
+  }
+
   const sequencerMultisig = await Safe.init({
     provider: config.rpc,
     safeAddress: deployment.SequencerMultisig,
@@ -137,56 +141,50 @@ task(
 
   // sequencer cannot send direct transaction to upgradeable proxy
   // AccessControl will reject this transaction
-  await expect(sequencerWallet.sendTransaction(writeTxData)).to.be.reverted;
+  await expect(sequencerWallet.sendTransaction(writeTx.data)).to.be.reverted;
 
   await sequencerMultisig.executeTransaction(writeTx);
 
   ////////////////////////////////////////////
-  // Check Aggregator and Registry adapters //
+  // Check Aggregator                       //
   ////////////////////////////////////////////
+  console.log('Checking Aggregator and Registry adapters...');
 
-  const checkAggregator = async () => {
-    console.log('Checking Aggregator and Registry adapters...');
+  const { feeds } = await readConfig('feeds_config_v2');
 
-    const { feeds } = await readConfig('feeds_config_v2');
+  const aggregator = await ethers.getContractAt(
+    ContractNames.CLAggregatorAdapter,
+    deployment.CLAggregatorAdapter[1].address,
+  );
 
-    const aggregator = await ethers.getContractAt(
-      ContractNames.CLAggregatorAdapter,
-      deployment.CLAggregatorAdapter[1].address,
+  expect(await aggregator.description()).to.equal(feeds[1].description);
+  expect(await aggregator.latestAnswer()).to.equal(1234);
+
+  ////////////////////////////////////////////
+  // Check Registry adapter                 //
+  ////////////////////////////////////////////
+  const feedRegistry = await ethers.getContractAt(
+    ContractNames.CLFeedRegistryAdapter,
+    deployment.coreContracts.CLFeedRegistryAdapter.address,
+    sequencerWallet,
+  );
+
+  const registeredFeed = Object.values(deployment.CLAggregatorAdapter).find(
+    feed => feed.base && feed.quote,
+  );
+
+  if (!registeredFeed) {
+    throw new Error(
+      'No feed found in deployment config that is registered in Registry',
     );
+  }
 
-    expect(await aggregator.description()).to.equal(feeds[1].description);
-    expect(await aggregator.latestAnswer()).to.equal(1234);
-  };
+  const feedFromRegistry = await feedRegistry.getFeed(
+    registeredFeed.base!,
+    registeredFeed.quote!,
+  );
 
-  await checkAggregator();
-
-  const checkFeedRegistry = async () => {
-    const feedRegistry = await ethers.getContractAt(
-      ContractNames.CLFeedRegistryAdapter,
-      deployment.coreContracts.CLFeedRegistryAdapter.address,
-      sequencerWallet,
-    );
-
-    const registeredFeed = deployment.CLAggregatorAdapter.find(
-      feed => feed.base && feed.quote,
-    );
-
-    if (!registeredFeed) {
-      throw new Error(
-        'No feed found in deployment config that is registered in Registry',
-      );
-    }
-
-    const feedFromRegistry = await feedRegistry.getFeed(
-      registeredFeed.base!,
-      registeredFeed.quote!,
-    );
-
-    expect(feedFromRegistry).to.equal(registeredFeed.address);
-  };
-
-  await checkFeedRegistry();
+  expect(feedFromRegistry).to.equal(registeredFeed.address);
 
   ///////////////////////////////////////////
   // Change sequencer rights in Safe Guard //
