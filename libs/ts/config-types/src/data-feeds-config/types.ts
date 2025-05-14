@@ -1,6 +1,10 @@
 import { Schema as S } from 'effect';
 
-import { cryptoPriceFeedsArgsSchema, geckoTerminalArgsSchema } from './oracles';
+import {
+  cryptoPriceFeedsArgsSchema,
+  geckoTerminalArgsSchema,
+  stockPriceFeedsArgsSchema,
+} from './oracles';
 /**
  * Schema for the data feed category ( Chainlink compatible ).
  */
@@ -189,7 +193,11 @@ export const NewFeedSchema = S.mutable(
         decimals: S.Number,
         category: FeedCategorySchema,
         market_hours: S.NullishOr(MarketHoursSchema),
-        arguments: S.Union(cryptoPriceFeedsArgsSchema, geckoTerminalArgsSchema),
+        arguments: S.Union(
+          stockPriceFeedsArgsSchema,
+          cryptoPriceFeedsArgsSchema,
+          geckoTerminalArgsSchema,
+        ),
         compatibility_info: S.UndefinedOr(
           S.Struct({
             chainlink: S.String,
