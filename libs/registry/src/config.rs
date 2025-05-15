@@ -57,6 +57,7 @@ pub struct CompatibilityInfo {
 //TODO(melatron): This is duplicated from the config crate
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct FeedConfig {
+    #[serde(with = "crate::custom_serde::serde_string")]
     pub id: u32,
     pub full_name: String,
     pub description: String,
