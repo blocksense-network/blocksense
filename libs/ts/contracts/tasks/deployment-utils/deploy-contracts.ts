@@ -28,14 +28,12 @@ export async function deployContracts({
   run,
   artifacts,
 }: Params) {
-  const signer = config.adminMultisig.signer || config.ledgerAccount;
-
   const createCallAddress = config.safeAddresses.createCallAddress;
 
   const createCall = new Contract(
     createCallAddress,
     getCreateCallDeployment()?.abi!,
-    signer,
+    config.deployer,
   );
 
   const ContractsConfigV2 = {
