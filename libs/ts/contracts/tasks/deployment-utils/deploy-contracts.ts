@@ -28,14 +28,12 @@ export async function deployContracts({
   run,
   artifacts,
 }: Params) {
-  const signer = config.adminMultisig.signer || config.ledgerAccount;
-
   const createCallAddress = config.safeAddresses.createCallAddress;
 
   const createCall = new Contract(
     createCallAddress,
     getCreateCallDeployment()?.abi!,
-    signer,
+    config.deployer,
   );
 
   const ContractsConfigV2 = {
@@ -101,11 +99,13 @@ export async function deployContracts({
         quote: registryInfo.quote,
         address: parseEthereumAddress(contractAddress),
         constructorArgs: contract.argsValues,
+        salt: contract.salt,
       };
     } else {
       ContractsConfigV2.coreContracts[contract.name] = {
         address: parseEthereumAddress(contractAddress),
         constructorArgs: contract.argsValues,
+        salt: contract.salt,
       };
     }
 
