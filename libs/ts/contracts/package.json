@@ -24,7 +24,7 @@
   },
   "scripts": {
     "clean": "git clean -fdx -e .env",
-    "build": "hardhat compile && yarn build:tsc",
+    "build": "hardhat compile",
     "build:tsc": "yarn run rollup:build-workspace",
     "sol-reflect": "hardhat reflect",
     "test": "hardhat test",
