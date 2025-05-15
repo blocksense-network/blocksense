@@ -13,6 +13,7 @@ import {
   asVarSchema,
   hexDataString,
   networkName,
+  parseHexDataString,
 } from '@blocksense/base-utils';
 
 import {
@@ -21,12 +22,7 @@ import {
   validateAndPrintDeploymentEnvConfig,
 } from '@blocksense/base-utils/evm/functions';
 
-import type {
-  NetworkConfig,
-  NetworkConfigBase,
-  NetworkConfigWithLedger,
-  NetworkConfigWithoutLedger,
-} from '../types';
+import type { NetworkConfig } from '../types';
 
 const sharedPerNetworkKind = {
   deployerAddressIsLedger: asVarSchema(S.BooleanFromString),
@@ -66,33 +62,16 @@ export async function initChain(
   ethers: typeof _ethers & HardhatEthersHelpers,
   networkName: NetworkName,
 ): Promise<NetworkConfig> {
-  const parsedEnv = parseDeploymentEnvConfig(
-    envSchema,
-    networkName,
-    process.env,
+  const parsedEnv = parseDeploymentEnvConfig(envSchema, networkName);
+
+  parsedEnv.mergedConfig.adfsUpgradeableProxySalt ??= parseHexDataString(
+    ethers.id('upgradeableProxy'),
   );
 
-  const parsedConfig = validateAndPrintDeploymentEnvConfig(parsedEnv);
+  const { mergedConfig: envCfg } =
+    validateAndPrintDeploymentEnvConfig(parsedEnv);
 
-  const {
-    rpcUrl,
-    feedIds,
-
-    deployerAddress,
-    deployerAddressIsLedger,
-    deployerPrivateKey,
-
-    adfsUpgradeableProxySalt,
-
-    reporterMultisigEnable,
-    reporterMultisigSigners,
-    reporterMultisigThreshold,
-
-    adminMultisigOwners,
-    adminMultisigThreshold,
-  } = parsedConfig.mergedConfig;
-
-  const rpc = rpcUrl.toString();
+  const rpc = envCfg.rpcUrl.toString();
   const provider = new JsonRpcProvider(rpc);
   const network = await withTimeout(
     () => provider.getNetwork(),
@@ -100,24 +79,37 @@ export async function initChain(
     new Error(`Failed to connect to network: '${rpc}'`),
   );
 
-  const baseConfig: NetworkConfigBase = {
+  return {
+    deployerAddress: envCfg.deployerAddress,
+    ...(envCfg.deployerAddressIsLedger
+      ? {
+          deployer: await ethers.getSigner(envCfg.deployerAddress),
+          deployerIsLedger: true,
+        }
+      : {
+          deployer: new Wallet(envCfg.deployerPrivateKey, provider),
+          deployerIsLedger: false,
+        }),
+
     rpc,
     provider,
     network,
     networkName,
-    adfsUpgradeableProxySalt,
+    adfsUpgradeableProxySalt: envCfg.adfsUpgradeableProxySalt,
 
-    deployWithSequencerMultisig: reporterMultisigEnable,
+    sequencerAddress: envCfg.sequencerAddress,
+
+    deployWithSequencerMultisig: envCfg.reporterMultisigEnable,
 
     sequencerMultisig: {
-      owners: reporterMultisigSigners,
-      threshold: reporterMultisigThreshold,
+      owners: envCfg.reporterMultisigSigners,
+      threshold: envCfg.reporterMultisigThreshold,
     },
     adminMultisig: {
-      owners: adminMultisigOwners,
-      threshold: adminMultisigThreshold,
+      owners: envCfg.adminMultisigOwners,
+      threshold: envCfg.adminMultisigThreshold,
     },
-    feedIds,
+    feedIds: envCfg.feedIds,
     safeAddresses: {
       multiSendAddress: parseEthereumAddress(
         '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526',
@@ -152,36 +144,5 @@ export async function initChain(
         '0x1d31F259eE307358a26dFb23EB365939E8641195',
       ),
     },
-  };
-
-  if (deployerAddressIsLedger) {
-    const ledgerAccount = await ethers.getSigner(deployerAddress);
-    const config: NetworkConfigWithLedger = {
-      ...baseConfig,
-      ledgerAccount,
-      sequencerMultisig: {
-        ...baseConfig.sequencerMultisig,
-        signer: undefined,
-      },
-      adminMultisig: {
-        ...baseConfig.adminMultisig,
-        signer: undefined,
-      },
-    };
-    return config;
-  } else {
-    const admin = new Wallet(deployerPrivateKey, provider);
-    const config: NetworkConfigWithoutLedger = {
-      ...baseConfig,
-      sequencerMultisig: {
-        ...baseConfig.sequencerMultisig,
-        signer: admin,
-      },
-      adminMultisig: {
-        ...baseConfig.adminMultisig,
-        signer: admin,
-      },
-    };
-    return config;
-  }
+  } satisfies NetworkConfig;
 }

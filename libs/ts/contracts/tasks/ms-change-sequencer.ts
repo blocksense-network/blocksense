@@ -35,9 +35,13 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
         },
       } = await readEvmDeployment(networkName, true);
 
+      const signer = config.deployerIsLedger
+        ? undefined
+        : config.deployer.privateKey;
+
       const adminMultisig = await Safe.init({
         provider: config.rpc,
-        signer: config.adminMultisig.signer?.privateKey,
+        signer,
         safeAddress: AdminMultisig,
         contractNetworks: {
           [config.network.chainId.toString()]: config.safeAddresses,
@@ -65,15 +69,13 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
 
       const safeTxHash = await adminMultisig.getTransactionHash(tx);
 
-      const signer = config.adminMultisig.signer || config.ledgerAccount!;
-
       const typedDataHash = ethers.toBeArray(safeTxHash);
-      const signedData = await signer.signMessage(typedDataHash);
+      const signedData = await config.deployer.signMessage(typedDataHash);
       const signature = await adjustVInSignature(
         SigningMethod.ETH_SIGN,
         signedData,
         safeTxHash,
-        await signer.getAddress(),
+        config.deployerAddress,
       );
 
       // Send the transaction to the Transaction Service with the signature from Owner A
@@ -81,7 +83,7 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
         safeAddress: AdminMultisig,
         safeTransactionData: tx.data,
         safeTxHash,
-        senderAddress: await signer.getAddress(),
+        senderAddress: config.deployerAddress,
         senderSignature: signature,
       });
     }
