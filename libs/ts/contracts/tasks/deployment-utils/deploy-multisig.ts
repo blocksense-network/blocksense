@@ -17,12 +17,12 @@ task('deploy-multisig', '[UTILS] Deploy multisig contract').setAction(
     } = args;
     const safeVersion = '1.4.1';
 
-    const signer = config[type].signer;
+    const signer = config.deployerIsLedger
+      ? undefined
+      : config.deployer.privateKey;
 
     const safeAccountConfig: SafeAccountConfig = {
-      owners: [
-        signer ? signer.address : await config.ledgerAccount!.getAddress(),
-      ],
+      owners: [config.deployerAddress],
       threshold: 1,
     };
 
@@ -38,7 +38,7 @@ task('deploy-multisig', '[UTILS] Deploy multisig contract').setAction(
 
     const protocolKit = await Safe.init({
       provider: config.rpc,
-      signer: signer?.privateKey,
+      signer,
       predictedSafe,
       contractNetworks: {
         [config.network.chainId.toString()]: config.safeAddresses,
@@ -53,7 +53,7 @@ task('deploy-multisig', '[UTILS] Deploy multisig contract').setAction(
       console.log(`  -> ✅ already deployed`);
       return protocolKit.connect({
         provider: config.rpc,
-        signer: signer?.privateKey,
+        signer,
         safeAddress,
         contractNetworks: {
           [config.network.chainId.toString()]: config.safeAddresses,
@@ -66,9 +66,7 @@ task('deploy-multisig', '[UTILS] Deploy multisig contract').setAction(
     const deploymentTransaction =
       await protocolKit.createSafeDeploymentTransaction();
 
-    const transactionHash = await (
-      signer ?? config.ledgerAccount!
-    ).sendTransaction({
+    const transactionHash = await config.deployer.sendTransaction({
       to: deploymentTransaction.to,
       value: BigInt(deploymentTransaction.value),
       data: deploymentTransaction.data as `0x${string}`,

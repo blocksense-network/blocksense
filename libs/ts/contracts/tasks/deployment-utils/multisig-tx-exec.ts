@@ -26,7 +26,7 @@ task('multisig-tx-exec', '[UTILS] Execute multisig transactions').setAction(
       transactions,
     });
 
-    if (config.adminMultisig.signer) {
+    if (!config.deployerIsLedger) {
       console.log('\nProposing transaction...');
 
       const txResponse = await safe.executeTransaction(tx);
@@ -43,12 +43,9 @@ task('multisig-tx-exec', '[UTILS] Execute multisig transactions').setAction(
       safe.getContractVersion(),
       await safe.getChainId(),
     );
-    const signer = assertNotNull(
-      config.ledgerAccount,
-      'Ledger signer address not specified',
-    );
-    const ledgerAddress = await signer.getAddress();
-    const signedMessage = await signer.signMessage(ethers.toBeArray(message));
+    const ledger = config.deployer;
+    const ledgerAddress = config.deployerAddress;
+    const signedMessage = await ledger.signMessage(ethers.toBeArray(message));
     const signature = await adjustVInSignature(
       SigningMethod.ETH_SIGN,
       signedMessage,
@@ -64,7 +61,7 @@ task('multisig-tx-exec', '[UTILS] Execute multisig transactions').setAction(
       'Safe contract not found',
     );
     const data = await safe.getEncodedTransaction(tx);
-    const receipt = await signer
+    const receipt = await ledger
       .sendTransaction({
         to: safeContract.getAddress(),
         data,
