@@ -357,6 +357,7 @@ export const server: ApiServer<Api> = {
               mintRequest: {
                 to: payload.accountAddress,
                 metadata,
+                // uid: ,
               },
               contractType: 'TokenERC721',
             });
