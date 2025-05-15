@@ -3,7 +3,6 @@ import { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 import { JsonRpcProvider, Network, Signer, Wallet } from 'ethers';
 
 export interface MultisigConfig {
-  signer?: Wallet;
   owners: readonly EthereumAddress[];
   threshold: number;
 }
@@ -11,9 +10,13 @@ export interface MultisigConfig {
 export interface NetworkConfigBase {
   rpc: string;
   provider: JsonRpcProvider;
+  deployer: Signer;
+  deployerAddress: EthereumAddress;
+  deployerIsLedger: boolean;
   network: Network;
   networkName: NetworkName;
   adfsUpgradeableProxySalt: HexDataString;
+  sequencerAddress: EthereumAddress;
   sequencerMultisig: MultisigConfig;
   deployWithSequencerMultisig: boolean;
   adminMultisig: MultisigConfig;
@@ -32,21 +35,17 @@ export interface NetworkConfigBase {
   };
 }
 
-export interface NetworkConfigWithLedger extends NetworkConfigBase {
-  ledgerAccount: Signer;
-  sequencerMultisig: Omit<MultisigConfig, 'signer'> & { signer?: undefined };
-  adminMultisig: Omit<MultisigConfig, 'signer'> & { signer?: undefined };
-}
-
-export interface NetworkConfigWithoutLedger extends NetworkConfigBase {
-  ledgerAccount?: undefined;
-  sequencerMultisig: MultisigConfig;
-  adminMultisig: MultisigConfig;
-}
-
-export type NetworkConfig =
-  | NetworkConfigWithLedger
-  | NetworkConfigWithoutLedger;
+export type NetworkConfig = NetworkConfigBase &
+  (
+    | {
+        deployerIsLedger: true;
+        deployer: Signer;
+      }
+    | {
+        deployerIsLedger: false;
+        deployer: Wallet;
+      }
+  );
 
 export enum ContractNames {
   SequencerMultisig = 'SequencerMultisig',
@@ -67,7 +66,7 @@ export type DeployContract = {
   >;
   argsTypes: string[];
   argsValues: any[];
-  salt: string;
+  salt: HexDataString;
   value: bigint;
   feedRegistryInfo?: {
     feedId: bigint;
