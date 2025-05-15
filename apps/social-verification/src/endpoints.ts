@@ -270,11 +270,6 @@ export const server: ApiServer<Api> = {
       const CLIENT_ID = env['NFT_CLIENT_ID'];
       const CONTRACT_ADDRESS = env['NFT_SMART_CONTRACT_ADDRESS'];
       const PRIVATE_KEY = env['NFT_PRIVATE_KEY'];
-      const socialDataApiKey = env['SOCIAL_DATA_API_KEY'];
-      const tweetId = env['X_BLOCKSENSE_TWEET_ID'];
-
-      const retweetCode = payload.retweetCode;
-      const userId = payload.userId;
 
       const metadata = {
         name: 'Blocksense Pirate',
@@ -298,41 +293,6 @@ export const server: ApiServer<Api> = {
 
       return Effect.tryPromise({
         try: async () => {
-          const xUserRetweetsResponse = await fetchAndDecodeJSON(
-            TweetsResponseSchema,
-            `https://api.socialdata.tools/twitter/user/${userId}/tweets`,
-            {
-              headers: {
-                Authorization: `Bearer ${socialDataApiKey}`,
-              },
-            },
-          );
-          console.log(`Successfully fetched retweet. userId: ${userId}`);
-
-          const targetRetweets = xUserRetweetsResponse.tweets.filter(
-            tweet => tweet.quoted_status?.id_str === tweetId,
-          );
-          if (!targetRetweets || targetRetweets.length === 0) {
-            console.error(
-              `No quoted retweets found for user ${userId} on tweet ${tweetId}`,
-            );
-            throw new NotFound();
-          }
-
-          const retweetContainsCode = targetRetweets.some(tweet =>
-            tweet.full_text.includes(retweetCode),
-          );
-          if (!retweetContainsCode) {
-            console.error(
-              `Retweet does not contain the correct code for user ${userId} on tweet ${tweetId}`,
-            );
-            throw new NotFound();
-          }
-
-          console.log(
-            `Successfully verified quote retweet for user ${userId} on tweet ${tweetId} with code ${payload.retweetCode}`,
-          );
-
           const client = createThirdwebClient({
             clientId: CLIENT_ID,
           });
@@ -385,14 +345,13 @@ export const server: ApiServer<Api> = {
           );
 
           const insertQuery =
-            'INSERT INTO participants (x_handle, discord_username, wallet_address, wallet_signature, minting_tx) VALUES (?, ?, ?, ?, ?)';
+            'INSERT INTO participants (x_handle, discord_username, wallet_address, minting_tx) VALUES (?, ?, ?, ?)';
           const insertResult = await db
             .prepare(insertQuery)
             .bind(
               payload.xHandle,
               payload.discordUsername,
               payload.walletAddress,
-              payload.walletSignature,
               payload.mintingTx,
             )
             .all();
@@ -423,7 +382,6 @@ export const server: ApiServer<Api> = {
           WHERE x_handle = ?
             OR discord_username = ?
             OR wallet_address = ?
-            OR wallet_signature = ?
           `;
           const selectResult = await db
             .prepare(selectQuery)
@@ -431,7 +389,6 @@ export const server: ApiServer<Api> = {
               payload.xHandle,
               payload.discordUsername,
               payload.walletAddress,
-              payload.walletSignature,
             )
             .all();
 
