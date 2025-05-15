@@ -9,24 +9,23 @@ task('fund-ledger', '[UTILS] Fund the ledger account with ETH').setAction(
       config: NetworkConfig;
     } = args;
 
-    const ledgerAccountAddress = await config.ledgerAccount!.getAddress();
-    console.log('ledgerAccount', ledgerAccountAddress);
+    console.log('ledgerAccount', config.deployerAddress);
     console.log(
       '[BEFORE] ledger balance',
-      await config.provider.getBalance(ledgerAccountAddress),
+      await config.provider.getBalance(config.deployerAddress),
     );
 
     const tx = await (await ethers.getSigners())[0]
       .connect(config.provider)
       .sendTransaction({
-        to: ledgerAccountAddress,
+        to: config.deployerAddress,
         value: ethers.parseEther('10'),
       });
     await tx.wait();
 
     console.log(
       '[AFTER] ledger balance',
-      await config.provider.getBalance(ledgerAccountAddress),
+      await config.provider.getBalance(config.deployerAddress),
     );
   },
 );

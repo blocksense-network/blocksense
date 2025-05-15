@@ -5,12 +5,14 @@ import {
   ethereumAddress,
   networkName,
 } from '@blocksense/base-utils/evm';
+import { hexDataString } from '@blocksense/base-utils';
 
 const ParameterType = S.Union(S.String, S.Number, S.BigIntFromSelf, S.Boolean);
 const FunctionArgs = S.Array(ParameterType);
 
 const ContractDataSchema = S.Struct({
   address: ethereumAddress,
+  salt: hexDataString,
   constructorArgs: FunctionArgs,
 });
 
@@ -47,8 +49,8 @@ const ContractsConfigSchemaV2 = S.mutable(
         UpgradeableProxyADFS: ContractDataSchema,
         CLFeedRegistryAdapter: ContractDataSchema,
         AccessControl: ContractDataSchema,
-        OnlySequencerGuard: S.UndefinedOr(ContractDataSchema),
-        AdminExecutorModule: S.UndefinedOr(ContractDataSchema),
+        OnlySequencerGuard: S.NullOr(ContractDataSchema),
+        AdminExecutorModule: S.NullOr(ContractDataSchema),
       }),
     ),
     CLAggregatorAdapter: S.mutable(
