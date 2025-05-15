@@ -81,6 +81,19 @@ export async function everyAsync<T>(
   return boolArray.every(b => b);
 }
 
+// Polyfill for Promise.withResolvers
+if (typeof Promise.withResolvers === 'undefined') {
+  Promise.withResolvers = <T>() => {
+    let resolve: (value: T | PromiseLike<T>) => void;
+    let reject: (reason?: unknown) => void;
+    const promise = new Promise<T>((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve: resolve!, reject: reject! };
+  };
+}
+
 /**
  * Executes an asynchronous function and applies a timeout.
  * If the provided asynchronous function (`asyncFn`) does not resolve or reject
