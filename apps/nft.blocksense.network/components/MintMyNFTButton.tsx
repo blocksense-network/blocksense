@@ -122,6 +122,8 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
 
       const { payload, signature } = await generateMintSignature(
         account.address,
+        xUserId,
+        retweetCode,
       );
       if (!payload || !signature) {
         setAlertMessage('Failed to generate mint signature');
