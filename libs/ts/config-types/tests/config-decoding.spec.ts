@@ -49,7 +49,7 @@ describe('Configuration files decoding', async () => {
     expect(networks).toHaveLength(deploymentFilenames.length);
     expect(networks.length).toBeGreaterThan(0);
 
-    expect.assertions(2 + 2 * networks.length);
+    expect.assertions(2 + 2 * networks.length + 1);
 
     const deployments: Partial<Record<NetworkName, DeploymentConfigV2>> = {};
 
@@ -58,7 +58,7 @@ describe('Configuration files decoding', async () => {
       expect(metadata).toBeDefined();
       const deployment = readEvmDeployment(net);
       await expect(deployment).resolves.toMatchObject({
-        name: net,
+        network: net,
         chainId: metadata.chainId,
         contracts: {
           coreContracts: expect.any(Object),
