@@ -501,14 +501,14 @@ impl RpcProvider {
             network,
             provider_metrics,
             get_max_priority_fee_per_gas
-        );
+        )?;
 
         let chain_id = process_provider_getter!(
             provider.get_chain_id().await,
             network,
             provider_metrics,
             get_chain_id
-        );
+        )?;
 
         let message_value = DynSolValue::Tuple(vec![DynSolValue::Address(signer.address())]);
 
