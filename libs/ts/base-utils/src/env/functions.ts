@@ -245,7 +245,7 @@ function mergeSchemaLayers(
   return mergedConfigSchema;
 }
 
-export function validateParsedEnvConfig<
+export function reportParsedEnvConfig<
   LayerNames extends readonly [string, ...string[]],
   Layers extends Record<LayerNames[number], EnvSchema>,
 >(

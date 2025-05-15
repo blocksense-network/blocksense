@@ -29,7 +29,7 @@ task(
   console.log('\nRegistering CLAggregatorAdapters in CLFeedRegistryAdapter...');
   console.log('------------------------------------------------------------');
 
-  const signer = config.adminMultisig.signer || config.ledgerAccount!;
+  const signer = config.deployer;
 
   const registry = new ethers.Contract(
     deployData.coreContracts.CLFeedRegistryAdapter.address,

@@ -3,7 +3,7 @@ import {
   LayeredEnvSchema,
   LayeredEnvSchemaToConfig,
   parseLayeredEnvConfig,
-  validateParsedEnvConfig,
+  reportParsedEnvConfig,
 } from '../env';
 import { kebabToSnakeCase } from '../string';
 import { getNetworkKind, NetworkName } from './networks';
@@ -57,7 +57,7 @@ export function validateAndPrintDeploymentEnvConfig<
     true
   >,
 ): LayeredEnvSchemaToConfig<DeploymentEnvPriority, EnvSchemaLayers, false> {
-  const { isValid, validationMessage } = validateParsedEnvConfig(parsedConfig);
+  const { isValid, validationMessage } = reportParsedEnvConfig(parsedConfig);
 
   console.log(validationMessage);
 

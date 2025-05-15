@@ -8,32 +8,35 @@ import {
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
 
-import { getEnvString, getOptionalEnvString } from '@blocksense/base-utils';
-
 import { ContractNames, NetworkConfig } from '../types';
 
 export type Params = {
   config: NetworkConfig;
   deployData: ContractsConfigV2;
   adminMultisig: Safe;
-  sequencerMultisig?: Safe;
+  reporterMultisig?: Safe;
   run: RunTaskFunction;
   artifacts: Artifacts;
 };
 
-export async function setUpAccessContol({
+export async function setUpAccessControl({
   run,
   artifacts,
   config,
   deployData,
   adminMultisig,
-  sequencerMultisig,
+  reporterMultisig,
 }: Params) {
-  const adminSigner = config.adminMultisig.signer ?? config.ledgerAccount!;
-  const sequencerSigner =
-    config.sequencerMultisig.signer ?? config.ledgerAccount!;
+  const { deployer, deployerAddress, sequencerAddress } = config;
 
   console.log('\nSetting sequencer role in sequencer guard...');
+  console.log(`Sequencer address: ${sequencerAddress}`);
+  console.log(`Admin multisig address: ${await adminMultisig.getAddress()}`);
+  console.log(
+    `Reporter multisig address: ${
+      reporterMultisig ? await reporterMultisig.getAddress() : 'none'
+    }`,
+  );
 
   const abiCoder = new AbiCoder();
   const transactions: SafeTransactionDataPartial[] = [];
@@ -44,19 +47,17 @@ export async function setUpAccessContol({
 
   const guard = OnlySequencerGuard__factory.connect(
     deployData.coreContracts.OnlySequencerGuard!.address,
-    adminSigner,
+    deployer,
   );
-  if (sequencerMultisig) {
-    const isSequencerSet = await guard.getSequencerRole(
-      getEnvString('SEQUENCER_ADDRESS'),
-    );
+  if (reporterMultisig) {
+    const isSequencerSet = await guard.getSequencerRole(sequencerAddress);
 
     if (!isSequencerSet) {
       const safeTxSetGuard: SafeTransactionDataPartial = {
         to: guard.target.toString(),
         value: '0',
         data: guard.interface.encodeFunctionData('setSequencer', [
-          getEnvString('SEQUENCER_ADDRESS'), // sequencer address
+          sequencerAddress,
           true,
         ]),
         operation: OperationType.Call,
@@ -67,9 +68,10 @@ export async function setUpAccessContol({
     }
   }
 
-  const sequencerMultisigAddress = sequencerMultisig
-    ? await sequencerMultisig.getAddress()
-    : getOptionalEnvString('SEQUENCER_ADDRESS', '');
+  const sequencerMultisigAddress = reporterMultisig
+    ? await reporterMultisig.getAddress()
+    : sequencerAddress;
+
   if (sequencerMultisigAddress) {
     console.log(
       '\nSetting up access control and adding owners to admin multisig...',
@@ -78,12 +80,12 @@ export async function setUpAccessContol({
     const accessControl = new Contract(
       deployData.coreContracts.AccessControl.address,
       artifacts.readArtifactSync(ContractNames.AccessControl).abi,
-      adminSigner,
+      deployer,
     );
 
     const isAllowed = Boolean(
       Number(
-        await sequencerSigner.call({
+        await deployer.call({
           to: accessControl.target.toString(),
           data: sequencerMultisigAddress,
         }),
@@ -106,8 +108,8 @@ export async function setUpAccessContol({
     }
   }
 
-  const owners = await adminMultisig.getOwners();
-  if (owners.length === 1 && config.adminMultisig.owners.length > 0) {
+  const ownerBefore = await adminMultisig.getOwners();
+  if (ownerBefore.length === 1 && config.adminMultisig.owners.length > 0) {
     const adminMultisigAddress = await adminMultisig.getAddress();
     for (const owner of config.adminMultisig.owners) {
       const safeTxAddOwner = await adminMultisig.createAddOwnerTx({
@@ -126,11 +128,7 @@ export async function setUpAccessContol({
         abiCoder
           .encode(
             ['address', 'address', 'uint256'],
-            [
-              prevOwnerAddress,
-              await adminSigner.getAddress(),
-              config.adminMultisig.threshold,
-            ],
+            [prevOwnerAddress, deployerAddress, config.adminMultisig.threshold],
           )
           .slice(2),
       operation: OperationType.Call,
@@ -145,7 +143,7 @@ export async function setUpAccessContol({
       config,
     });
 
-    if (owners.length === 1 && config.adminMultisig.owners.length > 0) {
+    if (ownerBefore.length === 1 && config.adminMultisig.owners.length > 0) {
       console.log(
         'Admin multisig owners changed to',
         await adminMultisig.getOwners(),
@@ -154,70 +152,73 @@ export async function setUpAccessContol({
       console.log('Current threshold', await adminMultisig.getThreshold());
     }
   }
-
-  if (!!sequencerMultisig) {
+  if (!reporterMultisig) {
     console.log(
-      '\nSetting up sequencer guard, adding reporters as owners and removing sequencer from owners...',
+      'Sequencer multisig not set up, skipping reporter multisig setup',
     );
-
-    const enabledGuard = await sequencerMultisig.getGuard();
-    if (enabledGuard !== guard.target.toString()) {
-      const sequencerMultisigAddress = await sequencerMultisig.getAddress();
-      const sequencerTransactions: SafeTransactionDataPartial[] = [];
-
-      const safeTxSetGuard = await sequencerMultisig.createEnableGuardTx(
-        await guard.getAddress(),
-      );
-      sequencerTransactions.push(safeTxSetGuard.data);
-
-      const safeTxSetModule = await sequencerMultisig.createEnableModuleTx(
-        deployData.coreContracts.AdminExecutorModule!.address,
-      );
-      sequencerTransactions.push(safeTxSetModule.data);
-
-      for (const owner of config.sequencerMultisig.owners) {
-        const safeTxAddOwner = await sequencerMultisig.createAddOwnerTx({
-          ownerAddress: owner,
-        });
-        sequencerTransactions.push(safeTxAddOwner.data);
-      }
-
-      const prevOwnerAddress = config.sequencerMultisig.owners[0];
-      // removeOwner(address prevOwner, address owner, uint256 threshold);
-      const safeTxRemoveOwner: SafeTransactionDataPartial = {
-        to: sequencerMultisigAddress,
-        value: '0',
-        data:
-          '0xf8dc5dd9' +
-          abiCoder
-            .encode(
-              ['address', 'address', 'uint256'],
-              [
-                prevOwnerAddress,
-                await sequencerSigner.getAddress(),
-                config.sequencerMultisig.threshold,
-              ],
-            )
-            .slice(2),
-        operation: OperationType.Call,
-      };
-      sequencerTransactions.push(safeTxRemoveOwner);
-
-      await run('multisig-tx-exec', {
-        transactions: sequencerTransactions,
-        safe: sequencerMultisig,
-        config,
-      });
-
-      console.log('Only sequencer guard set');
-      console.log(
-        'Sequencer multisig owners changed to reporters',
-        await sequencerMultisig.getOwners(),
-      );
-      console.log('Removed sequencer from multisig owners');
-      console.log('Current threshold', await sequencerMultisig.getThreshold());
-    } else {
-      console.log('Sequencer guard already set up');
-    }
+    return;
   }
+
+  console.log(
+    '\nSetting up sequencer guard, adding reporters as owners and removing sequencer from owners...',
+  );
+
+  const enabledGuard = await reporterMultisig.getGuard();
+  if (enabledGuard === guard.target.toString()) {
+    console.log('Sequencer guard already set up');
+    return;
+  }
+
+  const reporterMultisigTxs: SafeTransactionDataPartial[] = await Promise.all([
+    reporterMultisig
+      .createEnableGuardTx(await guard.getAddress())
+      .then(tx => tx.data),
+
+    reporterMultisig
+      .createEnableModuleTx(
+        deployData.coreContracts.AdminExecutorModule!.address,
+      )
+      .then(tx => tx.data),
+
+    ...config.sequencerMultisig.owners.map(ownerAddress =>
+      reporterMultisig
+        .createAddOwnerTx({
+          ownerAddress,
+        })
+        .then(tx => tx.data),
+    ),
+
+    {
+      to: sequencerMultisigAddress,
+      value: '0',
+      // removeOwner(address prevOwner, address owner, uint256 threshold);
+      data:
+        '0xf8dc5dd9' +
+        abiCoder
+          .encode(
+            ['address', 'address', 'uint256'],
+            [
+              config.sequencerMultisig.owners[0],
+              deployerAddress,
+              config.sequencerMultisig.threshold,
+            ],
+          )
+          .slice(2),
+      operation: OperationType.Call,
+    },
+  ]);
+
+  await run('multisig-tx-exec', {
+    transactions: reporterMultisigTxs,
+    safe: reporterMultisig,
+    config,
+  });
+
+  console.log('Only sequencer guard set');
+  console.log(
+    'Sequencer multisig owners changed to reporters',
+    await reporterMultisig.getOwners(),
+  );
+  console.log('Removed sequencer from multisig owners');
+  console.log('Current threshold', await reporterMultisig.getThreshold());
 }
