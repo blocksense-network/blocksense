@@ -29,7 +29,7 @@ export async function executeMultisigTransaction({
     transactions,
   });
 
-  if (config.adminMultisig.signer) {
+  if (!config.deployerIsLedger) {
     console.log('\nProposing transaction...');
 
     const txResponse = await safe.executeTransaction(tx);
@@ -46,12 +46,9 @@ export async function executeMultisigTransaction({
     safe.getContractVersion(),
     await safe.getChainId(),
   );
-  const signer = assertNotNull(
-    config.ledgerAccount,
-    'Ledger signer address not specified',
-  );
-  const ledgerAddress = await signer.getAddress();
-  const signedMessage = await signer.signMessage(toBeArray(message));
+  const ledger = config.deployer;
+  const ledgerAddress = config.deployerAddress;
+  const signedMessage = await ledger.signMessage(toBeArray(message));
   const signature = await adjustVInSignature(
     SigningMethod.ETH_SIGN,
     signedMessage,
@@ -67,7 +64,7 @@ export async function executeMultisigTransaction({
     'Safe contract not found',
   );
   const data = await safe.getEncodedTransaction(tx);
-  const receipt = await signer
+  const receipt = await ledger
     .sendTransaction({
       to: safeContract.getAddress(),
       data,
