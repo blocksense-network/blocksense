@@ -80,7 +80,7 @@ macro_rules! process_provider_getter {
                     .[<success_ $_metric>]
                     .with_label_values(&[&$_net.to_string()])
                     .inc();
-                    res
+                    Ok(res)
                 },
                 Err(e) => {
                     $_provider_metrics.read() // Holding a read lock here suffice, since the counters are atomic.
@@ -88,7 +88,7 @@ macro_rules! process_provider_getter {
                     .[<failed_ $_metric>]
                     .with_label_values(&[&$_net.to_string()])
                     .inc();
-                    return Err(e.into());
+                    Err(e)
                 },
             }
         }
