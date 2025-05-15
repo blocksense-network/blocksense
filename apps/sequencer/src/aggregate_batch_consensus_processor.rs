@@ -4,14 +4,16 @@ use blocksense_config::BlockConfig;
 use blocksense_feed_registry::{registry::SlotTimeTracker, types::Repeatability};
 use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_gnosis_safe::utils::{signature_to_bytes, SignatureWithAddress};
+use blocksense_metrics::{inc_metric, process_provider_getter};
 use blocksense_utils::time::current_unix_time;
+use paste::paste;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, warn};
 
 use crate::providers::eth_send_utils::{
-    decrement_feeds_round_indexes, get_tx_retry_params, log_gas_used,
+    decrement_feeds_round_indexes, get_tx_retry_params, inc_transaction_retries, log_gas_used,
 };
-use crate::providers::provider::{parse_eth_address, GNOSIS_SAFE_CONTRACT_NAME};
+use crate::providers::provider::{parse_eth_address, RpcProvider, GNOSIS_SAFE_CONTRACT_NAME};
 use crate::sequencer_state::SequencerState;
 use alloy_primitives::{Address, Bytes};
 use blocksense_gnosis_safe::utils::SafeMultisig;
@@ -170,22 +172,7 @@ pub async fn aggregation_batch_consensus_loop(
                                     let safe_address = provider.get_contract_address(GNOSIS_SAFE_CONTRACT_NAME).unwrap_or(Address::default());
                                     let contract = SafeMultisig::new(safe_address, &provider.provider);
 
-                                    let latest_safe_nonce = match contract.nonce().call().await {
-                                        Ok(n) => n,
-                                        Err(e) => {
-                                            decrement_feeds_round_indexes(&ids_vec, net, &mut provider).await;
-                                            provider.dec_num_tx_in_progress();
-                                            eyre::bail!("Failed to get the nonce of gnosis safe contract at address {safe_address} in network {net}: {e}! Blocksense block height: {block_height}");
-                                        }
-                                    };
-
                                     let safe_tx = quorum.safe_tx;
-
-                                    if latest_safe_nonce._0 != safe_tx.nonce {
-                                        decrement_feeds_round_indexes(&ids_vec, net, &mut provider).await;
-                                        provider.dec_num_tx_in_progress();
-                                        eyre::bail!("Nonce in safe contract {} not as expected {}! Skipping transaction. Blocksense block height: {block_height}", latest_safe_nonce._0, safe_tx.nonce);
-                                    }
 
                                     info!("About to post tx {safe_tx:?} for network {net}, Blocksense block height: {block_height}");
 
@@ -193,10 +180,40 @@ pub async fn aggregation_batch_consensus_loop(
 
                                     let receipt = loop {
 
+                                        let provider_metrics = provider.provider_metrics.clone();
+
                                         if transaction_retries_count > transaction_retries_count_limit {
-                                            decrement_feeds_round_indexes(&ids_vec, net, &mut provider).await;
-                                            provider.dec_num_tx_in_progress();
+                                            failed_tx(net, &ids_vec, &mut provider).await;
+                                            inc_metric!(provider_metrics, net, total_timed_out_tx);
                                             eyre::bail!("Failed to post tx after {transaction_retries_count} retries for network {net}: (timed out)! Blocksense block height: {block_height}");
+                                        }
+
+                                        let latest_safe_nonce_result = match actix_web::rt::time::timeout(
+                                            Duration::from_secs(transaction_retry_timeout_secs),
+                                            contract.nonce().call(),
+                                        ).await {
+                                            Ok(v) => v,
+                                            Err(err) => {
+                                                warn!("Timed out while trying to get safe nonce for network {net} and address {safe_address} due to {err}");
+                                                inc_transaction_retries(net.as_str(), &mut transaction_retries_count, &provider_metrics).await;
+                                                continue;
+                                            },
+                                        };
+
+                                        let latest_safe_nonce = match latest_safe_nonce_result {
+                                            Ok(n) => n,
+                                            Err(e) => {
+                                                warn!("Failed to get the nonce of gnosis safe contract at address {safe_address} in network {net}: {e}! Blocksense block height: {block_height}");
+                                                inc_transaction_retries(net.as_str(), &mut transaction_retries_count, &provider_metrics).await;
+                                                continue;
+                                            }
+                                        };
+
+                                        if latest_safe_nonce._0 != safe_tx.nonce {
+                                            warn!("Nonce in safe contract {} not as expected {}! Blocksense block height: {block_height}", latest_safe_nonce._0, safe_tx.nonce);
+                                            inc_metric!(provider_metrics, net, total_mismatched_gnosis_safe_nonce);
+                                            inc_transaction_retries(net.as_str(), &mut transaction_retries_count, &provider_metrics).await;
+                                            continue;
                                         }
 
                                         let tx_to_send = contract.execTransaction(
@@ -219,14 +236,11 @@ pub async fn aggregation_batch_consensus_loop(
                                             let provider_settings = if let Some(provider_settings) = providers_config.get(net) {
                                                 provider_settings
                                             } else {
-                                                decrement_feeds_round_indexes(&ids_vec, net, &mut provider).await;
-                                                provider.dec_num_tx_in_progress();
+                                                failed_tx(net, &ids_vec, &mut provider).await;
                                                 eyre::bail!(
                                                     "Logical error! Network `{net}` is not configured in sequencer; skipping it during reporting"
                                                 );
                                             };
-
-                                            let _provider_metrics = provider.provider_metrics.clone();
 
                                             let (sender_address, _is_impersonated) = match &provider_settings.impersonated_anvil_account {
                                                 Some(impersonated_anvil_account) => {
@@ -252,8 +266,8 @@ pub async fn aggregation_batch_consensus_loop(
                                             ).await {
                                                 Ok(res) => res,
                                                 Err(e) => {
-                                                    transaction_retries_count += 1;
                                                     warn!("Timed out on get_tx_retry_params for {transaction_retries_count}-th time for network {net}, Blocksense block height: {block_height}: {e}!");
+                                                    inc_transaction_retries(net.as_str(), &mut transaction_retries_count, &provider_metrics).await;
                                                     continue;
                                                 },
                                             };
@@ -275,13 +289,15 @@ pub async fn aggregation_batch_consensus_loop(
                                             Ok(post_tx_res) => post_tx_res,
                                             Err(err) => {
                                                 warn!("Timed out while trying to post tx to RPC for network {net} and address {safe_address} due to {err}");
-                                                transaction_retries_count += 1;
+                                                inc_transaction_retries(net.as_str(), &mut transaction_retries_count, &provider_metrics).await;
                                                 continue;
                                             }
                                         };
                                         debug!("Sent price feed update transaction to network `{net}`");
 
-                                        let receipt = match result {
+                                        inc_metric!(provider_metrics, net, total_tx_sent);
+
+                                        let receipt = match process_provider_getter!(result, net, provider_metrics, send_tx) {
                                             Ok(v) => {
                                                 info!("Posted tx for network {net}, Blocksense block height: {block_height}! Waiting for receipt ...");
                                                 let receipt = match actix_web::rt::time::timeout(
@@ -291,7 +307,7 @@ pub async fn aggregation_batch_consensus_loop(
                                                     Ok(r) => r,
                                                     Err(err) => {
                                                         warn!("Timed out while trying to post tx to RPC for network {net} and address {safe_address} due to {err}");
-                                                        transaction_retries_count += 1;
+                                                        inc_transaction_retries(net.as_str(), &mut transaction_retries_count, &provider_metrics).await;
                                                         continue;
                                                     }
                                                 };
@@ -301,9 +317,11 @@ pub async fn aggregation_batch_consensus_loop(
 
                                                 match &receipt {
                                                     Ok(receipt) => {
+                                                        inc_metric!(provider_metrics, net, success_get_receipt);
                                                         log_gas_used(net, receipt, transaction_time, &provider.provider_metrics).await;
                                                     }
                                                     Err(e) => {
+                                                        inc_metric!(provider_metrics, net, failed_get_receipt);
                                                         warn!("Error in getting receipt from network {net} that took {transaction_time}ms for {transaction_retries_count} retries, Blocksense block height: {block_height}! {receipt:?}: {e}");
                                                     }
                                                 }
@@ -311,8 +329,7 @@ pub async fn aggregation_batch_consensus_loop(
                                                 receipt
                                             }
                                             Err(e) => {
-                                                decrement_feeds_round_indexes(&ids_vec, net, &mut provider).await;
-                                                provider.dec_num_tx_in_progress();
+                                                failed_tx(net, &ids_vec, &mut provider).await;
                                                 eyre::bail!("Failed to post tx for network {net}: {e}! Blocksense block height: {block_height}");
                                             }
                                         };
@@ -327,4 +344,9 @@ pub async fn aggregation_batch_consensus_loop(
             }
         })
         .expect("Failed to spawn aggregation_batch_consensus_loop!")
+}
+
+async fn failed_tx(net: &str, ids_vec: &Vec<u32>, provider: &mut RpcProvider) {
+    decrement_feeds_round_indexes(ids_vec, net, provider).await;
+    provider.dec_num_tx_in_progress();
 }

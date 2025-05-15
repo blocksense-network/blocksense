@@ -294,7 +294,12 @@ pub async fn eth_batch_send_to_contract(
             Ok(v) => v,
             Err(err) => {
                 warn!("{err} for {transaction_retries_count}-th time.");
-                transaction_retries_count += 1;
+                inc_transaction_retries(
+                    net.as_str(),
+                    &mut transaction_retries_count,
+                    provider_metrics,
+                )
+                .await;
                 continue;
             }
         };
@@ -312,7 +317,12 @@ pub async fn eth_batch_send_to_contract(
             Ok(v) => v,
             Err(err) => {
                 warn!("{err} for {transaction_retries_count}-th time.");
-                transaction_retries_count += 1;
+                inc_transaction_retries(
+                    net.as_str(),
+                    &mut transaction_retries_count,
+                    provider_metrics,
+                )
+                .await;
                 continue;
             }
         };
@@ -344,7 +354,12 @@ pub async fn eth_batch_send_to_contract(
                 Err(e) => {
                     let block_height = updates.block_height;
                     warn!("Timed out on get_tx_retry_params for {transaction_retries_count}-th time for network {net}, Blocksense block height: {block_height}: {e}!");
-                    transaction_retries_count += 1;
+                    inc_transaction_retries(
+                        net.as_str(),
+                        &mut transaction_retries_count,
+                        provider_metrics,
+                    )
+                    .await;
                     continue;
                 }
             };
@@ -381,7 +396,12 @@ pub async fn eth_batch_send_to_contract(
                 Ok(post_tx_res) => post_tx_res,
                 Err(err) => {
                     warn!("Timed out while trying to post tx to RPC for network {net} and address {sender_address} due to {err}");
-                    transaction_retries_count += 1;
+                    inc_transaction_retries(
+                        net.as_str(),
+                        &mut transaction_retries_count,
+                        provider_metrics,
+                    )
+                    .await;
                     continue;
                 }
             };
@@ -403,7 +423,12 @@ pub async fn eth_batch_send_to_contract(
             Ok(v) => v,
             Err(err) => {
                 warn!("Error while trying to post tx to RPC for network {net} and address {sender_address} due to {err}");
-                transaction_retries_count += 1;
+                inc_transaction_retries(
+                    net.as_str(),
+                    &mut transaction_retries_count,
+                    provider_metrics,
+                )
+                .await;
                 continue;
             }
         };
@@ -427,12 +452,22 @@ pub async fn eth_batch_send_to_contract(
                 }
                 Err(e) => {
                     warn!("PendingTransactionError tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
-                    transaction_retries_count += 1;
+                    inc_transaction_retries(
+                        net.as_str(),
+                        &mut transaction_retries_count,
+                        provider_metrics,
+                    )
+                    .await;
                 }
             },
             Err(e) => {
                 warn!("Timed out tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
-                transaction_retries_count += 1;
+                inc_transaction_retries(
+                    net.as_str(),
+                    &mut transaction_retries_count,
+                    provider_metrics,
+                )
+                .await;
                 continue;
             }
         }
@@ -451,6 +486,15 @@ pub async fn eth_batch_send_to_contract(
     debug!("Released a read/write lock on provider state for network `{net}`");
 
     Ok((receipt.status().to_string(), feeds_to_update_ids))
+}
+
+pub async fn inc_transaction_retries(
+    net: &str,
+    transaction_retries_count: &mut u64,
+    provider_metrics: &Arc<RwLock<ProviderMetrics>>,
+) {
+    *transaction_retries_count += 1;
+    inc_metric!(provider_metrics, net, total_tx_sent);
 }
 
 pub async fn get_gas_price(
