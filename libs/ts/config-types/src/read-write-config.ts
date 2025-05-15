@@ -58,24 +58,22 @@ export function readEvmDeployment(
   );
 }
 
-export function readAllEvmDeployments(
+export async function readAllEvmDeployments(
   excludedNetworks: NetworkName[],
 ): Promise<Record<NetworkName, DeploymentConfigV2>> {
   const { readAllJSONFiles } = selectDirectory(
     configDirs.evm_contracts_deployment_v2,
   );
-
-  return readAllJSONFiles()
-    .then(allFiles =>
-      allFiles.filter(({ base }) => !excludedNetworks.includes(base as any)),
-    )
-    .then(allFiles =>
-      allFiles.map(({ base, content }) => {
-        const data = S.decodeUnknownSync(DeploymentConfigSchemaV2)(content);
-        return [parseNetworkName(base), data];
-      }),
-    )
-    .then(allFiles => Object.fromEntries(allFiles));
+  const result = {} as Record<NetworkName, DeploymentConfigV2>;
+  for (const { base, content } of await readAllJSONFiles()) {
+    const network = parseNetworkName(base.replace(/\.json$/, ''));
+    if (excludedNetworks.includes(network)) {
+      continue;
+    }
+    const data = S.decodeUnknownSync(DeploymentConfigSchemaV2)(content);
+    result[network] = data;
+  }
+  return result;
 }
 
 export function writeEvmDeployment(
