@@ -56,13 +56,7 @@ export const verifyApi = HttpApi.make('verify')
     HttpApiGroup.make('mint')
       .add(
         HttpApiEndpoint.post('generateMintSignature', '/signature')
-          .setPayload(
-            S.Struct({
-              accountAddress: S.String,
-              userId: S.String,
-              retweetCode: S.String,
-            }),
-          )
+          .setPayload(S.Struct({ accountAddress: S.String }))
           .addSuccess(
             S.Struct({
               signature: S.String,

@@ -2,6 +2,7 @@ import Image from 'next/image';
 
 import successFormBlocksenseLogo from '/public/icons/success-form-blocksense-logo.svg';
 import exploreIcon from '/public/icons/explore.svg';
+import { RetweetCard } from './RetweetCard';
 
 type SuccessFormProps = {
   mintTransactionUrl: string;
@@ -44,6 +45,12 @@ export const SuccessForm = ({
             Explore your minting transaction
           </p>
         </a>
+        <article>
+          <RetweetCard />
+          <p className="md:text-base text-sm mt-2">
+            Stand out - use the unique code or your own message
+          </p>
+        </article>
       </article>
     </form>
   );
