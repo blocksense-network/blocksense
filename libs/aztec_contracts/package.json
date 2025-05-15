@@ -17,6 +17,6 @@
         "@babel/preset-typescript": "^7.26.0",
         "@types/node": "^22.10.2",
         "typescript": "5.8.3",
-        "vitest": "^3.0.2"
+        "vitest": "^3.0.5"
     }
 }
