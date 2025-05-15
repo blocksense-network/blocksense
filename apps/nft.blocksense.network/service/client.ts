@@ -126,12 +126,16 @@ export const hasXUserRetweeted = createApiRequestHandler<
 );
 
 export const generateMintSignature = createApiRequestHandler<
-  [string],
-  { accountAddress: string },
+  [string, string, string],
+  { accountAddress: string; userId: string; retweetCode: string },
   MintNftResponse
 >(
   (client, payload) => client.mint.generateMintSignature({ payload }),
-  accountAddress => ({ accountAddress }),
+  (accountAddress, userId, retweetCode) => ({
+    accountAddress,
+    userId,
+    retweetCode,
+  }),
 );
 
 export const saveParticipant = createApiRequestHandler<

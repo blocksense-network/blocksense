@@ -7,7 +7,7 @@ import { useMintFormContext } from '../app/contexts/MintFormContext';
 import { Input } from './Input';
 
 export const Discord = () => {
-  const { discord, setDiscord, discordStatus, setDiscordStatus, mintLoading } =
+  const { discord, setDiscord, discordStatus, setDiscordStatus } =
     useMintFormContext();
 
   useEffect(() => {
@@ -21,12 +21,19 @@ export const Discord = () => {
   }, [discord]);
 
   const onDiscordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (mintLoading) return;
-    setDiscord(e.target.value.trim());
+    setDiscord(e.target.value);
     setDiscordStatus({ type: 'none', message: '' });
   };
 
   const verifyDiscord = async () => {
+    if (discord[0] === '#') {
+      setDiscordStatus({
+        type: 'error',
+        message: 'Discord handle should not start with #',
+      });
+      return;
+    }
+
     setDiscordStatus({ type: 'loading', message: '' });
     try {
       const { isMember } = await isDiscordUserMemberOfGuild(discord);
@@ -51,7 +58,7 @@ export const Discord = () => {
     <Input
       value={discord}
       onChange={onDiscordChange}
-      placeholder="Discord Username"
+      placeholder="Discord #"
       id="discord-handle"
       status={discordStatus.type}
       message={discordStatus.message}

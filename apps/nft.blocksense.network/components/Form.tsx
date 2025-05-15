@@ -37,24 +37,31 @@ export const Form = () => {
         >
           Join the crew and receive your NFT by completing all the steps:
         </motion.h2>
-        <MintFormProvider>
-          {!showSuccess && (
-            <motion.div
-              className="w-full"
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, delay: 0.2 }}
-            >
+        {!showSuccess && (
+          <motion.div
+            className="w-full"
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.2 }}
+          >
+            <MintFormProvider>
               <MintForm onSuccessAction={onSuccess} />
-            </motion.div>
-          )}
-          {showSuccess && (
+            </MintFormProvider>
+          </motion.div>
+        )}
+        {showSuccess && (
+          <motion.div
+            className="w-full"
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1, delay: 0.2 }}
+          >
             <SuccessForm
               mintTransactionUrl={mintTransactionUrl}
               isAlreadyMinted={isAlreadyMinted}
             />
-          )}
-        </MintFormProvider>
+          </motion.div>
+        )}
       </article>
     </section>
   );

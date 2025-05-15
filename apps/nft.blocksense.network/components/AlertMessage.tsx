@@ -1,18 +1,26 @@
-import { useMintFormContext } from 'app/contexts/MintFormContext';
+import { HTMLAttributes } from 'react';
 
-export const AlertMessage = () => {
-  const { alertMessage } = useMintFormContext();
+type AlertMessageProps = HTMLAttributes<HTMLParagraphElement> & {
+  message?: string;
+  className?: string;
+};
 
-  if (!alertMessage) {
+export const AlertMessage = ({
+  message = '',
+  className = '',
+  ...props
+}: AlertMessageProps) => {
+  if (!message) {
     return null;
   }
 
   return (
     <p
       role="alert"
-      className="alert-message border border-[var(--gray-dark)] rounded-full text-center px-4 py-2 text-base mt-2"
+      className={`alert-message border border-[var(--gray-dark)] rounded-full text-center px-4 py-2 text-xs ${className}`}
+      {...props}
     >
-      {alertMessage}
+      {message}
     </p>
   );
 };

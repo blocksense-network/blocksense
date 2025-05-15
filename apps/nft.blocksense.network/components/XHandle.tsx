@@ -1,12 +1,11 @@
 import { ChangeEvent, useEffect } from 'react';
 
 import { isXUserFollowing } from 'service/client';
-import { clearXHandle } from '@/utils';
 import { useMintFormContext } from '../app/contexts/MintFormContext';
 import { Input } from './Input';
 
 export const XHandle = () => {
-  const { xHandle, setXHandle, xStatus, setXStatus, mintLoading } =
+  const { xHandle, setXHandle, xStatus, setXStatus, setXUserId } =
     useMintFormContext();
 
   useEffect(() => {
@@ -20,26 +19,32 @@ export const XHandle = () => {
   }, [xHandle]);
 
   const onXHandleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (mintLoading) return;
     setXHandle(e.target.value);
     setXStatus({ type: 'none', message: '' });
   };
 
   const verifyXHandle = async () => {
-    const resultXHandle = clearXHandle(xHandle);
-    if (resultXHandle === '') return;
+    if (xHandle[0] === '@') {
+      setXStatus({
+        type: 'error',
+        message: 'X handle should not start with @',
+      });
+      return;
+    }
 
     setXStatus({ type: 'loading', message: '' });
     try {
-      const { isFollowing } = await isXUserFollowing(resultXHandle);
-      if (isFollowing) {
+      const { isFollowing, userId } = await isXUserFollowing(xHandle);
+      if (isFollowing && userId) {
         setXStatus({ type: 'success', message: 'You are following us on X' });
+        setXUserId(userId);
       } else {
         throw new Error('User is not following us on X');
       }
     } catch (err) {
       console.error(err);
       setXStatus({ type: 'error', message: 'You are not following us on X' });
+      setXUserId(null);
     }
   };
 
@@ -47,7 +52,7 @@ export const XHandle = () => {
     <Input
       value={xHandle}
       onChange={onXHandleChange}
-      placeholder="X Handle"
+      placeholder="X handle"
       id="x-handle"
       status={xStatus.type}
       message={xStatus.message}
