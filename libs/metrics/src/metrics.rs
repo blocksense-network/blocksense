@@ -156,6 +156,8 @@ pub struct ProviderMetrics {
     pub success_get_max_priority_fee_per_gas: IntCounterVec,
     pub success_get_chain_id: IntCounterVec,
     pub total_timed_out_tx: IntCounterVec,
+    pub total_transaction_retries: IntCounterVec,
+    pub total_mismatched_gnosis_safe_nonce: IntCounterVec,
     pub is_enabled: IntGaugeVec,
 }
 
@@ -241,6 +243,16 @@ impl ProviderMetrics {
             total_timed_out_tx: register_int_counter_vec!(
                 format!("{}total_timed_out_tx", prefix),
                 "Total number of tx sent that reached the configured timeout before completion for network",
+                &["Network"]
+            )?,
+            total_transaction_retries: register_int_counter_vec!(
+                format!("{}total_transaction_retries", prefix),
+                "Total number of tx retries for network",
+                &["Network"]
+            )?,
+            total_mismatched_gnosis_safe_nonce: register_int_counter_vec!(
+                format!("{}total_mismatched_gnosis_safe_nonce", prefix),
+                "Total number of times we got a mismatching safe nonce prior to tx send for network",
                 &["Network"]
             )?,
             is_enabled: register_int_gauge_vec!(
