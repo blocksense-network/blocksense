@@ -107,7 +107,11 @@ export function parseEnvConfig<Env$ extends EnvSchema>(
 
   for (const key in config) {
     const varName = envVarNameJoin(key, suffix);
-    res[key] = parseEnv(varName, config[key], true, env);
+    const schema = assertNotNull(
+      config[varName],
+      `Schema for '${varName}' is missing.`,
+    );
+    res[key] = parseEnv(varName, schema, true, env);
   }
 
   return res;
