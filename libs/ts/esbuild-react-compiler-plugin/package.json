@@ -21,11 +21,11 @@
   },
   "dependencies": {
     "babel-plugin-react-compiler": "0.0.0-experimental-22c6e49-20241219",
-    "react-compiler-webpack": "0.1.2"
+    "react-compiler-webpack": "0.2.0"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
-    "tsup": "8.3.5",
+    "@types/node": "^22.15.18",
+    "tsup": "8.4.0",
     "typescript": "5.8.3"
   }
 }
