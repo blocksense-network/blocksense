@@ -5,6 +5,7 @@ import {
   Layer,
   Redacted,
   Schema as S,
+  Schedule,
 } from 'effect';
 import { Tag } from 'effect/Context';
 import { NotFound, Unauthorized } from '@effect/platform/HttpApiError';
@@ -22,7 +23,7 @@ import {
   XUserFollowingResponseSchema,
   XUserInfoResponseSchema,
 } from './types';
-import { fetchAndDecodeJSON } from './utils';
+import { fetchAndDecodeJSON, TooManyRequests } from './utils';
 
 type ApiEndpoint<RequestA, RequestI, ResponseA, ResponseI> = {
   method: HttpMethod;
@@ -124,14 +125,42 @@ export const server: ApiServer<Api> = {
 
       return Effect.tryPromise({
         try: async () => {
-          const xUserInfoResponse = await fetchAndDecodeJSON(
-            XUserInfoResponseSchema,
-            `https://api.socialdata.tools/twitter/user/${username}`,
-            {
-              headers: {
-                Authorization: `Bearer ${socialDataApiKey}`,
+          let xUserInfoResponse;
+          const xUserInfoResponseTask = await Effect.async<
+            boolean,
+            Error | TooManyRequests
+          >(resume => {
+            fetchAndDecodeJSON(
+              XUserInfoResponseSchema,
+              `https://api.socialdata.tools/twitter/user/${username}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${socialDataApiKey}`,
+                },
               },
-            },
+            )
+              .then(response => {
+                console.log(
+                  `Successfully fetched user info. username: ${username}`,
+                );
+                xUserInfoResponse = response;
+                resume(Effect.succeed(true));
+              })
+              .catch(error => {
+                if (error instanceof TooManyRequests) {
+                  console.warn('Received TooManyRequests error, will retry...');
+                  resume(Effect.fail(error));
+                } else {
+                  throw error;
+                }
+              });
+          });
+
+          Effect.runPromise(
+            Effect.retry(xUserInfoResponseTask, {
+              schedule: Schedule.exponential(1000),
+              times: 3, // Retry up to 3 times
+            }),
           );
 
           const userId = xUserInfoResponse.id_str;
