@@ -28,6 +28,9 @@ export async function setUpAccessControl({
   reporterMultisig,
 }: Params) {
   const { deployer, deployerAddress, sequencerAddress } = config;
+  const {
+    OnlySequencerGuard__factory,
+  } = require('@blocksense/contracts/typechain');
 
   console.log('\nSetting sequencer role in sequencer guard...');
   console.log(`Sequencer address: ${sequencerAddress}`);
@@ -41,17 +44,17 @@ export async function setUpAccessControl({
   const abiCoder = new AbiCoder();
   const transactions: SafeTransactionDataPartial[] = [];
 
-  const {
-    OnlySequencerGuard__factory,
-  } = require('@blocksense/contracts/typechain');
-
-  const guard = OnlySequencerGuard__factory.connect(
-    deployData.coreContracts.OnlySequencerGuard!.address,
-    deployer,
-  );
   if (reporterMultisig) {
-    const isSequencerSet = await guard.getSequencerRole(sequencerAddress);
+    const guard = OnlySequencerGuard__factory.connect(
+      deployData.coreContracts.OnlySequencerGuard!.address,
+      deployer,
+    );
 
+    console.log(
+      '\nSetting up sequencer guard, adding reporters as owners and removing sequencer from owners...',
+    );
+
+    const isSequencerSet = await guard.getSequencerRole(sequencerAddress);
     if (!isSequencerSet) {
       const safeTxSetGuard: SafeTransactionDataPartial = {
         to: guard.target.toString(),
@@ -152,15 +155,17 @@ export async function setUpAccessControl({
       console.log('Current threshold', await adminMultisig.getThreshold());
     }
   }
+
   if (!reporterMultisig) {
     console.log(
-      'Sequencer multisig not set up, skipping reporter multisig setup',
+      'Reporter multisig not set up, skipping reporter multisig setup',
     );
     return;
   }
 
-  console.log(
-    '\nSetting up sequencer guard, adding reporters as owners and removing sequencer from owners...',
+  const guard = OnlySequencerGuard__factory.connect(
+    deployData.coreContracts.OnlySequencerGuard!.address,
+    deployer,
   );
 
   const enabledGuard = await reporterMultisig.getGuard();
