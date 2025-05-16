@@ -264,7 +264,7 @@ pub mod tests {
     use super::*;
 
     // Helper function to create VotedFeedUpdate
-    fn create_voted_feed_update(feed_id: u32, value: &str) -> VotedFeedUpdate {
+    fn create_voted_feed_update(feed_id: u128, value: &str) -> VotedFeedUpdate {
         let bytes = from_hex_string(value).unwrap();
         VotedFeedUpdate {
             feed_id,
@@ -275,8 +275,8 @@ pub mod tests {
 
     fn setup_updates_rounds_and_config() -> (
         BatchedAggegratesToSend,
-        HashMap<u32, u64>,
-        HashMap<u32, FeedStrideAndDecimals>,
+        HashMap<u128, u64>,
+        HashMap<u128, FeedStrideAndDecimals>,
     ) {
         let updates = BatchedAggegratesToSend {
             block_height: 1234567890,

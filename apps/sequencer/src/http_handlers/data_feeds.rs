@@ -1121,7 +1121,7 @@ pub mod tests {
         .await;
         {
             let mut history = sequencer_state.feed_aggregate_history.write().await;
-            let feed_id = 1_u32;
+            let feed_id = 1_u128;
             history.register_feed(feed_id, 100);
             let feed_value = FeedType::Numerical(102754.0f64);
             let end_slot_timestamp = first_report_start_time
@@ -1191,7 +1191,7 @@ pub mod tests {
             + 300_u128 * 10_u128;
         {
             let mut history = sequencer_state.feed_aggregate_history.write().await;
-            let feed_id = 1_u32;
+            let feed_id = 1_u128;
             history.register_feed(feed_id, 3);
 
             history.push_next(

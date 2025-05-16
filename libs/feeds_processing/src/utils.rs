@@ -412,7 +412,7 @@ pub mod tests {
 
     use super::*;
 
-    fn create_feeds_config() -> HashMap<u32, FeedStrideAndDecimals> {
+    fn create_feeds_config() -> HashMap<u128, FeedStrideAndDecimals> {
         let mut config = HashMap::new();
 
         for feed_id in 0..15 {
@@ -442,9 +442,9 @@ pub mod tests {
     }
 
     async fn call_validate_with_values(
-        reporter_feed_ids: [u32; 3],
+        reporter_feed_ids: [u128; 3],
         reporter_last_votes: [f64; 3],
-        aggregated_feed_ids: [u32; 3],
+        aggregated_feed_ids: [u128; 3],
         aggregated_values: [f64; 3],
     ) -> Result<()> {
         let mut last_votes = HashMap::new();
@@ -493,7 +493,7 @@ pub mod tests {
             },
         ];
 
-        let mut feeds_rounds: HashMap<u32, u64> = HashMap::new();
+        let mut feeds_rounds: HashMap<u128, u64> = HashMap::new();
         feeds_rounds.insert(1, 1000);
         feeds_rounds.insert(5, 2000);
         feeds_rounds.insert(11, 3000);
@@ -556,7 +556,7 @@ pub mod tests {
             feeds_rounds,
         };
 
-        let feed_ids_union: HashSet<u32> = HashSet::from_iter(
+        let feed_ids_union: HashSet<u128> = HashSet::from_iter(
             reporter_feed_ids
                 .iter()
                 .copied()

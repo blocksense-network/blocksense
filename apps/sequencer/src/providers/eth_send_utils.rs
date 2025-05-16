@@ -976,7 +976,7 @@ mod tests {
         None
     }
 
-    fn test_feeds_config() -> HashMap<u32, FeedStrideAndDecimals> {
+    fn test_feeds_config() -> HashMap<u128, FeedStrideAndDecimals> {
         let mut feeds_config = HashMap::new();
         feeds_config.insert(
             0,
@@ -1103,7 +1103,7 @@ mod tests {
              uint32 awayFirstHalfTimeScore;
         }
         */
-        let result_key = String::from("00000003"); // 4 bytes of zeroes in hex
+        let result_key = String::from("00000000000000000000000000000003"); // 16 bytes of zeroes in hex
         let number_of_slots: String = String::from("0002"); // number 2 in two-bytes hex
         let slot1 =
             String::from("0000000100000002000000030000000400000005000000060000000700000008");
@@ -1132,7 +1132,7 @@ mod tests {
             .get(&net)
             .unwrap_or_else(|| panic!("Config for network {net} not found!"))
             .clone();
-        let feeds_config = Arc::new(RwLock::new(HashMap::<u32, FeedConfig>::new()));
+        let feeds_config = Arc::new(RwLock::new(HashMap::<u128, FeedConfig>::new()));
 
         let result = eth_batch_send_to_contract(
             net.clone(),
@@ -1260,7 +1260,7 @@ mod tests {
         let updates_oneshot = BatchedAggegratesToSend {
             block_height: 0,
             updates: vec![VotedFeedUpdate::new_decode(
-                "00000003",
+                "00000000000000000000000000000003",
                 &value1,
                 end_of_timeslot,
                 FeedType::Text("".to_string()),
@@ -1403,7 +1403,7 @@ mod tests {
                 .expect("Can't get latest values from contract");
             assert_eq!(latest.len(), 1);
             let latest = latest[0].clone().expect("no error in feed");
-            assert_eq!(latest.feed_id, 1_u32);
+            assert_eq!(latest.feed_id, 1_u128);
             assert_eq!(latest.num_updates, 3_u128);
             assert_eq!(latest.value, FeedType::Numerical(104011.78f64));
 
@@ -1414,7 +1414,7 @@ mod tests {
 
             assert_eq!(history.len(), 5);
 
-            let feed_ids: Vec<u32> = history
+            let feed_ids: Vec<u128> = history
                 .iter()
                 .map(|x| match x {
                     Ok(x) => x.feed_id,
@@ -1454,11 +1454,11 @@ mod tests {
                 })
                 .collect();
 
-            assert_eq!(feed_ids[0], 1_u32);
-            assert_eq!(feed_ids[1], 1_u32);
-            assert_eq!(feed_ids[2], 1_u32);
-            assert_eq!(feed_ids[3], 1_u32);
-            assert_eq!(feed_ids[4], 1_u32);
+            assert_eq!(feed_ids[0], 1_u128);
+            assert_eq!(feed_ids[1], 1_u128);
+            assert_eq!(feed_ids[2], 1_u128);
+            assert_eq!(feed_ids[3], 1_u128);
+            assert_eq!(feed_ids[4], 1_u128);
 
             assert_eq!(errors[0], Some("Timestamp is zero"));
             assert_eq!(values[1], Some(FeedType::Numerical(103082.01f64)));
@@ -1574,7 +1574,7 @@ mod tests {
         //let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
         let end_slot_timestamp = 0_u128;
         let v1 = VotedFeedUpdate {
-            feed_id: 0x1F_u32,
+            feed_id: 0x1F_u128,
             value: FeedType::Text("hi".to_string()),
             end_slot_timestamp,
         };
@@ -1671,7 +1671,7 @@ mod tests {
     fn peg_stable_coin_updates_data() -> BatchedAggegratesToSend {
         let end_slot_timestamp = 0_u128;
         let v1 = VotedFeedUpdate {
-            feed_id: 0x1F_u32,
+            feed_id: 0x1F_u128,
             value: FeedType::Text("hi".to_string()),
             end_slot_timestamp,
         };
@@ -1681,18 +1681,18 @@ mod tests {
             end_slot_timestamp,
         };
         let v3 = VotedFeedUpdate {
-            feed_id: 0x001_u32,
+            feed_id: 0x001_u128,
             value: FeedType::Numerical(1.001f64),
             end_slot_timestamp,
         };
 
         let v4 = VotedFeedUpdate {
-            feed_id: 0x001_u32,
+            feed_id: 0x001_u128,
             value: FeedType::Numerical(1.101f64),
             end_slot_timestamp,
         };
         let v5 = VotedFeedUpdate {
-            feed_id: 0x001_u32,
+            feed_id: 0x001_u128,
             value: FeedType::Numerical(0.991f64),
             end_slot_timestamp,
         };
@@ -1717,7 +1717,7 @@ mod tests {
             .entry(network.to_string())
             .and_modify(|p| {
                 let c = PublishCriteria {
-                    feed_id: 1_u32,
+                    feed_id: 1_u128,
                     skip_publish_if_less_then_percentage: 0.3f64,
                     always_publish_heartbeat_ms: None,
                     peg_to_value: Some(1f64),
@@ -1740,7 +1740,7 @@ mod tests {
         let mut provider = prov2.get_mut(network).unwrap().lock().await;
 
         provider.update_history(&[VotedFeedUpdate {
-            feed_id: 0x001_u32,
+            feed_id: 0x001_u128,
             value: FeedType::Numerical(1.0f64),
             end_slot_timestamp: 0_u128,
         }]);
@@ -1772,7 +1772,7 @@ mod tests {
             .entry(network.to_string())
             .and_modify(|p| {
                 let c = PublishCriteria {
-                    feed_id: 1_u32,
+                    feed_id: 1_u128,
                     skip_publish_if_less_then_percentage: 0.0f64,
                     always_publish_heartbeat_ms: None,
                     peg_to_value: None,
@@ -1794,7 +1794,7 @@ mod tests {
         let mut provider = prov2.get_mut(network).unwrap().lock().await;
 
         provider.update_history(&[VotedFeedUpdate {
-            feed_id: 0x001_u32,
+            feed_id: 0x001_u128,
             value: FeedType::Numerical(1.0f64),
             end_slot_timestamp: 0_u128,
         }]);

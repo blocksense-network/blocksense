@@ -507,7 +507,7 @@ mod tests {
 
     #[tokio::test]
     async fn relevant_feed_check() {
-        const DATA_FEED_ID: u32 = 1;
+        const DATA_FEED_ID: u128 = 1;
 
         let fmdr = new_feeds_meta_data_reg_with_test_data();
 
@@ -711,7 +711,7 @@ mod tests {
     #[tokio::test]
     async fn check_relevant_and_insert_mt() {
         const NTHREADS: u32 = 10;
-        const DATA_FEED_ID: u32 = 1;
+        const DATA_FEED_ID: u128 = 1;
 
         let fmdr = Arc::new(RwLock::new(new_feeds_meta_data_reg_with_test_data()));
         let reports = Arc::new(RwLock::new(AllFeedsReports::new()));
