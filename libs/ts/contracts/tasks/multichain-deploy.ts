@@ -67,6 +67,19 @@ task('deploy', 'Deploy contracts')
       const signerBalance = await config.provider.getBalance(signer);
       console.log(`// balance: ${signerBalance} //`);
 
+      const create2ContractSalts = {
+        upgradeableProxy: getOptionalEnvString(
+          'ADFS_UPGRADEABLE_PROXY_SALT',
+          ethers.id('upgradeableProxy'),
+        ),
+        accessControl: ethers.id('accessControl'),
+        adfs: ethers.id('aggregatedDataFeedStore'),
+        safeGuard: ethers.id('onlySafeGuard'),
+        safeModule: ethers.id('adminExecutorModule'),
+        clFeedRegistry: ethers.id('registry'),
+        clAggregatorProxy: ethers.id('aggregator'),
+      };
+
       const adminMultisig = await run('deploy-multisig', {
         config,
         type: 'adminMultisig',
@@ -75,28 +88,18 @@ task('deploy', 'Deploy contracts')
         await adminMultisig.getAddress(),
       );
 
-      const accessControlSalt = ethers.id('accessControl');
-      const adfsSalt = ethers.id('aggregatedDataFeedStore');
-      // env variable can be set to achieve an address that starts with '0xADF5'
-      const proxySalt = getOptionalEnvString(
-        'ADFS_UPGRADEABLE_PROXY_SALT',
-        ethers.id('upgradeableProxy'),
-      );
-      const safeGuardSalt = ethers.id('onlySafeGuard');
-      const safeModuleSalt = ethers.id('adminExecutorModule');
-
       const accessControlAddress = await predictAddress(
         artifacts,
         config,
         ContractNames.AccessControl,
-        accessControlSalt,
+        create2ContractSalts.accessControl,
         abiCoder.encode(['address'], [adminMultisigAddress]),
       );
       const upgradeableProxyAddress = await predictAddress(
         artifacts,
         config,
         ContractNames.UpgradeableProxyADFS,
-        proxySalt,
+        create2ContractSalts.upgradeableProxy,
         abiCoder.encode(['address'], [adminMultisigAddress]),
       );
 
@@ -105,28 +108,28 @@ task('deploy', 'Deploy contracts')
           name: ContractNames.AccessControl,
           argsTypes: ['address'],
           argsValues: [adminMultisigAddress],
-          salt: accessControlSalt,
+          salt: create2ContractSalts.accessControl,
           value: 0n,
         },
         {
           name: ContractNames.ADFS,
           argsTypes: ['address'],
           argsValues: [accessControlAddress],
-          salt: adfsSalt,
+          salt: create2ContractSalts.adfs,
           value: 0n,
         },
         {
           name: ContractNames.UpgradeableProxyADFS,
           argsTypes: ['address'],
           argsValues: [adminMultisigAddress],
-          salt: proxySalt,
+          salt: create2ContractSalts.upgradeableProxy,
           value: 0n,
         },
         {
           name: ContractNames.CLFeedRegistryAdapter,
           argsTypes: ['address', 'address'],
           argsValues: [adminMultisigAddress, upgradeableProxyAddress],
-          salt: ethers.id('registry'),
+          salt: create2ContractSalts.clFeedRegistry,
           value: 0n,
         },
         ...dataFeedConfig.map(data => {
@@ -139,7 +142,7 @@ task('deploy', 'Deploy contracts')
               data.id,
               upgradeableProxyAddress,
             ],
-            salt: ethers.id('aggregator'),
+            salt: create2ContractSalts.clAggregatorProxy,
             value: 0n,
             feedRegistryInfo: {
               description: data.description,
@@ -166,7 +169,7 @@ task('deploy', 'Deploy contracts')
           name: ContractNames.AdminExecutorModule,
           argsTypes: ['address', 'address'],
           argsValues: [sequencerMultisigAddress, adminMultisigAddress],
-          salt: safeModuleSalt,
+          salt: create2ContractSalts.safeModule,
           value: 0n,
         });
         contracts.unshift({
@@ -177,7 +180,7 @@ task('deploy', 'Deploy contracts')
             adminMultisigAddress,
             upgradeableProxyAddress,
           ],
-          salt: safeGuardSalt,
+          salt: create2ContractSalts.safeGuard,
           value: 0n,
         });
       }
