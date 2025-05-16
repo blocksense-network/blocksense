@@ -30,7 +30,7 @@ export async function executeMultisigTransaction({
   });
 
   if (!config.deployerIsLedger) {
-    console.log('\nProposing transaction...');
+    console.log('\n[WALLET] Proposing transaction...');
 
     const txResponse = await safe.executeTransaction(tx);
     const transaction = await config.provider.getTransaction(txResponse.hash);
@@ -57,7 +57,7 @@ export async function executeMultisigTransaction({
   );
   tx.addSignature(new EthSafeSignature(ledgerAddress, signature));
 
-  console.log('\nProposing transaction...');
+  console.log('\n[LEDGER] Proposing transaction...');
 
   const safeContract = assertNotNull(
     safe.getContractManager().safeContract,
