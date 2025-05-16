@@ -8,7 +8,10 @@ import {
   HttpApiSecurity,
 } from '@effect/platform';
 
-import { ParticipantPayloadSchema } from './types';
+import {
+  ParticipantPayloadSchema,
+  RetweetCheckPayloadSchema,
+} from './types';
 
 export class Authorization extends HttpApiMiddleware.Tag<Authorization>()(
   'Authorization',
@@ -36,7 +39,7 @@ export const verifyApi = HttpApi.make('verify')
       )
       .add(
         HttpApiEndpoint.post('hasXUserRetweeted', '/retweeted')
-          .setPayload(S.Struct({ userId: S.String, retweetCode: S.String }))
+          .setPayload(RetweetCheckPayloadSchema)
           .addSuccess(
             S.Struct({ isRetweeted: S.Boolean, isCodeCorrect: S.Boolean }),
           ),

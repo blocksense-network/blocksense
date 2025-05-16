@@ -22,8 +22,7 @@ import {
   XUserFollowingResponseSchema,
   XUserInfoResponseSchema,
 } from './types';
-import { fetchAndDecodeJSON, TooManyRequests } from './utils';
-import { isFollowing } from 'thirdweb/extensions/lens';
+import { checkCodeRetweet, fetchAndDecodeJSON, TooManyRequests } from './utils';
 
 type ApiEndpoint<RequestA, RequestI, ResponseA, ResponseI> = {
   method: HttpMethod;
@@ -214,45 +213,7 @@ export const server: ApiServer<Api> = {
 
       return Effect.tryPromise({
         try: async () => {
-          const xUserRetweetsResponse = await fetchAndDecodeJSON(
-            TweetsResponseSchema,
-            `https://api.socialdata.tools/twitter/user/${userId}/tweets`,
-            {
-              headers: {
-                Authorization: `Bearer ${socialDataApiKey}`,
-              },
-            },
-          );
-          console.log(`Successfully fetched retweet. userId: ${userId}`);
-
-          const targetRetweets = xUserRetweetsResponse.tweets.filter(
-            tweet => tweet.quoted_status?.id_str === tweetId,
-          );
-          if (!targetRetweets || targetRetweets.length === 0) {
-            console.error(
-              `No quoted retweets found for user ${userId} on tweet ${tweetId}`,
-            );
-            return { isRetweeted: false, isCodeCorrect: false };
-          }
-
-          const retweetContainsCode = targetRetweets.some(tweet =>
-            tweet.full_text.includes(payload.retweetCode),
-          );
-          if (!retweetContainsCode) {
-            console.error(
-              `Retweet does not contain the correct code for user ${userId} on tweet ${tweetId}`,
-            );
-            return { isRetweeted: true, isCodeCorrect: false };
-          }
-
-          console.log(
-            `Successfully verified quote retweet for user ${userId} on tweet ${tweetId} with code ${payload.retweetCode}`,
-          );
-
-          return {
-            isRetweeted: true,
-            isCodeCorrect: true,
-          };
+          return await checkCodeRetweet(payload, tweetId, socialDataApiKey);
         },
         catch: error => {
           console.error(`Error fetching X user ${userId} retweets`, error);

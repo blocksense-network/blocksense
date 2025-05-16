@@ -28,6 +28,13 @@ export const DiscordUserInfoResponseSchema = S.Array(
   }),
 );
 
+export const RetweetCheckPayloadSchema = S.Struct({
+  retweetCode: S.String,
+  userId: S.String,
+});
+
+export type RetweetCheckPayload = typeof RetweetCheckPayloadSchema.Type;
+
 export const ParticipantPayloadSchema = S.mutable(
   S.Struct({
     xHandle: S.String,
