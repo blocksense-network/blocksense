@@ -345,7 +345,7 @@ export const server: ApiServer<Api> = {
           );
 
           const insertQuery =
-            'INSERT INTO participants (x_handle, discord_username, wallet_address, minting_tx) VALUES (?, ?, ?, ?)';
+            'INSERT INTO participants (x_handle, discord_username, wallet_address, minting_tx, is_verified) VALUES (?, ?, ?, ?, ?)';
           const insertResult = await db
             .prepare(insertQuery)
             .bind(
@@ -353,6 +353,7 @@ export const server: ApiServer<Api> = {
               payload.discordUsername,
               payload.walletAddress,
               payload.mintingTx,
+              false,
             )
             .all();
 
