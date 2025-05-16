@@ -32,6 +32,7 @@
   "dependencies": {
     "@effect/platform": "^0.80.13",
     "effect": "^3.14.13",
-    "thirdweb": "^5.95.3"
+    "thirdweb": "^5.95.3",
+    "web3": "^4.16.0"
   }
 }

@@ -2232,6 +2232,7 @@ __metadata:
     tsx: "npm:^4.19.3"
     typescript: "npm:^5.5.2"
     vitest: "npm:~3.0.7"
+    web3: "npm:^4.16.0"
     wrangler: "npm:^4.15.2"
   languageName: unknown
   linkType: soft
