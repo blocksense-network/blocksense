@@ -22,7 +22,8 @@ import {
   XUserFollowingResponseSchema,
   XUserInfoResponseSchema,
 } from './types';
-import { fetchAndDecodeJSON } from './utils';
+import { fetchAndDecodeJSON, TooManyRequests } from './utils';
+import { isFollowing } from 'thirdweb/extensions/lens';
 
 type ApiEndpoint<RequestA, RequestI, ResponseA, ResponseI> = {
   method: HttpMethod;
@@ -124,15 +125,30 @@ export const server: ApiServer<Api> = {
 
       return Effect.tryPromise({
         try: async () => {
-          const xUserInfoResponse = await fetchAndDecodeJSON(
-            XUserInfoResponseSchema,
-            `https://api.socialdata.tools/twitter/user/${username}`,
-            {
-              headers: {
-                Authorization: `Bearer ${socialDataApiKey}`,
+          let xUserInfoResponse;
+          try {
+            xUserInfoResponse = await fetchAndDecodeJSON(
+              XUserInfoResponseSchema,
+              `https://api.socialdata.tools/twitter/user/${username}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${socialDataApiKey}`,
+                },
               },
-            },
-          );
+            );
+          } catch (error) {
+            if (error instanceof TooManyRequests) {
+              console.warn(
+                'Too many requests to X API, returning isFollowing as true',
+              );
+              return {
+                isFollowing: true,
+                userId: '',
+              };
+            } else {
+              throw error;
+            }
+          }
 
           const userId = xUserInfoResponse.id_str;
           if (!userId) {
@@ -143,15 +159,31 @@ export const server: ApiServer<Api> = {
             `Successfully fetched user ID. username: ${username} id: ${userId}`,
           );
 
-          const xUserFollowingResponse = await fetchAndDecodeJSON(
-            XUserFollowingResponseSchema,
-            `https://api.socialdata.tools/twitter/user/${userId}/following/${xBlocksenseAccountId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${socialDataApiKey}`,
+          let xUserFollowingResponse;
+          try {
+            xUserFollowingResponse = await fetchAndDecodeJSON(
+              XUserFollowingResponseSchema,
+              `https://api.socialdata.tools/twitter/user/${userId}/following/${xBlocksenseAccountId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${socialDataApiKey}`,
+                },
               },
-            },
-          );
+            );
+          } catch (error) {
+            if (error instanceof TooManyRequests) {
+              console.warn(
+                'Too many requests to X API, returning isFollowing as true',
+              );
+              return {
+                isFollowing: true,
+                userId: '',
+              };
+            } else {
+              throw error;
+            }
+          }
+
           console.log(
             `Successfully fetched user following status. username: ${username} id: ${userId} isFollowing: ${xUserFollowingResponse.is_following}`,
           );
@@ -238,15 +270,30 @@ export const server: ApiServer<Api> = {
 
       return Effect.tryPromise({
         try: async () => {
-          const discordResponse = await fetchAndDecodeJSON(
-            DiscordUserInfoResponseSchema,
-            `https://discord.com/api/v10/guilds/${discordGuildId}/members/search?query=${username}`,
-            {
-              headers: {
-                Authorization: `Bot ${discordBotToken}`,
+          let discordResponse;
+          try {
+            discordResponse = await fetchAndDecodeJSON(
+              DiscordUserInfoResponseSchema,
+              `https://discord.com/api/v10/guilds/${discordGuildId}/members/search?query=${username}`,
+              {
+                headers: {
+                  Authorization: `Bot ${discordBotToken}`,
+                },
               },
-            },
-          );
+            );
+          } catch (error) {
+            if (error instanceof TooManyRequests) {
+              console.warn(
+                'Too many requests to Discord API, returning isMember as true',
+              );
+              return {
+                isMember: true,
+              };
+            } else {
+              throw error;
+            }
+          }
+
           console.log(
             `Successfully fetched Discord member. username: ${username}`,
           );
@@ -364,7 +411,7 @@ export const server: ApiServer<Api> = {
               payload.discordUsername,
               payload.walletAddress,
               payload.mintingTx,
-              false,
+              true,
             )
             .all();
 
