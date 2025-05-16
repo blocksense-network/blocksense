@@ -60,7 +60,7 @@ impl InMemDb {
         sequencer_id: u64,
         new_block_height: u64,
         new_feeds_in_block: Vec<BlockFeedConfig>,
-        feed_ids_to_delete_in_block: Vec<u32>,
+        feed_ids_to_delete_in_block: Vec<u128>,
     ) -> Result<(BlockHeader, FeedActions)> {
         // Populate new and to be removed feeds in block:
         let mut add_remove_feeds = FeedActions::default();

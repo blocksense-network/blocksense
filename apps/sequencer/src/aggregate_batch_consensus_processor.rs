@@ -377,7 +377,7 @@ pub async fn aggregation_batch_consensus_loop(
         .expect("Failed to spawn aggregation_batch_consensus_loop!")
 }
 
-async fn failed_tx(net: &str, ids_vec: &Vec<u32>, provider: &mut RpcProvider) {
+async fn failed_tx(net: &str, ids_vec: &Vec<u128>, provider: &mut RpcProvider) {
     decrement_feeds_round_indexes(ids_vec, net, provider).await;
     provider.dec_num_tx_in_progress();
 }
