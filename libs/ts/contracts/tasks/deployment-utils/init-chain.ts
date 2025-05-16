@@ -96,9 +96,9 @@ export async function initChain(
 
     sequencerAddress: envCfg.sequencerAddress,
 
-    deployWithSequencerMultisig: envCfg.reporterMultisigEnable,
+    deployWithReporterMultisig: envCfg.reporterMultisigEnable,
 
-    sequencerMultisig: {
+    reporterMultisig: {
       owners: envCfg.reporterMultisigSigners,
       threshold: envCfg.reporterMultisigThreshold,
     },
