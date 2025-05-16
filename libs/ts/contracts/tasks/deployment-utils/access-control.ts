@@ -28,6 +28,9 @@ export async function setUpAccessControl({
   reporterMultisig,
 }: Params) {
   const { deployer, deployerAddress, sequencerAddress } = config;
+  const {
+    OnlySequencerGuard__factory,
+  } = require('@blocksense/contracts/typechain');
 
   console.log('\nSetting sequencer role in sequencer guard...');
   console.log(`Sequencer address: ${sequencerAddress}`);
@@ -41,17 +44,17 @@ export async function setUpAccessControl({
   const abiCoder = new AbiCoder();
   const transactions: SafeTransactionDataPartial[] = [];
 
-  const {
-    OnlySequencerGuard__factory,
-  } = require('@blocksense/contracts/typechain');
-
-  const guard = OnlySequencerGuard__factory.connect(
-    deployData.coreContracts.OnlySequencerGuard!.address,
-    deployer,
-  );
   if (reporterMultisig) {
-    const isSequencerSet = await guard.getSequencerRole(sequencerAddress);
+    const guard = OnlySequencerGuard__factory.connect(
+      deployData.coreContracts.OnlySequencerGuard!.address,
+      deployer,
+    );
 
+    console.log(
+      '\nSetting up sequencer guard, adding reporters as owners and removing sequencer from owners...',
+    );
+
+    const isSequencerSet = await guard.getSequencerRole(sequencerAddress);
     if (!isSequencerSet) {
       const safeTxSetGuard: SafeTransactionDataPartial = {
         to: guard.target.toString(),
@@ -68,11 +71,11 @@ export async function setUpAccessControl({
     }
   }
 
-  const sequencerMultisigAddress = reporterMultisig
+  const reporterMultisigAddress = reporterMultisig
     ? await reporterMultisig.getAddress()
     : sequencerAddress;
 
-  if (sequencerMultisigAddress) {
+  if (reporterMultisigAddress) {
     console.log(
       '\nSetting up access control and adding owners to admin multisig...',
     );
@@ -87,7 +90,7 @@ export async function setUpAccessControl({
       Number(
         await deployer.call({
           to: accessControl.target.toString(),
-          data: sequencerMultisigAddress,
+          data: reporterMultisigAddress,
         }),
       ),
     );
@@ -98,7 +101,7 @@ export async function setUpAccessControl({
         value: '0',
         data: solidityPacked(
           ['address', 'bool'],
-          [sequencerMultisigAddress, true],
+          [reporterMultisigAddress, true],
         ),
         operation: OperationType.Call,
       };
@@ -152,15 +155,17 @@ export async function setUpAccessControl({
       console.log('Current threshold', await adminMultisig.getThreshold());
     }
   }
+
   if (!reporterMultisig) {
     console.log(
-      'Sequencer multisig not set up, skipping reporter multisig setup',
+      'Reporter multisig not set up, skipping reporter multisig setup',
     );
     return;
   }
 
-  console.log(
-    '\nSetting up sequencer guard, adding reporters as owners and removing sequencer from owners...',
+  const guard = OnlySequencerGuard__factory.connect(
+    deployData.coreContracts.OnlySequencerGuard!.address,
+    deployer,
   );
 
   const enabledGuard = await reporterMultisig.getGuard();
@@ -180,7 +185,7 @@ export async function setUpAccessControl({
       )
       .then(tx => tx.data),
 
-    ...config.sequencerMultisig.owners.map(ownerAddress =>
+    ...config.reporterMultisig.owners.map(ownerAddress =>
       reporterMultisig
         .createAddOwnerTx({
           ownerAddress,
@@ -189,7 +194,7 @@ export async function setUpAccessControl({
     ),
 
     {
-      to: sequencerMultisigAddress,
+      to: reporterMultisigAddress,
       value: '0',
       // removeOwner(address prevOwner, address owner, uint256 threshold);
       data:
@@ -198,9 +203,9 @@ export async function setUpAccessControl({
           .encode(
             ['address', 'address', 'uint256'],
             [
-              config.sequencerMultisig.owners[0],
+              config.reporterMultisig.owners[0],
               deployerAddress,
-              config.sequencerMultisig.threshold,
+              config.reporterMultisig.threshold,
             ],
           )
           .slice(2),
@@ -216,7 +221,7 @@ export async function setUpAccessControl({
 
   console.log('Only sequencer guard set');
   console.log(
-    'Sequencer multisig owners changed to reporters',
+    'Reporter multisig owners changed to reporters',
     await reporterMultisig.getOwners(),
   );
   console.log('Removed sequencer from multisig owners');

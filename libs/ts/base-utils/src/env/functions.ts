@@ -104,11 +104,10 @@ export function parseEnvConfig<Env$ extends EnvSchema>(
   env: NodeJS.ProcessEnv = process.env,
 ): EnvTypeFromSchema<Env$> {
   const res = {} as EnvTypeFromSchema<Env$>;
-
   for (const key in config) {
     const varName = envVarNameJoin(key, suffix);
     const schema = assertNotNull(
-      config[varName],
+      config[key],
       `Schema for '${varName}' is missing.`,
     );
     res[key] = parseEnv(varName, schema, true, env);

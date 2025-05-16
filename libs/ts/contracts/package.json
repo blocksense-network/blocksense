@@ -15,7 +15,7 @@
     },
     "./typechain": {
       "types": "./typechain/index.ts",
-      "require": "./dist/typechain/index.js"
+      "require": "./typechain/index.ts"
     },
     "./contractsFileStructure.json": {
       "require": "./artifacts/docs/contractsFileStructure.json",

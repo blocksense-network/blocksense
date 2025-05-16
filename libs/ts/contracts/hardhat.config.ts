@@ -55,8 +55,10 @@ const config: HardhatUserConfig = {
         enabled: process.env['FORKING'] === 'true',
         url: getOptionalRpcUrl('ethereum-mainnet'),
       },
-      ledgerAccounts: getOptionalEnvString('LEDGER_ACCOUNT', '')
-        ? [getOptionalEnvString('LEDGER_ACCOUNT', '')]
+      ledgerAccounts: Boolean(
+        getOptionalEnvString('DEPLOYER_ADDRESS_IS_LEDGER_LOCAL', 'false'),
+      )
+        ? [getOptionalEnvString('DEPLOYER_ADDRESS_LOCAL', '')]
         : undefined,
     },
     ...fromEntries(

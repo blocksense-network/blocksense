@@ -7,7 +7,7 @@ import {
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
 
-import { NetworkConfig, ContractNames } from './types';
+import { ContractNames } from './types';
 
 import { readEvmDeployment, readConfig } from '@blocksense/config-types';
 import { encodeDataAndTimestamp } from '../test/utils/helpers/common';
@@ -15,6 +15,7 @@ import { Feed, WriteOp } from '../test/utils/wrappers/types';
 
 import { expect } from 'chai';
 import { initChain } from './deployment-utils/init-chain';
+import { EthereumAddress } from '@blocksense/base-utils';
 
 task(
   'test-deploy',
@@ -38,16 +39,9 @@ task(
 
   const config = await initChain(ethers, networkName);
 
-  if (!config.deployWithSequencerMultisig) {
-    console.log('Test needs sequencer multisig set!');
-    return;
-  }
-
   const { contracts: deployment } = await readEvmDeployment(networkName, true);
 
-  const accessControl = deployment.coreContracts.AccessControl.address;
   const adminMultisigAddr = deployment.AdminMultisig;
-  const sequencerMultisigAddr = deployment.SequencerMultisig;
 
   const adminMultisig = await Safe.init({
     provider: config.rpc,
@@ -58,92 +52,156 @@ task(
     },
   });
 
+  if (
+    config.sequencerAddress !== '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199'
+  ) {
+    throw new Error(
+      'Test needs sequencer address set to 0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199!',
+    );
+  }
+
   // Public key: 0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199
   const sequencerWallet = new Wallet(
     '0xdf57089febbacf7ba0bc227dafbffa9fc08a93fdc68e1e42411a14efcf23656e',
     config.provider,
   );
 
-  if (!deployment.SequencerMultisig) {
-    throw new Error('Sequencer multisig not found in deployment');
-  }
+  type ReporterMultisig = {
+    signer: Wallet;
+    address: string;
+    multisig: Safe;
+  };
+  type SequencerSigner = {
+    signer: Wallet;
+    address: string;
+  };
 
-  const sequencerMultisig = await Safe.init({
-    provider: config.rpc,
-    safeAddress: deployment.SequencerMultisig,
-    signer: sequencerWallet.privateKey,
-    contractNetworks: {
-      [config.network.chainId.toString()]: config.safeAddresses,
-    },
-  });
+  const isReporterMultisig = (
+    multisig: ReporterMultisig | SequencerSigner,
+  ): multisig is ReporterMultisig => {
+    return 'multisig' in multisig;
+  };
+
+  let writer: ReporterMultisig | SequencerSigner = {
+    signer: sequencerWallet,
+    address: sequencerWallet.address,
+  };
 
   // Public key: 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
   const reporter = new Wallet(
     '0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d',
+    config.provider,
   );
 
-  // change threshold to 1 for easier testing
-  const tx = await adminMultisig.createTransaction({
-    transactions: [
-      {
-        to: deployment.coreContracts.AdminExecutorModule!.address,
-        data: (await sequencerMultisig.createChangeThresholdTx(1)).data.data,
-        value: '0',
-      } as SafeTransactionDataPartial,
-    ],
-  });
-  await adminMultisig.executeTransaction(tx);
+  if (deployment.ReporterMultisig && config.deployWithReporterMultisig) {
+    const reporterMultisigAddr = deployment.ReporterMultisig;
+    const reporterMultisig = await Safe.init({
+      provider: config.rpc,
+      safeAddress: reporterMultisigAddr,
+      signer: sequencerWallet.privateKey,
+      contractNetworks: {
+        [config.network.chainId.toString()]: config.safeAddresses,
+      },
+    });
+
+    if (
+      !config.reporterMultisig.owners.includes(
+        reporter.address as EthereumAddress,
+      )
+    ) {
+      throw new Error(
+        'Test needs reporter multisig owner: ' + reporter.address,
+      );
+    }
+
+    writer = {
+      multisig: reporterMultisig,
+      address: reporterMultisigAddr,
+      signer: reporter,
+    };
+
+    // change threshold to 1 for easier testing
+    let safeTxChangeThreshold =
+      await reporterMultisig.createChangeThresholdTx(1);
+    const adminExecutorModule = await ethers.getContractAt(
+      'AdminExecutorModule',
+      deployment.coreContracts.AdminExecutorModule!.address,
+    );
+
+    const isValidExecTx = await reporterMultisig.isValidTransaction(
+      safeTxChangeThreshold,
+    );
+    expect(isValidExecTx).to.be.false;
+
+    await execMultiSig({
+      safe: adminMultisig,
+      to: adminExecutorModule.target.toString(),
+      data: (
+        await adminExecutorModule.executeTransaction.populateTransaction(
+          safeTxChangeThreshold.data.data,
+        )
+      ).data,
+    });
+  }
 
   ////////////////////////
   // Write data in ADFS //
   ////////////////////////
   console.log('Writing data in ADFS...');
 
+  const deployedClAggregatorKey = +Object.keys(
+    deployment.CLAggregatorAdapter,
+  )[0];
+
   const upgradeableProxyAddr =
     deployment.coreContracts.UpgradeableProxyADFS.address;
 
-  let writeTx = await sequencerMultisig.createTransaction({
-    transactions: [
+  const txData = {
+    to: upgradeableProxyAddr,
+    value: '0',
+    data: encodeDataWrite([
       {
-        to: upgradeableProxyAddr,
-        value: '0',
-        data: encodeDataWrite([
-          {
-            id: 1n,
-            stride: 0n,
-            round: 1n,
-            data: encodeDataAndTimestamp(1234),
-          },
-        ]),
+        id: BigInt(deployedClAggregatorKey),
+        stride: 0n,
+        round: 1n,
+        data: encodeDataAndTimestamp(1234),
       },
-    ],
-  });
+    ]),
+  };
 
-  const apiKit = await Safe.init({
-    provider: config.rpc,
-    safeAddress: await sequencerMultisig.getAddress(),
-    signer: reporter.address,
-    contractNetworks: {
-      [config.network.chainId.toString()]: config.safeAddresses,
-    },
-  });
-  writeTx = await apiKit.signTransaction(writeTx);
+  if (isReporterMultisig(writer)) {
+    let writeTx = await writer.multisig.createTransaction({
+      transactions: [txData],
+    });
 
-  const safeGuard = await ethers.getContractAt(
-    ContractNames.OnlySequencerGuard,
-    deployment.coreContracts.OnlySequencerGuard!.address,
-  );
+    const reporterMultisigWithReporterSigner = await Safe.init({
+      provider: config.rpc,
+      safeAddress: writer.address,
+      signer: writer.signer.address,
+      contractNetworks: {
+        [config.network.chainId.toString()]: config.safeAddresses,
+      },
+    });
+    writeTx = await reporterMultisigWithReporterSigner.signTransaction(writeTx);
 
-  const isValidTransaction = await apiKit.isValidTransaction(writeTx);
-  // reporters cannot send signed transactions to upgradeable proxy
-  // only sequencer can
-  expect(isValidTransaction).to.be.false;
+    const isValidTransaction =
+      await reporterMultisigWithReporterSigner.isValidTransaction(writeTx);
+    // reporters cannot send signed transactions to upgradeable proxy
+    // only sequencer can
+    expect(isValidTransaction).to.be.false;
 
-  // sequencer cannot send direct transaction to upgradeable proxy
-  // AccessControl will reject this transaction
-  await expect(sequencerWallet.sendTransaction(writeTx.data)).to.be.reverted;
+    // sequencer cannot send direct transaction to upgradeable proxy
+    // AccessControl will reject this transaction
+    await expect(sequencerWallet.sendTransaction(writeTx.data)).to.be.reverted;
 
-  await sequencerMultisig.executeTransaction(writeTx);
+    await writer.multisig.executeTransaction(writeTx);
+  } else {
+    // other signers cannot send direct transaction to upgradeable proxy
+    await expect(reporter.sendTransaction(txData)).to.be.reverted;
+
+    const tx = await sequencerWallet.sendTransaction(txData);
+    await tx.wait();
+  }
 
   ////////////////////////////////////////////
   // Check Aggregator                       //
@@ -154,10 +212,13 @@ task(
 
   const aggregator = await ethers.getContractAt(
     ContractNames.CLAggregatorAdapter,
-    deployment.CLAggregatorAdapter[1].address,
+    deployment.CLAggregatorAdapter[deployedClAggregatorKey].address,
+    sequencerWallet,
   );
 
-  expect(await aggregator.description()).to.equal(feeds[1].description);
+  expect(await aggregator.description()).to.equal(
+    feeds[deployedClAggregatorKey].full_name,
+  );
   expect(await aggregator.latestAnswer()).to.equal(1234);
 
   ////////////////////////////////////////////
@@ -189,23 +250,30 @@ task(
   ///////////////////////////////////////////
   // Change sequencer rights in Safe Guard //
   ///////////////////////////////////////////
-  console.log('Changing sequencer rights in Safe Guard...');
+  if (isReporterMultisig(writer)) {
+    console.log('Changing sequencer rights in Safe Guard...');
 
-  await execMultiSig({
-    safe: adminMultisig,
-    to: safeGuard.target.toString(),
-    data: safeGuard.interface.encodeFunctionData('setSequencer', [
-      reporter.address,
-      false,
-    ]),
-  });
+    const safeGuard = await ethers.getContractAt(
+      ContractNames.OnlySequencerGuard,
+      deployment.coreContracts.OnlySequencerGuard!.address,
+    );
 
-  const writeTxData2: SafeTransactionDataPartial = {
+    await execMultiSig({
+      safe: adminMultisig,
+      to: safeGuard.target.toString(),
+      data: safeGuard.interface.encodeFunctionData('setSequencer', [
+        reporter.address,
+        true,
+      ]),
+    });
+  }
+
+  const txData2 = {
     to: upgradeableProxyAddr,
     value: '0',
     data: encodeDataWrite([
       {
-        id: 1n,
+        id: BigInt(deployedClAggregatorKey),
         stride: 0n,
         round: 2n,
         data: encodeDataAndTimestamp(5678),
@@ -213,14 +281,28 @@ task(
     ]),
   };
 
-  const writeDataTx = await sequencerMultisig.createTransaction({
-    transactions: [writeTxData2].map(tx => ({
-      ...tx,
-      operation: OperationType.Call,
-    })),
-  });
+  if (isReporterMultisig(writer)) {
+    const reporterMultisigWithReporterSigner = await Safe.init({
+      provider: config.rpc,
+      safeAddress: writer.address,
+      signer: writer.signer.address,
+      contractNetworks: {
+        [config.network.chainId.toString()]: config.safeAddresses,
+      },
+    });
+    const writeDataTx =
+      await reporterMultisigWithReporterSigner.createTransaction({
+        transactions: [txData2].map(tx => ({
+          ...tx,
+          operation: OperationType.Call,
+        })),
+      });
 
-  await apiKit.executeTransaction(writeDataTx);
+    await reporterMultisigWithReporterSigner.executeTransaction(writeDataTx);
+  } else {
+    const tx = await writer.signer.sendTransaction(txData2);
+    await tx.wait();
+  }
 
   const latestAnswer2 = await aggregator.latestAnswer();
   expect(latestAnswer2).to.equal(5678);
@@ -230,27 +312,26 @@ task(
   //////////////////////////////////////
   console.log('Changing Access Control admin role...');
 
+  const accessControlAddr = deployment.coreContracts.AccessControl.address;
+
   const isAllowed = await resolveBool(
     sequencerWallet.call({
-      to: accessControl,
-      data: sequencerMultisigAddr,
+      to: accessControlAddr,
+      data: writer.address,
     }),
   );
   expect(isAllowed).to.equal(true);
 
   await execMultiSig({
     safe: adminMultisig,
-    to: accessControl,
-    data: ethers.solidityPacked(
-      ['address', 'bool'],
-      [sequencerMultisigAddr, true],
-    ),
+    to: accessControlAddr,
+    data: ethers.solidityPacked(['address', 'bool'], [writer.address, false]),
   });
 
   const isAllowedAfter = await resolveBool(
     sequencerWallet.call({
-      to: accessControl,
-      data: sequencerMultisigAddr,
+      to: accessControlAddr,
+      data: writer.address,
     }),
   );
   expect(isAllowedAfter).to.equal(false);

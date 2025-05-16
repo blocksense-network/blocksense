@@ -27,7 +27,7 @@ task('multisig-tx-exec', '[UTILS] Execute multisig transactions').setAction(
     });
 
     if (!config.deployerIsLedger) {
-      console.log('\nProposing transaction...');
+      console.log('\n[WALLET] Proposing transaction...');
 
       const txResponse = await safe.executeTransaction(tx);
       const transaction = await config.provider.getTransaction(txResponse.hash);
@@ -54,7 +54,7 @@ task('multisig-tx-exec', '[UTILS] Execute multisig transactions').setAction(
     );
     tx.addSignature(new EthSafeSignature(ledgerAddress, signature));
 
-    console.log('\nProposing transaction...');
+    console.log('\n[LEDGER] Proposing transaction...');
 
     const safeContract = assertNotNull(
       safe.getContractManager().safeContract,

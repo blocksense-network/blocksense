@@ -76,7 +76,7 @@ const ContractsConfigSchemaV2 = S.mutable(
         value: CLAggregatorAdapterDataSchemaV2,
       }),
     ),
-    SequencerMultisig: S.NullOr(ethereumAddress),
+    ReporterMultisig: S.NullOr(ethereumAddress),
     AdminMultisig: ethereumAddress,
   }),
 ).annotations({ identifier: 'ContractsConfigV2' });
