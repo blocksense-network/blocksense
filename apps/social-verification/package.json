@@ -27,7 +27,7 @@
     "tsx": "^4.19.3",
     "typescript": "^5.5.2",
     "vitest": "~3.0.7",
-    "wrangler": "^4.13.0"
+    "wrangler": "^4.15.2"
   },
   "dependencies": {
     "@effect/platform": "^0.80.13",
