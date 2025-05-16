@@ -4,7 +4,7 @@ pragma solidity ^0.8.28;
 contract AggregatedDataFeedStoreGeneric {
   address internal constant DATA_FEED_ADDRESS =
     0x0000000100000000000000000000000000000000;
-  address internal constant ROUND_ADDRESS =
+  address internal constant RING_BUFFER_TABLE_ADDRESS =
     0x0000000000000000000000000000000000001000;
   address internal immutable ACCESS_CONTROL;
 
@@ -16,18 +16,20 @@ contract AggregatedDataFeedStoreGeneric {
     ACCESS_CONTROL = accessControl;
   }
 
-  function getLatestRound(
+  function getLatestIndex(
     uint256 stride,
     uint256 feedId
-  ) public view returns (uint256 round) {
-    uint256 index = uint160(ROUND_ADDRESS) + (2 ** 115 * stride + feedId) / 16;
+  ) public view returns (uint256 index) {
+    uint256 indexSlot = uint160(RING_BUFFER_TABLE_ADDRESS) +
+      (2 ** 115 * stride + feedId) /
+      16;
     uint256 pos = (feedId % 16) * 16;
 
     assembly {
-      round := shr(
+      index := shr(
         sub(240, pos),
         and(
-          sload(index),
+          sload(indexSlot),
           shr(
             pos,
             0xFFFF000000000000000000000000000000000000000000000000000000000000
@@ -45,7 +47,7 @@ contract AggregatedDataFeedStoreGeneric {
   ) public view returns (bytes memory) {
     return
       _getData(
-        getLatestRound(stride, feedId),
+        getLatestIndex(stride, feedId),
         stride,
         feedId,
         startSlot,
@@ -53,28 +55,28 @@ contract AggregatedDataFeedStoreGeneric {
       );
   }
 
-  function getFeedAtRound(
+  function getDataAtIndex(
     uint256 stride,
     uint256 feedId,
-    uint256 round,
+    uint256 index,
     uint256 startSlot,
     uint256 slots
   ) public view returns (bytes memory) {
-    return _getData(round, stride, feedId, startSlot, slots);
+    return _getData(index, stride, feedId, startSlot, slots);
   }
 
-  function getLatestDataAndRound(
+  function getLatestDataAndIndex(
     uint256 stride,
     uint256 feedId,
     uint256 startSlot,
     uint256 slots
   ) external view returns (uint256, bytes memory) {
-    uint256 round = getLatestRound(stride, feedId);
-    return (round, getFeedAtRound(stride, feedId, round, startSlot, slots));
+    uint256 index = getLatestIndex(stride, feedId);
+    return (index, getDataAtIndex(stride, feedId, index, startSlot, slots));
   }
 
   function _getData(
-    uint256 round,
+    uint256 index,
     uint256 stride,
     uint256 feedId,
     uint256 startSlot,
@@ -82,7 +84,7 @@ contract AggregatedDataFeedStoreGeneric {
   ) internal view returns (bytes memory data) {
     uint256 pos = startSlot +
       (uint256(uint160(DATA_FEED_ADDRESS)) << stride) +
-      (feedId * (2 ** 13) + round) *
+      (feedId * (2 ** 13) + index) *
       (2 ** stride);
 
     assembly {
@@ -108,8 +110,8 @@ contract AggregatedDataFeedStoreGeneric {
     uint256[] calldata strides,
     uint256[] calldata indices,
     bytes[] calldata data,
-    uint256[] calldata roundTableIndices,
-    bytes32[] calldata roundTableData
+    uint256[] calldata indexTableIndices,
+    bytes32[] calldata indexTableData
   ) external {
     (bool success, bytes memory res) = ACCESS_CONTROL.call(
       abi.encodePacked(msg.sender)
@@ -136,14 +138,14 @@ contract AggregatedDataFeedStoreGeneric {
       }
     }
 
-    for (uint256 i = 0; i < roundTableIndices.length; i++) {
-      uint256 index = roundTableIndices[i];
+    for (uint256 i = 0; i < indexTableIndices.length; i++) {
+      uint256 index = indexTableIndices[i];
 
       require(index < 2 ** 116);
 
-      bytes32 dataSlice = roundTableData[i];
+      bytes32 dataSlice = indexTableData[i];
       assembly {
-        sstore(add(ROUND_ADDRESS, index), dataSlice)
+        sstore(add(RING_BUFFER_TABLE_ADDRESS, index), dataSlice)
       }
     }
 

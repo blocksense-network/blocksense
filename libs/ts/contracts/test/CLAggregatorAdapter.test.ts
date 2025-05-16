@@ -84,7 +84,7 @@ describe('CLAggregatorAdapter', function () {
         await contractWrappers[i].proxy.proxyCall('setFeeds', sequencer, [
           {
             id: BigInt(data.id),
-            round: 2n,
+            index: 2n,
             data: data2,
             stride: 0n,
           },
@@ -106,7 +106,7 @@ describe('CLAggregatorAdapter', function () {
         await contractWrappers[i].proxy.proxyCall('setFeeds', sequencer, [
           {
             id: BigInt(data.id),
-            round: 2n,
+            index: 2n,
             data: data2,
             stride: 0n,
           },
@@ -128,7 +128,7 @@ describe('CLAggregatorAdapter', function () {
         await contractWrappers[i].proxy.proxyCall('setFeeds', sequencer, [
           {
             id: BigInt(data.id),
-            round: 2n,
+            index: 2n,
             data: data2,
             stride: 0n,
           },
@@ -166,7 +166,7 @@ describe('CLAggregatorAdapter', function () {
         await contractWrappers[i].proxy.proxyCall('setFeeds', sequencer, [
           {
             id: BigInt(data.id),
-            round: 3n,
+            index: 3n,
             data: data3,
             stride: 0n,
           },

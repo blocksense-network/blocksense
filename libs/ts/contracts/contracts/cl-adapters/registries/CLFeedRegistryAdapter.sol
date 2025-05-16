@@ -48,8 +48,7 @@ contract CLFeedRegistryAdapter is ICLFeedRegistryAdapter {
     address base,
     address quote
   ) external view override returns (int256) {
-    return
-      CLAdapterLib._latestAnswer(feedData[base][quote].id, DATA_FEED_STORE);
+    return CLAdapterLib.latestAnswer(feedData[base][quote].id, DATA_FEED_STORE);
   }
 
   /// @inheritdoc IChainlinkFeedRegistry
@@ -59,7 +58,7 @@ contract CLFeedRegistryAdapter is ICLFeedRegistryAdapter {
     uint80 _roundId
   ) external view override returns (uint80, int256, uint256, uint256, uint80) {
     return
-      CLAdapterLib._getRoundData(
+      CLAdapterLib.getRoundData(
         _roundId,
         feedData[base][quote].id,
         DATA_FEED_STORE
@@ -84,7 +83,7 @@ contract CLFeedRegistryAdapter is ICLFeedRegistryAdapter {
       feedData[feeds[i].base][feeds[i].quote] = FeedData(
         IChainlinkAggregator(feeds[i].feed),
         ICLAggregatorAdapter(feeds[i].feed).decimals(),
-        CLAdapterLib._shiftId(ICLAggregatorAdapter(feeds[i].feed).id()),
+        CLAdapterLib.shiftId(ICLAggregatorAdapter(feeds[i].feed).id()),
         ICLAggregatorAdapter(feeds[i].feed).description()
       );
     }
@@ -95,7 +94,7 @@ contract CLFeedRegistryAdapter is ICLFeedRegistryAdapter {
     address base,
     address quote
   ) external view override returns (uint256) {
-    return CLAdapterLib._latestRound(feedData[base][quote].id, DATA_FEED_STORE);
+    return CLAdapterLib.latestRound(feedData[base][quote].id, DATA_FEED_STORE);
   }
 
   /// @inheritdoc IChainlinkFeedRegistry
@@ -104,6 +103,6 @@ contract CLFeedRegistryAdapter is ICLFeedRegistryAdapter {
     address quote
   ) external view override returns (uint80, int256, uint256, uint256, uint80) {
     return
-      CLAdapterLib._latestRoundData(feedData[base][quote].id, DATA_FEED_STORE);
+      CLAdapterLib.latestRoundData(feedData[base][quote].id, DATA_FEED_STORE);
   }
 }

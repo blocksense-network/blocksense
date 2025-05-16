@@ -21,8 +21,8 @@ export const compareGasUsed = async <
   adfsGenericContractWrappers: IADFSWrapper[] | IUpgradeableProxyADFSWrapper[],
   valuesCount: number,
   adfsData?: {
-    skip?: number; // used to skip feeds so to make testing round table write
-    round?: bigint;
+    skip?: number; // used to skip feeds so to make testing ring buffer index table write
+    index?: bigint;
     stride?: bigint;
   },
   start: number = 0,
@@ -51,9 +51,9 @@ export const compareGasUsed = async <
     ...adfsGenericContractWrappers,
   ]) {
     if (isUpgradeableProxy(wrapper)) {
-      await wrapper.proxyCall('checkLatestValue', sequencer, data.feeds);
+      await wrapper.proxyCall('checkLatestData', sequencer, data.feeds);
     } else {
-      await wrapper.checkLatestValue(sequencer, data.feeds);
+      await wrapper.checkLatestData(sequencer, data.feeds);
     }
   }
 

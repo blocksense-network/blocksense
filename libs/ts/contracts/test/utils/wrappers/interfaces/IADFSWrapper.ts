@@ -22,7 +22,7 @@ export interface IADFSWrapper extends IBaseWrapper<AggregatedDataFeedStore> {
 
   getEventFragment(): EventFragment;
 
-  checkLatestValue(
+  checkLatestData(
     caller: HardhatEthersSigner,
     feeds: Feed[],
     opts?: {
@@ -30,7 +30,7 @@ export interface IADFSWrapper extends IBaseWrapper<AggregatedDataFeedStore> {
     },
   ): Promise<void>;
 
-  checkLatestRound(
+  checkLatestIndex(
     caller: HardhatEthersSigner,
     feeds: Feed[],
     opts?: {
@@ -38,7 +38,7 @@ export interface IADFSWrapper extends IBaseWrapper<AggregatedDataFeedStore> {
     },
   ): Promise<void>;
 
-  checkValueAtRound(
+  checkDataAtIndex(
     caller: HardhatEthersSigner,
     feeds: Feed[],
     opts?: {
@@ -46,7 +46,7 @@ export interface IADFSWrapper extends IBaseWrapper<AggregatedDataFeedStore> {
     },
   ): Promise<void>;
 
-  checkLatestFeedAndRound(
+  checkLatestDataAndIndex(
     caller: HardhatEthersSigner,
     feeds: Feed[],
     opts?: {

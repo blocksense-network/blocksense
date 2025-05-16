@@ -40,7 +40,7 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
     return this.contract.interface.getEvent('DataFeedsUpdated')!;
   }
 
-  public async checkLatestValue(
+  public async checkLatestData(
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
     opts: {
@@ -50,7 +50,7 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
     for (const feed of feeds) {
       const storedValue = await sequencer.call({
         to: this.contract.target,
-        data: this.encodeDataRead(ReadOp.GetLatestFeed, feed),
+        data: this.encodeDataRead(ReadOp.GetLatestData, feed),
         ...opts.txData,
       });
 
@@ -60,7 +60,7 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
     }
   }
 
-  public async checkLatestRound(
+  public async checkLatestIndex(
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
     opts: {
@@ -68,17 +68,17 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
     } = {},
   ) {
     for (const feed of feeds) {
-      const round = await sequencer.call({
+      const index = await sequencer.call({
         to: this.contract.target,
-        data: this.encodeDataRead(ReadOp.GetLatestRound, feed),
+        data: this.encodeDataRead(ReadOp.GetLatestIndex, feed),
         ...opts.txData,
       });
 
-      expect(+round).to.equal(feed.round);
+      expect(+index).to.equal(feed.index);
     }
   }
 
-  public async checkValueAtRound(
+  public async checkDataAtIndex(
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
     opts: {
@@ -88,7 +88,7 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
     for (const feed of feeds) {
       const storedValue = await sequencer.call({
         to: this.contract.target,
-        data: this.encodeDataRead(ReadOp.GetFeedAtRound, feed),
+        data: this.encodeDataRead(ReadOp.GetDataAtIndex, feed),
         ...opts.txData,
       });
 
@@ -98,7 +98,7 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
     }
   }
 
-  public async checkLatestFeedAndRound(
+  public async checkLatestDataAndIndex(
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
     opts: {
@@ -108,7 +108,7 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
     for (const feed of feeds) {
       const storedValue = await sequencer.call({
         to: this.contract.target,
-        data: this.encodeDataRead(ReadOp.GetLatestFeedAndRound, feed),
+        data: this.encodeDataRead(ReadOp.GetLatestDataAndIndex, feed),
         ...opts.txData,
       });
 
@@ -117,9 +117,7 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
         storedValue,
       );
 
-      // console.log('feed', feed);
-
-      expect(parsed[0]).to.be.equal(feed.round);
+      expect(parsed[0]).to.be.equal(feed.index);
       expect(parsed[1]).to.be.equal(this.formatData(feed));
     }
   }
@@ -137,7 +135,7 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
       const res = await caller.call({
         to: this.contract.target,
         data: this.encodeDataRead(
-          opts.operations ? opts.operations[index] : ReadOp.GetLatestFeed,
+          opts.operations ? opts.operations[index] : ReadOp.GetLatestData,
           feed,
         ),
         ...opts.txData,
@@ -152,7 +150,7 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
   public encodeDataWrite = (feeds: Feed[], blockNumber?: number) => {
     blockNumber ??= Date.now() + 100;
     const indices = feeds.map(
-      feed => (feed.id * 2n ** 13n + feed.round) * 2n ** feed.stride,
+      feed => (feed.id * 2n ** 13n + feed.index) * 2n ** feed.stride,
     );
 
     const batchFeeds: { [key: string]: string } = {};
@@ -166,8 +164,8 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
         batchFeeds[rowIndex] = '0x' + '0'.repeat(64);
       }
 
-      // Convert round to 2b hex and pad if needed
-      const roundHex = feed.round.toString(16).padStart(4, '0');
+      // Convert index to 2b hex and pad if needed
+      const indexHex = feed.index.toString(16).padStart(4, '0');
 
       // Calculate position in the 32b row (64 hex chars)
       const position = slotPosition * 4;
@@ -175,23 +173,23 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
       // Replace the corresponding 2b in the row
       batchFeeds[rowIndex] =
         batchFeeds[rowIndex].slice(0, position + 2) +
-        roundHex +
+        indexHex +
         batchFeeds[rowIndex].slice(position + 6);
     });
 
-    const roundTableIndices = Object.keys(batchFeeds).filter(
+    const indexTableIndices = Object.keys(batchFeeds).filter(
       key => batchFeeds[key] !== ethers.toBeHex(0, 32),
     );
 
-    const roundTableData = roundTableIndices.map(key => batchFeeds[key]);
+    const indexTableData = indexTableIndices.map(key => batchFeeds[key]);
 
     return this.contract.interface.encodeFunctionData('write', [
       blockNumber,
       feeds.map(feed => feed.stride),
       indices,
       feeds.map(feed => feed.data),
-      roundTableIndices,
-      roundTableData,
+      indexTableIndices,
+      indexTableData,
     ]);
   };
 
@@ -199,30 +197,30 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
     const slots = feed.slotsToRead ?? Math.ceil((feed.data.length - 2) / 64);
 
     switch (operation) {
-      case ReadOp.GetLatestFeed:
+      case ReadOp.GetLatestData:
         return this.contract.interface.encodeFunctionData('getLatestData', [
           feed.stride,
           feed.id,
           feed.startSlotToReadFrom ?? 0,
           slots,
         ]);
-      case ReadOp.GetLatestRound:
-        return this.contract.interface.encodeFunctionData('getLatestRound', [
+      case ReadOp.GetLatestIndex:
+        return this.contract.interface.encodeFunctionData('getLatestIndex', [
           feed.stride,
           feed.id,
         ]);
-      case ReadOp.GetFeedAtRound:
-        return this.contract.interface.encodeFunctionData('getFeedAtRound', [
+      case ReadOp.GetDataAtIndex:
+        return this.contract.interface.encodeFunctionData('getDataAtIndex', [
           feed.stride,
           feed.id,
-          feed.round,
+          feed.index,
           feed.startSlotToReadFrom ?? 0,
 
           slots,
         ]);
-      case ReadOp.GetLatestFeedAndRound:
+      case ReadOp.GetLatestDataAndIndex:
         return this.contract.interface.encodeFunctionData(
-          'getLatestDataAndRound',
+          'getLatestDataAndIndex',
           [feed.stride, feed.id, feed.startSlotToReadFrom ?? 0, slots],
         );
       default:

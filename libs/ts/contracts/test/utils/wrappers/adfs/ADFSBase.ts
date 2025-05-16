@@ -61,7 +61,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     });
   }
 
-  public async checkLatestValue(
+  public async checkLatestData(
     caller: HardhatEthersSigner,
     feeds: Feed[],
     opts: {
@@ -71,7 +71,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     for (const feed of feeds) {
       const storedValue = await caller.call({
         to: this.contract.target,
-        data: this.encodeDataRead(ReadOp.GetLatestFeed, feed),
+        data: this.encodeDataRead(ReadOp.GetLatestData, feed),
         ...opts.txData,
       });
 
@@ -79,7 +79,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     }
   }
 
-  public async checkLatestRound(
+  public async checkLatestIndex(
     caller: HardhatEthersSigner,
     feeds: Feed[],
     opts: {
@@ -89,15 +89,15 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     for (const feed of feeds) {
       const round = await caller.call({
         to: this.contract.target,
-        data: this.encodeDataRead(ReadOp.GetLatestRound, feed),
+        data: this.encodeDataRead(ReadOp.GetLatestIndex, feed),
         ...opts.txData,
       });
 
-      expect(+round).to.equal(feed.round);
+      expect(+round).to.equal(feed.index);
     }
   }
 
-  public async checkValueAtRound(
+  public async checkDataAtIndex(
     caller: HardhatEthersSigner,
     feeds: Feed[],
     opts: {
@@ -107,7 +107,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     for (const feed of feeds) {
       const storedValue = await caller.call({
         to: this.contract.target,
-        data: this.encodeDataRead(ReadOp.GetFeedAtRound, feed),
+        data: this.encodeDataRead(ReadOp.GetDataAtIndex, feed),
         ...opts.txData,
       });
 
@@ -115,7 +115,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     }
   }
 
-  public async checkLatestFeedAndRound(
+  public async checkLatestDataAndIndex(
     caller: HardhatEthersSigner,
     feeds: Feed[],
     opts: {
@@ -125,12 +125,12 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     for (const feed of feeds) {
       const storedValue = await caller.call({
         to: this.contract.target,
-        data: this.encodeDataRead(ReadOp.GetLatestFeedAndRound, feed),
+        data: this.encodeDataRead(ReadOp.GetLatestDataAndIndex, feed),
         ...opts.txData,
       });
 
       expect(storedValue).to.be.equal(
-        ethers.toBeHex(feed.round, 32).concat(this.formatData(feed).slice(2)),
+        ethers.toBeHex(feed.index, 32).concat(this.formatData(feed).slice(2)),
       );
     }
   }
@@ -148,7 +148,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
       const res = await caller.call({
         to: this.contract.target,
         data: this.encodeDataRead(
-          opts.operations ? opts.operations[index] : ReadOp.GetLatestFeed,
+          opts.operations ? opts.operations[index] : ReadOp.GetLatestData,
           feed,
         ),
         ...opts.txData,
@@ -168,7 +168,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     );
 
     const data = feeds.map(feed => {
-      const index = (feed.id * 2n ** 13n + feed.round) * 2n ** feed.stride;
+      const index = (feed.id * 2n ** 13n + feed.index) * 2n ** feed.stride;
       const indexInBytesLength = Math.ceil(index.toString(2).length / 8);
       const bytes = (feed.data.length - 2) / 2;
       const bytesLength = Math.ceil(bytes.toString(2).length / 8);
@@ -207,7 +207,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
       }
 
       // Convert round to 2b hex and pad if needed
-      const roundHex = feed.round.toString(16).padStart(4, '0');
+      const roundHex = feed.index.toString(16).padStart(4, '0');
 
       // Calculate position in the 32b row (64 hex chars)
       const position = slotPosition * 4;
@@ -258,20 +258,20 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     }
     const types = Array(optionalParameters.length).fill('uint32');
 
-    if (operation === ReadOp.GetFeedAtRound) {
+    if (operation === ReadOp.GetDataAtIndex) {
       return prefix.concat(
         ethers
           .solidityPacked(
             ['uint16', ...types],
-            [feed.round, ...optionalParameters],
+            [feed.index, ...optionalParameters],
           )
           .slice(2),
       );
     }
 
     if (
-      operation === ReadOp.GetLatestFeed ||
-      operation === ReadOp.GetLatestFeedAndRound
+      operation === ReadOp.GetLatestData ||
+      operation === ReadOp.GetLatestDataAndIndex
     ) {
       return prefix.concat(
         ethers.solidityPacked(types, optionalParameters).slice(2),

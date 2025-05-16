@@ -17,32 +17,32 @@ import { generateRandomFeeds } from './utils/helpers/common';
 const feeds: Feed[] = [
   {
     id: 1n,
-    round: 6n,
+    index: 6n,
     stride: 1n,
     data: '0x12343267643573',
     slotsToRead: 1,
   },
   {
     id: 2n,
-    round: 5n,
+    index: 5n,
     stride: 0n,
     data: '0x2456',
   },
   {
     id: 3n,
-    round: 4n,
+    index: 4n,
     stride: 0n,
     data: '0x3678',
   },
   {
     id: 4n,
-    round: 3n,
+    index: 3n,
     stride: 0n,
     data: '0x4890',
   },
   {
     id: 5n,
-    round: 2n,
+    index: 2n,
     stride: 0n,
     data: '0x5abc',
   },
@@ -77,9 +77,9 @@ describe('AggregatedDataFeedStore', () => {
     contract.checkEvent(receipt!, blockNumber);
   });
 
-  it('Should get latest round', async () => {
+  it('Should get latest index', async () => {
     await contract.setFeeds(sequencer, feeds);
-    await contract.checkLatestRound(sequencer, feeds);
+    await contract.checkLatestIndex(sequencer, feeds);
   });
 
   it('Should get latest single feed data', async () => {
@@ -96,65 +96,65 @@ describe('AggregatedDataFeedStore', () => {
 
   it('Should get latest data', async () => {
     await contract.setFeeds(sequencer, feeds);
-    await contract.checkLatestValue(sequencer, feeds);
+    await contract.checkLatestData(sequencer, feeds);
   });
 
-  it('Should get historical feed at round', async () => {
+  it('Should get historical feed at index', async () => {
     await contract.setFeeds(sequencer, feeds);
 
     const updatedFeeds = feeds.map(feed => {
       return {
         ...feed,
-        round: feed.round + 1n,
+        index: feed.index + 1n,
         data: ethers.hexlify(ethers.randomBytes(feed.data.length)),
       };
     });
 
     await contract.setFeeds(sequencer, updatedFeeds);
 
-    await contract.checkValueAtRound(sequencer, feeds);
-    await contract.checkValueAtRound(sequencer, updatedFeeds);
+    await contract.checkDataAtIndex(sequencer, feeds);
+    await contract.checkDataAtIndex(sequencer, updatedFeeds);
   });
 
-  it('Should get latest single feed and round after update', async () => {
+  it('Should get latest single feed and index after update', async () => {
     const stride0Feeds = feeds.filter(feed => feed.stride === 0n);
     await contract.setFeeds(sequencer, stride0Feeds);
 
     const updatedFeeds = stride0Feeds.map(feed => {
       return {
         ...feed,
-        round: feed.round + 1n,
+        index: feed.index + 1n,
         data: ethers.hexlify(ethers.randomBytes(feed.data.length)),
       };
     });
 
     await contract.setFeeds(sequencer, updatedFeeds);
     const res = await contract.getValues(sequencer, stride0Feeds, {
-      operations: stride0Feeds.map(() => ReadOp.GetLatestSingleFeedAndRound),
+      operations: stride0Feeds.map(() => ReadOp.GetLatestSingleDataAndIndex),
     });
 
     for (const [i, feed] of updatedFeeds.entries()) {
       expect(res[i]).to.equal(
         ethers
-          .toBeHex(feed.round, 32)
+          .toBeHex(feed.index, 32)
           .concat(contract.formatData(feed).slice(2)),
       );
     }
   });
 
-  it('Should get latest feed and round after update', async () => {
+  it('Should get latest feed and index after update', async () => {
     await contract.setFeeds(sequencer, feeds);
 
     const updatedFeeds = feeds.map(feed => {
       return {
         ...feed,
-        round: feed.round + 1n,
+        index: feed.index + 1n,
         data: ethers.hexlify(ethers.randomBytes(feed.data.length)),
       };
     });
 
     await contract.setFeeds(sequencer, updatedFeeds);
-    await contract.checkLatestFeedAndRound(sequencer, updatedFeeds);
+    await contract.checkLatestDataAndIndex(sequencer, updatedFeeds);
   });
 
   it('Should revert on write when not in access control', async () => {
@@ -183,7 +183,7 @@ describe('AggregatedDataFeedStore', () => {
       contract.setFeeds(sequencer, [
         {
           id: 1n,
-          round: 1n,
+          index: 1n,
           stride: 31n,
           data: '0x12343267643573',
         },
@@ -194,7 +194,7 @@ describe('AggregatedDataFeedStore', () => {
       contract.setFeeds(sequencer, [
         {
           id: 1n,
-          round: 1n,
+          index: 1n,
           stride: 32n,
           data: '0x12343267643573',
         },
@@ -205,14 +205,14 @@ describe('AggregatedDataFeedStore', () => {
   it('[R] Should revert when id is bigger than max id (2**115 - 1)', async () => {
     const feed: Feed = {
       id: 2n ** 115n - 1n,
-      round: 1n,
+      index: 1n,
       stride: 31n,
       data: '0x12343267643573',
       slotsToRead: 1,
     };
     await contract.setFeeds(sequencer, [feed]);
-    await contract.checkLatestValue(sequencer, [feed]);
-    await contract.checkValueAtRound(sequencer, [feed]);
+    await contract.checkLatestData(sequencer, [feed]);
+    await contract.checkDataAtIndex(sequencer, [feed]);
 
     await expect(
       contract.getValues(sequencer, [
@@ -231,7 +231,7 @@ describe('AggregatedDataFeedStore', () => {
             id: feed.id + 1n,
           },
         ],
-        { operations: [ReadOp.GetFeedAtRound] },
+        { operations: [ReadOp.GetDataAtIndex] },
       ),
     ).to.be.reverted;
   });
@@ -239,14 +239,14 @@ describe('AggregatedDataFeedStore', () => {
   it('[R] Should revert when stride is bigger than max stride (31)', async () => {
     const feed: Feed = {
       id: 2n,
-      round: 1n,
+      index: 1n,
       stride: 31n,
       data: '0x12343267643573',
       slotsToRead: 1,
     };
     await contract.setFeeds(sequencer, [feed]);
-    await contract.checkLatestValue(sequencer, [feed]);
-    await contract.checkValueAtRound(sequencer, [feed]);
+    await contract.checkLatestData(sequencer, [feed]);
+    await contract.checkDataAtIndex(sequencer, [feed]);
 
     await expect(
       contract.getValues(sequencer, [
@@ -265,21 +265,21 @@ describe('AggregatedDataFeedStore', () => {
             stride: 32n,
           },
         ],
-        { operations: [ReadOp.GetFeedAtRound] },
+        { operations: [ReadOp.GetDataAtIndex] },
       ),
     ).to.be.reverted;
   });
 
-  it('[R] Should revert when round is bigger than max round (2**13 - 1)', async () => {
+  it('[R] Should revert when index is bigger than max index (2**13 - 1)', async () => {
     const feed: Feed = {
       id: 1n,
-      round: 2n ** 13n - 1n,
+      index: 2n ** 13n - 1n,
       stride: 31n,
       data: '0x12343267643573',
       slotsToRead: 1,
     };
     await contract.setFeeds(sequencer, [feed]);
-    await contract.checkValueAtRound(sequencer, [feed]);
+    await contract.checkDataAtIndex(sequencer, [feed]);
 
     await expect(
       contract.getValues(
@@ -287,13 +287,13 @@ describe('AggregatedDataFeedStore', () => {
         [
           {
             id: 1n,
-            round: 2n ** 13n,
+            index: 2n ** 13n,
             stride: 31n,
             slotsToRead: 1,
           },
         ],
         {
-          operations: [ReadOp.GetFeedAtRound],
+          operations: [ReadOp.GetDataAtIndex],
         },
       ),
     ).to.be.reverted;
@@ -302,14 +302,14 @@ describe('AggregatedDataFeedStore', () => {
   it('[R] Should revert when slots to read exceed feed space', async () => {
     const feed = {
       id: 5000000000000n,
-      round: 2n ** 13n - 1n,
+      index: 2n ** 13n - 1n,
       stride: 3n,
       data: ethers.hexlify(ethers.randomBytes(32)),
       slotsToRead: 8,
     };
     await contract.setFeeds(sequencer, [feed]);
-    await contract.checkLatestValue(sequencer, [feed]);
-    await contract.checkValueAtRound(sequencer, [feed]);
+    await contract.checkLatestData(sequencer, [feed]);
+    await contract.checkDataAtIndex(sequencer, [feed]);
 
     await expect(
       contract.getValues(
@@ -321,7 +321,7 @@ describe('AggregatedDataFeedStore', () => {
           },
         ],
         {
-          operations: [ReadOp.GetFeedAtRound],
+          operations: [ReadOp.GetDataAtIndex],
         },
       ),
     ).to.be.reverted;
@@ -335,19 +335,19 @@ describe('AggregatedDataFeedStore', () => {
           },
         ],
         {
-          operations: [ReadOp.GetLatestFeed],
+          operations: [ReadOp.GetLatestData],
         },
       ),
     ).to.be.reverted;
   });
 
   it('[W] Should revert when index is outside of stride space', async () => {
-    // round is exceeded
+    // index is exceeded
     await expect(
       contract.setFeeds(sequencer, [
         {
           id: 2n ** 115n - 1n,
-          round: 2n ** 13n,
+          index: 2n ** 13n,
           stride: 0n,
           data: '0x12343267643573',
         },
@@ -359,7 +359,7 @@ describe('AggregatedDataFeedStore', () => {
       contract.setFeeds(sequencer, [
         {
           id: 2n ** 115n,
-          round: 2n,
+          index: 2n,
           stride: 0n,
           data: '0x12343267643573',
         },
@@ -370,7 +370,7 @@ describe('AggregatedDataFeedStore', () => {
       contract.setFeeds(sequencer, [
         {
           id: 2n ** 115n - 1n,
-          round: 2n ** 13n - 1n,
+          index: 2n ** 13n - 1n,
           stride: 0n,
           data: ethers.hexlify(ethers.randomBytes(32)),
         },
@@ -382,7 +382,7 @@ describe('AggregatedDataFeedStore', () => {
       contract.setFeeds(sequencer, [
         {
           id: 2n ** 115n - 1n,
-          round: 2n ** 13n - 1n,
+          index: 2n ** 13n - 1n,
           stride: 0n,
           data: ethers.hexlify(ethers.randomBytes(33)),
         },
@@ -390,21 +390,21 @@ describe('AggregatedDataFeedStore', () => {
     ).to.be.reverted;
   });
 
-  it('[W] Should revert when round table index is bigger than 2**116', async () => {
+  it('[W] Should revert when index table index is bigger than 2**116', async () => {
     const feed = {
       id: 2n ** 115n - 1n,
-      round: 1n,
+      index: 1n,
       stride: 31n,
       data: '0x12343267643573',
     };
 
     let data = contract.encodeDataWrite([feed]);
 
-    const roundTableIndex = ethers.toBeHex(
+    const indexTableIndex = ethers.toBeHex(
       (2n ** 115n * feed.stride + feed.id) / 16n,
     );
-    const maxRoundTableIndex = ethers.toBeHex(2n ** 116n - 1n);
-    data = data.replace(roundTableIndex.slice(2), maxRoundTableIndex.slice(2));
+    const maxindexTableIndex = ethers.toBeHex(2n ** 116n - 1n);
+    data = data.replace(indexTableIndex.slice(2), maxindexTableIndex.slice(2));
     await expect(
       sequencer.sendTransaction({
         to: contract.contract.target,
@@ -412,10 +412,10 @@ describe('AggregatedDataFeedStore', () => {
       }),
     ).to.not.be.reverted;
 
-    const overflowRoundTableIndex = ethers.toBeHex(2n ** 116n);
+    const overflowindexTableIndex = ethers.toBeHex(2n ** 116n);
     data = data.replace(
-      maxRoundTableIndex.slice(2),
-      overflowRoundTableIndex.slice(2),
+      maxindexTableIndex.slice(2),
+      overflowindexTableIndex.slice(2),
     );
 
     // change blocknumber
@@ -434,7 +434,7 @@ describe('AggregatedDataFeedStore', () => {
     const feeds = generateRandomFeeds(15);
 
     await contract.setFeeds(sequencer, feeds);
-    await contract.checkLatestFeedAndRound(sequencer, feeds);
+    await contract.checkLatestDataAndIndex(sequencer, feeds);
   });
 
   describe('Compare gas usage', function () {
@@ -488,7 +488,7 @@ describe('AggregatedDataFeedStore', () => {
           [genericContract],
           i,
           {
-            round: 1n,
+            index: 1n,
           },
         );
 
@@ -500,7 +500,7 @@ describe('AggregatedDataFeedStore', () => {
           [genericContract],
           i,
           {
-            round: 2n,
+            index: 2n,
           },
         );
       });
@@ -515,7 +515,7 @@ describe('AggregatedDataFeedStore', () => {
           i,
           {
             skip: 16,
-            round: 1n,
+            index: 1n,
           },
         );
 
@@ -528,7 +528,7 @@ describe('AggregatedDataFeedStore', () => {
           i,
           {
             skip: 16,
-            round: 2n,
+            index: 2n,
           },
         );
       });
