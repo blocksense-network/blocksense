@@ -35,6 +35,15 @@ export const RetweetCheckPayloadSchema = S.Struct({
 
 export type RetweetCheckPayload = typeof RetweetCheckPayloadSchema.Type;
 
+export const GenerateSignaturePayloadSchema = S.mutable(
+  S.Struct({
+    ...RetweetCheckPayloadSchema.fields,
+    accountAddress: S.String,
+    xHandle: S.String,
+    discord: S.String,
+  }),
+);
+
 export const ParticipantPayloadSchema = S.mutable(
   S.Struct({
     xHandle: S.String,

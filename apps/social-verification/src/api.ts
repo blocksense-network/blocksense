@@ -9,6 +9,7 @@ import {
 } from '@effect/platform';
 
 import {
+  GenerateSignaturePayloadSchema,
   ParticipantPayloadSchema,
   RetweetCheckPayloadSchema,
 } from './types';
@@ -59,7 +60,7 @@ export const verifyApi = HttpApi.make('verify')
     HttpApiGroup.make('mint')
       .add(
         HttpApiEndpoint.post('generateMintSignature', '/signature')
-          .setPayload(S.Struct({ accountAddress: S.String }))
+          .setPayload(GenerateSignaturePayloadSchema)
           .addSuccess(
             S.Union(
               S.Struct({

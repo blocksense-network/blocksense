@@ -14,6 +14,7 @@ import { createThirdwebClient, getContract } from 'thirdweb';
 import { arbitrum } from 'thirdweb/chains';
 import { privateKeyToAccount } from 'thirdweb/wallets';
 import { balanceOf, generateMintSignature } from 'thirdweb/extensions/erc721';
+import Web3 from 'web3';
 
 import { Authorization, verifyApi } from './api';
 import {
@@ -278,6 +279,10 @@ export const server: ApiServer<Api> = {
       const CLIENT_ID = env['NFT_CLIENT_ID'];
       const CONTRACT_ADDRESS = env['NFT_SMART_CONTRACT_ADDRESS'];
       const PRIVATE_KEY = env['NFT_PRIVATE_KEY'];
+      const socialDataApiKey = env['SOCIAL_DATA_API_KEY'];
+      const tweetId = env['X_BLOCKSENSE_TWEET_ID'];
+
+      const { retweetCode, userId, discord, xHandle, accountAddress } = payload;
 
       const metadata = {
         name: 'Blocksense Pirate',
@@ -301,6 +306,42 @@ export const server: ApiServer<Api> = {
 
       return Effect.tryPromise({
         try: async () => {
+          // Check signature
+          const message = `🏴‍☠️ Ahoy! ${discord}, known as @${xHandle}, is part of the Blocksense crew now — welcome aboard!`;
+          const web3 = new Web3();
+          const recoveredAddress = await web3.eth.accounts.recover(
+            message,
+            retweetCode,
+          );
+          const isSignatureCorrect =
+            recoveredAddress.toLowerCase() === accountAddress.toLowerCase();
+
+          if (!isSignatureCorrect) {
+            console.error(
+              `Retweet code signature does not match for users wallet ${accountAddress}`,
+            );
+            return {
+              error: 'Retweet code signature does not match',
+            };
+          }
+
+          // Check if user has retweeted the tweet with the correct code
+          const retweetStatus = await checkCodeRetweet(
+            { userId, retweetCode },
+            tweetId,
+            socialDataApiKey,
+          );
+
+          const { isRetweeted, isCodeCorrect } = retweetStatus;
+          if (!isRetweeted) {
+            return { error: 'You have not retweeted' };
+          }
+          if (!isCodeCorrect) {
+            return {
+              error: 'Your retweet does not contain the correct code',
+            };
+          }
+
           const client = createThirdwebClient({
             clientId: CLIENT_ID,
           });
@@ -311,35 +352,36 @@ export const server: ApiServer<Api> = {
             address: CONTRACT_ADDRESS,
           });
 
+          // Check if user already has an NFT
+          const balance = await balanceOf({
+            contract,
+            owner: accountAddress,
+          });
+
+          if (balance > 0) {
+            const error = `Account ${accountAddress} already has an NFT`;
+            console.error(error);
+            return { error };
+          }
+
           const admin = privateKeyToAccount({
             client,
             privateKey: PRIVATE_KEY,
           });
-
-          const balance = await balanceOf({
-            contract,
-            owner: payload.accountAddress,
-          });
-
-          if (balance > 0) {
-            const error = `Account ${payload.accountAddress} already has an NFT`;
-            console.error(error);
-            return { error };
-          }
 
           const { payload: generatedPayload, signature } =
             await generateMintSignature({
               account: admin,
               contract,
               mintRequest: {
-                to: payload.accountAddress,
+                to: accountAddress,
                 metadata,
               },
               contractType: 'TokenERC721',
             });
 
           console.log(
-            `Successfully generated mint signature - ${signature} for account ${payload.accountAddress}`,
+            `Successfully generated mint signature - ${signature} for account ${accountAddress}`,
           );
 
           return { signature, payload: generatedPayload };
