@@ -8,7 +8,7 @@ import {
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
 
-import { assertNotNull } from '@blocksense/base-utils';
+import { assertNotNull, EthereumAddress } from '@blocksense/base-utils';
 
 import { ContractNames, NetworkConfig } from '../types';
 import { executeMultisigTransaction } from './multisig-tx-exec';
@@ -29,6 +29,9 @@ export async function setUpAccessControl({
   reporterMultisig,
 }: Params) {
   const { deployer, deployerAddress, sequencerAddress } = config;
+  const {
+    OnlySequencerGuard__factory,
+  } = require('@blocksense/contracts/typechain');
 
   console.log('\nSetting sequencer role in sequencer guard...');
   console.log(`Sequencer address: ${sequencerAddress}`);
@@ -42,20 +45,15 @@ export async function setUpAccessControl({
   const abiCoder = new AbiCoder();
   const transactions: SafeTransactionDataPartial[] = [];
 
-  const { OnlySequencerGuard__factory } = await import(
-    '@blocksense/contracts/typechain'
-  );
-
-  const guard = OnlySequencerGuard__factory.connect(
-    assertNotNull(
-      deployData.safe.OnlySequencerGuard,
-      'OnlySequencerGuard is not specified in the deployment data',
-    ).address,
-    deployer,
-  );
   if (reporterMultisig) {
-    const isSequencerSet = await guard.getSequencerRole(sequencerAddress);
+    const guard = OnlySequencerGuard__factory.connect(
+      deployData.safe.OnlySequencerGuard!.address,
+      deployer,
+    );
 
+    console.log('\nSetting sequencer address in guard...');
+
+    const isSequencerSet = await guard.getSequencerRole(sequencerAddress);
     if (!isSequencerSet) {
       const safeTxSetGuard: SafeTransactionDataPartial = {
         to: guard.target.toString(),
@@ -72,72 +70,90 @@ export async function setUpAccessControl({
     }
   }
 
-  const reporterMultisigAddress = reporterMultisig
-    ? await reporterMultisig.getAddress()
-    : sequencerAddress;
+  let reporterMultisigAddress: EthereumAddress;
 
-  if (reporterMultisigAddress) {
+  if (!reporterMultisig) {
     console.log(
-      '\nSetting up access control and adding owners to admin multisig...',
+      `Reporter multisig not set up, using sequencer address ${sequencerAddress} for access control`,
     );
-
-    const accessControl = new Contract(
-      deployData.coreContracts.AccessControl.address,
-      artifacts.readArtifactSync(ContractNames.AccessControl).abi,
-      deployer,
+    reporterMultisigAddress = sequencerAddress;
+  } else {
+    reporterMultisigAddress =
+      (await reporterMultisig.getAddress()) as EthereumAddress;
+    console.log(
+      `Reporter multisig set up, using reporter multisig address ${reporterMultisigAddress} for access control`,
     );
-
-    const isAllowed = Boolean(
-      Number(
-        await deployer.call({
-          to: accessControl.target.toString(),
-          data: reporterMultisigAddress,
-        }),
-      ),
-    );
-
-    if (!isAllowed) {
-      const safeTxSetAccessControl: SafeTransactionDataPartial = {
-        to: accessControl.target.toString(),
-        value: '0',
-        data: solidityPacked(
-          ['address', 'bool'],
-          [reporterMultisigAddress, true],
-        ),
-        operation: OperationType.Call,
-      };
-      transactions.push(safeTxSetAccessControl);
-    } else {
-      console.log('Access control already set up');
-    }
   }
 
-  const ownerBefore = await adminMultisig.getOwners();
-  if (ownerBefore.length === 1 && config.adminMultisig.owners.length > 0) {
+  const accessControl = new Contract(
+    deployData.coreContracts.AccessControl.address,
+    artifacts.readArtifactSync(ContractNames.AccessControl).abi,
+    deployer,
+  );
+
+  const isAllowed = Boolean(
+    Number(
+      await deployer.call({
+        to: accessControl.target.toString(),
+        data: reporterMultisigAddress,
+      }),
+    ),
+  );
+
+  if (!isAllowed) {
+    const safeTxSetAccessControl: SafeTransactionDataPartial = {
+      to: accessControl.target.toString(),
+      value: '0',
+      data: solidityPacked(
+        ['address', 'bool'],
+        [reporterMultisigAddress, true],
+      ),
+      operation: OperationType.Call,
+    };
+    transactions.push(safeTxSetAccessControl);
+  } else {
+    console.log('Access control already set up');
+  }
+
+  const ownersBeforeAdminMultisig = await adminMultisig.getOwners();
+  if (
+    ownersBeforeAdminMultisig.length === 1 &&
+    config.adminMultisig.owners.length > 0
+  ) {
     const adminMultisigAddress = await adminMultisig.getAddress();
     for (const owner of config.adminMultisig.owners) {
+      if (ownersBeforeAdminMultisig.includes(owner)) {
+        console.log(owner + ' is already an owner');
+        continue;
+      }
       const safeTxAddOwner = await adminMultisig.createAddOwnerTx({
         ownerAddress: owner,
       });
       transactions.push(safeTxAddOwner.data);
     }
-
-    const prevOwnerAddress = config.adminMultisig.owners[0];
-    // removeOwner(address prevOwner, address owner, uint256 threshold);
-    const safeTxRemoveOwner: SafeTransactionDataPartial = {
-      to: adminMultisigAddress,
-      value: '0',
-      data:
-        '0xf8dc5dd9' +
-        abiCoder
-          .encode(
-            ['address', 'address', 'uint256'],
-            [prevOwnerAddress, deployerAddress, config.adminMultisig.threshold],
-          )
-          .slice(2),
-      operation: OperationType.Call,
-    };
-    transactions.push(safeTxRemoveOwner);
+    if (!config.adminMultisig.owners.includes(deployerAddress)) {
+      console.log('Removing deployer from owners');
+      const prevOwnerAddress = config.adminMultisig.owners[0];
+      // removeOwner(address prevOwner, address owner, uint256 threshold);
+      const safeTxRemoveOwner: SafeTransactionDataPartial = {
+        to: adminMultisigAddress,
+        value: '0',
+        data:
+          '0xf8dc5dd9' +
+          abiCoder
+            .encode(
+              ['address', 'address', 'uint256'],
+              [
+                prevOwnerAddress,
+                deployerAddress,
+                config.adminMultisig.threshold,
+              ],
+            )
+            .slice(2),
+        operation: OperationType.Call,
+      };
+      transactions.push(safeTxRemoveOwner);
+    }
   }
 
   if (transactions.length > 0) {
@@ -147,24 +163,31 @@ export async function setUpAccessControl({
       config,
     });
 
-    if (ownerBefore.length === 1 && config.adminMultisig.owners.length > 0) {
+    if (
+      ownersBeforeAdminMultisig.length === 1 &&
+      config.adminMultisig.owners.length > 0
+    ) {
       console.log(
         'Admin multisig owners changed to',
         await adminMultisig.getOwners(),
       );
-      console.log('Removed signer from multisig owners');
       console.log('Current threshold', await adminMultisig.getThreshold());
     }
   }
+
   if (!reporterMultisig) {
     console.log(
-      'Sequencer multisig not set up, skipping reporter multisig setup',
+      'Reporter multisig not set up, skipping reporter multisig setup',
     );
     return;
   }
 
-  console.log(
-    '\nSetting up sequencer guard, adding reporters as owners and removing sequencer from owners...',
+  const guard = OnlySequencerGuard__factory.connect(
+    assertNotNull(
+      deployData.safe.OnlySequencerGuard,
+      'OnlySequencerGuard is not specified in the deployment data',
+    ).address,
+    deployer,
   );
 
   const enabledGuard = await reporterMultisig.getGuard();
@@ -209,6 +232,10 @@ export async function setUpAccessControl({
       operation: OperationType.Call,
     },
   ]);
+
+  console.log(
+    'Enabling reporter multisig guard and admin executor module, adding owners and removing deployer from owners',
+  );
 
   await executeMultisigTransaction({
     transactions: reporterMultisigTxs,

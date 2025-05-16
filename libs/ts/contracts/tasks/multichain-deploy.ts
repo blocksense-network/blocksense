@@ -295,10 +295,11 @@ task('deploy', 'Deploy contracts')
         config,
         deployData,
         adminMultisig,
-        reporterMultisig: reporterMultisig,
+        reporterMultisig,
       });
 
       if (!config.deployWithReporterMultisig) {
+        chainsDeployment[networkName].contracts.safe.AdminExecutorModule = null;
         chainsDeployment[networkName].contracts.safe.OnlySequencerGuard = null;
       }
     }
