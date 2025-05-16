@@ -17,8 +17,8 @@ export interface NetworkConfigBase {
   networkName: NetworkName;
   adfsUpgradeableProxySalt: HexDataString;
   sequencerAddress: EthereumAddress;
-  sequencerMultisig: MultisigConfig;
-  deployWithSequencerMultisig: boolean;
+  reporterMultisig: MultisigConfig;
+  deployWithReporterMultisig: boolean;
   adminMultisig: MultisigConfig;
   feedIds: 'all' | readonly bigint[];
   safeAddresses: {
@@ -48,7 +48,7 @@ export type NetworkConfig = NetworkConfigBase &
   );
 
 export enum ContractNames {
-  SequencerMultisig = 'SequencerMultisig',
+  ReporterMultisig = 'ReporterMultisig',
   AdminMultisig = 'AdminMultisig',
   CLFeedRegistryAdapter = 'CLFeedRegistryAdapter',
   CLAggregatorAdapter = 'CLAggregatorAdapter',
@@ -62,7 +62,7 @@ export enum ContractNames {
 export type DeployContract = {
   name: Exclude<
     ContractNames,
-    ContractNames.AdminMultisig | ContractNames.SequencerMultisig
+    ContractNames.AdminMultisig | ContractNames.ReporterMultisig
   >;
   argsTypes: string[];
   argsValues: any[];
