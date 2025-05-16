@@ -23,11 +23,11 @@ use tracing::{debug, info};
 
 pub struct FeedSlotsProcessor {
     name: String,
-    key: u32,
+    key: u128,
 }
 
 impl FeedSlotsProcessor {
-    pub fn new(name: String, key: u32) -> FeedSlotsProcessor {
+    pub fn new(name: String, key: u128) -> FeedSlotsProcessor {
         FeedSlotsProcessor { name, key }
     }
 
@@ -44,7 +44,7 @@ impl FeedSlotsProcessor {
 
     async fn get_reports_for_feed(
         &self,
-        feed_id: u32,
+        feed_id: u128,
         reports: &Arc<RwLock<AllFeedsReports>>,
     ) -> Option<Arc<RwLock<FeedReports>>> {
         debug!("Get a read lock on all reports [feed {feed_id}]");
@@ -386,7 +386,7 @@ pub mod tests {
 
     pub fn check_received(
         received: Result<Option<VotedFeedUpdateWithProof>, Elapsed>,
-        expected: (u32, FeedType),
+        expected: (u128, FeedType),
     ) {
         let feed_id = expected.0;
         let original_report_data = expected.1;
@@ -1051,7 +1051,7 @@ pub mod tests {
             always_publish_heartbeat_ms,
         )
         .await;
-        check_received(received, (1_u32, FeedType::Numerical(102.0)));
+        check_received(received, (1_u128, FeedType::Numerical(102.0)));
     }
 
     #[tokio::test]

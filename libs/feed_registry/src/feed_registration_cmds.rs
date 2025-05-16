@@ -8,7 +8,7 @@ pub struct RegisterNewAssetFeed {
 
 #[derive(Debug, Clone)]
 pub struct DeleteAssetFeed {
-    pub id: u32,
+    pub id: u128,
 }
 
 #[allow(clippy::large_enum_variant)]
