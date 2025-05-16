@@ -58,21 +58,24 @@ export const verifyApi = HttpApi.make('verify')
         HttpApiEndpoint.post('generateMintSignature', '/signature')
           .setPayload(S.Struct({ accountAddress: S.String }))
           .addSuccess(
-            S.Struct({
-              signature: S.String,
-              payload: S.Struct({
-                uri: S.String,
-                currency: S.String,
-                uid: S.String,
-                price: S.BigInt,
-                to: S.String,
-                royaltyRecipient: S.String,
-                royaltyBps: S.BigInt,
-                primarySaleRecipient: S.String,
-                validityStartTimestamp: S.BigInt,
-                validityEndTimestamp: S.BigInt,
+            S.Union(
+              S.Struct({
+                signature: S.String,
+                payload: S.Struct({
+                  uri: S.String,
+                  currency: S.String,
+                  uid: S.String,
+                  price: S.BigInt,
+                  to: S.String,
+                  royaltyRecipient: S.String,
+                  royaltyBps: S.BigInt,
+                  primarySaleRecipient: S.String,
+                  validityStartTimestamp: S.BigInt,
+                  validityEndTimestamp: S.BigInt,
+                }),
               }),
-            }),
+              S.Struct({ error: S.String }),
+            ),
           ),
       )
       .prefix('/mint'),
