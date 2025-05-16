@@ -15,7 +15,7 @@ export function prepareDeploymentData(
       contracts: {
         coreContracts: data.contracts.coreContracts!,
         CLAggregatorAdapter: [cLAggregatorAdapter!],
-        SequencerMultisig: data.contracts.SequencerMultisig,
+        ReporterMultisig: data.contracts.ReporterMultisig,
         AdminMultisig: data.contracts.AdminMultisig,
       },
     };

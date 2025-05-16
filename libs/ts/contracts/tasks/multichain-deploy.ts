@@ -99,10 +99,10 @@ task('deploy', 'Deploy contracts')
       console.log(`//      owners: ${config.adminMultisig.owners}`);
       console.log(`// `);
       console.log(
-        `// Reporter MultiSig: ${config.deployWithSequencerMultisig ? '✅' : '❌'}`,
+        `// Reporter MultiSig: ${config.deployWithReporterMultisig ? '✅' : '❌'}`,
       );
-      console.log(`//   threshold: ${config.sequencerMultisig.threshold}`);
-      console.log(`//      owners: ${config.sequencerMultisig.owners}`);
+      console.log(`//   threshold: ${config.reporterMultisig.threshold}`);
+      console.log(`//      owners: ${config.reporterMultisig.owners}`);
       console.log(`// `);
       console.log(`// Feeds: `);
 
@@ -217,10 +217,10 @@ task('deploy', 'Deploy contracts')
       let reporterMultisig: Safe | undefined;
       let reporterMultisigAddress = parseEthereumAddress(ethers.ZeroAddress);
 
-      if (config.deployWithSequencerMultisig) {
+      if (config.deployWithReporterMultisig) {
         reporterMultisig = await deployMultisig({
           config,
-          type: 'sequencerMultisig',
+          type: 'reporterMultisig',
         });
         reporterMultisigAddress = parseEthereumAddress(
           await reporterMultisig!.getAddress(),
@@ -259,7 +259,7 @@ task('deploy', 'Deploy contracts')
         contracts: {
           ...deployData,
           AdminMultisig: adminMultisigAddress,
-          SequencerMultisig:
+          ReporterMultisig:
             reporterMultisigAddress === ethers.ZeroAddress
               ? null
               : reporterMultisigAddress,
@@ -294,7 +294,7 @@ task('deploy', 'Deploy contracts')
         reporterMultisig: reporterMultisig,
       });
 
-      if (!config.deployWithSequencerMultisig) {
+      if (!config.deployWithReporterMultisig) {
         chainsDeployment[
           networkName
         ].contracts.coreContracts.OnlySequencerGuard = null;
