@@ -29,15 +29,15 @@ export const Discord = () => {
   const verifyDiscord = async () => {
     setDiscordStatus({ type: 'loading', message: '' });
     try {
-      // const { isMember } = await isDiscordUserMemberOfGuild(discord);
-      // if (isMember) {
-      setDiscordStatus({
-        type: 'success',
-        message: 'You are a member of our Discord',
-      });
-      // } else {
-      //   throw new Error('User is not a member of our Discord');
-      // }
+      const { isMember } = await isDiscordUserMemberOfGuild(discord);
+      if (isMember) {
+        setDiscordStatus({
+          type: 'success',
+          message: 'You are a member of our Discord',
+        });
+      } else {
+        throw new Error('User is not a member of our Discord');
+      }
     } catch (err) {
       console.error(err);
       setDiscordStatus({
