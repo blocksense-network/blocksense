@@ -13,7 +13,7 @@ task('deploy-multisig', '[UTILS] Deploy multisig contract').setAction(
       type,
     }: {
       config: NetworkConfig;
-      type: keyof Pick<NetworkConfig, 'adminMultisig' | 'sequencerMultisig'>;
+      type: keyof Pick<NetworkConfig, 'adminMultisig' | 'reporterMultisig'>;
     } = args;
     const safeVersion = '1.4.1';
 
