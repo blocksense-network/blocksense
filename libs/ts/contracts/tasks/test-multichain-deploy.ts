@@ -39,7 +39,7 @@ task(
 
   const config = await initChain(ethers, networkName);
 
-  if (!config.deployWithSequencerMultisig) {
+  if (!config.deployWithReporterMultisig) {
     console.log('Test needs sequencer multisig set!');
     return;
   }
@@ -48,7 +48,7 @@ task(
 
   const accessControl = deployment.coreContracts.AccessControl.address;
   const adminMultisigAddr = deployment.AdminMultisig;
-  const sequencerMultisigAddr = deployment.SequencerMultisig;
+  const reporterMultisigAddr = deployment.ReporterMultisig;
 
   const adminMultisig = await Safe.init({
     provider: config.rpc,
@@ -65,13 +65,13 @@ task(
     config.provider,
   );
 
-  if (!deployment.SequencerMultisig) {
+  if (!deployment.ReporterMultisig) {
     throw new Error('Sequencer multisig not found in deployment');
   }
 
-  const sequencerMultisig = await Safe.init({
+  const reporterMultisig = await Safe.init({
     provider: config.rpc,
-    safeAddress: deployment.SequencerMultisig,
+    safeAddress: deployment.ReporterMultisig,
     signer: sequencerWallet.privateKey,
     contractNetworks: {
       [config.network.chainId.toString()]: config.safeAddresses,
@@ -88,7 +88,7 @@ task(
     transactions: [
       {
         to: deployment.coreContracts.AdminExecutorModule!.address,
-        data: (await sequencerMultisig.createChangeThresholdTx(1)).data.data,
+        data: (await reporterMultisig.createChangeThresholdTx(1)).data.data,
         value: '0',
       } as SafeTransactionDataPartial,
     ],
@@ -103,7 +103,7 @@ task(
   const upgradeableProxyAddr =
     deployment.coreContracts.UpgradeableProxyADFS.address;
 
-  let writeTx = await sequencerMultisig.createTransaction({
+  let writeTx = await reporterMultisig.createTransaction({
     transactions: [
       {
         to: upgradeableProxyAddr,
@@ -122,7 +122,7 @@ task(
 
   const apiKit = await Safe.init({
     provider: config.rpc,
-    safeAddress: await sequencerMultisig.getAddress(),
+    safeAddress: await reporterMultisig.getAddress(),
     signer: reporter.address,
     contractNetworks: {
       [config.network.chainId.toString()]: config.safeAddresses,
@@ -144,7 +144,7 @@ task(
   // AccessControl will reject this transaction
   await expect(sequencerWallet.sendTransaction(writeTx.data)).to.be.reverted;
 
-  await sequencerMultisig.executeTransaction(writeTx);
+  await reporterMultisig.executeTransaction(writeTx);
 
   //////////////////////
   // Check Aggregator //
@@ -214,7 +214,7 @@ task(
     ]),
   };
 
-  const writeDataTx = await sequencerMultisig.createTransaction({
+  const writeDataTx = await reporterMultisig.createTransaction({
     transactions: [writeTxData2].map(tx => ({
       ...tx,
       operation: OperationType.Call,
@@ -234,7 +234,7 @@ task(
   const isAllowed = await resolveBool(
     sequencerWallet.call({
       to: accessControl,
-      data: sequencerMultisigAddr,
+      data: reporterMultisigAddr,
     }),
   );
   expect(isAllowed).to.equal(true);
@@ -244,14 +244,14 @@ task(
     to: accessControl,
     data: ethers.solidityPacked(
       ['address', 'bool'],
-      [sequencerMultisigAddr, true],
+      [reporterMultisigAddr, true],
     ),
   });
 
   const isAllowedAfter = await resolveBool(
     sequencerWallet.call({
       to: accessControl,
-      data: sequencerMultisigAddr,
+      data: reporterMultisigAddr,
     }),
   );
   expect(isAllowedAfter).to.equal(false);
