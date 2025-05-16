@@ -15,7 +15,7 @@ import { calculateFieldShift } from './adjustFields';
 import * as helpers from './helpers';
 
 // TODO: move non-specific to encoding utils out of this directory when adding SSZ
-export {
+export type {
   // types
   TupleField,
   PrimitiveField,
@@ -25,7 +25,9 @@ export {
   GenerateDecoderConfig,
   DecoderData,
   Struct,
+};
 
+export {
   // helpers
   helpers,
 
