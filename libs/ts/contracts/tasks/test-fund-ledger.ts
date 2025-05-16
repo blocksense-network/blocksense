@@ -1,13 +1,9 @@
 import { task } from 'hardhat/config';
-import { NetworkConfig } from './types';
+import { initChain } from './deployment-utils/init-chain';
 
 task('fund-ledger', '[UTILS] Fund the ledger account with ETH').setAction(
-  async (args, { ethers }) => {
-    const {
-      config,
-    }: {
-      config: NetworkConfig;
-    } = args;
+  async (_, { ethers }) => {
+    const config = await initChain(ethers, 'local');
 
     console.log('ledgerAccount', config.deployerAddress);
     console.log(
