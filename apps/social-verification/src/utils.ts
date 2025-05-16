@@ -1,4 +1,12 @@
+import { HttpApiSchema } from '@effect/platform';
 import { Schema as S } from 'effect';
+
+export class TooManyRequests extends HttpApiSchema.EmptyError<TooManyRequests>()(
+  {
+    tag: 'TooManyRequests',
+    status: 429,
+  },
+) {}
 
 export function fetchAndDecodeJSON<A, I>(
   schema: S.Schema<A, I>,
@@ -15,6 +23,9 @@ export function fetchAndDecodeJSON<A, I>(
     ...options,
   })
     .then(response => {
+      if (response.status === 429) {
+        throw new TooManyRequests();
+      }
       if (!response.ok) {
         throw new Error(
           `Failed to fetch JSON from ${url}; status=${response.status}`,
