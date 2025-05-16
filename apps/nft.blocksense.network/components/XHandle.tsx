@@ -6,7 +6,7 @@ import { useMintFormContext } from '../app/contexts/MintFormContext';
 import { Input } from './Input';
 
 export const XHandle = () => {
-  const { xHandle, setXHandle, xStatus, setXStatus, mintLoading } =
+  const { xHandle, setXHandle, xStatus, setXStatus, setXUserId, mintLoading } =
     useMintFormContext();
 
   useEffect(() => {
@@ -31,15 +31,17 @@ export const XHandle = () => {
 
     setXStatus({ type: 'loading', message: '' });
     try {
-      const { isFollowing } = await isXUserFollowing(resultXHandle);
-      if (isFollowing) {
+      const { isFollowing, userId } = await isXUserFollowing(resultXHandle);
+      if (isFollowing && userId) {
         setXStatus({ type: 'success', message: 'You are following us on X' });
+        setXUserId(userId);
       } else {
         throw new Error('User is not following us on X');
       }
     } catch (err) {
       console.error(err);
       setXStatus({ type: 'error', message: 'You are not following us on X' });
+      setXUserId(null);
     }
   };
 
