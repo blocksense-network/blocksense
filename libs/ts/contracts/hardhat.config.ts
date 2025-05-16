@@ -52,7 +52,7 @@ const config: HardhatUserConfig = {
       chainId: 99999999999,
       forking: {
         blockNumber: 22044232,
-        enabled: process.env.FORKING === 'true',
+        enabled: process.env['FORKING'] === 'true',
         url: getOptionalRpcUrl('ethereum-mainnet'),
       },
       ledgerAccounts: getOptionalEnvString('LEDGER_ACCOUNT', '')
@@ -73,7 +73,7 @@ const config: HardhatUserConfig = {
     ),
   },
   gasReporter: {
-    enabled: process.env.REPORT_GAS === 'true',
+    enabled: process.env['REPORT_GAS'] === 'true',
     currency: 'USD',
   },
   paths: {
@@ -83,7 +83,7 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     enabled: true,
-    apiKey: process.env.ETHERSCAN_API_KEY || '',
+    apiKey: process.env['ETHERSCAN_API_KEY'] || '',
   },
 };
 
