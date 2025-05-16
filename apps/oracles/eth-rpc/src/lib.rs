@@ -44,7 +44,7 @@ pub struct RequestEthCallParams {
 pub struct RequestEthCall {
     pub jsonrpc: String,
     pub method: String,
-    pub id: u64,
+    pub id: u128,
     pub params: (RequestEthCallParams, String),
 }
 
@@ -57,7 +57,7 @@ pub struct ResponseEthCallError {
 #[derive(Deserialize, Debug, Clone)]
 pub struct ResponseEthCall {
     pub jsonrpc: String,
-    pub id: Option<u64>,
+    pub id: Option<u128>,
     pub error: Option<ResponseEthCallError>,
     pub result: Option<String>,
     #[serde(default)]
@@ -104,7 +104,7 @@ impl ResponseEthCall {
 }
 
 impl RequestEthCall {
-    pub fn latest(calldata: &Bytes, contract_address: &Address, id: u64) -> RequestEthCall {
+    pub fn latest(calldata: &Bytes, contract_address: &Address, id: u128) -> RequestEthCall {
         let params = RequestEthCallParams {
             data: calldata.0.encode_hex_upper_with_prefix(),
             from: "0x0000000000000000000000000000000000000000".to_string(),
@@ -126,7 +126,7 @@ struct FetchedDataForFeed {
     pub responses: Vec<ResponseEthCall>,
 }
 
-type FetchedDataHashMap = HashMap<u64, FetchedDataForFeed>;
+type FetchedDataHashMap = HashMap<u128, FetchedDataForFeed>;
 type MyProvider = alloy::providers::fillers::FillProvider<
     alloy::providers::fillers::JoinFill<
         alloy::providers::Identity,
@@ -165,7 +165,7 @@ async fn fetch_all(resourses: &[FeedConfig]) -> Result<FetchedDataHashMap> {
 }
 
 impl Contract {
-    pub fn prepare_request(&self, provider: MyProvider, id: u64) -> Option<RequestEthCall> {
+    pub fn prepare_request(&self, provider: MyProvider, id: u128) -> Option<RequestEthCall> {
         match self.method_name.as_str() {
             "convertToAssets" => Some(self.convert_to_assets(provider.clone(), id)),
             "exchangeRate" => Some(self.exchange_rate(provider.clone(), id)),
@@ -173,7 +173,7 @@ impl Contract {
         }
     }
 
-    pub fn convert_to_assets(&self, provider: MyProvider, id: u64) -> RequestEthCall {
+    pub fn convert_to_assets(&self, provider: MyProvider, id: u128) -> RequestEthCall {
         let contact = VaultABI::new(self.address, provider.clone());
         let shares = self.param1.unwrap();
         let x = contact.convertToAssets(shares);
@@ -181,14 +181,14 @@ impl Contract {
         RequestEthCall::latest(&calldata, &self.address, id)
     }
 
-    pub fn exchange_rate(&self, provider: MyProvider, id: u64) -> RequestEthCall {
+    pub fn exchange_rate(&self, provider: MyProvider, id: u128) -> RequestEthCall {
         let contact = YieldFiyUSD::new(self.address, provider.clone());
         let x = contact.exchangeRate();
         let calldata = x.calldata().clone();
         RequestEthCall::latest(&calldata, &self.address, id)
     }
 
-    async fn fetch(&self, id: u64) -> Option<ResponseEthCall> {
+    async fn fetch(&self, id: u128) -> Option<ResponseEthCall> {
         let mut last_value = None;
         for rpc_url_candidate in &self.rpc_urls {
             if let Ok(rpc_url) = rpc_url_candidate.as_str().parse::<Url>() {
@@ -256,7 +256,7 @@ fn process_results(results: &FetchedDataHashMap, resourses: &[FeedConfig]) -> Re
 }
 
 fn print_responses(results: &FetchedDataHashMap) {
-    let mut feed_ids = results.keys().cloned().collect::<Vec<u64>>();
+    let mut feed_ids = results.keys().cloned().collect::<Vec<u128>>();
     feed_ids.sort();
 
     let mut table = Table::new();
@@ -291,7 +291,7 @@ fn print_responses(results: &FetchedDataHashMap) {
 }
 
 fn print_payload(payload: &Payload, resourses: &[FeedConfig]) {
-    let mut feed_ids = resourses.iter().map(|x| x.feed_id).collect::<Vec<u64>>();
+    let mut feed_ids = resourses.iter().map(|x| x.feed_id).collect::<Vec<u128>>();
     feed_ids.sort();
 
     let mut table = Table::new();
@@ -307,7 +307,7 @@ fn print_payload(payload: &Payload, resourses: &[FeedConfig]) {
         let x = payload
             .values
             .iter()
-            .find(|x| x.id.parse::<u64>().unwrap() == feed_id)
+            .find(|x| x.id.parse::<u128>().unwrap() == feed_id)
             .unwrap();
         let pair = resourses
             .iter()
@@ -381,7 +381,7 @@ struct OracleArgs {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 struct FeedConfig {
     #[serde(default)]
-    pub feed_id: u64,
+    pub feed_id: u128,
     pub pair: PairDescription,
     #[serde(default)]
     pub decimals: u32,
@@ -397,7 +397,7 @@ fn get_resources_from_settings(settings: &Settings) -> Result<Vec<FeedConfig>> {
     for feed_setting in &settings.data_feeds {
         match serde_json::from_str::<FeedConfig>(&feed_setting.data) {
             Ok(mut feed_config) => {
-                feed_config.feed_id = feed_setting.id.parse::<u64>()?;
+                feed_config.feed_id = feed_setting.id.parse::<u128>()?;
                 config.push(feed_config);
             }
             Err(err) => {

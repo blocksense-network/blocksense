@@ -16,7 +16,7 @@ pub struct CallDataWithSignatures {
     pub tx_hash: String,
     pub safe_tx: SafeTx,
     pub signatures: HashMap<u64, SignatureWithAddress>,
-    pub updated_feeds_ids: HashSet<u32>,
+    pub updated_feeds_ids: HashSet<u128>,
 }
 
 pub struct AggregationBatchConsensus {

@@ -58,7 +58,7 @@ pub struct CompatibilityInfo {
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct FeedConfig {
     #[serde(with = "crate::custom_serde::serde_string")]
-    pub id: u32,
+    pub id: u128,
     pub full_name: String,
     pub description: String,
     #[serde(rename = "type")] // rename because of reserved keyword

@@ -12,14 +12,14 @@ use std::cmp::Ordering;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VotedFeedUpdate {
-    pub feed_id: u32,
+    pub feed_id: u128,
     pub value: FeedType,
     pub end_slot_timestamp: Timestamp,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EncodedVotedFeedUpdate {
-    pub feed_id: u32,
+    pub feed_id: u128,
     pub value: Vec<u8>,
     pub end_slot_timestamp: Timestamp,
 }
@@ -88,19 +88,29 @@ impl VotedFeedUpdate {
         &self,
         digits_in_fraction: usize,
         timestamp: u64,
+        legacy: bool,
     ) -> anyhow::Result<(Vec<u8>, Vec<u8>)> {
-        Ok((self.feed_id.to_be_bytes().to_vec(), {
-            match naive_packing(&self.value, digits_in_fraction, timestamp) {
-                Ok(bytes) => bytes,
-                Err(e) => {
-                    anyhow::bail!(
-                        "Error converting value for feed id {} to bytes {}",
-                        self.feed_id,
-                        e
-                    )
+        Ok((
+            {
+                if legacy {
+                    (self.feed_id as u32).to_be_bytes().to_vec()
+                } else {
+                    self.feed_id.to_be_bytes().to_vec()
                 }
-            }
-        }))
+            },
+            {
+                match naive_packing(&self.value, digits_in_fraction, timestamp) {
+                    Ok(bytes) => bytes,
+                    Err(e) => {
+                        anyhow::bail!(
+                            "Error converting value for feed id {} to bytes {}",
+                            self.feed_id,
+                            e
+                        )
+                    }
+                }
+            },
+        ))
     }
 
     pub fn new_decode(
@@ -111,9 +121,9 @@ impl VotedFeedUpdate {
         digits_in_fraction: usize,
     ) -> Result<VotedFeedUpdate, anyhow::Error> {
         let key_bytes = from_hex_string(key)?;
-        let mut dst = [0u8; 4];
-        dst.clone_from_slice(&key_bytes[0..4]);
-        let feed_id = u32::from_be_bytes(dst);
+        let mut dst = [0u8; 16];
+        dst.clone_from_slice(&key_bytes[0..16]);
+        let feed_id = u128::from_be_bytes(dst);
         let value_bytes = from_hex_string(value)?;
         let value = FeedType::from_bytes(value_bytes, variant, digits_in_fraction)
             .map_err(|e| anyhow!("{e}"))?;
@@ -194,7 +204,7 @@ pub struct EncodedBatchedAggegratesToSend {
 
 #[derive(Clone, Debug)]
 pub struct PublishedFeedUpdate {
-    pub feed_id: u32,
+    pub feed_id: u128,
     pub num_updates: u128,
     pub value: FeedType,
     pub published: Timestamp, // in seconds since UNIX_EPOCH
@@ -202,14 +212,14 @@ pub struct PublishedFeedUpdate {
 
 #[derive(Clone, Debug)]
 pub struct PublishedFeedUpdateError {
-    pub feed_id: u32,
+    pub feed_id: u128,
     pub num_updates: u128,
     pub error: String,
 }
 
 impl PublishedFeedUpdate {
     pub fn latest(
-        feed_id: u32,
+        feed_id: u128,
         variant: FeedType,
         digits_in_fraction: usize,
         data: &[u8],
@@ -235,7 +245,7 @@ impl PublishedFeedUpdate {
         }
     }
 
-    pub fn error(feed_id: u32, message: &str) -> PublishedFeedUpdateError {
+    pub fn error(feed_id: u128, message: &str) -> PublishedFeedUpdateError {
         PublishedFeedUpdateError {
             feed_id,
             num_updates: 0,
@@ -244,7 +254,7 @@ impl PublishedFeedUpdate {
     }
 
     pub fn error_num_update(
-        feed_id: u32,
+        feed_id: u128,
         message: &str,
         num_updates: u128,
     ) -> PublishedFeedUpdateError {
@@ -254,7 +264,7 @@ impl PublishedFeedUpdate {
     }
 
     pub fn nth(
-        feed_id: u32,
+        feed_id: u128,
         num_updates: u128,
         variant: FeedType,
         digits_in_fraction: usize,
@@ -329,11 +339,11 @@ mod tests {
     fn voted_feed_update_encode() {
         let end_slot_timestamp = 1_735_902_088_000_u128; // 3 Jan 2025 time of refactoring this test
         let update = VotedFeedUpdate {
-            feed_id: 42_u32,
+            feed_id: 42_u128,
             value: FeedType::Numerical(142.0),
             end_slot_timestamp,
         };
-        let (encoded_key, encoded_value) = update.encode(18, 0).unwrap();
+        let (encoded_key, encoded_value) = update.encode(18, 0, true).unwrap();
         assert_eq!("0000002a", to_hex_string(encoded_key, None));
         assert_eq!(
             "00000000000000000000000000000007b2a557a6d97800000000000000000000",
@@ -345,12 +355,12 @@ mod tests {
     fn voted_feed_update_new_decode() {
         let end_slot_timestamp = 1_735_902_088_000_u128; // 3 Jan 2025 time of refactoring this test
                                                          // Send test votes
-        let k1 = "ab000001";
+        let k1 = "ab000000000000000000000000000001";
         let v1 = "000000000000000000000000000010f0da2079987e1000000000000000000000";
         let vote_1 =
             VotedFeedUpdate::new_decode(k1, v1, end_slot_timestamp, FeedType::Numerical(0.0), 18)
                 .unwrap();
-        assert_eq!(vote_1.feed_id, 2868903937_u32);
+        assert_eq!(vote_1.feed_id, 227297987279220614266551007307938922497_u128);
         assert_eq!(vote_1.value, FeedType::Numerical(80000.8f64));
     }
 
@@ -491,11 +501,11 @@ mod tests {
             .unwrap()
             .as_millis();
         let update = VotedFeedUpdate {
-            feed_id: 42_u32,
+            feed_id: 42_u128,
             value: FeedType::Numerical(142.0),
             end_slot_timestamp,
         };
-        let (encoded_key, encoded_value) = update.encode(18, 0).unwrap();
+        let (encoded_key, encoded_value) = update.encode(18, 0, true).unwrap();
         assert_eq!("0000002a", to_hex_string(encoded_key, None));
         assert_eq!(
             "00000000000000000000000000000007b2a557a6d97800000000000000000000",
@@ -503,12 +513,12 @@ mod tests {
         );
 
         // Send test votes
-        let k1 = "ab000001";
+        let k1 = "ab000000000000000000000000000001";
         let v1 = "000000000000000000000000000010f0da2079987e1000000000000000000000";
         let vote_1 =
             VotedFeedUpdate::new_decode(k1, v1, end_slot_timestamp, FeedType::Numerical(0.0), 18)
                 .unwrap();
-        assert_eq!(vote_1.feed_id, 2868903937_u32);
+        assert_eq!(vote_1.feed_id, 227297987279220614266551007307938922497_u128);
         assert_eq!(vote_1.value, FeedType::Numerical(80000.8f64));
     }
 }
