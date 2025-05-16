@@ -78,7 +78,7 @@ pub async fn consume_reports(
     is_oneshot: bool,
     aggregator: FeedAggregate,
     history: Option<Arc<RwLock<FeedAggregateHistory>>>,
-    feed_id: u32,
+    feed_id: u128,
 ) -> ConsumedReports {
     let values = collect_reported_values(feed_type, feed_id, reports, slot);
 
@@ -175,7 +175,7 @@ pub async fn consume_reports(
 
 pub fn collect_reported_values(
     expected_feed_type: &FeedType,
-    feed_id: u32,
+    feed_id: u128,
     reports: &HashMap<u64, DataFeedPayload>,
     slot: u64,
 ) -> Vec<FeedType> {
@@ -201,7 +201,7 @@ pub fn collect_reported_values(
 }
 
 pub async fn perform_anomaly_detection(
-    feed_id: u32,
+    feed_id: u128,
     history: Arc<RwLock<FeedAggregateHistory>>,
     candidate_value: f64,
 ) -> Result<f64, anyhow::Error> {
@@ -261,8 +261,8 @@ pub async fn perform_anomaly_detection(
 fn check_aggregated_votes_deviation(
     updates: &[VotedFeedUpdate],
     block_height: u64,
-    last_votes: &HashMap<u32, VotedFeedUpdate>,
-    tolerated_deviations: &HashMap<u32, f64>,
+    last_votes: &HashMap<u128, VotedFeedUpdate>,
+    tolerated_deviations: &HashMap<u128, f64>,
 ) -> Result<()> {
     let mut errors = Vec::new();
 
@@ -311,10 +311,10 @@ fn check_aggregated_votes_deviation(
 }
 
 pub async fn validate(
-    feeds_config: HashMap<u32, FeedStrideAndDecimals>,
+    feeds_config: HashMap<u128, FeedStrideAndDecimals>,
     mut batch: ConsensusSecondRoundBatch,
-    last_votes: HashMap<u32, VotedFeedUpdate>,
-    tolerated_deviations: HashMap<u32, f64>,
+    last_votes: HashMap<u128, VotedFeedUpdate>,
+    tolerated_deviations: HashMap<u128, f64>,
 ) -> Result<()> {
     check_aggregated_votes_deviation(
         &batch.updates,

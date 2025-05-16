@@ -182,7 +182,7 @@ pub struct Pair {
 #[derive(Deserialize, Debug)]
 struct FeedConfig {
     #[serde(default)]
-    pub feed_id: u64,
+    pub feed_id: u128,
 }
 
 fn get_resources_from_settings(settings: &Settings) -> Result<Vec<FeedConfig>> {
@@ -190,7 +190,7 @@ fn get_resources_from_settings(settings: &Settings) -> Result<Vec<FeedConfig>> {
     for feed_setting in &settings.data_feeds {
         let mut feed_config = serde_json::from_str::<FeedConfig>(&feed_setting.data)
             .context("Couldn't parse data feed")?;
-        feed_config.feed_id = feed_setting.id.parse::<u64>()?;
+        feed_config.feed_id = feed_setting.id.parse::<u128>()?;
         config.push(feed_config);
     }
     Ok(config)

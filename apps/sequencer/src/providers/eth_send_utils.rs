@@ -54,7 +54,7 @@ pub async fn deploy_contract(
 fn legacy_serialize_updates(
     net: &str,
     updates: &BatchedAggegratesToSend,
-    feeds_config: HashMap<u32, FeedStrideAndDecimals>,
+    feeds_config: HashMap<u128, FeedStrideAndDecimals>,
 ) -> Vec<u8> {
     let mut result: String = Default::default();
 
@@ -79,6 +79,7 @@ fn legacy_serialize_updates(
         let (key, val) = match update.encode(
             digits_in_fraction as usize,
             update.end_slot_timestamp as u64,
+            true,
         ) {
             Ok((k, v)) => (k, v),
             Err(e) => {
@@ -101,7 +102,7 @@ fn legacy_serialize_updates(
 pub fn filter_allowed_feeds(
     net: &str,
     updates: &mut BatchedAggegratesToSend,
-    allow_feeds: &Option<Vec<u32>>,
+    allow_feeds: &Option<Vec<u128>>,
 ) {
     if let Some(allowed_feed_ids) = allow_feeds {
         let mut res: Vec<VotedFeedUpdate> = vec![];
@@ -123,8 +124,8 @@ pub async fn get_serialized_updates_for_network(
     provider_mutex: &Arc<Mutex<RpcProvider>>,
     updates: &mut BatchedAggegratesToSend,
     provider_settings: &blocksense_config::Provider,
-    feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
-    feeds_rounds: &mut HashMap<u32, u64>,
+    feeds_config: Arc<RwLock<HashMap<u128, FeedConfig>>>,
+    feeds_rounds: &mut HashMap<u128, u64>,
 ) -> Result<Vec<u8>> {
     debug!("Acquiring a read lock on provider config for `{net}`");
     let provider = provider_mutex.lock().await;
@@ -202,11 +203,11 @@ pub async fn eth_batch_send_to_contract(
     provider_settings: blocksense_config::Provider,
     mut updates: BatchedAggegratesToSend,
     feed_type: Repeatability,
-    feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
+    feeds_config: Arc<RwLock<HashMap<u128, FeedConfig>>>,
     transaction_retry_timeout_secs: u64,
     transaction_retries_count_limit: u64,
     retry_fee_increment_fraction: f64,
-) -> Result<(String, Vec<u32>)> {
+) -> Result<(String, Vec<u128>)> {
     let mut feeds_rounds = HashMap::new();
     let serialized_updates = get_serialized_updates_for_network(
         net.as_str(),
@@ -232,7 +233,7 @@ pub async fn eth_batch_send_to_contract(
     let mut provider = provider.lock().await;
     debug!("Acquired a read/write lock on provider state for network `{net}`");
 
-    let feeds_to_update_ids: Vec<u32> = updates
+    let feeds_to_update_ids: Vec<u128> = updates
         .updates
         .iter()
         .map(|update| update.feed_id)
@@ -858,7 +859,7 @@ pub async fn eth_batch_send_to_all_contracts(
 
 async fn log_round_counters(
     prefix: &str,
-    updated_feeds: &Vec<u32>,
+    updated_feeds: &Vec<u128>,
     round_counters: &mut RoundCounters,
     net: &str,
 ) {
@@ -872,7 +873,7 @@ async fn log_round_counters(
 }
 
 pub async fn increment_feeds_round_indexes(
-    updated_feeds: &Vec<u32>,
+    updated_feeds: &Vec<u128>,
     net: &str,
     provider: &mut RpcProvider,
 ) {
@@ -900,7 +901,7 @@ pub async fn increment_feeds_round_indexes(
 // Since we update the round counters when we post the tx and before we
 // receive its receipt if the tx fails we need to decrease the round indexes.
 pub async fn decrement_feeds_round_indexes(
-    updated_feeds: &Vec<u32>,
+    updated_feeds: &Vec<u128>,
     net: &str,
     provider: &mut RpcProvider,
 ) {
@@ -929,7 +930,7 @@ pub async fn decrement_feeds_round_indexes(
 }
 
 async fn increment_feeds_round_metrics(
-    updated_feeds: &Vec<u32>,
+    updated_feeds: &Vec<u128>,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     net: &str,
 ) {

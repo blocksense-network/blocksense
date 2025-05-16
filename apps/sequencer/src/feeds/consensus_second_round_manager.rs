@@ -16,7 +16,7 @@ pub struct CallDataWithSignatures {
     pub tx_hash: String,
     pub safe_tx: SafeTx,
     pub signatures: HashMap<u64, SignatureWithAddress>,
-    pub updated_feeds_ids: HashSet<u32>,
+    pub updated_feeds_ids: HashSet<u128>,
 }
 
 pub struct AggregationBatchConsensus {
@@ -63,7 +63,7 @@ impl AggregationBatchConsensus {
             return;
         }
 
-        let feeds_to_update_ids: Vec<u32> =
+        let feeds_to_update_ids: Vec<u128> =
             batch.updates.iter().map(|update| update.feed_id).collect();
 
         self.backlog_batches.push_back(key.clone());

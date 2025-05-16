@@ -23,11 +23,11 @@ use tracing::{debug, info};
 
 pub struct FeedSlotsProcessor {
     name: String,
-    key: u32,
+    key: u128,
 }
 
 impl FeedSlotsProcessor {
-    pub fn new(name: String, key: u32) -> FeedSlotsProcessor {
+    pub fn new(name: String, key: u128) -> FeedSlotsProcessor {
         FeedSlotsProcessor { name, key }
     }
 
@@ -44,7 +44,7 @@ impl FeedSlotsProcessor {
 
     async fn get_reports_for_feed(
         &self,
-        feed_id: u32,
+        feed_id: u128,
         reports: &Arc<RwLock<AllFeedsReports>>,
     ) -> Option<Arc<RwLock<FeedReports>>> {
         debug!("Get a read lock on all reports [feed {feed_id}]");

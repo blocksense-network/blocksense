@@ -127,7 +127,7 @@ async fn recvd_feed_update_to_block(
     updates_to_block: &mut Vec<VotedFeedUpdateWithProof>,
     backlog_updates: &mut VecDeque<VotedFeedUpdateWithProof>,
     max_feed_updates_to_batch: usize,
-    feeds_config: &Arc<RwLock<HashMap<u32, FeedConfig>>>,
+    feeds_config: &Arc<RwLock<HashMap<u128, FeedConfig>>>,
 ) {
     match recvd_feed_update {
         Some(voted_update) => {
@@ -145,6 +145,7 @@ async fn recvd_feed_update_to_block(
             let (key, val) = match voted_update.update.encode(
                 digits_in_fraction,
                 voted_update.update.end_slot_timestamp as u64,
+                false,
             ) {
                 Ok((k, v)) => (k, v),
                 Err(e) => {

@@ -15,7 +15,7 @@ pub struct ConsensusSecondRoundBatch {
     pub tx_hash: String,
     pub calldata: String, // TODO: send all data needed to validate and recreate calldata.
     pub updates: Vec<VotedFeedUpdate>,
-    pub feeds_rounds: HashMap<u32, u64>,
+    pub feeds_rounds: HashMap<u128, u64>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
