@@ -120,7 +120,7 @@ export const logTable = async (
     ).toFixed(2);
   }
 
-  if (process.env.TRACE_TX === 'true') {
+  if (process.env['TRACE_TX'] === 'true') {
     for (const receipt of receipts.concat(receiptsGeneric)) {
       const res = await network.provider.send('debug_traceTransaction', [
         receipt.hash,
