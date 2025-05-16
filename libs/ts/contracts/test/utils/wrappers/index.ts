@@ -14,8 +14,8 @@ import { OracleBaseWrapper } from './oracle/Base';
 import { OracleWrapper } from './oracle/Oracle';
 import { RegistryWrapper } from './oracle/registry/Base';
 
+export type { IADFSWrapper };
 export {
-  IADFSWrapper,
   ADFSWrapper,
   ADFSBaseWrapper,
   ADFSBaseGenericWrapper,
