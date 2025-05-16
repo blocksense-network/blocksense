@@ -13,7 +13,7 @@ import { HttpApiBuilder } from '@effect/platform';
 import { createThirdwebClient, getContract } from 'thirdweb';
 import { arbitrum } from 'thirdweb/chains';
 import { privateKeyToAccount } from 'thirdweb/wallets';
-import { generateMintSignature } from 'thirdweb/extensions/erc721';
+import { balanceOf, generateMintSignature } from 'thirdweb/extensions/erc721';
 
 import { Authorization, verifyApi } from './api';
 import {
@@ -307,6 +307,17 @@ export const server: ApiServer<Api> = {
             client,
             privateKey: PRIVATE_KEY,
           });
+
+          const balance = await balanceOf({
+            contract,
+            owner: payload.accountAddress,
+          });
+
+          if (balance > 0) {
+            const error = `Account ${payload.accountAddress} already has an NFT`;
+            console.error(error);
+            return { error };
+          }
 
           const { payload: generatedPayload, signature } =
             await generateMintSignature({

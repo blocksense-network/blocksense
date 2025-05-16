@@ -70,9 +70,19 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
         return;
       }
 
-      const { payload, signature } = await generateMintSignature(
+      const generateMintSignatureResult = await generateMintSignature(
         account.address,
       );
+      if ('error' in generateMintSignatureResult) {
+        onSuccessAction(
+          `https://arbiscan.io/address/${account.address}#nfttransfers`,
+          true,
+        );
+        return;
+      }
+
+      const { payload, signature } = generateMintSignatureResult;
+
       if (!payload || !signature) {
         setAlertMessage('Failed to generate mint signature');
         return;

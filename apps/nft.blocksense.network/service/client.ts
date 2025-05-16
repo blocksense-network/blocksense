@@ -91,7 +91,9 @@ type MintNftResponsePayload = {
   validityStartTimestamp: bigint;
   validityEndTimestamp: bigint;
 };
-type MintNftResponse = { signature: string; payload: MintNftResponsePayload };
+type MintNftResponse =
+  | { signature: string; payload: MintNftResponsePayload }
+  | { error: string };
 type SaveParticipantResponse = { isSuccessful: boolean };
 type CheckParticipantResponse = {
   isParticipant: boolean;
