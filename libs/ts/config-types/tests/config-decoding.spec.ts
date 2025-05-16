@@ -54,7 +54,7 @@ describe('Configuration files decoding', async () => {
         contracts: {
           coreContracts: expect.any(Object),
           CLAggregatorAdapter: expect.any(Object),
-          SequencerMultisig: expect.any(String),
+          ReporterMultisig: expect.any(String),
           AdminMultisig: expect.any(String),
         },
       });

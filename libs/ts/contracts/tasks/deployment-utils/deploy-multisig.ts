@@ -9,7 +9,7 @@ import { checkAddressExists } from '../utils';
 
 type Params = {
   config: NetworkConfig;
-  type: keyof Pick<NetworkConfig, 'adminMultisig' | 'sequencerMultisig'>;
+  type: keyof Pick<NetworkConfig, 'adminMultisig' | 'reporterMultisig'>;
 };
 
 export async function deployMultisig({ config, type }: Params): Promise<Safe> {
