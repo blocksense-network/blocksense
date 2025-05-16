@@ -58,7 +58,7 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
   let registryOwner: HardhatEthersSigner;
 
   before(async function () {
-    if (process.env.FORKING !== 'true') {
+    if (process.env['FORKING'] !== 'true') {
       this.skip();
     }
 
