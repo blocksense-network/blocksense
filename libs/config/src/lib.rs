@@ -149,7 +149,7 @@ impl Validated for ReporterConfig {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct PublishCriteria {
-    pub feed_id: u32,
+    pub feed_id: u128,
     #[serde(default)]
     pub skip_publish_if_less_then_percentage: f64,
 
@@ -194,7 +194,7 @@ pub struct Provider {
     pub is_enabled: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub allow_feeds: Option<Vec<u32>>,
+    pub allow_feeds: Option<Vec<u128>>,
 
     #[serde(default)]
     pub publishing_criteria: Vec<PublishCriteria>,
@@ -351,7 +351,7 @@ pub fn get_sequencer_and_feed_configs() -> (SequencerConfig, AllFeedsConfig) {
 
 // Utility functions for tests follow:
 
-pub fn test_feed_config(id: u32, stride: u16) -> FeedConfig {
+pub fn test_feed_config(id: u128, stride: u16) -> FeedConfig {
     FeedConfig {
         id,
         full_name: "FOXY".to_owned(),
@@ -404,7 +404,7 @@ pub fn test_feed_config(id: u32, stride: u16) -> FeedConfig {
     }
 }
 
-pub fn test_feeds_config(id: u32, stride: u16) -> HashMap<u32, FeedConfig> {
+pub fn test_feeds_config(id: u128, stride: u16) -> HashMap<u128, FeedConfig> {
     let mut feeds_config = HashMap::new();
     feeds_config.insert(id, test_feed_config(id, stride));
     feeds_config

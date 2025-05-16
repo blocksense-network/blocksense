@@ -51,7 +51,7 @@ async fn process_report(
     let signature = &data_feed.payload_metadata.signature;
     let msg_timestamp = data_feed.payload_metadata.timestamp;
 
-    let feed_id: u32;
+    let feed_id: u128;
     let reporter = {
         let reporters = sequencer_state.reporters.read().await;
         let reporter = reporters.get_key_value(&reporter_id);
@@ -59,7 +59,7 @@ async fn process_report(
             Some(x) => {
                 let reporter = x.1;
                 let reporter_metrics = reporter.read().await.reporter_metrics.clone();
-                feed_id = match data_feed.payload_metadata.feed_id.parse::<u32>() {
+                feed_id = match data_feed.payload_metadata.feed_id.parse::<u128>() {
                     Ok(val) => val,
                     Err(e) => {
                         inc_metric!(reporter_metrics, reporter_id, non_valid_feed_id_reports);
@@ -243,7 +243,7 @@ pub async fn get_last_published_value_and_time(
     let history = sequencer_state.feed_aggregate_history.read().await;
     let mut results: Vec<LastPublishedValue> = vec![];
     for r in requested_data_feeds {
-        let v = match r.feed_id.parse::<u32>() {
+        let v = match r.feed_id.parse::<u128>() {
             Ok(feed_id) => {
                 if history.is_registered_feed(feed_id) {
                     if let Some(last) = history.last(feed_id) {
@@ -1130,7 +1130,7 @@ pub mod tests {
         .await;
         {
             let mut history = sequencer_state.feed_aggregate_history.write().await;
-            let feed_id = 1_u32;
+            let feed_id = 1_u128;
             history.register_feed(feed_id, 100);
             let feed_value = FeedType::Numerical(102754.0f64);
             let end_slot_timestamp = first_report_start_time
@@ -1200,7 +1200,7 @@ pub mod tests {
             + 300_u128 * 10_u128;
         {
             let mut history = sequencer_state.feed_aggregate_history.write().await;
-            let feed_id = 1_u32;
+            let feed_id = 1_u128;
             history.register_feed(feed_id, 3);
 
             history.push_next(

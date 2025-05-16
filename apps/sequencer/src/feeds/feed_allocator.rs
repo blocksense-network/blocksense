@@ -6,7 +6,7 @@ use uuid::Uuid;
 /// An Allocation is a representation of an allocated storage slot in a Solidity smart contract.
 #[allow(dead_code)]
 pub struct Allocation {
-    storage_index: u32,
+    storage_index: u128,
     number_of_slots: u8,
     schema_id: Uuid,
     allocation_timestamp: DateTime<Utc>,
@@ -16,7 +16,7 @@ pub struct Allocation {
 
 impl Allocation {
     pub fn new(
-        storage_index: u32,
+        storage_index: u128,
         number_of_slots: u8,
         schema_id: Uuid,
         allocation_timestamp: DateTime<Utc>,
@@ -54,13 +54,13 @@ impl Allocation {
 /// If no free index has been found, it iterates from lower to upper bound
 /// until an expired index is found and returns is.
 pub struct Allocator {
-    space_lower_bound: u32,
-    space_upper_bound: u32,
-    allocations: HashMap<u32, Allocation>,
+    space_lower_bound: u128,
+    space_upper_bound: u128,
+    allocations: HashMap<u128, Allocation>,
 }
 
 impl Allocator {
-    pub fn new(space: std::ops::RangeInclusive<u32>) -> Allocator {
+    pub fn new(space: std::ops::RangeInclusive<u128>) -> Allocator {
         Allocator {
             space_lower_bound: *space.start(),
             space_upper_bound: *space.end(),
@@ -68,17 +68,17 @@ impl Allocator {
         }
     }
 
-    pub fn space_size(&self) -> u32 {
-        let space_size: u32 = self.space_upper_bound - self.space_lower_bound + 1;
+    pub fn space_size(&self) -> u128 {
+        let space_size: u128 = self.space_upper_bound - self.space_lower_bound + 1;
         space_size
     }
 
-    pub fn num_allocated_indexes(&self) -> u32 {
+    pub fn num_allocated_indexes(&self) -> u128 {
         let num_allocated_indexes = self.allocations.len();
-        num_allocated_indexes as u32
+        num_allocated_indexes as u128
     }
 
-    pub fn num_free_indexes(&self) -> u32 {
+    pub fn num_free_indexes(&self) -> u128 {
         self.space_size() - self.num_allocated_indexes()
     }
 
@@ -91,11 +91,11 @@ impl Allocator {
         schema_id: Uuid,
         voting_start_timestamp: DateTime<Utc>,
         voting_end_timestamp: DateTime<Utc>,
-    ) -> Result<u32, String> {
+    ) -> Result<u128, String> {
         // generate Allocation index
         // get free slot
         // if no free slot get the oldest expired slot
-        let free_index: u32 = self
+        let free_index: u128 = self
             .get_free_index()
             .or_else(|_| self.get_expired_index())?;
 
@@ -117,13 +117,13 @@ impl Allocator {
         Ok(free_index)
     }
 
-    fn get_free_index(&self) -> Result<u32, &str> {
+    fn get_free_index(&self) -> Result<u128, &str> {
         (self.space_lower_bound..=self.space_upper_bound)
             .find(|index| !self.allocations.contains_key(index))
             .ok_or("no free space")
     }
 
-    fn get_expired_index(&self) -> Result<u32, &str> {
+    fn get_expired_index(&self) -> Result<u128, &str> {
         let now: DateTime<Utc> = Utc::now();
         let current_time_ms = now.timestamp_millis();
         let result = (self.space_lower_bound..=self.space_upper_bound)
@@ -154,7 +154,7 @@ pub struct ConcurrentAllocator {
 
 /// A concurrent version of an Allocator.
 impl ConcurrentAllocator {
-    pub fn new(space: std::ops::RangeInclusive<u32>) -> Self {
+    pub fn new(space: std::ops::RangeInclusive<u128>) -> Self {
         Self {
             allocator: Arc::new(RwLock::new(Allocator::new(space))),
         }
@@ -166,7 +166,7 @@ impl ConcurrentAllocator {
         schema_id: Uuid,
         voting_start_timestamp: DateTime<Utc>,
         voting_end_timestamp: DateTime<Utc>,
-    ) -> Result<u32, String> {
+    ) -> Result<u128, String> {
         let mut allocator = self.allocator.write().unwrap();
         allocator.allocate(
             number_of_slots,
@@ -176,17 +176,17 @@ impl ConcurrentAllocator {
         )
     }
 
-    pub fn space_size(&self) -> u32 {
+    pub fn space_size(&self) -> u128 {
         let allocator = self.allocator.read().unwrap();
         allocator.space_size()
     }
 
-    pub fn num_allocated_indexes(&self) -> u32 {
+    pub fn num_allocated_indexes(&self) -> u128 {
         let allocator = self.allocator.read().unwrap();
         allocator.num_allocated_indexes()
     }
 
-    pub fn num_free_indexes(&self) -> u32 {
+    pub fn num_free_indexes(&self) -> u128 {
         let allocator = self.allocator.read().unwrap();
         allocator.num_free_indexes()
     }

@@ -113,7 +113,7 @@ pub async fn get_key(
     let network: String = req.match_info().get("network").ok_or(bad_input)?.parse()?;
     let key: String = req.match_info().query("key").parse()?;
 
-    let feed_id: u32 = match key.parse() {
+    let feed_id: u128 = match key.parse() {
         Ok(v) => v,
         Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
     };
@@ -180,7 +180,7 @@ pub async fn get_feed_report_interval(
     let bad_input = error::ErrorBadRequest("Incorrect input.");
     let feed_id: String = req.match_info().get("feed_id").ok_or(bad_input)?.parse()?;
 
-    let feed_id: u32 = match feed_id.parse() {
+    let feed_id: u128 = match feed_id.parse() {
         Ok(r) => r,
         Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
     };
@@ -226,7 +226,7 @@ pub async fn get_feed_config(
     let bad_input = error::ErrorBadRequest("Incorrect input.");
     let feed_id: String = req.match_info().get("feed_id").ok_or(bad_input)?.parse()?;
 
-    let feed_id: u32 = match feed_id.parse() {
+    let feed_id: u128 = match feed_id.parse() {
         Ok(r) => r,
         Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
     };
@@ -455,7 +455,7 @@ pub async fn delete_asset_feed(
     let bad_input = error::ErrorBadRequest("Incorrect input.");
     let feed_id: String = req.match_info().get("feed_id").ok_or(bad_input)?.parse()?;
 
-    let feed_id: u32 = match feed_id.parse() {
+    let feed_id: u128 = match feed_id.parse() {
         Ok(r) => r,
         Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
     };

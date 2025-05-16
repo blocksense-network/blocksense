@@ -78,7 +78,7 @@ pub async fn consume_reports(
     is_oneshot: bool,
     aggregator: FeedAggregate,
     history: Option<Arc<RwLock<FeedAggregateHistory>>>,
-    feed_id: u32,
+    feed_id: u128,
 ) -> ConsumedReports {
     let values = collect_reported_values(feed_type, feed_id, reports, slot);
 
@@ -175,7 +175,7 @@ pub async fn consume_reports(
 
 pub fn collect_reported_values(
     expected_feed_type: &FeedType,
-    feed_id: u32,
+    feed_id: u128,
     reports: &HashMap<u64, DataFeedPayload>,
     slot: u64,
 ) -> Vec<FeedType> {
@@ -201,7 +201,7 @@ pub fn collect_reported_values(
 }
 
 pub async fn perform_anomaly_detection(
-    feed_id: u32,
+    feed_id: u128,
     history: Arc<RwLock<FeedAggregateHistory>>,
     candidate_value: f64,
 ) -> Result<f64, anyhow::Error> {
@@ -261,8 +261,8 @@ pub async fn perform_anomaly_detection(
 fn check_aggregated_votes_deviation(
     updates: &[VotedFeedUpdate],
     block_height: u64,
-    last_votes: &HashMap<u32, VotedFeedUpdate>,
-    tolerated_deviations: &HashMap<u32, f64>,
+    last_votes: &HashMap<u128, VotedFeedUpdate>,
+    tolerated_deviations: &HashMap<u128, f64>,
 ) -> Result<()> {
     let mut errors = Vec::new();
 
@@ -311,10 +311,10 @@ fn check_aggregated_votes_deviation(
 }
 
 pub async fn validate(
-    feeds_config: HashMap<u32, FeedStrideAndDecimals>,
+    feeds_config: HashMap<u128, FeedStrideAndDecimals>,
     mut batch: ConsensusSecondRoundBatch,
-    last_votes: HashMap<u32, VotedFeedUpdate>,
-    tolerated_deviations: HashMap<u32, f64>,
+    last_votes: HashMap<u128, VotedFeedUpdate>,
+    tolerated_deviations: HashMap<u128, f64>,
 ) -> Result<()> {
     check_aggregated_votes_deviation(
         &batch.updates,
@@ -412,7 +412,7 @@ pub mod tests {
 
     use super::*;
 
-    fn create_feeds_config() -> HashMap<u32, FeedStrideAndDecimals> {
+    fn create_feeds_config() -> HashMap<u128, FeedStrideAndDecimals> {
         let mut config = HashMap::new();
 
         for feed_id in 0..15 {
@@ -442,9 +442,9 @@ pub mod tests {
     }
 
     async fn call_validate_with_values(
-        reporter_feed_ids: [u32; 3],
+        reporter_feed_ids: [u128; 3],
         reporter_last_votes: [f64; 3],
-        aggregated_feed_ids: [u32; 3],
+        aggregated_feed_ids: [u128; 3],
         aggregated_values: [f64; 3],
     ) -> Result<()> {
         let mut last_votes = HashMap::new();
@@ -493,7 +493,7 @@ pub mod tests {
             },
         ];
 
-        let mut feeds_rounds: HashMap<u32, u64> = HashMap::new();
+        let mut feeds_rounds: HashMap<u128, u64> = HashMap::new();
         feeds_rounds.insert(1, 1000);
         feeds_rounds.insert(5, 2000);
         feeds_rounds.insert(11, 3000);
@@ -556,7 +556,7 @@ pub mod tests {
             feeds_rounds,
         };
 
-        let feed_ids_union: HashSet<u32> = HashSet::from_iter(
+        let feed_ids_union: HashSet<u128> = HashSet::from_iter(
             reporter_feed_ids
                 .iter()
                 .copied()

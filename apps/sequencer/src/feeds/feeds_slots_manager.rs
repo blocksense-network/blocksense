@@ -430,6 +430,6 @@ mod tests {
             vote_recv.recv(),
         )
         .await;
-        check_received(received, (1_u32, original_report_data));
+        check_received(received, (1_u128, original_report_data));
     }
 }
