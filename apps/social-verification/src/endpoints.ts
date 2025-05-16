@@ -406,7 +406,7 @@ export const server: ApiServer<Api> = {
           );
 
           const insertQuery =
-            'INSERT INTO participants (x_handle, discord_username, wallet_address, minting_tx, is_verified) VALUES (?, ?, ?, ?, ?)';
+            'INSERT INTO participants (x_handle, discord_username, wallet_address, minting_tx, wallet_signature, is_verified) VALUES (?, ?, ?, ?, ?, ?)';
           const insertResult = await db
             .prepare(insertQuery)
             .bind(
@@ -414,6 +414,7 @@ export const server: ApiServer<Api> = {
               payload.discordUsername,
               payload.walletAddress,
               payload.mintingTx,
+              payload.walletSignature,
               true,
             )
             .all();
@@ -444,6 +445,7 @@ export const server: ApiServer<Api> = {
           WHERE x_handle = ?
             OR discord_username = ?
             OR wallet_address = ?
+            OR wallet_signature = ?
           `;
           const selectResult = await db
             .prepare(selectQuery)
@@ -451,6 +453,7 @@ export const server: ApiServer<Api> = {
               payload.xHandle,
               payload.discordUsername,
               payload.walletAddress,
+              payload.walletSignature,
             )
             .all();
 
