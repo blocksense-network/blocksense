@@ -4,9 +4,11 @@ import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
 import client from 'prom-client';
 import {
+  getNetworkNameByChainId,
   getOptionalRpcUrl,
   networkMetadata,
   parseEthereumAddress,
+  isChainId,
 } from '@blocksense/base-utils/evm';
 import { deployedNetworks } from '../types';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
@@ -15,7 +17,7 @@ import { startPrometheusServer } from '@blocksense/base-utils/prometheus';
 const balanceGauge = new client.Gauge({
   name: 'eth_account_balance',
   help: 'Ethereum account balance in Ether',
-  labelNames: ['chainId', 'address'],
+  labelNames: ['networkName', 'address'],
 });
 
 function filterSmallBalance(balance: string, threshold = 1e-6): number {
@@ -93,11 +95,19 @@ const main = async (): Promise<void> => {
         const balance = web3.utils.fromWei(balanceWei, 'ether');
 
         const chainId = Number(await web3.eth.net.getId());
+        const networkName = isChainId(chainId)
+          ? getNetworkNameByChainId(chainId)
+          : 'unknown';
         console.log(
-          chalk.green(`${balance} (RPC: ${rpcUrl}) (ChainId: ${chainId})`),
+          chalk.green(
+            `${balance} (RPC: ${rpcUrl}) (NetworkName: ${networkName})`,
+          ),
         );
         if (argv.prometheus) {
-          balanceGauge.set({ chainId, address }, filterSmallBalance(balance));
+          balanceGauge.set(
+            { networkName, address },
+            filterSmallBalance(balance),
+          );
         }
       } catch (error) {
         console.error(
@@ -126,7 +136,7 @@ const main = async (): Promise<void> => {
       const { currency } = networkMetadata[networkName];
       console.log(chalk.green(`${networkName}: ${balance} ${currency}`));
       if (argv.prometheus) {
-        balanceGauge.set({ chainId, address }, filterSmallBalance(balance));
+        balanceGauge.set({ networkName, address }, filterSmallBalance(balance));
       }
     } catch (error) {
       console.error(
