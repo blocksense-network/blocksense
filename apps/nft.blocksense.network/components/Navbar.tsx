@@ -80,7 +80,7 @@ const MobileNavbar = () => {
 
   return (
     <header className="navbar md:hidden relative">
-      <section className="navbar__header-section fixed top-0 w-full bg-[var(--black)] flex justify-between items-center px-5 py-4 z-50">
+      <section className="navbar__header-section fixed top-[2.375rem] w-full bg-[var(--black)] flex justify-between items-center px-5 py-4 z-50">
         <motion.div {...animationProps}>
           <Logo />
         </motion.div>
@@ -107,7 +107,7 @@ const MobileNavbar = () => {
         </motion.div>
       </section>
       {isOpen && (
-        <nav className="fixed top-[3.85rem] left-0 w-full h-[calc(100vh-3.85rem)] px-5 py-12 flex flex-col items-center justify-center gap-12 bg-[var(--black)] overflow-auto z-50">
+        <nav className="fixed top-[calc(3.85rem+2.375rem)] left-0 w-full h-[calc(100vh-3.85rem-2.375rem)] px-5 py-12 flex flex-col items-center justify-center gap-12 bg-[var(--black)] overflow-auto z-50">
           <section className="flex flex-col gap-8 text-center w-full">
             {navLinks.map((link, i) => (
               <motion.a
