@@ -88,6 +88,7 @@ pub struct RpcProvider {
     pub contracts: Vec<Contract>,
     pub rpc_url: Url,
     pub round_counters: RoundCounters,
+    num_tx_in_progress: u32,
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -217,6 +218,7 @@ impl RpcProvider {
             contracts,
             rpc_url,
             round_counters: HashMap::new(),
+            num_tx_in_progress: 0,
         }
     }
 
@@ -499,14 +501,14 @@ impl RpcProvider {
             network,
             provider_metrics,
             get_max_priority_fee_per_gas
-        );
+        )?;
 
         let chain_id = process_provider_getter!(
             provider.get_chain_id().await,
             network,
             provider_metrics,
             get_chain_id
-        );
+        )?;
 
         let message_value = DynSolValue::Tuple(vec![DynSolValue::Address(signer.address())]);
 
@@ -643,6 +645,22 @@ impl RpcProvider {
         } else {
             Ok(0)
         }
+    }
+
+    pub fn inc_num_tx_in_progress(&mut self) {
+        self.num_tx_in_progress += 1;
+    }
+
+    pub fn dec_num_tx_in_progress(&mut self) {
+        if self.num_tx_in_progress == 0 {
+            error!("Logical error! Trying to reduce the number of tx_in_progress, but there are 0 pending!");
+        } else {
+            self.num_tx_in_progress -= 1;
+        }
+    }
+
+    pub fn get_num_tx_in_progress(&self) -> u32 {
+        self.num_tx_in_progress
     }
 }
 // pub fn print_type<T>(_: &T) {
