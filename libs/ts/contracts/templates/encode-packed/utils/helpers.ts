@@ -1,4 +1,4 @@
-import { ExpandedFieldOrArray } from './types';
+import { ExpandedFieldOrArray } from '../../utils';
 
 export const checkForDynamicData = (fields: ExpandedFieldOrArray[]) => {
   let containsDynamicData = false;
@@ -8,6 +8,7 @@ export const checkForDynamicData = (fields: ExpandedFieldOrArray[]) => {
       containsDynamicData = containsDynamicData || checkForDynamicData(field);
     } else if (field.isDynamic) {
       containsDynamicData = true;
+      return;
     } else if ('components' in field) {
       containsDynamicData =
         containsDynamicData || checkForDynamicData(field.components!);
