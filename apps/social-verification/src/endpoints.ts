@@ -438,17 +438,19 @@ export const server: ApiServer<Api> = {
             `Inserting participant data.\n` + JSON.stringify(payload),
           );
 
-          const insertQuery =
-            'INSERT INTO participants (x_handle, discord_username, wallet_address, minting_tx, wallet_signature, is_verified) VALUES (?, ?, ?, ?, ?, ?)';
+          const insertQuery = `
+          INSERT INTO participants_unique
+            (x_handle, discord_username, user_address, user_signature, minting_tx)
+            VALUES (?, ?, ?, ?, ?)
+          `;
           const insertResult = await db
             .prepare(insertQuery)
             .bind(
               payload.xHandle,
               payload.discordUsername,
               payload.walletAddress,
-              payload.mintingTx,
               payload.walletSignature,
-              true,
+              payload.mintingTx,
             )
             .all();
 
@@ -474,11 +476,11 @@ export const server: ApiServer<Api> = {
           console.log(`Checking participant data:\n` + JSON.stringify(payload));
 
           const selectQuery = `
-          SELECT * FROM participants
+          SELECT * FROM participants_unique
           WHERE x_handle = ?
             OR discord_username = ?
-            OR wallet_address = ?
-            OR wallet_signature = ?
+            OR user_address = ?
+            OR user_signature = ?
           `;
           const selectResult = await db
             .prepare(selectQuery)
