@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 
-import { Schema } from 'effect';
+import { Schema as S } from 'effect';
 
 import { configDir } from '@blocksense/base-utils/env';
 import { selectDirectory } from '@blocksense/base-utils/fs';
@@ -20,7 +20,7 @@ export function readConfig<Name extends ConfigFileName>(
 ): Promise<ConfigType<Name>> {
   const { decodeJSON } = selectDirectory(dir);
   const { schema } = configFiles[configName];
-  return decodeJSON({ name: configName }, schema as Schema.Schema<any>);
+  return decodeJSON({ name: configName }, schema as S.Schema<any>);
 }
 
 export function writeConfig<Name extends ConfigFileName>(
@@ -30,7 +30,7 @@ export function writeConfig<Name extends ConfigFileName>(
 ): Promise<string> {
   const { writeJSON } = selectDirectory(dir);
   const { schema } = configFiles[configName];
-  if (!Schema.is(schema as Schema.Schema<unknown>)(content)) {
+  if (!S.is(schema as S.Schema<unknown>)(content)) {
     throw new Error(`Attempt to write invalid config for '${configName}'.`);
   }
   return writeJSON({ name: configName, content });
@@ -63,7 +63,7 @@ export function writeEvmDeployment(
   data: DeploymentConfigV2,
 ) {
   const { writeJSON } = selectDirectory(configDirs.evm_contracts_deployment_v2);
-  if (!Schema.is(DeploymentConfigSchemaV2)(data)) {
+  if (!S.is(DeploymentConfigSchemaV2)(data)) {
     throw new Error(
       `Attempt to write invalid EVM deployment config for '${network}'.`,
     );
@@ -73,7 +73,7 @@ export function writeEvmDeployment(
 
 export type ConfigFileName = keyof typeof configFiles;
 
-export type ConfigType<Name extends ConfigFileName> = Schema.Schema.Type<
+export type ConfigType<Name extends ConfigFileName> = S.Schema.Type<
   (typeof configFiles)[Name]['schema']
 >;
 
@@ -101,7 +101,7 @@ export const configFiles = {
 } satisfies {
   [name: string]: {
     path: string;
-    schema: Schema.Schema<any>;
+    schema: S.Schema<any>;
   };
 };
 

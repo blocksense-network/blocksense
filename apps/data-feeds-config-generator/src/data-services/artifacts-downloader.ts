@@ -1,5 +1,5 @@
 import { Octokit } from '@octokit/rest';
-import { Schema, ParseResult } from 'effect';
+import { Schema as S, ParseResult } from 'effect';
 
 import { getEnvString } from '@blocksense/base-utils/env';
 import {
@@ -39,7 +39,7 @@ export type Artifacts = {
 
 async function downloadAndDecodeFile<A, I>(
   filePath: string,
-  schema: Schema.Schema<A, I, never> | null,
+  schema: S.Schema<A, I, never> | null,
 ) {
   try {
     const { data: fileData } = await octokit.repos.getContent({
@@ -103,7 +103,7 @@ export async function fetchRepoFiles(
         } else {
           const content = await downloadAndDecodeFile(
             file.path,
-            Schema.Array(ChainLinkFeedInfoSchema),
+            S.Array(ChainLinkFeedInfoSchema),
           );
           artifacts.clArtifacts.push({
             base: file.name,
