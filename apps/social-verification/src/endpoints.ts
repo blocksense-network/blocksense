@@ -5,6 +5,7 @@ import {
   Layer,
   Redacted,
   Schema as S,
+  Schedule,
 } from 'effect';
 import { Tag } from 'effect/Context';
 import { NotFound, Unauthorized } from '@effect/platform/HttpApiError';
@@ -126,8 +127,11 @@ export const server: ApiServer<Api> = {
       return Effect.tryPromise({
         try: async () => {
           let xUserInfoResponse;
-          try {
-            xUserInfoResponse = await fetchAndDecodeJSON(
+          const xUserInfoResponseTask = await Effect.async<
+            boolean,
+            Error | TooManyRequests
+          >(resume => {
+            fetchAndDecodeJSON(
               XUserInfoResponseSchema,
               `https://api.socialdata.tools/twitter/user/${username}`,
               {
@@ -135,22 +139,37 @@ export const server: ApiServer<Api> = {
                   Authorization: `Bearer ${socialDataApiKey}`,
                 },
               },
-            );
-          } catch (error) {
-            if (error instanceof TooManyRequests) {
-              console.warn(
-                'Too many requests to X API, returning isFollowing as true',
-              );
-              return {
-                isFollowing: true,
-                userId: '',
-              };
-            } else {
-              throw error;
-            }
-          }
+            )
+              .then(response => {
+                console.log(
+                  `Successfully fetched user info. username: ${username}`,
+                );
+                xUserInfoResponse = response;
+                resume(Effect.succeed(true));
+              })
+              .catch(error => {
+                if (error instanceof TooManyRequests) {
+                  console.warn('Received TooManyRequests error, will retry...');
+                  resume(Effect.fail(error));
+                } else {
+                  console.error(
+                    `Error fetching user info for ${username}:`,
+                    error,
+                  );
+                  resume(Effect.fail(error));
+                }
+              });
+          });
 
-          const userId = xUserInfoResponse.id_str;
+          await Effect.runPromise(
+            Effect.retry(xUserInfoResponseTask, {
+              schedule: Schedule.exponential(1000),
+              times: 3,
+              until: err => !(err instanceof TooManyRequests),
+            }),
+          );
+
+          const userId = xUserInfoResponse!.id_str;
           if (!userId) {
             console.error(`User ID not found in response for user ${username}`);
             throw new NotFound();
@@ -160,8 +179,11 @@ export const server: ApiServer<Api> = {
           );
 
           let xUserFollowingResponse;
-          try {
-            xUserFollowingResponse = await fetchAndDecodeJSON(
+          const xUserFollowingTask = await Effect.async<
+            boolean,
+            Error | TooManyRequests
+          >(resume => {
+            fetchAndDecodeJSON(
               XUserFollowingResponseSchema,
               `https://api.socialdata.tools/twitter/user/${userId}/following/${xBlocksenseAccountId}`,
               {
@@ -169,27 +191,38 @@ export const server: ApiServer<Api> = {
                   Authorization: `Bearer ${socialDataApiKey}`,
                 },
               },
-            );
-          } catch (error) {
-            if (error instanceof TooManyRequests) {
-              console.warn(
-                'Too many requests to X API, returning isFollowing as true',
-              );
-              return {
-                isFollowing: true,
-                userId: '',
-              };
-            } else {
-              throw error;
-            }
-          }
+            )
+              .then(response => {
+                xUserFollowingResponse = response;
+                console.log(
+                  `Successfully fetched user following status. username: ${username} id: ${userId} isFollowing: ${xUserFollowingResponse.is_following}`,
+                );
+                resume(Effect.succeed(true));
+              })
+              .catch(error => {
+                if (error instanceof TooManyRequests) {
+                  console.warn('Received TooManyRequests error, will retry...');
+                  resume(Effect.fail(error));
+                } else {
+                  console.error(
+                    `Error fetching user following status for ${username}:`,
+                    error,
+                  );
+                  resume(Effect.fail(error));
+                }
+              });
+          });
 
-          console.log(
-            `Successfully fetched user following status. username: ${username} id: ${userId} isFollowing: ${xUserFollowingResponse.is_following}`,
+          await Effect.runPromise(
+            Effect.retry(xUserFollowingTask, {
+              schedule: Schedule.exponential(1000),
+              times: 3,
+              until: err => !(err instanceof TooManyRequests),
+            }),
           );
 
           return {
-            isFollowing: xUserFollowingResponse.is_following,
+            isFollowing: xUserFollowingResponse!.is_following,
             userId,
           };
         },
