@@ -24,8 +24,11 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
   const {
     xHandle,
     xStatus,
+    xUserId,
     discord,
     discordStatus,
+    retweetCode,
+    setRetweetStatus,
     setAlertMessage,
     mintLoading,
     setMintLoading,
@@ -38,7 +41,9 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
     discordStatus.type !== 'success' ||
     !xHandle ||
     !discord ||
-    mintLoading;
+    !xUserId ||
+    mintLoading ||
+    !retweetCode;
 
   const onMintClick = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -46,6 +51,7 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
 
     setMintLoading(true);
     setAlertMessage('');
+    setRetweetStatus({ type: 'none', message: '' });
 
     try {
       const resultXHandle = clearXHandle(xHandle);
@@ -54,6 +60,7 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
         xHandle: resultXHandle,
         discordUsername: discord,
         walletAddress: account.address,
+        walletSignature: retweetCode,
       };
 
       const { isParticipant, mintingTx: mintingTxFromDB } =
@@ -72,13 +79,30 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
 
       const generateMintSignatureResult = await generateMintSignature(
         account.address,
+        xUserId,
+        clearXHandle(xHandle),
+        discord,
+        retweetCode,
       );
       if ('error' in generateMintSignatureResult) {
-        onSuccessAction(
-          `https://arbiscan.io/address/${account.address}#nfttransfers`,
-          true,
-        );
-        return;
+        if (
+          generateMintSignatureResult.error ===
+          `Account ${account.address} already has an NFT`
+        ) {
+          setAlertMessage('You have already minted this NFT');
+          onSuccessAction(
+            `https://arbiscan.io/address/${account.address}#nfttransfers`,
+            true,
+          );
+          return;
+        } else {
+          setRetweetStatus({
+            type: 'error',
+            message: generateMintSignatureResult.error,
+          });
+          setAlertMessage(generateMintSignatureResult.error);
+          return;
+        }
       }
 
       const { payload, signature } = generateMintSignatureResult;
@@ -99,6 +123,7 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
       sendGAEvent('event', 'mintedNFT', {
         xHandle: resultXHandle,
         discord,
+        retweetCode,
         walletAddress: account.address,
       });
 
@@ -119,7 +144,7 @@ export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
       onClick={onMintClick}
       isLoading={mintLoading}
       disabled={isMintDisabled}
-      className="mint-form_button w-full mt-4"
+      className="mint-form_button w-full md:mt-12 mt-8"
     >
       Mint My NFT
     </Button>
