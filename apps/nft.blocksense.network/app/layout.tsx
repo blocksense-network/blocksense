@@ -89,7 +89,7 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
       <GoogleAnalytics gaId="G-7E3PF0WSSM" />
       <body className="nft-drop-layout__body">
         <ThirdwebProvider>
-          {/* <Banner /> */}
+          <Banner />
           <Navbar />
           <main className="nft-drop-layout__main pt-[3.85rem]">{children}</main>
           <Footer />
