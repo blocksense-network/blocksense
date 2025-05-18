@@ -11,7 +11,7 @@ export const Banner = () => {
         <div className="animate-scroll flex">
           <p className="text-sm text-black font-semibold flex items-center justify-center gap-10">
             {Array.from({ length: 10 }).map((_, index) => (
-              <span key={index}>{crewIsBack}</span>
+              <span key={index}>{lastWind}</span>
             ))}
           </p>
         </div>
