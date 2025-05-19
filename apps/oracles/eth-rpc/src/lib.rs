@@ -10,6 +10,7 @@ use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
 };
+use blocksense_utils::FeedId;
 use prettytable::{format, Cell, Row, Table};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -57,7 +58,7 @@ pub struct ResponseEthCallError {
 #[derive(Deserialize, Debug, Clone)]
 pub struct ResponseEthCall {
     pub jsonrpc: String,
-    pub id: Option<u128>,
+    pub id: Option<FeedId>,
     pub error: Option<ResponseEthCallError>,
     pub result: Option<String>,
     #[serde(default)]
@@ -126,7 +127,7 @@ impl RequestEthCall {
     }
 }
 
-type FetchedDataForFeed = HashMap<u128, ResponseEthCall>;
+type FetchedDataForFeed = HashMap<FeedId, ResponseEthCall>;
 type MyProvider = alloy::providers::fillers::FillProvider<
     alloy::providers::fillers::JoinFill<
         alloy::providers::Identity,
@@ -222,7 +223,7 @@ fn process_results(results: &FetchedDataForFeed) -> Result<Payload> {
 }
 
 fn print_results(results: &FetchedDataForFeed, payload: &Payload) {
-    let mut keys = results.keys().cloned().collect::<Vec<u128>>();
+    let mut keys = results.keys().cloned().collect::<Vec<FeedId>>();
     keys.sort();
 
     let mut table = Table::new();
@@ -278,7 +279,7 @@ pub struct Pair {
 #[derive(Deserialize, Debug)]
 struct FeedConfig {
     #[serde(default)]
-    pub feed_id: u128,
+    pub feed_id: FeedId,
     pub arguments: Vec<String>,
 }
 
@@ -287,7 +288,7 @@ fn get_resources_from_settings(settings: &Settings) -> Result<Vec<FeedConfig>> {
     for feed_setting in &settings.data_feeds {
         let mut feed_config = serde_json::from_str::<FeedConfig>(&feed_setting.data)
             .context("Couldn't parse data feed")?;
-        feed_config.feed_id = feed_setting.id.parse::<u128>()?;
+        feed_config.feed_id = feed_setting.id.parse::<FeedId>()?;
         config.push(feed_config);
     }
     Ok(config)

@@ -13,6 +13,7 @@ use blocksense_feed_registry::{aggregate::FeedAggregate, registry::FeedReports};
 use blocksense_feeds_processing::utils::{consume_reports, ConsumedReports};
 use blocksense_metrics::{inc_metric, metrics::FeedsMetrics};
 use blocksense_utils::time::current_unix_time;
+use blocksense_utils::FeedId;
 use eyre::{eyre, ContextCompat, Result};
 use std::sync::Arc;
 use std::time::Duration;
@@ -23,11 +24,11 @@ use tracing::{debug, info};
 
 pub struct FeedSlotsProcessor {
     name: String,
-    key: u128,
+    key: FeedId,
 }
 
 impl FeedSlotsProcessor {
-    pub fn new(name: String, key: u128) -> FeedSlotsProcessor {
+    pub fn new(name: String, key: FeedId) -> FeedSlotsProcessor {
         FeedSlotsProcessor { name, key }
     }
 
@@ -44,7 +45,7 @@ impl FeedSlotsProcessor {
 
     async fn get_reports_for_feed(
         &self,
-        feed_id: u128,
+        feed_id: FeedId,
         reports: &Arc<RwLock<AllFeedsReports>>,
     ) -> Option<Arc<RwLock<FeedReports>>> {
         debug!("Get a read lock on all reports [feed {feed_id}]");
@@ -386,7 +387,7 @@ pub mod tests {
 
     pub fn check_received(
         received: Result<Option<VotedFeedUpdateWithProof>, Elapsed>,
-        expected: (u128, FeedType),
+        expected: (FeedId, FeedType),
     ) {
         let feed_id = expected.0;
         let original_report_data = expected.1;
@@ -1051,7 +1052,7 @@ pub mod tests {
             always_publish_heartbeat_ms,
         )
         .await;
-        check_received(received, (1_u128, FeedType::Numerical(102.0)));
+        check_received(received, (1 as FeedId, FeedType::Numerical(102.0)));
     }
 
     #[tokio::test]
