@@ -1,4 +1,5 @@
 root-dir := justfile_directory()
+spin-data-dir := root-dir + "/target/spin-artifacts"
 
 default:
   @just --list
@@ -24,12 +25,16 @@ test-ts:
 build-oracle oracle-name:
   #!/usr/bin/env bash
   set -euo pipefail
+
   cd "{{root-dir}}/apps/oracles/{{oracle-name}}"
   RUST_LOG=trigger=trace "${SPIN:-spin}" build
 
 start-oracle oracle-name:
   #!/usr/bin/env bash
   set -euo pipefail
+
+  export SPIN_DATA_DIR={{spin-data-dir}}
+
   cd "{{root-dir}}/apps/oracles/{{oracle-name}}"
   RUST_LOG=trigger=info "${SPIN:-spin}" build --up
 
