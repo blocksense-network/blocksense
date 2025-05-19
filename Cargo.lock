@@ -2245,6 +2245,7 @@ dependencies = [
  "anyhow",
  "blocksense-data-feeds",
  "blocksense-feed-registry",
+ "blocksense-utils",
  "hex",
  "serde 1.0.217",
  "serde_json",
@@ -2276,6 +2277,7 @@ name = "blocksense-registry"
 version = "0.1.1"
 dependencies = [
  "anyhow",
+ "blocksense-utils",
  "serde 1.0.217",
  "serde_json",
 ]
@@ -3964,6 +3966,7 @@ dependencies = [
  "alloy",
  "anyhow",
  "blocksense-sdk",
+ "blocksense-utils",
  "itertools 0.8.2",
  "prettytable-rs",
  "serde 1.0.217",

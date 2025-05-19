@@ -1,6 +1,7 @@
 pub mod in_mem_db;
 
 use anyhow::Result;
+use blocksense_utils::FeedId;
 use ssz_rs::prelude::*;
 
 pub const DATA_CHUNK_SIZE: usize = 32;
@@ -18,7 +19,7 @@ pub struct AssetPair {
 
 #[derive(Debug, PartialEq, SimpleSerialize, Default, Clone)]
 pub struct BlockFeedConfig {
-    pub id: u128,
+    pub id: FeedId,
     pub name: DataChunk,
     pub full_name: DataChunk,
     pub description: DataChunk,
@@ -71,7 +72,7 @@ impl BlockHeader {
 pub struct FeedActions {
     pub block_height: u64,
     pub new_feeds: [Option<BlockFeedConfig>; MAX_NEW_FEEDS_IN_BLOCK],
-    pub feed_ids_to_rm: [Option<u128>; MAX_FEED_ID_TO_DELETE_IN_BLOCK],
+    pub feed_ids_to_rm: [Option<FeedId>; MAX_FEED_ID_TO_DELETE_IN_BLOCK],
 }
 
 impl FeedActions {

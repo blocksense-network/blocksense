@@ -3,7 +3,7 @@ use crate::{
     MAX_NEW_FEEDS_IN_BLOCK,
 };
 use anyhow::Result;
-use blocksense_utils::time::current_unix_time;
+use blocksense_utils::{time::current_unix_time, FeedId};
 use hex::FromHex;
 use hex_literal::hex;
 use ssz_rs::{Node, SimpleSerialize};
@@ -60,7 +60,7 @@ impl InMemDb {
         sequencer_id: u64,
         new_block_height: u64,
         new_feeds_in_block: Vec<BlockFeedConfig>,
-        feed_ids_to_delete_in_block: Vec<u128>,
+        feed_ids_to_delete_in_block: Vec<FeedId>,
     ) -> Result<(BlockHeader, FeedActions)> {
         // Populate new and to be removed feeds in block:
         let mut add_remove_feeds = FeedActions::default();

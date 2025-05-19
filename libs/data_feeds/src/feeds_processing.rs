@@ -4,7 +4,7 @@ use blocksense_feed_registry::{
     registry::FeedAggregateHistory,
     types::{DataFeedPayload, FeedType, Timestamp},
 };
-use blocksense_utils::from_hex_string;
+use blocksense_utils::{from_hex_string, FeedId};
 use log::error;
 use serde::Deserialize;
 use serde::Serialize;
@@ -12,14 +12,14 @@ use std::cmp::Ordering;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VotedFeedUpdate {
-    pub feed_id: u128,
+    pub feed_id: FeedId,
     pub value: FeedType,
     pub end_slot_timestamp: Timestamp,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EncodedVotedFeedUpdate {
-    pub feed_id: u128,
+    pub feed_id: FeedId,
     pub value: Vec<u8>,
     pub end_slot_timestamp: Timestamp,
 }
@@ -121,9 +121,9 @@ impl VotedFeedUpdate {
         digits_in_fraction: usize,
     ) -> Result<VotedFeedUpdate, anyhow::Error> {
         let key_bytes = from_hex_string(key)?;
-        let mut dst = [0u8; 16];
-        dst.clone_from_slice(&key_bytes[0..16]);
-        let feed_id = u128::from_be_bytes(dst);
+        let mut dst = [0u8; std::mem::size_of::<FeedId>()];
+        dst.clone_from_slice(&key_bytes[0..std::mem::size_of::<FeedId>()]);
+        let feed_id = FeedId::from_be_bytes(dst);
         let value_bytes = from_hex_string(value)?;
         let value = FeedType::from_bytes(value_bytes, variant, digits_in_fraction)
             .map_err(|e| anyhow!("{e}"))?;
@@ -204,7 +204,7 @@ pub struct EncodedBatchedAggegratesToSend {
 
 #[derive(Clone, Debug)]
 pub struct PublishedFeedUpdate {
-    pub feed_id: u128,
+    pub feed_id: FeedId,
     pub num_updates: u128,
     pub value: FeedType,
     pub published: Timestamp, // in seconds since UNIX_EPOCH
@@ -212,14 +212,14 @@ pub struct PublishedFeedUpdate {
 
 #[derive(Clone, Debug)]
 pub struct PublishedFeedUpdateError {
-    pub feed_id: u128,
+    pub feed_id: FeedId,
     pub num_updates: u128,
     pub error: String,
 }
 
 impl PublishedFeedUpdate {
     pub fn latest(
-        feed_id: u128,
+        feed_id: FeedId,
         variant: FeedType,
         digits_in_fraction: usize,
         data: &[u8],
@@ -245,7 +245,7 @@ impl PublishedFeedUpdate {
         }
     }
 
-    pub fn error(feed_id: u128, message: &str) -> PublishedFeedUpdateError {
+    pub fn error(feed_id: FeedId, message: &str) -> PublishedFeedUpdateError {
         PublishedFeedUpdateError {
             feed_id,
             num_updates: 0,
@@ -254,7 +254,7 @@ impl PublishedFeedUpdate {
     }
 
     pub fn error_num_update(
-        feed_id: u128,
+        feed_id: FeedId,
         message: &str,
         num_updates: u128,
     ) -> PublishedFeedUpdateError {
@@ -264,7 +264,7 @@ impl PublishedFeedUpdate {
     }
 
     pub fn nth(
-        feed_id: u128,
+        feed_id: FeedId,
         num_updates: u128,
         variant: FeedType,
         digits_in_fraction: usize,
@@ -339,7 +339,7 @@ mod tests {
     fn voted_feed_update_encode() {
         let end_slot_timestamp = 1_735_902_088_000_u128; // 3 Jan 2025 time of refactoring this test
         let update = VotedFeedUpdate {
-            feed_id: 42_u128,
+            feed_id: 42 as FeedId,
             value: FeedType::Numerical(142.0),
             end_slot_timestamp,
         };
@@ -360,7 +360,10 @@ mod tests {
         let vote_1 =
             VotedFeedUpdate::new_decode(k1, v1, end_slot_timestamp, FeedType::Numerical(0.0), 18)
                 .unwrap();
-        assert_eq!(vote_1.feed_id, 227297987279220614266551007307938922497_u128);
+        assert_eq!(
+            vote_1.feed_id,
+            227297987279220614266551007307938922497 as FeedId
+        );
         assert_eq!(vote_1.value, FeedType::Numerical(80000.8f64));
     }
 
@@ -501,7 +504,7 @@ mod tests {
             .unwrap()
             .as_millis();
         let update = VotedFeedUpdate {
-            feed_id: 42_u128,
+            feed_id: 42 as FeedId,
             value: FeedType::Numerical(142.0),
             end_slot_timestamp,
         };
@@ -518,7 +521,10 @@ mod tests {
         let vote_1 =
             VotedFeedUpdate::new_decode(k1, v1, end_slot_timestamp, FeedType::Numerical(0.0), 18)
                 .unwrap();
-        assert_eq!(vote_1.feed_id, 227297987279220614266551007307938922497_u128);
+        assert_eq!(
+            vote_1.feed_id,
+            227297987279220614266551007307938922497 as FeedId
+        );
         assert_eq!(vote_1.value, FeedType::Numerical(80000.8f64));
     }
 }
