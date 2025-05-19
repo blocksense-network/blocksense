@@ -8,7 +8,6 @@ import { CookieBanner } from '../components/CookieBanner';
 import { Footer } from '../components/Footer';
 import { geist, geistMono } from '../src/geist';
 import './globals.css';
-import { Banner } from 'components/Banner';
 
 export const metadata: Metadata = {
   title: {
@@ -89,7 +88,6 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
       <GoogleAnalytics gaId="G-7E3PF0WSSM" />
       <body className="nft-drop-layout__body">
         <ThirdwebProvider>
-          <Banner />
           <Navbar />
           <main className="nft-drop-layout__main pt-[3.85rem]">{children}</main>
           <Footer />

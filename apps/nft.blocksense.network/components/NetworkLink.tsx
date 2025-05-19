@@ -12,7 +12,7 @@ const networkLinks = {
   },
   discord: {
     title: 'Community',
-    description: '+45k members',
+    description: '+80k members',
     url: 'https://discord.com/invite/mYujUXwrMr',
     icon: discordIcon,
   },
