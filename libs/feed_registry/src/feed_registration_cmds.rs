@@ -1,4 +1,5 @@
 use blocksense_registry::config::FeedConfig;
+use blocksense_utils::FeedId;
 use tokio::sync::mpsc;
 
 #[derive(Debug, Clone)]
@@ -8,7 +9,7 @@ pub struct RegisterNewAssetFeed {
 
 #[derive(Debug, Clone)]
 pub struct DeleteAssetFeed {
-    pub id: u128,
+    pub id: FeedId,
 }
 
 #[allow(clippy::large_enum_variant)]
