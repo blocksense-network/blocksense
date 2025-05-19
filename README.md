@@ -46,7 +46,7 @@ Blocksense is a **permissionless oracle network** that enables builders to bring
 
 Join the Blocksense community! 🎉
 
-[![Discord](https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white&style=for-the-badge)](https://discord.gg/b3xmcWs4Qp)
+[![Discord](https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white&style=for-the-badge)](https://discord.gg/blocksense)
 [![Twitter/X](https://img.shields.io/badge/X-000000?logo=x&logoColor=white&style=for-the-badge)](https://x.com/blocksense_)
 [![Telegram](https://img.shields.io/badge/Telegram-26A5E4?logo=telegram&logoColor=white&style=for-the-badge)](https://t.me/BlocksenseNetwork)
 
