@@ -3,7 +3,7 @@ use alloy_primitives::U256;
 use anyhow::Result;
 use blocksense_config::FeedStrideAndDecimals;
 use blocksense_data_feeds::feeds_processing::BatchedAggegratesToSend;
-use blocksense_utils::{from_hex_string, to_hex_string};
+use blocksense_utils::{from_hex_string, to_hex_string, FeedId};
 use std::cmp::max;
 use std::collections::{BTreeMap, HashMap, HashSet};
 
@@ -14,7 +14,7 @@ use once_cell::sync::Lazy;
 const MAX_HISTORY_ELEMENTS_PER_FEED: u64 = 8192;
 const NUM_FEED_IDS_IN_ROUND_RECORD: u128 = 16;
 
-pub type RoundCounters = HashMap<u128, u64>; // for each key (feed_id) we store its round counter
+pub type RoundCounters = HashMap<FeedId, u64>; // for each key (feed_id) we store its round counter
 
 static STRIDES_SIZES: Lazy<HashMap<u16, u32>> = Lazy::new(|| {
     let mut map = HashMap::new(); // TODO: confirm the correct values for the strides we will support
@@ -63,11 +63,11 @@ pub async fn adfs_serialize_updates(
     net: &str,
     feed_updates: &BatchedAggegratesToSend,
     round_counters: Option<&RoundCounters>,
-    strides_and_decimals: HashMap<u128, FeedStrideAndDecimals>,
-    feeds_rounds: &mut HashMap<u128, u64>, /* The rounds table for the relevant feeds. If the round_counters are provided,
-                                           this map will be filled with the update count for each feed from it. If the
-                                           round_counters is None, feeds_rounds will be used as the source of the updates
-                                           count. */
+    strides_and_decimals: HashMap<FeedId, FeedStrideAndDecimals>,
+    feeds_rounds: &mut HashMap<FeedId, u64>, /* The rounds table for the relevant feeds. If the round_counters are provided,
+                                             this map will be filled with the update count for each feed from it. If the
+                                             round_counters is None, feeds_rounds will be used as the source of the updates
+                                             count. */
 ) -> Result<Vec<u8>> {
     let mut result = Vec::<u8>::new();
     let updates = &feed_updates.updates;
@@ -249,9 +249,9 @@ pub async fn adfs_serialize_updates(
     Ok(result)
 }
 
-pub fn get_neighbour_feed_ids(feed_id: u128) -> Vec<u128> {
-    let additional_feeds_begin: u128 = feed_id - (feed_id % NUM_FEED_IDS_IN_ROUND_RECORD);
-    let additional_feeds_end: u128 = additional_feeds_begin + NUM_FEED_IDS_IN_ROUND_RECORD;
+pub fn get_neighbour_feed_ids(feed_id: FeedId) -> Vec<FeedId> {
+    let additional_feeds_begin: FeedId = feed_id - (feed_id % NUM_FEED_IDS_IN_ROUND_RECORD);
+    let additional_feeds_end: FeedId = additional_feeds_begin + NUM_FEED_IDS_IN_ROUND_RECORD;
 
     (additional_feeds_begin..additional_feeds_end).collect()
 }
@@ -264,7 +264,7 @@ pub mod tests {
     use super::*;
 
     // Helper function to create VotedFeedUpdate
-    fn create_voted_feed_update(feed_id: u128, value: &str) -> VotedFeedUpdate {
+    fn create_voted_feed_update(feed_id: FeedId, value: &str) -> VotedFeedUpdate {
         let bytes = from_hex_string(value).unwrap();
         VotedFeedUpdate {
             feed_id,
@@ -275,8 +275,8 @@ pub mod tests {
 
     fn setup_updates_rounds_and_config() -> (
         BatchedAggegratesToSend,
-        HashMap<u128, u64>,
-        HashMap<u128, FeedStrideAndDecimals>,
+        HashMap<FeedId, u64>,
+        HashMap<FeedId, FeedStrideAndDecimals>,
     ) {
         let updates = BatchedAggegratesToSend {
             block_height: 1234567890,

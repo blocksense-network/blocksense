@@ -16,6 +16,7 @@ use alloy::{
 };
 use alloy_primitives::Bytes;
 use blocksense_feeds_processing::adfs_gen_calldata::RoundCounters;
+use blocksense_utils::FeedId;
 use futures::future::join_all;
 use reqwest::Url;
 
@@ -84,8 +85,8 @@ pub struct RpcProvider {
     pub transaction_gas_limit: u32,
     pub impersonated_anvil_account: Option<Address>,
     pub history: FeedAggregateHistory,
-    pub publishing_criteria: HashMap<u128, PublishCriteria>,
-    pub feeds_variants: HashMap<u128, (FeedType, usize)>,
+    pub publishing_criteria: HashMap<FeedId, PublishCriteria>,
+    pub feeds_variants: HashMap<FeedId, (FeedType, usize)>,
     pub contracts: Vec<Contract>,
     pub rpc_url: Url,
     pub round_counters: RoundCounters,
@@ -194,7 +195,7 @@ impl RpcProvider {
             .and_then(|x| parse_eth_address(x.as_str()));
         let (history, publishing_criteria) = RpcProvider::prepare_history(p);
         let contracts = RpcProvider::prepare_contracts(p);
-        let mut feeds_variants: HashMap<u128, (FeedType, usize)> = HashMap::new();
+        let mut feeds_variants: HashMap<FeedId, (FeedType, usize)> = HashMap::new();
         for f in feeds_config.feeds.iter() {
             debug!("Registering feed for network; feed={f:?}; network={network}");
             match FeedType::get_variant_from_string(f.value_type.as_str()) {
@@ -230,9 +231,9 @@ impl RpcProvider {
 
     pub fn prepare_history(
         p: &blocksense_config::Provider,
-    ) -> (FeedAggregateHistory, HashMap<u128, PublishCriteria>) {
+    ) -> (FeedAggregateHistory, HashMap<FeedId, PublishCriteria>) {
         let mut history = FeedAggregateHistory::new();
-        let mut publishing_criteria: HashMap<u128, PublishCriteria> = HashMap::new();
+        let mut publishing_criteria: HashMap<FeedId, PublishCriteria> = HashMap::new();
 
         for crit in p.publishing_criteria.iter() {
             let feed_id = crit.feed_id;
@@ -375,7 +376,7 @@ impl RpcProvider {
 
     pub async fn get_latest_values(
         &self,
-        feed_ids: &[u128],
+        feed_ids: &[FeedId],
     ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>, eyre::Error> {
         let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
         let data_feed = self.get_contract_address(PRICE_FEED_CONTRACT_NAME)?;
@@ -427,7 +428,7 @@ impl RpcProvider {
 
     pub async fn get_historical_values_for_feed(
         &self,
-        feed_id: u128,
+        feed_id: FeedId,
         updates: &[u128],
     ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>> {
         let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
@@ -479,10 +480,10 @@ impl RpcProvider {
         Ok(res)
     }
 
-    pub fn get_history_capacity(&self, feed_id: u128) -> Option<usize> {
+    pub fn get_history_capacity(&self, feed_id: FeedId) -> Option<usize> {
         self.history.get(feed_id).map(|x| x.capacity().get())
     }
-    pub fn get_last_update_num_from_history(&self, feed_id: u128) -> u128 {
+    pub fn get_last_update_num_from_history(&self, feed_id: FeedId) -> u128 {
         let default = 0;
         self.history
             .get(feed_id)
@@ -604,7 +605,7 @@ impl RpcProvider {
 
     pub async fn load_history_from_chain(
         &mut self,
-        feed_id: u128,
+        feed_id: FeedId,
         limit_entries: u32,
     ) -> Result<u32> {
         let latest = self.get_latest_values(&[feed_id]).await?;

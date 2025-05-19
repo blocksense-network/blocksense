@@ -13,6 +13,7 @@ use blocksense_feed_registry::registry::SlotTimeTracker;
 use blocksense_feed_registry::types::Repeatability;
 use blocksense_registry::config::FeedConfig;
 use blocksense_utils::time::current_unix_time;
+use blocksense_utils::FeedId;
 use rdkafka::producer::FutureRecord;
 use rdkafka::util::Timeout;
 use serde_json::json;
@@ -129,7 +130,7 @@ async fn recvd_feed_update_to_block(
     updates_to_block: &mut BTreeSet<VotedFeedUpdateWithProof>,
     backlog_updates: &mut VecDeque<VotedFeedUpdateWithProof>,
     max_feed_updates_to_batch: usize,
-    feeds_config: &Arc<RwLock<HashMap<u128, FeedConfig>>>,
+    feeds_config: &Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
 ) {
     match recvd_feed_update {
         Some(voted_update) => {

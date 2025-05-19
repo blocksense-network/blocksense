@@ -9,7 +9,7 @@ use alloy::{
 use blocksense_config::FeedStrideAndDecimals;
 use blocksense_data_feeds::feeds_processing::{BatchedAggegratesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
-use blocksense_utils::to_hex_string;
+use blocksense_utils::{to_hex_string, FeedId};
 use eyre::{bail, eyre, Result};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
 use tokio::{
@@ -60,7 +60,7 @@ pub async fn deploy_contract(
 fn legacy_serialize_updates(
     net: &str,
     updates: &BatchedAggegratesToSend,
-    feeds_config: HashMap<u128, FeedStrideAndDecimals>,
+    feeds_config: HashMap<FeedId, FeedStrideAndDecimals>,
 ) -> Vec<u8> {
     let mut result: String = Default::default();
 
@@ -108,7 +108,7 @@ fn legacy_serialize_updates(
 pub fn filter_allowed_feeds(
     net: &str,
     updates: &mut BatchedAggegratesToSend,
-    allow_feeds: &Option<Vec<u128>>,
+    allow_feeds: &Option<Vec<FeedId>>,
 ) {
     if let Some(allowed_feed_ids) = allow_feeds {
         let mut res: Vec<VotedFeedUpdate> = vec![];
@@ -130,8 +130,8 @@ pub async fn get_serialized_updates_for_network(
     provider_mutex: &Arc<Mutex<RpcProvider>>,
     updates: &mut BatchedAggegratesToSend,
     provider_settings: &blocksense_config::Provider,
-    feeds_config: Arc<RwLock<HashMap<u128, FeedConfig>>>,
-    feeds_rounds: &mut HashMap<u128, u64>,
+    feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
+    feeds_rounds: &mut HashMap<FeedId, u64>,
 ) -> Result<Vec<u8>> {
     debug!("Acquiring a read lock on provider config for `{net}`");
     let provider = provider_mutex.lock().await;
@@ -218,7 +218,7 @@ pub struct BatchOfUpdatesToProcess {
     pub provider_settings: blocksense_config::Provider,
     pub updates: BatchedAggegratesToSend,
     pub feed_type: Repeatability,
-    pub feeds_config: Arc<RwLock<HashMap<u128, FeedConfig>>>,
+    pub feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
     pub transaction_retry_timeout_secs: u64,
     pub transaction_retries_count_limit: u64,
     pub retry_fee_increment_fraction: f64,
@@ -347,11 +347,11 @@ pub async fn eth_batch_send_to_contract(
     provider_settings: blocksense_config::Provider,
     mut updates: BatchedAggegratesToSend,
     feed_type: Repeatability,
-    feeds_config: Arc<RwLock<HashMap<u128, FeedConfig>>>,
+    feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
     transaction_retry_timeout_secs: u64,
     transaction_retries_count_limit: u64,
     retry_fee_increment_fraction: f64,
-) -> Result<(String, Vec<u128>)> {
+) -> Result<(String, Vec<FeedId>)> {
     let mut feeds_rounds = HashMap::new();
     let serialized_updates = get_serialized_updates_for_network(
         net.as_str(),
@@ -382,7 +382,7 @@ pub async fn eth_batch_send_to_contract(
     let mut provider = provider.lock().await;
     debug!("Acquired a read/write lock on provider state for network `{net}` block height {block_height}");
 
-    let feeds_to_update_ids: Vec<u128> = updates
+    let feeds_to_update_ids: Vec<FeedId> = updates
         .updates
         .iter()
         .map(|update| update.feed_id)
@@ -1112,7 +1112,7 @@ pub async fn eth_batch_send_to_all_contracts(
 
 async fn log_round_counters(
     prefix: &str,
-    updated_feeds: &Vec<u128>,
+    updated_feeds: &Vec<FeedId>,
     round_counters: &mut RoundCounters,
     net: &str,
 ) {
@@ -1126,7 +1126,7 @@ async fn log_round_counters(
 }
 
 pub async fn increment_feeds_round_indexes(
-    updated_feeds: &Vec<u128>,
+    updated_feeds: &Vec<FeedId>,
     net: &str,
     provider: &mut RpcProvider,
 ) {
@@ -1154,7 +1154,7 @@ pub async fn increment_feeds_round_indexes(
 // Since we update the round counters when we post the tx and before we
 // receive its receipt if the tx fails we need to decrease the round indexes.
 pub async fn decrement_feeds_round_indexes(
-    updated_feeds: &Vec<u128>,
+    updated_feeds: &Vec<FeedId>,
     net: &str,
     provider: &mut RpcProvider,
 ) {
@@ -1183,7 +1183,7 @@ pub async fn decrement_feeds_round_indexes(
 }
 
 async fn increment_feeds_round_metrics(
-    updated_feeds: &Vec<u128>,
+    updated_feeds: &Vec<FeedId>,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     net: &str,
 ) {
@@ -1232,7 +1232,7 @@ mod tests {
         None
     }
 
-    fn test_feeds_config() -> HashMap<u128, FeedStrideAndDecimals> {
+    fn test_feeds_config() -> HashMap<FeedId, FeedStrideAndDecimals> {
         let mut feeds_config = HashMap::new();
         feeds_config.insert(
             0,
@@ -1388,7 +1388,7 @@ mod tests {
             .get(&net)
             .unwrap_or_else(|| panic!("Config for network {net} not found!"))
             .clone();
-        let feeds_config = Arc::new(RwLock::new(HashMap::<u128, FeedConfig>::new()));
+        let feeds_config = Arc::new(RwLock::new(HashMap::<FeedId, FeedConfig>::new()));
 
         let result = eth_batch_send_to_contract(
             net.clone(),
@@ -1697,7 +1697,7 @@ mod tests {
                 .expect("Can't get latest values from contract");
             assert_eq!(latest.len(), 1);
             let latest = latest[0].clone().expect("no error in feed");
-            assert_eq!(latest.feed_id, 1_u128);
+            assert_eq!(latest.feed_id, 1 as FeedId);
             assert_eq!(latest.num_updates, 3_u128);
             assert_eq!(latest.value, FeedType::Numerical(104011.78f64));
 
@@ -1708,7 +1708,7 @@ mod tests {
 
             assert_eq!(history.len(), 5);
 
-            let feed_ids: Vec<u128> = history
+            let feed_ids: Vec<FeedId> = history
                 .iter()
                 .map(|x| match x {
                     Ok(x) => x.feed_id,
@@ -1748,11 +1748,11 @@ mod tests {
                 })
                 .collect();
 
-            assert_eq!(feed_ids[0], 1_u128);
-            assert_eq!(feed_ids[1], 1_u128);
-            assert_eq!(feed_ids[2], 1_u128);
-            assert_eq!(feed_ids[3], 1_u128);
-            assert_eq!(feed_ids[4], 1_u128);
+            assert_eq!(feed_ids[0], 1 as FeedId);
+            assert_eq!(feed_ids[1], 1 as FeedId);
+            assert_eq!(feed_ids[2], 1 as FeedId);
+            assert_eq!(feed_ids[3], 1 as FeedId);
+            assert_eq!(feed_ids[4], 1 as FeedId);
 
             assert_eq!(errors[0], Some("Timestamp is zero"));
             assert_eq!(values[1], Some(FeedType::Numerical(103082.01f64)));
@@ -1868,7 +1868,7 @@ mod tests {
         //let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
         let end_slot_timestamp = 0_u128;
         let v1 = VotedFeedUpdate {
-            feed_id: 0x1F_u128,
+            feed_id: 0x1F as FeedId,
             value: FeedType::Text("hi".to_string()),
             end_slot_timestamp,
         };
@@ -1965,7 +1965,7 @@ mod tests {
     fn peg_stable_coin_updates_data() -> BatchedAggegratesToSend {
         let end_slot_timestamp = 0_u128;
         let v1 = VotedFeedUpdate {
-            feed_id: 0x1F_u128,
+            feed_id: 0x1F as FeedId,
             value: FeedType::Text("hi".to_string()),
             end_slot_timestamp,
         };
@@ -1975,18 +1975,18 @@ mod tests {
             end_slot_timestamp,
         };
         let v3 = VotedFeedUpdate {
-            feed_id: 0x001_u128,
+            feed_id: 0x001 as FeedId,
             value: FeedType::Numerical(1.001f64),
             end_slot_timestamp,
         };
 
         let v4 = VotedFeedUpdate {
-            feed_id: 0x001_u128,
+            feed_id: 0x001 as FeedId,
             value: FeedType::Numerical(1.101f64),
             end_slot_timestamp,
         };
         let v5 = VotedFeedUpdate {
-            feed_id: 0x001_u128,
+            feed_id: 0x001 as FeedId,
             value: FeedType::Numerical(0.991f64),
             end_slot_timestamp,
         };
@@ -2011,7 +2011,7 @@ mod tests {
             .entry(network.to_string())
             .and_modify(|p| {
                 let c = PublishCriteria {
-                    feed_id: 1_u128,
+                    feed_id: 1 as FeedId,
                     skip_publish_if_less_then_percentage: 0.3f64,
                     always_publish_heartbeat_ms: None,
                     peg_to_value: Some(1f64),
@@ -2034,7 +2034,7 @@ mod tests {
         let mut provider = prov2.get_mut(network).unwrap().lock().await;
 
         provider.update_history(&[VotedFeedUpdate {
-            feed_id: 0x001_u128,
+            feed_id: 0x001 as FeedId,
             value: FeedType::Numerical(1.0f64),
             end_slot_timestamp: 0_u128,
         }]);
@@ -2066,7 +2066,7 @@ mod tests {
             .entry(network.to_string())
             .and_modify(|p| {
                 let c = PublishCriteria {
-                    feed_id: 1_u128,
+                    feed_id: 1 as FeedId,
                     skip_publish_if_less_then_percentage: 0.0f64,
                     always_publish_heartbeat_ms: None,
                     peg_to_value: None,
@@ -2088,7 +2088,7 @@ mod tests {
         let mut provider = prov2.get_mut(network).unwrap().lock().await;
 
         provider.update_history(&[VotedFeedUpdate {
-            feed_id: 0x001_u128,
+            feed_id: 0x001 as FeedId,
             value: FeedType::Numerical(1.0f64),
             end_slot_timestamp: 0_u128,
         }]);
