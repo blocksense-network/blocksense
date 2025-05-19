@@ -570,10 +570,7 @@ impl RpcProvider {
         let timeout_duration = Duration::from_secs(1);
         if let Some(addr) = contract.address {
             let read_byte_code = self.read_contract_bytecode(&addr, timeout_duration).await?;
-            return Ok(format!(
-                "Contract {contract_name} on address {addr} has byte code {}",
-                read_byte_code
-            ));
+            return Ok(format!("Contract {contract_name} on address {addr} has byte code {}", read_byte_code));
         }
         let mut bytecode = contract.creation_byte_code.ok_or(eyre!(
             "Byte code unavailable to create contract named {contract_name}"
@@ -896,22 +893,34 @@ mod tests {
         let _guard = span.enter();
 
         let network = "ETH";
-        let fork_url = "https://rpc-gel-sepolia.inkonchain.com";
-        let anvil = Anvil::new().fork(fork_url).try_spawn()?;
-
         //let fork_url = "https://rpc-gel-sepolia.inkonchain.com";
-        //let anvil = Anvil::new().try_spawn()?;
+        //let anvil = Anvil::new().fork(fork_url).try_spawn()?;
+        let anvil = Anvil::new().try_spawn()?;
 
         let key_path = get_test_private_key_path();
 
-        let sequencer_config =
+        let mut sequencer_config =
             get_test_config_with_single_provider(network, key_path.as_path(), &anvil.endpoint());
 
         //let feeds_config = AllFeedsConfig { feeds: vec![] };
-        let feed_1_config = test_feed_config(31, 8);
+        let feed_id = 31;
+        let stride = 8;
+        let feed_1_config = test_feed_config(feed_id, stride);
         let feeds_config = AllFeedsConfig {
             feeds: vec![feed_1_config],
         };
+
+        let p_entry = sequencer_config.providers.entry(network.to_string());
+        p_entry.and_modify(|p| {
+            if let Some(x) = p
+                .contracts
+                .iter_mut()
+                .find(|x| x.name == MULTICALL_CONTRACT_NAME)
+            {
+                x.address = None;
+                x.creation_byte_code = Some(Multicall::BYTECODE.to_string());
+            }
+        });
 
         let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
@@ -921,25 +930,31 @@ mod tests {
         .await;
 
         // run
-        // let msg = sequencer_state
-        //     .deploy_contract(network, ADFS_CONTRACT_NAME)
-        //     .await
-        //     .expect("Data feed publishing contract deployment failed!");
+        let msg = sequencer_state
+             .deploy_contract(network, ADFS_CONTRACT_NAME)
+             .await
+             .expect("Data feed publishing contract deployment failed!");
+        info!("{msg}");
+        let msg = sequencer_state
+            .deploy_contract(network, MULTICALL_CONTRACT_NAME)
+            .await
+            .expect("Error when deploying multicall contract!");
+        info!("{msg}");
 
         {
             let rpc_provider_mutex = sequencer_state.get_provider(network).await.clone().unwrap();
             let mut rpc_provider = rpc_provider_mutex.lock().await;
             let block_number = rpc_provider.provider.get_block_number().await.unwrap();
             //println!("Block number from provider = {number}");
-            let block_num_at_time_of_writing_this_test = 16500374_u64;
+            //let block_num_at_time_of_writing_this_test = 16500374_u64;
+            let block_num_at_time_of_writing_this_test = 0_u64;
             assert!(block_number > block_num_at_time_of_writing_this_test);
-            let last_updates = rpc_provider.get_latest_values(&[31]).await.unwrap();
-            println!("last update on chain {last_updates:?}");
-            //let last_round = rpc_provider_guard.get_latest_round(&0, 18).await;
-            //println!("last rounds on chain {last_round:?}");
-            let m = rpc_provider.deploy_contract(ADFS_CONTRACT_NAME).await;
-            //let m = rpc_provider.deploy_contract(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME).await;
-            println!("{:?}", &m);
+            let last_round = rpc_provider.get_latest_round(&(feed_id as u128), stride.into()).await.unwrap();
+            println!("last update on chain {last_round:?}");
+            let r = last_round.first().expect("One round is expected");
+            assert_eq!(r._feed_id, feed_id.into());
+            assert_eq!(r._round, 0)
+
         }
 
         // let alice = anvil.addresses()[7];

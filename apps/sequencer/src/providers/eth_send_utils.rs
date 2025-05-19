@@ -136,8 +136,7 @@ pub async fn get_serialized_updates_for_network(
     if updates.updates.is_empty() {
         return Ok(Vec::new());
     }
-    println!("updates = {:?}", &updates);
-    println!("feed_configs = {:?}", &feeds_config);
+
     let contract_version = provider.get_latest_contract_version(feeds_repeatability);
     drop(provider);
     debug!("Released a read lock on provider config for `{net}`");
@@ -983,7 +982,7 @@ mod tests {
             0.1,
         )
         .await;
-        println!("Result = {result:?}");
+        
         assert!(result.is_ok());
         // getter calldata will be:
         // 0x800000030000000000000000000000000000000000000000000000000000000000000002
