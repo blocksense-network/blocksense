@@ -5,6 +5,8 @@ set -euo pipefail
 SPIN_DATA_DIR="$GIT_ROOT/target/spin-artifacts"
 mkdir -p $SPIN_DATA_DIR
 
+IFS='-' read -r ARCH OS <<< $($GIT_ROOT/scripts/get-host-arch-and-os.sh)
+
 ARCHIVE_PATH="$SPIN_DATA_DIR/trigger-oracle.tar.gz"
 
 tar czf $ARCHIVE_PATH -C "$GIT_ROOT/target/release" ./trigger-oracle
@@ -25,8 +27,8 @@ cat > $MANIFEST_PATH << EOF
     "version": "0.1.0",
     "packages": [
         {
-            "os": "linux",
-            "arch": "amd64",
+            "os": "$OS",
+            "arch": "$ARCH",
             "url": "file://$ARCHIVE_PATH",
             "sha256": "$HASH"
         }
