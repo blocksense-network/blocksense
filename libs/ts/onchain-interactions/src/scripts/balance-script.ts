@@ -30,7 +30,7 @@ export const startPrometheusServer = (host: string, port: number): void => {
 const balanceGauge = new client.Gauge({
   name: 'eth_account_balance',
   help: 'Ethereum account balance in Ether',
-  labelNames: ['networkName', 'address'],
+  labelNames: ['networkName', 'address', 'rpcUrl'],
 });
 
 function filterSmallBalance(balance: string, threshold = 1e-6): number {
@@ -118,7 +118,7 @@ const main = async (): Promise<void> => {
         );
         if (argv.prometheus) {
           balanceGauge.set(
-            { networkName, address },
+            { networkName, address, rpcUrl },
             filterSmallBalance(balance),
           );
         }
@@ -149,7 +149,10 @@ const main = async (): Promise<void> => {
       const { currency } = networkMetadata[networkName];
       console.log(chalk.green(`${networkName}: ${balance} ${currency}`));
       if (argv.prometheus) {
-        balanceGauge.set({ networkName, address }, filterSmallBalance(balance));
+        balanceGauge.set(
+          { networkName, address, rpcUrl },
+          filterSmallBalance(balance),
+        );
       }
     } catch (error) {
       console.error(
