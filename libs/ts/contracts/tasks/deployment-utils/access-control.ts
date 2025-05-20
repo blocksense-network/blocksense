@@ -9,6 +9,7 @@ import {
 } from '@safe-global/safe-core-sdk-types';
 
 import { ContractNames, NetworkConfig } from '../types';
+import { EthereumAddress } from '@blocksense/base-utils';
 
 export type Params = {
   config: NetworkConfig;
@@ -50,9 +51,7 @@ export async function setUpAccessControl({
       deployer,
     );
 
-    console.log(
-      '\nSetting up sequencer guard, adding reporters as owners and removing sequencer from owners...',
-    );
+    console.log('\nSetting sequencer address in guard...');
 
     const isSequencerSet = await guard.getSequencerRole(sequencerAddress);
     if (!isSequencerSet) {
@@ -71,44 +70,49 @@ export async function setUpAccessControl({
     }
   }
 
-  const reporterMultisigAddress = reporterMultisig
-    ? await reporterMultisig.getAddress()
-    : sequencerAddress;
+  let reporterMultisigAddress: EthereumAddress;
 
-  if (reporterMultisigAddress) {
+  if (!reporterMultisig) {
     console.log(
-      '\nSetting up access control and adding owners to admin multisig...',
+      `Reporter multisig not set up, using sequencer address ${sequencerAddress} for access control`,
     );
-
-    const accessControl = new Contract(
-      deployData.coreContracts.AccessControl.address,
-      artifacts.readArtifactSync(ContractNames.AccessControl).abi,
-      deployer,
+    reporterMultisigAddress = sequencerAddress;
+  } else {
+    reporterMultisigAddress =
+      (await reporterMultisig.getAddress()) as EthereumAddress;
+    console.log(
+      `Reporter multisig set up, using reporter multisig address ${reporterMultisigAddress} for access control`,
     );
+  }
 
-    const isAllowed = Boolean(
-      Number(
-        await deployer.call({
-          to: accessControl.target.toString(),
-          data: reporterMultisigAddress,
-        }),
-      ),
-    );
+  const accessControl = new Contract(
+    deployData.coreContracts.AccessControl.address,
+    artifacts.readArtifactSync(ContractNames.AccessControl).abi,
+    deployer,
+  );
 
-    if (!isAllowed) {
-      const safeTxSetAccessControl: SafeTransactionDataPartial = {
+  const isAllowed = Boolean(
+    Number(
+      await deployer.call({
         to: accessControl.target.toString(),
-        value: '0',
-        data: solidityPacked(
-          ['address', 'bool'],
-          [reporterMultisigAddress, true],
-        ),
-        operation: OperationType.Call,
-      };
-      transactions.push(safeTxSetAccessControl);
-    } else {
-      console.log('Access control already set up');
-    }
+        data: reporterMultisigAddress,
+      }),
+    ),
+  );
+
+  if (!isAllowed) {
+    const safeTxSetAccessControl: SafeTransactionDataPartial = {
+      to: accessControl.target.toString(),
+      value: '0',
+      data: solidityPacked(
+        ['address', 'bool'],
+        [reporterMultisigAddress, true],
+      ),
+      operation: OperationType.Call,
+    };
+    transactions.push(safeTxSetAccessControl);
+  } else {
+    console.log('Access control already set up');
   }
 
   const ownerBefore = await adminMultisig.getOwners();
@@ -212,6 +216,10 @@ export async function setUpAccessControl({
       operation: OperationType.Call,
     },
   ]);
+
+  console.log(
+    'Enabling reporter multisig guard and admin executor module, adding owners and removing deployer from owners',
+  );
 
   await run('multisig-tx-exec', {
     transactions: reporterMultisigTxs,
