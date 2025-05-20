@@ -6,14 +6,16 @@ export function prepareDeploymentData(
   feedName: string,
 ): DeploymentConfigV2[] {
   return deploymentConfig.map(data => {
-    const clAggregatorAdapter = data.contracts.CLAggregatorAdapter[feedName];
+    const cLAggregatorAdapter = data.contracts.CLAggregatorAdapter.find(
+      adapter => adapter.description === feedName,
+    );
     return {
-      network: data.network,
+      name: data.name,
       chainId: data.chainId,
       contracts: {
         coreContracts: data.contracts.coreContracts!,
-        CLAggregatorAdapter: { [feedName]: clAggregatorAdapter },
-        ReporterMultisig: data.contracts.ReporterMultisig,
+        CLAggregatorAdapter: [cLAggregatorAdapter!],
+        SequencerMultisig: data.contracts.SequencerMultisig,
         AdminMultisig: data.contracts.AdminMultisig,
       },
     };

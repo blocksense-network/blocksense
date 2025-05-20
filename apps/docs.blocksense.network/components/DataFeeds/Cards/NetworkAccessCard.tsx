@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { DeploymentConfigV2 } from '@blocksense/config-types';
+import { DeploymentConfigV2, NewFeed } from '@blocksense/config-types';
 import { NetworkName } from '@blocksense/base-utils/evm';
 
 import { useHash } from '@/hooks/useHash';
@@ -184,10 +184,10 @@ type DataFeedCardProps = {
 export const NetworkAccessCard = ({
   feedsDeploymentInfo,
 }: DataFeedCardProps) => {
-  const networks = feedsDeploymentInfo.map(({ network }) => network);
+  const networks = feedsDeploymentInfo.map(networkData => networkData.name);
   const [selectedNetwork, setSelectedNetwork] = useState(networks[0]);
   const [deploymentInfo, setDeploymentInfo] = useState<DeploymentConfigV2>(
-    feedsDeploymentInfo.find(info => info.network === networks[0])!,
+    feedsDeploymentInfo.find(networkData => networkData.name === networks[0])!,
   );
   const { hash, setNewHash } = useHash();
   const networkFromHash = hash.replace('#', '');
@@ -211,9 +211,7 @@ export const NetworkAccessCard = ({
 
   const changeNetwork = (network: NetworkName) => {
     setSelectedNetwork(network);
-    setDeploymentInfo(
-      feedsDeploymentInfo.find(data => data.network === network)!,
-    );
+    setDeploymentInfo(feedsDeploymentInfo.find(data => data.name === network)!);
   };
 
   return (
