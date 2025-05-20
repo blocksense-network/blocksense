@@ -57,8 +57,8 @@ export const DeployedContracts = ({
   }, [deployedCoreContracts, hash]);
 
   function getRowLink(row: DataRowType) {
-    return dataFeedUrl && cellHaveContent(row.id)
-      ? `${dataFeedUrl}${row.id}${hash}`
+    return dataFeedUrl && cellHaveContent(row.feedId)
+      ? `${dataFeedUrl}${row.feedId}${hash}`
       : '';
   }
 

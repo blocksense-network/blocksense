@@ -21,13 +21,11 @@ export const decodeCoreContracts = S.decodeUnknownSync(
 
 const ProxyContractDataSchema = S.mutable(
   S.Struct({
-    description: S.String,
-    id: S.NullishOr(S.Number),
+    feedId: S.String,
     network: networkName,
     base: S.NullishOr(ethereumAddress),
     quote: S.NullishOr(ethereumAddress),
     address: ethereumAddress,
-    chainlink_proxy: S.NullishOr(ethereumAddress),
   }),
 );
 
@@ -41,14 +39,13 @@ export const decodeProxyContracts = S.decodeUnknownSync(
   S.mutable(S.Array(ProxyContractDataSchema)),
 );
 
-export const DeploymentConfigArraySchema = S.mutable(
-  S.Array(DeploymentConfigSchemaV2),
-);
+export const AllDeploymentConfigSchema = S.Record({
+  key: networkName,
+  value: S.UndefinedOr(DeploymentConfigSchemaV2),
+});
 
-export type DeploymentConfigArray = S.Schema.Type<
-  typeof DeploymentConfigArraySchema
->;
+export type AllDeploymentConfig = typeof AllDeploymentConfigSchema.Type;
 
-export const decodeDeploymentConfigArray = S.decodeUnknownSync(
-  DeploymentConfigArraySchema,
+export const decodeAllDeploymentConfig = S.decodeUnknownSync(
+  AllDeploymentConfigSchema,
 );

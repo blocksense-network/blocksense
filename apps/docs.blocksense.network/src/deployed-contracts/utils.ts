@@ -1,22 +1,20 @@
 import { DeploymentConfigV2 } from '@blocksense/config-types';
-import { DeploymentConfigArray } from './types';
+import { AllDeploymentConfig } from './types';
+import { entriesOf } from '@blocksense/base-utils/array-iter';
 
 export function prepareDeploymentData(
-  deploymentConfig: DeploymentConfigArray,
-  feedName: string,
+  deploymentConfig: AllDeploymentConfig,
+  feedId: string,
 ): DeploymentConfigV2[] {
-  return deploymentConfig.map(data => {
-    const cLAggregatorAdapter = data.contracts.CLAggregatorAdapter.find(
-      adapter => adapter.description === feedName,
-    );
+  return [...entriesOf(deploymentConfig)].map(([_, data]) => {
+    const clAggregatorAdapter = data.contracts.CLAggregatorAdapter[feedId];
     return {
-      name: data.name,
+      network: data.network,
       chainId: data.chainId,
       contracts: {
         coreContracts: data.contracts.coreContracts!,
-        CLAggregatorAdapter: [cLAggregatorAdapter!],
-        SequencerMultisig: data.contracts.SequencerMultisig,
-        AdminMultisig: data.contracts.AdminMultisig,
+        CLAggregatorAdapter: { [feedId]: clAggregatorAdapter },
+        safe: data.contracts.safe,
       },
     };
   });
