@@ -33,33 +33,29 @@ library ADFS {
 
   /// @notice Gets latest data for a given feed from the dataFeedStore
   /// @param dataFeedStore The address of the dataFeedStore contract
-  /// @param stride The stride of the feed
   /// @param id The ID of the feed
   /// @return data The latest stored value
   function getLatestData(
     address dataFeedStore,
-    uint256 stride,
     uint256 id
   ) internal view returns (bytes32[] memory) {
     return
       _callDataFeed(
         dataFeedStore,
-        (uint256(0x84) << 248) | (stride << 240) | (id << 120),
+        (uint256(0x84) << 248) | (id << 120),
         17,
-        1 << stride
+        1 << _decodeStride(id)
       );
   }
 
   /// @notice Gets latest data slice for a given feed from the dataFeedStore
   /// @param dataFeedStore The address of the dataFeedStore contract
-  /// @param stride The stride of the feed
   /// @param id The ID of the feed
   /// @param startSlot The starting slot to read from
   /// @param slotsCount The number of slots to read
   /// @return data The latest stored value
   function getLatestDataSlice(
     address dataFeedStore,
-    uint256 stride,
     uint256 id,
     uint256 startSlot,
     uint256 slotsCount // if this value is 0, then it will return all the slots for the feed starting at startSlot
@@ -68,12 +64,11 @@ library ADFS {
       _callDataFeed(
         dataFeedStore,
         (uint256(0x84) << 248) |
-          (stride << 240) |
           (id << 120) |
           (startSlot << 88) |
           (slotsCount << 56),
         slotsCount == 0 ? 21 : 25,
-        slotsCount > 0 ? slotsCount : (1 << (stride - startSlot))
+        slotsCount > 0 ? slotsCount : (1 << (_decodeStride(id) - startSlot))
       );
   }
 
@@ -99,28 +94,25 @@ library ADFS {
 
   /// @notice Gets historical data at a given index from the dataFeedStore
   /// @param dataFeedStore The address of the dataFeedStore contract
-  /// @param stride The stride of the feed
   /// @param id The ID of the feed
   /// @param index The index to retrieve data for
   /// @return data The value stored for the feed at the given index
   function getDataAtIndex(
     address dataFeedStore,
-    uint256 stride,
     uint256 id,
     uint256 index
   ) internal view returns (bytes32[] memory) {
     return
       _callDataFeed(
         dataFeedStore,
-        (uint256(0x86) << 248) | (stride << 240) | (id << 120) | (index << 104),
+        (uint256(0x86) << 248) | (id << 120) | (index << 104),
         19,
-        1 << stride
+        1 << _decodeStride(id)
       );
   }
 
   /// @notice Gets historical data slice at a given index from the dataFeedStore
   /// @param dataFeedStore The address of the dataFeedStore contract
-  /// @param stride The stride of the feed
   /// @param id The ID of the feed
   /// @param index The index to retrieve data for
   /// @param startSlot The starting slot to read from
@@ -128,7 +120,6 @@ library ADFS {
   /// @return data The value stored for the feed at the given index
   function getDataSliceAtIndex(
     address dataFeedStore,
-    uint256 stride,
     uint256 id,
     uint256 index,
     uint256 startSlot,
@@ -138,34 +129,28 @@ library ADFS {
       _callDataFeed(
         dataFeedStore,
         (uint256(0x86) << 248) |
-          (stride << 240) |
           (id << 120) |
           (index << 104) |
           (startSlot << 72) |
           (slotsCount << 40),
         slotsCount == 0 ? 23 : 27,
-        slotsCount > 0 ? slotsCount : (1 << (stride - startSlot))
+        slotsCount > 0 ? slotsCount : (1 << (_decodeStride(id) - startSlot))
       );
   }
 
   /// @notice Gets latest index for a given feed from the dataFeedStore
   /// @param dataFeedStore The address of the dataFeedStore contract
-  /// @param stride The stride of the feed
   /// @param id The ID of the feed
   /// @return index The latest index
   function getLatestIndex(
     address dataFeedStore,
-    uint256 stride,
     uint256 id
   ) internal view returns (uint256) {
     return
       uint256(
-        // 1st 2 bytes are function selector and stride
-        // after that are 15 bytes of the feed id
-        _callSingleDataFeed(
-          dataFeedStore,
-          (uint256(0x81) << 248) | (stride << 240) | (id << 120)
-        )
+        // 1st byte is function selector
+        // after that are 16 bytes of the feed id
+        _callSingleDataFeed(dataFeedStore, (uint256(0x81) << 248) | (id << 120))
       );
   }
 
@@ -185,8 +170,8 @@ library ADFS {
       let ptr := mload(0x40)
 
       // store selector in memory at location 0
-      // 1st 2 bytes are function selector and stride
-      // after that are 15 bytes of the feed id
+      // 1st byte is function selector
+      // after that are 16 bytes of the feed id
       mstore(
         0x00,
         or(
@@ -214,27 +199,24 @@ library ADFS {
 
   /// @notice Gets latest data for a given feed and its latest index from the dataFeedStore
   /// @param dataFeedStore The address of the dataFeedStore contract
-  /// @param stride The stride of the feed
   /// @param id The ID of the feed
   /// @return data The latest stored value
   /// @return index The latest index
   function getLatestDataAndIndex(
     address dataFeedStore,
-    uint256 stride,
     uint256 id
   ) internal view returns (bytes32[] memory data, uint256 index) {
     return
       _callDataFeedAndIndex(
         dataFeedStore,
-        (uint256(0x85) << 248) | (stride << 240) | (id << 120),
+        (uint256(0x85) << 248) | (id << 120),
         17,
-        1 << stride
+        1 << _decodeStride(id)
       );
   }
 
   /// @notice Gets latest data slice for a given feed and its latest index from the dataFeedStore
   /// @param dataFeedStore The address of the dataFeedStore contract
-  /// @param stride The stride of the feed
   /// @param id The ID of the feed
   /// @param startSlot The starting slot to read from
   /// @param slotsCount The number of slots to read
@@ -242,7 +224,6 @@ library ADFS {
   /// @return index The latest index
   function getLatestDataSliceAndIndex(
     address dataFeedStore,
-    uint256 stride,
     uint256 id,
     uint256 startSlot,
     uint256 slotsCount // if this value is 0, then it will return all the slots for the feed starting at startSlot
@@ -251,12 +232,11 @@ library ADFS {
       _callDataFeedAndIndex(
         dataFeedStore,
         (uint256(0x85) << 248) |
-          (stride << 240) |
           (id << 120) |
           (startSlot << 88) |
           (slotsCount << 56),
         slotsCount == 0 ? 23 : 27,
-        slotsCount > 0 ? slotsCount : (1 << (stride - startSlot))
+        slotsCount > 0 ? slotsCount : (1 << (_decodeStride(id) - startSlot))
       );
   }
 
@@ -268,7 +248,7 @@ library ADFS {
     return uint64(uint256(data));
   }
 
-  /// @notice Calls the dataFeedStore with the given data for stride 0 feeds
+  /// @notice Calls the dataFeedStore with the given data for signle data feeds
   /// @dev Using assembly achieves lower gas costs
   /// Used as a call() function to dataFeedStore
   /// @param dataFeedStore The address of the dataFeedStore contract
@@ -303,7 +283,7 @@ library ADFS {
     }
   }
 
-  /// @notice Calls the dataFeedStore with the given data for stride > 0 feeds
+  /// @notice Calls the dataFeedStore with the given data for bigger feeds
   /// @dev Using assembly achieves lower gas costs
   /// Used as a call() function to dataFeedStore
   /// @param dataFeedStore The address of the dataFeedStore contract
@@ -340,7 +320,7 @@ library ADFS {
     }
   }
 
-  /// @notice Calls the dataFeedStore with the given data for stride > 0 feeds
+  /// @notice Calls the dataFeedStore with the given data for bigger feeds
   /// @dev Using assembly achieves lower gas costs
   /// Used as a call() function to dataFeedStore
   /// @param dataFeedStore The address of the dataFeedStore contract
@@ -391,5 +371,14 @@ library ADFS {
   /// @return timestamp The timestamp when the value was stored
   function _decodeData(bytes32 data) internal pure returns (uint256, uint256) {
     return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
+  }
+
+  /// @notice Decodes the stride from the feed id
+  /// @dev The first 3 bits of the stride are reserved for access control
+  /// There are only 32 strides (from 0 to 31 incl.) so only the last 5 bits are used to determine the stride
+  /// @param id The id of the feed
+  /// @return stride The stride of the feed
+  function _decodeStride(uint256 id) internal pure returns (uint256) {
+    return (id >> 120) & 0x1f;
   }
 }

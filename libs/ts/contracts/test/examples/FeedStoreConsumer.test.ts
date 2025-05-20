@@ -74,10 +74,7 @@ describe('Example: ADFSConsumer', function () {
     },
   ].forEach(data => {
     it(`Should ${data.title}`, async function () {
-      await getAndCompareData(
-        [null, id, index],
-        data.fnName as keyof typeof utils,
-      );
+      await getAndCompareData([id, index], data.fnName as keyof typeof utils);
     });
   });
 
@@ -99,7 +96,7 @@ describe('Example: ADFSConsumer', function () {
     for (const feed of feedsWithMultipleSlots) {
       it(`Should ${data.title} for stride ${feed.stride}`, async function () {
         await getAndCompareData(
-          [feed.stride, id, index],
+          [mergeStrideAndFeedId(feed.stride, id), index],
           data.fnName as keyof typeof utils,
         );
       });
@@ -126,8 +123,7 @@ describe('Example: ADFSConsumer', function () {
         it(`Should ${data.title} for stride ${feed.stride} and slice(${i}, ${Number(2n ** feed.stride) - i})`, async function () {
           await getAndCompareData(
             [
-              feed.stride,
-              id,
+              mergeStrideAndFeedId(feed.stride, id),
               data.fnName === 'getDataSliceAtIndex' ? index : null,
               i,
               Number(2n ** feed.stride) - i,
@@ -141,7 +137,10 @@ describe('Example: ADFSConsumer', function () {
 
   for (const feed of feeds) {
     it(`Should get latest index for stride ${feed.stride}`, async function () {
-      await getAndCompareData([feed.stride, feed.id], 'getLatestIndex');
+      await getAndCompareData(
+        [mergeStrideAndFeedId(feed.stride, feed.id)],
+        'getLatestIndex',
+      );
     });
   }
 
@@ -174,6 +173,12 @@ describe('Example: ADFSConsumer', function () {
     const timestamp = await adfsConsumer.getEpochMilliseconds(feed.id);
     expect(timestamp).to.be.equal(timestampNow);
   });
+
+  const mergeStrideAndFeedId = (stride: bigint, feedId: bigint) => {
+    stride = stride << 120n;
+    const id = stride | feedId;
+    return id;
+  };
 
   const getAndCompareData = async (
     data: any[],

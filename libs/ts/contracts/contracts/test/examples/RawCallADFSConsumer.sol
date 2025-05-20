@@ -16,7 +16,7 @@ contract RawCallADFSConsumer {
     uint256 id
   ) external view returns (bytes32 data) {
     (bool success, bytes memory returnData) = adfs.staticcall(
-      abi.encodePacked(bytes1(0x82), uint8(0), uint120(id))
+      abi.encodePacked(bytes1(0x82), uint128(id))
     );
     require(success, 'ADFS: call failed');
 
@@ -24,11 +24,10 @@ contract RawCallADFSConsumer {
   }
 
   function getLatestData(
-    uint8 stride,
     uint256 id
   ) external view returns (bytes32[] memory data) {
     (bool success, bytes memory returnData) = adfs.staticcall(
-      abi.encodePacked(bytes1(0x84), stride, uint120(id))
+      abi.encodePacked(bytes1(0x84), uint128(id))
     );
     require(success, 'ADFS: call failed');
 
@@ -36,13 +35,12 @@ contract RawCallADFSConsumer {
   }
 
   function getLatestDataSlice(
-    uint8 stride,
     uint256 id,
     uint32 startSlot,
     uint32 slotsCount
   ) external view returns (bytes32[] memory data) {
     (bool success, bytes memory returnData) = adfs.staticcall(
-      abi.encodePacked(bytes1(0x84), stride, uint120(id), startSlot, slotsCount)
+      abi.encodePacked(bytes1(0x84), uint128(id), startSlot, slotsCount)
     );
     require(success, 'ADFS: call failed');
 
@@ -54,7 +52,7 @@ contract RawCallADFSConsumer {
     uint256 index
   ) external view returns (bytes32 data) {
     (bool success, bytes memory returnData) = adfs.staticcall(
-      abi.encodePacked(bytes1(0x86), uint8(0), uint120(id), uint16(round))
+      abi.encodePacked(bytes1(0x86), uint128(id), uint16(index))
     );
     require(success, 'ADFS: call failed');
 
@@ -62,12 +60,11 @@ contract RawCallADFSConsumer {
   }
 
   function getDataAtIndex(
-    uint8 stride,
     uint256 id,
     uint256 index
   ) external view returns (bytes32[] memory data) {
     (bool success, bytes memory returnData) = adfs.staticcall(
-      abi.encodePacked(bytes1(0x86), stride, uint120(id), uint16(index))
+      abi.encodePacked(bytes1(0x86), uint128(id), uint16(index))
     );
     require(success, 'ADFS: call failed');
 
@@ -83,8 +80,7 @@ contract RawCallADFSConsumer {
     (bool success, bytes memory returnData) = adfs.staticcall(
       abi.encodePacked(
         bytes1(0x86),
-        stride,
-        uint120(id),
+        uint128(id),
         uint16(index),
         startSlot,
         slotsCount
@@ -95,12 +91,9 @@ contract RawCallADFSConsumer {
     return parseBytesToBytes32Array(returnData);
   }
 
-  function getLatestIndex(
-    uint8 stride,
-    uint256 id
-  ) external view returns (uint256 index) {
+  function getLatestIndex(uint256 id) external view returns (uint256 index) {
     (bool success, bytes memory returnData) = adfs.staticcall(
-      abi.encodePacked(bytes1(0x81), stride, uint120(id))
+      abi.encodePacked(bytes1(0x81), uint128(id))
     );
     require(success, 'ADFS: call failed');
 
@@ -111,19 +104,18 @@ contract RawCallADFSConsumer {
     uint256 id
   ) external view returns (bytes32 data, uint256 index) {
     (bool success, bytes memory returnData) = adfs.staticcall(
-      abi.encodePacked(bytes1(0x83), uint8(0), uint120(id))
+      abi.encodePacked(bytes1(0x83), uint128(id))
     );
     require(success, 'ADFS: call failed');
 
-    (round, data) = abi.decode(returnData, (uint256, bytes32));
+    (index, data) = abi.decode(returnData, (uint256, bytes32));
   }
 
   function getLatestDataAndIndex(
-    uint8 stride,
     uint256 id
   ) external view returns (bytes32[] memory data, uint256 index) {
     (bool success, bytes memory returnData) = adfs.staticcall(
-      abi.encodePacked(bytes1(0x85), stride, uint120(id))
+      abi.encodePacked(bytes1(0x85), uint128(id))
     );
     require(success, 'ADFS: call failed');
 
@@ -139,13 +131,12 @@ contract RawCallADFSConsumer {
   }
 
   function getLatestDataSliceAndIndex(
-    uint8 stride,
     uint256 id,
     uint32 startSlot,
     uint32 slotsCount
   ) external view returns (bytes32[] memory data, uint256 index) {
     (bool success, bytes memory returnData) = adfs.staticcall(
-      abi.encodePacked(bytes1(0x85), stride, uint120(id), startSlot, slotsCount)
+      abi.encodePacked(bytes1(0x85), uint128(id), startSlot, slotsCount)
     );
     require(success, 'ADFS: call failed');
 
