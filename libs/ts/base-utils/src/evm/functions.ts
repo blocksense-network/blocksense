@@ -4,7 +4,7 @@ import {
   LayeredEnvSchemaToConfig,
   parseLayeredEnvConfig,
   reportParsedEnvConfig,
-} from '../env';
+} from '../env/functions';
 import { kebabToSnakeCase } from '../string';
 import { getNetworkKind, NetworkName } from './networks';
 
