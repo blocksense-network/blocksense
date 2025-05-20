@@ -50,7 +50,7 @@ export async function setUpAccessControl({
 
   const guard = OnlySequencerGuard__factory.connect(
     assertNotNull(
-      deployData.coreContracts.OnlySequencerGuard,
+      deployData.safe.OnlySequencerGuard,
       'OnlySequencerGuard is not specified in the deployment data',
     ).address,
     deployer,
@@ -181,9 +181,7 @@ export async function setUpAccessControl({
       .then(tx => tx.data),
 
     reporterMultisig
-      .createEnableModuleTx(
-        deployData.coreContracts.AdminExecutorModule!.address,
-      )
+      .createEnableModuleTx(deployData.safe.AdminExecutorModule!.address)
       .then(tx => tx.data),
 
     ...config.reporterMultisig.owners.map(ownerAddress =>
