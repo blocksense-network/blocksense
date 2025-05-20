@@ -67,10 +67,16 @@ const ContractsConfigSchemaV2 = S.mutable(
   S.Struct({
     coreContracts: S.mutable(
       S.Struct({
-        AggregatedDataFeedStore: ContractDataSchemaV2,
         UpgradeableProxyADFS: ContractDataSchemaV2,
-        CLFeedRegistryAdapter: ContractDataSchemaV2,
+        AggregatedDataFeedStore: ContractDataSchemaV2,
         AccessControl: ContractDataSchemaV2,
+        CLFeedRegistryAdapter: ContractDataSchemaV2,
+      }),
+    ),
+    safe: S.mutable(
+      S.Struct({
+        AdminMultisig: ethereumAddress,
+        ReporterMultisig: S.NullOr(ethereumAddress),
         OnlySequencerGuard: S.NullOr(ContractDataSchemaV2),
         AdminExecutorModule: S.NullOr(ContractDataSchemaV2),
       }),
@@ -83,8 +89,6 @@ const ContractsConfigSchemaV2 = S.mutable(
         value: CLAggregatorAdapterDataSchemaV2,
       }),
     ),
-    ReporterMultisig: S.NullOr(ethereumAddress),
-    AdminMultisig: ethereumAddress,
   }),
 ).annotations({ identifier: 'ContractsConfigV2' });
 
