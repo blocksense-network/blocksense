@@ -70,4 +70,13 @@
   a {
     text-decoration: none;
   }
+
+  .footer__copyright {
+    font-family: var(--font-geist-mono);
+  }
+
+  .link:hover {
+    color: var(--gray-medium);
+    transition: color 0.35s ease-in-out;
+  }
 }

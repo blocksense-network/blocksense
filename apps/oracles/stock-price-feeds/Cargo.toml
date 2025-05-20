@@ -19,3 +19,5 @@ serde-this-or-that = { workspace = true }
 prettytable-rs = { workspace = true }
 futures = { workspace = true }
 itertools = { workspace = true }
+chrono = "0.4"
+chrono-tz = "0.8"

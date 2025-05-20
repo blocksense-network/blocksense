@@ -1,0 +1,38 @@
+{
+  "name": "@blocksense/social-verification",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    "./api": {
+      "import": "./src/api.ts",
+      "types": "./src/api.ts"
+    },
+    "./types": {
+      "import": "./src/types.ts",
+      "types": "./src/types.ts"
+    }
+  },
+  "scripts": {
+    "deploy": "wrangler deploy",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "test": "vitest",
+    "cf-typegen": "wrangler types",
+    "ts": "yarn node --import tsx"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.7.5",
+    "@cloudflare/workers-types": "^4.20250423.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.5.2",
+    "vitest": "~3.0.7",
+    "wrangler": "^4.15.2"
+  },
+  "dependencies": {
+    "@effect/platform": "^0.80.13",
+    "effect": "^3.14.13",
+    "thirdweb": "^5.95.3",
+    "web3": "^4.16.0"
+  }
+}

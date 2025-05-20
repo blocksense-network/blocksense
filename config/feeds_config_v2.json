@@ -10667,6 +10667,11 @@
                 "TIA-USDC",
                 "TIA-USDT"
               ]
+            },
+            "Upbit": {
+              "market": [
+                "USDT-TIA"
+              ]
             }
           },
           "aggregators": {
@@ -10751,6 +10756,11 @@
             "OKX": {
               "instId": [
                 "TIA-USDT"
+              ]
+            },
+            "Upbit": {
+              "market": [
+                "USDT-TIA"
               ]
             }
           }
@@ -11465,13 +11475,6 @@
         "category": "Crypto",
         "market_hours": "Crypto",
         "arguments": {
-          "exchanges": {
-            "MEXC": {
-              "symbol": [
-                "LBTCUSDT"
-              ]
-            }
-          },
           "aggregators": {
             "CoinMarketCap": {
               "symbol": [
@@ -11516,15 +11519,7 @@
         "decimals": 18,
         "category": "Crypto",
         "market_hours": "Crypto",
-        "arguments": {
-          "exchanges": {
-            "MEXC": {
-              "symbol": [
-                "LBTCUSDT"
-              ]
-            }
-          }
-        },
+        "arguments": {},
         "compatibility_info": {
           "chainlink": "LBTC/USD-RefPrice-mainnet-production"
         }
@@ -13208,6 +13203,18 @@
                 "S_USDT"
               ]
             },
+            "Kraken": {
+              "pair": [
+                "SUSD",
+                "SUSDC",
+                "SUSDT"
+              ],
+              "wsname": [
+                "S/USD",
+                "S/USDC",
+                "S/USDT"
+              ]
+            },
             "KuCoin": {
               "symbol": [
                 "S-USDC",
@@ -13298,6 +13305,14 @@
                 "S_USDT"
               ]
             },
+            "Kraken": {
+              "pair": [
+                "SUSDT"
+              ],
+              "wsname": [
+                "S/USDT"
+              ]
+            },
             "KuCoin": {
               "symbol": [
                 "S-USDT"
@@ -13351,6 +13366,14 @@
             "Binance": {
               "symbol": [
                 "SUSDC"
+              ]
+            },
+            "Kraken": {
+              "pair": [
+                "SUSDC"
+              ],
+              "wsname": [
+                "S/USDC"
               ]
             },
             "KuCoin": {
@@ -15227,6 +15250,11 @@
                 "WLDUSDT"
               ]
             },
+            "Coinbase": {
+              "id": [
+                "WLD-USD"
+              ]
+            },
             "CryptoCom": {
               "symbol": [
                 "WLD_USD",
@@ -15647,11 +15675,6 @@
               "symbol": [
                 "GRTUSD",
                 "GRTUSDT"
-              ]
-            },
-            "Bitfinex": {
-              "symbol": [
-                "tGRTUSD"
               ]
             },
             "Bitget": {
@@ -22084,6 +22107,14 @@
                 "CAKE_USDT"
               ]
             },
+            "Kraken": {
+              "pair": [
+                "CAKEUSD"
+              ],
+              "wsname": [
+                "CAKE/USD"
+              ]
+            },
             "KuCoin": {
               "symbol": [
                 "CAKE-USDT"
@@ -24323,6 +24354,11 @@
                 "VIRTUALUSDT"
               ]
             },
+            "BinanceUS": {
+              "symbol": [
+                "VIRTUALUSDT"
+              ]
+            },
             "Bitget": {
               "symbol": [
                 "VIRTUALUSDT"
@@ -24418,6 +24454,11 @@
         "arguments": {
           "exchanges": {
             "Binance": {
+              "symbol": [
+                "VIRTUALUSDT"
+              ]
+            },
+            "BinanceUS": {
               "symbol": [
                 "VIRTUALUSDT"
               ]
@@ -24618,6 +24659,11 @@
                 "PENGU-USD",
                 "PENGU-USDT"
               ]
+            },
+            "Upbit": {
+              "market": [
+                "USDT-PENGU"
+              ]
             }
           },
           "aggregators": {
@@ -24715,6 +24761,11 @@
             "OKX": {
               "instId": [
                 "PENGU-USDT"
+              ]
+            },
+            "Upbit": {
+              "market": [
+                "USDT-PENGU"
               ]
             }
           }
@@ -29050,11 +29101,6 @@
                 "NOTUSDT"
               ]
             },
-            "Bitfinex": {
-              "symbol": [
-                "tNOTUSD"
-              ]
-            },
             "Bitget": {
               "symbol": [
                 "NOTUSDT"
@@ -30663,11 +30709,6 @@
                 "HOTUSDT"
               ]
             },
-            "Bybit": {
-              "symbol": [
-                "HOTUSDT"
-              ]
-            },
             "CryptoCom": {
               "symbol": [
                 "HOT_USD",
@@ -30743,11 +30784,6 @@
                 "HOTUSDT"
               ]
             },
-            "Bybit": {
-              "symbol": [
-                "HOTUSDT"
-              ]
-            },
             "CryptoCom": {
               "symbol": [
                 "HOT_USDT"
@@ -30806,11 +30842,6 @@
             "Bybit": {
               "symbol": [
                 "WEMIXUSDT"
-              ]
-            },
-            "CryptoCom": {
-              "symbol": [
-                "WEMIX_USD"
               ]
             },
             "GateIo": {
@@ -32419,6 +32450,7 @@
           "exchanges": {
             "Binance": {
               "symbol": [
+                "ENJUSDC",
                 "ENJUSDT"
               ]
             },
@@ -32641,7 +32673,15 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
-        "arguments": {},
+        "arguments": {
+          "exchanges": {
+            "Binance": {
+              "symbol": [
+                "ENJUSDC"
+              ]
+            }
+          }
+        },
         "compatibility_info": {
           "chainlink": "ENJ / USD"
         }
@@ -34327,11 +34367,6 @@
                 "TURBOUSDT"
               ]
             },
-            "Bitfinex": {
-              "symbol": [
-                "tTURBO:USD"
-              ]
-            },
             "Bitget": {
               "symbol": [
                 "TURBOUSDT"
@@ -34781,11 +34816,6 @@
               "symbol": [
                 "HMSTRUSDC",
                 "HMSTRUSDT"
-              ]
-            },
-            "Bitfinex": {
-              "symbol": [
-                "tHMSTR:USD"
               ]
             },
             "Bitget": {
@@ -36621,6 +36651,11 @@
               "symbol": [
                 "IOUSDT"
               ]
+            },
+            "Upbit": {
+              "market": [
+                "USDT-IO"
+              ]
             }
           },
           "aggregators": {
@@ -36700,6 +36735,11 @@
             "MEXC": {
               "symbol": [
                 "IOUSDT"
+              ]
+            },
+            "Upbit": {
+              "market": [
+                "USDT-IO"
               ]
             }
           }
@@ -39500,6 +39540,11 @@
                 "AIXBTUSDT"
               ]
             },
+            "BinanceUS": {
+              "symbol": [
+                "AIXBTUSDT"
+              ]
+            },
             "Bitget": {
               "symbol": [
                 "AIXBTUSDT"
@@ -39591,6 +39636,11 @@
         "arguments": {
           "exchanges": {
             "Binance": {
+              "symbol": [
+                "AIXBTUSDT"
+              ]
+            },
+            "BinanceUS": {
               "symbol": [
                 "AIXBTUSDT"
               ]
@@ -40528,11 +40578,6 @@
         "market_hours": "Crypto",
         "arguments": {
           "exchanges": {
-            "Bitfinex": {
-              "symbol": [
-                "tBLAST:USD"
-              ]
-            },
             "Bitget": {
               "symbol": [
                 "BLASTUSDT"
@@ -49988,11 +50033,6 @@
                 "WINGUSDT"
               ]
             },
-            "Bitget": {
-              "symbol": [
-                "WINGUSDT"
-              ]
-            },
             "GateIo": {
               "id": [
                 "WING_USDT"
@@ -50051,11 +50091,6 @@
         "arguments": {
           "exchanges": {
             "Binance": {
-              "symbol": [
-                "WINGUSDT"
-              ]
-            },
-            "Bitget": {
               "symbol": [
                 "WINGUSDT"
               ]
@@ -50247,11 +50282,6 @@
               "id": [
                 "LINA_USDT"
               ]
-            },
-            "MEXC": {
-              "symbol": [
-                "LINAUSDT"
-              ]
             }
           },
           "aggregators": {
@@ -50306,11 +50336,6 @@
             "GateIo": {
               "id": [
                 "LINA_USDT"
-              ]
-            },
-            "MEXC": {
-              "symbol": [
-                "LINAUSDT"
               ]
             }
           }
@@ -50949,11 +50974,6 @@
                 "RENUSDT"
               ]
             },
-            "Bitget": {
-              "symbol": [
-                "RENUSDT"
-              ]
-            },
             "GateIo": {
               "id": [
                 "REN_USDT"
@@ -51033,11 +51053,6 @@
               ]
             },
             "BinanceUS": {
-              "symbol": [
-                "RENUSDT"
-              ]
-            },
-            "Bitget": {
               "symbol": [
                 "RENUSDT"
               ]
@@ -51448,11 +51463,6 @@
                 "WELLUSDT"
               ]
             },
-            "Bybit": {
-              "symbol": [
-                "WELLUSDT"
-              ]
-            },
             "Coinbase": {
               "id": [
                 "WELL-USD"
@@ -51527,11 +51537,6 @@
         "arguments": {
           "exchanges": {
             "Bitget": {
-              "symbol": [
-                "WELLUSDT"
-              ]
-            },
-            "Bybit": {
               "symbol": [
                 "WELLUSDT"
               ]
@@ -52409,14 +52414,6 @@
               "symbol": [
                 "FTMUSD"
               ]
-            },
-            "Kraken": {
-              "pair": [
-                "FTMUSD"
-              ],
-              "wsname": [
-                "FTM/USD"
-              ]
             }
           }
         },
@@ -52916,52 +52913,62 @@
           {
             "network": "monad-testnet",
             "pool": "0x264e9b75723d75e3c607627d8e21d2c758db4c80",
-            "reverse": true
+            "reverse": true,
+            "min_volume_usd": 200000
           },
           {
             "network": "monad-testnet",
             "pool": "0x8552706d9a27013f20ea0f9df8e20b61e283d2d3",
-            "reverse": true
+            "reverse": true,
+            "min_volume_usd": 200000
           },
           {
             "network": "monad-testnet",
             "pool": "0x5323821de342c56b80c99fbc7cd725f2da8eb87b",
-            "reverse": true
+            "reverse": true,
+            "min_volume_usd": 200000
           },
           {
             "network": "monad-testnet",
             "pool": "0x6e4b7be5ef7f8950c76baa0bd90125bc9b33c8db",
-            "reverse": true
+            "reverse": true,
+            "min_volume_usd": 200000
           },
           {
             "network": "monad-testnet",
             "pool": "0x212fde77a42d55f980d0a0304e7eebe1e999c60f",
-            "reverse": true
+            "reverse": true,
+            "min_volume_usd": 200000
           },
           {
             "network": "monad-testnet",
             "pool": "0xc0ce32eee0eb8bf24fa2b00923a78abc5002f91e",
-            "reverse": true
+            "reverse": true,
+            "min_volume_usd": 200000
           },
           {
             "network": "monad-testnet",
             "pool": "0x786f4aa162457ecdf8fa4657759fa3e86c9394ff",
-            "reverse": true
+            "reverse": true,
+            "min_volume_usd": 200000
           },
           {
             "network": "monad-testnet",
             "pool": "0xf2afc5aa9965cdb2d4be94823c98411291b61297",
-            "reverse": true
+            "reverse": true,
+            "min_volume_usd": 200000
           },
           {
             "network": "monad-testnet",
             "pool": "0xf22d36b6bee8a7fd51def4e3badf35a8733b284f",
-            "reverse": true
+            "reverse": true,
+            "min_volume_usd": 200000
           },
           {
             "network": "monad-testnet",
             "pool": "0xe8a806ae6ecb1f02063e21c6f0579b145399ee5f",
-            "reverse": true
+            "reverse": true,
+            "min_volume_usd": 200000
           }
         ]
       }
@@ -52996,52 +53003,62 @@
           {
             "network": "base",
             "pool": "0xcf88b8bf7ccce2d836878e538197eb20fc673bce",
-            "reverse": false
+            "reverse": false,
+            "min_volume_usd": 500000
           },
           {
             "network": "base",
             "pool": "0x6d0b9c9e92a3de30081563c3657b5258b3ffa38b",
-            "reverse": false
+            "reverse": false,
+            "min_volume_usd": 500000
           },
           {
             "network": "base",
             "pool": "0xebf0e4da26a0d040c2343a9e072a0d0b8cf1e0b0",
-            "reverse": false
+            "reverse": false,
+            "min_volume_usd": 500000
           },
           {
             "network": "base",
             "pool": "0x96cc4b6a75fa1dfea66091589d1f25aff3aa0318",
-            "reverse": false
+            "reverse": false,
+            "min_volume_usd": 500000
           },
           {
             "network": "base",
             "pool": "0xcea8ef6ce6235f2c2cdd13c9e8a3ed470725a638",
-            "reverse": false
+            "reverse": false,
+            "min_volume_usd": 500000
           },
           {
             "network": "base",
             "pool": "0xde5ff829fef54d1bdec957d9538a306f0ead1368",
-            "reverse": false
+            "reverse": false,
+            "min_volume_usd": 500000
           },
           {
             "network": "base",
             "pool": "0x2ce63497999f520cc2afaaadbcfc37afd9def4b0",
-            "reverse": false
+            "reverse": false,
+            "min_volume_usd": 500000
           },
           {
             "network": "base",
             "pool": "0xe722e6bce1a598e6b5d26e9975bf44140d2aa3e5",
-            "reverse": false
+            "reverse": false,
+            "min_volume_usd": 500000
           },
           {
             "network": "base",
             "pool": "0x4ef1e503c4f1e5664ac98294d0e42ddc9c0ff961",
-            "reverse": false
+            "reverse": false,
+            "min_volume_usd": 500000
           },
           {
             "network": "base",
             "pool": "0x2c206c7de24787f85b5c52d2ea339adc6d5af40f",
-            "reverse": false
+            "reverse": false,
+            "min_volume_usd": 500000
           }
         ]
       }
@@ -53076,52 +53093,260 @@
           {
             "network": "base",
             "pool": "0xd3ee0a3b349237d68517df30bfb66be971f46ad9",
-            "reverse": false
+            "reverse": false,
+            "min_volume_usd": 500000
           },
           {
             "network": "base",
             "pool": "0xb924561a57fc60041414b8471cbc99d3497097fa",
-            "reverse": false
+            "reverse": false,
+            "min_volume_usd": 500000
           },
           {
             "network": "base",
             "pool": "0x97c9750305a39e06002edd851f3d37a862ac7060",
-            "reverse": false
+            "reverse": false,
+            "min_volume_usd": 500000
           },
           {
             "network": "eth",
             "pool": "0x3ee841f47947fefbe510366e4bbb49e145484195",
-            "reverse": false
+            "reverse": false,
+            "min_volume_usd": 500000
           },
           {
             "network": "eth",
             "pool": "0xc907ba505c2e1cbc4658c395d4a2c7e6d2c32656",
-            "reverse": false
+            "reverse": false,
+            "min_volume_usd": 500000
           },
           {
             "network": "eth",
             "pool": "0x8bb9cd887dd51c5aa8d7da9e244c94bec035e47c",
-            "reverse": false
+            "reverse": false,
+            "min_volume_usd": 500000
           },
           {
             "network": "eth",
             "pool": "0x8461537a9bfc5a1df57cf825f8a58049ef61557b",
-            "reverse": false
+            "reverse": false,
+            "min_volume_usd": 500000
           },
           {
             "network": "eth",
             "pool": "0x4628f13651ead6793f8d838b34b8f8522fb0cc52",
-            "reverse": true
+            "reverse": true,
+            "min_volume_usd": 500000
           },
           {
             "network": "eth",
             "pool": "0x38de22a3175708d45e7c7c64cd78479c8b56f76e",
-            "reverse": true
+            "reverse": true,
+            "min_volume_usd": 500000
           },
           {
             "network": "eth",
             "pool": "0xd552716f3bba4224a19d7eb37a31650d7ae10144",
-            "reverse": true
+            "reverse": true,
+            "min_volume_usd": 500000
+          }
+        ]
+      }
+    },
+    {
+      "id": 1000003,
+      "full_name": "CHOG / USD",
+      "description": "CHOG token on Monad test net address 0xE0590015A873bF326bd645c3E1266d4db41C4E6B",
+      "type": "price-feed",
+      "oracle_id": "gecko-terminal",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "CHOG",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": [
+          {
+            "network": "monad-testnet",
+            "pool": "0x4d2e4c5ff07d1c82d512335dea0a1aa82c031a86",
+            "reverse": false,
+            "min_volume_usd": 10000
+          },
+          {
+            "network": "monad-testnet",
+            "pool": "0x1076ad67c1f8ecaeeaabbdf28577fe5b7ccd5e03",
+            "reverse": false,
+            "min_volume_usd": 10000
+          },
+          {
+            "network": "monad-testnet",
+            "pool": "0x48f7d84b7f9e86324ad4c68c9941a2c4ea781217",
+            "reverse": false,
+            "min_volume_usd": 10000
+          },
+          {
+            "network": "monad-testnet",
+            "pool": "0x7aab85507e595d4debd8ec66b04fd9b9f6d36890",
+            "reverse": false,
+            "min_volume_usd": 10000
+          },
+          {
+            "network": "monad-testnet",
+            "pool": "0x9ddb0832edf80dce1768a594faedaa7978a3e118",
+            "reverse": false,
+            "min_volume_usd": 10000
+          },
+          {
+            "network": "monad-testnet",
+            "pool": "0xc0ce32eee0eb8bf24fa2b00923a78abc5002f91e",
+            "reverse": false,
+            "min_volume_usd": 10000
+          }
+        ]
+      }
+    },
+    {
+      "id": 1000004,
+      "full_name": "MOYAKI / USD",
+      "description": "MOYAKI token on Monad test net address 0xfe140e1dCe99Be9F4F15d657CD9b7BF622270C50",
+      "type": "price-feed",
+      "oracle_id": "gecko-terminal",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "YAKI",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": [
+          {
+            "network": "monad-testnet",
+            "pool": "0x212fde77a42d55f980d0a0304e7eebe1e999c60f",
+            "reverse": false,
+            "min_volume_usd": 10000
+          },
+          {
+            "network": "monad-testnet",
+            "pool": "0x6def0cf33d16f067c95f9df8918b876dd360561c",
+            "reverse": false,
+            "min_volume_usd": 10000
+          },
+          {
+            "network": "monad-testnet",
+            "pool": "0xb8c074805ab9c39281289089f20ec2629449f03a",
+            "reverse": false,
+            "min_volume_usd": 10000
+          },
+          {
+            "network": "monad-testnet",
+            "pool": "0x7674797d34df5b537ab39c1d4d21d0881fad5963",
+            "reverse": false,
+            "min_volume_usd": 10000
+          },
+          {
+            "network": "monad-testnet",
+            "pool": "0x7e6fdc0a3cd8577babe28e5a4de388c6d91ca08a",
+            "reverse": false,
+            "min_volume_usd": 10000
+          },
+          {
+            "network": "monad-testnet",
+            "pool": "0x4d0f25f3febf89a19e99c049094f6ef02542489a",
+            "reverse": false,
+            "min_volume_usd": 10000
+          }
+        ]
+      }
+    },
+    {
+      "id": 1000005,
+      "full_name": "MONLANDAK / USD",
+      "description": "MONLANDAK token on Monad test net address 0x0F0BDEbF0F83cD1EE3974779Bcb7315f9808c714",
+      "type": "price-feed",
+      "oracle_id": "gecko-terminal",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "DAK",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": [
+          {
+            "network": "monad-testnet",
+            "pool": "0x6e4b7be5ef7f8950c76baa0bd90125bc9b33c8db",
+            "reverse": false,
+            "min_volume_usd": 10000
+          },
+          {
+            "network": "monad-testnet",
+            "pool": "0x6007a0804fe538745ffed91f9c124cd3ce06102d",
+            "reverse": false,
+            "min_volume_usd": 10000
+          },
+          {
+            "network": "monad-testnet",
+            "pool": "0x9e9b7f93b0375b2d53d68bd65ceeb716f10ada21",
+            "reverse": false,
+            "min_volume_usd": 10000
+          },
+          {
+            "network": "monad-testnet",
+            "pool": "0x20a1f1e0757f4c209c6b9608ef709e981ce3a7a6",
+            "reverse": false,
+            "min_volume_usd": 10000
+          },
+          {
+            "network": "monad-testnet",
+            "pool": "0x3452e05318e2606a37e73201c9bb873ac7a83440",
+            "reverse": false,
+            "min_volume_usd": 10000
+          },
+          {
+            "network": "monad-testnet",
+            "pool": "0x6d067d9453aafb84c94b112368144b2206df144f",
+            "reverse": false,
+            "min_volume_usd": 10000
           }
         ]
       }
@@ -53155,11 +53380,8 @@
         "arguments": {
           "providers": [
             "AlphaVantage",
-            "PolygonIO",
-            "Finnhum",
             "YahooFinance",
             "twelvedata",
-            "Tiingo",
             "FMP"
           ]
         }
@@ -53194,11 +53416,8 @@
         "arguments": {
           "providers": [
             "AlphaVantage",
-            "PolygonIO",
-            "Finnhum",
             "YahooFinance",
             "twelvedata",
-            "Tiingo",
             "FMP"
           ]
         }

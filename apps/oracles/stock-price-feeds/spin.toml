@@ -20,13 +20,13 @@ component = "stock-price-feeds"
 id = "2000000"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"IBIT","quote":"USD"},"decimals":8,"category":"Equities","provider_hours":"US_Equities","arguments":{"providers":["AlphaVantage","PolygonIO","Finnhum","YahooFinance","twelvedata","Tiingo","FMP"]}}'
+data = '{"pair":{"base":"IBIT","quote":"USD"},"decimals":8,"category":"Equities","provider_hours":"US_Equities","arguments":{"providers":["AlphaVantage","YahooFinance","twelvedata","FMP"]}}'
 
 [[trigger.oracle.data_feeds]]
 id = "2000001"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"SPY","quote":"USD"},"decimals":8,"category":"Equities","provider_hours":"US_Equities","arguments":{"providers":["AlphaVantage","PolygonIO","Finnhum","YahooFinance","twelvedata","Tiingo","FMP"]}}'
+data = '{"pair":{"base":"SPY","quote":"USD"},"decimals":8,"category":"Equities","provider_hours":"US_Equities","arguments":{"providers":["AlphaVantage","YahooFinance","twelvedata","FMP"]}}'
 
 [component.stock-price-feeds]
 source = "../../../target/wasm32-wasip1/release/stock_price_feeds.wasm"

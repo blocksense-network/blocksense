@@ -8,6 +8,8 @@ use blocksense_sdk::{
     traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
 };
 
+use crate::utils::print_missing_network_price_data;
+
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PriceData {
@@ -60,17 +62,7 @@ impl<'a> PricesFetcher<'a> for FMPPriceFetcher<'a> {
                             Some((value.symbol, PricePoint { price, volume }))
                         }
                         _ => {
-                            eprintln!(
-                                "[FMP] Skipping symbol {}: missing {}{}{}",
-                                value.symbol,
-                                if price.is_none() { "price" } else { "" },
-                                if price.is_none() && volume.is_none() {
-                                    " and "
-                                } else {
-                                    ""
-                                },
-                                if volume.is_none() { "volume" } else { "" },
-                            );
+                            print_missing_network_price_data("FMP", value.symbol, price, volume);
                             None
                         }
                     }

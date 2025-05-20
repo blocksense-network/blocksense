@@ -25,3 +25,21 @@
   animation: blink-dot 1.5s infinite;
   animation-delay: 0.6s;
 }
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  display: inline-block;
+  animation: scroll 50s linear infinite;
+}
+
+.animate-scroll p {
+  white-space: nowrap;
+}

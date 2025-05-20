@@ -9,7 +9,6 @@ import { StatusMessage, StatusType } from './StatusMessage';
 import { InputLoadingIcon } from './InputLoadingIcon';
 
 type InputProps = InputHTMLAttributes<HTMLInputElement> & {
-  isLoading?: boolean;
   labelClassName?: string;
   status?: StatusType;
   message?: string;
@@ -19,16 +18,15 @@ export const Input = ({
   value = '',
   className = '',
   disabled,
-  isLoading,
   id,
   labelClassName = '',
-  status,
-  message,
+  status = 'none',
+  message = '',
   onChange,
   ...props
 }: InputProps) => {
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (isLoading || disabled) {
+    if (status === 'loading' || disabled) {
       e.preventDefault();
       return;
     }
@@ -38,13 +36,14 @@ export const Input = ({
     }
   };
 
-  const borderColor = isLoading
-    ? 'border-[var(--gray-light)]'
-    : status === 'error'
-      ? 'border-[var(--red)]'
-      : status === 'success'
-        ? 'border-[var(--green)]'
-        : 'border-[var(--gray-dark)]';
+  const borderColor =
+    status === 'loading'
+      ? 'border-[var(--gray-light)]'
+      : status === 'error'
+        ? 'border-[var(--red)]'
+        : status === 'success'
+          ? 'border-[var(--green)]'
+          : 'border-[var(--gray-dark)]';
 
   return (
     <article className="input__container flex flex-col gap-2">
@@ -60,7 +59,7 @@ export const Input = ({
           value={value}
           {...props}
         />
-        {isLoading ? (
+        {status === 'loading' ? (
           <InputLoadingIcon />
         ) : (
           <>
@@ -81,7 +80,7 @@ export const Input = ({
           </>
         )}
       </label>
-      {!isLoading && <StatusMessage status={status} message={message} />}
+      <StatusMessage status={status} message={message} />
     </article>
   );
 };

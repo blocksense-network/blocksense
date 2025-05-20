@@ -10,6 +10,8 @@ use blocksense_sdk::{
     traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
 };
 
+use crate::utils::print_missing_network_price_data;
+
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct PriceData {
     pub symbol: String,
@@ -63,16 +65,11 @@ impl<'a> PricesFetcher<'a> for TwelveDataPriceFetcher<'a> {
                             Some((value.symbol.clone(), PricePoint { price, volume }))
                         }
                         _ => {
-                            eprintln!(
-                                "[TwelveData] Skipping symbol {}: missing {}{}{}",
-                                value.symbol,
-                                if price.is_none() { "price" } else { "" },
-                                if price.is_none() && volume.is_none() {
-                                    " and "
-                                } else {
-                                    ""
-                                },
-                                if volume.is_none() { "volume" } else { "" },
+                            print_missing_network_price_data(
+                                "TwelveData",
+                                value.symbol.clone(),
+                                price,
+                                volume,
                             );
                             None
                         }

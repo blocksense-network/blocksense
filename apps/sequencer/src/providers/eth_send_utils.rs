@@ -166,7 +166,11 @@ pub async fn get_serialized_updates_for_network(
     let serialized_updates = match contract_version {
         1 => {
             let bytes = legacy_serialize_updates(net, updates, strides_and_decimals);
-            debug!("legacy_serialize_updates result = {}", hex::encode(&bytes));
+            debug!(
+                "legacy_serialize_updates result for network {} = {}",
+                net,
+                hex::encode(&bytes)
+            );
             bytes
         }
         2 => {
@@ -181,7 +185,11 @@ pub async fn get_serialized_updates_for_network(
             .await
             {
                 Ok(bytes) => {
-                    debug!("adfs_serialize_updates result = {}", hex::encode(&bytes));
+                    debug!(
+                        "adfs_serialize_updates result for network {} = {}",
+                        net,
+                        hex::encode(&bytes)
+                    );
                     bytes
                 }
                 Err(e) => eyre::bail!("ADFS serialization failed: {e}!"),
