@@ -115,32 +115,45 @@ export async function setUpAccessControl({
     console.log('Access control already set up');
   }
 
-  const ownerBefore = await adminMultisig.getOwners();
-  if (ownerBefore.length === 1 && config.adminMultisig.owners.length > 0) {
+  const ownersBeforeAdminMultisig = await adminMultisig.getOwners();
+  if (
+    ownersBeforeAdminMultisig.length === 1 &&
+    config.adminMultisig.owners.length > 0
+  ) {
     const adminMultisigAddress = await adminMultisig.getAddress();
     for (const owner of config.adminMultisig.owners) {
+      if (ownersBeforeAdminMultisig.includes(owner)) {
+        console.log(owner + ' is already an owner');
+        continue;
+      }
       const safeTxAddOwner = await adminMultisig.createAddOwnerTx({
         ownerAddress: owner,
       });
       transactions.push(safeTxAddOwner.data);
     }
-
-    const prevOwnerAddress = config.adminMultisig.owners[0];
-    // removeOwner(address prevOwner, address owner, uint256 threshold);
-    const safeTxRemoveOwner: SafeTransactionDataPartial = {
-      to: adminMultisigAddress,
-      value: '0',
-      data:
-        '0xf8dc5dd9' +
-        abiCoder
-          .encode(
-            ['address', 'address', 'uint256'],
-            [prevOwnerAddress, deployerAddress, config.adminMultisig.threshold],
-          )
-          .slice(2),
-      operation: OperationType.Call,
-    };
-    transactions.push(safeTxRemoveOwner);
+    if (!config.adminMultisig.owners.includes(deployerAddress)) {
+      console.log('Removing deployer from owners');
+      const prevOwnerAddress = config.adminMultisig.owners[0];
+      // removeOwner(address prevOwner, address owner, uint256 threshold);
+      const safeTxRemoveOwner: SafeTransactionDataPartial = {
+        to: adminMultisigAddress,
+        value: '0',
+        data:
+          '0xf8dc5dd9' +
+          abiCoder
+            .encode(
+              ['address', 'address', 'uint256'],
+              [
+                prevOwnerAddress,
+                deployerAddress,
+                config.adminMultisig.threshold,
+              ],
+            )
+            .slice(2),
+        operation: OperationType.Call,
+      };
+      transactions.push(safeTxRemoveOwner);
+    }
   }
 
   if (transactions.length > 0) {
@@ -150,12 +163,14 @@ export async function setUpAccessControl({
       config,
     });
 
-    if (ownerBefore.length === 1 && config.adminMultisig.owners.length > 0) {
+    if (
+      ownersBeforeAdminMultisig.length === 1 &&
+      config.adminMultisig.owners.length > 0
+    ) {
       console.log(
         'Admin multisig owners changed to',
         await adminMultisig.getOwners(),
       );
-      console.log('Removed signer from multisig owners');
       console.log('Current threshold', await adminMultisig.getThreshold());
     }
   }
