@@ -13,7 +13,7 @@ export abstract class CLBaseWrapper {
   public async setFeed(
     sequencer: HardhatEthersSigner,
     data: string,
-    round: bigint,
+    index: bigint,
     blockNumber?: number,
   ): Promise<any> {
     return this.proxy.proxyCall(
@@ -22,7 +22,7 @@ export abstract class CLBaseWrapper {
       [
         {
           id: this.id,
-          round,
+          index,
           data,
           stride: this.stride,
         },
@@ -37,26 +37,26 @@ export abstract class CLBaseWrapper {
     caller: HardhatEthersSigner,
     data: string,
   ): Promise<void> {
-    return this.proxy.proxyCall('checkLatestValue', caller, [
+    return this.proxy.proxyCall('checkLatestData', caller, [
       {
         id: this.id,
         data: data,
         stride: 0n,
-        round: 0n, // this is not used in this test
+        index: 0n, // this is not used in this test
       },
     ]);
   }
 
   public async checkLatestRoundId(
     caller: HardhatEthersSigner,
-    round: bigint,
+    index: bigint,
   ): Promise<void> {
     const latestRoundId = await this.contract.latestRound();
-    expect(latestRoundId).to.be.eq(round);
+    expect(latestRoundId).to.be.eq(index);
 
-    await this.proxy.proxyCall('checkLatestRound', caller, [
+    await this.proxy.proxyCall('checkLatestIndex', caller, [
       {
-        round,
+        index,
         data: '', // this is not used in this test
         id: this.id,
         stride: this.stride,
@@ -81,7 +81,7 @@ export abstract class CLBaseWrapper {
     answer: string,
   ): Promise<void> {
     const feed: Feed = {
-      round: 0n, // this is not used in this test
+      index: 0n, // this is not used in this test
       data: answer,
       id: this.id,
       stride: this.stride,
@@ -98,10 +98,10 @@ export abstract class CLBaseWrapper {
   public async checkLatestRoundData(
     caller: HardhatEthersSigner,
     answer: string,
-    round: bigint,
+    index: bigint,
   ): Promise<void> {
     const feed: Feed = {
-      round,
+      index,
       data: answer,
       id: this.id,
       stride: this.stride,
@@ -111,14 +111,14 @@ export abstract class CLBaseWrapper {
     const counter = BigInt(
       (
         await this.proxy.proxyCall('getValues', caller, [feed], {
-          operations: [ReadOp.GetLatestRound],
+          operations: [ReadOp.GetLatestIndex],
         })
       )[0],
     );
     const parsedData = this.getParsedData(data);
     const parsedDataRes = this.getParsedData(feed.data);
 
-    expect(roundData[0]).to.be.eq(feed.round);
+    expect(roundData[0]).to.be.eq(feed.index);
     expect(roundData[1]).to.be.eq(parsedDataRes.decimal);
     expect(roundData[2]).to.be.eq(parsedData.timestamp);
 
@@ -132,18 +132,18 @@ export abstract class CLBaseWrapper {
   public async checkRoundData(
     caller: HardhatEthersSigner,
     answer: string,
-    round: bigint,
+    index: bigint,
   ): Promise<void> {
     const feed: Feed = {
-      round,
+      index,
       data: answer,
       id: this.id,
       stride: this.stride,
     };
-    const roundData = await this.contract.getRoundData(feed.round);
+    const roundData = await this.contract.getRoundData(feed.index);
     const data = (
       await this.proxy.proxyCall('getValues', caller, [feed], {
-        operations: [ReadOp.GetFeedAtRound],
+        operations: [ReadOp.GetDataAtIndex],
       })
     )[0];
     const parsedData = this.getParsedData(data);
@@ -152,11 +152,11 @@ export abstract class CLBaseWrapper {
     expect(roundData[1]).to.be.eq(parsedDataRes.decimal);
     expect(roundData[2]).to.be.eq(parsedData.timestamp);
 
-    expect(roundData[0]).to.be.eq(feed.round);
+    expect(roundData[0]).to.be.eq(feed.index);
     expect(roundData[1]).to.be.eq(parsedData.decimal);
     expect(roundData[2].toString()).to.be.eq(parsedData.timestamp);
     expect(roundData[3].toString()).to.be.eq(parsedData.timestamp);
-    expect(roundData[4]).to.be.eq(feed.round);
+    expect(roundData[4]).to.be.eq(feed.index);
   }
 
   public getHexAnswer(value: bigint): string {

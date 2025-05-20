@@ -12,7 +12,7 @@ contract RawCallADFSConsumer {
     adfs = _adfs;
   }
 
-  function getLatestSingleFeedData(
+  function getLatestSingleData(
     uint256 id
   ) external view returns (bytes32 data) {
     (bool success, bytes memory returnData) = adfs.staticcall(
@@ -23,7 +23,7 @@ contract RawCallADFSConsumer {
     return (bytes32(returnData));
   }
 
-  function getLatestFeedData(
+  function getLatestData(
     uint8 stride,
     uint256 id
   ) external view returns (bytes32[] memory data) {
@@ -35,7 +35,7 @@ contract RawCallADFSConsumer {
     return parseBytesToBytes32Array(returnData);
   }
 
-  function getLatestSlicedFeedData(
+  function getLatestDataSlice(
     uint8 stride,
     uint256 id,
     uint32 startSlot,
@@ -49,9 +49,9 @@ contract RawCallADFSConsumer {
     return parseBytesToBytes32Array(returnData);
   }
 
-  function getSingleFeedDataAtRound(
+  function getSingleDataAtIndex(
     uint256 id,
-    uint256 round
+    uint256 index
   ) external view returns (bytes32 data) {
     (bool success, bytes memory returnData) = adfs.staticcall(
       abi.encodePacked(bytes1(0x86), uint8(0), uint120(id), uint16(round))
@@ -61,23 +61,22 @@ contract RawCallADFSConsumer {
     return (bytes32(returnData));
   }
 
-  function getFeedDataAtRound(
+  function getDataAtIndex(
     uint8 stride,
     uint256 id,
-    uint256 round
+    uint256 index
   ) external view returns (bytes32[] memory data) {
     (bool success, bytes memory returnData) = adfs.staticcall(
-      abi.encodePacked(bytes1(0x86), stride, uint120(id), uint16(round))
+      abi.encodePacked(bytes1(0x86), stride, uint120(id), uint16(index))
     );
     require(success, 'ADFS: call failed');
 
     return parseBytesToBytes32Array(returnData);
   }
 
-  function getSlicedFeedDataAtRound(
-    uint8 stride,
+  function getDataSliceAtIndex(
     uint256 id,
-    uint256 round,
+    uint256 index,
     uint32 startSlot,
     uint32 slotsCount
   ) external view returns (bytes32[] memory data) {
@@ -86,7 +85,7 @@ contract RawCallADFSConsumer {
         bytes1(0x86),
         stride,
         uint120(id),
-        uint16(round),
+        uint16(index),
         startSlot,
         slotsCount
       )
@@ -96,10 +95,10 @@ contract RawCallADFSConsumer {
     return parseBytesToBytes32Array(returnData);
   }
 
-  function getLatestRound(
+  function getLatestIndex(
     uint8 stride,
     uint256 id
-  ) external view returns (uint256 round) {
+  ) external view returns (uint256 index) {
     (bool success, bytes memory returnData) = adfs.staticcall(
       abi.encodePacked(bytes1(0x81), stride, uint120(id))
     );
@@ -108,9 +107,9 @@ contract RawCallADFSConsumer {
     return uint256(bytes32(returnData));
   }
 
-  function getLatestSingleFeedDataAndRound(
+  function getLatestSingleDataAndIndex(
     uint256 id
-  ) external view returns (bytes32 data, uint256 round) {
+  ) external view returns (bytes32 data, uint256 index) {
     (bool success, bytes memory returnData) = adfs.staticcall(
       abi.encodePacked(bytes1(0x83), uint8(0), uint120(id))
     );
@@ -119,16 +118,16 @@ contract RawCallADFSConsumer {
     (round, data) = abi.decode(returnData, (uint256, bytes32));
   }
 
-  function getLatestFeedDataAndRound(
+  function getLatestDataAndIndex(
     uint8 stride,
     uint256 id
-  ) external view returns (bytes32[] memory data, uint256 round) {
+  ) external view returns (bytes32[] memory data, uint256 index) {
     (bool success, bytes memory returnData) = adfs.staticcall(
       abi.encodePacked(bytes1(0x85), stride, uint120(id))
     );
     require(success, 'ADFS: call failed');
 
-    round = uint256(bytes32(returnData));
+    index = uint256(bytes32(returnData));
 
     assembly {
       let len := mload(returnData)
@@ -139,18 +138,18 @@ contract RawCallADFSConsumer {
     data = parseBytesToBytes32Array(returnData);
   }
 
-  function getLatestSlicedFeedDataAndRound(
+  function getLatestDataSliceAndIndex(
     uint8 stride,
     uint256 id,
     uint32 startSlot,
     uint32 slotsCount
-  ) external view returns (bytes32[] memory data, uint256 round) {
+  ) external view returns (bytes32[] memory data, uint256 index) {
     (bool success, bytes memory returnData) = adfs.staticcall(
       abi.encodePacked(bytes1(0x85), stride, uint120(id), startSlot, slotsCount)
     );
     require(success, 'ADFS: call failed');
 
-    round = uint256(bytes32(returnData));
+    index = uint256(bytes32(returnData));
 
     assembly {
       let len := mload(returnData)

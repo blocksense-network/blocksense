@@ -103,7 +103,7 @@ task(
   const feed: Feed = {
     id: 1n,
     stride: 0n,
-    round: 1n,
+    index: 1n,
     data: encodeDataAndTimestamp(1234),
   };
 
@@ -225,7 +225,7 @@ task(
   const newFeed: Feed = {
     id: 1n,
     stride: 0n,
-    round: 2n,
+    index: 2n,
     data: encodeDataAndTimestamp(5678),
   };
 
@@ -302,7 +302,7 @@ const encodeDataWrite = (feeds: Feed[], blockNumber?: number) => {
   );
 
   const data = feeds.map(feed => {
-    const index = (feed.id * 2n ** 13n + feed.round) * 2n ** feed.stride;
+    const index = (feed.id * 2n ** 13n + feed.index) * 2n ** feed.stride;
     const indexInBytesLength = Math.ceil(index.toString(2).length / 8);
     const bytes = (feed.data.length - 2) / 2;
     const bytesLength = Math.ceil(bytes.toString(2).length / 8);
@@ -333,8 +333,8 @@ const encodeDataWrite = (feeds: Feed[], blockNumber?: number) => {
       batchFeeds[rowIndex] = '0x' + '0'.repeat(64);
     }
 
-    // Convert round to 2b hex and pad if needed
-    const roundHex = feed.round.toString(16).padStart(4, '0');
+    // Convert index to 2b hex and pad if needed
+    const indexHex = feed.index.toString(16).padStart(4, '0');
 
     // Calculate position in the 32b row (64 hex chars)
     const position = slotPosition * 4;
@@ -342,11 +342,11 @@ const encodeDataWrite = (feeds: Feed[], blockNumber?: number) => {
     // Replace the corresponding 2b in the row
     batchFeeds[rowIndex] =
       batchFeeds[rowIndex].slice(0, position + 2) +
-      roundHex +
+      indexHex +
       batchFeeds[rowIndex].slice(position + 6);
   });
 
-  const roundData = Object.keys(batchFeeds)
+  const indexData = Object.keys(batchFeeds)
     .map(index => {
       const indexInBytesLength = Math.ceil(
         BigInt(index).toString(2).length / 8,
@@ -361,5 +361,5 @@ const encodeDataWrite = (feeds: Feed[], blockNumber?: number) => {
     })
     .join('');
 
-  return prefix.concat(data.join('')).concat(roundData);
+  return prefix.concat(data.join('')).concat(indexData);
 };
