@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
-import { Schema as S, ParseResult } from 'effect';
+import { Schema as S, ParseResult, Either } from 'effect';
 
 /**  An object whose properties represent significant elements of the path. */
 // ┌─────────────────────┬────────────┐
@@ -140,8 +140,17 @@ class SelectedDirectory {
   readJSON = (args: FileArgs) =>
     this.read({ ext: '.json', ...args }).then(JSON.parse);
 
-  decodeJSON = <A, I>(args: FileArgs, schema: S.Schema<A, I, never>) =>
-    this.readJSON(args).then(x => ParseResult.decodeUnknownSync(schema)(x));
+  decodeJSON = async <A, I>(args: FileArgs, schema: S.Schema<A, I, never>) => {
+    const json = await this.readJSON(args);
+    const res = S.decodeEither(schema)(json);
+    if (Either.isLeft(res)) {
+      console.error(res.left.message);
+      throw new Error(
+        `Failed to decode JSON file '${path.format(args)}' with schema: ${schema}`,
+      );
+    }
+    return res.right;
+  };
 
   /**
    * Reads all JSON files in a directory and returns their data.
