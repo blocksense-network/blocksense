@@ -1,25 +1,27 @@
 /**
- * Converts a kebab-case string literal type to SNAKE_CASE.
+ * Converts a kebab-case string literal type to SCREAMING_SNAKE_CASE.
  */
-export type KebabToSnakeCase<S extends string> =
+export type KebabToScreamingSnakeCase<S extends string> =
   S extends `${infer T}-${infer U}`
-    ? `${Uppercase<T>}_${KebabToSnakeCase<U>}`
+    ? `${Uppercase<T>}_${KebabToScreamingSnakeCase<U>}`
     : Uppercase<S>;
 
 /**
- * Converts a kebab-case string to SNAKE_CASE.
+ * Converts a kebab-case string to SCREAMING_SNAKE_CASE.
  * @param str - The kebab-case string to convert.
- * @returns The SNAKE_CASE version of the input string.
+ * @returns The SCREAMING_SNAKE_CASE version of the input string.
  * @example
  * ```ts
- * kebabToSnakeCase('foo-bar'); // 'FOO_BAR'
+ * kebabToScreamingSnakeCase('foo-bar'); // 'FOO_BAR'
  * ```
- * @see {@link KebabToSnakeCase}
+ * @see {@link KebabToScreamingSnakeCase}
  */
-export function kebabToSnakeCase<Str extends string>(
+export function kebabToScreamingSnakeCase<Str extends string>(
   str: Str,
-): KebabToSnakeCase<Str> {
-  return str.replaceAll(/-/g, '_').toUpperCase() as KebabToSnakeCase<Str>;
+): KebabToScreamingSnakeCase<Str> {
+  return str
+    .replaceAll(/-/g, '_')
+    .toUpperCase() as KebabToScreamingSnakeCase<Str>;
 }
 
 /**

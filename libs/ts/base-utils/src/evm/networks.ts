@@ -9,7 +9,10 @@ import { Schema as S } from 'effect';
 
 import { getEnvString, getOptionalEnvString } from '../env/functions';
 import { EthereumAddress, TxHash } from './hex-types';
-import { KebabToSnakeCase, kebabToSnakeCase } from '../string';
+import {
+  KebabToScreamingSnakeCase,
+  kebabToScreamingSnakeCase,
+} from '../string';
 import { NumberFromSelfBigIntOrString } from '../numeric';
 
 const networks = [
@@ -902,14 +905,14 @@ export function getAddressExplorerUrl(
 }
 
 export type NetworkNameToEnvVar<Net extends NetworkName> =
-  `RPC_URL_${KebabToSnakeCase<Net>}`;
+  `RPC_URL_${KebabToScreamingSnakeCase<Net>}`;
 
 export type RpcUrlEnvVarNames = NetworkNameToEnvVar<NetworkName>;
 
 export function getRpcUrlEnvVar<Net extends NetworkName>(
   network: Net,
 ): NetworkNameToEnvVar<Net> {
-  return `RPC_URL_${kebabToSnakeCase(network)}`;
+  return `RPC_URL_${kebabToScreamingSnakeCase(network)}`;
 }
 
 export function getRpcUrl(network: NetworkName): string {

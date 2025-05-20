@@ -2,7 +2,7 @@ import { task } from 'hardhat/config';
 import {
   NetworkName,
   getRpcUrl,
-  kebabToSnakeCase,
+  kebabToScreamingSnakeCase,
   parseEthereumAddress,
   getOptionalEnvString,
   getEnvString,
@@ -33,7 +33,9 @@ task('init-chain', '[UTILS] Init chain configuration').setAction(
     }
 
     const envSequencerOwners =
-      process.env['REPORTER_ADDRESSES_' + kebabToSnakeCase(networkName)];
+      process.env[
+        'REPORTER_ADDRESSES_' + kebabToScreamingSnakeCase(networkName)
+      ];
     const sequencerOwners = envSequencerOwners
       ? envSequencerOwners
           .split(',')
@@ -41,14 +43,17 @@ task('init-chain', '[UTILS] Init chain configuration').setAction(
       : [];
 
     const envAdminOwners =
-      process.env['ADMIN_EXTRA_SIGNERS_' + kebabToSnakeCase(networkName)];
+      process.env[
+        'ADMIN_EXTRA_SIGNERS_' + kebabToScreamingSnakeCase(networkName)
+      ];
     const adminOwners = envAdminOwners
       ? envAdminOwners.split(',').map(address => parseEthereumAddress(address))
       : [];
 
     const deploySequencerMultisig = JSON.parse(
       getOptionalEnvString(
-        'DEPLOY_WITH_SEQUENCER_MULTISIG_' + kebabToSnakeCase(networkName),
+        'DEPLOY_WITH_SEQUENCER_MULTISIG_' +
+          kebabToScreamingSnakeCase(networkName),
         'true',
       ),
     );
@@ -64,7 +69,7 @@ task('init-chain', '[UTILS] Init chain configuration').setAction(
     }
 
     const feedIds = getOptionalEnvString(
-      'FEED_IDS_' + kebabToSnakeCase(networkName),
+      'FEED_IDS_' + kebabToScreamingSnakeCase(networkName),
       '',
     );
 
