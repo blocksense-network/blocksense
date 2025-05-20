@@ -14,113 +14,87 @@ contract ADFSConsumer {
     adfs = _adfs;
   }
 
-  function getLatestSingleFeedData(uint256 id) external view returns (bytes32) {
-    return ADFS._getLatestSingleFeedData(adfs, id);
+  function getLatestSingleData(uint256 id) external view returns (bytes32) {
+    return ADFS.getLatestSingleData(adfs, id);
   }
 
-  function getLatestFeedData(
+  function getLatestData(
     uint256 stride,
     uint256 id
   ) external view returns (bytes32[] memory) {
-    return ADFS._getLatestFeedData(adfs, stride, id);
+    return ADFS.getLatestData(adfs, stride, id);
   }
 
-  function getLatestSlicedFeedData(
+  function getLatestDataSlice(
     uint256 stride,
     uint256 id,
     uint256 startSlot,
     uint256 slotsCount
   ) external view returns (bytes32[] memory) {
-    return
-      ADFS._getLatestSlicedFeedData(
-        adfs,
-        stride,
-        id,
-        startSlot,
-        slotsCount
-      );
+    return ADFS.getLatestDataSlice(adfs, stride, id, startSlot, slotsCount);
   }
 
-  function getLatestRound(
+  function getLatestIndex(
     uint256 stride,
     uint256 id
   ) external view returns (uint256 round) {
-    return ADFS._getLatestRound(adfs, stride, id);
+    return ADFS.getLatestIndex(adfs, stride, id);
   }
 
-  function getSingleFeedDataAtRound(
+  function getSingleDataAtIndex(
     uint256 id,
-    uint256 round
+    uint256 index
   ) external view returns (bytes32) {
-    return ADFS._getSingleFeedDataAtRound(adfs, id, round);
+    return ADFS.getSingleDataAtIndex(adfs, id, index);
   }
 
-  function getFeedDataAtRound(
+  function getDataAtIndex(
     uint256 stride,
     uint256 id,
-    uint256 round
+    uint256 index
   ) external view returns (bytes32[] memory) {
-    return ADFS._getFeedDataAtRound(adfs, stride, id, round);
+    return ADFS.getDataAtIndex(adfs, stride, id, index);
   }
 
-  function getSlicedFeedDataAtRound(
+  function getDataSliceAtIndex(
     uint256 stride,
     uint256 id,
-    uint256 round,
+    uint256 index,
     uint256 startSlot,
     uint256 slotsCount
   ) external view returns (bytes32[] memory) {
     return
-      ADFS._getSlicedFeedDataAtRound(
-        adfs,
-        stride,
-        id,
-        round,
-        startSlot,
-        slotsCount
-      );
+      ADFS.getDataSliceAtIndex(adfs, stride, id, index, startSlot, slotsCount);
   }
 
-  function getLatestSingleFeedDataAndRound(
+  function getLatestSingleDataAndIndex(
     uint256 id
-  ) external view returns (bytes32 data, uint256 round) {
-    return ADFS._getLatestSingleFeedDataAndRound(adfs, id);
+  ) external view returns (bytes32 data, uint256 index) {
+    return ADFS.getLatestSingleDataAndIndex(adfs, id);
   }
 
-  function getLatestFeedDataAndRound(
+  function getLatestDataAndIndex(
     uint256 stride,
     uint256 id
-  ) external view returns (bytes32[] memory data, uint256 round) {
-    return ADFS._getLatestFeedDataAndRound(adfs, stride, id);
+  ) external view returns (bytes32[] memory data, uint256 index) {
+    return ADFS.getLatestDataAndIndex(adfs, stride, id);
   }
 
-  function getLatestSlicedFeedDataAndRound(
+  function getLatestDataSliceAndIndex(
     uint256 stride,
     uint256 id,
     uint256 startSlot,
     uint256 slotsCount
-  ) external view returns (bytes32[] memory data, uint256 round) {
+  ) external view returns (bytes32[] memory data, uint256 index) {
     return
-      ADFS._getLatestSlicedFeedDataAndRound(
-        adfs,
-        stride,
-        id,
-        startSlot,
-        slotsCount
-      );
+      ADFS.getLatestDataSliceAndIndex(adfs, stride, id, startSlot, slotsCount);
   }
 
   function getEpochSeconds(uint256 id) external view returns (uint64) {
-    return
-      ADFS._getEpochSeconds(
-        ADFS._getLatestSingleFeedData(adfs, id)
-      );
+    return ADFS.getEpochSeconds(ADFS.getLatestSingleData(adfs, id));
   }
 
   function getEpochMilliseconds(uint256 id) external view returns (uint64) {
-    return
-      ADFS._getEpochMilliseconds(
-        ADFS._getLatestSingleFeedData(adfs, id)
-      );
+    return ADFS.getEpochMilliseconds(ADFS.getLatestSingleData(adfs, id));
   }
 }

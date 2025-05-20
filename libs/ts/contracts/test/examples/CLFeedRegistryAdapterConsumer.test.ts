@@ -14,14 +14,14 @@ const aggregatorData = [
   {
     description: 'ETH/USD',
     decimals: 8,
-    key: 3,
+    id: 3,
     base: TOKENS.ETH,
     quote: TOKENS.USD,
   },
   {
     description: 'BTC/USD',
     decimals: 6,
-    key: 132,
+    id: 132,
     base: TOKENS.BTC,
     quote: TOKENS.USD,
   },
@@ -50,10 +50,10 @@ describe('Example: CLFeedRegistryAdapterConsumer', function () {
 
     for (const data of aggregatorData) {
       const newAdapter = new CLAdapterWrapper();
-      await newAdapter.init(data.description, data.decimals, data.key, proxy);
+      await newAdapter.init(data.description, data.decimals, data.id, proxy);
       aggregators.push(newAdapter);
 
-      const value = encodeDataAndTimestamp(data.key * 1000, Date.now());
+      const value = encodeDataAndTimestamp(data.id * 1000, Date.now());
       await newAdapter.setFeed(sequencer, value, 1n);
     }
 
