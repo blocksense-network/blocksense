@@ -38,7 +38,8 @@
   "files": [],
   "include": [
     ".next/types/**/*.ts",
-    "dist/types/**/*.ts"
+    "dist/types/**/*.ts",
+    "@types/**/*.d.ts",
   ],
   "references": [
     {
