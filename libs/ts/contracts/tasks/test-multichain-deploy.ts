@@ -48,8 +48,8 @@ task(
   const { contracts: deployment } = await readEvmDeployment(networkName, true);
 
   const accessControl = deployment.coreContracts.AccessControl.address;
-  const adminMultisigAddr = deployment.AdminMultisig;
-  const reporterMultisigAddr = deployment.ReporterMultisig;
+  const adminMultisigAddr = deployment.safe.AdminMultisig;
+  const reporterMultisigAddr = deployment.safe.ReporterMultisig;
 
   const adminMultisig = await Safe.init({
     provider: config.rpc,
@@ -66,13 +66,13 @@ task(
     config.provider,
   );
 
-  if (!deployment.ReporterMultisig) {
+  if (!deployment.safe.ReporterMultisig) {
     throw new Error('Sequencer multisig not found in deployment');
   }
 
   const reporterMultisig = await Safe.init({
     provider: config.rpc,
-    safeAddress: deployment.ReporterMultisig,
+    safeAddress: deployment.safe.ReporterMultisig,
     signer: sequencerWallet.privateKey,
     contractNetworks: {
       [config.network.chainId.toString()]: config.safeAddresses,
@@ -88,7 +88,7 @@ task(
   const tx = await adminMultisig.createTransaction({
     transactions: [
       {
-        to: deployment.coreContracts.AdminExecutorModule!.address,
+        to: deployment.safe.AdminExecutorModule!.address,
         data: (await reporterMultisig.createChangeThresholdTx(1)).data.data,
         value: '0',
       } as SafeTransactionDataPartial,
@@ -133,7 +133,7 @@ task(
 
   const safeGuard = await ethers.getContractAt(
     ContractNames.OnlySequencerGuard,
-    deployment.coreContracts.OnlySequencerGuard!.address,
+    deployment.safe.OnlySequencerGuard!.address,
   );
 
   const isValidTransaction = await apiKit.isValidTransaction(writeTx);
