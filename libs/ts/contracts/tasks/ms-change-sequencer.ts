@@ -30,7 +30,7 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
       const { networkName } = config;
       const {
         contracts: {
-          AdminMultisig,
+          safe: { AdminMultisig },
           coreContracts: { AccessControl },
         },
       } = await readEvmDeployment(networkName, true);
