@@ -78,6 +78,13 @@ task('deploy-multisig', '[UTILS] Deploy multisig contract').setAction(
 
     console.log('    ✅ Safe deployment tx hash:', transactionReceipt?.hash);
 
-    return protocolKit.connect({ safeAddress });
+    return protocolKit.connect({
+      provider: config.rpc,
+      signer,
+      safeAddress,
+      contractNetworks: {
+        [config.network.chainId.toString()]: config.safeAddresses,
+      },
+    });
   },
 );
