@@ -67,6 +67,11 @@
       "import": "./dist/esm/string.mjs",
       "types": "./src/string.ts"
     },
+    "./tty": {
+      "require": "./dist/cjs/tty.cjs",
+      "import": "./dist/esm/tty.mjs",
+      "types": "./src/tty.ts"
+    },
     "./type-level": {
       "require": "./dist/cjs/type-level.cjs",
       "import": "./dist/esm/type-level.mjs",
