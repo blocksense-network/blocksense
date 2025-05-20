@@ -1,13 +1,19 @@
 import { artifactsFolder } from '@/src/constants';
-import { selectDirectory } from '@blocksense/base-utils';
+import { NetworkName, selectDirectory } from '@blocksense/base-utils';
 import { readAllEvmDeployments } from '@blocksense/config-types';
 
 export async function collectDeploymentData() {
   const { writeJSON } = selectDirectory(artifactsFolder);
 
+  const excludeLocalDeployment =
+    process.env['NEXT_PUBLIC_EXCLUDE_LOCAL_DEPLOYMENT'] ?? true;
+
+  const excludeLocal: NetworkName[] =
+    excludeLocalDeployment === true ? ['local'] : [];
+
   await writeJSON({
     name: 'deployment_data',
-    content: await readAllEvmDeployments([]),
+    content: await readAllEvmDeployments(excludeLocal),
   });
 }
 
