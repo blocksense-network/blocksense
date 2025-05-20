@@ -771,11 +771,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1744630980,
-        "narHash": "sha256-/vRKLwAujKGw94jn3gua6vw+IpAnSOYqRYzlsoiYc8w=",
+        "lastModified": 1745432695,
+        "narHash": "sha256-KGo8P2IvReCWRztoCgqop2IFtODYQTX+8sN5Tc1jF1o=",
         "owner": "metacraft-labs",
         "repo": "nix-blockchain-development",
-        "rev": "e98a30329bfcff26f53691c5139812a61835363f",
+        "rev": "9d24544a51928b099574326459ad893e4bc35033",
         "type": "github"
       },
       "original": {
