@@ -15,6 +15,7 @@ export type KebabToScreamingSnakeCase<S extends string> =
  * kebabToScreamingSnakeCase('foo-bar'); // 'FOO_BAR'
  * ```
  * @see {@link KebabToScreamingSnakeCase}
+ * @todo (milagenova): should we check input validity?
  */
 export function kebabToScreamingSnakeCase<Str extends string>(
   str: Str,
@@ -41,6 +42,7 @@ export type KebabToCamelCase<S extends string> =
  * kebabToCamelCase('foo-bar-baz'); // 'fooBarBaz'
  * ```
  * @see {@link KebabToCamelCase}
+ * @todo (milagenova): should we check input validity?
  */
 export function kebabToCamelCase<Str extends string>(
   str: Str,
