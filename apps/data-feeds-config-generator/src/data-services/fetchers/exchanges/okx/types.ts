@@ -12,7 +12,7 @@ const OKXAssetInfoSchema = S.mutable(
   }),
 );
 
-export type OKXAssetInfo = S.Schema.Type<typeof OKXAssetInfoSchema>;
+export type OKXAssetInfo = typeof OKXAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from OKX Exchange.
@@ -29,7 +29,7 @@ export const OKXInfoRespSchema = S.mutable(
   }),
 );
 
-export type OKXInfoResp = S.Schema.Type<typeof OKXInfoRespSchema>;
+export type OKXInfoResp = typeof OKXInfoRespSchema.Type;
 
 export const OKXPriceSchema = S.mutable(
   S.Struct({
@@ -42,4 +42,4 @@ export const OKXPriceSchema = S.mutable(
   }),
 );
 
-export type OKXPrice = S.Schema.Type<typeof OKXPriceSchema>;
+export type OKXPrice = typeof OKXPriceSchema.Type;

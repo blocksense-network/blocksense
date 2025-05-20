@@ -8,14 +8,16 @@ export const columns: ColumnDef[] = [
     id: 'id',
     title: 'Id',
     header: ({ column }) => <DataTableColumnHeader title={column.title} />,
-    cell: ({ row }) => <DataTableBadge>{row.id}</DataTableBadge>,
+    cell: ({ row }) => <DataTableBadge>{row.feedId}</DataTableBadge>,
     facetedFilter: true,
   },
   {
     id: 'description',
     title: 'Data Feed',
     header: ({ column }) => <DataTableColumnHeader title={column.title} />,
-    cell: ({ row }) => <DataTableBadge>{row.description}</DataTableBadge>,
+    cell: ({ row }) => (
+      <DataTableBadge>{row.constructorArgs[0]}</DataTableBadge>
+    ),
   },
   {
     id: 'address',

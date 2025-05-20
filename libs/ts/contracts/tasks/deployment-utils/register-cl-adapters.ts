@@ -9,6 +9,7 @@ import {
   OperationType,
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
+import { entriesOf } from '@blocksense/base-utils/array-iter';
 
 task(
   'register-cl-adapters',
@@ -26,8 +27,9 @@ task(
 
   // The difference between setting n and n+1 feeds via CLFeedRegistryAdapter::setFeeds is slightly above 55k gas.
   console.log('\nRegistering CLAggregatorAdapters in CLFeedRegistryAdapter...');
+  console.log('------------------------------------------------------------');
 
-  const signer = config.adminMultisig.signer || config.ledgerAccount!;
+  const signer = config.deployer;
 
   const registry = new ethers.Contract(
     deployData.coreContracts.CLFeedRegistryAdapter.address,
@@ -38,12 +40,11 @@ task(
   // Split into batches of 100
   const BATCH_LENGTH = 100;
   const batches: Array<Array<CLAggregatorAdapterData>> = [];
-  const aggregatorData = deployData.CLAggregatorAdapter.filter(d => d.base);
   const filteredData = [];
 
-  for (const data of aggregatorData) {
+  for (const [description, data] of entriesOf(deployData.CLAggregatorAdapter)) {
     if (!data.base || !data.quote) {
-      console.log(` -> Feed '${data.description}' has no base or quote`);
+      console.log(` -> Feed '${description}' has no base or quote`, '\n');
       continue;
     }
 
@@ -55,11 +56,15 @@ task(
     if (feed === ethers.ZeroAddress) {
       filteredData.push(data);
     } else {
-      console.log(` -> Feed '${data.description}' already registered`, {
-        base: data.base,
-        quote: data.quote,
-        feed,
-      });
+      console.log(
+        ` -> Feed '${description}' already registered`,
+        {
+          base: data.base,
+          quote: data.quote,
+          feed,
+        },
+        '\n',
+      );
     }
   }
   for (let i = 0; i < filteredData.length; i += BATCH_LENGTH) {
@@ -80,6 +85,10 @@ task(
       ]),
       operation: OperationType.Call,
     };
+
+    console.log(
+      `Registering ${batch.length} CLAggregatorAdapters in CLFeedRegistryAdapter`,
+    );
 
     await run('multisig-tx-exec', {
       transactions: [safeTransactionData],

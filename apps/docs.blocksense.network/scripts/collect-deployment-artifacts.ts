@@ -1,27 +1,19 @@
-import { readdir } from 'fs/promises';
-
 import { artifactsFolder } from '@/src/constants';
-import { selectDirectory, parseNetworkName } from '@blocksense/base-utils';
-import { configDirs, readEvmDeployment } from '@blocksense/config-types';
+import { NetworkName, selectDirectory } from '@blocksense/base-utils';
+import { readAllEvmDeployments } from '@blocksense/config-types';
 
 export async function collectDeploymentData() {
-  const deploymentFilenames = await readdir(
-    configDirs.evm_contracts_deployment_v2,
-  );
-
-  const networks = deploymentFilenames.map(filename =>
-    parseNetworkName(filename.replace(/\.json$/, '')),
-  );
-
-  const deploymentFiles = await Promise.all(
-    networks.map(async net => await readEvmDeployment(net)),
-  );
-
   const { writeJSON } = selectDirectory(artifactsFolder);
+
+  const excludeLocalDeployment =
+    process.env['NEXT_PUBLIC_EXCLUDE_LOCAL_DEPLOYMENT'] ?? true;
+
+  const excludeLocal: NetworkName[] =
+    excludeLocalDeployment === true ? ['local'] : [];
 
   await writeJSON({
     name: 'deployment_data',
-    content: deploymentFiles,
+    content: await readAllEvmDeployments(excludeLocal),
   });
 }
 

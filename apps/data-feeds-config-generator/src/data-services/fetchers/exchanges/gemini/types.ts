@@ -12,16 +12,14 @@ const GeminiAssetInfoSchema = S.mutable(
   }),
 );
 
-export type GeminiAssetInfo = S.Schema.Type<typeof GeminiAssetInfoSchema>;
+export type GeminiAssetInfo = typeof GeminiAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about symbols received from Gemini Exchange.
  */
 export const GeminiSymbolsInfoRespSchema = S.mutable(S.Array(S.String));
 
-export type GeminiSymbolsInfoResp = S.Schema.Type<
-  typeof GeminiSymbolsInfoRespSchema
->;
+export type GeminiSymbolsInfoResp = typeof GeminiSymbolsInfoRespSchema.Type;
 
 /**
  * Schema for the relevant information about symbol details received from Gemini Exchange.
@@ -34,12 +32,11 @@ export const GeminiSymbolDetailsInfoRespSchema = S.mutable(
   }),
 );
 
-export type GeminiSymbolDetailsInfoResp = S.Schema.Type<
-  typeof GeminiSymbolDetailsInfoRespSchema
->;
+export type GeminiSymbolDetailsInfoResp =
+  typeof GeminiSymbolDetailsInfoRespSchema.Type;
 
 export const GeminiPriceSchema = S.Struct({
   last: S.String,
 });
 
-export type GeminiPrice = S.Schema.Type<typeof GeminiPriceSchema>;
+export type GeminiPrice = typeof GeminiPriceSchema.Type;

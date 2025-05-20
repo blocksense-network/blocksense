@@ -1,20 +1,20 @@
 import DEPLOYMENT_INFO from '@/artifacts/deployment_data.json';
 
-import { parseNetworkName } from '@blocksense/base-utils/evm';
-import { DeploymentConfigV2 } from '@blocksense/config-types';
 import {
   CoreContract,
-  decodeDeploymentConfigArray,
+  decodeAllDeploymentConfig,
+  AllDeploymentConfig,
+  ProxyContractData,
 } from '@/src/deployed-contracts/types';
+import { entriesOf } from '@blocksense/base-utils/array-iter';
 
-const getCoreContractsData = (networksData: DeploymentConfigV2[]) => {
+function getCoreContractsData(
+  networksData: AllDeploymentConfig,
+): CoreContract[] {
   const parsedCoreContracts: CoreContract[] = [];
 
-  networksData.map(data => {
-    if (!data) return;
-    if (data.name === 'local') return;
-    const networkName = parseNetworkName(data.name);
-    const coreContracts = data.contracts.coreContracts;
+  [...entriesOf(networksData)].map(([network, { contracts }]) => {
+    const coreContracts = contracts.coreContracts;
     const skipContracts = ['AccessControl', 'OnlySequencerGuard'];
 
     Object.entries(coreContracts).forEach(([contractName, contractsData]) => {
@@ -23,45 +23,42 @@ const getCoreContractsData = (networksData: DeploymentConfigV2[]) => {
       );
 
       if (existingContract) {
-        existingContract.networks.push(networkName);
+        existingContract.networks.push(network);
       } else {
         if (contractsData && !skipContracts.includes(contractName)) {
           parsedCoreContracts.push({
             contract: contractName,
             address: contractsData.address,
-            networks: [networkName],
+            networks: [network],
           });
         }
       }
     });
   });
   return parsedCoreContracts;
-};
+}
 
-const getProxyContractsContent = (networksData: DeploymentConfigV2[]) => {
-  const supportedNetworks = networksData
-    .map(data => {
-      if (!data) return [];
-      if (data.name === 'local') return [];
-      const networkName = parseNetworkName(data.name);
-      const { CLAggregatorAdapter } = data.contracts;
-
-      return CLAggregatorAdapter.map(proxy => {
-        let id = proxy.constructorArgs[2];
-        return {
+function getProxyContractsContent(
+  networksData: AllDeploymentConfig,
+): ProxyContractData[] {
+  return [...entriesOf(networksData)]
+    .map(([network, { contracts }]) => {
+      return [...entriesOf(contracts.CLAggregatorAdapter)].map(
+        ([id, proxy]) => ({
           ...proxy,
-          id,
-          network: networkName,
-        };
-      });
+          feedId: id,
+          network,
+        }),
+      );
     })
     .flat();
+}
 
-  return supportedNetworks;
-};
-
-export function getContractsData() {
-  const networksData = decodeDeploymentConfigArray(DEPLOYMENT_INFO);
+export function getContractsData(): {
+  parsedCoreContracts: CoreContract[];
+  parsedProxyContracts: ProxyContractData[];
+} {
+  const networksData = decodeAllDeploymentConfig(DEPLOYMENT_INFO);
   const parsedCoreContracts = getCoreContractsData(networksData);
   const parsedProxyContracts = getProxyContractsContent(networksData);
 
