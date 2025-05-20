@@ -4,6 +4,13 @@ import { assert, assertNotNull } from '../assert';
 import { envVarNameJoin } from '../string';
 import { UnionToIntersection } from '../type-level';
 import { entriesOf, fromEntries, keysOf } from '../array-iter';
+import {
+  RenderArgs,
+  alignRight,
+  renderToString,
+  drawBox,
+  color as color,
+} from '../tty';
 
 /**
  * Retrieves the value of an environment variable.
@@ -260,14 +267,6 @@ export function reportParsedEnvConfig<
   validationMessage: string;
   isValid: boolean;
 } {
-  const bold = tty ? '\x1B[1m' : '';
-  const noBold = tty ? '\x1B[22m' : '';
-  const underline = tty ? '\x1B[4m' : '';
-  const noUnderline = tty ? '\x1B[24m' : '';
-  const red = tty ? '\x1B[31m' : '';
-  const green = tty ? '\x1B[32m' : '';
-  const noColor = tty ? '\x1B[39m' : '';
-
   const getColumnWidth = <S extends string>(cells: Iterable<S>) =>
     Iterator.from(cells).reduce((max, cell) => Math.max(max, cell.length), 0);
 
@@ -303,210 +302,24 @@ export function reportParsedEnvConfig<
   );
   const columnWidth = Math.max(longestKeyLength, longestLayerLength);
 
-  function getTextWidth(str: string) {
-    // 1. Remove ANSI escape sequences.
-    const cleanedStr = str.replace(/\u001b\[[0-9;?]*m/g, '');
-    if (!cleanedStr) return 0; // Handle empty or only-ANSI string
-
-    const segmenter = new Intl.Segmenter(undefined, {
-      granularity: 'grapheme',
-    });
-
-    let width = 0;
-    for (const { segment: grapheme } of segmenter.segment(cleanedStr)) {
-      const firstCodePoint = grapheme.codePointAt(0);
-      // 2. Disallow newline/tab.
-      if (grapheme === '\n' || grapheme === '\t' || firstCodePoint == null) {
-        throw new Error(
-          `Unsupported char: '${grapheme === '\n' ? '\\n' : '\\t'}'`,
-        );
-      }
-
-      // Check if the grapheme is composed of exactly this single code point.
-      const isSingleCodePointGrapheme =
-        String.fromCodePoint(firstCodePoint) === grapheme;
-
-      // 3. Handle single-width characters:
-      //    - Printable ASCII (U+0020 space to U+007E ~)
-      //    - Box Drawing characters (U+2500 to U+257F)
-      if (
-        isSingleCodePointGrapheme &&
-        ((firstCodePoint >= 0x20 && firstCodePoint <= 0x7e) ||
-          (firstCodePoint >= 0x2500 && firstCodePoint <= 0x257f))
-      ) {
-        width += 1;
-        // 4. Approximate emoji detection (width 2):
-        //    - Grapheme's first char is Extended_Pictographic OR
-        //    - Grapheme consists of more than one Unicode scalar value (complex emoji).
-      } else if (
-        /\p{Extended_Pictographic}/u.test(
-          String.fromCodePoint(firstCodePoint),
-        ) ||
-        !isSingleCodePointGrapheme
-      ) {
-        width += 2;
-      } else {
-        // 5. Throw for anything else.
-        throw new Error(
-          `Unsupported grapheme: '${grapheme}' (U+${firstCodePoint.toString(16).toUpperCase()})`,
-        );
-      }
-    }
-    return width;
-  }
-
-  const alignText = (
-    text: string,
-    width: number,
-    alignDir: 'left' | 'center' | 'right',
-    padding = '─',
-  ) => {
-    const textWidth = getTextWidth(text);
-    if (textWidth >= width) return text;
-    const paddingLength = width - textWidth;
-    switch (alignDir) {
-      case 'left':
-        return text + padding.repeat(paddingLength);
-      case 'right':
-        return padding.repeat(paddingLength) + text;
-      case 'center': {
-        const leftPadding = Math.floor(paddingLength / 2);
-        const rightPadding = paddingLength - leftPadding;
-        return (
-          padding.repeat(leftPadding) + text + padding.repeat(rightPadding)
-        );
-      }
-      default:
-        throw new Error(`Invalid alignment direction: ${alignDir}`);
-    }
-  };
-
-  const alignRight = (text: string, width: number, padding = '─') =>
-    alignText(text, width, 'right', padding);
-  const alignLeft = (text: string, width: number, padding = '─') =>
-    alignText(text, width, 'left', padding);
-
-  const line = (len: number) => '─'.repeat(len);
-
-  type RenderArgs = { maxWidth: number };
-
-  type Element = string | ((args: RenderArgs) => string[]);
-
-  const renderToString = (args: RenderArgs, ...elements: Element[]): string =>
-    renderAllElements(args, ...elements).join('\n');
-
-  const renderAllElements = (
-    args: RenderArgs,
-    ...elements: Element[]
-  ): string[] => elements.flatMap(e => renderSingleElement(args, e));
-
-  const renderSingleElement = (args: RenderArgs, el: Element): string[] => {
-    const res = typeof el === 'function' ? el(args) : [el];
-
-    for (let i = 0; i < res.length; i++) {
-      const line = res[i];
-      if (typeof line !== 'string') {
-        throw new Error(`Expected a string, but got '${line}'`);
-      }
-      const wrappedContent = wrapLines(line, args.maxWidth);
-      res.splice(i, 1, ...wrappedContent);
-      i += wrappedContent.length - 1;
-    }
-
-    // trim lines which overflow after wrapping
-    for (let i = 0; i < res.length; i++) {
-      const line = res[i];
-      if (getTextWidth(line) > args.maxWidth) {
-        res[i] = line.slice(0, args.maxWidth);
-      }
-    }
-
-    return res;
-  };
-
-  const renderSingleLine = (args: RenderArgs, el: Element): string => {
-    const lines = renderSingleElement(args, el);
-    if (lines.length != 1) {
-      throw new Error(`Expected a single line, but got ${line.length} lines`);
-    }
-    return lines[0];
-  };
-
-  const wrapLines = (text: string, width: number) => {
-    if (getTextWidth(text) <= width) {
-      return [text];
-    }
-    const words = text.split(' ');
-    const lines: string[] = [];
-    let currentLine = '';
-    for (const word of words) {
-      const wordWidth = getTextWidth(word);
-      if (currentLine.length + wordWidth > width) {
-        lines.push(currentLine);
-        currentLine = '';
-      }
-      if (currentLine.length > 0) {
-        currentLine += ' ';
-      }
-      currentLine += word;
-    }
-    if (currentLine.length > 0) {
-      lines.push(currentLine);
-    }
-    return lines;
-  };
-
-  const drawTitle = (txt: Element) => (args: RenderArgs) => [
-    `╼ ${bold}${renderSingleLine(args, txt)}${noBold} ╾`,
-  ];
-
-  const drawBox =
-    (title: Element, ...content: Element[]) =>
-    (args: RenderArgs) => {
-      args = { maxWidth: args.maxWidth - 4 };
-      title = renderSingleLine(args, drawTitle(title));
-      const renderedContent = renderAllElements(args, ...content);
-      const contentWidth = [title, ...renderedContent].reduce(
-        (max, line) => Math.max(max, getTextWidth(line)),
-        0,
-      );
-      assert(
-        contentWidth <= args.maxWidth,
-        `Content is too wide: ${contentWidth} > ${args.maxWidth}`,
-      );
-      const boxWidth = Math.min(contentWidth, args.maxWidth);
-      const topBorder = `╭${alignLeft(title, boxWidth + 2, '─')}╮`;
-      const botBorder = `╰${line(boxWidth + 2)}╯`;
-      const result = [];
-      result.push(topBorder);
-      for (const line of renderedContent) {
-        result.push(`│ ${alignLeft(line, boxWidth, ' ')} │`);
-      }
-      result.push(botBorder);
-      return result;
-    };
-
   const missingEnvVariables: string[] = [];
   const formatLayerKeys = (layerKeys: string[]) => (args: RenderArgs) => {
     let layerText = [];
     for (const key of layerKeys) {
       const { envVarName, value, layer, schema } = getVarInfo(key);
       const keyFormatted = `${alignRight(key, columnWidth + 2, ' ')}: `;
-      const envVarFormatted = `(${bold}${layer}${noBold} env var ${bold}${envVarName}${noBold})`;
+      const envVarFormatted = color`({bold ${layer}} env var {bold ${envVarName}})`;
 
       if (value != null) {
         const prettyPrint = Pretty.make(schema);
         layerText.push(
           keyFormatted +
-            `✅ ${bold}${prettyPrint(value)}${noBold} ` +
-            `${green}${envVarFormatted}${noColor}`,
+            color`✅ {bold ${prettyPrint(value)}} {green ${envVarFormatted}}`,
         );
       } else {
         missingEnvVariables.push(envVarName);
         layerText.push(
-          keyFormatted +
-            `❌ ${red}${underline}missing${noUnderline} ` +
-            `${envVarFormatted}${noColor}`,
+          keyFormatted + color`❌ {red {underline missing} ${envVarFormatted}}`,
         );
       }
     }
@@ -522,9 +335,9 @@ export function reportParsedEnvConfig<
       ),
       drawBox('Summary', () =>
         missingEnvVariables.length === 0
-          ? [`${green}${bold}All env variables are set.${noBold}${noColor}`]
+          ? [color`{green {bold All env variables are set.}}`]
           : [
-              `${red}${bold}Missing env variables:${noBold}${noColor}`,
+              color`{red {bold Missing env variables:}}`,
               ...missingEnvVariables,
             ],
       ),
