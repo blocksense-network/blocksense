@@ -259,11 +259,15 @@ task('deploy', 'Deploy contracts')
         chainId,
         contracts: {
           ...deployData,
-          AdminMultisig: adminMultisigAddress,
-          ReporterMultisig:
-            reporterMultisigAddress === ethers.ZeroAddress
-              ? null
-              : reporterMultisigAddress,
+          safe: {
+            AdminMultisig: adminMultisigAddress,
+            ReporterMultisig:
+              reporterMultisigAddress === ethers.ZeroAddress
+                ? null
+                : reporterMultisigAddress,
+            AdminExecutorModule: deployData.safe.AdminExecutorModule,
+            OnlySequencerGuard: deployData.safe.OnlySequencerGuard,
+          },
         },
       };
       const signerBalancePost = await config.provider.getBalance(
@@ -298,10 +302,8 @@ task('deploy', 'Deploy contracts')
         reporterMultisig: reporterMultisig,
       });
 
-      if (!config.deployWithSequencerMultisig) {
-        chainsDeployment[
-          networkName
-        ].contracts.coreContracts.OnlySequencerGuard = null;
+      if (!config.deployWithReporterMultisig) {
+        chainsDeployment[networkName].contracts.safe.OnlySequencerGuard = null;
       }
     }
 
