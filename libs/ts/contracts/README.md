@@ -17,7 +17,7 @@ contracts
 │   ├── ICLAggregatorAdapter.sol
 │   └── ICLFeedRegistryAdapter.sol
 ├── libraries
-│   ├── Blocksense.sol
+│   ├── ADFS.sol
 │   └── CLAdapterLib.sol
 ├── safe
 │   └── OnlySequencerGuard.sol
@@ -37,7 +37,7 @@ The `cl-adapters` folder contains the Chainlink aggregator contract - CLAggregat
 
 The `interfaces` folder contains the interfaces for the Chainlink aggregator contract - IChainlinkAggregator.sol, the data feed store contract - ICLFeedRegistryAdapter.sol, the modified aggregator contract which extends the functionality of IChainlinkAggregator.sol - ICLAggregatorAdapter.sol.
 
-The `libraries` folder contains the Blocksense library which is used to make calls to the upgradeable ADFS proxy. The CLAdapterLib is used by the Chainlink aggregator contracts and the CLFeedRegistryAdapter contract.
+The `libraries` folder contains the ADFS library which is used to make calls to the upgradeable ADFS proxy. The CLAdapterLib is used by the Chainlink aggregator contracts and the CLFeedRegistryAdapter contract.
 
 The `safe` folder contains the OnlySequencerGuard contract which is used to restrict access when writing data to the ADFS contract.
 

@@ -13,11 +13,11 @@ pragma solidity ^0.8.28;
 // Website:         https://blocksense.network/
 // Git Repository:  https://github.com/blocksense-network/blocksense
 
-/// @title Blocksense
+/// @title ADFS
 /// @author Aneta Tsvetkova
 /// @notice Library for calling dataFeedStore functions
 /// @dev Contains utility functions for calling gas efficiently dataFeedStore functions and decoding return data
-library Blocksense {
+library ADFS {
   /// @notice Gets latest single feed data for a given feed from the dataFeedStore
   /// @dev This function reads only stride 0 feeds
   /// @param dataFeedStore The address of the dataFeedStore contract

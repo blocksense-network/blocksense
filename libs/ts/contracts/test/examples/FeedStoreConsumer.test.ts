@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { deployContract } from '../experiments/utils/helpers/common';
-import { BlocksenseADFSConsumer, RawCallADFSConsumer } from '../../typechain';
+import { ADFSConsumer, RawCallADFSConsumer } from '../../typechain';
 import * as utils from './utils/feedStoreConsumer';
 import { expect } from 'chai';
 import { ADFSWrapper } from '../utils/wrappers';
@@ -31,7 +31,7 @@ const feeds: Feed[] = [
 
 describe('Example: ADFSConsumer', function () {
   let dataFeedStore: ADFSWrapper;
-  let blocksenseADFSConsumer: BlocksenseADFSConsumer;
+  let adfsConsumer: ADFSConsumer;
   let rawCallADFSConsumer: RawCallADFSConsumer;
   let sequencer: HardhatEthersSigner;
 
@@ -52,8 +52,8 @@ describe('Example: ADFSConsumer', function () {
 
     await dataFeedStore.setFeeds(sequencer, feeds);
 
-    blocksenseADFSConsumer = await deployContract<BlocksenseADFSConsumer>(
-      'BlocksenseADFSConsumer',
+    adfsConsumer = await deployContract<ADFSConsumer>(
+      'ADFSConsumer',
       dataFeedStore.contract.target,
     );
     rawCallADFSConsumer = await deployContract<RawCallADFSConsumer>(
@@ -156,7 +156,7 @@ describe('Example: ADFSConsumer', function () {
     };
     await dataFeedStore.setFeeds(sequencer, [feed]);
 
-    const timestamp = await blocksenseADFSConsumer.getEpochSeconds(feed.id);
+    const timestamp = await adfsConsumer.getEpochSeconds(feed.id);
     expect(timestamp).to.be.equal(Math.floor(timestampNow / 1000));
   });
 
@@ -171,9 +171,7 @@ describe('Example: ADFSConsumer', function () {
     };
     await dataFeedStore.setFeeds(sequencer, [feed]);
 
-    const timestamp = await blocksenseADFSConsumer.getEpochMilliseconds(
-      feed.id,
-    );
+    const timestamp = await adfsConsumer.getEpochMilliseconds(feed.id);
     expect(timestamp).to.be.equal(timestampNow);
   });
 
@@ -182,12 +180,12 @@ describe('Example: ADFSConsumer', function () {
     functionName: keyof typeof utils,
   ) => {
     const inputsCount =
-      blocksenseADFSConsumer.interface.getFunction(functionName).inputs.length;
+      adfsConsumer.interface.getFunction(functionName).inputs.length;
     const filteredData = data.filter(v => v !== null).slice(0, inputsCount);
 
-    const blocksenseData = await blocksenseADFSConsumer.getFunction(
-      functionName,
-    )(...filteredData);
+    const adfsData = await adfsConsumer.getFunction(functionName)(
+      ...filteredData,
+    );
     const rawCallData = await rawCallADFSConsumer.getFunction(functionName)(
       ...filteredData,
     );
@@ -197,7 +195,7 @@ describe('Example: ADFSConsumer', function () {
       data,
     );
 
-    expect(blocksenseData).to.deep.equal(utilData);
+    expect(adfsData).to.deep.equal(utilData);
     expect(rawCallData).to.deep.equal(utilData);
   };
 });
