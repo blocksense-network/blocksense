@@ -6,10 +6,7 @@ export const getLatestSingleData = async (
 ) => {
   const [, id] = feedData;
 
-  const data = ethers.solidityPacked(
-    ['bytes1', 'uint8', 'uint120'],
-    ['0x82', 0, id],
-  );
+  const data = ethers.solidityPacked(['bytes1', 'uint128'], ['0x82', id]);
 
   return ethers.provider.call!({
     to: adfsAddress,
@@ -21,11 +18,8 @@ export const getLatestData = async (
   adfsAddress: string,
   feedData: number[],
 ) => {
-  const [stride, id] = feedData;
-  const data = ethers.solidityPacked(
-    ['bytes1', 'uint8', 'uint120'],
-    ['0x84', stride, id],
-  );
+  const [id] = feedData;
+  const data = ethers.solidityPacked(['bytes1', 'uint128'], ['0x84', id]);
 
   const res = await ethers.provider.call!({
     to: adfsAddress,
@@ -39,10 +33,10 @@ export const getLatestDataSlice = async (
   adfsAddress: string,
   feedData: number[],
 ) => {
-  const [stride, id, , startSlot, slots] = feedData;
+  const [id, , startSlot, slots] = feedData;
   const data = ethers.solidityPacked(
-    ['bytes1', 'uint8', 'uint120', 'uint32', 'uint32'],
-    ['0x84', stride, id, startSlot, slots],
+    ['bytes1', 'uint128', 'uint32', 'uint32'],
+    ['0x84', id, startSlot, slots],
   );
 
   const res = await ethers.provider.call!({
@@ -60,8 +54,8 @@ export const getSingleDataAtIndex = async (
   const [id, indexId] = feedData;
 
   const data = ethers.solidityPacked(
-    ['bytes1', 'uint8', 'uint120', 'uint16'],
-    ['0x86', 0, id, indexId],
+    ['bytes1', 'uint128', 'uint16'],
+    ['0x86', id, indexId],
   );
 
   return ethers.provider.call!({
@@ -74,11 +68,11 @@ export const getDataAtIndex = async (
   adfsAddress: string,
   feedData: number[],
 ) => {
-  const [stride, id, indexId] = feedData;
+  const [id, indexId] = feedData;
 
   const data = ethers.solidityPacked(
-    ['bytes1', 'uint8', 'uint120', 'uint16'],
-    ['0x86', stride, id, indexId],
+    ['bytes1', 'uint128', 'uint16'],
+    ['0x86', id, indexId],
   );
 
   const res = await ethers.provider.call!({
@@ -93,10 +87,10 @@ export const getDataSliceAtIndex = async (
   adfsAddress: string,
   feedData: number[],
 ) => {
-  const [stride, id, indexId, startSlot, slots] = feedData;
+  const [id, indexId, startSlot, slots] = feedData;
   const data = ethers.solidityPacked(
-    ['bytes1', 'uint8', 'uint120', 'uint16', 'uint32', 'uint32'],
-    ['0x86', stride, id, indexId, startSlot, slots],
+    ['bytes1', 'uint128', 'uint16', 'uint32', 'uint32'],
+    ['0x86', id, indexId, startSlot, slots],
   );
 
   const res = await ethers.provider.call!({
@@ -111,12 +105,9 @@ export const getLatestIndex = async (
   adfsAddress: string,
   feedData: number[],
 ) => {
-  const [stride, id] = feedData;
+  const [id] = feedData;
 
-  const data = ethers.solidityPacked(
-    ['bytes1', 'uint8', 'uint120'],
-    ['0x81', stride ?? 0n, id],
-  );
+  const data = ethers.solidityPacked(['bytes1', 'uint128'], ['0x81', id]);
 
   return ethers.provider.call!({
     to: adfsAddress,
@@ -128,12 +119,9 @@ export const getLatestSingleDataAndIndex = async (
   adfsAddress: string,
   feedData: number[],
 ) => {
-  const [, id] = feedData;
+  const [id] = feedData;
 
-  const data = ethers.solidityPacked(
-    ['bytes1', 'uint8', 'uint120'],
-    ['0x83', 0, id],
-  );
+  const data = ethers.solidityPacked(['bytes1', 'uint128'], ['0x83', id]);
 
   const res = await ethers.provider.call!({
     to: adfsAddress,
@@ -149,12 +137,9 @@ export const getLatestDataAndIndex = async (
   adfsAddress: string,
   feedData: number[],
 ) => {
-  const [stride, id] = feedData;
+  const [id] = feedData;
 
-  const data = ethers.solidityPacked(
-    ['bytes1', 'uint8', 'uint120'],
-    ['0x85', stride, id],
-  );
+  const data = ethers.solidityPacked(['bytes1', 'uint128'], ['0x85', id]);
 
   const res = await ethers.provider.call!({
     to: adfsAddress,
@@ -170,10 +155,10 @@ export const getLatestDataSliceAndIndex = async (
   adfsAddress: string,
   feedData: number[],
 ) => {
-  const [stride, id, , startSlot, slots] = feedData;
+  const [id, , startSlot, slots] = feedData;
   const data = ethers.solidityPacked(
-    ['bytes1', 'uint8', 'uint120', 'uint32', 'uint32'],
-    ['0x85', stride, id, startSlot, slots],
+    ['bytes1', 'uint128', 'uint32', 'uint32'],
+    ['0x85', id, startSlot, slots],
   );
 
   const res = await ethers.provider.call!({

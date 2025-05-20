@@ -18,27 +18,20 @@ contract ADFSConsumer {
     return ADFS.getLatestSingleData(adfs, id);
   }
 
-  function getLatestData(
-    uint256 stride,
-    uint256 id
-  ) external view returns (bytes32[] memory) {
-    return ADFS.getLatestData(adfs, stride, id);
+  function getLatestData(uint256 id) external view returns (bytes32[] memory) {
+    return ADFS.getLatestData(adfs, id);
   }
 
   function getLatestDataSlice(
-    uint256 stride,
     uint256 id,
     uint256 startSlot,
     uint256 slotsCount
   ) external view returns (bytes32[] memory) {
-    return ADFS.getLatestDataSlice(adfs, stride, id, startSlot, slotsCount);
+    return ADFS.getLatestDataSlice(adfs, id, startSlot, slotsCount);
   }
 
-  function getLatestIndex(
-    uint256 stride,
-    uint256 id
-  ) external view returns (uint256 round) {
-    return ADFS.getLatestIndex(adfs, stride, id);
+  function getLatestIndex(uint256 id) external view returns (uint256 index) {
+    return ADFS.getLatestIndex(adfs, id);
   }
 
   function getSingleDataAtIndex(
@@ -49,22 +42,19 @@ contract ADFSConsumer {
   }
 
   function getDataAtIndex(
-    uint256 stride,
     uint256 id,
     uint256 index
   ) external view returns (bytes32[] memory) {
-    return ADFS.getDataAtIndex(adfs, stride, id, index);
+    return ADFS.getDataAtIndex(adfs, id, index);
   }
 
   function getDataSliceAtIndex(
-    uint256 stride,
     uint256 id,
     uint256 index,
     uint256 startSlot,
     uint256 slotsCount
   ) external view returns (bytes32[] memory) {
-    return
-      ADFS.getDataSliceAtIndex(adfs, stride, id, index, startSlot, slotsCount);
+    return ADFS.getDataSliceAtIndex(adfs, id, index, startSlot, slotsCount);
   }
 
   function getLatestSingleDataAndIndex(
@@ -74,20 +64,17 @@ contract ADFSConsumer {
   }
 
   function getLatestDataAndIndex(
-    uint256 stride,
     uint256 id
   ) external view returns (bytes32[] memory data, uint256 index) {
-    return ADFS.getLatestDataAndIndex(adfs, stride, id);
+    return ADFS.getLatestDataAndIndex(adfs, id);
   }
 
   function getLatestDataSliceAndIndex(
-    uint256 stride,
     uint256 id,
     uint256 startSlot,
     uint256 slotsCount
   ) external view returns (bytes32[] memory data, uint256 index) {
-    return
-      ADFS.getLatestDataSliceAndIndex(adfs, stride, id, startSlot, slotsCount);
+    return ADFS.getLatestDataSliceAndIndex(adfs, id, startSlot, slotsCount);
   }
 
   function getEpochSeconds(uint256 id) external view returns (uint64) {
