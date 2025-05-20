@@ -41,7 +41,7 @@ task(
 
   const { contracts: deployment } = await readEvmDeployment(networkName, true);
 
-  const adminMultisigAddr = deployment.AdminMultisig;
+  const adminMultisigAddr = deployment.safe.AdminMultisig;
 
   const adminMultisig = await Safe.init({
     provider: config.rpc,
@@ -93,8 +93,8 @@ task(
     config.provider,
   );
 
-  if (deployment.ReporterMultisig && config.deployWithReporterMultisig) {
-    const reporterMultisigAddr = deployment.ReporterMultisig;
+  if (deployment.safe.ReporterMultisig && config.deployWithReporterMultisig) {
+    const reporterMultisigAddr = deployment.safe.ReporterMultisig;
     const reporterMultisig = await Safe.init({
       provider: config.rpc,
       safeAddress: reporterMultisigAddr,
@@ -125,7 +125,7 @@ task(
       await reporterMultisig.createChangeThresholdTx(1);
     const adminExecutorModule = await ethers.getContractAt(
       'AdminExecutorModule',
-      deployment.coreContracts.AdminExecutorModule!.address,
+      deployment.safe.AdminExecutorModule!.address,
     );
 
     const isValidExecTx = await reporterMultisig.isValidTransaction(
@@ -255,7 +255,7 @@ task(
 
     const safeGuard = await ethers.getContractAt(
       ContractNames.OnlySequencerGuard,
-      deployment.coreContracts.OnlySequencerGuard!.address,
+      deployment.safe.OnlySequencerGuard!.address,
     );
 
     await execMultiSig({
