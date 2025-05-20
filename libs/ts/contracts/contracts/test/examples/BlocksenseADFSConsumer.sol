@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {Blocksense} from '../../libraries/Blocksense.sol';
+import {ADFS} from '../../libraries/ADFS.sol';
 
 /**
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
  * DO NOT USE THIS CODE IN PRODUCTION.
  */
-contract BlocksenseADFSConsumer {
+contract ADFSConsumer {
   address public immutable adfs;
 
   constructor(address _adfs) {
@@ -15,14 +15,14 @@ contract BlocksenseADFSConsumer {
   }
 
   function getLatestSingleFeedData(uint256 id) external view returns (bytes32) {
-    return Blocksense._getLatestSingleFeedData(adfs, id);
+    return ADFS._getLatestSingleFeedData(adfs, id);
   }
 
   function getLatestFeedData(
     uint256 stride,
     uint256 id
   ) external view returns (bytes32[] memory) {
-    return Blocksense._getLatestFeedData(adfs, stride, id);
+    return ADFS._getLatestFeedData(adfs, stride, id);
   }
 
   function getLatestSlicedFeedData(
@@ -32,7 +32,7 @@ contract BlocksenseADFSConsumer {
     uint256 slotsCount
   ) external view returns (bytes32[] memory) {
     return
-      Blocksense._getLatestSlicedFeedData(
+      ADFS._getLatestSlicedFeedData(
         adfs,
         stride,
         id,
@@ -45,14 +45,14 @@ contract BlocksenseADFSConsumer {
     uint256 stride,
     uint256 id
   ) external view returns (uint256 round) {
-    return Blocksense._getLatestRound(adfs, stride, id);
+    return ADFS._getLatestRound(adfs, stride, id);
   }
 
   function getSingleFeedDataAtRound(
     uint256 id,
     uint256 round
   ) external view returns (bytes32) {
-    return Blocksense._getSingleFeedDataAtRound(adfs, id, round);
+    return ADFS._getSingleFeedDataAtRound(adfs, id, round);
   }
 
   function getFeedDataAtRound(
@@ -60,7 +60,7 @@ contract BlocksenseADFSConsumer {
     uint256 id,
     uint256 round
   ) external view returns (bytes32[] memory) {
-    return Blocksense._getFeedDataAtRound(adfs, stride, id, round);
+    return ADFS._getFeedDataAtRound(adfs, stride, id, round);
   }
 
   function getSlicedFeedDataAtRound(
@@ -71,7 +71,7 @@ contract BlocksenseADFSConsumer {
     uint256 slotsCount
   ) external view returns (bytes32[] memory) {
     return
-      Blocksense._getSlicedFeedDataAtRound(
+      ADFS._getSlicedFeedDataAtRound(
         adfs,
         stride,
         id,
@@ -84,14 +84,14 @@ contract BlocksenseADFSConsumer {
   function getLatestSingleFeedDataAndRound(
     uint256 id
   ) external view returns (bytes32 data, uint256 round) {
-    return Blocksense._getLatestSingleFeedDataAndRound(adfs, id);
+    return ADFS._getLatestSingleFeedDataAndRound(adfs, id);
   }
 
   function getLatestFeedDataAndRound(
     uint256 stride,
     uint256 id
   ) external view returns (bytes32[] memory data, uint256 round) {
-    return Blocksense._getLatestFeedDataAndRound(adfs, stride, id);
+    return ADFS._getLatestFeedDataAndRound(adfs, stride, id);
   }
 
   function getLatestSlicedFeedDataAndRound(
@@ -101,7 +101,7 @@ contract BlocksenseADFSConsumer {
     uint256 slotsCount
   ) external view returns (bytes32[] memory data, uint256 round) {
     return
-      Blocksense._getLatestSlicedFeedDataAndRound(
+      ADFS._getLatestSlicedFeedDataAndRound(
         adfs,
         stride,
         id,
@@ -112,15 +112,15 @@ contract BlocksenseADFSConsumer {
 
   function getEpochSeconds(uint256 id) external view returns (uint64) {
     return
-      Blocksense._getEpochSeconds(
-        Blocksense._getLatestSingleFeedData(adfs, id)
+      ADFS._getEpochSeconds(
+        ADFS._getLatestSingleFeedData(adfs, id)
       );
   }
 
   function getEpochMilliseconds(uint256 id) external view returns (uint64) {
     return
-      Blocksense._getEpochMilliseconds(
-        Blocksense._getLatestSingleFeedData(adfs, id)
+      ADFS._getEpochMilliseconds(
+        ADFS._getLatestSingleFeedData(adfs, id)
       );
   }
 }

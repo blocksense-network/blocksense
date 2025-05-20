@@ -86,7 +86,7 @@ contract AggregatedDataFeedStore {
           )
 
           // `startSlot` and `slots` are used to read a slice from the feed
-          // check `_callSingleDataFeed` in contracts/libraries/Blocksense.sol for more info about `calldatasize`
+          // check `_callSingleDataFeed` in contracts/libraries/ADFS.sol for more info about `calldatasize`
           if gt(calldatasize(), 19) {
             // last index of feed: (feedId + 1) * 2**13 * 2**stride - 1
             let lastFeedIndex := sub(shl(stride, shl(13, add(feedId, 1))), 1)
@@ -191,7 +191,7 @@ contract AggregatedDataFeedStore {
           )
 
           // `startSlot` and `slots` are used to read a slice from the feed
-          // check `_callSingleDataFeed` in contracts/libraries/Blocksense.sol for more info about `calldatasize`
+          // check `_callSingleDataFeed` in contracts/libraries/ADFS.sol for more info about `calldatasize`
           if gt(calldatasize(), 19) {
             // last index of feed: (feedId + 1) * 2**13 * 2**stride - 1
             let lastFeedIndex := sub(shl(stride, shl(13, add(feedId, 1))), 1)
