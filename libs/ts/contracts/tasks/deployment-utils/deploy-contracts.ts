@@ -38,6 +38,7 @@ export async function deployContracts({
 
   const ContractsConfigV2 = {
     coreContracts: {},
+    safe: {},
     CLAggregatorAdapter: {},
   } as ContractsConfigV2;
 
@@ -97,6 +98,15 @@ export async function deployContracts({
         feedId: registryInfo.feedId,
         base: registryInfo.base,
         quote: registryInfo.quote,
+        address: parseEthereumAddress(contractAddress),
+        constructorArgs: contract.argsValues,
+        salt: contract.salt,
+      };
+    } else if (
+      contract.name === ContractNames.OnlySequencerGuard ||
+      contract.name === ContractNames.AdminExecutorModule
+    ) {
+      ContractsConfigV2.safe[contract.name] = {
         address: parseEthereumAddress(contractAddress),
         constructorArgs: contract.argsValues,
         salt: contract.salt,
