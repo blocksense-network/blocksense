@@ -3,6 +3,7 @@ import './test-fund-ledger';
 import './multichain-deploy';
 import './verify';
 import './ms-change-sequencer';
+import './add-signer-to-multisig';
 
 import './deployment-utils/deploy-multisig';
 import './deployment-utils/init-chain';
