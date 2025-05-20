@@ -53,9 +53,11 @@ describe('Configuration files decoding', async () => {
         chainId: metadata.chainId,
         contracts: {
           coreContracts: expect.any(Object),
+          safe: {
+            AdminMultisig: expect.any(String),
+            ReporterMultisig: expect.toBeOneOf([expect.any(String), null]),
+          },
           CLAggregatorAdapter: expect.any(Object),
-          ReporterMultisig: expect.any(String),
-          AdminMultisig: expect.any(String),
         },
       });
       deployments[net] = assertNotNull(await deployment);
