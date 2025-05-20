@@ -1,5 +1,3 @@
-import { createInterface } from 'node:readline/promises';
-
 import { formatEther } from 'ethers';
 import { task } from 'hardhat/config';
 
@@ -22,11 +20,7 @@ import { initChain } from './deployment-utils/init-chain';
 import { deployContracts } from './deployment-utils/deploy-contracts';
 import { setUpAccessControl } from './deployment-utils/access-control';
 import { HexDataString, parseHexDataString } from '@blocksense/base-utils';
-
-const readline = createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
+import { readline } from '@blocksense/base-utils/tty';
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
@@ -131,7 +125,7 @@ task('deploy', 'Deploy contracts')
       }
       console.log('\n');
 
-      if ((await readline.question('Confirm deployment? (y/n) ')) !== 'y') {
+      if ((await readline().question('Confirm deployment? (y/n) ')) !== 'y') {
         console.log('Aborting deployment...');
         return;
       }
