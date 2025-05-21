@@ -246,12 +246,19 @@ pub async fn eth_batch_send_to_contract(
     increment_feeds_round_indexes(&feeds_to_update_ids, net.as_str(), &mut provider).await;
 
     let signer = &provider.signer;
-    let contract_name = if feed_type == Periodic {
-        HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME
+    let contract_address = if let Some(contract) = provider.get_latest_contract(feed_type) {
+        if let Some(contract_address) = contract.address {
+            contract_address
+        } else {
+            return Err(eyre!(
+                "No publishing contract address is set for network {net}"
+            ));
+        }
     } else {
-        SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME
+        return Err(eyre!(
+            "No publishing contract is deployed for network {net}"
+        ));
     };
-    let contract_address = provider.get_contract_address(contract_name)?;
     info!(
         "sending data to address `{}` in network `{}`",
         contract_address, net
@@ -982,7 +989,7 @@ mod tests {
             0.1,
         )
         .await;
-        
+
         assert!(result.is_ok());
         // getter calldata will be:
         // 0x800000030000000000000000000000000000000000000000000000000000000000000002

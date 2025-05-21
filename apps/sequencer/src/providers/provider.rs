@@ -336,6 +336,25 @@ impl RpcProvider {
         0
     }
 
+    pub fn get_latest_contract(&self, feeds_repeatability: Repeatability) -> Option<Contract> {
+        if self.is_deployed(ADFS_CONTRACT_NAME) {
+            if let Some(contract) = self.get_contract(ADFS_CONTRACT_NAME) {
+                return Some(contract);
+            }
+        }
+        if self.is_deployed(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
+            && feeds_repeatability == Repeatability::Periodic
+        {
+            return self.get_contract(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME);
+        }
+        if self.is_deployed(SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
+            && feeds_repeatability == Repeatability::Oneshot
+        {
+            return self.get_contract(SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME);
+        }
+        None
+    }
+
     pub fn peg_stable_coins_to_value(&self, updates: &mut BatchedAggegratesToSend) {
         for u in updates.updates.iter_mut() {
             if let FeedType::Numerical(value) = u.value {
@@ -570,7 +589,10 @@ impl RpcProvider {
         let timeout_duration = Duration::from_secs(1);
         if let Some(addr) = contract.address {
             let read_byte_code = self.read_contract_bytecode(&addr, timeout_duration).await?;
-            return Ok(format!("Contract {contract_name} on address {addr} has byte code {}", read_byte_code));
+            return Ok(format!(
+                "Contract {contract_name} on address {addr} has byte code {}",
+                read_byte_code
+            ));
         }
         let mut bytecode = contract.creation_byte_code.ok_or(eyre!(
             "Byte code unavailable to create contract named {contract_name}"
@@ -627,7 +649,10 @@ impl RpcProvider {
                 error!("Can't read deployed code for contract {contract_name} Error -> {e}");
             }
         };
-        Ok(format!("CONTRACT_ADDRESS set to {}", contract_address))
+        Ok(format!(
+            "{contract_name} address set to {}",
+            contract_address
+        ))
     }
 
     pub async fn can_read_contract_bytecode(
@@ -770,11 +795,14 @@ mod tests {
     use blocksense_utils::test_env::get_test_private_key_path;
     use tracing::info_span;
 
+    use crate::providers::eth_send_utils::eth_batch_send_to_all_contracts;
     use crate::providers::provider::get_rpc_providers;
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
     use alloy::consensus::Transaction;
     use alloy::providers::Provider as AlloyProvider;
     use blocksense_config::{get_test_config_with_single_provider, test_feed_config};
+    use blocksense_feed_registry::types::Repeatability::Periodic;
+    use std::time::UNIX_EPOCH;
 
     #[tokio::test]
     async fn basic_test_provider() -> Result<()> {
@@ -885,7 +913,7 @@ mod tests {
         assert_eq!(result.len(), 1);
     }
 
-    #[tokio::test]
+    #[actix_web::test]
     async fn fork_test_provider() -> Result<()> {
         let metrics_prefix = "fork_test_provider";
 
@@ -904,10 +932,10 @@ mod tests {
 
         //let feeds_config = AllFeedsConfig { feeds: vec![] };
         let feed_id = 31;
-        let stride = 8;
+        let stride = 0;
         let feed_1_config = test_feed_config(feed_id, stride);
         let feeds_config = AllFeedsConfig {
-            feeds: vec![feed_1_config],
+            feeds: vec![feed_1_config.clone()],
         };
 
         let p_entry = sequencer_config.providers.entry(network.to_string());
@@ -928,12 +956,16 @@ mod tests {
             feeds_config,
         )
         .await;
-
+        let a = sequencer_state.active_feeds.read().await;
+        println!("Showing active feeds!");
+        for (id, config) in a.iter() {
+            println!("id = {id}, config = {config:?}");
+        }
         // run
         let msg = sequencer_state
-             .deploy_contract(network, ADFS_CONTRACT_NAME)
-             .await
-             .expect("Data feed publishing contract deployment failed!");
+            .deploy_contract(network, ADFS_CONTRACT_NAME)
+            .await
+            .expect("Data feed publishing contract deployment failed!");
         info!("{msg}");
         let msg = sequencer_state
             .deploy_contract(network, MULTICALL_CONTRACT_NAME)
@@ -944,17 +976,72 @@ mod tests {
         {
             let rpc_provider_mutex = sequencer_state.get_provider(network).await.clone().unwrap();
             let mut rpc_provider = rpc_provider_mutex.lock().await;
+            rpc_provider.history.register_feed(feed_id, 100);
+            let contract_version = rpc_provider.get_latest_contract_version(Periodic);
+            assert_eq!(contract_version, 2);
+
             let block_number = rpc_provider.provider.get_block_number().await.unwrap();
             //println!("Block number from provider = {number}");
             //let block_num_at_time_of_writing_this_test = 16500374_u64;
             let block_num_at_time_of_writing_this_test = 0_u64;
             assert!(block_number > block_num_at_time_of_writing_this_test);
-            let last_round = rpc_provider.get_latest_round(&(feed_id as u128), stride.into()).await.unwrap();
+            let last_round = rpc_provider
+                .get_latest_round(&(feed_id as u128), stride.into())
+                .await
+                .unwrap();
             println!("last update on chain {last_round:?}");
             let r = last_round.first().expect("One round is expected");
             assert_eq!(r._feed_id, feed_id.into());
             assert_eq!(r._round, 0)
+        }
 
+        {
+            let feed = feed_1_config;
+            // Some arbitrary point in time in the past, nothing special about this value
+            let first_report_start_time = UNIX_EPOCH + Duration::from_secs(1524885322);
+            let end_slot_timestamp = first_report_start_time.elapsed().unwrap().as_millis();
+            let interval_ms = feed.schedule.interval_ms as u128;
+            let v1 = VotedFeedUpdate {
+                feed_id: feed.id,
+                value: FeedType::Numerical(103082.01f64),
+                end_slot_timestamp: end_slot_timestamp + interval_ms,
+            };
+            let v2 = VotedFeedUpdate {
+                feed_id: feed.id,
+                value: FeedType::Numerical(103012.21f64),
+                end_slot_timestamp: end_slot_timestamp + interval_ms * 2,
+            };
+
+            let v3 = VotedFeedUpdate {
+                feed_id: feed.id,
+                value: FeedType::Numerical(104011.78f64),
+                end_slot_timestamp: end_slot_timestamp + interval_ms * 3,
+            };
+
+            let updates1 = BatchedAggegratesToSend {
+                block_height: 0,
+                updates: vec![v1],
+            };
+            let updates2 = BatchedAggegratesToSend {
+                block_height: 1,
+                updates: vec![v2],
+            };
+            let updates3 = BatchedAggegratesToSend {
+                block_height: 2,
+                updates: vec![v3],
+            };
+
+            let p1 =
+                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates1, Periodic).await;
+            assert!(p1.is_ok());
+
+            let p2 =
+                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates2, Periodic).await;
+            assert!(p2.is_ok());
+
+            let p3 =
+                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates3, Periodic).await;
+            assert!(p3.is_ok());
         }
 
         // let alice = anvil.addresses()[7];
