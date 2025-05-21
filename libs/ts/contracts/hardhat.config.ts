@@ -19,7 +19,7 @@ import {
 } from '@blocksense/base-utils/evm';
 
 import './tasks';
-import { getOptionalEnvString } from '@blocksense/base-utils';
+import { getOptionalEnvString, kebabToSnakeCase } from '@blocksense/base-utils';
 
 dotenv.config();
 
@@ -67,8 +67,18 @@ const config: HardhatUserConfig = {
         {
           url: getOptionalRpcUrl(network),
           chainId: networkMetadata[network].chainId,
-          ledgerAccounts: getOptionalEnvString('LEDGER_ACCOUNT', '')
-            ? [getOptionalEnvString('LEDGER_ACCOUNT', '')]
+          ledgerAccounts: Boolean(
+            getOptionalEnvString(
+              `DEPLOYER_ADDRESS_IS_LEDGER_${kebabToSnakeCase(network)}`,
+              'false',
+            ),
+          )
+            ? [
+                getOptionalEnvString(
+                  `DEPLOYER_ADDRESS_${kebabToSnakeCase(network)}`,
+                  '',
+                ),
+              ]
             : undefined,
         },
       ]),
