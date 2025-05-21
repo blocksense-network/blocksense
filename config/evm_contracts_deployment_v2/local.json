@@ -5,23 +5,17 @@
     "coreContracts": {
       "UpgradeableProxyADFS": {
         "address": "0xec15a270113E58bfC795802a990F83B03c31897f",
-        "constructorArgs": [
-          "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05"
-        ],
+        "constructorArgs": ["0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05"],
         "salt": "0x62f1a19b0c1d9115e54b8f7b89d83a0f2bf06ebd0272380e54384a2dce50d3d6"
       },
       "AggregatedDataFeedStore": {
         "address": "0x8D731985A1A0E2455Dc4f2f094f74510e1670fB0",
-        "constructorArgs": [
-          "0x235DFbb56294754625E3f662D719Ba4a39768ABb"
-        ],
+        "constructorArgs": ["0x235DFbb56294754625E3f662D719Ba4a39768ABb"],
         "salt": "0x71b411ccc58b0bf522c76bab9a977992a03cfbc078d3852ee8ee8b6d5311a477"
       },
       "AccessControl": {
         "address": "0x235DFbb56294754625E3f662D719Ba4a39768ABb",
-        "constructorArgs": [
-          "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05"
-        ],
+        "constructorArgs": ["0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05"],
         "salt": "0x26186f5256760fb01ab0053f874a1674c76a40b87c3031918056ef3ace009aac"
       },
       "CLFeedRegistryAdapter": {
