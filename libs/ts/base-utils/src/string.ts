@@ -52,10 +52,6 @@ export function kebabToCamelCase<Str extends string>(
   ) as KebabToCamelCase<Str>;
 }
 
-export function padNumber(num: number | bigint, size: number, padChar = ' ') {
-  return num.toString().padStart(size, padChar);
-}
-
 /**
  * Compares two strings for equality in a case-insensitive manner.
  *
