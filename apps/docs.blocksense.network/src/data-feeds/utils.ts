@@ -17,7 +17,9 @@ export function getDataSources(feed: NewFeed) {
       const exchanges = (feed.additional_feed_info.arguments as any)[
         'exchanges'
       ];
-      const dataSources = exchanges ? keysOf(exchanges) : ['No data providers'];
+      const dataSources = exchanges
+        ? [...keysOf(exchanges)]
+        : ['No data providers'];
       return dataSources;
     case 'gecko-terminal':
       return ['CoinGecko'];

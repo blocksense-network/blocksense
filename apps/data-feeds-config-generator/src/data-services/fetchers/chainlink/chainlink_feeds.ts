@@ -15,9 +15,12 @@ import { KeysOf, isObject } from '@blocksense/base-utils/type-level';
 
 import {
   chainlinkNetworkNameToChainId,
+  parseNetworkFilename,
+} from '@blocksense/config-types/chainlink-compatibility';
+
+import {
   decodeConfirmedFeedEvent,
   FeedRegistryEventsPerAggregator,
-  parseNetworkFilename,
 } from '../../../chainlink-compatibility/types';
 import {
   ChainLinkFeedDocsInfo,
@@ -68,7 +71,7 @@ export function aggregateNetworkInfoPerField(
   for (const feedName of Object.keys(rawDataFeeds)) {
     const feedData = rawDataFeeds[feedName].networks;
 
-    const firstFeedData = feedData[keysOf(feedData)[0]];
+    const firstFeedData = feedData[keysOf(feedData).next().value];
     const fieldNames = keysOf(firstFeedData);
 
     const aggregatedFeedInfo: AggregatedFeedInfo = {} as AggregatedFeedInfo;

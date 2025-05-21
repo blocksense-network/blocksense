@@ -22,12 +22,10 @@ task(
     safe: Safe;
   } = args;
 
-  const signer = config.adminMultisig.signer || config.ledgerAccount!;
-
   const proxy = new ethers.Contract(
     deployData.coreContracts.UpgradeableProxyADFS.address,
     artifacts.readArtifactSync(ContractNames.UpgradeableProxyADFS).abi,
-    signer,
+    config.deployer,
   );
 
   // if new implementation needs initialization data, change the line below
@@ -41,6 +39,10 @@ task(
     ).concat(calldata.slice(2)),
     operation: OperationType.Call,
   };
+
+  console.log(
+    `Upgrading proxy implementation to ${deployData.coreContracts.AggregatedDataFeedStore.address}`,
+  );
 
   await run('multisig-tx-exec', {
     transactions: [safeTransactionData],

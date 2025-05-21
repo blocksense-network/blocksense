@@ -54,7 +54,7 @@ export function getProviderResourcesForPair(
     {} as Record<string, (string | number)[]>,
   );
 
-  if (keysOf(providerInfo).length === 0) {
+  if (keysOf(providerInfo).next().done) {
     return null;
   }
 

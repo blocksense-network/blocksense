@@ -10,7 +10,7 @@ import { Schema as S } from 'effect';
 import { getEnvString, getOptionalEnvString } from '../env/functions';
 import { EthereumAddress, TxHash } from './hex-types';
 import { KebabToSnakeCase, kebabToSnakeCase } from '../string';
-import { NumberFromSelfBigIntOrString } from '../numeric';
+import { NumberFromSelfBigIntOrString } from '../schemas';
 
 const networks = [
   'local',
@@ -139,23 +139,46 @@ const chainIds = [
   300,
 ] as const;
 
-export const networkName = S.Literal(...networks);
+export const networkName = S.Literal(...networks).annotations({
+  identifier: 'NetworkName',
+});
 export const isNetworkName = S.is(networkName);
 export const parseNetworkName = S.decodeUnknownSync(networkName);
-export type NetworkName = S.Schema.Type<typeof networkName>;
+export type NetworkName = typeof networkName.Type;
 
 export const chainId = S.compose(
   NumberFromSelfBigIntOrString,
-  S.Literal(...chainIds),
+  S.Literal(...chainIds).annotations({ identifier: 'ChainId' }),
 );
 export const isChainId = S.is(chainId);
 export const parseChainId = S.decodeUnknownSync(chainId);
-export type ChainId = S.Schema.Type<typeof chainId>;
+export type ChainId = typeof chainId.Type;
 
 export const network = S.Union(networkName, chainId);
 export const isNetwork = S.is(network);
 export const parseNetwork = S.decodeUnknownSync(network);
-export type Network = S.Schema.Type<typeof network>;
+export type Network = typeof network.Type;
+
+export const networkKindSchema = S.Literal(
+  'local',
+  'testnet',
+  'mainnet',
+).annotations({ identifier: 'NetworkKind' });
+export type NetworkKind = typeof networkKindSchema.Type;
+
+export type NetworkNameToKind<N extends NetworkName> = N extends 'local'
+  ? 'local'
+  : (typeof networkMetadata)[N]['isTestnet'] extends true
+    ? 'testnet'
+    : 'mainnet';
+
+export function getNetworkKind<N extends NetworkName>(
+  network: N,
+): NetworkNameToKind<N> {
+  if (network === 'local') return 'local' as any;
+  if (isTestnet(network)) return 'testnet' as any;
+  return 'mainnet' as any;
+}
 
 export enum Currency {
   ETH = 'ETH',

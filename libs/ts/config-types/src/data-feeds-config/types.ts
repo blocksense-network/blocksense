@@ -26,7 +26,7 @@ export const FeedCategorySchema = S.Union(
 /**
  * Type for the data feed categories.
  */
-export type FeedCategory = S.Schema.Type<typeof FeedCategorySchema>;
+export type FeedCategory = typeof FeedCategorySchema.Type;
 
 export const PairSchema = S.mutable(
   S.Struct({
@@ -35,7 +35,7 @@ export const PairSchema = S.mutable(
   }),
 ).annotations({ identifier: 'Pair' });
 
-export type Pair = S.Schema.Type<typeof PairSchema>;
+export type Pair = typeof PairSchema.Type;
 
 /**
  * Creates a `Pair` object with the given base and quote currencies.
@@ -92,7 +92,7 @@ export const FeedSchema = S.mutable(
 /**
  * The Data Feed type.
  */
-export type Feed = S.Schema.Type<typeof FeedSchema>;
+export type Feed = typeof FeedSchema.Type;
 
 /**
  * Function to decode the Data Feed.
@@ -111,7 +111,7 @@ export const FeedsConfigSchema = S.mutable(
 /**
  * Type for the Data Feeds configuration.
  */
-export type FeedsConfig = S.Schema.Type<typeof FeedsConfigSchema>;
+export type FeedsConfig = typeof FeedsConfigSchema.Type;
 
 /**
  * Function to decode Data Feeds configuration.
@@ -128,7 +128,7 @@ export const FeedTypeSchema = S.Union(S.Literal('price-feed')).annotations({
 /**
  * Type for the data feed type.
  */
-export type FeedType = S.Schema.Type<typeof FeedTypeSchema>;
+export type FeedType = typeof FeedTypeSchema.Type;
 
 /**
  * Schema for the data feed market hours ( Chainlink compatible ).
@@ -149,11 +149,11 @@ export const MarketHoursSchema = S.Union(
   S.Literal('US_Equities'),
 ).annotations({ identifier: 'MarketHours' });
 
-export type MarketHours = S.Schema.Type<typeof MarketHoursSchema>;
+export type MarketHours = typeof MarketHoursSchema.Type;
 
 export const NewFeedSchema = S.mutable(
   S.Struct({
-    id: S.Number,
+    id: S.BigInt,
     full_name: S.String,
     description: S.String,
 
@@ -177,14 +177,14 @@ export const NewFeedSchema = S.mutable(
       aggregation: S.Union(S.Literal('median')).annotations({
         identifier: 'QuorumAggregation',
       }),
-    }),
+    }).annotations({ identifier: 'FeedQuorum' }),
 
     schedule: S.Struct({
       interval_ms: S.Number,
       heartbeat_ms: S.Number,
       deviation_percentage: S.Number,
       first_report_start_unix_time_ms: S.Number,
-    }),
+    }).annotations({ identifier: 'FeedSchedule' }),
 
     // TODO: This field should be optional / different depending on the `type`.
     additional_feed_info: S.mutable(
@@ -197,7 +197,8 @@ export const NewFeedSchema = S.mutable(
           stockPriceFeedsArgsSchema,
           cryptoPriceFeedsArgsSchema,
           geckoTerminalArgsSchema,
-        ),
+        ).annotations({ identifier: 'OracleScriptArguments' }),
+
         compatibility_info: S.UndefinedOr(
           S.Struct({
             chainlink: S.String,
@@ -206,9 +207,9 @@ export const NewFeedSchema = S.mutable(
       }),
     ),
   }),
-);
+).annotations({ identifier: 'FeedV2' });
 
-export type NewFeed = S.Schema.Type<typeof NewFeedSchema>;
+export type NewFeed = typeof NewFeedSchema.Type;
 
 /**
  * Schema for the Data Feeds configuration.
@@ -217,12 +218,12 @@ export const NewFeedsConfigSchema = S.mutable(
   S.Struct({
     feeds: S.mutable(S.Array(NewFeedSchema)),
   }),
-);
+).annotations({ identifier: 'FeedsConfigV2' });
 
 /**
  * Type for the Data Feeds configuration.
  */
-export type NewFeedsConfig = S.Schema.Type<typeof NewFeedsConfigSchema>;
+export type NewFeedsConfig = typeof NewFeedsConfigSchema.Type;
 
 /**
  * Function to decode Data Feeds configuration.

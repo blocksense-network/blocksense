@@ -9,7 +9,7 @@ import 'solidity-coverage';
 import '@typechain/hardhat';
 import 'hardhat-contract-sizer';
 import 'hardhat-gas-reporter';
-import '../sol-reflector/src';
+import '@blocksense/sol-reflector';
 
 import { fromEntries } from '@blocksense/base-utils/array-iter';
 import {
@@ -19,7 +19,7 @@ import {
 } from '@blocksense/base-utils/evm';
 
 import './tasks';
-import { getOptionalEnvString } from '@blocksense/base-utils';
+import { getOptionalEnvString, kebabToSnakeCase } from '@blocksense/base-utils';
 
 dotenv.config();
 
@@ -52,11 +52,13 @@ const config: HardhatUserConfig = {
       chainId: 99999999999,
       forking: {
         blockNumber: 22044232,
-        enabled: process.env.FORKING === 'true',
+        enabled: process.env['FORKING'] === 'true',
         url: getOptionalRpcUrl('ethereum-mainnet'),
       },
-      ledgerAccounts: getOptionalEnvString('LEDGER_ACCOUNT', '')
-        ? [getOptionalEnvString('LEDGER_ACCOUNT', '')]
+      ledgerAccounts: Boolean(
+        getOptionalEnvString('DEPLOYER_ADDRESS_IS_LEDGER_LOCAL', 'false'),
+      )
+        ? [getOptionalEnvString('DEPLOYER_ADDRESS_LOCAL', '')]
         : undefined,
     },
     ...fromEntries(
@@ -65,15 +67,25 @@ const config: HardhatUserConfig = {
         {
           url: getOptionalRpcUrl(network),
           chainId: networkMetadata[network].chainId,
-          ledgerAccounts: getOptionalEnvString('LEDGER_ACCOUNT', '')
-            ? [getOptionalEnvString('LEDGER_ACCOUNT', '')]
+          ledgerAccounts: Boolean(
+            getOptionalEnvString(
+              `DEPLOYER_ADDRESS_IS_LEDGER_${kebabToSnakeCase(network)}`,
+              'false',
+            ),
+          )
+            ? [
+                getOptionalEnvString(
+                  `DEPLOYER_ADDRESS_${kebabToSnakeCase(network)}`,
+                  '',
+                ),
+              ]
             : undefined,
         },
       ]),
     ),
   },
   gasReporter: {
-    enabled: process.env.REPORT_GAS === 'true',
+    enabled: process.env['REPORT_GAS'] === 'true',
     currency: 'USD',
   },
   paths: {
@@ -83,7 +95,7 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     enabled: true,
-    apiKey: process.env.ETHERSCAN_API_KEY || '',
+    apiKey: process.env['ETHERSCAN_API_KEY'] || '',
   },
 };
 
