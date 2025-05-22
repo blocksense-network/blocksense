@@ -127,16 +127,16 @@ macro_rules! set_metric (
 );
 
 #[macro_export]
-macro_rules! inc_vec_metric (
-($_component: ident, $_comp_index: ident, $_metric: ident, $_index: ident) => (
-    $_component
-    .read() // Holding a read lock here suffice, since the counters are atomic.
-    .await
-    .$_metric
-    .with_label_values(&[&$_comp_index.to_string(), &$_index.to_string()])
-    .inc();
-);
-);
+macro_rules! inc_vec_metric {
+    ($component:ident, $metric:ident, $( $label:expr ),+ ) => {
+        $component
+            .read()
+            .await
+            .$metric
+            .with_label_values(&[ $( &$label.to_string() ),+ ])
+            .inc();
+    };
+}
 
 #[derive(Debug)]
 pub struct ProviderMetrics {
@@ -290,22 +290,22 @@ impl ReporterMetrics {
             timely_reports_per_feed: register_int_counter_vec!(
                 format!("{}reporter_timely_reports_per_feed", prefix),
                 "Per feed accepted (valid) feed reports from reporter",
-                &["ReporterId", "FeedId"]
+                &["ReporterId", "FeedId", "HeartbeatMs"]
             )?,
             late_reports_per_feed: register_int_counter_vec!(
                 format!("{}reporter_late_reporte_per_feed", prefix),
                 "Per feed recvd reports for a past slot from reporter",
-                &["ReporterId", "FeedId"]
+                &["ReporterId", "FeedId", "HeartbeatMs"]
             )?,
             in_future_reports_per_feed: register_int_counter_vec!(
                 format!("{}reporter_in_future_reports_per_feed", prefix),
                 "Per feed recvd reports for a future slot from reporter",
-                &["ReporterId", "FeedId"]
+                &["ReporterId", "FeedId", "HeartbeatMs"]
             )?,
             total_revotes_for_same_slot_per_feed: register_int_counter_vec!(
                 format!("{}reporter_total_revotes_for_same_slot_per_feed", prefix),
                 "Total recvd revotes for the same slot from reporter",
-                &["ReporterId", "FeedId"]
+                &["ReporterId", "FeedId", "HeartbeatMs"]
             )?,
         })
     }
