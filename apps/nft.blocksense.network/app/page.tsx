@@ -5,6 +5,7 @@ import { Hero } from 'components/Hero';
 import { Form } from 'components/Form';
 import { CTA } from 'components/CTA';
 import { About } from 'components/About';
+import { ProductFeatures } from 'components/ProductFeatures';
 export const metadata: Metadata = {
   title: nftDropConfig.title,
 };
@@ -16,6 +17,9 @@ const NFTDropPage = () => {
       <Form />
       <About />
       <CTA />
+
+      {/* Implement scrolling animation using Motion */}
+      <ProductFeatures />
     </>
   );
 };
