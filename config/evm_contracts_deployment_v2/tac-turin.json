@@ -1,6 +1,6 @@
 {
-  "network": "ink-sepolia",
-  "chainId": "763373",
+  "network": "tac-turin",
+  "chainId": "2390",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {

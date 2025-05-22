@@ -1,6 +1,6 @@
 {
-  "network": "ink-sepolia",
-  "chainId": "763373",
+  "network": "ethereum-holesky",
+  "chainId": "17000",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {

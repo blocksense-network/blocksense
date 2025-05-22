@@ -1,6 +1,6 @@
 {
-  "network": "ink-sepolia",
-  "chainId": "763373",
+  "network": "taiko-hekla",
+  "chainId": "167009",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {
