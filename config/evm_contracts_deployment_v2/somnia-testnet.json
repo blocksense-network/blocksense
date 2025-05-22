@@ -1,6 +1,6 @@
 {
-  "network": "ink-sepolia",
-  "chainId": "763373",
+  "network": "somnia-testnet",
+  "chainId": "50312",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {

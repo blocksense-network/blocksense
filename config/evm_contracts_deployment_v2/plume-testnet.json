@@ -1,6 +1,6 @@
 {
-  "network": "ink-sepolia",
-  "chainId": "763373",
+  "network": "plume-testnet",
+  "chainId": "98867",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {

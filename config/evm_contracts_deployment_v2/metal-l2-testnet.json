@@ -1,6 +1,6 @@
 {
-  "network": "ink-sepolia",
-  "chainId": "763373",
+  "network": "metal-l2-testnet",
+  "chainId": "1740",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {

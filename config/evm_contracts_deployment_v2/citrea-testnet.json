@@ -1,6 +1,6 @@
 {
-  "network": "ink-sepolia",
-  "chainId": "763373",
+  "network": "citrea-testnet",
+  "chainId": "5115",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {

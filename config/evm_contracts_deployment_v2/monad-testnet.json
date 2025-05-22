@@ -1,6 +1,6 @@
 {
-  "network": "ink-sepolia",
-  "chainId": "763373",
+  "network": "monad-testnet",
+  "chainId": "10143",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {
