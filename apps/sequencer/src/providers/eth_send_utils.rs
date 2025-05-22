@@ -748,7 +748,7 @@ async fn increment_feeds_round_metrics(
     if let Some(ref fm) = feeds_metrics {
         for feed in updated_feeds {
             // update the round counters' metrics accordingly
-            inc_vec_metric!(fm, feed, updates_to_networks, net);
+            inc_vec_metric!(fm, updates_to_networks, feed, net);
         }
     }
 }
