@@ -93,6 +93,12 @@ impl VotedFeedUpdate {
         Ok((
             {
                 if legacy {
+                    if self.feed_id > u32::MAX as u128 {
+                        anyhow::bail!(
+                            "Error converting feed id {} to bytes for legacy contract - feed id does not fit in 4 bytes!",
+                            self.feed_id,
+                        )
+                    }
                     (self.feed_id as u32).to_be_bytes().to_vec()
                 } else {
                     self.feed_id.to_be_bytes().to_vec()
