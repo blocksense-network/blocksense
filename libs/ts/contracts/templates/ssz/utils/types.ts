@@ -1,12 +1,9 @@
 export type Schema = {
-  isBasic: boolean;
-  isDynamic: boolean;
   isNested: boolean;
   type: string;
   typeName: string;
   fixedSize: number;
   sszFixedSize: number | null;
-  fixedEnd: number;
   isFirst?: boolean;
   length?: number;
   fieldName?: string;
@@ -14,7 +11,6 @@ export type Schema = {
   isFixedLen?: boolean[];
   fieldRangesFixedLen?: { start: Offset; end: Offset }[];
   variableOffsetsPosition?: number[];
-  isLastDynamic?: boolean;
   prevType?: { type: string; length?: number };
   types: { type: string; length?: number }[];
 };
