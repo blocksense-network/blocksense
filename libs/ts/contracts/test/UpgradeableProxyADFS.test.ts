@@ -22,7 +22,7 @@ import { compareGasUsed } from './utils/helpers/compareGasWithExperiments';
 
 const feed: Feed = {
   id: 0n,
-  round: 1n,
+  index: 1n,
   data: ethers.hexlify(ethers.randomBytes(18)),
   stride: 0n,
 };
@@ -125,7 +125,7 @@ describe('UpgradeableProxyADFS', function () {
 
     const newFeed = {
       ...feed,
-      round: feed.round + 1n,
+      index: feed.index + 1n,
       data: ethers.hexlify(ethers.randomBytes(18)),
     };
 
@@ -151,7 +151,7 @@ describe('UpgradeableProxyADFS', function () {
     // get old value at round 1 and assert that is hasn't changed after upgrade
     const valueV2 = (
       await proxy.proxyCall('getValues', sequencer, [feed], {
-        operations: [ReadOp.GetFeedAtRound],
+        operations: [ReadOp.GetDataAtIndex],
       })
     )[0];
 
@@ -310,7 +310,7 @@ describe('UpgradeableProxyADFS', function () {
           [genericProxy],
           i,
           {
-            round: 1n,
+            index: 1n,
           },
         );
 
@@ -322,7 +322,7 @@ describe('UpgradeableProxyADFS', function () {
           [genericProxy],
           i,
           {
-            round: 2n,
+            index: 2n,
           },
         );
       });
@@ -337,7 +337,7 @@ describe('UpgradeableProxyADFS', function () {
           i,
           {
             skip: 16,
-            round: 1n,
+            index: 1n,
           },
         );
 
@@ -350,7 +350,7 @@ describe('UpgradeableProxyADFS', function () {
           i,
           {
             skip: 16,
-            round: 2n,
+            index: 2n,
           },
         );
       });

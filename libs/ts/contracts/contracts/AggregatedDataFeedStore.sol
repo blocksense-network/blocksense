@@ -20,7 +20,7 @@ pragma solidity ^0.8.28;
 contract AggregatedDataFeedStore {
   address internal constant DATA_FEED_ADDRESS =
     0x0000000100000000000000000000000000000000;
-  address internal constant ROUND_ADDRESS =
+  address internal constant RING_BUFFER_TABLE_ADDRESS =
     0x00000000FFf00000000000000000000000000000;
   address internal immutable ACCESS_CONTROL;
 
@@ -35,7 +35,7 @@ contract AggregatedDataFeedStore {
         0x0000 - latest blocknumber
         0x0001 - implementation slot (UpgradeableProxy)
         0x0002 - admin slot (UpgradeableProxy)
-      Round table: [2**128-2**116 to 2**128)
+      Ring buffer index table: [2**128-2**116 to 2**128)
       Data feed space: [2**128 to 2**160)
   */
 
@@ -50,7 +50,7 @@ contract AggregatedDataFeedStore {
       // Load selector from memory
       let selector := calldataload(0x00)
 
-      /* <selector 1b> <stride 1b> <feedId 15b> (<round 2b> <startSlot? 4b> <slots? 4b> | <startSlot? 4b> <slots? 4b>) */
+      /* <selector 1b> <stride 1b> <feedId 15b> (<index 2b> <startSlot? 4b> <slots? 4b> | <startSlot? 4b> <slots? 4b>) */
       if and(
         selector,
         0x8000000000000000000000000000000000000000000000000000000000000000
@@ -67,33 +67,33 @@ contract AggregatedDataFeedStore {
 
         selector := shr(248, selector)
 
-        // getFeedAtRound(uint8 stride, uint120 feedId, uint16 round, uint32 startSlot?, uint32 slots?) returns (bytes)
+        // getDataAtIndex(uint8 stride, uint120 feedId, uint16 index, uint32 startSlot?, uint32 slots?) returns (bytes)
         if eq(selector, 0x86) {
           // how many slots in this stride: 2**stride
           let strideSlots := shl(stride, 1)
-          let round := shr(240, data)
+          let index := shr(240, data)
 
-          // ensure round is in range [0-8192)
-          if gt(round, 0x1fff) {
+          // ensure index is in range [0-8192)
+          if gt(index, 0x1fff) {
             revert(0, 0)
           }
 
           // base feed index: (feedId * 2**13) * 2**stride
-          // find start index for round: baseFeedIndex + round * 2**stride
-          let startIndex := add(
+          // find start slot for ring buffer index: baseFeedIndex + index * 2**stride
+          let startDataIndex := add(
             shl(stride, shl(13, feedId)),
-            shl(stride, round)
+            shl(stride, index)
           )
 
           // `startSlot` and `slots` are used to read a slice from the feed
-          // check `_callSingleDataFeed` in contracts/libraries/Blocksense.sol for more info about `calldatasize`
+          // check `_callSingleDataFeed` in contracts/libraries/ADFS.sol for more info about `calldatasize`
           if gt(calldatasize(), 19) {
             // last index of feed: (feedId + 1) * 2**13 * 2**stride - 1
             let lastFeedIndex := sub(shl(stride, shl(13, add(feedId, 1))), 1)
 
             // read startSlot from calldata
             let startSlot := shr(224, shl(16, data))
-            startIndex := add(startIndex, startSlot)
+            startDataIndex := add(startDataIndex, startSlot)
 
             // strideSlots = slots
             strideSlots := shr(224, shl(48, data))
@@ -102,12 +102,12 @@ contract AggregatedDataFeedStore {
             }
 
             // ensure the caller is not trying to read past the end of the feed
-            if gt(add(startIndex, sub(strideSlots, 1)), lastFeedIndex) {
+            if gt(add(startDataIndex, sub(strideSlots, 1)), lastFeedIndex) {
               revert(0, 0)
             }
           }
 
-          let initialPos := add(shl(stride, DATA_FEED_ADDRESS), startIndex)
+          let initialPos := add(shl(stride, DATA_FEED_ADDRESS), startDataIndex)
 
           let len := 0
           let ptr := mload(0x40)
@@ -136,13 +136,13 @@ contract AggregatedDataFeedStore {
         // feedId%16 * 16
         // mod is represented as `feedId % 2^4 = feedId & (2^4 - 1)`
         let pos := shl(4, and(feedId, 15))
-        let round := shr(
+        let index := shr(
           sub(240, pos),
           and(
             sload(
               add(
-                ROUND_ADDRESS,
-                // find round table slot: (2**115 * stride + feedId)/16
+                RING_BUFFER_TABLE_ADDRESS,
+                // find index table slot: (2**115 * stride + feedId)/16
                 shr(4, add(shl(115, stride), feedId))
               )
             ),
@@ -155,24 +155,24 @@ contract AggregatedDataFeedStore {
         let len := 0
         let ptr := mload(0x40)
 
-        // 0x83 will call both getLatestRound and getLatestSingleData
-        // 0x85 will call both getLatestRound and getLatestData
+        // 0x83 will call both getLatestIndex and getLatestSingleData
+        // 0x85 will call both getLatestIndex and getLatestData
 
-        // getLatestRound(uint8 stride, uint120 feedId) returns (uint16)
+        // getLatestIndex(uint8 stride, uint120 feedId) returns (uint16)
         if and(selector, 0x01) {
           len := 32
-          mstore(ptr, round)
+          mstore(ptr, index)
         }
 
         // getLatestSingleData(uint8 stride, uint120 feedId) returns (bytes)
         if and(selector, 0x02) {
-          // find start index for round: feedId * 2**13 + round
-          let startIndex := add(shl(13, feedId), round)
+          // find start index for index: feedId * 2**13 + index
+          let startDataIndex := add(shl(13, feedId), index)
 
           // load feed data from storage and store it in memory
           mstore(
             add(ptr, len),
-            sload(add(shl(stride, DATA_FEED_ADDRESS), startIndex))
+            sload(add(shl(stride, DATA_FEED_ADDRESS), startDataIndex))
           )
 
           return(ptr, add(len, 32))
@@ -184,21 +184,21 @@ contract AggregatedDataFeedStore {
           let strideSlots := shl(stride, 1)
 
           // base feed index: (feedId * 2**13) * 2**stride
-          // find start index for round: baseFeedIndex + round * 2**stride
-          let startIndex := add(
+          // find start index for index: baseFeedIndex + index * 2**stride
+          let startDataIndex := add(
             shl(stride, shl(13, feedId)),
-            shl(stride, round)
+            shl(stride, index)
           )
 
           // `startSlot` and `slots` are used to read a slice from the feed
-          // check `_callSingleDataFeed` in contracts/libraries/Blocksense.sol for more info about `calldatasize`
+          // check `_callSingleDataFeed` in contracts/libraries/ADFS.sol for more info about `calldatasize`
           if gt(calldatasize(), 19) {
             // last index of feed: (feedId + 1) * 2**13 * 2**stride - 1
             let lastFeedIndex := sub(shl(stride, shl(13, add(feedId, 1))), 1)
 
             // read startSlot from calldata
             let startSlot := shr(224, data)
-            startIndex := add(startIndex, startSlot)
+            startDataIndex := add(startDataIndex, startSlot)
 
             // strideSlots = slots
             strideSlots := shr(224, shl(32, data))
@@ -207,12 +207,12 @@ contract AggregatedDataFeedStore {
             }
 
             // ensure the caller is not trying to read past the end of the feed
-            if gt(add(startIndex, sub(strideSlots, 1)), lastFeedIndex) {
+            if gt(add(startDataIndex, sub(strideSlots, 1)), lastFeedIndex) {
               revert(0, 0)
             }
           }
 
-          let initialPos := add(shl(stride, DATA_FEED_ADDRESS), startIndex)
+          let initialPos := add(shl(stride, DATA_FEED_ADDRESS), startDataIndex)
 
           for {
             let i := 0
@@ -237,11 +237,11 @@ contract AggregatedDataFeedStore {
     address accessControl = ACCESS_CONTROL;
 
     /*
-                                                                                                                        ┌--------------------- round table data --------------------┐
+                                                                                                                        ┌--------------------- index table data --------------------┐
                                                                                                                         │                                                           │
                                       ┌---------------------- feed 1 ----------------------------┬-- feed 2 .. feed N --┼-------------- row 1 --------------┬---- row 2 .. row N ---┤
       ┌────────┬───────────┬──────────┬──────┬────────────┬──────────────┬────────────┬─────┬────┬──────────────────────┬────────────┬─────┬────────────────┬───────────────────────┐
-      │selector│blocknumber│# of feeds│stride│index length│feedId + round│bytes length│bytes│data│          ..          │index length│index│round table data│           ..          │
+      │selector│blocknumber│# of feeds│stride│index length│feedId + index│bytes length│bytes│data│          ..          │index length│index│index table data│           ..          │
       ├────────┼───────────┼──────────┼──────┼────────────┼──────────────┼────────────┼─────┼────┼──────────────────────┼────────────┼─────┼────────────────┼───────────────────────┤
       │   1b   │    8b     │    4b    │  1b  │     1b     │      Xb      │     1b     │ Yb  │ Zb │          ..          │     1b     │ Xb  │      32b       │           ..          │
       └────────┴───────────┴──────────┴──────┴────────────┴──────────────┴────────────┴─────┴────┴──────────────────────┴────────────┴─────┴────────────────┴───────────────────────┘
@@ -297,13 +297,13 @@ contract AggregatedDataFeedStore {
           feed id 0 │   │   │   │   │   │   │   │   │    feed id 0 │   │   │   │   │   │   │   │   │
                     ├───└───└───└───└───└───└───└───┤              ├───────────────└───────────────┤
                     │                               │              │                               │
-                    │   ...... 2**13 rounds ......  │              │   ...... 2**13 rounds ......  │
+                    │   ..... 2**13 indices ......  │              │   ..... 2**13 indices ......  │
                     │                               │              │                               │
                     ├───┌───┌───┌───┌───┌───┌───┌───┤              ├───────────────┌───────────────┤
           feed id 1 │   │   │   │   │   │   │   │   │    feed id 1 │   │   │   │   │   │   │   │   │
                     ├───└───└───└───└───└───└───└───┤              ├───────────────└───────────────┤
                   . │                               │            . │                               │
-                  . │   ...... 2**13 rounds ......  │            . │   ...... 2**13 rounds ......  │
+                  . │   ..... 2**13 indices ......  │            . │   ..... 2**13 indices ......  │
                     │                               │              │                               │
           feed id N └───────────────────────────────┘    feed id N └───────────────────────────────┘
         */
@@ -320,7 +320,7 @@ contract AggregatedDataFeedStore {
           // get correct stride address based on provided stride
           let strideAddress := shl(stride, DATA_FEED_ADDRESS)
 
-          // get length of index (feedId + round)
+          // get length of index (feedId + index)
           let indexLength := byte(1, metadata)
           // bytes to bits as shift op code works with bits (for next line)
           let indexLengthBits := shl(3, indexLength)
@@ -375,12 +375,12 @@ contract AggregatedDataFeedStore {
           }
         }
 
-        ///////////////////////////////////
-        //       Update round table      //
-        ///////////////////////////////////
+        ////////////////////////////////////
+        // Update ring buffer index table //
+        ////////////////////////////////////
         /*
                               ┌───────────────────────────────────────────────────────────────┐
-                              │                      latest round table                       │
+                              │                latest ring buffer index table                 │
                               │───────────────────────────────────────────────────────────────│
                               ├───┌───┌───┌───┌───┌───┌───┌───┌───┌───┌───┌───┌───┌───┌───┌───┤slot 0
                 feed ids 0-15 │2b │2b │2b │ . │ . │ . │ . │ . │ . │ . │ . │ . │ . │2b │2b │2b │
@@ -398,27 +398,25 @@ contract AggregatedDataFeedStore {
 
                                 max id: (2**115)*32-1                        max slot index: 2**116-1
         */
+        // This is where the latest ring buffer index for each feed id is stored
         for {
 
         } lt(pointer, len) {
           pointer := add(pointer, 0x20)
         } {
-          let roundTableData := calldataload(pointer)
+          let indexTableData := calldataload(pointer)
           // how many bytes to read for index (max: 15b)
-          let indexLength := byte(0, roundTableData)
-          // get round table index at which to store rounds
-          let index := shr(
-            sub(256, shl(3, indexLength)),
-            shl(8, roundTableData)
-          )
-          // index must always be less than 2**116
-          if gt(index, 0xfffffffffffffffffffffffffffff) {
+          let indexLength := byte(0, indexTableData)
+          // get slot at which to store latest ring buffer indices
+          let slot := shr(sub(256, shl(3, indexLength)), shl(8, indexTableData))
+          // slot must always be less than 2**116
+          if gt(slot, 0xfffffffffffffffffffffffffffff) {
             revert(0, 0)
           }
 
-          // update pointer to start start of round data
+          // update pointer to start start of index data
           pointer := add(pointer, add(indexLength, 1))
-          sstore(add(ROUND_ADDRESS, index), calldataload(pointer))
+          sstore(add(RING_BUFFER_TABLE_ADDRESS, slot), calldataload(pointer))
         }
 
         ///////////////////////////////////

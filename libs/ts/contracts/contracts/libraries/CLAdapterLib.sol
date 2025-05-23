@@ -22,7 +22,7 @@ library CLAdapterLib {
   /// @param dataFeedStore The address of the dataFeedStore contract
   /// @param id The ID of the feed
   /// @return answer The latest stored value after being decoded
-  function _latestAnswer(
+  function latestAnswer(
     uint256 id,
     address dataFeedStore
   ) internal view returns (int256) {
@@ -31,8 +31,8 @@ library CLAdapterLib {
         uint256(
           uint192(
             bytes24(
-              // 1st 2 bytes are function selector and stride (which is always 0 for CL adapters)
-              // after that are 15 bytes of the feed id
+              // 1st byte is function selector
+              // after that are 16 bytes of the feed id
               _callDataFeed(dataFeedStore, (uint256(0x82) << 248) | id)
             )
           )
@@ -49,7 +49,7 @@ library CLAdapterLib {
   /// @return startedAt The timestamp when the value was stored
   /// @return updatedAt Same as startedAt
   /// @return answeredInRound Same as roundId
-  function _getRoundData(
+  function getRoundData(
     uint80 _roundId,
     uint256 id,
     address dataFeedStore
@@ -61,8 +61,8 @@ library CLAdapterLib {
     (answer, startedAt) = _decodeData(
       _callDataFeed(
         dataFeedStore,
-        // 1st 2 bytes are function selector and stride (which is always 0 for CL adapters)
-        // after that are 15 bytes of the feed id
+        // 1st byte is function selector
+        // after that are 16 bytes of the feed id
         // after the feed id are 2 bytes of the round id
         (uint256(0x86) << 248) | id | (uint256(_roundId) << 104)
       )
@@ -74,14 +74,14 @@ library CLAdapterLib {
   /// @param id The ID of the feed
   /// @param dataFeedStore The address of the dataFeedStore contract
   /// @return roundId The latest round ID
-  function _latestRound(
+  function latestRound(
     uint256 id,
     address dataFeedStore
   ) internal view returns (uint256) {
     return
       uint256(
-        // 1st 2 bytes are function selector and stride (which is always 0 for CL adapters)
-        // after that are 15 bytes of the feed id
+        // 1st byte is function selector
+        // after that are 16 bytes of the feed id
         _callDataFeed(dataFeedStore, (uint256(0x81) << 248) | id)
       );
   }
@@ -95,7 +95,7 @@ library CLAdapterLib {
   /// @return startedAt The timestamp when the value was stored
   /// @return updatedAt Same as startedAt
   /// @return answeredInRound Same as roundId
-  function _latestRoundData(
+  function latestRoundData(
     uint256 id,
     address dataFeedStore
   )
@@ -111,8 +111,8 @@ library CLAdapterLib {
       let ptr := mload(0x40)
 
       // store selector in memory at location 0
-      // 1st 2 bytes are function selector and stride (which is always 0 for CL adapters)
-      // after that are 15 bytes of the feed id
+      // 1st byte is function selector
+      // after that are 16 bytes of the feed id
       mstore(
         0x00,
         or(
@@ -154,9 +154,6 @@ library CLAdapterLib {
   ) internal view returns (bytes32 returnData) {
     // using assembly staticcall costs less gas than using a view function
     assembly {
-      // get free memory pointer
-      let ptr := mload(0x40)
-
       // store selector in memory at location 0
       mstore(0x00, selector)
 
@@ -166,7 +163,7 @@ library CLAdapterLib {
         dataFeedStore, // address to call
         0x00, // location of data to call
         19, // size of data to call - usually it is 17b but for _getRoundData it is 19b because of the 2 bytes of the roundId
-        ptr, // where to store the return data
+        returnData, // where to store the return data
         32 // how much data to store
       )
 
@@ -175,8 +172,8 @@ library CLAdapterLib {
         revert(0, 0)
       }
 
-      // assign loaded return value at memory location ptr to returnData
-      returnData := mload(ptr)
+      // assign loaded return value to returnData
+      returnData := mload(returnData)
     }
   }
 
@@ -193,9 +190,9 @@ library CLAdapterLib {
 
   /// @notice Shifts the feed id to the left by 120 bits
   /// @dev This is used in the constructor to save gas when calling the dataFeedStore
-  /// The dataFeedStore expects the feed id to be positioned in the calldata in a 15 bytes value starting from the 3rd byte
+  /// The dataFeedStore expects the feed id to be positioned in the calldata in a 16 bytes value starting from the 2nd byte
   /// @param id The feed id to shift
-  function _shiftId(uint256 id) internal pure returns (uint256) {
+  function shiftId(uint256 id) internal pure returns (uint256) {
     return id << 120;
   }
 }
