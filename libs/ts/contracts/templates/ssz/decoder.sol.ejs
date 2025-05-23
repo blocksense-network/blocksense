@@ -2,7 +2,7 @@
 pragma solidity ^0.8.28;
 
 /// @notice Decoder for stored packed tuple data
-library EncodePackedDecoder {
+library SSZDecoder {
   /// @notice User defined struct
   /// @dev Using structs avoids hitting the EVM stack limit
 <%= structs.map((struct) => {
@@ -15,9 +15,6 @@ library EncodePackedDecoder {
     bytes memory data
   ) external pure returns (<%= returnType %> memory <%= mainStructName %>) {
     assembly ('memory-safe') {
-      // First 32 bytes are the length of the data
-      let memData := mload(add(data, 32))
-      <%= containsDynamicData ? 'let shift := 0' : '' %>
       <%= lines.join('\n') %>
     }
   }
