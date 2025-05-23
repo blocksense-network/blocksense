@@ -16,8 +16,8 @@ use alloy::{
 };
 use alloy_primitives::Bytes;
 use blocksense_feeds_processing::adfs_gen_calldata::RoundCounters;
-use futures::future::join_all;
 use blocksense_utils::FeedId;
+use futures::future::join_all;
 use reqwest::Url;
 
 use blocksense_config::{AllFeedsConfig, PublishCriteria, SequencerConfig};
