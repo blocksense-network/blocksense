@@ -137,7 +137,12 @@ in
         default-exec-interval = 30;
         secret-key-path = "${testKeysDir}/reporter_secret_key";
         second-consensus-secret-key-path = "${testKeysDir}/reporter_second_consensus_secret_key";
-        api-keys = { };
+        api-keys = {
+          ALPHAVANTAGE_API_KEY = "${testKeysDir}/ALPHAVANTAGE_API_KEY";
+          YAHOO_FINANCE_API_KEY = "${testKeysDir}/YAHOO_FINANCE_API_KEY";
+          TWELVEDATA_API_KEY = "${testKeysDir}/TWELVEDATA_API_KEY";
+          FMP_API_KEY = "${testKeysDir}/FMP_API_KEY";
+        };
       };
     };
 
@@ -190,7 +195,18 @@ in
 
       stock-price-feeds = {
         exec-interval = 60;
-        allowed-outbound-hosts = [ ];
+        allowed-outbound-hosts = [
+          "https://www.alphavantage.co"
+          "https://yfapi.net"
+          "https://api.twelvedata.com"
+          "https://financialmodelingprep.com"
+        ];
+        api-keys = [
+          "ALPHAVANTAGE_API_KEY"
+          "YAHOO_FINANCE_API_KEY"
+          "TWELVEDATA_API_KEY"
+          "FMP_API_KEY"
+        ];
       };
     };
   };
