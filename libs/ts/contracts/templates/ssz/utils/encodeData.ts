@@ -1,11 +1,7 @@
 import { ethers } from 'ethers';
-import {
-  checkPrimitiveField,
-  PrimitiveField,
-  Schema,
-  TupleField,
-} from '../../utils';
+import { checkPrimitiveField, PrimitiveField, TupleField } from '../../utils';
 import { ContainerType } from '@chainsafe/ssz';
+import { Schema } from './types';
 
 const BYTES_LIMIT = 8192;
 const ARRAY_LIMIT = 1024;
@@ -234,13 +230,10 @@ export const sszSchema = async (
       const types = parseTypeName(field.typeName);
 
       const data: Schema = {
-        isBasic: field.isBasic,
-        isDynamic: field.isList ?? false, // all non-container types
         isNested: extraData?.isNested ?? false,
         typeName: field.typeName,
         fixedSize: field.fixedSize,
         sszFixedSize: field.fixedSize,
-        fixedEnd: field.fixedEnd,
         type: extraData?.type ?? field.type ?? '',
         fieldName: toLowerFirstLetter(extraData?.fieldName ?? field.fieldName),
         length: field.length,
@@ -260,7 +253,6 @@ export const sszSchema = async (
         );
         data.fields = extractFieldsFromSchema(field.fields, inputFields);
         data.isFixedLen = field.isFixedLen;
-        data.isDynamic = field.isFixedLen.some((x: boolean) => x === false);
         data.fieldRangesFixedLen = field.fieldRangesFixedLen;
         data.variableOffsetsPosition = field.variableOffsetsPosition;
       } else if (
@@ -305,18 +297,6 @@ export const sszSchema = async (
         data.isNested ||=
           !isPrimitiveDynamic && (isNestedDynamic || isContainerDynamic);
 
-        if (data.isNested && !isFixed) {
-          let lastDynamicDim = -1;
-          for (let i = dimensions.length - 1; i >= 0; i--) {
-            if (dimensions[i] !== '[]') {
-              break;
-            }
-            lastDynamicDim = i;
-          }
-
-          data.isLastDynamic = lastDynamicDim === dimensions.length - 1;
-        }
-
         data.fields = extractFieldsFromSchema(
           {
             data: field.elementType,
@@ -329,9 +309,6 @@ export const sszSchema = async (
             prevType: data.types[0],
           },
         );
-        if (data.fields.length === 1 && data.fields[0].isDynamic) {
-          data.isDynamic = true;
-        }
 
         if (!data.fixedSize) {
           let size = 0;
@@ -342,9 +319,7 @@ export const sszSchema = async (
         }
       } else if (field.elementType instanceof ssz.ContainerType) {
         const tuple = field.elementType;
-        data.isBasic = tuple.isBasic;
         data.isFixedLen = tuple.isFixedLen;
-        data.isDynamic = tuple.isFixedLen.some((x: boolean) => x === false);
         data.fieldRangesFixedLen = tuple.fieldRangesFixedLen;
         data.variableOffsetsPosition = tuple.variableOffsetsPosition;
         data.fields = extractFieldsFromSchema(tuple.fields, inputFields);
