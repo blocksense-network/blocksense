@@ -169,8 +169,9 @@ pub async fn get_serialized_updates_for_network(
         1 => {
             let bytes = legacy_serialize_updates(net, updates, strides_and_decimals);
             debug!(
-                "legacy_serialize_updates result for network {} = {}",
+                "legacy_serialize_updates result for network {} and block height {} = {}",
                 net,
+                updates.block_height,
                 hex::encode(&bytes)
             );
             bytes
@@ -188,8 +189,9 @@ pub async fn get_serialized_updates_for_network(
             {
                 Ok(bytes) => {
                     debug!(
-                        "adfs_serialize_updates result for network {} = {}",
+                        "adfs_serialize_updates result for network {} and block height {} = {}",
                         net,
+                        updates.block_height,
                         hex::encode(&bytes)
                     );
                     bytes
@@ -741,7 +743,6 @@ pub async fn eth_batch_send_to_all_contracts(
         let feeds_config = sequencer_state.active_feeds.clone();
 
         for (net, provider) in providers.iter() {
-            let updates = updates.clone();
             let (
                 transaction_retries_count_limit,
                 transaction_retry_timeout_secs,
@@ -814,11 +815,12 @@ pub async fn eth_batch_send_to_all_contracts(
 
     let result = futures::future::join_all(collected_futures).await;
     let mut all_results = String::new();
+    let block_height = updates.block_height;
     for v in result {
         match v {
             Ok((result, net, provider)) => match result.await {
                 Ok((status, updated_feeds)) => {
-                    all_results += &format!("result from network {net}: Ok -> status: {status}");
+                    all_results += &format!("result from network {net} and block_height {block_height}: Ok -> status: {status}");
                     if status == "true" {
                         all_results += &format!(", updated_feeds: {updated_feeds:?}");
                         increment_feeds_round_metrics(
@@ -848,7 +850,9 @@ pub async fn eth_batch_send_to_all_contracts(
                     }
                 }
                 Err(e) => {
-                    error!("Got error sending to network {net}: {e}");
+                    error!(
+                        "Got error sending to network {net} and block_height {block_height}: {e}"
+                    );
                 }
             },
             Err(e) => {
