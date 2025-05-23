@@ -320,22 +320,22 @@ impl ReporterMetrics {
             timely_reports_per_feed: register_int_counter_vec!(
                 format!("{}reporter_timely_reports_per_feed", prefix),
                 "Per feed accepted (valid) feed reports from reporter",
-                &["ReporterId", "FeedId", "HeartbeatMs"]
+                &["ReporterId", "FeedId", "FeedName", "HeartbeatMs"]
             )?,
             late_reports_per_feed: register_int_counter_vec!(
                 format!("{}reporter_late_reports_per_feed", prefix),
                 "Per feed recvd reports for a past slot from reporter",
-                &["ReporterId", "FeedId", "HeartbeatMs"]
+                &["ReporterId", "FeedId", "FeedName", "HeartbeatMs"]
             )?,
             in_future_reports_per_feed: register_int_counter_vec!(
                 format!("{}reporter_in_future_reports_per_feed", prefix),
                 "Per feed recvd reports for a future slot from reporter",
-                &["ReporterId", "FeedId", "HeartbeatMs"]
+                &["ReporterId", "FeedId", "FeedName", "HeartbeatMs"]
             )?,
             total_revotes_for_same_slot_per_feed: register_int_counter_vec!(
                 format!("{}reporter_total_revotes_for_same_slot_per_feed", prefix),
                 "Total recvd revotes for the same slot from reporter",
-                &["ReporterId", "FeedId", "HeartbeatMs"]
+                &["ReporterId", "FeedId", "FeedName", "HeartbeatMs"]
             )?,
         })
     }
