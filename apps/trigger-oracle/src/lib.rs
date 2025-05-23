@@ -831,12 +831,12 @@ impl OracleTrigger {
             {
                 Ok(_) => {
                     tracing::info!(
-                        "Validated batch to post to contract: block_height={block_height}"
+                        "Validated batch to post to contract: block height = {block_height}"
                     );
                 }
                 Err(e) => {
                     tracing::error!(
-                        "Failed to validate second consensus for block_height={block_height}: {}",
+                        "Failed to validate second consensus for block height = {block_height}: {}",
                         &e
                     );
                     continue;
