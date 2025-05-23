@@ -9,7 +9,7 @@ import { generateDecoder as generateDecoderEP } from '../templates/encode-packed
 import { generateDecoder as generateDecoderSSZ } from '../templates/ssz';
 import { EncodePackedDecoder, SSZDecoder } from '../typechain';
 
-describe('EncodePackedDecoder @skip-coverage', function () {
+describe('Template Decoder @skip-coverage', function () {
   this.timeout(1000000);
 
   const encodePacked = {
