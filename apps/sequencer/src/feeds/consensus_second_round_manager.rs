@@ -118,7 +118,7 @@ impl AggregationBatchConsensus {
             }
             debug!("Cleanup call for: {key:?}");
             if let Some(calldata_with_signatures) = self.in_progress_batches.remove(key) {
-                warn!("Removing timed out (did not collect quorum of signatures as of block {}) entry for network: {}, block_height: {} with calldata: {:?}",
+                warn!("Removing timed out (did not collect quorum of signatures as of block {}) entry for network: {}, block height: {} with calldata: {:?}",
                     current_block_height,
                     key.network,
                     key.block_height,
