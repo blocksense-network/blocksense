@@ -624,7 +624,7 @@ pub async fn eth_batch_send_to_all_contracts(
         match v {
             Ok((result, net, provider)) => match result.await {
                 Ok((status, updated_feeds)) => {
-                    all_results += &format!("result from network {net} and block_height {block_height}: Ok -> status: {status}");
+                    all_results += &format!("result from network {net} and block height {block_height}: Ok -> status: {status}");
                     if status == "true" {
                         all_results += &format!(", updated_feeds: {updated_feeds:?}");
                         increment_feeds_round_metrics(
@@ -655,7 +655,7 @@ pub async fn eth_batch_send_to_all_contracts(
                 }
                 Err(e) => {
                     error!(
-                        "Got error sending to network {net} and block_height {block_height}: {e}"
+                        "Got error sending to network {net} and block height {block_height}: {e}"
                     );
                 }
             },

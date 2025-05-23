@@ -298,9 +298,9 @@ fn check_aggregated_votes_deviation(
         let deviated_by_percent = (difference / reporter_voted_value) * 100.0;
 
         if update_aggregate_value < lower_bound || update_aggregate_value > upper_bound {
-            errors.push(format!("Final answer for feed={feed_id}, block_height={block_height}, deviates by more than {tolerated_diff_percent}% ({deviated_by_percent}%). Reported value is {reporter_voted_value}. Sequencer reported {update_aggregate_value}"));
+            errors.push(format!("Final answer for feed={feed_id}, block height = {block_height}, deviates by more than {tolerated_diff_percent}% ({deviated_by_percent}%). Reported value is {reporter_voted_value}. Sequencer reported {update_aggregate_value}"));
         }
-        debug!("Final answer for feed={feed_id}, block_height={block_height}, deviates by {deviated_by_percent}%");
+        debug!("Final answer for feed={feed_id}, block height = {block_height}, deviates by {deviated_by_percent}%");
     }
 
     if !errors.is_empty() {
@@ -396,7 +396,7 @@ pub async fn validate(
         let block_height = batch.block_height;
         let recvd_calldata = batch.calldata;
         anyhow::bail!(
-            "tx_hash mismatch, block_height = {block_height}; recvd: {} generated: {}; calc_calldata = {}; recvd_calldata = {recvd_calldata}",
+            "tx_hash mismatch, block height = {block_height}; recvd: {} generated: {}; calc_calldata = {}; recvd_calldata = {recvd_calldata}",
             batch.tx_hash,
             hex::encode(tx_hash),
             hex::encode(calldata),

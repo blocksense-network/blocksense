@@ -128,7 +128,7 @@ pub async fn aggregation_batch_consensus_loop(
                             .into_iter()
                             .flat_map(|entry| signature_to_bytes(entry.signature))
                             .collect();
-                        info!("Generated aggregated signature: {} for network: {} Blocksense block_height: {}", signature_bytes.encode_hex(), net, block_height);
+                        info!("Generated aggregated signature: {} for network: {} Blocksense block height: {}", signature_bytes.encode_hex(), net, block_height);
 
                         let sequencer_state_clone = sequencer_state.clone();
                         collected_futures.push(
