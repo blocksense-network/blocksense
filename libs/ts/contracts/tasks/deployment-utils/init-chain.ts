@@ -94,7 +94,8 @@ task('init-chain', '[UTILS] Init chain configuration').setAction(
         threshold: +getOptionalEnvString('ADMIN_THRESHOLD', '1'),
       },
       ledgerAccount,
-      feedIds: feedIds ? feedIds.split(',').map(id => +id) : undefined,
+      feedIds:
+        feedIds === 'all' ? 'all' : feedIds.split(',').map(id => BigInt(id)),
       safeAddresses: {
         multiSendAddress: parseEthereumAddress(
           '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526',

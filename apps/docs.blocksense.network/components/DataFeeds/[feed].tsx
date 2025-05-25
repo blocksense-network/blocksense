@@ -36,7 +36,7 @@ export default async function DataFeed({ params }: DataFeedProps) {
   }
 
   const feedsConfig = decodeNewFeedsConfig(DATA_FEEDS);
-  const feed = feedsConfig.feeds.find(feed => feed.id === Number(feedId));
+  const feed = feedsConfig.feeds.find(feed => feed.id.toString() === feedId);
 
   if (!feed) {
     return <Error404 />;

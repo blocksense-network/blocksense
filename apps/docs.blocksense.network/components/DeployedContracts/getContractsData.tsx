@@ -47,7 +47,7 @@ const getProxyContractsContent = (networksData: DeploymentConfigV2[]) => {
       const { CLAggregatorAdapter } = data.contracts;
 
       return CLAggregatorAdapter.map(proxy => {
-        let id = proxy.constructorArgs[2];
+        let id = proxy.constructorArgs[2].toString();
         return {
           ...proxy,
           id,
