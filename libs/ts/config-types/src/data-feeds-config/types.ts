@@ -154,7 +154,7 @@ export type MarketHours = typeof MarketHoursSchema.Type;
 
 export const NewFeedSchema = S.mutable(
   S.Struct({
-    id: S.Number,
+    id: S.BigInt,
     full_name: S.String,
     description: S.String,
 
