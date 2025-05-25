@@ -15,7 +15,7 @@ interface NetworkConfigBase {
   sequencerMultisig: MultisigConfig;
   deployWithSequencerMultisig: boolean;
   adminMultisig: MultisigConfig;
-  feedIds?: number[];
+  feedIds: 'all' | readonly bigint[];
   safeAddresses: {
     multiSendAddress: EthereumAddress;
     multiSendCallOnlyAddress: EthereumAddress;

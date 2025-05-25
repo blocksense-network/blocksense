@@ -180,7 +180,7 @@ task('deploy', 'Deploy contracts')
             argsTypes: ['string', 'uint8', 'uint32', 'address'],
             argsValues: [
               data.description,
-              data.decimals,
+              data.additional_feed_info.decimals,
               data.id,
               upgradeableProxyAddress,
             ],
