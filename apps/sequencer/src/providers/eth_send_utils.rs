@@ -2,21 +2,21 @@ use actix_web::{rt::spawn, web::Data};
 use alloy::{
     hex,
     network::TransactionBuilder,
-    primitives::Bytes,
+    primitives::{Address, Bytes},
     providers::{Provider, ProviderBuilder},
-    rpc::types::eth::TransactionRequest,
+    rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
 use blocksense_config::FeedStrideAndDecimals;
 use blocksense_data_feeds::feeds_processing::{BatchedAggegratesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
 use blocksense_utils::to_hex_string;
-use eyre::{eyre, Result};
+use eyre::{bail, eyre, Result};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
 use tokio::{sync::Mutex, sync::RwLock, time::Duration};
 
 use crate::{
     providers::provider::{
-        parse_eth_address, ProviderStatus, RpcProvider, SharedRpcProviders,
+        parse_eth_address, ProviderStatus, ProviderType, RpcProvider, SharedRpcProviders,
         EVENT_FEED_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME,
     },
     sequencer_state::SequencerState,
@@ -26,7 +26,9 @@ use blocksense_feeds_processing::adfs_gen_calldata::{
     adfs_serialize_updates, get_neighbour_feed_ids, RoundCounters,
 };
 use blocksense_metrics::{
-    inc_metric, inc_vec_metric, metrics::FeedsMetrics, process_provider_getter, set_metric,
+    inc_metric, inc_vec_metric,
+    metrics::{FeedsMetrics, ProviderMetrics},
+    process_provider_getter, set_metric,
 };
 use futures::stream::FuturesUnordered;
 use paste::paste;
@@ -192,10 +194,10 @@ pub async fn get_serialized_updates_for_network(
                     );
                     bytes
                 }
-                Err(e) => eyre::bail!("ADFS serialization failed: {e}!"),
+                Err(e) => bail!("ADFS serialization failed: {e}!"),
             }
         }
-        _ => eyre::bail!("Unsupported contract version set for network {net}!"),
+        _ => bail!("Unsupported contract version set for network {net}!"),
     };
 
     Ok(serialized_updates)
@@ -263,26 +265,6 @@ pub async fn eth_batch_send_to_contract(
 
     let input = Bytes::from(serialized_updates);
 
-    debug!("Observing gas price (base_fee) for network {net}...");
-    let base_fee = process_provider_getter!(
-        rpc_handle.get_gas_price().await,
-        net,
-        provider_metrics,
-        get_gas_price
-    );
-    debug!("Observed gas price (base_fee) for network {net} = {base_fee}");
-
-    set_metric!(provider_metrics, net, gas_price, base_fee);
-
-    debug!("Getting chain_id for network {net}...");
-    let chain_id = process_provider_getter!(
-        rpc_handle.get_chain_id().await,
-        net,
-        provider_metrics,
-        get_chain_id
-    );
-    debug!("Got chain_id={chain_id} for network {net}");
-
     let receipt;
     let tx_time = Instant::now();
 
@@ -309,6 +291,50 @@ pub async fn eth_batch_send_to_contract(
             return Ok(("timeout".to_string(), feeds_to_update_ids));
         }
 
+        let gas_price = match get_gas_price(
+            net.as_str(),
+            &provider,
+            &updates,
+            transaction_retry_timeout_secs,
+        )
+        .await
+        {
+            Ok(v) => v,
+            Err(err) => {
+                warn!("{err} for {transaction_retries_count}-th time.");
+                inc_transaction_retries(
+                    net.as_str(),
+                    &mut transaction_retries_count,
+                    provider_metrics,
+                )
+                .await;
+                continue;
+            }
+        };
+
+        set_metric!(provider_metrics, net, gas_price, gas_price);
+
+        let chain_id = match get_chain_id(
+            net.as_str(),
+            &provider,
+            &updates,
+            transaction_retry_timeout_secs,
+        )
+        .await
+        {
+            Ok(v) => v,
+            Err(err) => {
+                warn!("{err} for {transaction_retries_count}-th time.");
+                inc_transaction_retries(
+                    net.as_str(),
+                    &mut transaction_retries_count,
+                    provider_metrics,
+                )
+                .await;
+                continue;
+            }
+        };
+
         let tx;
         if transaction_retries_count == 0 {
             tx = TransactionRequest::default()
@@ -322,84 +348,30 @@ pub async fn eth_batch_send_to_contract(
                 "Retrying to send updates to network {net} for {transaction_retries_count}-th time"
             );
 
-            debug!("Getting nonce for network {net} and address {sender_address}...");
-            let nonce = match actix_web::rt::time::timeout(
-                Duration::from_secs(transaction_retry_timeout_secs),
-                rpc_handle.get_transaction_count(sender_address).latest(),
+            let (nonce, max_fee_per_gas, priority_fee) = match get_tx_retry_params(
+                net.as_str(),
+                rpc_handle,
+                &sender_address,
+                transaction_retry_timeout_secs,
+                transaction_retries_count,
+                retry_fee_increment_fraction,
             )
             .await
             {
-                Ok(nonce_result) => match nonce_result {
-                    Ok(nonce) => {
-                        debug!("Got nonce={nonce} for network {net} and address {sender_address}");
-                        nonce
-                    }
-                    Err(err) => {
-                        debug!("Failed to get nonce for network {net} and address {sender_address} due to {err}");
-                        return Err(err.into());
-                    }
-                },
-                Err(err) => {
-                    warn!("Timed out while getting nonce for network {net} and address {sender_address} due to {err}");
-                    transaction_retries_count += 1;
+                Ok(res) => res,
+                Err(e) => {
+                    let block_height = updates.block_height;
+                    warn!("Timed out on get_tx_retry_params for {transaction_retries_count}-th time for network {net}, Blocksense block height: {block_height}: {e}!");
+                    inc_transaction_retries(
+                        net.as_str(),
+                        &mut transaction_retries_count,
+                        provider_metrics,
+                    )
+                    .await;
                     continue;
                 }
             };
 
-            let price_increment =
-                1.0 + (transaction_retries_count as f64 * retry_fee_increment_fraction);
-
-            debug!("Getting gas_price for network {net}...");
-            let gas_price = match actix_web::rt::time::timeout(
-                Duration::from_secs(transaction_retry_timeout_secs),
-                rpc_handle.get_gas_price(),
-            )
-            .await
-            {
-                Ok(gas_price_result) => match gas_price_result {
-                    Ok(gas_price) => {
-                        debug!("Got gas_price={gas_price} for network {net}");
-                        gas_price
-                    }
-                    Err(err) => {
-                        debug!("Failed to get gas_price for network {net} due to {err}");
-                        return Err(err.into());
-                    }
-                },
-                Err(err) => {
-                    warn!("Timed out while getting gas_price for network {net} and address {sender_address} due to {err}");
-                    transaction_retries_count += 1;
-                    continue;
-                }
-            };
-
-            debug!("Getting priority_fee for network {net}...");
-            let mut priority_fee = match actix_web::rt::time::timeout(
-                Duration::from_secs(transaction_retry_timeout_secs),
-                rpc_handle.get_max_priority_fee_per_gas(),
-            )
-            .await
-            {
-                Ok(priority_fee_result) => match priority_fee_result {
-                    Ok(priority_fee) => {
-                        debug!("Got priority_fee={priority_fee} for network {net}");
-                        priority_fee
-                    }
-                    Err(err) => {
-                        debug!("Failed to get priority_fee for network {net} due to {err}");
-                        return Err(err.into());
-                    }
-                },
-                Err(err) => {
-                    warn!("Timed out while getting priority_fee for network {net} and address {sender_address} due to {err}");
-                    transaction_retries_count += 1;
-                    continue;
-                }
-            };
-
-            priority_fee = (priority_fee as f64 * price_increment) as u128;
-            let mut max_fee_per_gas = gas_price + gas_price + priority_fee;
-            max_fee_per_gas = (max_fee_per_gas as f64 * price_increment) as u128;
             tx = TransactionRequest::default()
                 .to(contract_address)
                 .nonce(nonce)
@@ -432,7 +404,12 @@ pub async fn eth_batch_send_to_contract(
                 Ok(post_tx_res) => post_tx_res,
                 Err(err) => {
                     warn!("Timed out while trying to post tx to RPC for network {net} and address {sender_address} due to {err}");
-                    transaction_retries_count += 1;
+                    inc_transaction_retries(
+                        net.as_str(),
+                        &mut transaction_retries_count,
+                        provider_metrics,
+                    )
+                    .await;
                     continue;
                 }
             };
@@ -445,7 +422,24 @@ pub async fn eth_batch_send_to_contract(
         let tx_result_str = format!("{tx_result:?}");
         debug!("tx_result_str={tx_result_str}");
 
-        let receipt_future = process_provider_getter!(tx_result, net, provider_metrics, send_tx);
+        let receipt_future = match process_provider_getter!(
+            tx_result,
+            net,
+            provider_metrics,
+            send_tx
+        ) {
+            Ok(v) => v,
+            Err(err) => {
+                warn!("Error while trying to post tx to RPC for network {net} and address {sender_address} due to {err}");
+                inc_transaction_retries(
+                    net.as_str(),
+                    &mut transaction_retries_count,
+                    provider_metrics,
+                )
+                .await;
+                continue;
+            }
+        };
 
         debug!("Awaiting receipt for transaction to network `{net}`...");
         let receipt_result = actix_web::rt::time::timeout(
@@ -466,12 +460,22 @@ pub async fn eth_batch_send_to_contract(
                 }
                 Err(e) => {
                     warn!("PendingTransactionError tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
-                    transaction_retries_count += 1;
+                    inc_transaction_retries(
+                        net.as_str(),
+                        &mut transaction_retries_count,
+                        provider_metrics,
+                    )
+                    .await;
                 }
             },
             Err(e) => {
                 warn!("Timed out tx={tx_str}, tx_result={tx_result_str}, network={net}: {e}");
-                transaction_retries_count += 1;
+                inc_transaction_retries(
+                    net.as_str(),
+                    &mut transaction_retries_count,
+                    provider_metrics,
+                )
+                .await;
                 continue;
             }
         }
@@ -479,10 +483,114 @@ pub async fn eth_batch_send_to_contract(
 
     let transaction_time = tx_time.elapsed().as_millis();
     info!(
-        "Recvd transaction receipt that took {}ms from `{}`: {:?}",
+        "Recvd transaction receipt that took {}ms for {transaction_retries_count} retries from `{}`: {:?}",
         transaction_time, net, receipt
     );
 
+    log_gas_used(&net, &receipt, transaction_time, provider_metrics).await;
+
+    provider.update_history(&updates.updates);
+    drop(provider);
+    debug!("Released a read/write lock on provider state for network `{net}`");
+
+    Ok((receipt.status().to_string(), feeds_to_update_ids))
+}
+
+pub async fn inc_transaction_retries(
+    net: &str,
+    transaction_retries_count: &mut u64,
+    provider_metrics: &Arc<RwLock<ProviderMetrics>>,
+) {
+    *transaction_retries_count += 1;
+    inc_metric!(provider_metrics, net, total_tx_sent);
+}
+
+pub async fn get_gas_price(
+    net: &str,
+    provider: &RpcProvider,
+    updates: &BatchedAggegratesToSend,
+    transaction_retry_timeout_secs: u64,
+) -> Result<u128> {
+    let provider_metrics = &provider.provider_metrics;
+    let rpc_handle = &provider.provider;
+
+    debug!("Observing gas price (base_fee) for network {net}...");
+
+    let gas_price_result = match actix_web::rt::time::timeout(
+        Duration::from_secs(transaction_retry_timeout_secs),
+        rpc_handle.get_gas_price(),
+    )
+    .await
+    {
+        Ok(v) => v,
+        Err(e) => {
+            let block_height = updates.block_height;
+            bail!("Timed out on gas_price_result for network {net}, Blocksense block height: {block_height}: {e}!");
+        }
+    };
+    let base_fee = match process_provider_getter!(
+        gas_price_result,
+        net,
+        provider_metrics,
+        get_gas_price
+    ) {
+        Ok(v) => v,
+        Err(err) => {
+            let block_height = updates.block_height;
+            bail!("Error while trying to get gas_price_result for network {net} Blocksense block height: {block_height} due to {err}");
+        }
+    };
+    debug!("Observed gas price (base_fee) for network {net} = {base_fee}");
+
+    Ok(base_fee)
+}
+
+pub async fn get_chain_id(
+    net: &str,
+    provider: &RpcProvider,
+    updates: &BatchedAggegratesToSend,
+    transaction_retry_timeout_secs: u64,
+) -> Result<u64> {
+    let provider_metrics = &provider.provider_metrics;
+    let rpc_handle = &provider.provider;
+
+    let chain_id_result = match actix_web::rt::time::timeout(
+        Duration::from_secs(transaction_retry_timeout_secs),
+        rpc_handle.get_chain_id(),
+    )
+    .await
+    {
+        Ok(v) => v,
+        Err(err) => {
+            let block_height = updates.block_height;
+            bail!("Timed out on get chain_id for network {net} Blocksense block height: {block_height} due to {err}");
+        }
+    };
+
+    debug!("Getting chain_id for network {net}...");
+    let chain_id = match process_provider_getter!(
+        chain_id_result,
+        net,
+        provider_metrics,
+        get_chain_id
+    ) {
+        Ok(v) => v,
+        Err(err) => {
+            let block_height = updates.block_height;
+            bail!("Error while trying to get chain_id for network {net} Blocksense block height: {block_height} due to {err}");
+        }
+    };
+
+    debug!("Got chain_id={chain_id} for network {net}");
+    Ok(chain_id)
+}
+
+pub async fn log_gas_used(
+    net: &str,
+    receipt: &TransactionReceipt,
+    transaction_time: u128,
+    provider_metrics: &Arc<RwLock<ProviderMetrics>>,
+) {
     let gas_used_value = receipt.gas_used;
     set_metric!(provider_metrics, net, gas_used, gas_used_value);
 
@@ -505,12 +613,105 @@ pub async fn eth_batch_send_to_contract(
         transaction_confirmation_time,
         transaction_time
     );
+}
 
-    provider.update_history(&updates.updates);
-    drop(provider);
-    debug!("Released a read/write lock on provider state for network `{net}`");
+pub async fn log_provider_enabled(
+    net: &str,
+    provider: &Arc<Mutex<RpcProvider>>,
+    is_enabled_value: bool,
+) {
+    debug!("Acquiring a read lock on provider for network {net}");
+    let p = provider.lock().await;
+    debug!("Acquired a read lock on provider for network {net}");
+    let provider_metrics = p.provider_metrics.clone();
+    set_metric!(provider_metrics, net, is_enabled, is_enabled_value);
+    debug!("Released a read lock on provider for network {net}");
+}
 
-    Ok((receipt.status().to_string(), feeds_to_update_ids))
+pub async fn get_tx_retry_params(
+    net: &str,
+    rpc_handle: &ProviderType,
+    sender_address: &Address,
+    transaction_retry_timeout_secs: u64,
+    transaction_retries_count: u64,
+    retry_fee_increment_fraction: f64,
+) -> Result<(u64, u128, u128)> {
+    debug!("Getting nonce for network {net} and address {sender_address}...");
+    let nonce = match actix_web::rt::time::timeout(
+        Duration::from_secs(transaction_retry_timeout_secs),
+        rpc_handle.get_transaction_count(*sender_address).latest(),
+    )
+    .await
+    {
+        Ok(nonce_result) => match nonce_result {
+            Ok(nonce) => {
+                debug!("Got nonce={nonce} for network {net} and address {sender_address}");
+                nonce
+            }
+            Err(err) => {
+                debug!("Failed to get nonce for network {net} and address {sender_address} due to {err}");
+                return Err(err.into());
+            }
+        },
+        Err(err) => {
+            warn!("Timed out while getting nonce for network {net} and address {sender_address} due to {err}");
+            bail!("Timed out");
+        }
+    };
+
+    let price_increment = 1.0 + (transaction_retries_count as f64 * retry_fee_increment_fraction);
+
+    debug!("Getting gas_price for network {net}...");
+    let gas_price = match actix_web::rt::time::timeout(
+        Duration::from_secs(transaction_retry_timeout_secs),
+        rpc_handle.get_gas_price(),
+    )
+    .await
+    {
+        Ok(gas_price_result) => match gas_price_result {
+            Ok(gas_price) => {
+                debug!("Got gas_price={gas_price} for network {net}");
+                gas_price
+            }
+            Err(err) => {
+                debug!("Failed to get gas_price for network {net} due to {err}");
+                return Err(err.into());
+            }
+        },
+        Err(err) => {
+            warn!("Timed out while getting gas_price for network {net} and address {sender_address} due to {err}");
+            bail!("Timed out");
+        }
+    };
+
+    debug!("Getting priority_fee for network {net}...");
+    let mut priority_fee = match actix_web::rt::time::timeout(
+        Duration::from_secs(transaction_retry_timeout_secs),
+        rpc_handle.get_max_priority_fee_per_gas(),
+    )
+    .await
+    {
+        Ok(priority_fee_result) => match priority_fee_result {
+            Ok(priority_fee) => {
+                debug!("Got priority_fee={priority_fee} for network {net}");
+                priority_fee
+            }
+            Err(err) => {
+                debug!("Failed to get priority_fee for network {net} due to {err}");
+                return Err(err.into());
+            }
+        },
+        Err(err) => {
+            warn!("Timed out while getting priority_fee for network {net} and address {sender_address} due to {err}");
+            bail!("Timed out");
+        }
+    };
+
+    priority_fee = (priority_fee as f64 * price_increment) as u128;
+    let mut max_fee_per_gas = gas_price + gas_price + priority_fee;
+    max_fee_per_gas = (max_fee_per_gas as f64 * price_increment) as u128;
+
+    Ok((nonce, max_fee_per_gas, priority_fee))
 }
 
 pub async fn eth_batch_send_to_all_contracts(
@@ -566,14 +767,9 @@ pub async fn eth_batch_send_to_all_contracts(
                     continue;
                 }
                 let is_enabled_value = provider_settings.is_enabled;
-                {
-                    debug!("Acquiring a read lock on provider for network {net}");
-                    let p = provider.lock().await;
-                    debug!("Acquired a read lock on provider for network {net}");
-                    let provider_metrics = p.provider_metrics.clone();
-                    set_metric!(provider_metrics, net, is_enabled, is_enabled_value);
-                    debug!("Released a read lock on provider for network {net}");
-                }
+
+                log_provider_enabled(net.as_str(), provider, is_enabled_value).await;
+
                 if !is_enabled_value {
                     warn!("Network `{net}` is not enabled; skipping it during reporting");
                     continue;
@@ -683,7 +879,7 @@ async fn log_round_counters(
     debug!(debug_string);
 }
 
-async fn increment_feeds_round_indexes(
+pub async fn increment_feeds_round_indexes(
     updated_feeds: &Vec<u32>,
     net: &str,
     provider: &mut RpcProvider,
@@ -711,7 +907,7 @@ async fn increment_feeds_round_indexes(
 }
 // Since we update the round counters when we post the tx and before we
 // receive its receipt if the tx fails we need to decrease the round indexes.
-async fn decrement_feeds_round_indexes(
+pub async fn decrement_feeds_round_indexes(
     updated_feeds: &Vec<u32>,
     net: &str,
     provider: &mut RpcProvider,
