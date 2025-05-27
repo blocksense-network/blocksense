@@ -15,7 +15,7 @@ jobs:
         include:
           - project: docs.blocksense.network
             path: apps/docs.blocksense.network/dist
-            project_name: blocksense
+            project_name: blocksense-docs
             build_command: yarn workspace @blocksense/docs.blocksense.network build:with-deps
           - project: ui.blocksense.network
             path: libs/ts/ui/storybook-static
