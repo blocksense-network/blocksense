@@ -13,7 +13,8 @@ use blocksense_data_feeds::feeds_processing::BatchedAggegratesToSend;
 use blocksense_feed_registry::types::Repeatability::Periodic;
 use blocksense_gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use blocksense_gnosis_safe::utils::{create_safe_tx, generate_transaction_hash, SafeMultisig};
-use rdkafka::producer::FutureRecord;
+use eyre::Result;
+use rdkafka::producer::{FutureProducer, FutureRecord};
 use rdkafka::util::Timeout;
 use std::io::Error;
 use std::time::Duration;
@@ -43,6 +44,9 @@ pub async fn votes_result_sender_loop(
                         )
                         .await;
 
+                        aggregated_updates_to_publishers(&sequencer_state, &updates).await;
+
+                        info!("sending updates to contracts:");
                         let sequencer_state = sequencer_state.clone();
                         let blocksense_block_height = updates.block_height;
                         debug!("Processing eth_batch_send_to_all_contracts{blocksense_block_height}_{batch_count}");
@@ -62,6 +66,46 @@ pub async fn votes_result_sender_loop(
             }
         })
         .expect("Failed to spawn votes result sender!")
+}
+
+
+async fn aggregated_updates_to_publishers(
+    sequencer_state: &Data<SequencerState>,
+    updates: &BatchedAggegratesToSend,
+) {
+    let Some(kafka_endpoint) = &sequencer_state.kafka_endpoint else {
+        warn!("No Kafka endpoint set to stream aggregated updates to publishers.");
+        return;
+    };
+
+    let block_height = updates.block_height;
+
+    match serde_json::to_string(updates) {
+        Ok(json) => {
+            match send_to_msg_stream(
+                kafka_endpoint,
+                &json,
+                "aggregated_updates",
+                3 * 60,
+                "blocksense",
+                block_height,
+            )
+            .await
+            {
+                Ok(_) => {
+                    info!(
+                        "sent aggregated updates to publishers for block_height = {block_height}."
+                    );
+                }
+                Err(e) => {
+                    error!("send_to_msg_stream: {e}");
+                }
+            }
+        }
+        Err(e) => {
+            error!("Could not serialize updates = {updates:?} due to: {e}")
+        }
+    };
 }
 
 async fn try_send_aggregation_consensus_trigger_to_reporters(
@@ -231,24 +275,24 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
         };
 
         info!("About to send feed values to kafka; network={net}, serialized_updates={serialized_updates}");
-        match kafka_endpoint
-            .send(
-                FutureRecord::<(), _>::to("aggregation_consensus").payload(&serialized_updates),
-                Timeout::After(Duration::from_secs(3 * 60)),
-            )
-            .await
+        match send_to_msg_stream(
+            kafka_endpoint,
+            &serialized_updates,
+            "aggregation_consensus",
+            3 * 60,
+            net,
+            block_height,
+        )
+        .await
         {
-            Ok(res) => {
-                debug!(
-                    "Successfully sent batch of aggregated feed values to kafka endpoint: {res:?}; network={net}"
-                );
+            Ok(_) => {
                 let mut batches_awaiting_consensus =
                     sequencer_state.batches_awaiting_consensus.write().await;
                 batches_awaiting_consensus
                     .insert_new_in_process_batch(&updates_to_kafka, safe_transaction);
             }
             Err(e) => {
-                error!("Failed to send batch of aggregated feed values for network: {net}, block height: {block_height} to kafka endpoint! {e:?}")
+                error!("send_to_msg_stream: {e}");
             }
         }
 
@@ -256,6 +300,33 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             let mut provider = provider.lock().await;
             increment_feeds_round_indexes(&updated_feeds_ids, net, &mut provider).await;
             provider.inc_num_tx_in_progress();
+        }
+    }
+}
+
+async fn send_to_msg_stream(
+    endpoint: &FutureProducer,
+    serialized_updates: &String,
+    topic: &str,
+    tomeout_secs: u64,
+    net: &str,
+    block_height: u64,
+) -> eyre::Result<()> {
+    match endpoint
+        .send(
+            FutureRecord::<(), _>::to(topic).payload(serialized_updates),
+            Timeout::After(Duration::from_secs(tomeout_secs)),
+        )
+        .await
+    {
+        Ok(res) => {
+            debug!(
+                "Successfully sent batch of aggregated feed values to kafka endpoint: {res:?}; network: {net} topic: {topic}"
+            );
+            Ok(())
+        }
+        Err(e) => {
+            eyre::bail!("Failed to send batch of aggregated feed values for network: {net}, topic: {topic}, block height: {block_height} to kafka endpoint! {e:?}");
         }
     }
 }
