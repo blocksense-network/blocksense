@@ -173,7 +173,7 @@ pub fn naive_packing(
     feed_result.as_bytes(digits_in_fraction, timestamp)
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize)]
 pub struct BatchedAggegratesToSend {
     pub block_height: u64,
     pub updates: Vec<VotedFeedUpdate>,
