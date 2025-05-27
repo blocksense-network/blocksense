@@ -52,6 +52,12 @@ stride = 0
 decimals = 8
 data = '{"pair":{"base":"DAK","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":[{"min_volume_usd":10000,"network":"monad-testnet","pool":"0x6e4b7be5ef7f8950c76baa0bd90125bc9b33c8db","reverse":false},{"min_volume_usd":10000,"network":"monad-testnet","pool":"0x6007a0804fe538745ffed91f9c124cd3ce06102d","reverse":false},{"min_volume_usd":10000,"network":"monad-testnet","pool":"0x9e9b7f93b0375b2d53d68bd65ceeb716f10ada21","reverse":false},{"min_volume_usd":10000,"network":"monad-testnet","pool":"0x20a1f1e0757f4c209c6b9608ef709e981ce3a7a6","reverse":false},{"min_volume_usd":10000,"network":"monad-testnet","pool":"0x3452e05318e2606a37e73201c9bb873ac7a83440","reverse":false},{"min_volume_usd":10000,"network":"monad-testnet","pool":"0x6d067d9453aafb84c94b112368144b2206df144f","reverse":false}]}'
 
+[[trigger.oracle.data_feeds]]
+id = "1000006"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"YUSD","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":[{"min_volume_usd":10000,"network":"bsc","pool":"0x7f1c018f4ed5a424f620300535e789d7dc0290d81d357638cd15a3005911d00f","reverse":false},{"min_volume_usd":10000,"network":"bsc","pool":"0x5006ef6c1a986d214f8c24244b965bc6a3706b88827f94c2270b332170cf0523","reverse":false},{"min_volume_usd":10000,"network":"bsc","pool":"0xef802fff6a683d8b1107dcd7ffbba3ce346a9c20155ad5044955c48aedd01f3b","reverse":false},{"min_volume_usd":10000,"network":"eth","pool":"0xda4a305e8b85194ff5cb70577824cf1f03fb408257b621b82350423cc752ddab","reverse":false},{"min_volume_usd":10000,"network":"eth","pool":"0xa9eeccbfde38d8f6a5bea63564f33a984cd7561930ee86666f4a54d52b3a6e12","reverse":false},{"min_volume_usd":10000,"network":"eth","pool":"0xdfce55c1cc365d3cb2fb475a4762d34ef0bf6c0d","reverse":false},{"min_volume_usd":10000,"network":"eth","pool":"0x9804c30875127246ac92d72d5cdf0630aa356861","reverse":false},{"min_volume_usd":10000,"network":"eth","pool":"0xcf908d925b21594f9a92b264167a85b0649051a8","reverse":false},{"min_volume_usd":10000,"network":"eth","pool":"0x2309d4c880ab017f4372a0f8e0d31c31e97fec44948503d622d10d81229d883d","reverse":false}]}'
+
 [component.gecko-terminal]
 source = "../../../target/wasm32-wasip1/release/gecko_terminal.wasm"
 allowed_outbound_hosts = ["https://api.geckoterminal.com"]
