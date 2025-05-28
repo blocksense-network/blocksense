@@ -52856,7 +52856,7 @@
     },
     {
       "id": 100001,
-      "full_name": "YieldNest convertToAssets on ETH",
+      "full_name": "ynETH MAX (ynETHx) - YieldNest convertToAssets on ETH",
       "description": "YieldNest convertToAssets call on ETH mainnet at 0x657d9ABA1DBb59e53f9F3eCAA878447dCfC96dCb",
       "type": "price-feed",
       "oracle_id": "eth-rpc",
@@ -52885,8 +52885,8 @@
     },
     {
       "id": 100002,
-      "full_name": "YToken exchangeRate",
-      "description": "YToken exchangeRate call on 0x19Ebd191f7A24ECE672ba13A302212b5eF7F35cb",
+      "full_name": "YieldFi yUSD (yUSD) exchangeRate on ETH mainnet",
+      "description": "YieldFi yUSD exchangeRate call on 0x19Ebd191f7A24ECE672ba13A302212b5eF7F35cb",
       "type": "price-feed",
       "oracle_id": "eth-rpc",
       "value_type": "numerical",
@@ -52914,7 +52914,7 @@
     },
     {
       "id": 100003,
-      "full_name": "YieldNest convertToAssets on BNB",
+      "full_name": "ynBNB MAX (ynBNBx) - YieldNest convertToAssets on BNB",
       "description": "YieldNest convertToAssets call on BNB chain 0x32c830f5c34122c6afb8ae87aba541b7900a2c5f",
       "type": "price-feed",
       "oracle_id": "eth-rpc",
