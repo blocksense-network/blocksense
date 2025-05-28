@@ -36,7 +36,7 @@ use std::time::Instant;
 use tracing::{debug, error, info, info_span, warn};
 
 pub async fn deploy_contract(
-    network: &String,
+    network: &str,
     providers: &SharedRpcProviders,
     contract_name: &str,
 ) -> Result<String> {
@@ -1021,8 +1021,7 @@ mod tests {
         .await;
 
         // run
-        let result =
-            deploy_contract(&String::from(network), &providers, PRICE_FEED_CONTRACT_NAME).await;
+        let result = deploy_contract(network, &providers, PRICE_FEED_CONTRACT_NAME).await;
         // assert
         // validate contract was deployed at expected address
         if let Ok(msg) = result {
@@ -1075,8 +1074,7 @@ mod tests {
         .await;
 
         // run
-        let result =
-            deploy_contract(&String::from(network), &providers, EVENT_FEED_CONTRACT_NAME).await;
+        let result = deploy_contract(network, &providers, EVENT_FEED_CONTRACT_NAME).await;
         // assert
         // validate contract was deployed at expected address
         if let Ok(msg) = result {
