@@ -3,7 +3,7 @@
     {
       "id": 0,
       "full_name": "BTC / USD",
-      "description": "Bitcoin",
+      "description": "Price of Bitcoin in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -134,7 +134,7 @@
     {
       "id": 1,
       "full_name": "BTC / USDT",
-      "description": "Bitcoin",
+      "description": "Price of Bitcoin in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -229,7 +229,7 @@
     {
       "id": 2,
       "full_name": "BTC / USDC",
-      "description": "Bitcoin",
+      "description": "Price of Bitcoin in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -304,7 +304,7 @@
     {
       "id": 3,
       "full_name": "ETH / USD",
-      "description": "Ethereum",
+      "description": "Price of Ethereum in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -443,7 +443,7 @@
     {
       "id": 4,
       "full_name": "ETH / BTC",
-      "description": "Ethereum",
+      "description": "Price of Ethereum in BTC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -543,7 +543,7 @@
     {
       "id": 5,
       "full_name": "ETH / USDT",
-      "description": "Ethereum",
+      "description": "Price of Ethereum in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -646,7 +646,7 @@
     {
       "id": 6,
       "full_name": "ETH / USDC",
-      "description": "Ethereum",
+      "description": "Price of Ethereum in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -729,7 +729,7 @@
     {
       "id": 7,
       "full_name": "USDT / USD",
-      "description": "Tether USD",
+      "description": "Price of Tether USD in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -819,7 +819,7 @@
     {
       "id": 8,
       "full_name": "USDT / USDC",
-      "description": "Tether USD",
+      "description": "Price of Tether USD in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -869,7 +869,7 @@
     {
       "id": 9,
       "full_name": "XRP / USD",
-      "description": "XRP",
+      "description": "Price of XRP in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -1004,7 +1004,7 @@
     {
       "id": 10,
       "full_name": "XRP / BNB",
-      "description": "Ripple",
+      "description": "Price of Ripple in BNB",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -1044,7 +1044,7 @@
     {
       "id": 11,
       "full_name": "XRP / USDT",
-      "description": "XRP",
+      "description": "Price of XRP in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -1142,7 +1142,7 @@
     {
       "id": 12,
       "full_name": "XRP / USDC",
-      "description": "XRP",
+      "description": "Price of XRP in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -1220,7 +1220,7 @@
     {
       "id": 13,
       "full_name": "BNB / USD",
-      "description": "BNB",
+      "description": "Price of BNB in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -1325,7 +1325,7 @@
     {
       "id": 14,
       "full_name": "BNB / USDT",
-      "description": "BNB",
+      "description": "Price of BNB in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -1408,7 +1408,7 @@
     {
       "id": 15,
       "full_name": "BNB / USDC",
-      "description": "BNB",
+      "description": "Price of BNB in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -1481,7 +1481,7 @@
     {
       "id": 16,
       "full_name": "SOL / USD",
-      "description": "Solana",
+      "description": "Price of Solana in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -1619,7 +1619,7 @@
     {
       "id": 17,
       "full_name": "SOL / USDT",
-      "description": "Solana",
+      "description": "Price of Solana in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -1717,7 +1717,7 @@
     {
       "id": 18,
       "full_name": "SOL / USDC",
-      "description": "Solana",
+      "description": "Price of Solana in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -1800,7 +1800,7 @@
     {
       "id": 19,
       "full_name": "USDC / USD",
-      "description": "Circle USD",
+      "description": "Price of Circle USD in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -1906,7 +1906,7 @@
     {
       "id": 20,
       "full_name": "USDC / BNB",
-      "description": "Circle USD",
+      "description": "Price of Circle USD in BNB",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -1946,7 +1946,7 @@
     {
       "id": 21,
       "full_name": "USDC / USDT",
-      "description": "Circle USD",
+      "description": "Price of Circle USD in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -2034,7 +2034,7 @@
     {
       "id": 22,
       "full_name": "ADA / USD",
-      "description": "Cardano",
+      "description": "Price of Cardano in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -2163,7 +2163,7 @@
     {
       "id": 23,
       "full_name": "ADA / BNB",
-      "description": "Cardano",
+      "description": "Price of Cardano in BNB",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -2203,7 +2203,7 @@
     {
       "id": 24,
       "full_name": "ADA / USDT",
-      "description": "Cardano",
+      "description": "Price of Cardano in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -2301,7 +2301,7 @@
     {
       "id": 25,
       "full_name": "ADA / USDC",
-      "description": "Cardano",
+      "description": "Price of Cardano in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -2384,7 +2384,7 @@
     {
       "id": 26,
       "full_name": "DOGE / USD",
-      "description": "Dogecoin",
+      "description": "Price of Dogecoin in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -2535,7 +2535,7 @@
     {
       "id": 27,
       "full_name": "DOGE / USDT",
-      "description": "Dogecoin",
+      "description": "Price of Dogecoin in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -2625,7 +2625,7 @@
     {
       "id": 28,
       "full_name": "DOGE / USDC",
-      "description": "Dogecoin",
+      "description": "Price of Dogecoin in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -2695,7 +2695,7 @@
     {
       "id": 29,
       "full_name": "TRX / USD",
-      "description": "Tron",
+      "description": "Price of Tron in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -2807,7 +2807,7 @@
     {
       "id": 30,
       "full_name": "TRX / USDT",
-      "description": "Tron",
+      "description": "Price of Tron in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -2887,7 +2887,7 @@
     {
       "id": 31,
       "full_name": "TRX / USDC",
-      "description": "Tron",
+      "description": "Price of Tron in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -2957,7 +2957,7 @@
     {
       "id": 32,
       "full_name": "wBTC / USD",
-      "description": "Wrapped Bitcoin",
+      "description": "Price of Wrapped Bitcoin in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -3053,7 +3053,7 @@
     {
       "id": 33,
       "full_name": "wBTC / USDT",
-      "description": "Wrapped Bitcoin",
+      "description": "Price of Wrapped Bitcoin in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -3123,7 +3123,7 @@
     {
       "id": 34,
       "full_name": "wBTC / USDC",
-      "description": "Wrapped Bitcoin",
+      "description": "Price of Wrapped Bitcoin in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -3168,7 +3168,7 @@
     {
       "id": 35,
       "full_name": "LINK / USD",
-      "description": "Chainlink",
+      "description": "Price of Chainlink in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -3296,7 +3296,7 @@
     {
       "id": 36,
       "full_name": "LINK / ETH",
-      "description": "Chainlink",
+      "description": "Price of Chainlink in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -3364,7 +3364,7 @@
     {
       "id": 37,
       "full_name": "LINK / BNB",
-      "description": "Chainlink",
+      "description": "Price of Chainlink in BNB",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -3404,7 +3404,7 @@
     {
       "id": 38,
       "full_name": "LINK / USDT",
-      "description": "Chainlink",
+      "description": "Price of Chainlink in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -3497,7 +3497,7 @@
     {
       "id": 39,
       "full_name": "LINK / USDC",
-      "description": "Chainlink",
+      "description": "Price of Chainlink in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -3575,7 +3575,7 @@
     {
       "id": 40,
       "full_name": "HBAR / USD",
-      "description": "Hedera Hashgraph",
+      "description": "Price of Hedera Hashgraph in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -3678,7 +3678,7 @@
     {
       "id": 41,
       "full_name": "HBAR / USDT",
-      "description": "Hedera Hashgraph",
+      "description": "Price of Hedera Hashgraph in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -3763,7 +3763,7 @@
     {
       "id": 42,
       "full_name": "HBAR / USDC",
-      "description": "Hedera Hashgraph",
+      "description": "Price of Hedera Hashgraph in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -3818,7 +3818,7 @@
     {
       "id": 43,
       "full_name": "USDS / USD",
-      "description": "USDS",
+      "description": "Price of USDS in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -3886,7 +3886,7 @@
     {
       "id": 44,
       "full_name": "USDS / USDT",
-      "description": "USDS",
+      "description": "Price of USDS in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -3931,7 +3931,7 @@
     {
       "id": 45,
       "full_name": "USDS / USDC",
-      "description": "USDS",
+      "description": "Price of USDS in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -3971,7 +3971,7 @@
     {
       "id": 46,
       "full_name": "XLM / USD",
-      "description": "Stellar",
+      "description": "Price of Stellar in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -4094,7 +4094,7 @@
     {
       "id": 47,
       "full_name": "XLM / USDT",
-      "description": "Stellar",
+      "description": "Price of Stellar in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -4184,7 +4184,7 @@
     {
       "id": 48,
       "full_name": "XLM / USDC",
-      "description": "Stellar",
+      "description": "Price of Stellar in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -4249,7 +4249,7 @@
     {
       "id": 49,
       "full_name": "AVAX / USD",
-      "description": "Avalanche",
+      "description": "Price of Avalanche in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -4377,7 +4377,7 @@
     {
       "id": 50,
       "full_name": "AVAX / USDT",
-      "description": "Avalanche",
+      "description": "Price of Avalanche in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -4470,7 +4470,7 @@
     {
       "id": 51,
       "full_name": "AVAX / USDC",
-      "description": "Avalanche",
+      "description": "Price of Avalanche in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -4548,7 +4548,7 @@
     {
       "id": 52,
       "full_name": "SHIB / USD",
-      "description": "Shiba Inu",
+      "description": "Price of Shiba Inu in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -4686,7 +4686,7 @@
     {
       "id": 53,
       "full_name": "SHIB / USDT",
-      "description": "Shiba Inu",
+      "description": "Price of Shiba Inu in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -4779,7 +4779,7 @@
     {
       "id": 54,
       "full_name": "SHIB / USDC",
-      "description": "Shiba Inu",
+      "description": "Price of Shiba Inu in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -4857,7 +4857,7 @@
     {
       "id": 55,
       "full_name": "SUI / USD",
-      "description": "Sui",
+      "description": "Price of Sui in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -4975,7 +4975,7 @@
     {
       "id": 56,
       "full_name": "SUI / USDT",
-      "description": "Sui",
+      "description": "Price of Sui in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -5055,7 +5055,7 @@
     {
       "id": 57,
       "full_name": "SUI / USDC",
-      "description": "Sui",
+      "description": "Price of Sui in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -5125,7 +5125,7 @@
     {
       "id": 58,
       "full_name": "BCH / BNB",
-      "description": "Bitcoin Cash",
+      "description": "Price of Bitcoin Cash in BNB",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -5165,7 +5165,7 @@
     {
       "id": 59,
       "full_name": "BCH / USD",
-      "description": "Bitcoin Cash",
+      "description": "Price of Bitcoin Cash in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -5292,7 +5292,7 @@
     {
       "id": 60,
       "full_name": "BCH / USDT",
-      "description": "Bitcoin Cash",
+      "description": "Price of Bitcoin Cash in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -5385,7 +5385,7 @@
     {
       "id": 61,
       "full_name": "BCH / USDC",
-      "description": "Bitcoin Cash",
+      "description": "Price of Bitcoin Cash in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -5463,7 +5463,7 @@
     {
       "id": 62,
       "full_name": "LTC / BNB",
-      "description": "Litecoin",
+      "description": "Price of Litecoin in BNB",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -5503,7 +5503,7 @@
     {
       "id": 63,
       "full_name": "LTC / USD",
-      "description": "Litecoin",
+      "description": "Price of Litecoin in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -5630,7 +5630,7 @@
     {
       "id": 64,
       "full_name": "LTC / USDT",
-      "description": "Litecoin",
+      "description": "Price of Litecoin in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -5718,7 +5718,7 @@
     {
       "id": 65,
       "full_name": "LTC / USDC",
-      "description": "Litecoin",
+      "description": "Price of Litecoin in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -5796,7 +5796,7 @@
     {
       "id": 66,
       "full_name": "TON / USD",
-      "description": "Toncoin",
+      "description": "Price of Toncoin in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -5902,7 +5902,7 @@
     {
       "id": 67,
       "full_name": "TON / USDT",
-      "description": "Toncoin",
+      "description": "Price of Toncoin in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -5980,7 +5980,7 @@
     {
       "id": 68,
       "full_name": "TON / USDC",
-      "description": "Toncoin",
+      "description": "Price of Toncoin in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -6048,7 +6048,7 @@
     {
       "id": 69,
       "full_name": "OM / USD",
-      "description": "MANTRA",
+      "description": "Price of MANTRA in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -6143,7 +6143,7 @@
     {
       "id": 70,
       "full_name": "OM / USDT",
-      "description": "MANTRA",
+      "description": "Price of MANTRA in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -6213,7 +6213,7 @@
     {
       "id": 71,
       "full_name": "OM / USDC",
-      "description": "MANTRA",
+      "description": "Price of MANTRA in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -6253,7 +6253,7 @@
     {
       "id": 72,
       "full_name": "DOT / USD",
-      "description": "Polkadot",
+      "description": "Price of Polkadot in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -6380,7 +6380,7 @@
     {
       "id": 73,
       "full_name": "DOT / BNB",
-      "description": "Polkadot",
+      "description": "Price of Polkadot in BNB",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -6420,7 +6420,7 @@
     {
       "id": 74,
       "full_name": "DOT / USDT",
-      "description": "Polkadot",
+      "description": "Price of Polkadot in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -6513,7 +6513,7 @@
     {
       "id": 75,
       "full_name": "DOT / USDC",
-      "description": "Polkadot",
+      "description": "Price of Polkadot in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -6586,7 +6586,7 @@
     {
       "id": 76,
       "full_name": "USDe / USD",
-      "description": "Ethena USDe",
+      "description": "Price of Ethena USDe in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -6658,7 +6658,7 @@
     {
       "id": 77,
       "full_name": "USDE / USD",
-      "description": "Ethena USDe",
+      "description": "Price of Ethena USDe in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -6730,7 +6730,7 @@
     {
       "id": 78,
       "full_name": "USDe / USDT",
-      "description": "Ethena USDe",
+      "description": "Price of Ethena USDe in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -6790,7 +6790,7 @@
     {
       "id": 79,
       "full_name": "USDe / USDC",
-      "description": "Ethena USDe",
+      "description": "Price of Ethena USDe in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -6835,7 +6835,7 @@
     {
       "id": 80,
       "full_name": "USDE / USDT",
-      "description": "Ethena USDe",
+      "description": "Price of Ethena USDe in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -6895,7 +6895,7 @@
     {
       "id": 81,
       "full_name": "USDE / USDC",
-      "description": "Ethena USDe",
+      "description": "Price of Ethena USDe in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -6940,7 +6940,7 @@
     {
       "id": 82,
       "full_name": "DAI / USD",
-      "description": "DAI",
+      "description": "Price of DAI in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -7054,7 +7054,7 @@
     {
       "id": 83,
       "full_name": "DAI / BNB",
-      "description": "DAI",
+      "description": "Price of DAI in BNB",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -7094,7 +7094,7 @@
     {
       "id": 84,
       "full_name": "DAI / USDT",
-      "description": "DAI",
+      "description": "Price of DAI in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -7172,7 +7172,7 @@
     {
       "id": 85,
       "full_name": "DAI / USDC",
-      "description": "DAI",
+      "description": "Price of DAI in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -7217,7 +7217,7 @@
     {
       "id": 86,
       "full_name": "HYPE / USD",
-      "description": "Hyperliquid",
+      "description": "Price of Hyperliquid in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -7283,7 +7283,7 @@
     {
       "id": 87,
       "full_name": "HYPE / USDT",
-      "description": "Hyperliquid",
+      "description": "Price of Hyperliquid in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -7338,7 +7338,7 @@
     {
       "id": 88,
       "full_name": "XMR / USD",
-      "description": "Monero",
+      "description": "Price of Monero in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -7417,7 +7417,7 @@
     {
       "id": 89,
       "full_name": "XMR / USDT",
-      "description": "Monero",
+      "description": "Price of Monero in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -7475,7 +7475,7 @@
     {
       "id": 90,
       "full_name": "XMR / USDC",
-      "description": "Monero",
+      "description": "Price of Monero in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -7528,7 +7528,7 @@
     {
       "id": 91,
       "full_name": "UNI / USD",
-      "description": "Uniswap",
+      "description": "Price of Uniswap in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -7659,7 +7659,7 @@
     {
       "id": 92,
       "full_name": "UNI / BNB",
-      "description": "Uniswap",
+      "description": "Price of Uniswap in BNB",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -7699,7 +7699,7 @@
     {
       "id": 93,
       "full_name": "UNI / ETH",
-      "description": "Uniswap",
+      "description": "Price of Uniswap in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -7752,7 +7752,7 @@
     {
       "id": 94,
       "full_name": "UNI / USDT",
-      "description": "Uniswap",
+      "description": "Price of Uniswap in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -7837,7 +7837,7 @@
     {
       "id": 95,
       "full_name": "UNI / USDC",
-      "description": "Uniswap",
+      "description": "Price of Uniswap in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -7902,7 +7902,7 @@
     {
       "id": 96,
       "full_name": "APT / USD",
-      "description": "Aptos",
+      "description": "Price of Aptos in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -8022,7 +8022,7 @@
     {
       "id": 97,
       "full_name": "APT / USDT",
-      "description": "Aptos",
+      "description": "Price of Aptos in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -8107,7 +8107,7 @@
     {
       "id": 98,
       "full_name": "APT / USDC",
-      "description": "Aptos",
+      "description": "Price of Aptos in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -8172,7 +8172,7 @@
     {
       "id": 99,
       "full_name": "NEAR / USD",
-      "description": "NEAR Protocol",
+      "description": "Price of NEAR Protocol in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -8296,7 +8296,7 @@
     {
       "id": 100,
       "full_name": "NEAR / USDT",
-      "description": "NEAR Protocol",
+      "description": "Price of NEAR Protocol in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -8386,7 +8386,7 @@
     {
       "id": 101,
       "full_name": "NEAR / USDC",
-      "description": "NEAR Protocol",
+      "description": "Price of NEAR Protocol in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -8456,7 +8456,7 @@
     {
       "id": 102,
       "full_name": "PEPE / USD",
-      "description": "PEPE",
+      "description": "Price of PEPE in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -8624,7 +8624,7 @@
     {
       "id": 103,
       "full_name": "PEPE / USDT",
-      "description": "PEPE",
+      "description": "Price of PEPE in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -8709,7 +8709,7 @@
     {
       "id": 104,
       "full_name": "PEPE / USDC",
-      "description": "PEPE",
+      "description": "Price of PEPE in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -8779,7 +8779,7 @@
     {
       "id": 105,
       "full_name": "ETC / USD",
-      "description": "Ethereum",
+      "description": "Price of Ethereum in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -8898,7 +8898,7 @@
     {
       "id": 106,
       "full_name": "ETC / USDT",
-      "description": "Ethereum",
+      "description": "Price of Ethereum in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -8983,7 +8983,7 @@
     {
       "id": 107,
       "full_name": "ETC / USDC",
-      "description": "Ethereum",
+      "description": "Price of Ethereum in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -9033,7 +9033,7 @@
     {
       "id": 108,
       "full_name": "ONDO / USD",
-      "description": "Ondo",
+      "description": "Price of Ondo in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -9144,7 +9144,7 @@
     {
       "id": 109,
       "full_name": "ONDO / USDT",
-      "description": "Ondo",
+      "description": "Price of Ondo in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -9224,7 +9224,7 @@
     {
       "id": 110,
       "full_name": "ONDO / USDC",
-      "description": "Ondo",
+      "description": "Price of Ondo in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -9289,7 +9289,7 @@
     {
       "id": 111,
       "full_name": "ICP / USD",
-      "description": "Internet Computer Protocol",
+      "description": "Price of Internet Computer Protocol in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -9407,7 +9407,7 @@
     {
       "id": 112,
       "full_name": "ICP / USDT",
-      "description": "Internet Computer Protocol",
+      "description": "Price of Internet Computer Protocol in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -9492,7 +9492,7 @@
     {
       "id": 113,
       "full_name": "ICP / USDC",
-      "description": "Internet Computer Protocol",
+      "description": "Price of Internet Computer Protocol in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -9557,7 +9557,7 @@
     {
       "id": 114,
       "full_name": "AAVE / USD",
-      "description": "Aave",
+      "description": "Price of Aave in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -9677,7 +9677,7 @@
     {
       "id": 115,
       "full_name": "AAVE / ETH",
-      "description": "Aave",
+      "description": "Price of Aave in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -9730,7 +9730,7 @@
     {
       "id": 116,
       "full_name": "AAVE / USDT",
-      "description": "Aave",
+      "description": "Price of Aave in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -9810,7 +9810,7 @@
     {
       "id": 117,
       "full_name": "AAVE / USDC",
-      "description": "Aave",
+      "description": "Price of Aave in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -9865,7 +9865,7 @@
     {
       "id": 118,
       "full_name": "MNT / USD",
-      "description": "Mantle",
+      "description": "Price of Mantle in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -9947,7 +9947,7 @@
     {
       "id": 119,
       "full_name": "MNT / USDT",
-      "description": "Mantle",
+      "description": "Price of Mantle in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -10007,7 +10007,7 @@
     {
       "id": 120,
       "full_name": "MNT / USDC",
-      "description": "Mantle",
+      "description": "Price of Mantle in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -10052,7 +10052,7 @@
     {
       "id": 121,
       "full_name": "TAO / USD",
-      "description": "Bittensor",
+      "description": "Price of Bittensor in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -10144,7 +10144,7 @@
     {
       "id": 122,
       "full_name": "TAO / USDT",
-      "description": "Bittensor",
+      "description": "Price of Bittensor in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -10204,7 +10204,7 @@
     {
       "id": 123,
       "full_name": "TAO / USDC",
-      "description": "Bittensor",
+      "description": "Price of Bittensor in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -10259,7 +10259,7 @@
     {
       "id": 124,
       "full_name": "VET / USD",
-      "description": "VeChain",
+      "description": "Price of VeChain in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -10352,7 +10352,7 @@
     {
       "id": 125,
       "full_name": "VET / USDT",
-      "description": "VeChain",
+      "description": "Price of VeChain in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -10427,7 +10427,7 @@
     {
       "id": 126,
       "full_name": "FDUSD / USD",
-      "description": "First Digital USD",
+      "description": "Price of First Digital USD in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -10488,7 +10488,7 @@
     {
       "id": 127,
       "full_name": "FDUSD / USDT",
-      "description": "First Digital USD",
+      "description": "Price of First Digital USD in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -10538,7 +10538,7 @@
     {
       "id": 128,
       "full_name": "FDUSD / USDC",
-      "description": "First Digital USD",
+      "description": "Price of First Digital USD in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -10578,7 +10578,7 @@
     {
       "id": 129,
       "full_name": "TIA / USD",
-      "description": "Celestia",
+      "description": "Price of Celestia in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -10693,7 +10693,7 @@
     {
       "id": 130,
       "full_name": "TIA / USDT",
-      "description": "Celestia",
+      "description": "Price of Celestia in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -10773,7 +10773,7 @@
     {
       "id": 131,
       "full_name": "TIA / USDC",
-      "description": "Celestia",
+      "description": "Price of Celestia in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -10833,7 +10833,7 @@
     {
       "id": 132,
       "full_name": "POL / USD",
-      "description": "POL",
+      "description": "Price of POL in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -10946,7 +10946,7 @@
     {
       "id": 133,
       "full_name": "POL / ETH",
-      "description": "Polygon",
+      "description": "Price of Polygon in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -10991,7 +10991,7 @@
     {
       "id": 134,
       "full_name": "POL / USDT",
-      "description": "POL",
+      "description": "Price of POL in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -11071,7 +11071,7 @@
     {
       "id": 135,
       "full_name": "POL / USDC",
-      "description": "POL",
+      "description": "Price of POL in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -11116,7 +11116,7 @@
     {
       "id": 136,
       "full_name": "FIL / USD",
-      "description": "Filecoin",
+      "description": "Price of Filecoin in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -11243,7 +11243,7 @@
     {
       "id": 137,
       "full_name": "FIL / ETH",
-      "description": "Filecoin",
+      "description": "Price of Filecoin in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -11301,7 +11301,7 @@
     {
       "id": 138,
       "full_name": "FIL / USDT",
-      "description": "Filecoin",
+      "description": "Price of Filecoin in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -11386,7 +11386,7 @@
     {
       "id": 139,
       "full_name": "FIL / USDC",
-      "description": "Filecoin",
+      "description": "Price of Filecoin in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -11451,7 +11451,7 @@
     {
       "id": 140,
       "full_name": "LBTC / USD",
-      "description": "LOMBARD STAKED BTC",
+      "description": "Price of LOMBARD STAKED BTC in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -11496,7 +11496,7 @@
     {
       "id": 141,
       "full_name": "LBTC / USDT",
-      "description": "LOMBARD STAKED BTC",
+      "description": "Price of LOMBARD STAKED BTC in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -11528,7 +11528,7 @@
     {
       "id": 142,
       "full_name": "ALGO / USD",
-      "description": "Algorand",
+      "description": "Price of Algorand in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -11644,7 +11644,7 @@
     {
       "id": 143,
       "full_name": "ALGO / USDT",
-      "description": "Algorand",
+      "description": "Price of Algorand in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -11732,7 +11732,7 @@
     {
       "id": 144,
       "full_name": "ALGO / USDC",
-      "description": "Algorand",
+      "description": "Price of Algorand in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -11805,7 +11805,7 @@
     {
       "id": 145,
       "full_name": "RENDER / USD",
-      "description": "Render",
+      "description": "Price of Render in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -11920,7 +11920,7 @@
     {
       "id": 146,
       "full_name": "RENDER / USDT",
-      "description": "Render",
+      "description": "Price of Render in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -12005,7 +12005,7 @@
     {
       "id": 147,
       "full_name": "RENDER / USDC",
-      "description": "Render",
+      "description": "Price of Render in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -12060,7 +12060,7 @@
     {
       "id": 148,
       "full_name": "ATOM / USD",
-      "description": "Cosmos",
+      "description": "Price of Cosmos in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -12184,7 +12184,7 @@
     {
       "id": 149,
       "full_name": "ATOM / USDT",
-      "description": "Cosmos",
+      "description": "Price of Cosmos in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -12277,7 +12277,7 @@
     {
       "id": 150,
       "full_name": "ATOM / USDC",
-      "description": "Cosmos",
+      "description": "Price of Cosmos in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -12350,7 +12350,7 @@
     {
       "id": 151,
       "full_name": "ARB / USD",
-      "description": "Arbitrum",
+      "description": "Price of Arbitrum in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -12475,7 +12475,7 @@
     {
       "id": 152,
       "full_name": "ARB / USDT",
-      "description": "Arbitrum",
+      "description": "Price of Arbitrum in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -12555,7 +12555,7 @@
     {
       "id": 153,
       "full_name": "ARB / USDC",
-      "description": "Arbitrum",
+      "description": "Price of Arbitrum in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -12615,7 +12615,7 @@
     {
       "id": 154,
       "full_name": "JUP / USD",
-      "description": "Jupiter",
+      "description": "Price of Jupiter in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -12732,7 +12732,7 @@
     {
       "id": 155,
       "full_name": "JUP / USDT",
-      "description": "Jupiter",
+      "description": "Price of Jupiter in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -12817,7 +12817,7 @@
     {
       "id": 156,
       "full_name": "JUP / USDC",
-      "description": "Jupiter",
+      "description": "Price of Jupiter in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -12872,7 +12872,7 @@
     {
       "id": 157,
       "full_name": "OP / USD",
-      "description": "Optimism",
+      "description": "Price of Optimism in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -12991,7 +12991,7 @@
     {
       "id": 158,
       "full_name": "OP / USDT",
-      "description": "Optimism",
+      "description": "Price of Optimism in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -13076,7 +13076,7 @@
     {
       "id": 159,
       "full_name": "OP / USDC",
-      "description": "Optimism",
+      "description": "Price of Optimism in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -13146,7 +13146,7 @@
     {
       "id": 160,
       "full_name": "S / USD",
-      "description": "Sonic",
+      "description": "Price of Sonic in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -13255,7 +13255,7 @@
     {
       "id": 161,
       "full_name": "S / USDT",
-      "description": "Sonic",
+      "description": "Price of Sonic in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -13338,7 +13338,7 @@
     {
       "id": 162,
       "full_name": "S / USDC",
-      "description": "Sonic",
+      "description": "Price of Sonic in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -13396,7 +13396,7 @@
     {
       "id": 163,
       "full_name": "FET / USD",
-      "description": "Fetch.ai",
+      "description": "Price of Fetch.ai in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -13517,7 +13517,7 @@
     {
       "id": 164,
       "full_name": "FET / USDT",
-      "description": "Fetch.ai",
+      "description": "Price of Fetch.ai in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -13602,7 +13602,7 @@
     {
       "id": 165,
       "full_name": "FET / USDC",
-      "description": "Fetch.ai",
+      "description": "Price of Fetch.ai in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -13662,7 +13662,7 @@
     {
       "id": 166,
       "full_name": "ENA / USD",
-      "description": "Ethena",
+      "description": "Price of Ethena in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -13761,7 +13761,7 @@
     {
       "id": 167,
       "full_name": "ENA / USDT",
-      "description": "Ethena",
+      "description": "Price of Ethena in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -13831,7 +13831,7 @@
     {
       "id": 168,
       "full_name": "ENA / USDC",
-      "description": "Ethena",
+      "description": "Price of Ethena in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -13891,7 +13891,7 @@
     {
       "id": 169,
       "full_name": "MKR / USD",
-      "description": "Maker",
+      "description": "Price of Maker in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -14009,7 +14009,7 @@
     {
       "id": 170,
       "full_name": "MKR / ETH",
-      "description": "Maker",
+      "description": "Price of Maker in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -14049,7 +14049,7 @@
     {
       "id": 171,
       "full_name": "MKR / USDT",
-      "description": "Maker",
+      "description": "Price of Maker in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -14129,7 +14129,7 @@
     {
       "id": 172,
       "full_name": "MKR / USDC",
-      "description": "Maker",
+      "description": "Price of Maker in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -14174,7 +14174,7 @@
     {
       "id": 173,
       "full_name": "ZBU / USD",
-      "description": "Zeebu",
+      "description": "Price of Zeebu in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -14234,7 +14234,7 @@
     {
       "id": 174,
       "full_name": "ZBU / USDT",
-      "description": "Zeebu",
+      "description": "Price of Zeebu in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -14284,7 +14284,7 @@
     {
       "id": 175,
       "full_name": "STX / USD",
-      "description": "Stacks",
+      "description": "Price of Stacks in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -14396,7 +14396,7 @@
     {
       "id": 176,
       "full_name": "STX / USDT",
-      "description": "Stacks",
+      "description": "Price of Stacks in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -14476,7 +14476,7 @@
     {
       "id": 177,
       "full_name": "STX / USDC",
-      "description": "Stacks",
+      "description": "Price of Stacks in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -14531,7 +14531,7 @@
     {
       "id": 178,
       "full_name": "INJ / USD",
-      "description": "Injective Protocol",
+      "description": "Price of Injective Protocol in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -14646,7 +14646,7 @@
     {
       "id": 179,
       "full_name": "INJ / USDT",
-      "description": "Injective Protocol",
+      "description": "Price of Injective Protocol in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -14726,7 +14726,7 @@
     {
       "id": 180,
       "full_name": "INJ / USDC",
-      "description": "Injective Protocol",
+      "description": "Price of Injective Protocol in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -14791,7 +14791,7 @@
     {
       "id": 181,
       "full_name": "IMX / USD",
-      "description": "Immutable",
+      "description": "Price of Immutable in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -14903,7 +14903,7 @@
     {
       "id": 182,
       "full_name": "IMX / USDT",
-      "description": "Immutable",
+      "description": "Price of Immutable in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -14988,7 +14988,7 @@
     {
       "id": 183,
       "full_name": "IMX / USDC",
-      "description": "Immutable",
+      "description": "Price of Immutable in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -15020,7 +15020,7 @@
     {
       "id": 184,
       "full_name": "QNT / USD",
-      "description": "Quant",
+      "description": "Price of Quant in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -15127,7 +15127,7 @@
     {
       "id": 185,
       "full_name": "QNT / USDT",
-      "description": "Quant",
+      "description": "Price of Quant in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -15207,7 +15207,7 @@
     {
       "id": 186,
       "full_name": "WLD / USD",
-      "description": "Worldcoin",
+      "description": "Price of Worldcoin in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -15312,7 +15312,7 @@
     {
       "id": 187,
       "full_name": "WLD / USDT",
-      "description": "Worldcoin",
+      "description": "Price of Worldcoin in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -15387,7 +15387,7 @@
     {
       "id": 188,
       "full_name": "WLD / USDC",
-      "description": "Worldcoin",
+      "description": "Price of Worldcoin in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -15447,7 +15447,7 @@
     {
       "id": 189,
       "full_name": "THETA / USD",
-      "description": "Theta Token",
+      "description": "Price of Theta Token in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -15531,7 +15531,7 @@
     {
       "id": 190,
       "full_name": "THETA / USDT",
-      "description": "Theta Token",
+      "description": "Price of Theta Token in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -15601,7 +15601,7 @@
     {
       "id": 191,
       "full_name": "THETA / USDC",
-      "description": "Theta Token",
+      "description": "Price of Theta Token in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -15641,7 +15641,7 @@
     {
       "id": 192,
       "full_name": "GRT / USD",
-      "description": "The Graph",
+      "description": "Price of The Graph in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -15753,7 +15753,7 @@
     {
       "id": 193,
       "full_name": "GRT / ETH",
-      "description": "The Graph",
+      "description": "Price of The Graph in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -15793,7 +15793,7 @@
     {
       "id": 194,
       "full_name": "GRT / USDT",
-      "description": "The Graph",
+      "description": "Price of The Graph in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -15873,7 +15873,7 @@
     {
       "id": 195,
       "full_name": "GRT / USDC",
-      "description": "The Graph",
+      "description": "Price of The Graph in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -15913,7 +15913,7 @@
     {
       "id": 196,
       "full_name": "SEI / USD",
-      "description": "Sei",
+      "description": "Price of Sei in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -16015,7 +16015,7 @@
     {
       "id": 197,
       "full_name": "SEI / USDT",
-      "description": "Sei",
+      "description": "Price of Sei in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -16085,7 +16085,7 @@
     {
       "id": 198,
       "full_name": "SEI / USDC",
-      "description": "Sei",
+      "description": "Price of Sei in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -16135,7 +16135,7 @@
     {
       "id": 199,
       "full_name": "BONK / USD",
-      "description": "Bonk",
+      "description": "Price of Bonk in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -16266,7 +16266,7 @@
     {
       "id": 200,
       "full_name": "BONK / USDT",
-      "description": "Bonk",
+      "description": "Price of Bonk in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -16351,7 +16351,7 @@
     {
       "id": 201,
       "full_name": "BONK / USDC",
-      "description": "Bonk",
+      "description": "Price of Bonk in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -16406,7 +16406,7 @@
     {
       "id": 202,
       "full_name": "LDO / USD",
-      "description": "Lido DAO",
+      "description": "Price of Lido DAO in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -16527,7 +16527,7 @@
     {
       "id": 203,
       "full_name": "LDO / USDT",
-      "description": "Lido DAO",
+      "description": "Price of Lido DAO in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -16607,7 +16607,7 @@
     {
       "id": 204,
       "full_name": "LDO / USDC",
-      "description": "Lido DAO",
+      "description": "Price of Lido DAO in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -16667,7 +16667,7 @@
     {
       "id": 205,
       "full_name": "EOS / USD",
-      "description": "EOS",
+      "description": "Price of EOS in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -16788,7 +16788,7 @@
     {
       "id": 206,
       "full_name": "EOS / BNB",
-      "description": "EOS",
+      "description": "Price of EOS in BNB",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -16828,7 +16828,7 @@
     {
       "id": 207,
       "full_name": "EOS / USDT",
-      "description": "EOS",
+      "description": "Price of EOS in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -16916,7 +16916,7 @@
     {
       "id": 208,
       "full_name": "EOS / USDC",
-      "description": "EOS",
+      "description": "Price of EOS in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -16989,7 +16989,7 @@
     {
       "id": 209,
       "full_name": "GALA / USD",
-      "description": "Gala",
+      "description": "Price of Gala in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -17098,7 +17098,7 @@
     {
       "id": 210,
       "full_name": "GALA / USDT",
-      "description": "Gala",
+      "description": "Price of Gala in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -17173,7 +17173,7 @@
     {
       "id": 211,
       "full_name": "GALA / USDC",
-      "description": "Gala",
+      "description": "Price of Gala in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -17223,7 +17223,7 @@
     {
       "id": 212,
       "full_name": "PYUSD / USD",
-      "description": "PayPal USD",
+      "description": "Price of PayPal USD in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -17307,7 +17307,7 @@
     {
       "id": 213,
       "full_name": "PYUSD / USDT",
-      "description": "PayPal USD",
+      "description": "Price of PayPal USD in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -17372,7 +17372,7 @@
     {
       "id": 214,
       "full_name": "XTZ / BNB",
-      "description": "Tezos",
+      "description": "Price of Tezos in BNB",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -17412,7 +17412,7 @@
     {
       "id": 215,
       "full_name": "XTZ / USD",
-      "description": "Tezos",
+      "description": "Price of Tezos in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -17533,7 +17533,7 @@
     {
       "id": 216,
       "full_name": "XTZ / USDT",
-      "description": "Tezos",
+      "description": "Price of Tezos in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -17621,7 +17621,7 @@
     {
       "id": 217,
       "full_name": "XTZ / USDC",
-      "description": "Tezos",
+      "description": "Price of Tezos in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -17669,7 +17669,7 @@
     {
       "id": 218,
       "full_name": "SAND / USD",
-      "description": "The Sandbox",
+      "description": "Price of The Sandbox in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -17789,7 +17789,7 @@
     {
       "id": 219,
       "full_name": "SAND / USDT",
-      "description": "The Sandbox",
+      "description": "Price of The Sandbox in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -17874,7 +17874,7 @@
     {
       "id": 220,
       "full_name": "SAND / USDC",
-      "description": "The Sandbox",
+      "description": "Price of The Sandbox in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -17924,7 +17924,7 @@
     {
       "id": 221,
       "full_name": "BERA / USD",
-      "description": "Berachain",
+      "description": "Price of Berachain in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -18034,7 +18034,7 @@
     {
       "id": 222,
       "full_name": "BERA / USDT",
-      "description": "Berachain",
+      "description": "Price of Berachain in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -18117,7 +18117,7 @@
     {
       "id": 223,
       "full_name": "BERA / USDC",
-      "description": "Berachain",
+      "description": "Price of Berachain in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -18170,7 +18170,7 @@
     {
       "id": 224,
       "full_name": "JTO / USD",
-      "description": "Jito",
+      "description": "Price of Jito in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -18282,7 +18282,7 @@
     {
       "id": 225,
       "full_name": "JTO / USDT",
-      "description": "Jito",
+      "description": "Price of Jito in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -18362,7 +18362,7 @@
     {
       "id": 226,
       "full_name": "JTO / USDC",
-      "description": "Jito",
+      "description": "Price of Jito in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -18412,7 +18412,7 @@
     {
       "id": 227,
       "full_name": "FLOW / USD",
-      "description": "FLOW (dapper labs)",
+      "description": "Price of FLOW (dapper labs) in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -18519,7 +18519,7 @@
     {
       "id": 228,
       "full_name": "FLOW / USDT",
-      "description": "FLOW (dapper labs)",
+      "description": "Price of FLOW (dapper labs) in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -18604,7 +18604,7 @@
     {
       "id": 229,
       "full_name": "FLOW / USDC",
-      "description": "FLOW (dapper labs)",
+      "description": "Price of FLOW (dapper labs) in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -18636,7 +18636,7 @@
     {
       "id": 230,
       "full_name": "FLOKI / USD",
-      "description": "Floki Inu",
+      "description": "Price of Floki Inu in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -18763,7 +18763,7 @@
     {
       "id": 231,
       "full_name": "FLOKI / USDT",
-      "description": "Floki Inu",
+      "description": "Price of Floki Inu in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -18843,7 +18843,7 @@
     {
       "id": 232,
       "full_name": "FLOKI / USDC",
-      "description": "Floki Inu",
+      "description": "Price of Floki Inu in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -18903,7 +18903,7 @@
     {
       "id": 233,
       "full_name": "ENS / USD",
-      "description": "Ethereum Name Service",
+      "description": "Price of Ethereum Name Service in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -19019,7 +19019,7 @@
     {
       "id": 234,
       "full_name": "ENS / USDT",
-      "description": "Ethereum Name Service",
+      "description": "Price of Ethereum Name Service in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -19104,7 +19104,7 @@
     {
       "id": 235,
       "full_name": "ENS / USDC",
-      "description": "Ethereum Name Service",
+      "description": "Price of Ethereum Name Service in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -19159,7 +19159,7 @@
     {
       "id": 236,
       "full_name": "MANA / USD",
-      "description": "Decentraland",
+      "description": "Price of Decentraland in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -19275,7 +19275,7 @@
     {
       "id": 237,
       "full_name": "MANA / ETH",
-      "description": "Decentraland",
+      "description": "Price of Decentraland in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -19325,7 +19325,7 @@
     {
       "id": 238,
       "full_name": "MANA / USDT",
-      "description": "Decentraland",
+      "description": "Price of Decentraland in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -19413,7 +19413,7 @@
     {
       "id": 239,
       "full_name": "MANA / USDC",
-      "description": "Decentraland",
+      "description": "Price of Decentraland in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -19461,7 +19461,7 @@
     {
       "id": 240,
       "full_name": "CRV / USD",
-      "description": "Curve DAO",
+      "description": "Price of Curve DAO in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -19581,7 +19581,7 @@
     {
       "id": 241,
       "full_name": "CRV / ETH",
-      "description": "Curve DAO",
+      "description": "Price of Curve DAO in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -19631,7 +19631,7 @@
     {
       "id": 242,
       "full_name": "CRV / USDT",
-      "description": "Curve DAO",
+      "description": "Price of Curve DAO in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -19711,7 +19711,7 @@
     {
       "id": 243,
       "full_name": "CRV / USDC",
-      "description": "Curve DAO",
+      "description": "Price of Curve DAO in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -19766,7 +19766,7 @@
     {
       "id": 244,
       "full_name": "PYTH / USD",
-      "description": "Pyth Network",
+      "description": "Price of Pyth Network in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -19873,7 +19873,7 @@
     {
       "id": 245,
       "full_name": "PYTH / USDT",
-      "description": "Pyth Network",
+      "description": "Price of Pyth Network in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -19948,7 +19948,7 @@
     {
       "id": 246,
       "full_name": "PYTH / USDC",
-      "description": "Pyth Network",
+      "description": "Price of Pyth Network in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -19993,7 +19993,7 @@
     {
       "id": 247,
       "full_name": "EGLD / USD",
-      "description": "MultiversX",
+      "description": "Price of MultiversX in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -20110,7 +20110,7 @@
     {
       "id": 248,
       "full_name": "EGLD / USDT",
-      "description": "MultiversX",
+      "description": "Price of MultiversX in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -20195,7 +20195,7 @@
     {
       "id": 249,
       "full_name": "EGLD / USDC",
-      "description": "MultiversX",
+      "description": "Price of MultiversX in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -20235,7 +20235,7 @@
     {
       "id": 250,
       "full_name": "RON / USD",
-      "description": "Ronin",
+      "description": "Price of Ronin in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -20301,7 +20301,7 @@
     {
       "id": 251,
       "full_name": "RON / USDT",
-      "description": "Ronin",
+      "description": "Price of Ronin in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -20356,7 +20356,7 @@
     {
       "id": 252,
       "full_name": "RON / USDC",
-      "description": "Ronin",
+      "description": "Price of Ronin in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -20388,7 +20388,7 @@
     {
       "id": 253,
       "full_name": "AXS / USD",
-      "description": "Axie Infinity",
+      "description": "Price of Axie Infinity in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -20500,7 +20500,7 @@
     {
       "id": 254,
       "full_name": "AXS / USDT",
-      "description": "Axie Infinity",
+      "description": "Price of Axie Infinity in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -20585,7 +20585,7 @@
     {
       "id": 255,
       "full_name": "AXS / USDC",
-      "description": "Axie Infinity",
+      "description": "Price of Axie Infinity in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -20617,7 +20617,7 @@
     {
       "id": 256,
       "full_name": "TUSD / USD",
-      "description": "True USD",
+      "description": "Price of True USD in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -20711,7 +20711,7 @@
     {
       "id": 257,
       "full_name": "TUSD / ETH",
-      "description": "TrueUSD",
+      "description": "Price of TrueUSD in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -20751,7 +20751,7 @@
     {
       "id": 258,
       "full_name": "TUSD / USDT",
-      "description": "True USD",
+      "description": "Price of True USD in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -20826,7 +20826,7 @@
     {
       "id": 259,
       "full_name": "ZEC / USD",
-      "description": "ZCash",
+      "description": "Price of ZCash in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -20916,7 +20916,7 @@
     {
       "id": 260,
       "full_name": "ZEC / USDT",
-      "description": "ZCash",
+      "description": "Price of ZCash in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -20971,7 +20971,7 @@
     {
       "id": 261,
       "full_name": "ZEC / USDC",
-      "description": "ZCash",
+      "description": "Price of ZCash in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -21011,7 +21011,7 @@
     {
       "id": 262,
       "full_name": "KAVA / USD",
-      "description": "Kava",
+      "description": "Price of Kava in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -21116,7 +21116,7 @@
     {
       "id": 263,
       "full_name": "KAVA / USDT",
-      "description": "Kava",
+      "description": "Price of Kava in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -21191,7 +21191,7 @@
     {
       "id": 264,
       "full_name": "DYDX / USD",
-      "description": "dYdX",
+      "description": "Price of dYdX in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -21289,7 +21289,7 @@
     {
       "id": 265,
       "full_name": "DYDX / USDT",
-      "description": "dYdX",
+      "description": "Price of dYdX in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -21364,7 +21364,7 @@
     {
       "id": 266,
       "full_name": "DYDX / USDC",
-      "description": "dYdX",
+      "description": "Price of dYdX in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -21414,7 +21414,7 @@
     {
       "id": 267,
       "full_name": "XCN / USD",
-      "description": "Chain",
+      "description": "Price of Chain in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -21495,7 +21495,7 @@
     {
       "id": 268,
       "full_name": "XCN / USDT",
-      "description": "Chain",
+      "description": "Price of Chain in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -21550,7 +21550,7 @@
     {
       "id": 269,
       "full_name": "WIF / USD",
-      "description": "dogwifhat",
+      "description": "Price of dogwifhat in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -21680,7 +21680,7 @@
     {
       "id": 270,
       "full_name": "WIF / USDT",
-      "description": "dogwifhat",
+      "description": "Price of dogwifhat in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -21760,7 +21760,7 @@
     {
       "id": 271,
       "full_name": "WIF / USDC",
-      "description": "dogwifhat",
+      "description": "Price of dogwifhat in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -21820,7 +21820,7 @@
     {
       "id": 272,
       "full_name": "STRK / USD",
-      "description": "Starknet",
+      "description": "Price of Starknet in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -21931,7 +21931,7 @@
     {
       "id": 273,
       "full_name": "STRK / USDT",
-      "description": "Starknet",
+      "description": "Price of Starknet in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -22006,7 +22006,7 @@
     {
       "id": 274,
       "full_name": "STRK / USDC",
-      "description": "Starknet",
+      "description": "Price of Starknet in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -22061,7 +22061,7 @@
     {
       "id": 275,
       "full_name": "CAKE / USD",
-      "description": "PancakeSwap",
+      "description": "Price of PancakeSwap in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -22145,7 +22145,7 @@
     {
       "id": 276,
       "full_name": "CAKE / BNB",
-      "description": "PancakeSwap",
+      "description": "Price of PancakeSwap in BNB",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -22185,7 +22185,7 @@
     {
       "id": 277,
       "full_name": "CAKE / USDT",
-      "description": "PancakeSwap",
+      "description": "Price of PancakeSwap in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -22250,7 +22250,7 @@
     {
       "id": 278,
       "full_name": "CAKE / USDC",
-      "description": "PancakeSwap",
+      "description": "Price of PancakeSwap in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -22290,7 +22290,7 @@
     {
       "id": 279,
       "full_name": "MATIC / USD",
-      "description": "Polygon (MATIC)",
+      "description": "Price of Polygon (MATIC) in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -22375,7 +22375,7 @@
     {
       "id": 280,
       "full_name": "MATIC / USDT",
-      "description": "Polygon (MATIC)",
+      "description": "Price of Polygon (MATIC) in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -22433,7 +22433,7 @@
     {
       "id": 281,
       "full_name": "MATIC / USDC",
-      "description": "Polygon (MATIC)",
+      "description": "Price of Polygon (MATIC) in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -22481,7 +22481,7 @@
     {
       "id": 282,
       "full_name": "AERO / USD",
-      "description": "Aerodrome Finance",
+      "description": "Price of Aerodrome Finance in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -22571,7 +22571,7 @@
     {
       "id": 283,
       "full_name": "AERO / USDT",
-      "description": "Aerodrome Finance",
+      "description": "Price of Aerodrome Finance in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -22631,7 +22631,7 @@
     {
       "id": 284,
       "full_name": "CHZ / USD",
-      "description": "Chiliz",
+      "description": "Price of Chiliz in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -22751,7 +22751,7 @@
     {
       "id": 285,
       "full_name": "CHZ / USDT",
-      "description": "Chiliz",
+      "description": "Price of Chiliz in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -22836,7 +22836,7 @@
     {
       "id": 286,
       "full_name": "CHZ / USDC",
-      "description": "Chiliz",
+      "description": "Price of Chiliz in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -22886,7 +22886,7 @@
     {
       "id": 287,
       "full_name": "FRAX / USD",
-      "description": "FRAX",
+      "description": "Price of FRAX in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -22936,7 +22936,7 @@
     {
       "id": 288,
       "full_name": "FRAX / USDT",
-      "description": "FRAX",
+      "description": "Price of FRAX in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -22976,7 +22976,7 @@
     {
       "id": 289,
       "full_name": "CORE / USD",
-      "description": "",
+      "description": "Price of CORE in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -23049,7 +23049,7 @@
     {
       "id": 290,
       "full_name": "CORE / USDT",
-      "description": "",
+      "description": "Price of CORE in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -23109,7 +23109,7 @@
     {
       "id": 291,
       "full_name": "CORE / USDC",
-      "description": "",
+      "description": "Price of  in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -23141,7 +23141,7 @@
     {
       "id": 292,
       "full_name": "RUNE / USD",
-      "description": "THORChain",
+      "description": "Price of THORChain in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -23235,7 +23235,7 @@
     {
       "id": 293,
       "full_name": "RUNE / USDT",
-      "description": "THORChain",
+      "description": "Price of THORChain in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -23305,7 +23305,7 @@
     {
       "id": 294,
       "full_name": "RUNE / USDC",
-      "description": "THORChain",
+      "description": "Price of THORChain in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -23355,7 +23355,7 @@
     {
       "id": 295,
       "full_name": "AR / USD",
-      "description": "Arweave",
+      "description": "Price of Arweave in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -23453,7 +23453,7 @@
     {
       "id": 296,
       "full_name": "AR / USDT",
-      "description": "Arweave",
+      "description": "Price of Arweave in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -23528,7 +23528,7 @@
     {
       "id": 297,
       "full_name": "AR / USDC",
-      "description": "Arweave",
+      "description": "Price of Arweave in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -23578,7 +23578,7 @@
     {
       "id": 298,
       "full_name": "CFX / USD",
-      "description": "Conflux",
+      "description": "Price of Conflux in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -23656,7 +23656,7 @@
     {
       "id": 299,
       "full_name": "CFX / USDT",
-      "description": "Conflux",
+      "description": "Price of Conflux in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -23721,7 +23721,7 @@
     {
       "id": 300,
       "full_name": "CFX / USDC",
-      "description": "Conflux",
+      "description": "Price of Conflux in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -23766,7 +23766,7 @@
     {
       "id": 301,
       "full_name": "FTT / ETH",
-      "description": "FTX Token",
+      "description": "Price of FTX Token in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -23811,7 +23811,7 @@
     {
       "id": 302,
       "full_name": "FTT / USD",
-      "description": "FTX Token",
+      "description": "Price of FTX Token in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -23887,7 +23887,7 @@
     {
       "id": 303,
       "full_name": "FTT / USDT",
-      "description": "FTX Token",
+      "description": "Price of FTX Token in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -23952,7 +23952,7 @@
     {
       "id": 304,
       "full_name": "FTT / USDC",
-      "description": "FTX Token",
+      "description": "Price of FTX Token in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -23992,7 +23992,7 @@
     {
       "id": 305,
       "full_name": "APE / USD",
-      "description": "ApeCoin",
+      "description": "Price of ApeCoin in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -24122,7 +24122,7 @@
     {
       "id": 306,
       "full_name": "APE / ETH",
-      "description": "APECoin",
+      "description": "Price of APECoin in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -24162,7 +24162,7 @@
     {
       "id": 307,
       "full_name": "APE / USDT",
-      "description": "ApeCoin",
+      "description": "Price of ApeCoin in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -24255,7 +24255,7 @@
     {
       "id": 308,
       "full_name": "APE / USDC",
-      "description": "ApeCoin",
+      "description": "Price of ApeCoin in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -24323,7 +24323,7 @@
     {
       "id": 309,
       "full_name": "VIRTUAL / USD",
-      "description": "Virtuals Protocol",
+      "description": "Price of Virtuals Protocol in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -24428,7 +24428,7 @@
     {
       "id": 310,
       "full_name": "VIRTUAL / USDT",
-      "description": "Virtuals Protocol",
+      "description": "Price of Virtuals Protocol in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -24516,7 +24516,7 @@
     {
       "id": 311,
       "full_name": "VIRTUAL / USDC",
-      "description": "Virtuals Protocol",
+      "description": "Price of Virtuals Protocol in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -24569,7 +24569,7 @@
     {
       "id": 312,
       "full_name": "PENGU / USD",
-      "description": "Pudgy Penguins",
+      "description": "Price of Pudgy Penguins in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -24685,7 +24685,7 @@
     {
       "id": 313,
       "full_name": "PENGU / USDT",
-      "description": "Pudgy Penguins",
+      "description": "Price of Pudgy Penguins in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -24778,7 +24778,7 @@
     {
       "id": 314,
       "full_name": "PENGU / USDC",
-      "description": "Pudgy Penguins",
+      "description": "Price of Pudgy Penguins in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -24831,7 +24831,7 @@
     {
       "id": 315,
       "full_name": "COMP / USD",
-      "description": "Compound",
+      "description": "Price of Compound in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -24948,7 +24948,7 @@
     {
       "id": 316,
       "full_name": "COMP / USDT",
-      "description": "Compound",
+      "description": "Price of Compound in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -25028,7 +25028,7 @@
     {
       "id": 317,
       "full_name": "COMP / USDC",
-      "description": "Compound",
+      "description": "Price of Compound in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -25068,7 +25068,7 @@
     {
       "id": 318,
       "full_name": "AXL / USD",
-      "description": "Axelar",
+      "description": "Price of Axelar in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -25142,7 +25142,7 @@
     {
       "id": 319,
       "full_name": "AXL / USDT",
-      "description": "Axelar",
+      "description": "Price of Axelar in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -25197,7 +25197,7 @@
     {
       "id": 320,
       "full_name": "PENDLE / USD",
-      "description": "Pendle",
+      "description": "Price of Pendle in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -25299,7 +25299,7 @@
     {
       "id": 321,
       "full_name": "PENDLE / USDT",
-      "description": "Pendle",
+      "description": "Price of Pendle in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -25374,7 +25374,7 @@
     {
       "id": 322,
       "full_name": "PENDLE / USDC",
-      "description": "Pendle",
+      "description": "Price of Pendle in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -25419,7 +25419,7 @@
     {
       "id": 323,
       "full_name": "SPX / USD",
-      "description": "SPX6900",
+      "description": "Price of SPX6900 in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -25498,7 +25498,7 @@
     {
       "id": 324,
       "full_name": "SPX / USDT",
-      "description": "SPX6900",
+      "description": "Price of SPX6900 in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -25553,7 +25553,7 @@
     {
       "id": 325,
       "full_name": "GNO / USD",
-      "description": "Gnosis",
+      "description": "Price of Gnosis in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -25636,7 +25636,7 @@
     {
       "id": 326,
       "full_name": "GNO / USDT",
-      "description": "Gnosis",
+      "description": "Price of Gnosis in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -25691,7 +25691,7 @@
     {
       "id": 327,
       "full_name": "MORPHO / USD",
-      "description": "Morpho",
+      "description": "Price of Morpho in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -25786,7 +25786,7 @@
     {
       "id": 328,
       "full_name": "MORPHO / USDT",
-      "description": "Morpho",
+      "description": "Price of Morpho in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -25851,7 +25851,7 @@
     {
       "id": 329,
       "full_name": "MORPHO / USDC",
-      "description": "Morpho",
+      "description": "Price of Morpho in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -25891,7 +25891,7 @@
     {
       "id": 330,
       "full_name": "RSR / USD",
-      "description": "Reserve Rights",
+      "description": "Price of Reserve Rights in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -25987,7 +25987,7 @@
     {
       "id": 331,
       "full_name": "RSR / USDT",
-      "description": "Reserve Rights",
+      "description": "Price of Reserve Rights in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -26057,7 +26057,7 @@
     {
       "id": 332,
       "full_name": "RSR / USDC",
-      "description": "Reserve Rights",
+      "description": "Price of Reserve Rights in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -26097,7 +26097,7 @@
     {
       "id": 333,
       "full_name": "BRETT / USD",
-      "description": "Brett",
+      "description": "Price of Brett in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -26180,7 +26180,7 @@
     {
       "id": 334,
       "full_name": "BRETT / USDT",
-      "description": "Brett",
+      "description": "Price of Brett in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -26240,7 +26240,7 @@
     {
       "id": 335,
       "full_name": "BRETT / USDC",
-      "description": "Brett",
+      "description": "Price of Brett in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -26280,7 +26280,7 @@
     {
       "id": 336,
       "full_name": "BEAM / USD",
-      "description": "Beam",
+      "description": "Price of Beam in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -26365,7 +26365,7 @@
     {
       "id": 337,
       "full_name": "BEAM / USDT",
-      "description": "Beam",
+      "description": "Price of Beam in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -26430,7 +26430,7 @@
     {
       "id": 338,
       "full_name": "deUSD / USD",
-      "description": "",
+      "description": "Price of Elixir deUSD in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -26480,7 +26480,7 @@
     {
       "id": 339,
       "full_name": "deUSD / USDT",
-      "description": "",
+      "description": "Price of Elixir deUSD in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -26520,7 +26520,7 @@
     {
       "id": 340,
       "full_name": "SNX / USD",
-      "description": "Synthetix Network",
+      "description": "Price of Synthetix Network in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -26626,7 +26626,7 @@
     {
       "id": 341,
       "full_name": "SNX / ETH",
-      "description": "Synthetix Network",
+      "description": "Price of Synthetix Network in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -26676,7 +26676,7 @@
     {
       "id": 342,
       "full_name": "SNX / USDT",
-      "description": "Synthetix Network",
+      "description": "Price of Synthetix Network in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -26756,7 +26756,7 @@
     {
       "id": 343,
       "full_name": "SNX / USDC",
-      "description": "Synthetix Network",
+      "description": "Price of Synthetix Network in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -26788,7 +26788,7 @@
     {
       "id": 344,
       "full_name": "FARTCOIN / USD",
-      "description": "Fartcoin",
+      "description": "Price of Fartcoin in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -26874,7 +26874,7 @@
     {
       "id": 345,
       "full_name": "FARTCOIN / USDT",
-      "description": "Fartcoin",
+      "description": "Price of Fartcoin in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -26937,7 +26937,7 @@
     {
       "id": 346,
       "full_name": "FARTCOIN / USDC",
-      "description": "Fartcoin",
+      "description": "Price of Fartcoin in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -26990,7 +26990,7 @@
     {
       "id": 347,
       "full_name": "1INCH / USD",
-      "description": "1inch",
+      "description": "Price of 1inch in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -27096,7 +27096,7 @@
     {
       "id": 348,
       "full_name": "1INCH / USDT",
-      "description": "1inch",
+      "description": "Price of 1inch in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -27176,7 +27176,7 @@
     {
       "id": 349,
       "full_name": "1INCH / USDC",
-      "description": "1inch",
+      "description": "Price of 1inch in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -27216,7 +27216,7 @@
     {
       "id": 350,
       "full_name": "DASH / USD",
-      "description": "Dash",
+      "description": "Price of Dash in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -27295,7 +27295,7 @@
     {
       "id": 351,
       "full_name": "DASH / USDT",
-      "description": "Dash",
+      "description": "Price of Dash in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -27350,7 +27350,7 @@
     {
       "id": 352,
       "full_name": "EIGEN / USD",
-      "description": "Eigenlayer",
+      "description": "Price of Eigenlayer in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -27462,7 +27462,7 @@
     {
       "id": 353,
       "full_name": "EIGEN / USDT",
-      "description": "Eigenlayer",
+      "description": "Price of Eigenlayer in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -27537,7 +27537,7 @@
     {
       "id": 354,
       "full_name": "EIGEN / USDC",
-      "description": "Eigenlayer",
+      "description": "Price of Eigenlayer in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -27582,7 +27582,7 @@
     {
       "id": 355,
       "full_name": "ZK / USD",
-      "description": "ZKsync",
+      "description": "Price of ZKsync in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -27685,7 +27685,7 @@
     {
       "id": 356,
       "full_name": "ZK / USDT",
-      "description": "ZKsync",
+      "description": "Price of ZKsync in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -27760,7 +27760,7 @@
     {
       "id": 357,
       "full_name": "ZK / USDC",
-      "description": "ZKsync",
+      "description": "Price of ZKsync in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -27810,7 +27810,7 @@
     {
       "id": 358,
       "full_name": "KSM / USD",
-      "description": "Kusama",
+      "description": "Price of Kusama in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -27916,7 +27916,7 @@
     {
       "id": 359,
       "full_name": "KSM / USDT",
-      "description": "Kusama",
+      "description": "Price of Kusama in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -27996,7 +27996,7 @@
     {
       "id": 360,
       "full_name": "KSM / USDC",
-      "description": "Kusama",
+      "description": "Price of Kusama in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -28028,7 +28028,7 @@
     {
       "id": 361,
       "full_name": "SATS / USD",
-      "description": "SATS (Ordinals)",
+      "description": "Price of SATS (Ordinals) in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -28106,7 +28106,7 @@
     {
       "id": 362,
       "full_name": "SATS / USDT",
-      "description": "SATS (Ordinals)",
+      "description": "Price of SATS (Ordinals) in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -28171,7 +28171,7 @@
     {
       "id": 363,
       "full_name": "SATS / USDC",
-      "description": "SATS (Ordinals)",
+      "description": "Price of SATS (Ordinals) in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -28203,7 +28203,7 @@
     {
       "id": 364,
       "full_name": "ASTR / USD",
-      "description": "Astar",
+      "description": "Price of Astar in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -28304,7 +28304,7 @@
     {
       "id": 365,
       "full_name": "ASTR / USDT",
-      "description": "Astar",
+      "description": "Price of Astar in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -28384,7 +28384,7 @@
     {
       "id": 366,
       "full_name": "ASTR / USDC",
-      "description": "Astar",
+      "description": "Price of Astar in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -28416,7 +28416,7 @@
     {
       "id": 367,
       "full_name": "ZIL / USD",
-      "description": "Zilliqa",
+      "description": "Price of Zilliqa in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -28510,7 +28510,7 @@
     {
       "id": 368,
       "full_name": "ZIL / USDT",
-      "description": "Zilliqa",
+      "description": "Price of Zilliqa in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -28590,7 +28590,7 @@
     {
       "id": 369,
       "full_name": "ZIL / USDC",
-      "description": "Zilliqa",
+      "description": "Price of Zilliqa in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -28630,7 +28630,7 @@
     {
       "id": 370,
       "full_name": "ATH / USD",
-      "description": "Aethir",
+      "description": "Price of Aethir in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -28732,7 +28732,7 @@
     {
       "id": 371,
       "full_name": "ATH / USDT",
-      "description": "Aethir",
+      "description": "Price of Aethir in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -28797,7 +28797,7 @@
     {
       "id": 372,
       "full_name": "ATH / USDC",
-      "description": "Aethir",
+      "description": "Price of Aethir in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -28837,7 +28837,7 @@
     {
       "id": 373,
       "full_name": "BLUR / USD",
-      "description": "Blur",
+      "description": "Price of Blur in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -28945,7 +28945,7 @@
     {
       "id": 374,
       "full_name": "BLUR / USDT",
-      "description": "Blur",
+      "description": "Price of Blur in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -29020,7 +29020,7 @@
     {
       "id": 375,
       "full_name": "BLUR / USDC",
-      "description": "Blur",
+      "description": "Price of Blur in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -29070,7 +29070,7 @@
     {
       "id": 376,
       "full_name": "NOT / USD",
-      "description": "Notcoin",
+      "description": "Price of Notcoin in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -29169,7 +29169,7 @@
     {
       "id": 377,
       "full_name": "NOT / USDT",
-      "description": "Notcoin",
+      "description": "Price of Notcoin in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -29244,7 +29244,7 @@
     {
       "id": 378,
       "full_name": "NOT / USDC",
-      "description": "Notcoin",
+      "description": "Price of Notcoin in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -29299,7 +29299,7 @@
     {
       "id": 379,
       "full_name": "USDD / USD",
-      "description": "USDD",
+      "description": "Price of USDD in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -29368,7 +29368,7 @@
     {
       "id": 380,
       "full_name": "USDD / USDT",
-      "description": "USDD",
+      "description": "Price of USDD in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -29418,7 +29418,7 @@
     {
       "id": 381,
       "full_name": "USDD / USDC",
-      "description": "USDD",
+      "description": "Price of USDD in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -29458,7 +29458,7 @@
     {
       "id": 382,
       "full_name": "BAT / USD",
-      "description": "Basic Attention Token",
+      "description": "Price of Basic Attention Token in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -29575,7 +29575,7 @@
     {
       "id": 383,
       "full_name": "BAT / ETH",
-      "description": "Basic Attention Token",
+      "description": "Price of Basic Attention Token in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -29620,7 +29620,7 @@
     {
       "id": 384,
       "full_name": "BAT / USDT",
-      "description": "Basic Attention Token",
+      "description": "Price of Basic Attention Token in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -29705,7 +29705,7 @@
     {
       "id": 385,
       "full_name": "BAT / USDC",
-      "description": "Basic Attention Token",
+      "description": "Price of Basic Attention Token in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -29745,7 +29745,7 @@
     {
       "id": 386,
       "full_name": "MASK / USD",
-      "description": "Mask Network",
+      "description": "Price of Mask Network in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -29857,7 +29857,7 @@
     {
       "id": 387,
       "full_name": "MASK / USDT",
-      "description": "Mask Network",
+      "description": "Price of Mask Network in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -29942,7 +29942,7 @@
     {
       "id": 388,
       "full_name": "MASK / USDC",
-      "description": "Mask Network",
+      "description": "Price of Mask Network in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -29974,7 +29974,7 @@
     {
       "id": 389,
       "full_name": "ID / USD",
-      "description": "SPACE ID",
+      "description": "Price of SPACE ID in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -30057,7 +30057,7 @@
     {
       "id": 390,
       "full_name": "ID / USDT",
-      "description": "SPACE ID",
+      "description": "Price of SPACE ID in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -30127,7 +30127,7 @@
     {
       "id": 391,
       "full_name": "ID / USDC",
-      "description": "SPACE ID",
+      "description": "Price of SPACE ID in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -30159,7 +30159,7 @@
     {
       "id": 392,
       "full_name": "ZRX / USD",
-      "description": "0x",
+      "description": "Price of 0x in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -30279,7 +30279,7 @@
     {
       "id": 393,
       "full_name": "ZRX / ETH",
-      "description": "0x",
+      "description": "Price of 0x in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -30319,7 +30319,7 @@
     {
       "id": 394,
       "full_name": "ZRX / USDT",
-      "description": "0x",
+      "description": "Price of 0x in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -30399,7 +30399,7 @@
     {
       "id": 395,
       "full_name": "ZRX / USDC",
-      "description": "0x",
+      "description": "Price of 0x in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -30431,7 +30431,7 @@
     {
       "id": 396,
       "full_name": "ZRO / USD",
-      "description": "LayerZero",
+      "description": "Price of LayerZero in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -30544,7 +30544,7 @@
     {
       "id": 397,
       "full_name": "ZRO / USDT",
-      "description": "LayerZero",
+      "description": "Price of LayerZero in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -30624,7 +30624,7 @@
     {
       "id": 398,
       "full_name": "ZRO / USDC",
-      "description": "LayerZero",
+      "description": "Price of LayerZero in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -30674,7 +30674,7 @@
     {
       "id": 399,
       "full_name": "HOT / USD",
-      "description": "Holo",
+      "description": "Price of Holo in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -30749,7 +30749,7 @@
     {
       "id": 400,
       "full_name": "HOT / USDT",
-      "description": "Holo",
+      "description": "Price of Holo in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -30809,7 +30809,7 @@
     {
       "id": 401,
       "full_name": "WEMIX / USD",
-      "description": "WEMIX",
+      "description": "Price of WEMIX in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -30879,7 +30879,7 @@
     {
       "id": 402,
       "full_name": "WEMIX / USDT",
-      "description": "WEMIX",
+      "description": "Price of WEMIX in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -30939,7 +30939,7 @@
     {
       "id": 403,
       "full_name": "ORDI / USD",
-      "description": "ORDI",
+      "description": "Price of ORDI in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -31028,7 +31028,7 @@
     {
       "id": 404,
       "full_name": "ORDI / USDT",
-      "description": "ORDI",
+      "description": "Price of ORDI in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -31103,7 +31103,7 @@
     {
       "id": 405,
       "full_name": "ORDI / USDC",
-      "description": "ORDI",
+      "description": "Price of ORDI in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -31148,7 +31148,7 @@
     {
       "id": 406,
       "full_name": "CELO / USD",
-      "description": "Celo",
+      "description": "Price of Celo in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -31248,7 +31248,7 @@
     {
       "id": 407,
       "full_name": "CELO / USDT",
-      "description": "Celo",
+      "description": "Price of Celo in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -31323,7 +31323,7 @@
     {
       "id": 408,
       "full_name": "CELO / USDC",
-      "description": "Celo",
+      "description": "Price of Celo in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -31355,7 +31355,7 @@
     {
       "id": 409,
       "full_name": "AI16Z / USD",
-      "description": "ai16z",
+      "description": "Price of ai16z in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -31443,7 +31443,7 @@
     {
       "id": 410,
       "full_name": "AI16Z / USDT",
-      "description": "ai16z",
+      "description": "Price of ai16z in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -31511,7 +31511,7 @@
     {
       "id": 411,
       "full_name": "AI16Z / USDC",
-      "description": "ai16z",
+      "description": "Price of ai16z in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -31559,7 +31559,7 @@
     {
       "id": 412,
       "full_name": "CVX / USD",
-      "description": "Convex Finance",
+      "description": "Price of Convex Finance in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -31653,7 +31653,7 @@
     {
       "id": 413,
       "full_name": "CVX / USDT",
-      "description": "Convex Finance",
+      "description": "Price of Convex Finance in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -31718,7 +31718,7 @@
     {
       "id": 414,
       "full_name": "CVX / USDC",
-      "description": "Convex Finance",
+      "description": "Price of Convex Finance in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -31750,7 +31750,7 @@
     {
       "id": 415,
       "full_name": "MOG / USD",
-      "description": "Mog Coin",
+      "description": "Price of Mog Coin in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -31843,7 +31843,7 @@
     {
       "id": 416,
       "full_name": "MOG / USDT",
-      "description": "Mog Coin",
+      "description": "Price of Mog Coin in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -31908,7 +31908,7 @@
     {
       "id": 417,
       "full_name": "ANKR / USD",
-      "description": "Ankr",
+      "description": "Price of Ankr in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -32014,7 +32014,7 @@
     {
       "id": 418,
       "full_name": "ANKR / USDT",
-      "description": "Ankr",
+      "description": "Price of Ankr in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -32089,7 +32089,7 @@
     {
       "id": 419,
       "full_name": "ANKR / USDC",
-      "description": "Ankr",
+      "description": "Price of Ankr in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -32129,7 +32129,7 @@
     {
       "id": 420,
       "full_name": "YFI / USD",
-      "description": "Yearn Finance",
+      "description": "Price of Yearn Finance in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -32244,7 +32244,7 @@
     {
       "id": 421,
       "full_name": "YFI / BNB",
-      "description": "Yearn Finance",
+      "description": "Price of Yearn Finance in BNB",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -32284,7 +32284,7 @@
     {
       "id": 422,
       "full_name": "YFI / ETH",
-      "description": "Yearn Finance",
+      "description": "Price of Yearn Finance in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -32316,7 +32316,7 @@
     {
       "id": 423,
       "full_name": "YFI / USDT",
-      "description": "Yearn Finance",
+      "description": "Price of Yearn Finance in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -32391,7 +32391,7 @@
     {
       "id": 424,
       "full_name": "YFI / USDC",
-      "description": "Yearn Finance",
+      "description": "Price of Yearn Finance in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -32423,7 +32423,7 @@
     {
       "id": 425,
       "full_name": "ENJ / USD",
-      "description": "Enjin Coin",
+      "description": "Price of Enjin Coin in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -32525,7 +32525,7 @@
     {
       "id": 426,
       "full_name": "ENJ / ETH",
-      "description": "Enjin Coin",
+      "description": "Price of Enjin Coin in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -32570,7 +32570,7 @@
     {
       "id": 427,
       "full_name": "ENJ / USDT",
-      "description": "Enjin Coin",
+      "description": "Price of Enjin Coin in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -32650,7 +32650,7 @@
     {
       "id": 428,
       "full_name": "ENJ / USDC",
-      "description": "Enjin Coin",
+      "description": "Price of Enjin Coin in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -32690,7 +32690,7 @@
     {
       "id": 429,
       "full_name": "PNUT / USD",
-      "description": "Peanut the Squirrel",
+      "description": "Price of Peanut the Squirrel in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -32809,7 +32809,7 @@
     {
       "id": 430,
       "full_name": "PNUT / USDT",
-      "description": "Peanut the Squirrel",
+      "description": "Price of Peanut the Squirrel in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -32889,7 +32889,7 @@
     {
       "id": 431,
       "full_name": "PNUT / USDC",
-      "description": "Peanut the Squirrel",
+      "description": "Price of Peanut the Squirrel in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -32939,7 +32939,7 @@
     {
       "id": 432,
       "full_name": "ONE / USD",
-      "description": "Harmony",
+      "description": "Price of Harmony in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -33037,7 +33037,7 @@
     {
       "id": 433,
       "full_name": "ONE / USDT",
-      "description": "Harmony",
+      "description": "Price of Harmony in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -33117,7 +33117,7 @@
     {
       "id": 434,
       "full_name": "ONE / USDC",
-      "description": "Harmony",
+      "description": "Price of Harmony in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -33157,7 +33157,7 @@
     {
       "id": 435,
       "full_name": "MEW / USD",
-      "description": "cat in a dogs world",
+      "description": "Price of cat in a dogs world in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -33257,7 +33257,7 @@
     {
       "id": 436,
       "full_name": "MEW / USDT",
-      "description": "cat in a dogs world",
+      "description": "Price of cat in a dogs world in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -33327,7 +33327,7 @@
     {
       "id": 437,
       "full_name": "MEW / USDC",
-      "description": "cat in a dogs world",
+      "description": "Price of cat in a dogs world in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -33367,7 +33367,7 @@
     {
       "id": 438,
       "full_name": "SUSHI / USD",
-      "description": "Sushi",
+      "description": "Price of Sushi in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -33483,7 +33483,7 @@
     {
       "id": 439,
       "full_name": "SUSHI / ETH",
-      "description": "Sushi",
+      "description": "Price of Sushi in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -33515,7 +33515,7 @@
     {
       "id": 440,
       "full_name": "SUSHI / USDT",
-      "description": "Sushi",
+      "description": "Price of Sushi in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -33595,7 +33595,7 @@
     {
       "id": 441,
       "full_name": "SUSHI / USDC",
-      "description": "Sushi",
+      "description": "Price of Sushi in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -33627,7 +33627,7 @@
     {
       "id": 442,
       "full_name": "IOTX / USD",
-      "description": "IoTeX",
+      "description": "Price of IoTeX in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -33718,7 +33718,7 @@
     {
       "id": 443,
       "full_name": "IOTX / USDT",
-      "description": "IoTeX",
+      "description": "Price of IoTeX in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -33788,7 +33788,7 @@
     {
       "id": 444,
       "full_name": "ETHFI / USD",
-      "description": "Ether.fi",
+      "description": "Price of Ether.fi in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -33890,7 +33890,7 @@
     {
       "id": 445,
       "full_name": "ETHFI / USDT",
-      "description": "Ether.fi",
+      "description": "Price of Ether.fi in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -33960,7 +33960,7 @@
     {
       "id": 446,
       "full_name": "ETHFI / USDC",
-      "description": "Ether.fi",
+      "description": "Price of Ether.fi in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -34010,7 +34010,7 @@
     {
       "id": 447,
       "full_name": "WOO / USD",
-      "description": "Woo Network",
+      "description": "Price of Woo Network in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -34109,7 +34109,7 @@
     {
       "id": 448,
       "full_name": "WOO / USDT",
-      "description": "Woo Network",
+      "description": "Price of Woo Network in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -34184,7 +34184,7 @@
     {
       "id": 449,
       "full_name": "POPCAT / USD",
-      "description": "POPCAT",
+      "description": "Price of POPCAT in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -34276,7 +34276,7 @@
     {
       "id": 450,
       "full_name": "POPCAT / USDT",
-      "description": "POPCAT",
+      "description": "Price of POPCAT in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -34336,7 +34336,7 @@
     {
       "id": 451,
       "full_name": "TURBO / USD",
-      "description": "Turbo",
+      "description": "Price of Turbo in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -34438,7 +34438,7 @@
     {
       "id": 452,
       "full_name": "TURBO / USDT",
-      "description": "Turbo",
+      "description": "Price of Turbo in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -34508,7 +34508,7 @@
     {
       "id": 453,
       "full_name": "TURBO / USDC",
-      "description": "Turbo",
+      "description": "Price of Turbo in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -34558,7 +34558,7 @@
     {
       "id": 454,
       "full_name": "DGB / USD",
-      "description": "Digibyte",
+      "description": "Price of Digibyte in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -34645,7 +34645,7 @@
     {
       "id": 455,
       "full_name": "DGB / USDT",
-      "description": "Digibyte",
+      "description": "Price of Digibyte in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -34715,7 +34715,7 @@
     {
       "id": 456,
       "full_name": "DGB / USDC",
-      "description": "Digibyte",
+      "description": "Price of Digibyte in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -34747,7 +34747,7 @@
     {
       "id": 457,
       "full_name": "LRC / ETH",
-      "description": "Loopring",
+      "description": "Price of Loopring in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -34787,7 +34787,7 @@
     {
       "id": 458,
       "full_name": "HMSTR / USD",
-      "description": "Hamster Kombat",
+      "description": "Price of Hamster Kombat in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -34883,7 +34883,7 @@
     {
       "id": 459,
       "full_name": "HMSTR / USDT",
-      "description": "Hamster Kombat",
+      "description": "Price of Hamster Kombat in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -34953,7 +34953,7 @@
     {
       "id": 460,
       "full_name": "HMSTR / USDC",
-      "description": "Hamster Kombat",
+      "description": "Price of Hamster Kombat in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -34998,7 +34998,7 @@
     {
       "id": 461,
       "full_name": "GMX / USD",
-      "description": "GMX",
+      "description": "Price of GMX in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -35092,7 +35092,7 @@
     {
       "id": 462,
       "full_name": "GMX / USDT",
-      "description": "GMX",
+      "description": "Price of GMX in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -35162,7 +35162,7 @@
     {
       "id": 463,
       "full_name": "EURC / USD",
-      "description": "Circle EUR",
+      "description": "Price of Circle EUR in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -35219,7 +35219,7 @@
     {
       "id": 464,
       "full_name": "EURC / USDC",
-      "description": "Circle EUR",
+      "description": "Price of Circle EUR in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -35259,7 +35259,7 @@
     {
       "id": 465,
       "full_name": "GMT / USD",
-      "description": "STEPN",
+      "description": "Price of GMT in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -35362,7 +35362,7 @@
     {
       "id": 466,
       "full_name": "GMT / USDT",
-      "description": "STEPN",
+      "description": "Price of GMT in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -35432,7 +35432,7 @@
     {
       "id": 467,
       "full_name": "GMT / USDC",
-      "description": "STEPN",
+      "description": "Price of GMT in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -35482,7 +35482,7 @@
     {
       "id": 468,
       "full_name": "FXS / USD",
-      "description": "Frax Share",
+      "description": "Price of Frax Share in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -35575,7 +35575,7 @@
     {
       "id": 469,
       "full_name": "FXS / USDT",
-      "description": "Frax Share",
+      "description": "Price of Frax Share in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -35645,7 +35645,7 @@
     {
       "id": 470,
       "full_name": "ONT / USD",
-      "description": "Ontology",
+      "description": "Price of Ontology in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -35734,7 +35734,7 @@
     {
       "id": 471,
       "full_name": "ONT / USDT",
-      "description": "Ontology",
+      "description": "Price of Ontology in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -35804,7 +35804,7 @@
     {
       "id": 472,
       "full_name": "ONT / USDC",
-      "description": "Ontology",
+      "description": "Price of Ontology in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -35849,7 +35849,7 @@
     {
       "id": 473,
       "full_name": "SXP / USD",
-      "description": "Swipe",
+      "description": "Price of Swipe in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -35919,7 +35919,7 @@
     {
       "id": 474,
       "full_name": "SXP / USDT",
-      "description": "Swipe",
+      "description": "Price of Swipe in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -35979,7 +35979,7 @@
     {
       "id": 475,
       "full_name": "POLYX / USD",
-      "description": "Polymesh",
+      "description": "Price of Polymesh in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -36055,7 +36055,7 @@
     {
       "id": 476,
       "full_name": "POLYX / USDT",
-      "description": "Polymesh",
+      "description": "Price of Polymesh in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -36115,7 +36115,7 @@
     {
       "id": 477,
       "full_name": "BAND / BNB",
-      "description": "Band Protocol",
+      "description": "Price of Band Protocol in BNB",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -36155,7 +36155,7 @@
     {
       "id": 478,
       "full_name": "BAND / USD",
-      "description": "Band Protocol",
+      "description": "Price of Band Protocol in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -36251,7 +36251,7 @@
     {
       "id": 479,
       "full_name": "BAND / USDT",
-      "description": "Band Protocol",
+      "description": "Price of Band Protocol in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -36321,7 +36321,7 @@
     {
       "id": 480,
       "full_name": "BAND / USDC",
-      "description": "Band Protocol",
+      "description": "Price of Band Protocol in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -36353,7 +36353,7 @@
     {
       "id": 481,
       "full_name": "ARKM / USD",
-      "description": "Arkham",
+      "description": "Price of Arkham in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -36460,7 +36460,7 @@
     {
       "id": 482,
       "full_name": "ARKM / USDT",
-      "description": "Arkham",
+      "description": "Price of Arkham in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -36535,7 +36535,7 @@
     {
       "id": 483,
       "full_name": "ARKM / USDC",
-      "description": "Arkham",
+      "description": "Price of Arkham in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -36585,7 +36585,7 @@
     {
       "id": 484,
       "full_name": "IO / USD",
-      "description": "io.net",
+      "description": "Price of io.net in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -36677,7 +36677,7 @@
     {
       "id": 485,
       "full_name": "IO / USDT",
-      "description": "io.net",
+      "description": "Price of io.net in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -36752,7 +36752,7 @@
     {
       "id": 486,
       "full_name": "IO / USDC",
-      "description": "io.net",
+      "description": "Price of io.net in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -36792,7 +36792,7 @@
     {
       "id": 487,
       "full_name": "STORJ / USD",
-      "description": "Storj",
+      "description": "Price of Storj in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -36898,7 +36898,7 @@
     {
       "id": 488,
       "full_name": "STORJ / USDT",
-      "description": "Storj",
+      "description": "Price of Storj in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -36973,7 +36973,7 @@
     {
       "id": 489,
       "full_name": "STORJ / USDC",
-      "description": "Storj",
+      "description": "Price of Storj in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -37005,7 +37005,7 @@
     {
       "id": 490,
       "full_name": "RPL / USD",
-      "description": "Rocket Pool",
+      "description": "Price of Rocket Pool in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -37105,7 +37105,7 @@
     {
       "id": 491,
       "full_name": "RPL / USDT",
-      "description": "Rocket Pool",
+      "description": "Price of Rocket Pool in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -37175,7 +37175,7 @@
     {
       "id": 492,
       "full_name": "RPL / USDC",
-      "description": "Rocket Pool",
+      "description": "Price of Rocket Pool in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -37215,7 +37215,7 @@
     {
       "id": 493,
       "full_name": "USUAL / USD",
-      "description": "Usual",
+      "description": "Price of Usual in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -37294,7 +37294,7 @@
     {
       "id": 494,
       "full_name": "USUAL / USDT",
-      "description": "Usual",
+      "description": "Price of Usual in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -37354,7 +37354,7 @@
     {
       "id": 495,
       "full_name": "USUAL / USDC",
-      "description": "Usual",
+      "description": "Price of Usual in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -37394,7 +37394,7 @@
     {
       "id": 496,
       "full_name": "AEVO / USD",
-      "description": "Aevo",
+      "description": "Price of Aevo in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -37489,7 +37489,7 @@
     {
       "id": 497,
       "full_name": "AEVO / USDT",
-      "description": "Aevo",
+      "description": "Price of Aevo in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -37559,7 +37559,7 @@
     {
       "id": 498,
       "full_name": "AEVO / USDC",
-      "description": "Aevo",
+      "description": "Price of Aevo in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -37599,7 +37599,7 @@
     {
       "id": 499,
       "full_name": "METIS / USD",
-      "description": "Metis",
+      "description": "Price of Metis in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -37700,7 +37700,7 @@
     {
       "id": 500,
       "full_name": "METIS / USDT",
-      "description": "Metis",
+      "description": "Price of Metis in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -37775,7 +37775,7 @@
     {
       "id": 501,
       "full_name": "METIS / USDC",
-      "description": "Metis",
+      "description": "Price of Metis in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -37807,7 +37807,7 @@
     {
       "id": 502,
       "full_name": "NEIRO / USD",
-      "description": "Neiro",
+      "description": "Price of Neiro in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -37919,7 +37919,7 @@
     {
       "id": 503,
       "full_name": "NEIRO / USDT",
-      "description": "Neiro",
+      "description": "Price of Neiro in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -37994,7 +37994,7 @@
     {
       "id": 504,
       "full_name": "NEIRO / USDC",
-      "description": "Neiro",
+      "description": "Price of Neiro in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -38039,7 +38039,7 @@
     {
       "id": 505,
       "full_name": "MEME / USD",
-      "description": "Memecoin",
+      "description": "Price of Memecoin in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -38136,7 +38136,7 @@
     {
       "id": 506,
       "full_name": "MEME / USDT",
-      "description": "Memecoin",
+      "description": "Price of Memecoin in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -38201,7 +38201,7 @@
     {
       "id": 507,
       "full_name": "MEME / USDC",
-      "description": "Memecoin",
+      "description": "Price of Memecoin in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -38241,7 +38241,7 @@
     {
       "id": 508,
       "full_name": "UMA / USD",
-      "description": "UMA",
+      "description": "Price of UMA in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -38345,7 +38345,7 @@
     {
       "id": 509,
       "full_name": "UMA / USDT",
-      "description": "UMA",
+      "description": "Price of UMA in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -38415,7 +38415,7 @@
     {
       "id": 510,
       "full_name": "UMA / USDC",
-      "description": "UMA",
+      "description": "Price of UMA in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -38447,7 +38447,7 @@
     {
       "id": 511,
       "full_name": "AVAIL / USD",
-      "description": "Avail",
+      "description": "Price of Avail in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -38517,7 +38517,7 @@
     {
       "id": 512,
       "full_name": "AVAIL / USDT",
-      "description": "Avail",
+      "description": "Price of Avail in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -38577,7 +38577,7 @@
     {
       "id": 513,
       "full_name": "MANTA / USD",
-      "description": "Manta Network",
+      "description": "Price of Manta Network in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -38654,7 +38654,7 @@
     {
       "id": 514,
       "full_name": "MANTA / USDT",
-      "description": "Manta Network",
+      "description": "Price of Manta Network in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -38719,7 +38719,7 @@
     {
       "id": 515,
       "full_name": "MANTA / USDC",
-      "description": "Manta Network",
+      "description": "Price of Manta Network in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -38764,7 +38764,7 @@
     {
       "id": 516,
       "full_name": "ALT / USD",
-      "description": "Altlayer",
+      "description": "Price of Altlayer in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -38853,7 +38853,7 @@
     {
       "id": 517,
       "full_name": "ALT / USDT",
-      "description": "Altlayer",
+      "description": "Price of Altlayer in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -38908,7 +38908,7 @@
     {
       "id": 518,
       "full_name": "ALT / USDC",
-      "description": "Altlayer",
+      "description": "Price of Altlayer in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -38953,7 +38953,7 @@
     {
       "id": 519,
       "full_name": "SPELL / USD",
-      "description": "Spell Token",
+      "description": "Price of Spell Token in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -39053,7 +39053,7 @@
     {
       "id": 520,
       "full_name": "SPELL / USDT",
-      "description": "Spell Token",
+      "description": "Price of Spell Token in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -39123,7 +39123,7 @@
     {
       "id": 521,
       "full_name": "BOME / USD",
-      "description": "BOOK OF MEME",
+      "description": "Price of BOOK OF MEME in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -39221,7 +39221,7 @@
     {
       "id": 522,
       "full_name": "BOME / USDT",
-      "description": "BOOK OF MEME",
+      "description": "Price of BOOK OF MEME in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -39296,7 +39296,7 @@
     {
       "id": 523,
       "full_name": "BOME / USDC",
-      "description": "BOOK OF MEME",
+      "description": "Price of BOOK OF MEME in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -39341,7 +39341,7 @@
     {
       "id": 524,
       "full_name": "IQ / USD",
-      "description": "IQ",
+      "description": "Price of IQ in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -39417,7 +39417,7 @@
     {
       "id": 525,
       "full_name": "IQ / USDT",
-      "description": "IQ",
+      "description": "Price of IQ in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -39477,7 +39477,7 @@
     {
       "id": 526,
       "full_name": "IQ / USDC",
-      "description": "IQ",
+      "description": "Price of IQ in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -39509,7 +39509,7 @@
     {
       "id": 527,
       "full_name": "AIXBT / USD",
-      "description": "aixbt by Virtuals",
+      "description": "Price of aixbt in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -39610,7 +39610,7 @@
     {
       "id": 528,
       "full_name": "AIXBT / USDT",
-      "description": "aixbt by Virtuals",
+      "description": "Price of aixbt in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -39685,7 +39685,7 @@
     {
       "id": 529,
       "full_name": "AIXBT / USDC",
-      "description": "aixbt by Virtuals",
+      "description": "Price of aixbt in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -39730,7 +39730,7 @@
     {
       "id": 530,
       "full_name": "VELO / USD",
-      "description": "Velo",
+      "description": "Price of Velo in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -39818,7 +39818,7 @@
     {
       "id": 531,
       "full_name": "VELO / USDT",
-      "description": "Velo",
+      "description": "Price of Velo in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -39883,7 +39883,7 @@
     {
       "id": 532,
       "full_name": "VELO / USDC",
-      "description": "Velo",
+      "description": "Price of Velo in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -39915,7 +39915,7 @@
     {
       "id": 533,
       "full_name": "BAL / USD",
-      "description": "Balancer",
+      "description": "Price of Balancer in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -40015,7 +40015,7 @@
     {
       "id": 534,
       "full_name": "BAL / USDT",
-      "description": "Balancer",
+      "description": "Price of Balancer in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -40085,7 +40085,7 @@
     {
       "id": 535,
       "full_name": "BAL / USDC",
-      "description": "Balancer",
+      "description": "Price of Balancer in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -40117,7 +40117,7 @@
     {
       "id": 536,
       "full_name": "XVS / BNB",
-      "description": "Venus",
+      "description": "Price of Venus in BNB",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -40157,7 +40157,7 @@
     {
       "id": 537,
       "full_name": "XVS / USD",
-      "description": "Venus",
+      "description": "Price of Venus in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -40217,7 +40217,7 @@
     {
       "id": 538,
       "full_name": "XVS / USDT",
-      "description": "Venus",
+      "description": "Price of Venus in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -40267,7 +40267,7 @@
     {
       "id": 539,
       "full_name": "CHR / USD",
-      "description": "Chromaway",
+      "description": "Price of Chromaway in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -40353,7 +40353,7 @@
     {
       "id": 540,
       "full_name": "CHR / USDT",
-      "description": "Chromaway",
+      "description": "Price of Chromaway in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -40418,7 +40418,7 @@
     {
       "id": 541,
       "full_name": "ONG / USD",
-      "description": "Ontology Gas",
+      "description": "Price of Ontology Gas in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -40493,7 +40493,7 @@
     {
       "id": 542,
       "full_name": "ONG / USDT",
-      "description": "Ontology Gas",
+      "description": "Price of Ontology Gas in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -40553,7 +40553,7 @@
     {
       "id": 543,
       "full_name": "BLAST / USD",
-      "description": "Blast",
+      "description": "Price of Blast in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -40640,7 +40640,7 @@
     {
       "id": 544,
       "full_name": "BLAST / USDT",
-      "description": "Blast",
+      "description": "Price of Blast in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -40705,7 +40705,7 @@
     {
       "id": 545,
       "full_name": "BIGTIME / USD",
-      "description": "Big Time",
+      "description": "Price of Big Time in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -40806,7 +40806,7 @@
     {
       "id": 546,
       "full_name": "BIGTIME / USDT",
-      "description": "Big Time",
+      "description": "Price of Big Time in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -40881,7 +40881,7 @@
     {
       "id": 547,
       "full_name": "BIGTIME / USDC",
-      "description": "Big Time",
+      "description": "Price of Big Time in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -40921,7 +40921,7 @@
     {
       "id": 548,
       "full_name": "ILV / USD",
-      "description": "Illuvium",
+      "description": "Price of Illuvium in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -41014,7 +41014,7 @@
     {
       "id": 549,
       "full_name": "ILV / USDT",
-      "description": "Illuvium",
+      "description": "Price of Illuvium in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -41089,7 +41089,7 @@
     {
       "id": 550,
       "full_name": "USDP / USD",
-      "description": "Pax Dollar",
+      "description": "Price of Pax Dollar in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -41156,7 +41156,7 @@
     {
       "id": 551,
       "full_name": "USDP / USDT",
-      "description": "Pax Dollar",
+      "description": "Price of Pax Dollar in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -41211,7 +41211,7 @@
     {
       "id": 552,
       "full_name": "PEOPLE / USD",
-      "description": "ConstitutionDAO",
+      "description": "Price of ConstitutionDAO in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -41296,7 +41296,7 @@
     {
       "id": 553,
       "full_name": "PEOPLE / USDT",
-      "description": "ConstitutionDAO",
+      "description": "Price of ConstitutionDAO in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -41366,7 +41366,7 @@
     {
       "id": 554,
       "full_name": "PEOPLE / USDC",
-      "description": "ConstitutionDAO",
+      "description": "Price of ConstitutionDAO in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -41411,7 +41411,7 @@
     {
       "id": 555,
       "full_name": "TRB / USD",
-      "description": "Tellor Tributes",
+      "description": "Price of Tellor Tributes in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -41495,7 +41495,7 @@
     {
       "id": 556,
       "full_name": "TRB / USDT",
-      "description": "Tellor Tributes",
+      "description": "Price of Tellor Tributes in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -41560,7 +41560,7 @@
     {
       "id": 557,
       "full_name": "TRB / USDC",
-      "description": "Tellor Tributes",
+      "description": "Price of Tellor Tributes in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -41605,7 +41605,7 @@
     {
       "id": 558,
       "full_name": "PIXEL / USD",
-      "description": "Pixels",
+      "description": "Price of Pixels in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -41688,7 +41688,7 @@
     {
       "id": 559,
       "full_name": "PIXEL / USDT",
-      "description": "Pixels",
+      "description": "Price of Pixels in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -41753,7 +41753,7 @@
     {
       "id": 560,
       "full_name": "PIXEL / USDC",
-      "description": "Pixels",
+      "description": "Price of Pixels in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -41798,7 +41798,7 @@
     {
       "id": 561,
       "full_name": "XAI / USD",
-      "description": "Xai",
+      "description": "Price of Xai in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -41890,7 +41890,7 @@
     {
       "id": 562,
       "full_name": "XAI / USDT",
-      "description": "Xai",
+      "description": "Price of Xai in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -41955,7 +41955,7 @@
     {
       "id": 563,
       "full_name": "SLP / USD",
-      "description": "Smooth Love Potion",
+      "description": "Price of Smooth Love Potion in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -42048,7 +42048,7 @@
     {
       "id": 564,
       "full_name": "SLP / USDT",
-      "description": "Smooth Love Potion",
+      "description": "Price of Smooth Love Potion in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -42128,7 +42128,7 @@
     {
       "id": 565,
       "full_name": "SLP / USDC",
-      "description": "Smooth Love Potion",
+      "description": "Price of Smooth Love Potion in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -42160,7 +42160,7 @@
     {
       "id": 566,
       "full_name": "USDtb / USD",
-      "description": "",
+      "description": "Price of Ethena Labs (USDTb) in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -42210,7 +42210,7 @@
     {
       "id": 567,
       "full_name": "USDtb / USDT",
-      "description": "",
+      "description": "Price of Ethena Labs (USDTb) in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -42250,7 +42250,7 @@
     {
       "id": 568,
       "full_name": "HSK / USD",
-      "description": "HashKey Platform Token",
+      "description": "Price of HashKey Platform Token in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -42310,7 +42310,7 @@
     {
       "id": 569,
       "full_name": "HSK / USDT",
-      "description": "HashKey Platform Token",
+      "description": "Price of HashKey Platform Token in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -42360,7 +42360,7 @@
     {
       "id": 570,
       "full_name": "JOE / USD",
-      "description": "Trader Joe",
+      "description": "Price of Trader Joe in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -42440,7 +42440,7 @@
     {
       "id": 571,
       "full_name": "JOE / USDT",
-      "description": "Trader Joe",
+      "description": "Price of Trader Joe in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -42500,7 +42500,7 @@
     {
       "id": 572,
       "full_name": "JOE / USDC",
-      "description": "Trader Joe",
+      "description": "Price of Trader Joe in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -42532,7 +42532,7 @@
     {
       "id": 573,
       "full_name": "SCR / USD",
-      "description": "Scroll",
+      "description": "Price of Scroll in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -42620,7 +42620,7 @@
     {
       "id": 574,
       "full_name": "SCR / USDT",
-      "description": "Scroll",
+      "description": "Price of Scroll in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -42695,7 +42695,7 @@
     {
       "id": 575,
       "full_name": "SCR / USDC",
-      "description": "Scroll",
+      "description": "Price of Scroll in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -42727,7 +42727,7 @@
     {
       "id": 576,
       "full_name": "DOGS / USD",
-      "description": "DOGS",
+      "description": "Price of DOGS in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -42837,7 +42837,7 @@
     {
       "id": 577,
       "full_name": "DOGS / USDT",
-      "description": "DOGS",
+      "description": "Price of DOGS in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -42912,7 +42912,7 @@
     {
       "id": 578,
       "full_name": "DOGS / USDC",
-      "description": "DOGS",
+      "description": "Price of DOGS in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -42962,7 +42962,7 @@
     {
       "id": 579,
       "full_name": "EDU / USD",
-      "description": "Open Campus",
+      "description": "Price of Open Campus in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -43027,7 +43027,7 @@
     {
       "id": 580,
       "full_name": "EDU / USDT",
-      "description": "Open Campus",
+      "description": "Price of Open Campus in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -43082,7 +43082,7 @@
     {
       "id": 581,
       "full_name": "ANON / USD",
-      "description": "",
+      "description": "Price of Hey Anon in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -43149,7 +43149,7 @@
     {
       "id": 582,
       "full_name": "ANON / USDT",
-      "description": "",
+      "description": "Price of Hey Anon in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -43194,7 +43194,7 @@
     {
       "id": 583,
       "full_name": "C98 / USD",
-      "description": "C98",
+      "description": "Price of C98 in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -43287,7 +43287,7 @@
     {
       "id": 584,
       "full_name": "C98 / USDT",
-      "description": "C98",
+      "description": "Price of C98 in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -43352,7 +43352,7 @@
     {
       "id": 585,
       "full_name": "KNC / USD",
-      "description": "Kyber Network Crystal v2",
+      "description": "Price of Kyber Network Crystal v2 in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -43452,7 +43452,7 @@
     {
       "id": 586,
       "full_name": "KNC / ETH",
-      "description": "Kyber Network Crystal",
+      "description": "Price of Kyber Network Crystal in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -43497,7 +43497,7 @@
     {
       "id": 587,
       "full_name": "KNC / USDT",
-      "description": "Kyber Network Crystal v2",
+      "description": "Price of Kyber Network Crystal v2 in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -43567,7 +43567,7 @@
     {
       "id": 588,
       "full_name": "KNC / USDC",
-      "description": "Kyber Network Crystal v2",
+      "description": "Price of Kyber Network Crystal v2 in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -43599,7 +43599,7 @@
     {
       "id": 589,
       "full_name": "BB / USD",
-      "description": "BounceBit",
+      "description": "Price of BounceBit in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -43682,7 +43682,7 @@
     {
       "id": 590,
       "full_name": "BB / USDT",
-      "description": "BounceBit",
+      "description": "Price of BounceBit in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -43747,7 +43747,7 @@
     {
       "id": 591,
       "full_name": "BB / USDC",
-      "description": "BounceBit",
+      "description": "Price of BounceBit in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -43792,7 +43792,7 @@
     {
       "id": 592,
       "full_name": "BUSD / USD",
-      "description": "Binance USD",
+      "description": "Price of Binance USD in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -43848,7 +43848,7 @@
     {
       "id": 593,
       "full_name": "BUSD / USDT",
-      "description": "Binance USD",
+      "description": "Price of Binance USD in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -43893,7 +43893,7 @@
     {
       "id": 594,
       "full_name": "WIN / USD",
-      "description": "WINkLink",
+      "description": "Price of WINkLink in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -43982,7 +43982,7 @@
     {
       "id": 595,
       "full_name": "WIN / USDT",
-      "description": "WINkLink",
+      "description": "Price of WINkLink in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -44047,7 +44047,7 @@
     {
       "id": 596,
       "full_name": "WIN / USDC",
-      "description": "WINkLink",
+      "description": "Price of WINkLink in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -44087,7 +44087,7 @@
     {
       "id": 597,
       "full_name": "MOVR / USD",
-      "description": "Moonriver",
+      "description": "Price of Moonriver in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -44182,7 +44182,7 @@
     {
       "id": 598,
       "full_name": "MOVR / USDT",
-      "description": "Moonriver",
+      "description": "Price of Moonriver in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -44257,7 +44257,7 @@
     {
       "id": 599,
       "full_name": "MOVR / USDC",
-      "description": "Moonriver",
+      "description": "Price of Moonriver in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -44289,7 +44289,7 @@
     {
       "id": 600,
       "full_name": "GOAT / USD",
-      "description": "Goatseus Maximus",
+      "description": "Price of Goatseus Maximus in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -44390,7 +44390,7 @@
     {
       "id": 601,
       "full_name": "GOAT / USDT",
-      "description": "Goatseus Maximus",
+      "description": "Price of Goatseus Maximus in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -44460,7 +44460,7 @@
     {
       "id": 602,
       "full_name": "AI / USD",
-      "description": "Sleepless AI",
+      "description": "Price of Sleepless AI in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -44536,7 +44536,7 @@
     {
       "id": 603,
       "full_name": "AI / USDT",
-      "description": "Sleepless AI",
+      "description": "Price of Sleepless AI in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -44586,7 +44586,7 @@
     {
       "id": 604,
       "full_name": "OMNI / USD",
-      "description": "Omni Network",
+      "description": "Price of Omni Network in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -44685,7 +44685,7 @@
     {
       "id": 605,
       "full_name": "OMNI / USDT",
-      "description": "Omni Network",
+      "description": "Price of Omni Network in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -44750,7 +44750,7 @@
     {
       "id": 606,
       "full_name": "OMNI / USDC",
-      "description": "Omni Network",
+      "description": "Price of Omni Network in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -44795,7 +44795,7 @@
     {
       "id": 607,
       "full_name": "BONE / USD",
-      "description": "Bone ShibaSwap",
+      "description": "Price of Bone ShibaSwap in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -44869,7 +44869,7 @@
     {
       "id": 608,
       "full_name": "BONE / USDT",
-      "description": "Bone ShibaSwap",
+      "description": "Price of Bone ShibaSwap in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -44929,7 +44929,7 @@
     {
       "id": 609,
       "full_name": "BONE / USDC",
-      "description": "Bone ShibaSwap",
+      "description": "Price of Bone ShibaSwap in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -44961,7 +44961,7 @@
     {
       "id": 610,
       "full_name": "REZ / USD",
-      "description": "Renzo",
+      "description": "Price of Renzo in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -45046,7 +45046,7 @@
     {
       "id": 611,
       "full_name": "REZ / USDT",
-      "description": "Renzo",
+      "description": "Price of Renzo in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -45106,7 +45106,7 @@
     {
       "id": 612,
       "full_name": "REZ / USDC",
-      "description": "Renzo",
+      "description": "Price of Renzo in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -45151,7 +45151,7 @@
     {
       "id": 613,
       "full_name": "DODO / USD",
-      "description": "Dodo",
+      "description": "Price of Dodo in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -45225,7 +45225,7 @@
     {
       "id": 614,
       "full_name": "DODO / USDT",
-      "description": "Dodo",
+      "description": "Price of Dodo in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -45285,7 +45285,7 @@
     {
       "id": 615,
       "full_name": "QI / USD",
-      "description": "Benqi",
+      "description": "Price of Benqi in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -45364,7 +45364,7 @@
     {
       "id": 616,
       "full_name": "QI / USDT",
-      "description": "Benqi",
+      "description": "Price of Benqi in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -45419,7 +45419,7 @@
     {
       "id": 617,
       "full_name": "CYBER / USD",
-      "description": "CYBER",
+      "description": "Price of CYBER in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -45509,7 +45509,7 @@
     {
       "id": 618,
       "full_name": "CYBER / USDT",
-      "description": "CYBER",
+      "description": "Price of CYBER in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -45574,7 +45574,7 @@
     {
       "id": 619,
       "full_name": "MERL / USD",
-      "description": "Merlin Chain",
+      "description": "Price of Merlin Chain in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -45651,7 +45651,7 @@
     {
       "id": 620,
       "full_name": "MERL / USDT",
-      "description": "Merlin Chain",
+      "description": "Price of Merlin Chain in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -45716,7 +45716,7 @@
     {
       "id": 621,
       "full_name": "MERL / USDC",
-      "description": "Merlin Chain",
+      "description": "Price of Merlin Chain in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -45756,7 +45756,7 @@
     {
       "id": 622,
       "full_name": "DEGEN / USD",
-      "description": "Degen (Base)",
+      "description": "Price of Degen (Base) in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -45845,7 +45845,7 @@
     {
       "id": 623,
       "full_name": "DEGEN / USDT",
-      "description": "Degen (Base)",
+      "description": "Price of Degen (Base) in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -45905,7 +45905,7 @@
     {
       "id": 624,
       "full_name": "HIGH / USD",
-      "description": "Highstreet",
+      "description": "Price of Highstreet in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -45985,7 +45985,7 @@
     {
       "id": 625,
       "full_name": "HIGH / USDT",
-      "description": "Highstreet",
+      "description": "Price of Highstreet in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -46045,7 +46045,7 @@
     {
       "id": 626,
       "full_name": "COQ / USD",
-      "description": "Coq Inu",
+      "description": "Price of Coq Inu in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -46120,7 +46120,7 @@
     {
       "id": 627,
       "full_name": "COQ / USDT",
-      "description": "Coq Inu",
+      "description": "Price of Coq Inu in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -46180,7 +46180,7 @@
     {
       "id": 628,
       "full_name": "GNS / USD",
-      "description": "Gains Network",
+      "description": "Price of Gains Network in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -46255,7 +46255,7 @@
     {
       "id": 629,
       "full_name": "GNS / USDT",
-      "description": "Gains Network",
+      "description": "Price of Gains Network in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -46315,7 +46315,7 @@
     {
       "id": 630,
       "full_name": "GRIFFAIN / USD",
-      "description": "GRIFFAIN",
+      "description": "Price of GRIFFAIN in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -46388,7 +46388,7 @@
     {
       "id": 631,
       "full_name": "GRIFFAIN / USDT",
-      "description": "GRIFFAIN",
+      "description": "Price of GRIFFAIN in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -46443,7 +46443,7 @@
     {
       "id": 632,
       "full_name": "OGN / USD",
-      "description": "Origin Protocol",
+      "description": "Price of Origin Protocol in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -46537,7 +46537,7 @@
     {
       "id": 633,
       "full_name": "OGN / USDT",
-      "description": "Origin Protocol",
+      "description": "Price of Origin Protocol in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -46602,7 +46602,7 @@
     {
       "id": 634,
       "full_name": "MAGIC / USD",
-      "description": "Magic",
+      "description": "Price of Magic in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -46698,7 +46698,7 @@
     {
       "id": 635,
       "full_name": "MAGIC / USDT",
-      "description": "Magic",
+      "description": "Price of Magic in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -46773,7 +46773,7 @@
     {
       "id": 636,
       "full_name": "MAGIC / USDC",
-      "description": "Magic",
+      "description": "Price of Magic in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -46805,7 +46805,7 @@
     {
       "id": 637,
       "full_name": "STG / USD",
-      "description": "Stargate Finance",
+      "description": "Price of Stargate Finance in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -46909,7 +46909,7 @@
     {
       "id": 638,
       "full_name": "STG / USDT",
-      "description": "Stargate Finance",
+      "description": "Price of Stargate Finance in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -46979,7 +46979,7 @@
     {
       "id": 639,
       "full_name": "MOODENG / USD",
-      "description": "Moo Deng",
+      "description": "Price of Moo Deng in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -47080,7 +47080,7 @@
     {
       "id": 640,
       "full_name": "MOODENG / USDT",
-      "description": "Moo Deng",
+      "description": "Price of Moo Deng in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -47140,7 +47140,7 @@
     {
       "id": 641,
       "full_name": "MOODENG / USDC",
-      "description": "Moo Deng",
+      "description": "Price of Moo Deng in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -47180,7 +47180,7 @@
     {
       "id": 642,
       "full_name": "BADGER / USD",
-      "description": "Badger DAO",
+      "description": "Price of Badger DAO in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -47269,7 +47269,7 @@
     {
       "id": 643,
       "full_name": "BADGER / USDT",
-      "description": "Badger DAO",
+      "description": "Price of Badger DAO in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -47329,7 +47329,7 @@
     {
       "id": 644,
       "full_name": "BADGER / USDC",
-      "description": "Badger DAO",
+      "description": "Price of Badger DAO in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -47361,7 +47361,7 @@
     {
       "id": 645,
       "full_name": "ACE / USD",
-      "description": "Fusionist",
+      "description": "Price of Fusionist in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -47445,7 +47445,7 @@
     {
       "id": 646,
       "full_name": "ACE / USDT",
-      "description": "Fusionist",
+      "description": "Price of Fusionist in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -47510,7 +47510,7 @@
     {
       "id": 647,
       "full_name": "ACE / USDC",
-      "description": "Fusionist",
+      "description": "Price of Fusionist in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -47542,7 +47542,7 @@
     {
       "id": 648,
       "full_name": "CUSD / USD",
-      "description": "Celo Dollar",
+      "description": "Price of Celo Dollar in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -47594,7 +47594,7 @@
     {
       "id": 649,
       "full_name": "CUSD / USDT",
-      "description": "Celo Dollar",
+      "description": "Price of Celo Dollar in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -47634,7 +47634,7 @@
     {
       "id": 650,
       "full_name": "MAV / USD",
-      "description": "Maverick Protocol",
+      "description": "Price of Maverick Protocol in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -47711,7 +47711,7 @@
     {
       "id": 651,
       "full_name": "MAV / USDT",
-      "description": "Maverick Protocol",
+      "description": "Price of Maverick Protocol in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -47771,7 +47771,7 @@
     {
       "id": 652,
       "full_name": "ALPHA / USD",
-      "description": "Alpha Finance",
+      "description": "Price of Alpha Finance in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -47866,7 +47866,7 @@
     {
       "id": 653,
       "full_name": "ALPHA / USDT",
-      "description": "Alpha Finance",
+      "description": "Price of Alpha Finance in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -47931,7 +47931,7 @@
     {
       "id": 654,
       "full_name": "ALPHA / USDC",
-      "description": "Alpha Finance",
+      "description": "Price of Alpha Finance in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -47963,7 +47963,7 @@
     {
       "id": 655,
       "full_name": "LISTA / USD",
-      "description": "",
+      "description": "Price of Lista DAO in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -48033,7 +48033,7 @@
     {
       "id": 656,
       "full_name": "LISTA / USDT",
-      "description": "",
+      "description": "Price of Lista DAO in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -48093,7 +48093,7 @@
     {
       "id": 657,
       "full_name": "AMPL / USD",
-      "description": "Ampleforth",
+      "description": "Price of Ampleforth in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -48148,7 +48148,7 @@
     {
       "id": 658,
       "full_name": "AMPL / USDT",
-      "description": "Ampleforth",
+      "description": "Price of Ampleforth in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -48193,7 +48193,7 @@
     {
       "id": 659,
       "full_name": "HOOK / USD",
-      "description": "Hooked Protocol",
+      "description": "Price of Hooked Protocol in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -48263,7 +48263,7 @@
     {
       "id": 660,
       "full_name": "HOOK / USDT",
-      "description": "Hooked Protocol",
+      "description": "Price of Hooked Protocol in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -48323,7 +48323,7 @@
     {
       "id": 661,
       "full_name": "ZEREBRO / USD",
-      "description": "Zerebro",
+      "description": "Price of Zerebro in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -48401,7 +48401,7 @@
     {
       "id": 662,
       "full_name": "ZEREBRO / USDT",
-      "description": "Zerebro",
+      "description": "Price of Zerebro in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -48461,7 +48461,7 @@
     {
       "id": 663,
       "full_name": "ORDER / USD",
-      "description": "Orderly Network",
+      "description": "Price of Orderly Network in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -48539,7 +48539,7 @@
     {
       "id": 664,
       "full_name": "ORDER / USDT",
-      "description": "Orderly Network",
+      "description": "Price of Orderly Network in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -48599,7 +48599,7 @@
     {
       "id": 665,
       "full_name": "RDNT / USD",
-      "description": "Radiant Capital",
+      "description": "Price of Radiant Capital in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -48685,7 +48685,7 @@
     {
       "id": 666,
       "full_name": "RDNT / USDT",
-      "description": "Radiant Capital",
+      "description": "Price of Radiant Capital in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -48755,7 +48755,7 @@
     {
       "id": 667,
       "full_name": "RDNT / USDC",
-      "description": "Radiant Capital",
+      "description": "Price of Radiant Capital in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -48795,7 +48795,7 @@
     {
       "id": 668,
       "full_name": "MLN / USD",
-      "description": "Enzyme",
+      "description": "Price of Enzyme in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -48879,7 +48879,7 @@
     {
       "id": 669,
       "full_name": "MLN / ETH",
-      "description": "Melon",
+      "description": "Price of Enzyme in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -48911,7 +48911,7 @@
     {
       "id": 670,
       "full_name": "MLN / USDT",
-      "description": "Enzyme",
+      "description": "Price of Enzyme in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -48966,7 +48966,7 @@
     {
       "id": 671,
       "full_name": "MLN / USDC",
-      "description": "Enzyme",
+      "description": "Price of Enzyme in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -48998,7 +48998,7 @@
     {
       "id": 672,
       "full_name": "QUICK / USD",
-      "description": "Quickswap",
+      "description": "Price of Quickswap in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -49075,7 +49075,7 @@
     {
       "id": 673,
       "full_name": "QUICK / USDT",
-      "description": "Quickswap",
+      "description": "Price of Quickswap in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -49135,7 +49135,7 @@
     {
       "id": 674,
       "full_name": "ALCX / USD",
-      "description": "Alchemix",
+      "description": "Price of Alchemix in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -49214,7 +49214,7 @@
     {
       "id": 675,
       "full_name": "ALCX / USDT",
-      "description": "Alchemix",
+      "description": "Price of Alchemix in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -49264,7 +49264,7 @@
     {
       "id": 676,
       "full_name": "ALCX / USDC",
-      "description": "Alchemix",
+      "description": "Price of Alchemix in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -49296,7 +49296,7 @@
     {
       "id": 677,
       "full_name": "PERP / USD",
-      "description": "Perpetual Protocol",
+      "description": "Price of Perpetual Protocol in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -49395,7 +49395,7 @@
     {
       "id": 678,
       "full_name": "PERP / USDT",
-      "description": "Perpetual Protocol",
+      "description": "Price of Perpetual Protocol in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -49465,7 +49465,7 @@
     {
       "id": 679,
       "full_name": "PERP / USDC",
-      "description": "Perpetual Protocol",
+      "description": "Price of Perpetual Protocol in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -49497,7 +49497,7 @@
     {
       "id": 680,
       "full_name": "GHST / ETH",
-      "description": "Aavegotchi",
+      "description": "Price of Aavegotchi in ETH",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -49537,7 +49537,7 @@
     {
       "id": 681,
       "full_name": "GHST / USD",
-      "description": "Aavegotchi",
+      "description": "Price of Aavegotchi in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -49626,7 +49626,7 @@
     {
       "id": 682,
       "full_name": "GHST / USDT",
-      "description": "Aavegotchi",
+      "description": "Price of Aavegotchi in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -49686,7 +49686,7 @@
     {
       "id": 683,
       "full_name": "GHST / USDC",
-      "description": "Aavegotchi",
+      "description": "Price of Aavegotchi in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -49718,7 +49718,7 @@
     {
       "id": 684,
       "full_name": "BSW / USD",
-      "description": "Biswap",
+      "description": "Price of Biswap in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -49790,7 +49790,7 @@
     {
       "id": 685,
       "full_name": "BSW / USDT",
-      "description": "Biswap",
+      "description": "Price of Biswap in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -49850,7 +49850,7 @@
     {
       "id": 686,
       "full_name": "NULS / USD",
-      "description": "Nuls",
+      "description": "Price of Nuls in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -49916,7 +49916,7 @@
     {
       "id": 687,
       "full_name": "NULS / USDT",
-      "description": "Nuls",
+      "description": "Price of Nuls in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -49971,7 +49971,7 @@
     {
       "id": 688,
       "full_name": "NULS / USDC",
-      "description": "Nuls",
+      "description": "Price of Nuls in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -50003,7 +50003,7 @@
     {
       "id": 689,
       "full_name": "WING / USD",
-      "description": "Wing Finance",
+      "description": "Price of Wing Finance in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -50065,7 +50065,7 @@
     {
       "id": 690,
       "full_name": "WING / USDT",
-      "description": "Wing Finance",
+      "description": "Price of Wing Finance in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -50115,7 +50115,7 @@
     {
       "id": 691,
       "full_name": "TOKEN / USD",
-      "description": "TokenFi",
+      "description": "Price of TokenFi in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -50193,7 +50193,7 @@
     {
       "id": 692,
       "full_name": "TOKEN / USDT",
-      "description": "TokenFi",
+      "description": "Price of TokenFi in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -50248,7 +50248,7 @@
     {
       "id": 693,
       "full_name": "LINA / USD",
-      "description": "Linear",
+      "description": "Price of Linear in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -50303,7 +50303,7 @@
     {
       "id": 694,
       "full_name": "LINA / USDT",
-      "description": "Linear",
+      "description": "Price of Linear in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -50348,7 +50348,7 @@
     {
       "id": 695,
       "full_name": "TRUMP / USD",
-      "description": "Official Trump",
+      "description": "Price of Official Trump in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -50516,7 +50516,7 @@
     {
       "id": 696,
       "full_name": "TRUMP / USDT",
-      "description": "Official Trump",
+      "description": "Price of Official Trump in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -50609,7 +50609,7 @@
     {
       "id": 697,
       "full_name": "TRUMP / USDC",
-      "description": "Official Trump",
+      "description": "Price of Official Trump in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -50677,7 +50677,7 @@
     {
       "id": 698,
       "full_name": "ULTI / USD",
-      "description": "Ultiverse",
+      "description": "Price of Ultiverse in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -50753,7 +50753,7 @@
     {
       "id": 699,
       "full_name": "ULTI / USDT",
-      "description": "Ultiverse",
+      "description": "Price of Ultiverse in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -50818,7 +50818,7 @@
     {
       "id": 700,
       "full_name": "ALPACA / USD",
-      "description": "Alpaca Finance",
+      "description": "Price of Alpaca Finance in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -50883,7 +50883,7 @@
     {
       "id": 701,
       "full_name": "ALPACA / USDT",
-      "description": "Alpaca Finance",
+      "description": "Price of Alpaca Finance in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -50938,7 +50938,7 @@
     {
       "id": 702,
       "full_name": "REN / USD",
-      "description": "Ren",
+      "description": "Price of Ren in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -51022,7 +51022,7 @@
     {
       "id": 703,
       "full_name": "REN / USDT",
-      "description": "Ren",
+      "description": "Price of Ren in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -51082,7 +51082,7 @@
     {
       "id": 704,
       "full_name": "MAVIA / USD",
-      "description": "Heroes of Mavia",
+      "description": "Price of Heroes of Mavia in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -51158,7 +51158,7 @@
     {
       "id": 705,
       "full_name": "MAVIA / USDT",
-      "description": "Heroes of Mavia",
+      "description": "Price of Heroes of Mavia in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -51223,7 +51223,7 @@
     {
       "id": 706,
       "full_name": "KLIMA / USD",
-      "description": "",
+      "description": "Price of KlimaDAO in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -51278,7 +51278,7 @@
     {
       "id": 707,
       "full_name": "KLIMA / USDT",
-      "description": "",
+      "description": "Price of KlimaDAO in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -51323,7 +51323,7 @@
     {
       "id": 708,
       "full_name": "SKY / USD",
-      "description": "Sky",
+      "description": "Price of Sky in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -51388,7 +51388,7 @@
     {
       "id": 709,
       "full_name": "SKY / USDT",
-      "description": "Sky",
+      "description": "Price of Sky in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -51433,7 +51433,7 @@
     {
       "id": 710,
       "full_name": "WELL / USD",
-      "description": "Moonwell",
+      "description": "Price of Moonwell in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -51511,7 +51511,7 @@
     {
       "id": 711,
       "full_name": "WELL / USDT",
-      "description": "Moonwell",
+      "description": "Price of Moonwell in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -51566,7 +51566,7 @@
     {
       "id": 712,
       "full_name": "FOXY / USD",
-      "description": "Foxy",
+      "description": "Price of Foxy in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -51633,7 +51633,7 @@
     {
       "id": 713,
       "full_name": "FOXY / USDT",
-      "description": "Foxy",
+      "description": "Price of Foxy in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -51688,7 +51688,7 @@
     {
       "id": 714,
       "full_name": "MELANIA / USD",
-      "description": "Melania Meme",
+      "description": "Price of Melania Meme in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -51772,7 +51772,7 @@
     {
       "id": 715,
       "full_name": "MELANIA / USDT",
-      "description": "Melania Meme",
+      "description": "Price of Melania Meme in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -51840,7 +51840,7 @@
     {
       "id": 716,
       "full_name": "MELANIA / USDC",
-      "description": "Melania Meme",
+      "description": "Price of Melania Meme in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -51888,7 +51888,7 @@
     {
       "id": 717,
       "full_name": "MICHI / USD",
-      "description": "michi",
+      "description": "Price of michi in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -51956,7 +51956,7 @@
     {
       "id": 718,
       "full_name": "MICHI / USDT",
-      "description": "michi",
+      "description": "Price of michi in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -52006,7 +52006,7 @@
     {
       "id": 719,
       "full_name": "NEIROETH / USD",
-      "description": "Neiro",
+      "description": "Price of Neiro in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -52056,7 +52056,7 @@
     {
       "id": 720,
       "full_name": "NEIROETH / USDT",
-      "description": "Neiro",
+      "description": "Price of Neiro in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -52101,7 +52101,7 @@
     {
       "id": 721,
       "full_name": "VVV / USD",
-      "description": "Venice Token",
+      "description": "Price of Venice Token in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -52169,7 +52169,7 @@
     {
       "id": 722,
       "full_name": "VVV / USDT",
-      "description": "Venice Token",
+      "description": "Price of Venice Token in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -52224,7 +52224,7 @@
     {
       "id": 723,
       "full_name": "IP / USD",
-      "description": "Story",
+      "description": "Price of Story in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -52308,7 +52308,7 @@
     {
       "id": 724,
       "full_name": "IP / USDT",
-      "description": "Story",
+      "description": "Price of Story in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -52373,7 +52373,7 @@
     {
       "id": 725,
       "full_name": "FTM / USD",
-      "description": "Fantom",
+      "description": "Price of Fantom in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -52425,7 +52425,7 @@
     {
       "id": 726,
       "full_name": "FTM / USDT",
-      "description": "Fantom",
+      "description": "Price of Fantom in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -52470,7 +52470,7 @@
     {
       "id": 727,
       "full_name": "FTM / USDC",
-      "description": "Fantom",
+      "description": "Price of Fantom in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -52510,7 +52510,7 @@
     {
       "id": 728,
       "full_name": "RNDR / USD",
-      "description": "Render",
+      "description": "Price of Render in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -52568,7 +52568,7 @@
     {
       "id": 729,
       "full_name": "RNDR / USDT",
-      "description": "Render",
+      "description": "Price of Render in USDT",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -52618,7 +52618,7 @@
     {
       "id": 730,
       "full_name": "RNDR / USDC",
-      "description": "Render",
+      "description": "Price of Render in USDC",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
