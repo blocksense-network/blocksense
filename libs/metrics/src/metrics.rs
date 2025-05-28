@@ -305,7 +305,7 @@ impl ReporterMetrics {
                 &["ReporterId", "FeedId", "HeartbeatMs"]
             )?,
             late_reports_per_feed: register_int_counter_vec!(
-                format!("{}reporter_late_reporte_per_feed", prefix),
+                format!("{}reporter_late_reports_per_feed", prefix),
                 "Per feed recvd reports for a past slot from reporter",
                 &["ReporterId", "FeedId", "HeartbeatMs"]
             )?,
