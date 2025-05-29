@@ -130,6 +130,7 @@ task('deploy', 'Deploy contracts')
         console.log('Aborting deployment...');
         return;
       }
+      console.log('---------------------------\n');
 
       const adminMultisig = await run('deploy-multisig', {
         config,
