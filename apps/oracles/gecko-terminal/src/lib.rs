@@ -103,7 +103,7 @@ pub struct GeckoTerminalFeedConfig {
 }
 
 async fn fetch_pools_data_for_network(
-    network: &String,
+    network: &str,
     pools: &[GeckoTerminalFeedConfig],
 ) -> Result<GeckoTerminalMultipleResponce> {
     let r = pools
@@ -121,7 +121,7 @@ async fn fetch_pools_data_for_network(
         {
             v.reverse = p.reverse;
             v.feed_id = p.feed_id.clone();
-            v.network = network.clone();
+            v.network = network.to_string();
             v.min_volume_usd = p.min_volume_usd;
             v.pool = p.pool.clone();
         }
