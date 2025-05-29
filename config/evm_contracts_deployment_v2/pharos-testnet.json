@@ -3,13 +3,6 @@
   "chainId": "688688",
   "contracts": {
     "coreContracts": {
-      "AggregatedDataFeedStore": {
-        "address": "0x707bb37B703E4cf7C941bd57E90B16334714f887",
-        "constructorArgs": [
-          "0xF1B62f07bEc1935ADACdeE5d12ccA0E90F9A108B"
-        ],
-        "salt": "0x71b411ccc58b0bf522c76bab9a977992a03cfbc078d3852ee8ee8b6d5311a477"
-      },
       "UpgradeableProxyADFS": {
         "address": "0x176186264884f75A584f0C9e839Ae175cBA03B87",
         "constructorArgs": [
@@ -17,13 +10,12 @@
         ],
         "salt": "0x36d946ba08b13b7ec8aec7effec798658cf99491873a73e9c652b8ab3b96756a"
       },
-      "CLFeedRegistryAdapter": {
-        "address": "0xFEfFc68Ec78a622A3B2f8F286f297A991a8CdDAb",
+      "AggregatedDataFeedStore": {
+        "address": "0x707bb37B703E4cf7C941bd57E90B16334714f887",
         "constructorArgs": [
-          "0xe07A39d7fabD7C130742D3bBdD90f821CC666EEa",
-          "0x176186264884f75A584f0C9e839Ae175cBA03B87"
+          "0xF1B62f07bEc1935ADACdeE5d12ccA0E90F9A108B"
         ],
-        "salt": "0xd1adaede68d344519025e2ff574650cd99d3830fe6d274c7a7843cdc00e17938"
+        "salt": "0x71b411ccc58b0bf522c76bab9a977992a03cfbc078d3852ee8ee8b6d5311a477"
       },
       "AccessControl": {
         "address": "0xF1B62f07bEc1935ADACdeE5d12ccA0E90F9A108B",
@@ -32,6 +24,18 @@
         ],
         "salt": "0x26186f5256760fb01ab0053f874a1674c76a40b87c3031918056ef3ace009aac"
       },
+      "CLFeedRegistryAdapter": {
+        "address": "0xFEfFc68Ec78a622A3B2f8F286f297A991a8CdDAb",
+        "constructorArgs": [
+          "0xe07A39d7fabD7C130742D3bBdD90f821CC666EEa",
+          "0x176186264884f75A584f0C9e839Ae175cBA03B87"
+        ],
+        "salt": "0xd1adaede68d344519025e2ff574650cd99d3830fe6d274c7a7843cdc00e17938"
+      }
+    },
+    "safe": {
+      "AdminMultisig": "0xe07A39d7fabD7C130742D3bBdD90f821CC666EEa",
+      "ReporterMultisig": null,
       "OnlySequencerGuard": null,
       "AdminExecutorModule": null
     },
@@ -153,8 +157,6 @@
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348"
       }
-    },
-    "ReporterMultisig": null,
-    "AdminMultisig": "0xe07A39d7fabD7C130742D3bBdD90f821CC666EEa"
+    }
   }
 }
