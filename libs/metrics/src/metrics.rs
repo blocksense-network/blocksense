@@ -61,7 +61,7 @@ pub static ref REPORTER_FAILED_WASM_EXECS: IntCounterVec =
 
 pub static ref REPORTER_FAILED_SEQ_REQUESTS: IntCounterVec =
     register_int_counter_vec!("FAILED_SEQ_REQUESTS",
-        "Count of failed sequncer requests", &["code"]).unwrap();
+        "Count of failed sequencer requests", &["code"]).unwrap();
 
 pub static ref REPORTER_WASM_EXECUTION_TIME_GAUGE: IntGaugeVec =
     register_int_gauge_vec!("WASM_EXECUTION_TIME_GAUGE",
@@ -351,7 +351,7 @@ impl FeedsMetrics {
             )?,
             failures_to_reach_quorum: register_int_counter_vec!(
                 format!("{}failures_to_reach_quorum", prefix),
-                "Number of slots for whcih quorum was not reached for a given feed id",
+                "Number of slots for which quorum was not reached for a given feed id",
                 &["FeedId"]
             )?,
             updates_to_networks: register_int_counter_vec!(
