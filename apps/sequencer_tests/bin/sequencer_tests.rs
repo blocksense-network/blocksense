@@ -168,15 +168,33 @@ async fn wait_for_sequencer_to_accept_votes(max_time_to_wait_secs: u64) {
 }
 
 fn deploy_contract_to_networks(networks: Vec<&str>) {
-    for net in networks {
-        send_get_request(
-            format!(
-                "http://127.0.0.1:{}/deploy/{}/price_feed",
-                SEQUENCER_ADMIN_PORT, net
-            )
-            .as_str(),
-        );
-    }
+    // for net in networks {
+    //     send_get_request(
+    //         format!(
+    //             "http://127.0.0.1:{}/deploy/{}/price_feed",
+    //             SEQUENCER_ADMIN_PORT, net
+    //         )
+    //         .as_str(),
+    //     );
+    // }
+
+    let status = Command::new("sh")
+    .arg("-c")
+    .arg("yarn && cd libs/ts/contracts && yarn && just build-ts && yarn build && echo y | yarn hardhat deploy --networks local")
+    .env("NETWORKS","local")
+    .env("RPC_URL_LOCAL","http://127.0.0.1:8546/")
+    .env("FEED_IDS_LOCAL", "0,3,4")
+    .env("DEPLOYER_ADDRESS_IS_LEDGER_LOCAL", "false")
+    .env("DEPLOYER_ADDRESS_LOCAL", "0x70997970C51812dc3A010C7d01b50e0d17dc79C8")
+    .env("DEPLOYER_PRIVATE_KEY_LOCAL", "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d")
+    .env("ADMIN_MULTISIG_THRESHOLD_LOCAL", "1")
+    .env("ADMIN_MULTISIG_OWNERS_LOCAL", "")
+    .env("SEQUENCER_ADDRESS_LOCAL", "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266")
+    .env("REPORTER_MULTISIG_ENABLE_LOCAL", "false")
+    .env("REPORTER_MULTISIG_THRESHOLD_LOCAL", "2")
+    .env("REPORTER_MULTISIG_SIGNERS_LOCAL", "0x70997970C51812dc3A010C7d01b50e0d17dc79C8,0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC")
+    .status()
+    .expect("failed to execute process");
 }
 
 fn send_get_request(request: &str) -> String {
@@ -378,11 +396,13 @@ async fn main() -> Result<()> {
         .await;
     }
 
-    let seq = spawn_sequencer(PROVIDERS_PORTS.as_ref(), &safe_contracts_per_net).await;
+    // let seq = spawn_sequencer(PROVIDERS_PORTS.as_ref(), &safe_contracts_per_net).await;
 
-    wait_for_sequencer_to_accept_votes(5 * 60).await;
+    // wait_for_sequencer_to_accept_votes(5 * 60).await;
 
     deploy_contract_to_networks(vec!["ETH1", "ETH2"]);
+
+    wait_for_sequencer_to_accept_votes(5 * 60).await;
 
     println!("\n * Assert provider status is 'AwaitingFirstUpdate' at the start:\n");
     {
@@ -597,14 +617,14 @@ async fn main() -> Result<()> {
 
     cleanup_spawned_processes();
 
-    match seq.join() {
-        Ok(_) => {
-            println!("Sequencer thread done.");
-        }
-        Err(e) => {
-            println!("sequencer thread err {:?}", e);
-        }
-    }
+    // match seq.join() {
+    //     Ok(_) => {
+    //         println!("Sequencer thread done.");
+    //     }
+    //     Err(e) => {
+    //         println!("sequencer thread err {:?}", e);
+    //     }
+    // }
 
     Ok(())
 }
