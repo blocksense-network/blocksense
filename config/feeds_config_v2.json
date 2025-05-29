@@ -53279,7 +53279,7 @@
     },
     {
       "id": 1000004,
-      "full_name": "MOYAKI / USD",
+      "full_name": "YAKI / USD",
       "description": "MOYAKI token on Monad test net address 0xfe140e1dCe99Be9F4F15d657CD9b7BF622270C50",
       "type": "price-feed",
       "oracle_id": "gecko-terminal",
@@ -53345,8 +53345,8 @@
     },
     {
       "id": 1000005,
-      "full_name": "MONLANDAK / USD",
-      "description": "MONLANDAK token on Monad test net address 0x0F0BDEbF0F83cD1EE3974779Bcb7315f9808c714",
+      "full_name": "DAK / USD",
+      "description": "Molandak token on Monad test net address 0x0F0BDEbF0F83cD1EE3974779Bcb7315f9808c714",
       "type": "price-feed",
       "oracle_id": "gecko-terminal",
       "value_type": "numerical",
