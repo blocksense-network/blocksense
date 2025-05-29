@@ -11,7 +11,7 @@ import {
   parseDeploymentEnvConfig,
   validateAndPrintDeploymentEnvConfig,
 } from './functions';
-import { kebabToSnakeCase } from '../string';
+import { kebabToScreamingSnakeCase } from '../string';
 
 describe('evm/functions', () => {
   describe('parseNetworkEnvConfig', () => {
@@ -19,7 +19,7 @@ describe('evm/functions', () => {
       schema: EnvSchema,
       networkName: NetworkName,
       env: NodeJS.ProcessEnv,
-    ) => parseEnvConfig(schema, kebabToSnakeCase(networkName), env);
+    ) => parseEnvConfig(schema, kebabToScreamingSnakeCase(networkName), env);
 
     const testSchema = {
       RPC_URL: S.URL,

@@ -14,7 +14,7 @@ import {
 } from './functions';
 import { NetworkName, networkName } from '../evm';
 import { fromCommaSeparatedString } from '../schemas';
-import { kebabToSnakeCase } from '../string';
+import { kebabToScreamingSnakeCase } from '../string';
 
 describe('env', () => {
   describe('getEnvString', () => {
@@ -130,7 +130,7 @@ describe('env', () => {
         env: NodeJS.ProcessEnv = process.env,
       ): T =>
         parseRequiredEnv(
-          kebabToSnakeCase(`${varName}_${networkName}`),
+          kebabToScreamingSnakeCase(`${varName}_${networkName}`),
           schema,
           env,
         );

@@ -5,7 +5,7 @@ import {
   parseLayeredEnvConfig,
   reportParsedEnvConfig,
 } from '../env';
-import { kebabToSnakeCase } from '../string';
+import { kebabToScreamingSnakeCase } from '../string';
 import { getNetworkKind, NetworkName } from './networks';
 
 const deploymentEnvLayerPriority = [
@@ -32,8 +32,8 @@ export function parseDeploymentEnvConfig<
   const netKind = getNetworkKind(network);
   const suffixes: Record<DeploymentEnvPriority[number], string> = {
     global: '',
-    perNetworkKind: kebabToSnakeCase(netKind),
-    perNetworkName: kebabToSnakeCase(network),
+    perNetworkKind: kebabToScreamingSnakeCase(netKind),
+    perNetworkName: kebabToScreamingSnakeCase(network),
   };
 
   const parsedConfig = parseLayeredEnvConfig(
