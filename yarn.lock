@@ -1974,6 +1974,8 @@ __metadata:
     "@blocksense/base-utils": "workspace:*"
     "@blocksense/config-types": "workspace:*"
     "@blocksense/sol-reflector": "workspace:*"
+    "@chainsafe/ssz": "npm:^1.0.2"
+    "@lodestar/utils": "npm:^1.27.0"
     "@nomicfoundation/hardhat-chai-matchers": "npm:^2.0.8"
     "@nomicfoundation/hardhat-ethers": "npm:^3.0.8"
     "@nomicfoundation/hardhat-ledger": "npm:^1.0.3"
@@ -2293,6 +2295,73 @@ __metadata:
   version: 7.1.1
   resolution: "@braintree/sanitize-url@npm:7.1.1"
   checksum: 10c0/fdfc1759c4244e287693ce1e9d42d649423e7c203fdccf27a571f8951ddfe34baa5273b7e6a8dd3007d7676859c7a0a9819be0ab42a3505f8505ad0eefecf7c1
+  languageName: node
+  linkType: hard
+
+"@chainsafe/as-sha256@npm:1.1.0, @chainsafe/as-sha256@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@chainsafe/as-sha256@npm:1.1.0"
+  checksum: 10c0/b5daeeb18dccde143192f8c83fcf33e3403793cc9039eebc887a408bcace746d9352148b6d9802a3e7443fa7621fffdad933575e061a6bde034df850d4f366ed
+  languageName: node
+  linkType: hard
+
+"@chainsafe/hashtree-darwin-arm64@npm:1.0.1":
+  version: 1.0.1
+  resolution: "@chainsafe/hashtree-darwin-arm64@npm:1.0.1"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@chainsafe/hashtree-linux-arm64-gnu@npm:1.0.1":
+  version: 1.0.1
+  resolution: "@chainsafe/hashtree-linux-arm64-gnu@npm:1.0.1"
+  conditions: os=linux & cpu=arm64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@chainsafe/hashtree-linux-x64-gnu@npm:1.0.1":
+  version: 1.0.1
+  resolution: "@chainsafe/hashtree-linux-x64-gnu@npm:1.0.1"
+  conditions: os=linux & cpu=x64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@chainsafe/hashtree@npm:1.0.1":
+  version: 1.0.1
+  resolution: "@chainsafe/hashtree@npm:1.0.1"
+  dependencies:
+    "@chainsafe/hashtree-darwin-arm64": "npm:1.0.1"
+    "@chainsafe/hashtree-linux-arm64-gnu": "npm:1.0.1"
+    "@chainsafe/hashtree-linux-x64-gnu": "npm:1.0.1"
+  dependenciesMeta:
+    "@chainsafe/hashtree-darwin-arm64":
+      optional: true
+    "@chainsafe/hashtree-linux-arm64-gnu":
+      optional: true
+    "@chainsafe/hashtree-linux-x64-gnu":
+      optional: true
+  checksum: 10c0/fb2589727f222875f2e89459424809782717ce1e24a60c08ca413874134f219061a0389114a14c1fcb66a81ea34f3511a4d5916d8094f7961137fc6230d3c53f
+  languageName: node
+  linkType: hard
+
+"@chainsafe/persistent-merkle-tree@npm:1.1.0":
+  version: 1.1.0
+  resolution: "@chainsafe/persistent-merkle-tree@npm:1.1.0"
+  dependencies:
+    "@chainsafe/as-sha256": "npm:1.1.0"
+    "@chainsafe/hashtree": "npm:1.0.1"
+    "@noble/hashes": "npm:^1.3.0"
+  checksum: 10c0/e9741803071aaf9f07169040067bda622b0abd0b7e8580512ab9cb0beb51aad85941c5db910606e851ef64c2b7a46c1b05bfa6df0bcc1ea7e5f88fee144882c7
+  languageName: node
+  linkType: hard
+
+"@chainsafe/ssz@npm:^1.0.2":
+  version: 1.2.0
+  resolution: "@chainsafe/ssz@npm:1.2.0"
+  dependencies:
+    "@chainsafe/as-sha256": "npm:1.1.0"
+    "@chainsafe/persistent-merkle-tree": "npm:1.1.0"
+  checksum: 10c0/b9b57ffe6da161f637d0398d44147d2ead5b2c2253aa406896a52587c81bf727e851ae7f5fb34522244cad501ee326875a017a963f0dbed90d7ffcc3fe6ebbb1
   languageName: node
   linkType: hard
 
@@ -5144,6 +5213,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lodestar/utils@npm:^1.27.0":
+  version: 1.29.0
+  resolution: "@lodestar/utils@npm:1.29.0"
+  dependencies:
+    "@chainsafe/as-sha256": "npm:^1.1.0"
+    any-signal: "npm:3.0.1"
+    bigint-buffer: "npm:^1.1.5"
+    case: "npm:^1.6.3"
+    js-yaml: "npm:^4.1.0"
+  checksum: 10c0/16266f99cef863c4f720a64835cc2831c00f272d450333af87acc807fcb5d7edd99fc88562704d16b9a70a66ec3f509e6dbdce0e0cf3e02e93bcf913b6fd0cfc
+  languageName: node
+  linkType: hard
+
 "@mdx-js/mdx@npm:^3.0.0":
   version: 3.1.0
   resolution: "@mdx-js/mdx@npm:3.1.0"
@@ -5857,6 +5939,13 @@ __metadata:
   version: 1.7.2
   resolution: "@noble/hashes@npm:1.7.2"
   checksum: 10c0/b1411eab3c0b6691d847e9394fe7f1fcd45eeb037547c8f97e7d03c5068a499b4aef188e8e717eee67389dca4fee17d69d7e0f58af6c092567b0b76359b114b2
+  languageName: node
+  linkType: hard
+
+"@noble/hashes@npm:^1.3.0":
+  version: 1.8.0
+  resolution: "@noble/hashes@npm:1.8.0"
+  checksum: 10c0/06a0b52c81a6fa7f04d67762e08b2c476a00285858150caeaaff4037356dd5e119f45b2a530f638b77a5eeca013168ec1b655db41bae3236cb2e9d511484fc77
   languageName: node
   linkType: hard
 
@@ -12142,6 +12231,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"any-signal@npm:3.0.1":
+  version: 3.0.1
+  resolution: "any-signal@npm:3.0.1"
+  checksum: 10c0/3f7495920883dbd44221e3384acb1f58243133a1a062d59f0dde0817b30774f3126f93c6e4a0e1cb60b715d5c9cfa5546fa32c3f62fedce99bf64278ba4477bf
+  languageName: node
+  linkType: hard
+
 "anymatch@npm:^3.1.3, anymatch@npm:~3.1.2":
   version: 3.1.3
   resolution: "anymatch@npm:3.1.3"
@@ -12737,6 +12833,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"bigint-buffer@npm:^1.1.5":
+  version: 1.1.5
+  resolution: "bigint-buffer@npm:1.1.5"
+  dependencies:
+    bindings: "npm:^1.3.0"
+    node-gyp: "npm:latest"
+  checksum: 10c0/aa41e53d38242a2f05f85b08eaf592635f92e5328822784cda518232b1644efdbf29ab3664951b174cc645848add4605488e25c9439bcc749660c885b4ff6118
+  languageName: node
+  linkType: hard
+
 "bignumber.js@npm:^9.1.0, bignumber.js@npm:^9.1.2":
   version: 9.1.2
   resolution: "bignumber.js@npm:9.1.2"
@@ -12751,7 +12857,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bindings@npm:^1.5.0":
+"bindings@npm:^1.3.0, bindings@npm:^1.5.0":
   version: 1.5.0
   resolution: "bindings@npm:1.5.0"
   dependencies:
@@ -13284,6 +13390,13 @@ __metadata:
   version: 2.4.0
   resolution: "case-sensitive-paths-webpack-plugin@npm:2.4.0"
   checksum: 10c0/310dab619b661a7fa44ed773870be6d6d7373faff6953ad92720f9553e2579e46dda5b9a79eae6d25ff3733cc15aa466b96e5811af16213f23c115aa220b4ab4
+  languageName: node
+  linkType: hard
+
+"case@npm:^1.6.3":
+  version: 1.6.3
+  resolution: "case@npm:1.6.3"
+  checksum: 10c0/43fcbb1dff1c4add94dd2bc98bd923d6616f10bff6959adf686d192c3db7d7ced35410761e1ac94cc4a1f5c41c86406ad79d390805539e421e8a77e553f67223
   languageName: node
   linkType: hard
 
