@@ -6,7 +6,7 @@ use std::{
 
 use crate::types::{DataFeedPayload, FeedMetaData, FeedType, Repeatability, Timestamp};
 use blocksense_config::AllFeedsConfig;
-use blocksense_utils::time::current_unix_time;
+use blocksense_utils::{time::current_unix_time, FeedId};
 use chrono::{DateTime, TimeZone, Utc};
 use ringbuf::{
     storage::Heap,
@@ -21,7 +21,7 @@ use tracing::{debug, info};
 /// Map representing feed_id -> FeedMetaData
 #[derive(Debug)]
 pub struct FeedMetaDataRegistry {
-    registered_feeds: HashMap<u32, Arc<RwLock<FeedMetaData>>>,
+    registered_feeds: HashMap<FeedId, Arc<RwLock<FeedMetaData>>>,
 }
 
 impl Default for FeedMetaDataRegistry {
@@ -36,16 +36,16 @@ impl FeedMetaDataRegistry {
             registered_feeds: HashMap::new(),
         }
     }
-    pub fn push(&mut self, id: u32, fd: FeedMetaData) {
+    pub fn push(&mut self, id: FeedId, fd: FeedMetaData) {
         self.registered_feeds.insert(id, Arc::new(RwLock::new(fd)));
     }
-    pub fn get(&self, id: u32) -> Option<Arc<RwLock<FeedMetaData>>> {
+    pub fn get(&self, id: FeedId) -> Option<Arc<RwLock<FeedMetaData>>> {
         self.registered_feeds.get(&id).cloned()
     }
-    pub fn get_keys(&self) -> Vec<u32> {
+    pub fn get_keys(&self) -> Vec<FeedId> {
         self.registered_feeds.keys().copied().collect()
     }
-    pub fn remove(&mut self, id: u32) {
+    pub fn remove(&mut self, id: FeedId) {
         self.registered_feeds.remove(&id);
     }
 }
@@ -149,17 +149,17 @@ impl HistoryEntry {
 #[derive(Serialize)]
 pub struct FeedAggregateHistory {
     #[serde(serialize_with = "serialize_aggregate_history")]
-    aggregate_history: HashMap<u32, HeapRb<HistoryEntry>>,
+    aggregate_history: HashMap<FeedId, HeapRb<HistoryEntry>>,
 }
 
 fn serialize_aggregate_history<S>(
-    aggregate_history: &HashMap<u32, HeapRb<HistoryEntry>>,
+    aggregate_history: &HashMap<FeedId, HeapRb<HistoryEntry>>,
     s: S,
 ) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
-    let mut feed_ids: Vec<&u32> = aggregate_history.keys().collect();
+    let mut feed_ids: Vec<&FeedId> = aggregate_history.keys().collect();
     feed_ids.sort();
 
     let mut serialize_map = s.serialize_map(Some(feed_ids.len()))?;
@@ -192,29 +192,29 @@ impl FeedAggregateHistory {
         }
     }
 
-    pub fn register_feed(&mut self, feed_id: u32, buf_size: usize) {
+    pub fn register_feed(&mut self, feed_id: FeedId, buf_size: usize) {
         let shared_rb = SharedRb::new(buf_size);
 
         self.aggregate_history.insert(feed_id, shared_rb);
     }
 
-    pub fn deregister_feed(&mut self, feed_id: u32) {
+    pub fn deregister_feed(&mut self, feed_id: FeedId) {
         self.aggregate_history.remove(&feed_id);
     }
 
-    pub fn is_registered_feed(&self, feed_id: u32) -> bool {
+    pub fn is_registered_feed(&self, feed_id: FeedId) -> bool {
         self.aggregate_history.contains_key(&feed_id)
     }
 
-    pub fn get(&self, feed_id: u32) -> Option<&SharedRb<Heap<HistoryEntry>>> {
+    pub fn get(&self, feed_id: FeedId) -> Option<&SharedRb<Heap<HistoryEntry>>> {
         self.aggregate_history.get(&feed_id)
     }
 
-    pub fn get_mut(&mut self, feed_id: u32) -> Option<&mut SharedRb<Heap<HistoryEntry>>> {
+    pub fn get_mut(&mut self, feed_id: FeedId) -> Option<&mut SharedRb<Heap<HistoryEntry>>> {
         self.aggregate_history.get_mut(&feed_id)
     }
 
-    pub fn clear(&mut self, feed_id: u32) -> usize {
+    pub fn clear(&mut self, feed_id: FeedId) -> usize {
         match self.aggregate_history.get_mut(&feed_id) {
             Some(feed) => feed.clear(),
             _ => 0_usize,
@@ -223,7 +223,7 @@ impl FeedAggregateHistory {
 
     pub fn push_next(
         &mut self,
-        feed_id: u32,
+        feed_id: FeedId,
         aggregate_result: FeedType,
         end_slot_timestamp: Timestamp,
     ) {
@@ -243,7 +243,7 @@ impl FeedAggregateHistory {
         }
     }
 
-    pub fn last(&self, feed_id: u32) -> Option<&HistoryEntry> {
+    pub fn last(&self, feed_id: FeedId) -> Option<&HistoryEntry> {
         if let Some(ring_buffer) = self.aggregate_history.get(&feed_id) {
             ring_buffer.last()
         } else {
@@ -255,7 +255,7 @@ impl FeedAggregateHistory {
         }
     }
 
-    pub fn last_value(&self, feed_id: u32) -> Option<&FeedType> {
+    pub fn last_value(&self, feed_id: FeedId) -> Option<&FeedType> {
         self.last(feed_id).map(|h| &h.value)
     }
 }
@@ -263,7 +263,7 @@ impl FeedAggregateHistory {
 // This struct holds all the Feeds by ID (the key in the map) and the received votes for them
 #[derive(Debug)]
 pub struct AllFeedsReports {
-    reports: HashMap<u32, Arc<RwLock<FeedReports>>>,
+    reports: HashMap<FeedId, Arc<RwLock<FeedReports>>>,
 }
 
 impl Default for AllFeedsReports {
@@ -285,7 +285,7 @@ impl AllFeedsReports {
     }
     pub async fn push(
         &mut self,
-        feed_id: u32,
+        feed_id: FeedId,
         reporter_id: u64,
         data: DataFeedPayload,
     ) -> VoteStatus {
@@ -301,7 +301,7 @@ impl AllFeedsReports {
             None => VoteStatus::FirstVoteForSlot,
         }
     }
-    pub fn get(&self, feed_id: u32) -> Option<Arc<RwLock<FeedReports>>> {
+    pub fn get(&self, feed_id: FeedId) -> Option<Arc<RwLock<FeedReports>>> {
         self.reports.get(&feed_id).cloned()
     }
 }
@@ -404,6 +404,7 @@ pub async fn await_time(time_to_await_ms: u64) {
 #[cfg(test)]
 mod tests {
     use blocksense_utils::time::current_unix_time;
+    use blocksense_utils::FeedId;
 
     use crate::registry::new_feeds_meta_data_reg_with_test_data;
     use crate::registry::AllFeedsReports;
@@ -507,7 +508,7 @@ mod tests {
 
     #[tokio::test]
     async fn relevant_feed_check() {
-        const DATA_FEED_ID: u32 = 1;
+        const DATA_FEED_ID: FeedId = 1;
 
         let fmdr = new_feeds_meta_data_reg_with_test_data();
 
@@ -711,7 +712,7 @@ mod tests {
     #[tokio::test]
     async fn check_relevant_and_insert_mt() {
         const NTHREADS: u32 = 10;
-        const DATA_FEED_ID: u32 = 1;
+        const DATA_FEED_ID: FeedId = 1;
 
         let fmdr = Arc::new(RwLock::new(new_feeds_meta_data_reg_with_test_data()));
         let reports = Arc::new(RwLock::new(AllFeedsReports::new()));

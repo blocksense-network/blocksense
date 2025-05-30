@@ -1,3 +1,4 @@
+use blocksense_utils::FeedId;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
@@ -57,7 +58,7 @@ pub struct CompatibilityInfo {
 //TODO(melatron): This is duplicated from the config crate
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct FeedConfig {
-    pub id: u32,
+    pub id: FeedId,
     pub full_name: String,
     pub description: String,
     #[serde(rename = "type")] // rename because of reserved keyword
