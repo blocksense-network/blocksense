@@ -152,15 +152,41 @@
         "quote": "0x0000000000000000000000000000000000000348"
       },
       "100001": {
-        "address": "0x6Dd4866419eCac4EE3B087593f10F6D5c1aEc525",
+        "address": "0xd1434686544eF69b07d73c8380ACB233a43455e4",
         "constructorArgs": [
-          "YieldNest convertToAssets",
+          "ynETH MAX (ynETHx) - YieldNest convertToAssets on ETH",
           0,
           "100001",
           "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "100001",
+        "base": null,
+        "quote": null
+      },
+      "100002": {
+        "address": "0xe270147003a93B2D67c8426d7fFCE28954b9C0d9",
+        "constructorArgs": [
+          "YieldFi yUSD (yUSD) exchangeRate on ETH mainnet",
+          0,
+          "100002",
+          "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "100002",
+        "base": null,
+        "quote": null
+      },
+      "100003": {
+        "address": "0xd0BCa6253bEef808629099D07C0ea13f03516fB9",
+        "constructorArgs": [
+          "ynBNB MAX (ynBNBx) - YieldNest convertToAssets on BNB",
+          0,
+          "100003",
+          "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "100003",
         "base": null,
         "quote": null
       }
