@@ -2018,6 +2018,7 @@ __metadata:
     "@octokit/rest": "npm:^21.1.1"
     "@types/keccak": "npm:^3"
     "@types/node": "npm:^22.10.2"
+    cli-table3: "npm:^0.6.5"
     effect: "npm:^3.12.1"
     glob: "npm:^11.0.0"
     keccak: "npm:^3.0.4"
@@ -13660,7 +13661,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cli-table3@npm:^0.6.0, cli-table3@npm:^0.6.3":
+"cli-table3@npm:^0.6.0, cli-table3@npm:^0.6.3, cli-table3@npm:^0.6.5":
   version: 0.6.5
   resolution: "cli-table3@npm:0.6.5"
   dependencies:
