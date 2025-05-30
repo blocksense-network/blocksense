@@ -1,11 +1,11 @@
 {
-  config,
   lib,
   ...
 }:
 
 let
-  testKeysDir = config.devenv.root + "/nix/test-environments/test-keys";
+  testEnvironments = ./.;
+  testKeysDir = testEnvironments + "/test-keys";
 in
 
 {
