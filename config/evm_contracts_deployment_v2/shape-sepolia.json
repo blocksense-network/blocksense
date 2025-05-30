@@ -1,6 +1,6 @@
 {
-  "network": "ink-sepolia",
-  "chainId": "763373",
+  "network": "shape-sepolia",
+  "chainId": "11011",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {
@@ -9583,41 +9583,15 @@
         "quote": null
       },
       "100001": {
-        "address": "0xd1434686544eF69b07d73c8380ACB233a43455e4",
+        "address": "0x6Dd4866419eCac4EE3B087593f10F6D5c1aEc525",
         "constructorArgs": [
-          "ynETH MAX (ynETHx) - YieldNest convertToAssets on ETH",
+          "YieldNest convertToAssets",
           0,
           "100001",
           "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "100001",
-        "base": null,
-        "quote": null
-      },
-      "100002": {
-        "address": "0xe270147003a93B2D67c8426d7fFCE28954b9C0d9",
-        "constructorArgs": [
-          "YieldFi yUSD (yUSD) exchangeRate on ETH mainnet",
-          0,
-          "100002",
-          "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
-        ],
-        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
-        "feedId": "100002",
-        "base": null,
-        "quote": null
-      },
-      "100003": {
-        "address": "0xd0BCa6253bEef808629099D07C0ea13f03516fB9",
-        "constructorArgs": [
-          "ynBNB MAX (ynBNBx) - YieldNest convertToAssets on BNB",
-          0,
-          "100003",
-          "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
-        ],
-        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
-        "feedId": "100003",
         "base": null,
         "quote": null
       },
@@ -9674,9 +9648,9 @@
         "quote": null
       },
       "1000004": {
-        "address": "0x401e09ddF0391AC421d6dEcfe2BcA0a36934aD7e",
+        "address": "0xd85275A629E8Fad4b6727D730FF98cB34F14D984",
         "constructorArgs": [
-          "YAKI / USD",
+          "MOYAKI / USD",
           8,
           "1000004",
           "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
@@ -9687,28 +9661,15 @@
         "quote": null
       },
       "1000005": {
-        "address": "0x9ECc812337b61476CE36459A7122375fA44c4E00",
+        "address": "0xD73e1f67f968d09F06fb7aE14c7F94ec5E077b49",
         "constructorArgs": [
-          "DAK / USD",
+          "MONLANDAK / USD",
           8,
           "1000005",
           "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "1000005",
-        "base": null,
-        "quote": null
-      },
-      "1000006": {
-        "address": "0x274c06f303E902489f32914f8342340628dc9fF5",
-        "constructorArgs": [
-          "YUSD / USD Pegged to 1.00",
-          8,
-          "1000006",
-          "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
-        ],
-        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
-        "feedId": "1000006",
         "base": null,
         "quote": null
       },

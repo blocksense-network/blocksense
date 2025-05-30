@@ -1,6 +1,6 @@
 {
-  "network": "ink-sepolia",
-  "chainId": "763373",
+  "network": "fraxtal-testnet",
+  "chainId": "2522",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {

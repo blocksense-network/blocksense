@@ -1,0 +1,162 @@
+{
+  "network": "pharos-testnet",
+  "chainId": "688688",
+  "contracts": {
+    "coreContracts": {
+      "UpgradeableProxyADFS": {
+        "address": "0x176186264884f75A584f0C9e839Ae175cBA03B87",
+        "constructorArgs": [
+          "0xe07A39d7fabD7C130742D3bBdD90f821CC666EEa"
+        ],
+        "salt": "0x36d946ba08b13b7ec8aec7effec798658cf99491873a73e9c652b8ab3b96756a"
+      },
+      "AggregatedDataFeedStore": {
+        "address": "0x707bb37B703E4cf7C941bd57E90B16334714f887",
+        "constructorArgs": [
+          "0xF1B62f07bEc1935ADACdeE5d12ccA0E90F9A108B"
+        ],
+        "salt": "0x71b411ccc58b0bf522c76bab9a977992a03cfbc078d3852ee8ee8b6d5311a477"
+      },
+      "AccessControl": {
+        "address": "0xF1B62f07bEc1935ADACdeE5d12ccA0E90F9A108B",
+        "constructorArgs": [
+          "0xe07A39d7fabD7C130742D3bBdD90f821CC666EEa"
+        ],
+        "salt": "0x26186f5256760fb01ab0053f874a1674c76a40b87c3031918056ef3ace009aac"
+      },
+      "CLFeedRegistryAdapter": {
+        "address": "0xFEfFc68Ec78a622A3B2f8F286f297A991a8CdDAb",
+        "constructorArgs": [
+          "0xe07A39d7fabD7C130742D3bBdD90f821CC666EEa",
+          "0x176186264884f75A584f0C9e839Ae175cBA03B87"
+        ],
+        "salt": "0xd1adaede68d344519025e2ff574650cd99d3830fe6d274c7a7843cdc00e17938"
+      }
+    },
+    "safe": {
+      "AdminMultisig": "0xe07A39d7fabD7C130742D3bBdD90f821CC666EEa",
+      "ReporterMultisig": null,
+      "OnlySequencerGuard": null,
+      "AdminExecutorModule": null
+    },
+    "CLAggregatorAdapter": {
+      "0": {
+        "address": "0xD0bbe873EB00f20Ab581a8d89D89487F5f433E0F",
+        "constructorArgs": [
+          "BTC / USD",
+          8,
+          "0",
+          "0x176186264884f75A584f0C9e839Ae175cBA03B87"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "0",
+        "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "1": {
+        "address": "0x97990972E63c9dcA3c5211139F985950f6BF08a4",
+        "constructorArgs": [
+          "BTC / USDT",
+          8,
+          "1",
+          "0x176186264884f75A584f0C9e839Ae175cBA03B87"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "1",
+        "base": null,
+        "quote": null
+      },
+      "3": {
+        "address": "0x4d83ED672Aa50BAF27cf1B70AEFF783BaB7407A8",
+        "constructorArgs": [
+          "ETH / USD",
+          8,
+          "3",
+          "0x176186264884f75A584f0C9e839Ae175cBA03B87"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "3",
+        "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "9": {
+        "address": "0x5Ca21eA8c973AB7031909468c54d4b48559D2Ced",
+        "constructorArgs": [
+          "XRP / USD",
+          8,
+          "9",
+          "0x176186264884f75A584f0C9e839Ae175cBA03B87"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "9",
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "13": {
+        "address": "0x098e943BFAAFf23Ffa86dD23Eeab440728C3862A",
+        "constructorArgs": [
+          "BNB / USD",
+          8,
+          "13",
+          "0x176186264884f75A584f0C9e839Ae175cBA03B87"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "13",
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "16": {
+        "address": "0xe769212e61d789586AbF551B877647656739DA73",
+        "constructorArgs": [
+          "SOL / USD",
+          8,
+          "16",
+          "0x176186264884f75A584f0C9e839Ae175cBA03B87"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "16",
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "22": {
+        "address": "0x0A0aAD880db486819c56869830EDC3b28581adf7",
+        "constructorArgs": [
+          "ADA / USD",
+          8,
+          "22",
+          "0x176186264884f75A584f0C9e839Ae175cBA03B87"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "22",
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "26": {
+        "address": "0x63B6dec1aC87f4318dA14c06115bfDED3df0935f",
+        "constructorArgs": [
+          "DOGE / USD",
+          8,
+          "26",
+          "0x176186264884f75A584f0C9e839Ae175cBA03B87"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "26",
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "29": {
+        "address": "0x6E6635DE5d057101B4bb7c7b6c8CEc206343729A",
+        "constructorArgs": [
+          "TRX / USD",
+          8,
+          "29",
+          "0x176186264884f75A584f0C9e839Ae175cBA03B87"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "29",
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    }
+  }
+}

@@ -33,7 +33,7 @@
     "@octokit/rest": "^21.1.1",
     "@types/keccak": "^3",
     "@types/node": "^22.10.2",
-    "effect": "^3.12.1",
+    "effect": "^3.16.5",
     "glob": "^11.0.0",
     "keccak": "^3.0.4",
     "keccak256": "^1.0.6",
@@ -44,6 +44,14 @@
   },
   "dependencies": {
     "@blocksense/config-types": "workspace:*",
+    "@effect/cluster": "^0.38.14",
+    "@effect/experimental": "^0.48.10",
+    "@effect/platform": "^0.84.9",
+    "@effect/platform-node": "^0.85.14",
+    "@effect/rpc": "^0.61.13",
+    "@effect/sql": "^0.37.10",
+    "chalk": "^5.4.1",
+    "cli-table3": "^0.6.5",
     "web3": "^4.16.0"
   }
 }

@@ -2015,10 +2015,18 @@ __metadata:
     "@blocksense/base-utils": "workspace:*"
     "@blocksense/config-types": "workspace:*"
     "@blocksense/contracts": "workspace:*"
+    "@effect/cluster": "npm:^0.38.14"
+    "@effect/experimental": "npm:^0.48.10"
+    "@effect/platform": "npm:^0.84.9"
+    "@effect/platform-node": "npm:^0.85.14"
+    "@effect/rpc": "npm:^0.61.13"
+    "@effect/sql": "npm:^0.37.10"
     "@octokit/rest": "npm:^21.1.1"
     "@types/keccak": "npm:^3"
     "@types/node": "npm:^22.10.2"
-    effect: "npm:^3.12.1"
+    chalk: "npm:^5.4.1"
+    cli-table3: "npm:^0.6.5"
+    effect: "npm:^3.16.5"
     glob: "npm:^11.0.0"
     keccak: "npm:^3.0.4"
     keccak256: "npm:^1.0.6"
@@ -2568,6 +2576,73 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@effect/cluster@npm:^0.38.14":
+  version: 0.38.14
+  resolution: "@effect/cluster@npm:0.38.14"
+  peerDependencies:
+    "@effect/platform": ^0.84.9
+    "@effect/rpc": ^0.61.13
+    "@effect/sql": ^0.37.10
+    "@effect/workflow": ^0.1.12
+    effect: ^3.16.5
+  checksum: 10c0/6b8a4908139cebc9a88f84e366beb1d8bafa51a67ea7f9b96106dbc5435efc2db610c916ae2b4bd75238389d5e14d04880be99d81790603901b1118e8e7f58dd
+  languageName: node
+  linkType: hard
+
+"@effect/experimental@npm:^0.48.10":
+  version: 0.48.10
+  resolution: "@effect/experimental@npm:0.48.10"
+  dependencies:
+    uuid: "npm:^11.0.3"
+  peerDependencies:
+    "@effect/platform": ^0.84.9
+    effect: ^3.16.5
+    ioredis: ^5
+    lmdb: ^3
+  peerDependenciesMeta:
+    ioredis:
+      optional: true
+    lmdb:
+      optional: true
+  checksum: 10c0/61f2d0be291fe5a5935add49a15f5000b49ad4d7b626310bfe5844fed0cc4999bbb4b9a3724b8f923016f9b4def392a4fb412c8018e0b83c1ccd2e98052ca7df
+  languageName: node
+  linkType: hard
+
+"@effect/platform-node-shared@npm:^0.39.14":
+  version: 0.39.14
+  resolution: "@effect/platform-node-shared@npm:0.39.14"
+  dependencies:
+    "@parcel/watcher": "npm:^2.5.1"
+    multipasta: "npm:^0.2.5"
+    ws: "npm:^8.18.2"
+  peerDependencies:
+    "@effect/cluster": ^0.38.14
+    "@effect/platform": ^0.84.9
+    "@effect/rpc": ^0.61.13
+    "@effect/sql": ^0.37.10
+    effect: ^3.16.5
+  checksum: 10c0/36fe0d7daad2cd6ee4b3c269ac2ce0372a10cfe490926963d796c3414e15f8e1f2d735e3e915e39578c92530d43b0283f4aa5e3a994c3cf8afe77af1024c5cda
+  languageName: node
+  linkType: hard
+
+"@effect/platform-node@npm:^0.85.14":
+  version: 0.85.14
+  resolution: "@effect/platform-node@npm:0.85.14"
+  dependencies:
+    "@effect/platform-node-shared": "npm:^0.39.14"
+    mime: "npm:^3.0.0"
+    undici: "npm:^7.10.0"
+    ws: "npm:^8.18.2"
+  peerDependencies:
+    "@effect/cluster": ^0.38.14
+    "@effect/platform": ^0.84.9
+    "@effect/rpc": ^0.61.13
+    "@effect/sql": ^0.37.10
+    effect: ^3.16.5
+  checksum: 10c0/857d15aa57148219c706a06547c0fecf0ef106d644be4674f916e288c6753f73a665ef94b4044771461ef7f4474f993a833f0d1c3d9b421035ae1493073f0683
+  languageName: node
+  linkType: hard
+
 "@effect/platform@npm:^0.80.13":
   version: 0.80.13
   resolution: "@effect/platform@npm:0.80.13"
@@ -2578,6 +2653,43 @@ __metadata:
   peerDependencies:
     effect: ^3.14.13
   checksum: 10c0/0865c0280d6f7b94580fba31f111b591f0702a2838ddd3615fa750154133bad6cdbfc26f1e958dbd8c1bfe61df05dd3e4e8c734bb7af900a362542f37128d133
+  languageName: node
+  linkType: hard
+
+"@effect/platform@npm:^0.84.9":
+  version: 0.84.9
+  resolution: "@effect/platform@npm:0.84.9"
+  dependencies:
+    find-my-way-ts: "npm:^0.1.5"
+    msgpackr: "npm:^1.11.4"
+    multipasta: "npm:^0.2.5"
+  peerDependencies:
+    effect: ^3.16.5
+  checksum: 10c0/82f1755507c3f3a1eb40e79ff11bc367dc396272a32888992b7f39a03219a222bcb1e06d4482778758429352a5d0c9d50ca3c2dbbd852160710ed6b8eac7e980
+  languageName: node
+  linkType: hard
+
+"@effect/rpc@npm:^0.61.13":
+  version: 0.61.13
+  resolution: "@effect/rpc@npm:0.61.13"
+  peerDependencies:
+    "@effect/platform": ^0.84.9
+    effect: ^3.16.5
+  checksum: 10c0/710390756b84e0d0d5bf3cafbf7b85d5c165a83713aa2a324c0a984beb90fa494f01871b7c54d2c52c196c1289ad6ee493f246093bd4b554203c22f0d4b827d5
+  languageName: node
+  linkType: hard
+
+"@effect/sql@npm:^0.37.10":
+  version: 0.37.10
+  resolution: "@effect/sql@npm:0.37.10"
+  dependencies:
+    "@opentelemetry/semantic-conventions": "npm:^1.33.0"
+    uuid: "npm:^11.0.3"
+  peerDependencies:
+    "@effect/experimental": ^0.48.10
+    "@effect/platform": ^0.84.9
+    effect: ^3.16.5
+  checksum: 10c0/6c36309057cfa09fae84f4e0bd282f9061c34ab2820d63c6a4a1d69dc76dabeecc77d1b013856440bd929e1bbc9c4f56d4b35e21e8dae64ed884ae24df1fdfc8
   languageName: node
   linkType: hard
 
@@ -6399,6 +6511,13 @@ __metadata:
   version: 1.9.0
   resolution: "@opentelemetry/api@npm:1.9.0"
   checksum: 10c0/9aae2fe6e8a3a3eeb6c1fdef78e1939cf05a0f37f8a4fae4d6bf2e09eb1e06f966ece85805626e01ba5fab48072b94f19b835449e58b6d26720ee19a58298add
+  languageName: node
+  linkType: hard
+
+"@opentelemetry/semantic-conventions@npm:^1.33.0":
+  version: 1.34.0
+  resolution: "@opentelemetry/semantic-conventions@npm:1.34.0"
+  checksum: 10c0/a51a32a5cf5c803bd2125a680d0abacbff632f3b255d0fe52379dac191114a0e8d72a34f9c46c5483ccfe91c4061c309f3cf61a19d11347e2a69779e82cfefd0
   languageName: node
   linkType: hard
 
@@ -13402,7 +13521,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chalk@npm:^5.0.0, chalk@npm:^5.2.0":
+"chalk@npm:^5.0.0, chalk@npm:^5.2.0, chalk@npm:^5.4.1":
   version: 5.4.1
   resolution: "chalk@npm:5.4.1"
   checksum: 10c0/b23e88132c702f4855ca6d25cb5538b1114343e41472d5263ee8a37cccfccd9c4216d111e1097c6a27830407a1dc81fecdf2a56f2c63033d4dbbd88c10b0dcef
@@ -13660,7 +13779,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cli-table3@npm:^0.6.0, cli-table3@npm:^0.6.3":
+"cli-table3@npm:^0.6.0, cli-table3@npm:^0.6.3, cli-table3@npm:^0.6.5":
   version: 0.6.5
   resolution: "cli-table3@npm:0.6.5"
   dependencies:
@@ -15495,6 +15614,16 @@ __metadata:
     "@standard-schema/spec": "npm:^1.0.0"
     fast-check: "npm:^3.23.1"
   checksum: 10c0/d83e6ba14f4453c022b075d29c98947b1e3abce1da86379d4ce449a91cbbaabc5bbede03047ea247eaa8336940c46fee4c7759ef910258d9632e294e6a099078
+  languageName: node
+  linkType: hard
+
+"effect@npm:^3.16.5":
+  version: 3.16.5
+  resolution: "effect@npm:3.16.5"
+  dependencies:
+    "@standard-schema/spec": "npm:^1.0.0"
+    fast-check: "npm:^3.23.1"
+  checksum: 10c0/29d3cdc9c3db74642645fde08b11c25fde4fb00c2a3b30606a6513739220542d0f61e3dd38fa21416ad45cc7e4f89ee9a2e2bb39e9e4dfea3723d50aaca0e546
   languageName: node
   linkType: hard
 
@@ -22745,6 +22874,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"msgpackr@npm:^1.11.4":
+  version: 1.11.4
+  resolution: "msgpackr@npm:1.11.4"
+  dependencies:
+    msgpackr-extract: "npm:^3.0.2"
+  dependenciesMeta:
+    msgpackr-extract:
+      optional: true
+  checksum: 10c0/171f6e15b628e91969cbb715c076e218886dc505fdac9ce31aa9e8641877cb5cf52d89fe0ca2930520711b1bbc9f792e10d0a9fc08806ad5d543c50abfab322c
+  languageName: node
+  linkType: hard
+
 "multiformats@npm:^9.4.2":
   version: 9.9.0
   resolution: "multiformats@npm:9.9.0"
@@ -29336,6 +29477,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"undici@npm:^7.10.0":
+  version: 7.10.0
+  resolution: "undici@npm:7.10.0"
+  checksum: 10c0/756ac876a8df845bc89eb8348c35d33a0ff63c17eb45b664075c961a7fbd4a398f94f9dce438262f55fe66e4bbb0a46aa63a3fd58ce51361c616aff11a270450
+  languageName: node
+  linkType: hard
+
 "unenv@npm:2.0.0-rc.14":
   version: 2.0.0-rc.14
   resolution: "unenv@npm:2.0.0-rc.14"
@@ -29867,6 +30015,15 @@ __metadata:
   version: 0.4.0
   resolution: "utila@npm:0.4.0"
   checksum: 10c0/2791604e09ca4f77ae314df83e80d1805f867eb5c7e13e7413caee01273c278cf2c9a3670d8d25c889a877f7b149d892fe61b0181a81654b425e9622ab23d42e
+  languageName: node
+  linkType: hard
+
+"uuid@npm:^11.0.3":
+  version: 11.1.0
+  resolution: "uuid@npm:11.1.0"
+  bin:
+    uuid: dist/esm/bin/uuid
+  checksum: 10c0/34aa51b9874ae398c2b799c88a127701408cd581ee89ec3baa53509dd8728cbb25826f2a038f9465f8b7be446f0fbf11558862965b18d21c993684297628d4d3
   languageName: node
   linkType: hard
 
@@ -31532,6 +31689,21 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 10c0/bd7d5f4aaf04fae7960c23dcb6c6375d525e00f795dd20b9385902bd008c40a94d3db3ce97d878acc7573df852056ca546328b27b39f47609f80fb22a0a9b61d
+  languageName: node
+  linkType: hard
+
+"ws@npm:^8.18.2":
+  version: 8.18.2
+  resolution: "ws@npm:8.18.2"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 10c0/4b50f67931b8c6943c893f59c524f0e4905bbd183016cfb0f2b8653aa7f28dad4e456b9d99d285bbb67cca4fedd9ce90dfdfaa82b898a11414ebd66ee99141e4
   languageName: node
   linkType: hard
 

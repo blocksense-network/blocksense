@@ -1,6 +1,6 @@
 {
-  "network": "ink-sepolia",
-  "chainId": "763373",
+  "network": "mantle-sepolia",
+  "chainId": "5003",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {

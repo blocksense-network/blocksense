@@ -1,0 +1,177 @@
+{
+  "network": "local",
+  "chainId": "99999999999",
+  "contracts": {
+    "coreContracts": {
+      "UpgradeableProxyADFS": {
+        "address": "0xec15a270113E58bfC795802a990F83B03c31897f",
+        "constructorArgs": [
+          "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05"
+        ],
+        "salt": "0x62f1a19b0c1d9115e54b8f7b89d83a0f2bf06ebd0272380e54384a2dce50d3d6"
+      },
+      "AggregatedDataFeedStore": {
+        "address": "0x8D731985A1A0E2455Dc4f2f094f74510e1670fB0",
+        "constructorArgs": [
+          "0x235DFbb56294754625E3f662D719Ba4a39768ABb"
+        ],
+        "salt": "0x71b411ccc58b0bf522c76bab9a977992a03cfbc078d3852ee8ee8b6d5311a477"
+      },
+      "AccessControl": {
+        "address": "0x235DFbb56294754625E3f662D719Ba4a39768ABb",
+        "constructorArgs": [
+          "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05"
+        ],
+        "salt": "0x26186f5256760fb01ab0053f874a1674c76a40b87c3031918056ef3ace009aac"
+      },
+      "CLFeedRegistryAdapter": {
+        "address": "0xa3EE2141d105Ccef482163377B8E0eF7C56aEc82",
+        "constructorArgs": [
+          "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05",
+          "0xec15a270113E58bfC795802a990F83B03c31897f"
+        ],
+        "salt": "0xd1adaede68d344519025e2ff574650cd99d3830fe6d274c7a7843cdc00e17938"
+      }
+    },
+    "safe": {
+      "AdminMultisig": "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05",
+      "ReporterMultisig": "0x131f81956d0CCf7B7C82CA740fA7266D150bcB66",
+      "OnlySequencerGuard": {
+        "address": "0x954C2cD33aaF10903914291d7b24D3bC5b81BD9E",
+        "constructorArgs": [
+          "0x131f81956d0CCf7B7C82CA740fA7266D150bcB66",
+          "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05",
+          "0xec15a270113E58bfC795802a990F83B03c31897f"
+        ],
+        "salt": "0x090ff22fa2993d5eed99d2b1b1d9edcf6a9ba7b436b4a1a760c83267207413de"
+      },
+      "AdminExecutorModule": {
+        "address": "0x542dCbd1947A4716E98a69b24705B40D9837B704",
+        "constructorArgs": [
+          "0x131f81956d0CCf7B7C82CA740fA7266D150bcB66",
+          "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05"
+        ],
+        "salt": "0x0064a0bb9e2ecd6881ca0beb9fb7dc5c9cac1d94c992fd20b62a8854f7632048"
+      }
+    },
+    "CLAggregatorAdapter": {
+      "0": {
+        "address": "0x8BAf3EF25406BaB0cD473368043266a6E8a9Eab7",
+        "constructorArgs": [
+          "BTC / USD",
+          8,
+          "0",
+          "0xec15a270113E58bfC795802a990F83B03c31897f"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "0",
+        "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "3": {
+        "address": "0x3d0FD4C63D261488882D445B680F7Fd70dBb662a",
+        "constructorArgs": [
+          "ETH / USD",
+          8,
+          "3",
+          "0xec15a270113E58bfC795802a990F83B03c31897f"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "3",
+        "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "13": {
+        "address": "0x4a9E501ca5C978d08705487F0E0C2a82007aA2f7",
+        "constructorArgs": [
+          "BNB / USD",
+          8,
+          "13",
+          "0xec15a270113E58bfC795802a990F83B03c31897f"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "13",
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "16": {
+        "address": "0x1A49E8F2C9840ec56ea9bf11A9b60d36138495C2",
+        "constructorArgs": [
+          "SOL / USD",
+          8,
+          "16",
+          "0xec15a270113E58bfC795802a990F83B03c31897f"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "16",
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "35": {
+        "address": "0x6fB461740DCFF5915d40d68Fe3F1f0f4515cE744",
+        "constructorArgs": [
+          "LINK / USD",
+          8,
+          "35",
+          "0xec15a270113E58bfC795802a990F83B03c31897f"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "35",
+        "base": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "91": {
+        "address": "0x06cf829f354269b9361AED94A5C258350f819BDc",
+        "constructorArgs": [
+          "UNI / USD",
+          8,
+          "91",
+          "0xec15a270113E58bfC795802a990F83B03c31897f"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "91",
+        "base": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "114": {
+        "address": "0xB363C88843Af9CBD4FA88a1F985cE44A8ad447c6",
+        "constructorArgs": [
+          "AAVE / USD",
+          8,
+          "114",
+          "0xec15a270113E58bfC795802a990F83B03c31897f"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "114",
+        "base": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "121": {
+        "address": "0x5137bEed151A323E1bdfA8EA8eA2f5E1940fe259",
+        "constructorArgs": [
+          "TAO / USD",
+          18,
+          "121",
+          "0xec15a270113E58bfC795802a990F83B03c31897f"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "121",
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "347": {
+        "address": "0xfeAf4F7649829399592f342AF29AcCd426BAE8F5",
+        "constructorArgs": [
+          "1INCH / USD",
+          8,
+          "347",
+          "0xec15a270113E58bfC795802a990F83B03c31897f"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "347",
+        "base": "0x111111111117dC0aa78b770fA6A738034120C302",
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    }
+  }
+}
