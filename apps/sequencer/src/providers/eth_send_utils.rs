@@ -432,7 +432,7 @@ pub async fn eth_batch_send_to_contract(
         ) {
             Ok(v) => v,
             Err(err) => {
-                warn!("Error while trying to post tx to RPC for network {net} and address {sender_address} due to {err}");
+                warn!("Error while trying to post tx to RPC for network {net} and sender {sender_address} contract {contract_address} due to {err}");
                 inc_transaction_retries(
                     net.as_str(),
                     &mut transaction_retries_count,
