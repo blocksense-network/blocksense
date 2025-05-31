@@ -11,6 +11,7 @@ import {
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
 import { padNumber } from '@blocksense/base-utils/string';
+import { readline } from '@blocksense/base-utils/tty';
 
 import { DeploymentConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
 import { readConfig, writeEvmDeployment } from '@blocksense/config-types';
@@ -118,6 +119,11 @@ task('deploy', 'Deploy contracts')
       console.log(`// CREATE2 salts:`);
       for (const [name, salt] of Object.entries(create2ContractSalts)) {
         console.log(`//   | ${name.padStart(17)}| ${salt}`);
+      }
+
+      if ((await readline().question('\nConfirm deployment? (y/n) ')) !== 'y') {
+        console.log('Aborting deployment...');
+        return;
       }
 
       console.log('---------------------------\n');
