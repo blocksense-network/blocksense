@@ -1,22 +1,22 @@
 import { formatEther } from 'ethers';
 import { task } from 'hardhat/config';
 
-import Safe from '@safe-global/protocol-kit';
+import type Safe from '@safe-global/protocol-kit';
 
-import { NetworkConfig, ContractNames, DeployContract } from './types';
+import { getOptionalEnvString } from '@blocksense/base-utils/env';
 import {
   isNetworkName,
   NetworkName,
   parseChainId,
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
-
 import { padNumber } from '@blocksense/base-utils/string';
-import { getOptionalEnvString } from '@blocksense/base-utils/env';
 
 import { DeploymentConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
-import { predictAddress } from './utils';
 import { readConfig, writeEvmDeployment } from '@blocksense/config-types';
+
+import { NetworkConfig, ContractNames, DeployContract } from './types';
+import { predictAddress } from './utils';
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
