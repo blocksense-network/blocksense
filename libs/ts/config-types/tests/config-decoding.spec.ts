@@ -49,13 +49,15 @@ describe('Configuration files decoding', async () => {
       expect(metadata).toBeDefined();
       const deployment = readEvmDeployment(net);
       await expect(deployment).resolves.toMatchObject({
-        name: net,
+        network: net,
         chainId: metadata.chainId,
         contracts: {
           coreContracts: expect.any(Object),
+          safe: {
+            AdminMultisig: expect.any(String),
+            ReporterMultisig: expect.toBeOneOf([expect.any(String), null]),
+          },
           CLAggregatorAdapter: expect.any(Object),
-          SequencerMultisig: expect.any(String),
-          AdminMultisig: expect.any(String),
         },
       });
       deployments[net] = assertNotNull(await deployment);
