@@ -5,12 +5,14 @@ import {
   ethereumAddress,
   networkName,
 } from '@blocksense/base-utils/evm';
+import { hexDataString } from '@blocksense/base-utils';
 
 const ParameterType = S.Union(S.String, S.Number, S.BigIntFromSelf, S.Boolean);
 const FunctionArgs = S.Array(ParameterType);
 
 const ContractDataSchema = S.Struct({
   address: ethereumAddress,
+  salt: hexDataString,
   constructorArgs: FunctionArgs,
 });
 
