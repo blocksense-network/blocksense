@@ -1,3 +1,4 @@
+import { HexDataString } from '@blocksense/base-utils/buffer-and-hex';
 import { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 import { JsonRpcProvider, Network, Signer, Wallet } from 'ethers';
 
@@ -65,7 +66,7 @@ export type DeployContract = {
   >;
   argsTypes: string[];
   argsValues: any[];
-  salt: string;
+  salt: HexDataString;
   value: bigint;
   feedRegistryInfo?: {
     description: string;

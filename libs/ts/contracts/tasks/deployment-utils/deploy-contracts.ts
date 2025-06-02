@@ -95,11 +95,13 @@ export async function deployContracts({
         quote: contract.feedRegistryInfo?.quote ?? null,
         address: parseEthereumAddress(contractAddress),
         constructorArgs: contract.argsValues,
+        salt: contract.salt,
       });
     } else {
       ContractsConfigV2.coreContracts[contract.name] = {
         address: parseEthereumAddress(contractAddress),
         constructorArgs: contract.argsValues,
+        salt: contract.salt,
       };
     }
 

@@ -5,6 +5,10 @@ import type Safe from '@safe-global/protocol-kit';
 
 import { getOptionalEnvString } from '@blocksense/base-utils/env';
 import {
+  HexDataString,
+  parseHexDataString,
+} from '@blocksense/base-utils/buffer-and-hex';
+import {
   isNetworkName,
   NetworkName,
   parseChainId,
@@ -69,18 +73,20 @@ task('deploy', 'Deploy contracts')
 
       const signerBalance = await config.provider.getBalance(signer);
 
+      const keccak256 = (str: string) => parseHexDataString(ethers.id(str));
+
       const create2ContractSalts = {
         upgradeableProxy: getOptionalEnvString(
           'ADFS_UPGRADEABLE_PROXY_SALT',
-          ethers.id('upgradeableProxy'),
-        ),
-        accessControl: ethers.id('accessControl'),
-        adfs: ethers.id('aggregatedDataFeedStore'),
-        safeGuard: ethers.id('onlySafeGuard'),
-        safeModule: ethers.id('adminExecutorModule'),
-        clFeedRegistry: ethers.id('registry'),
-        clAggregatorProxy: ethers.id('aggregator'),
-      };
+          keccak256('upgradeableProxy'),
+        ) as HexDataString,
+        accessControl: keccak256('accessControl'),
+        adfs: keccak256('aggregatedDataFeedStore'),
+        safeGuard: keccak256('onlySafeGuard'),
+        safeModule: keccak256('adminExecutorModule'),
+        clFeedRegistry: keccak256('registry'),
+        clAggregatorProxy: keccak256('aggregator'),
+      } satisfies Record<string, HexDataString>;
 
       console.log(`Blocksense EVM contracts deployment`);
       console.log(`===================================\n`);
@@ -252,6 +258,7 @@ task('deploy', 'Deploy contracts')
       deployData.coreContracts.OnlySequencerGuard ??= {
         address: parseEthereumAddress(ethers.ZeroAddress),
         constructorArgs: [],
+        salt: create2ContractSalts.safeGuard,
       };
 
       chainsDeployment[networkName] = {

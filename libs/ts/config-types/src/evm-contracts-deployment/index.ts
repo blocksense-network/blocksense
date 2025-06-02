@@ -5,6 +5,7 @@ import {
   ethereumAddress,
   networkName,
 } from '@blocksense/base-utils/evm';
+import { hexDataString } from '@blocksense/base-utils';
 
 const ParameterType = S.Union(S.String, S.Number, S.BigIntFromSelf, S.Boolean);
 const FunctionArgs = S.Array(ParameterType);
@@ -18,6 +19,7 @@ const ContractDataSchemaV1 = S.Struct({
 
 const ContractDataSchemaV2 = S.Struct({
   ...ContractDataSchemaV1.fields,
+  salt: hexDataString,
 }).annotations({
   identifier: 'ContractDataV2',
 });
