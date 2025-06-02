@@ -14,9 +14,9 @@ use alloy::{
     },
     signers::local::PrivateKeySigner,
 };
-
 use alloy_primitives::Bytes;
 use blocksense_feeds_processing::adfs_gen_calldata::RoundCounters;
+use futures::future::join_all;
 use reqwest::Url;
 
 use blocksense_config::{AllFeedsConfig, PublishCriteria, SequencerConfig};
@@ -33,6 +33,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::{fs, mem};
+use tokio::join;
 use tokio::sync::{Mutex, RwLock};
 use tokio::time::error::Elapsed;
 use tokio::time::Duration;
@@ -123,6 +124,8 @@ async fn get_rpc_providers(
         ProviderMetrics::new(prefix).expect("Failed to allocate ProviderMetrics"),
     ));
 
+    let mut check_contracts_in_networks_tasks = Vec::new();
+
     for (net, p) in &conf.providers {
         let rpc_url: Url = p
             .url
@@ -148,17 +151,15 @@ async fn get_rpc_providers(
             &provider_metrics,
             feeds_config,
         );
-        rpc_provider
-            .log_if_contract_exists(PRICE_FEED_CONTRACT_NAME)
-            .await;
-        rpc_provider
-            .log_if_contract_exists(EVENT_FEED_CONTRACT_NAME)
-            .await;
 
         let rpc_provider = Arc::new(Mutex::new(rpc_provider));
 
+        check_contracts_in_networks_tasks.push(log_if_contracts_exist(rpc_provider.clone()));
+
         providers.insert(net.clone(), rpc_provider.clone());
     }
+
+    join_all(check_contracts_in_networks_tasks).await;
 
     debug!("List of providers:");
     for (key, value) in &providers {
@@ -167,6 +168,14 @@ async fn get_rpc_providers(
     }
 
     providers
+}
+
+async fn log_if_contracts_exist(provider_mutex: Arc<Mutex<RpcProvider>>) {
+    let rpc_provider = provider_mutex.lock().await;
+    join!(
+        rpc_provider.log_if_contract_exists(PRICE_FEED_CONTRACT_NAME),
+        rpc_provider.log_if_contract_exists(EVENT_FEED_CONTRACT_NAME),
+    );
 }
 
 impl RpcProvider {
@@ -581,7 +590,10 @@ impl RpcProvider {
                 }
             };
         } else {
-            warn!("No contract address set for network {}", network);
+            warn!(
+                "No contract address for {contract_name} set for network {}",
+                network
+            );
         }
     }
 
