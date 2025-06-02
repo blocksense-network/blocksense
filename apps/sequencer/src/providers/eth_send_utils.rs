@@ -1,9 +1,9 @@
-use actix_web::web::Data;
+use actix_web::{rt::time::interval, web::Data};
 use alloy::{
     hex,
     network::TransactionBuilder,
     primitives::{Address, Bytes},
-    providers::{Provider, ProviderBuilder},
+    providers::Provider,
     rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
 use blocksense_config::FeedStrideAndDecimals;
@@ -16,8 +16,8 @@ use tokio::{sync::Mutex, sync::RwLock, time::Duration};
 
 use crate::{
     providers::provider::{
-        parse_eth_address, ProviderStatus, ProviderType, RpcProvider, SharedRpcProviders,
-        EVENT_FEED_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME,
+        ProviderStatus, ProviderType, RpcProvider, SharedRpcProviders, EVENT_FEED_CONTRACT_NAME,
+        PRICE_FEED_CONTRACT_NAME,
     },
     sequencer_state::SequencerState,
 };
@@ -272,27 +272,18 @@ pub async fn eth_batch_send_to_contract(
     let receipt;
     let tx_time = Instant::now();
 
-    let (sender_address, is_impersonated) = match &provider_settings.impersonated_anvil_account {
-        Some(impersonated_anvil_account) => {
-            debug!(
-                "Using impersonated anvil account with address: {} in network `{net}` block height {block_height}",
-                impersonated_anvil_account
-            );
-            (parse_eth_address(impersonated_anvil_account).unwrap(), true)
-        }
-        None => {
-            debug!(
-                "Using signer address: {} in network `{net}` block height {block_height}",
-                signer.address()
-            );
-            (signer.address(), false)
-        }
+    let sender_address = {
+        debug!(
+            "Using signer address: {} in network `{net}` block height {block_height}",
+            signer.address()
+        );
+        signer.address()
     };
 
     let mut transaction_retries_count = 0;
 
     loop {
-        debug!("loop begin; transaction_retries_count={transaction_retries_count} in network `{net}` block height {block_height}");
+        debug!("loop begin; transaction_retries_count={transaction_retries_count} in network `{net}` block height {block_height} with transaction_retries_count_limit = {transaction_retries_count_limit} and transaction_retry_timeout_secs = {transaction_retry_timeout_secs}");
 
         if transaction_retries_count > transaction_retries_count_limit {
             return Ok(("timeout".to_string(), feeds_to_update_ids));
@@ -306,9 +297,12 @@ pub async fn eth_batch_send_to_contract(
         )
         .await
         {
-            Ok(v) => v,
+            Ok(v) => {
+                debug!("Successfully got value in network `{net}` block height {block_height} for gas_price");
+                v
+            }
             Err(err) => {
-                warn!("{err} for {transaction_retries_count}-th time in network `{net}` block height {block_height}");
+                warn!("get_gas_price error {err} for {transaction_retries_count}-th time in network `{net}` block height {block_height}");
                 inc_transaction_retries(
                     net.as_str(),
                     &mut transaction_retries_count,
@@ -329,9 +323,12 @@ pub async fn eth_batch_send_to_contract(
         )
         .await
         {
-            Ok(v) => v,
+            Ok(v) => {
+                debug!("Successfully got value in network `{net}` block height {block_height} for chain_id");
+                v
+            }
             Err(err) => {
-                warn!("{err} for {transaction_retries_count}-th time in network `{net}` block height {block_height}");
+                warn!("get_chain_id error {err} for {transaction_retries_count}-th time in network `{net}` block height {block_height}");
                 inc_transaction_retries(
                     net.as_str(),
                     &mut transaction_retries_count,
@@ -349,7 +346,7 @@ pub async fn eth_batch_send_to_contract(
                 .from(sender_address)
                 .with_chain_id(chain_id)
                 .input(Some(input.clone()).into());
-            debug!("Sending initial tx: {tx:?}");
+            debug!("Sending initial tx: {tx:?} in network `{net}` block height {block_height}");
         } else {
             debug!(
                 "Retrying to send updates in network `{net}` block height {block_height} for {transaction_retries_count}-th time"
@@ -393,24 +390,20 @@ pub async fn eth_batch_send_to_contract(
         let tx_str = format!("{tx:?}");
         debug!("tx_str={tx_str} in network `{net}` block height {block_height}");
 
-        let tx_result = if is_impersonated {
-            let rpc_url = provider.url();
-            let rpc_handle = ProviderBuilder::new().on_http(rpc_url);
-            debug!("Sending impersonated price feed update transaction in network `{net}` block height {block_height}...");
-            let result = rpc_handle.send_transaction(tx).await;
-            debug!("Sent impersonated price feed update transaction in network `{net}` block height {block_height}");
-            result
-        } else {
-            debug!("Sending price feed update transaction in network `{net}` block height {block_height}`...");
-            let result = match actix_web::rt::time::timeout(
-                Duration::from_secs(transaction_retry_timeout_secs),
-                rpc_handle.send_transaction(tx),
-            )
-            .await
+        let tx_receipt = {
+            let tx_hash = match rpc_handle
+                .send_transaction(tx)
+                .await?
+                // .with_required_confirmations(1)
+                .with_timeout(Some(std::time::Duration::from_secs(
+                    transaction_retry_timeout_secs,
+                )))
+                .watch()
+                .await
             {
-                Ok(post_tx_res) => post_tx_res,
+                Ok(v) => v,
                 Err(err) => {
-                    warn!("Timed out while trying to post tx to RPC in network `{net}` block height {block_height} and address {sender_address} due to {err}");
+                    warn!("Timed out while trying to post tx to RPC and get tx_hash in network `{net}` block height {block_height} and address {sender_address} due to {err}");
                     inc_transaction_retries(
                         net.as_str(),
                         &mut transaction_retries_count,
@@ -420,59 +413,50 @@ pub async fn eth_batch_send_to_contract(
                     continue;
                 }
             };
-            debug!(
-                "Sent price feed update transaction in network `{net}` block height {block_height}"
-            );
-            result
+
+            inc_metric!(provider_metrics, net, total_tx_sent);
+            info!("Successfully posted tx to RPC and got tx_hash in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash}");
+
+            let receipt = match actix_web::rt::time::timeout(
+                Duration::from_secs(transaction_retry_timeout_secs),
+                rpc_handle.get_transaction_receipt(tx_hash),
+            )
+            .await
+            {
+                Ok(v) => v,
+                Err(e) => {
+                    warn!("Timed out whule trying to get receipt for tx_hash={tx_hash} in network `{net}` block height {block_height}: {e}");
+                    inc_transaction_retries(
+                        net.as_str(),
+                        &mut transaction_retries_count,
+                        provider_metrics,
+                    )
+                    .await;
+                    continue;
+                }
+            };
+
+            receipt
         };
 
-        inc_metric!(provider_metrics, net, total_tx_sent);
-
-        let tx_result_str = format!("{tx_result:?}");
+        let tx_result_str = format!("{tx_receipt:?}");
         debug!("tx_result_str={tx_result_str} in network `{net}` block height {block_height}");
 
-        let receipt_future = match process_provider_getter!(
-            tx_result,
-            net,
-            provider_metrics,
-            send_tx
-        ) {
-            Ok(v) => v,
-            Err(err) => {
-                warn!("Error while trying to post tx to RPC in network `{net}` block height {block_height} and address {sender_address} due to {err}");
-                inc_transaction_retries(
-                    net.as_str(),
-                    &mut transaction_retries_count,
-                    provider_metrics,
-                )
-                .await;
-                continue;
-            }
-        };
-
-        debug!(
-            "Awaiting receipt for transaction in network `{net}` block height {block_height}..."
-        );
-        let receipt_result = actix_web::rt::time::timeout(
-            Duration::from_secs(transaction_retry_timeout_secs),
-            receipt_future.get_receipt(),
-        )
-        .await;
         debug!(
             "Done awaiting receipt for transaction in network `{net}` block height {block_height}"
         );
 
         debug!("matching receipt_result...");
 
-        match receipt_result {
+        match tx_receipt {
             Ok(inner_result) => match inner_result {
-                Ok(r) => {
+                Some(r) => {
                     debug!("Received valid receipt for transaction in network `{net}` block height {block_height}");
                     receipt = r;
                     break;
                 }
-                Err(e) => {
-                    warn!("PendingTransactionError tx={tx_str}, tx_result={tx_result_str}, in network `{net}` block height {block_height}: {e}");
+                None => {
+                    warn!("PendingTransactionError tx={tx_str}, tx_result={tx_result_str}, in network `{net}` block height {block_height}");
                     inc_transaction_retries(
                         net.as_str(),
                         &mut transaction_retries_count,
@@ -514,6 +498,12 @@ pub async fn inc_transaction_retries(
     transaction_retries_count: &mut u64,
     provider_metrics: &Arc<RwLock<ProviderMetrics>>,
 ) {
+    // Wait before sending the next request
+    let time_to_await: Duration = Duration::from_secs(1);
+    let mut interval = interval(time_to_await);
+    interval.tick().await;
+    // The first tick completes immediately.
+    interval.tick().await;
     *transaction_retries_count += 1;
     inc_metric!(provider_metrics, net, total_tx_sent);
 }
