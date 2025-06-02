@@ -13,7 +13,7 @@ export const BinanceTRAssetInfoSchema = S.mutable(
   }),
 );
 
-export type BinanceTRAssetInfo = S.Schema.Type<typeof BinanceTRAssetInfoSchema>;
+export type BinanceTRAssetInfo = typeof BinanceTRAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from BinanceTR Exchange.
@@ -32,4 +32,4 @@ export const BinanceTRInfoRespSchema = S.mutable(
   }),
 );
 
-export type BinanceTRInfoResp = S.Schema.Type<typeof BinanceTRInfoRespSchema>;
+export type BinanceTRInfoResp = typeof BinanceTRInfoRespSchema.Type;

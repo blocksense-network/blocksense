@@ -1,14 +1,23 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "module": "ES2022",
-    "moduleResolution": "bundler",
+    // module settings
     "target": "ES2024",
     "lib": ["ES2024"],
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
     "baseUrl": ".",
     "isolatedModules": true,
-    "resolveJsonModule": true,
+
+    // output settings
+    "declaration": true,
     "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "importHelpers": true,
+
+    // type checking settings
     "strict": true,
     "noUncheckedSideEffectImports": true,
     "noPropertyAccessFromIndexSignature": true,
@@ -16,17 +25,14 @@
     "exactOptionalPropertyTypes": false,
     "noImplicitOverride": true,
     "noImplicitReturns": true,
+    "noImplicitAny": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "noFallthroughCasesInSwitch": true,
-    "esModuleInterop": true,
-    "importHelpers": true,
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "declaration": true,
+    "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "forceConsistentCasingInFileNames": true
   },
   "exclude": [".yarn/unplugged", "tmp"]
 }

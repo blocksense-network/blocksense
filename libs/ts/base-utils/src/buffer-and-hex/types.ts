@@ -46,9 +46,9 @@ export const hexQuantityString = hexString.pipe(
   S.brand('Quantity'),
 );
 
-export type HexString = S.Schema.Type<typeof hexString>;
-export type HexDataString = S.Schema.Type<typeof hexDataString>;
-export type HexQuantityString = S.Schema.Type<typeof hexQuantityString>;
+export type HexString = typeof hexString.Type;
+export type HexDataString = typeof hexDataString.Type;
+export type HexQuantityString = typeof hexQuantityString.Type;
 
 export const isHexString = S.is(hexString);
 export const _isHexDataString = S.is(hexDataString);

@@ -15,9 +15,12 @@ import { KeysOf, isObject } from '@blocksense/base-utils/type-level';
 
 import {
   chainlinkNetworkNameToChainId,
+  parseNetworkFilename,
+} from '@blocksense/config-types/chainlink-compatibility';
+
+import {
   decodeConfirmedFeedEvent,
   FeedRegistryEventsPerAggregator,
-  parseNetworkFilename,
 } from '../../../chainlink-compatibility/types';
 import {
   ChainLinkFeedDocsInfo,

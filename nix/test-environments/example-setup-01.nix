@@ -190,6 +190,10 @@ in
         allowed-outbound-hosts = [
           "https://eth.llamarpc.com"
           "https://rpc.eth.gateway.fm"
+          "https://ethereum-rpc.publicnode.com"
+          "https://binance.llamarpc.com"
+          "https://bsc.meowrpc.com"
+          "https://bsc.drpc.org"
         ];
       };
 

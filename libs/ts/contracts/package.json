@@ -21,7 +21,7 @@
   "scripts": {
     "clean": "git clean -fdx -e .env",
     "build": "hardhat compile",
-    "sol-reflect": "yarn build:with-deps && yarn hardhat reflect",
+    "sol-reflect": "hardhat reflect",
     "test": "hardhat test",
     "test:fork": "FORKING=true hardhat test --grep '@fork'",
     "coverage": "hardhat coverage",
@@ -63,5 +63,9 @@
     "solidity-coverage": "^0.8.12",
     "ts-node": "^10.9.2",
     "typechain": "^8.3.2"
+  },
+  "dependencies": {
+    "effect": "^3.15.1",
+    "tslib": "^2.8.1"
   }
 }

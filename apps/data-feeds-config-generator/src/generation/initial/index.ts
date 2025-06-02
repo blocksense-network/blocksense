@@ -74,7 +74,7 @@ export async function generateFeedConfig(
   const feeds = feedsSorted.map((simplifiedFeed, id) => {
     const feed: NewFeed = {
       ...simplifiedFeed,
-      id,
+      id: BigInt(id),
       type: 'price-feed',
       oracle_id: 'crypto-price-feeds',
       value_type: 'numerical',

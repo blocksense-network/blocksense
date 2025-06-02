@@ -1,19 +1,23 @@
+import assert from 'node:assert';
+
 import { task } from 'hardhat/config';
+import { Network, Signer, Wallet } from 'ethers';
+
 import {
-  NetworkName,
+  isNetworkName,
   getRpcUrl,
   kebabToScreamingSnakeCase,
   parseEthereumAddress,
   getOptionalEnvString,
   getEnvString,
 } from '@blocksense/base-utils';
-import { Network, Signer, Wallet } from 'ethers';
+
 import { awaitTimeout } from '../utils';
 import { NetworkConfig } from '../types';
 
 task('init-chain', '[UTILS] Init chain configuration').setAction(
-  async (args, { ethers }) => {
-    const { networkName }: { networkName: NetworkName } = args;
+  async ({ networkName }, { ethers }) => {
+    assert(isNetworkName(networkName), `Invalid network name: ${networkName}`);
     const rpc = getRpcUrl(networkName);
     const provider = new ethers.JsonRpcProvider(rpc);
 
@@ -77,6 +81,7 @@ task('init-chain', '[UTILS] Init chain configuration').setAction(
       rpc,
       provider,
       network,
+      networkName,
       sequencerMultisig: {
         signer: admin,
         owners: sequencerOwners,
@@ -89,7 +94,8 @@ task('init-chain', '[UTILS] Init chain configuration').setAction(
         threshold: +getOptionalEnvString('ADMIN_THRESHOLD', '1'),
       },
       ledgerAccount,
-      feedIds: feedIds ? feedIds.split(',').map(id => +id) : undefined,
+      feedIds:
+        feedIds === 'all' ? 'all' : feedIds.split(',').map(id => BigInt(id)),
       safeAddresses: {
         multiSendAddress: parseEthereumAddress(
           '0x38869bf66a61cF6bDB996A6aE40D5853Fd43B526',

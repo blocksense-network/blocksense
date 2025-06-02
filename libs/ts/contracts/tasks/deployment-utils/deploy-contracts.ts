@@ -1,8 +1,5 @@
 import { parseEthereumAddress } from '@blocksense/base-utils';
-import {
-  CoreContractsV2,
-  ContractsConfigV2,
-} from '@blocksense/config-types/evm-contracts-deployment';
+import { ContractsConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
 import Safe from '@safe-global/protocol-kit';
 import {
   SafeTransactionDataPartial,
@@ -35,8 +32,9 @@ task('deploy-contracts', '[UTILS] Deploy contracts to the network').setAction(
       signer,
     );
 
-    const ContractsConfigV2 = {} as ContractsConfigV2;
-    ContractsConfigV2.coreContracts = {} as CoreContractsV2;
+    const ContractsConfigV2 = {
+      coreContracts: {},
+    } as ContractsConfigV2;
 
     const abiCoder = ethers.AbiCoder.defaultAbiCoder();
 
@@ -82,7 +80,7 @@ task('deploy-contracts', '[UTILS] Deploy contracts to the network').setAction(
         };
         transactions.push(safeTransactionData);
       } else {
-        console.log(' -> Contract already deployed!');
+        console.log(`  -> ✅ already deployed`);
       }
 
       if (contract.name === ContractNames.CLAggregatorAdapter) {

@@ -1,14 +1,19 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true,
     "lib": [
       "ES2022",
       "DOM",
-      "DOM.Iterable"
+      "DOM.Iterable",
+      "ES2024.Promise" // polyfilled in @blocksense/base-utils
     ],
+    "noEmit": true,
     "allowJs": true,
+    // Required to enable strict type checking in MDX files, as they are
+    // transpiled to JS.
+    "checkJs": true,
     "incremental": true,
+    "composite": true,
     "module": "esnext",
     "jsx": "preserve",
     "baseUrl": ".",
@@ -25,6 +30,10 @@
         "name": "next"
       }
     ]
+  },
+  "mdx": {
+    // Enable strict type checking in MDX files.
+    "checkMdx": true
   },
   "files": [],
   "include": [
