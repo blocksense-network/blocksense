@@ -67,7 +67,7 @@ export type DeployContract = {
   >;
   argsTypes: string[];
   argsValues: any[];
-  salt: string;
+  salt: HexDataString;
   value: bigint;
   feedRegistryInfo?: {
     feedId: bigint;
