@@ -1,6 +1,6 @@
 {
-  "network": "tac-turin",
-  "chainId": "2390",
+  "network": "gameswift-chain-testnet",
+  "chainId": "10888",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {

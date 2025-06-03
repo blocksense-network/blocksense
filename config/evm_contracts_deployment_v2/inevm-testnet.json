@@ -1,6 +1,6 @@
 {
-  "network": "tac-turin",
-  "chainId": "2390",
+  "network": "inevm-testnet",
+  "chainId": "2424",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {
