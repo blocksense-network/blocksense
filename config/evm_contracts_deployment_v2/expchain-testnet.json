@@ -1,6 +1,6 @@
 {
-  "network": "tac-turin",
-  "chainId": "2390",
+  "network": "expchain-testnet",
+  "chainId": "18880",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {

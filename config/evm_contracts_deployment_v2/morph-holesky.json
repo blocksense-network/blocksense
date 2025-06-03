@@ -1,6 +1,6 @@
 {
-  "network": "tac-turin",
-  "chainId": "2390",
+  "network": "morph-holesky",
+  "chainId": "2810",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {
