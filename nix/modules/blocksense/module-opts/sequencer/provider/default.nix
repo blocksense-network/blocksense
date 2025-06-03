@@ -42,7 +42,7 @@ lib: with lib; {
 
     transaction-retry-timeout-secs = mkOption {
       type = types.int;
-      default = 50;
+      default = 61;
       description = mdDoc "The timeout for transactions to be retried with higher fee.";
     };
 
