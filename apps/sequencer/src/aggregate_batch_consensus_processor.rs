@@ -209,8 +209,8 @@ pub async fn aggregation_batch_consensus_loop(
                                             }
                                         };
 
-                                        if latest_safe_nonce._0 != safe_tx.nonce {
-                                            warn!("Nonce in safe contract {} not as expected {}! Blocksense block height: {block_height}", latest_safe_nonce._0, safe_tx.nonce);
+                                        if latest_safe_nonce != safe_tx.nonce {
+                                            warn!("Nonce in safe contract {} not as expected {}! Blocksense block height: {block_height}", latest_safe_nonce, safe_tx.nonce);
                                             inc_metric!(provider_metrics, net, total_mismatched_gnosis_safe_nonce);
                                             inc_transaction_retries(net.as_str(), &mut transaction_retries_count, &provider_metrics).await;
                                             continue;

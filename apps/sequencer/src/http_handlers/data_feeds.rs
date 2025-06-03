@@ -1,5 +1,5 @@
 use actix_web::http::StatusCode;
-use alloy_primitives::{FixedBytes, PrimitiveSignature};
+use alloy_primitives::{FixedBytes, Signature};
 use blocksense_gnosis_safe::utils::SignatureWithAddress;
 use blocksense_utils::time::current_unix_time;
 use chrono::{TimeZone, Utc};
@@ -374,7 +374,7 @@ pub async fn post_aggregated_consensus_vote(
             warn!("Unknown Reporter sending aggregation batch signature {body:?}!");
             return Ok(HttpResponse::BadRequest().body("Unknown Reporter".to_string()));
         };
-        let signature = match PrimitiveSignature::from_str(reporter_response.signature.as_str()) {
+        let signature = match Signature::from_str(reporter_response.signature.as_str()) {
             Ok(r) => r,
             Err(e) => {
                 return Ok(HttpResponse::BadRequest()

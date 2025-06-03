@@ -186,7 +186,7 @@ impl RpcProvider {
     ) -> RpcProvider {
         let provider = ProviderBuilder::new()
             .wallet(EthereumWallet::from(signer.clone()))
-            .on_http(rpc_url.clone());
+            .connect_http(rpc_url.clone());
 
         let impersonated_anvil_account = p
             .impersonated_anvil_account
@@ -757,7 +757,7 @@ mod tests {
     // Copied from the alloy source code as an example.
     #[tokio::test]
     async fn no_gas_price_or_limit() {
-        let provider = ProviderBuilder::new().on_anvil_with_wallet();
+        let provider = ProviderBuilder::new().connect_anvil_with_wallet();
 
         // GasEstimationLayer requires chain_id to be set to handle EIP-1559 tx
         let tx = TransactionRequest {
