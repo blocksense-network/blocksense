@@ -394,12 +394,28 @@ pub async fn eth_batch_send_to_contract(
         debug!("tx_str={tx_str} in network `{net}` block height {block_height}");
 
         let tx_receipt = {
-            // TODO: put tiemout tiemout here
-            let tx_hash_result = match rpc_handle.send_transaction(tx).await {
-                Ok(r) => {
-                    debug!("Successfully submitted for {transaction_retries_count}-th time transaction in network `{net}` block height {block_height} tx_hash = {}", r.tx_hash());
-                    r
-                }
+            let tx_hash_result = match actix_web::rt::time::timeout(
+                Duration::from_secs(transaction_retry_timeout_secs),
+                rpc_handle.send_transaction(tx),
+            )
+            .await
+            {
+                Ok(r) => match r {
+                    Ok(tx_builder) => {
+                        debug!("Successfully submitted for {transaction_retries_count}-th time transaction in network `{net}` block height {block_height} tx_hash = {}", tx_builder.tx_hash());
+                        tx_builder
+                    }
+                    Err(err) => {
+                        warn!("Error while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
+                        inc_transaction_retries(
+                            net.as_str(),
+                            &mut transaction_retries_count,
+                            provider_metrics,
+                        )
+                        .await;
+                        continue;
+                    }
+                },
                 Err(err) => {
                     warn!("Error while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
                     inc_transaction_retries(
