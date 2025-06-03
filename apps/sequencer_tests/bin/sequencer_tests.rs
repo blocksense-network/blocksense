@@ -292,7 +292,7 @@ async fn main() -> Result<()> {
 
         let provider = ProviderBuilder::new()
             .wallet(EthereumWallet::from(signer.clone()))
-            .on_http(format!("http:127.0.0.1:{port}").as_str().parse().unwrap());
+            .connect_http(format!("http:127.0.0.1:{port}").as_str().parse().unwrap());
 
         let safe_iface = SafeABI::new(
             Address::from_str("0x41675C099F32341bf84BFc5382aF534df5C7461a")
@@ -350,7 +350,7 @@ async fn main() -> Result<()> {
 
         println!("deploy gnosis safe receipt = {receipt:?}");
 
-        let multisig_addr = res.proxy;
+        let multisig_addr = res.0;
 
         safe_contracts_per_net.push(multisig_addr.to_string());
         println!("multisig_addr = {multisig_addr}");

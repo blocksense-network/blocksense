@@ -198,9 +198,9 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
 
             let calldata = Bytes::from(serialized_updates);
 
-            nonce._0 += Uint::from(num_tx_in_progress);
+            nonce += Uint::from(num_tx_in_progress);
 
-            let safe_transaction = create_safe_tx(contract_address, calldata, nonce._0);
+            let safe_transaction = create_safe_tx(contract_address, calldata, nonce);
 
             let chain_id = match provider.provider.get_chain_id().await {
                 Ok(c) => c,
@@ -231,7 +231,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             block_height,
             contract_address: contract_address.encode_hex(),
             safe_address: safe_address.encode_hex(),
-            nonce: nonce._0.to_string(),
+            nonce: nonce.to_string(),
             chain_id: chain_id.to_string(),
             tx_hash: tx_hash.to_string(),
             network: net.to_string(),

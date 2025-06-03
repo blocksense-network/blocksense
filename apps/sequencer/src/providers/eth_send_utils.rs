@@ -1182,7 +1182,7 @@ mod tests {
             .lock()
             .await
             .provider
-            .call(&TransactionRequest {
+            .call(TransactionRequest {
                 to: Some(TxKind::Call(address_to_send)),
                 input: TransactionInput {
                     input: Some(calldata_bytes.clone()),

@@ -63,7 +63,7 @@ pub async fn get_key_from_contract(
         .with_chain_id(provider.get_chain_id().await?)
         .input(Some(input).into());
 
-    let result = provider.call(&tx).await?;
+    let result = provider.call(tx).await?;
     info!("Call result: {:?}", result);
     // TODO: get from metadata the type of the value.
     // TODO: Refector to not use dummy argument
