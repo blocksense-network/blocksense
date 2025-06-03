@@ -1,6 +1,6 @@
 {
-  "network": "tac-turin",
-  "chainId": "2390",
+  "network": "nexera-testnet",
+  "chainId": "72080",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {

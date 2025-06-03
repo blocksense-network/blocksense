@@ -1,6 +1,6 @@
 {
-  "network": "tac-turin",
-  "chainId": "2390",
+  "network": "hoodi-testnet",
+  "chainId": "560048",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {
