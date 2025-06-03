@@ -186,7 +186,7 @@ async fn fetch_value_for_feed(
     let mut last_value = None;
     for rpc_url_candidate in &feed_config.arguments {
         let rpc_url: Url = rpc_url_candidate.as_str().parse()?;
-        let provider = ProviderBuilder::new().on_http(rpc_url.clone());
+        let provider = ProviderBuilder::new().connect_http(rpc_url.clone());
         let eth_call = match feed_config.feed_id {
             100001 => yn_ethx_call(provider.clone(), 12345 + 998),
             100002 => yield_fi_yusd_call(provider.clone(), 12345 + 128),
