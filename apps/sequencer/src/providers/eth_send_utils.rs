@@ -228,17 +228,20 @@ pub async fn eth_batch_send_to_contract(
     )
     .await?;
 
+    let block_height = updates.block_height;
+
     if updates.updates.is_empty() {
-        info!("Network `{net}` posting to smart contract skipped because it received 0 updates");
-        return Ok((format!("No updates to send for network {net}"), Vec::new()));
+        info!("Posting to smart contract for network `{net}` block height {block_height} skipped because it received 0 updates");
+        return Ok((
+            format!("No updates to send for network `{net}` block height {block_height}"),
+            Vec::new(),
+        ));
     }
 
     debug!(
         "About to post {} updates to smart contract for network `{net}`",
         updates.updates.len()
     );
-
-    let block_height = updates.block_height;
 
     debug!("Acquiring a read/write lock on provider state for network `{net}` block height {block_height}");
     let mut provider = provider.lock().await;
@@ -387,23 +390,31 @@ pub async fn eth_batch_send_to_contract(
             debug!("Retrying for {transaction_retries_count}-th time in network `{net}` block height {block_height} tx: {tx:?}");
         }
 
-        let tx_str = format!("{tx:?}");
-        debug!("tx_str={tx_str} in network `{net}` block height {block_height}");
-
         let tx_receipt = {
-            let tx_hash = match rpc_handle
-                .send_transaction(tx)
-                .await?
-                // .with_required_confirmations(1)
-                .with_timeout(Some(std::time::Duration::from_secs(
-                    transaction_retry_timeout_secs,
-                )))
-                .watch()
-                .await
+            let tx_hash_result = match actix_web::rt::time::timeout(
+                Duration::from_secs(transaction_retry_timeout_secs),
+                rpc_handle.send_transaction(tx),
+            )
+            .await
             {
-                Ok(v) => v,
+                Ok(r) => match r {
+                    Ok(tx_builder) => {
+                        debug!("Successfully submitted for {transaction_retries_count}-th time transaction in network `{net}` block height {block_height} tx_hash = {}", tx_builder.tx_hash());
+                        tx_builder
+                    }
+                    Err(err) => {
+                        warn!("Error while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
+                        inc_transaction_retries(
+                            net.as_str(),
+                            &mut transaction_retries_count,
+                            provider_metrics,
+                        )
+                        .await;
+                        continue;
+                    }
+                },
                 Err(err) => {
-                    warn!("Timed out while trying to post tx to RPC and get tx_hash in network `{net}` block height {block_height} and address {sender_address} due to {err}");
+                    warn!("Error while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
                     inc_transaction_retries(
                         net.as_str(),
                         &mut transaction_retries_count,
@@ -411,71 +422,86 @@ pub async fn eth_batch_send_to_contract(
                     )
                     .await;
                     continue;
+                }
+            };
+
+            let tx_hash = *tx_hash_result.tx_hash();
+
+            let tx_receipt = match tx_hash_result
+                .with_timeout(Some(std::time::Duration::from_secs(
+                    transaction_retry_timeout_secs,
+                )))
+                .get_receipt()
+                .await
+            {
+                Ok(v) => {
+                    debug!("Successfully got receipt from RPC in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash}");
+                    v
+                }
+                Err(err) => {
+                    debug!("Timed out while trying to post tx to RPC and get tx_hash in network `{net}` block height {block_height} and address {sender_address} due to {err} and will try again");
+
+                    let receipt = match actix_web::rt::time::timeout(
+                        Duration::from_secs(transaction_retry_timeout_secs),
+                        rpc_handle.get_transaction_receipt(tx_hash),
+                    )
+                    .await
+                    {
+                        Ok(v) => match v {
+                            Ok(v) => match v {
+                                Some(v) => {
+                                    debug!("Successfully got tx_receipt in network `{net}` block height {block_height}");
+                                    v
+                                }
+                                None => {
+                                    warn!("Get tx_receipt returned None in network `{net}` block height {block_height}");
+                                    inc_transaction_retries(
+                                        net.as_str(),
+                                        &mut transaction_retries_count,
+                                        provider_metrics,
+                                    )
+                                    .await;
+                                    continue;
+                                }
+                            },
+                            Err(err) => {
+                                warn!("Error getting tx_receipt in network `{net}` block height {block_height}: {err}");
+                                inc_transaction_retries(
+                                    net.as_str(),
+                                    &mut transaction_retries_count,
+                                    provider_metrics,
+                                )
+                                .await;
+                                continue;
+                            }
+                        },
+                        Err(e) => {
+                            warn!("Timed out while trying to get receipt for tx_hash={tx_hash} in network `{net}` block height {block_height}: {e}");
+                            inc_transaction_retries(
+                                net.as_str(),
+                                &mut transaction_retries_count,
+                                provider_metrics,
+                            )
+                            .await;
+                            continue;
+                        }
+                    };
+                    receipt
                 }
             };
 
             inc_metric!(provider_metrics, net, total_tx_sent);
             info!("Successfully posted tx to RPC and got tx_hash in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash}");
 
-            let receipt = match actix_web::rt::time::timeout(
-                Duration::from_secs(transaction_retry_timeout_secs),
-                rpc_handle.get_transaction_receipt(tx_hash),
-            )
-            .await
-            {
-                Ok(v) => v,
-                Err(e) => {
-                    warn!("Timed out whule trying to get receipt for tx_hash={tx_hash} in network `{net}` block height {block_height}: {e}");
-                    inc_transaction_retries(
-                        net.as_str(),
-                        &mut transaction_retries_count,
-                        provider_metrics,
-                    )
-                    .await;
-                    continue;
-                }
-            };
-
-            receipt
+            tx_receipt
         };
 
         let tx_result_str = format!("{tx_receipt:?}");
         debug!("tx_result_str={tx_result_str} in network `{net}` block height {block_height}");
 
-        debug!(
-            "Done awaiting receipt for transaction in network `{net}` block height {block_height}"
-        );
+        receipt = tx_receipt;
 
-        debug!("matching receipt_result...");
-
-        match tx_receipt {
-            Ok(inner_result) => match inner_result {
-                Some(r) => {
-                    debug!("Received valid receipt for transaction in network `{net}` block height {block_height}");
-                    receipt = r;
-                    break;
-                }
-                None => {
-                    warn!("PendingTransactionError tx={tx_str}, tx_result={tx_result_str}, in network `{net}` block height {block_height}");
-                    inc_transaction_retries(
-                        net.as_str(),
-                        &mut transaction_retries_count,
-                        provider_metrics,
-                    )
-                    .await;
-                }
-            },
-            Err(e) => {
-                warn!("Timed out tx={tx_str}, tx_result={tx_result_str}, in network `{net}` block height {block_height}: {e}");
-                inc_transaction_retries(
-                    net.as_str(),
-                    &mut transaction_retries_count,
-                    provider_metrics,
-                )
-                .await;
-                continue;
-            }
-        }
+        break;
     }
 
     let transaction_time = tx_time.elapsed().as_millis();
