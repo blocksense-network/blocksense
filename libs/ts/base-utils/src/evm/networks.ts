@@ -87,6 +87,7 @@ const networks = [
   'monad-testnet',
   'morph-mainnet',
   'morph-holesky',
+  'nexera-testnet',
   'okto-testnet',
   'ontology-testnet',
   'optimism-mainnet',
@@ -136,11 +137,11 @@ const chainIds = [
   338, 111557560, 18880, 250, 4002, 114, 252, 2522, 10888, 100, 10200,
   1666700000, 743111, 560048, 1663, 998, 2424, 57073, 763373, 2221, 2358, 1284,
   1287, 1285, 59144, 59141, 4202, 994873017, 1952959480, 169, 3441006, 5000,
-  5003, 1740, 59902, 6342, 31611, 10143, 2818, 2810, 8801, 5851, 10, 11155420,
-  5611, 7849306, 50002, 688688, 98866, 98867, 137, 80002, 1101, 2442, 57000,
-  200018, 31, 534352, 534351, 11011, 50312, 16, 146, 57054, 1660990954, 5330,
-  53302, 1924, 2390, 167000, 167009, 5678, 842, 41, 130, 1301, 4801, 1417429182,
-  324, 300,
+  5003, 1740, 59902, 6342, 31611, 10143, 2818, 2810, 72080, 8801, 5851, 10,
+  11155420, 5611, 7849306, 50002, 688688, 98866, 98867, 137, 80002, 1101, 2442,
+  57000, 200018, 31, 534352, 534351, 11011, 50312, 16, 146, 57054, 1660990954,
+  5330, 53302, 1924, 2390, 167000, 167009, 5678, 842, 41, 130, 1301, 4801,
+  1417429182, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks);
@@ -203,6 +204,7 @@ export enum Currency {
   tFTM = 'tFTM',
   tGS = 'tGS',
   TLOS = 'TLOS',
+  tNXRA = 'tNXRA',
   tRBTC = 'tRBTC',
   TSYS = 'TSYS',
   tZEN = 'tZEN',
@@ -642,6 +644,12 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://explorer-holesky.morphl2.io',
     currency: Currency.ETH,
+  },
+  'nexera-testnet': {
+    chainId: 72080,
+    isTestnet: true,
+    explorerUrl: 'https://explorer.testnet.nexera.network/',
+    currency: Currency.tNXRA,
   },
   'okto-testnet': {
     chainId: 8801,
