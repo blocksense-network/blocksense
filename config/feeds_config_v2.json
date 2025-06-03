@@ -52657,8 +52657,8 @@
     },
     {
       "id": "50000",
-      "full_name": "USDT / USD Pegged",
-      "description": "Tether USD Pegged to 1",
+      "full_name": "USDT / USD Peg-aware",
+      "description": "Peg-aware price of USDT in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -52734,8 +52734,8 @@
     },
     {
       "id": "50001",
-      "full_name": "USDC / USD Pegged",
-      "description": "Circle USD Pegged to 1",
+      "full_name": "USDC / USD Peg-aware",
+      "description": "Peg-aware price of Circle USD (USDC) in USD",
       "type": "price-feed",
       "oracle_id": "crypto-price-feeds",
       "value_type": "numerical",
@@ -52827,8 +52827,8 @@
     },
     {
       "id": "100000",
-      "full_name": "ExSat BTC",
-      "description": "Exsat network bitcoin wallet total holdings in satoshi",
+      "full_name": "exSat PoR BTC",
+      "description": "exSat network Bitcoin wallet total holdings in satoshis",
       "type": "price-feed",
       "oracle_id": "exsat-holdings",
       "value_type": "numerical",
@@ -52845,8 +52845,8 @@
       },
       "additional_feed_info": {
         "pair": {
-          "base": "Exsat",
-          "quote": "satoshi"
+          "base": "exSat",
+          "quote": "satoshis"
         },
         "decimals": 0,
         "category": "Crypto",
@@ -52856,8 +52856,8 @@
     },
     {
       "id": "100001",
-      "full_name": "ynETH MAX (ynETHx) - YieldNest convertToAssets on ETH",
-      "description": "YieldNest convertToAssets call on ETH mainnet at 0x657d9ABA1DBb59e53f9F3eCAA878447dCfC96dCb",
+      "full_name": "ynETHx / WETH",
+      "description": "YieldNest Restaked Ethereum / Wrapped Ethereum Redemption Rate. YieldNest convertToAssets call on ETH mainnet at 0x657d9ABA1DBb59e53f9F3eCAA878447dCfC96dCb",
       "type": "price-feed",
       "oracle_id": "eth-rpc",
       "value_type": "numerical",
@@ -52874,8 +52874,8 @@
       },
       "additional_feed_info": {
         "pair": {
-          "base": "",
-          "quote": ""
+          "base": "ynETHx",
+          "quote": "WETH"
         },
         "decimals": 0,
         "category": "",
@@ -52885,8 +52885,8 @@
     },
     {
       "id": "100002",
-      "full_name": "YieldFi yUSD (yUSD) exchangeRate on ETH mainnet",
-      "description": "YieldFi yUSD exchangeRate call on 0x19Ebd191f7A24ECE672ba13A302212b5eF7F35cb",
+      "full_name": "YUSD / USDC",
+      "description": "YieldFi YUSD exchangeRate call on ETH mainnet at 0x19Ebd191f7A24ECE672ba13A302212b5eF7F35cb",
       "type": "price-feed",
       "oracle_id": "eth-rpc",
       "value_type": "numerical",
@@ -52903,8 +52903,8 @@
       },
       "additional_feed_info": {
         "pair": {
-          "base": "",
-          "quote": ""
+          "base": "YUSD",
+          "quote": "USDC"
         },
         "decimals": 0,
         "category": "",
@@ -52914,8 +52914,8 @@
     },
     {
       "id": "100003",
-      "full_name": "ynBNB MAX (ynBNBx) - YieldNest convertToAssets on BNB",
-      "description": "YieldNest convertToAssets call on BNB chain 0x32c830f5c34122c6afb8ae87aba541b7900a2c5f",
+      "full_name": "ynBNBx / WBNB",
+      "description": "YieldNest Restaked BNB / Wrapped BNB Redemption Rate. YieldNest convertToAssets call on BNB chain 0x32c830f5c34122c6afb8ae87aba541b7900a2c5f",
       "type": "price-feed",
       "oracle_id": "eth-rpc",
       "value_type": "numerical",
@@ -52932,8 +52932,8 @@
       },
       "additional_feed_info": {
         "pair": {
-          "base": "",
-          "quote": ""
+          "base": "ynBNBx",
+          "quote": "WBNB"
         },
         "decimals": 0,
         "category": "",
@@ -52944,7 +52944,7 @@
     {
       "id": "1000000",
       "full_name": "WMON / USD",
-      "description": "Wrapped Monad weighted average price from a few pools",
+      "description": "Price of Wrapped Monad in USD on Monad Testnet",
       "type": "price-feed",
       "oracle_id": "gecko-terminal",
       "value_type": "numerical",
@@ -53034,7 +53034,7 @@
     {
       "id": "1000001",
       "full_name": "USDZ / USD",
-      "description": "USDz on base from a few pools",
+      "description": "Price of Anzen Finance USDz (USDZ) in USD on Base network",
       "type": "price-feed",
       "oracle_id": "gecko-terminal",
       "value_type": "numerical",
@@ -53124,7 +53124,7 @@
     {
       "id": "1000002",
       "full_name": "USR / USD",
-      "description": "Resolv USD Price (USR) weighted average from a few pools",
+      "description": "Price of Resolv USD (USR) in USD",
       "type": "price-feed",
       "oracle_id": "gecko-terminal",
       "value_type": "numerical",
@@ -53214,7 +53214,7 @@
     {
       "id": "1000003",
       "full_name": "CHOG / USD",
-      "description": "CHOG token on Monad test net address 0xE0590015A873bF326bd645c3E1266d4db41C4E6B",
+      "description": "Price of CHOG in USD on Monad Testnet (0xE0590015A873bF326bd645c3E1266d4db41C4E6B)",
       "type": "price-feed",
       "oracle_id": "gecko-terminal",
       "value_type": "numerical",
@@ -53280,7 +53280,7 @@
     {
       "id": "1000004",
       "full_name": "YAKI / USD",
-      "description": "MOYAKI token on Monad test net address 0xfe140e1dCe99Be9F4F15d657CD9b7BF622270C50",
+      "description": "Price of MOYAKI (YAKI) in USD on Monad Testnet (0xfe140e1dCe99Be9F4F15d657CD9b7BF622270C50)",
       "type": "price-feed",
       "oracle_id": "gecko-terminal",
       "value_type": "numerical",
@@ -53346,7 +53346,7 @@
     {
       "id": "1000005",
       "full_name": "DAK / USD",
-      "description": "Molandak token on Monad test net address 0x0F0BDEbF0F83cD1EE3974779Bcb7315f9808c714",
+      "description": "Price of Molandak (DAK) in USD on Monad Testnet (0x0F0BDEbF0F83cD1EE3974779Bcb7315f9808c714)",
       "type": "price-feed",
       "oracle_id": "gecko-terminal",
       "value_type": "numerical",
@@ -53411,8 +53411,8 @@
     },
     {
       "id": "1000006",
-      "full_name": "YUSD / USD Pegged to 1.00",
-      "description": "YUSD stable coin pegged to 1.00 from BNB and ETH dex pools",
+      "full_name": "YUSD / USD Peg-aware",
+      "description": "Peg-aware price of YUSD in USD",
       "type": "price-feed",
       "oracle_id": "gecko-terminal",
       "value_type": "numerical",
@@ -53496,7 +53496,7 @@
     {
       "id": "2000000",
       "full_name": "IBIT / USD",
-      "description": "Price of iShares Bitcoin Trust ETF in USD",
+      "description": "Price of iShares Bitcoin Trust ETF ($IBIT) in USD",
       "type": "price-feed",
       "oracle_id": "stock-price-feeds",
       "value_type": "numerical",
@@ -53532,7 +53532,7 @@
     {
       "id": "2000001",
       "full_name": "SPY / USD",
-      "description": "Price of the SPDR S&P 500 ETF Trust in USD",
+      "description": "Price of the SPDR S&P 500 ETF Trust ($SPY) in USD",
       "type": "price-feed",
       "oracle_id": "stock-price-feeds",
       "value_type": "numerical",
