@@ -1,6 +1,6 @@
 {
-  "network": "ink-sepolia",
-  "chainId": "763373",
+  "network": "ethereum-sepolia",
+  "chainId": "11155111",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {

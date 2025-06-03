@@ -1,6 +1,6 @@
 {
-  "network": "ink-sepolia",
-  "chainId": "763373",
+  "network": "berachain-bepolia",
+  "chainId": "80069",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {
