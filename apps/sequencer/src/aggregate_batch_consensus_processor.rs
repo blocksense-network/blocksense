@@ -11,7 +11,8 @@ use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, warn};
 
 use crate::providers::eth_send_utils::{
-    decrement_feeds_round_indexes, get_tx_retry_params, inc_retries, log_gas_used,
+    decrement_feeds_round_indexes, get_pending_nonce, get_tx_retry_params, inc_retries,
+    log_gas_used,
 };
 use crate::providers::provider::{parse_eth_address, RpcProvider, GNOSIS_SAFE_CONTRACT_NAME};
 use crate::sequencer_state::SequencerState;
@@ -153,6 +154,7 @@ pub async fn aggregation_batch_consensus_loop(
                                 .spawn_local(async move {
 
                                     let mut transaction_retries_count = 0;
+                                    let mut nonce_get_retries_count = 0;
                                     let ids_vec: Vec<_> = quorum.updated_feeds_ids.iter().copied().collect();
 
                                     let block_height = signed_aggregate.block_height;
@@ -170,7 +172,6 @@ pub async fn aggregation_batch_consensus_loop(
                                     let retry_fee_increment_fraction = provider.retry_fee_increment_fraction;
 
                                     let safe_address = provider.get_contract_address(GNOSIS_SAFE_CONTRACT_NAME).unwrap_or(Address::default());
-                                    let contract = SafeMultisig::new(safe_address, &provider.provider);
 
                                     let safe_tx = quorum.safe_tx;
 
@@ -178,12 +179,36 @@ pub async fn aggregation_batch_consensus_loop(
 
                                     let tx_time = Instant::now();
 
+                                    let provider_metrics = provider.provider_metrics.clone();
+
                                     // First get the correct nonce
-                                    let nonce = 5; // TODO: extract the code to get the nonce in a function and use here
+                                    let nonce = loop {
+
+                                        if nonce_get_retries_count > transaction_retries_count_limit {
+                                            failed_tx(net, &ids_vec, &mut provider).await;
+                                            eyre::bail!("Failed get the nonce for network {net}! Blocksense block height: {block_height}");
+                                        }
+
+                                        let nonce = match get_pending_nonce(
+                                            net,
+                                            &provider.provider,
+                                            &signer.address(),
+                                            block_height,
+                                            transaction_retry_timeout_secs,
+                                        ).await {
+                                            Ok(n) => n,
+                                            Err(e) => {
+                                                warn!("{e}");
+                                                inc_retries(net.as_str(), &mut nonce_get_retries_count, &provider_metrics).await;
+                                                continue;
+                                            },
+                                        };
+                                        break nonce;
+                                    };
+
+                                    let contract = SafeMultisig::new(safe_address, &provider.provider);
 
                                     let receipt = loop {
-
-                                        let provider_metrics = provider.provider_metrics.clone();
 
                                         if transaction_retries_count > transaction_retries_count_limit {
                                             failed_tx(net, &ids_vec, &mut provider).await;

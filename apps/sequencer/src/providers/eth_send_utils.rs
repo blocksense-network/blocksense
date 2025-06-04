@@ -295,26 +295,18 @@ pub async fn eth_batch_send_to_contract(
             return Ok(("timeout".to_string(), feeds_to_update_ids));
         }
 
-        debug!("Getting nonce for network {net} and address {sender_address}...");
-        let nonce = match actix_web::rt::time::timeout(
-            Duration::from_secs(transaction_retry_timeout_secs),
-            rpc_handle.get_transaction_count(sender_address).pending(),
+        let nonce = match get_pending_nonce(
+            &net,
+            rpc_handle,
+            &sender_address,
+            block_height,
+            transaction_retry_timeout_secs,
         )
         .await
         {
-            Ok(nonce_result) => match nonce_result {
-                Ok(nonce) => {
-                    debug!("Got nonce={nonce} for network `{net}` block height {block_height} and address {sender_address}");
-                    nonce
-                }
-                Err(err) => {
-                    debug!("Failed to get nonce for network `{net}` block height {block_height} and address {sender_address} due to {err}");
-                    inc_retries(net.as_str(), &mut nonce_get_retries_count, provider_metrics).await;
-                    continue;
-                }
-            },
-            Err(err) => {
-                warn!("Timed out while getting nonce for network `{net}` block height {block_height} and address {sender_address} due to {err}");
+            Ok(n) => n,
+            Err(e) => {
+                warn!("{e}");
                 inc_retries(net.as_str(), &mut nonce_get_retries_count, provider_metrics).await;
                 continue;
             }
@@ -442,17 +434,11 @@ pub async fn eth_batch_send_to_contract(
                     }
                     Err(err) => {
                         warn!("Error while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
-                        inc_retries(
-                            net.as_str(),
-                            &mut transaction_retries_count,
-                            provider_metrics,
-                        )
-                        .await;
-                        continue;
+                        return Ok(("false".to_string(), feeds_to_update_ids));
                     }
                 },
                 Err(err) => {
-                    warn!("Error while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
+                    warn!("Error timeout while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
                     inc_retries(
                         net.as_str(),
                         &mut transaction_retries_count,
@@ -555,6 +541,35 @@ pub async fn eth_batch_send_to_contract(
     debug!("Released a read/write lock on provider state in network `{net}` block height {block_height}");
 
     Ok((receipt.status().to_string(), feeds_to_update_ids))
+}
+
+pub async fn get_pending_nonce(
+    net: &str,
+    rpc_handle: &ProviderType,
+    sender_address: &Address,
+    block_height: u64,
+    transaction_retry_timeout_secs: u64,
+) -> Result<u64> {
+    debug!("Getting pending nonce for network {net} and address {sender_address}...");
+    match actix_web::rt::time::timeout(
+        Duration::from_secs(transaction_retry_timeout_secs),
+        rpc_handle.get_transaction_count(*sender_address).pending(),
+    )
+    .await
+    {
+        Ok(nonce_result) => match nonce_result {
+            Ok(nonce) => {
+                debug!("Got nonce={nonce} for network `{net}` block height {block_height} and address {sender_address}");
+                Ok(nonce)
+            }
+            Err(err) => {
+                bail!("Failed to get nonce for network `{net}` block height {block_height} and address {sender_address} due to {err}");
+            }
+        },
+        Err(err) => {
+            bail!("Timed out while getting nonce for network `{net}` block height {block_height} and address {sender_address} due to {err}");
+        }
+    }
 }
 
 pub async fn inc_retries(
