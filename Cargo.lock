@@ -1419,6 +1419,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "alpaca-core"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "log",
+ "reqwest 0.12.12",
+ "serde 1.0.217",
+ "serde_json",
+ "url",
+]
+
+[[package]]
 name = "ambient-authority"
 version = "0.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
