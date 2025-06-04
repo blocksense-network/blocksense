@@ -37,7 +37,8 @@ rec {
       value = pkgs.writeShellScriptBin name ''
         #!${pkgs.bash}/bin/bash
         cd ${onchainInteractionsDeps}
-        ${yarn-berry}/bin/yarn workspace @blocksense/onchain-interactions run ${name}
+        export GIT_ROOT="${onchainInteractionsDeps}"
+        ${yarn-berry}/bin/yarn workspace @blocksense/onchain-interactions run ${name} "''$@"
       '';
     }) (lib.attrNames (readJson ../../../libs/ts/onchain-interactions/package.json).scripts)
   );
