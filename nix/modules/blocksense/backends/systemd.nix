@@ -74,6 +74,7 @@ in
           serviceConfig = {
             ExecStart = sequencer.program;
             Restart = "always";
+            KillSignal = "SIGKILL";
           };
         };
       }
