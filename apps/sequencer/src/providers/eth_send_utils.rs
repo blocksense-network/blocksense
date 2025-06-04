@@ -295,12 +295,13 @@ pub async fn eth_batch_send_to_contract(
             return Ok(("timeout".to_string(), feeds_to_update_ids));
         }
 
-        let nonce = match get_pending_nonce(
+        let nonce = match get_nonce(
             &net,
             rpc_handle,
             &sender_address,
             block_height,
             transaction_retry_timeout_secs,
+            true,
         )
         .await
         {
@@ -320,6 +321,34 @@ pub async fn eth_batch_send_to_contract(
         if transaction_retries_count > transaction_retries_count_limit {
             return Ok(("timeout".to_string(), feeds_to_update_ids));
         }
+
+        match get_nonce(
+            &net,
+            rpc_handle,
+            &sender_address,
+            block_height,
+            transaction_retry_timeout_secs,
+            false,
+        )
+        .await
+        {
+            Ok(latest_nonce) => {
+                if latest_nonce > nonce {
+                    //TODO: Check the tx hashes of all posted/retried txs for block inclusion
+                    return Ok(("true".to_string(), feeds_to_update_ids));
+                }
+            }
+            Err(err) => {
+                warn!("{err}");
+                inc_retries(
+                    net.as_str(),
+                    &mut transaction_retries_count,
+                    provider_metrics,
+                )
+                .await;
+                continue;
+            }
+        };
 
         let gas_price = match get_gas_price(
             net.as_str(),
@@ -543,19 +572,24 @@ pub async fn eth_batch_send_to_contract(
     Ok((receipt.status().to_string(), feeds_to_update_ids))
 }
 
-pub async fn get_pending_nonce(
+pub async fn get_nonce(
     net: &str,
     rpc_handle: &ProviderType,
     sender_address: &Address,
     block_height: u64,
     transaction_retry_timeout_secs: u64,
+    pending: bool,
 ) -> Result<u64> {
     debug!("Getting pending nonce for network {net} and address {sender_address}...");
-    match actix_web::rt::time::timeout(
-        Duration::from_secs(transaction_retry_timeout_secs),
-        rpc_handle.get_transaction_count(*sender_address).pending(),
-    )
-    .await
+
+    let future = if pending {
+        rpc_handle.get_transaction_count(*sender_address).pending()
+    } else {
+        rpc_handle.get_transaction_count(*sender_address).latest()
+    };
+
+    match actix_web::rt::time::timeout(Duration::from_secs(transaction_retry_timeout_secs), future)
+        .await
     {
         Ok(nonce_result) => match nonce_result {
             Ok(nonce) => {

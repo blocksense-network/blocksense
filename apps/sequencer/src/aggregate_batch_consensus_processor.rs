@@ -11,8 +11,7 @@ use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, warn};
 
 use crate::providers::eth_send_utils::{
-    decrement_feeds_round_indexes, get_pending_nonce, get_tx_retry_params, inc_retries,
-    log_gas_used,
+    decrement_feeds_round_indexes, get_nonce, get_tx_retry_params, inc_retries, log_gas_used,
 };
 use crate::providers::provider::{parse_eth_address, RpcProvider, GNOSIS_SAFE_CONTRACT_NAME};
 use crate::sequencer_state::SequencerState;
@@ -189,12 +188,13 @@ pub async fn aggregation_batch_consensus_loop(
                                             eyre::bail!("Failed get the nonce for network {net}! Blocksense block height: {block_height}");
                                         }
 
-                                        let nonce = match get_pending_nonce(
+                                        let nonce = match get_nonce(
                                             net,
                                             &provider.provider,
                                             &signer.address(),
                                             block_height,
                                             transaction_retry_timeout_secs,
+                                            true,
                                         ).await {
                                             Ok(n) => n,
                                             Err(e) => {
