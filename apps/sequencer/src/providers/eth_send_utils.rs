@@ -231,17 +231,20 @@ pub async fn eth_batch_send_to_contract(
     )
     .await?;
 
+    let block_height = updates.block_height;
+
     if updates.updates.is_empty() {
-        info!("Network `{net}` posting to smart contract skipped because it received 0 updates");
-        return Ok((format!("No updates to send for network {net}"), Vec::new()));
+        info!("Posting to smart contract for network `{net}` block height {block_height} skipped because it received 0 updates");
+        return Ok((
+            format!("No updates to send for network `{net}` block height {block_height}"),
+            Vec::new(),
+        ));
     }
 
     debug!(
         "About to post {} updates to smart contract for network `{net}`",
         updates.updates.len()
     );
-
-    let block_height = updates.block_height;
 
     debug!("Acquiring a read/write lock on provider state for network `{net}` block height {block_height}");
     let mut provider = provider.lock().await;
@@ -390,9 +393,6 @@ pub async fn eth_batch_send_to_contract(
             debug!("Retrying for {transaction_retries_count}-th time in network `{net}` block height {block_height} tx: {tx:?}");
         }
 
-        let tx_str = format!("{tx:?}");
-        debug!("tx_str={tx_str} in network `{net}` block height {block_height}");
-
         let tx_receipt = {
             let tx_hash_result = match actix_web::rt::time::timeout(
                 Duration::from_secs(transaction_retry_timeout_secs),
@@ -479,7 +479,7 @@ pub async fn eth_batch_send_to_contract(
                             }
                         },
                         Err(e) => {
-                            warn!("Timed out whule trying to get receipt for tx_hash={tx_hash} in network `{net}` block height {block_height}: {e}");
+                            warn!("Timed out while trying to get receipt for tx_hash={tx_hash} in network `{net}` block height {block_height}: {e}");
                             inc_transaction_retries(
                                 net.as_str(),
                                 &mut transaction_retries_count,
