@@ -284,6 +284,33 @@ pub async fn eth_batch_send_to_contract(
     };
 
     let mut transaction_retries_count = 0;
+    let mut nonce_get_retries_count = 0;
+
+    // First get the correct nonce
+    let nonce = loop {
+        if nonce_get_retries_count > transaction_retries_count_limit {
+            return Ok(("timeout".to_string(), feeds_to_update_ids));
+        }
+
+        let nonce = match get_nonce(
+            &net,
+            rpc_handle,
+            &sender_address,
+            block_height,
+            transaction_retry_timeout_secs,
+            true,
+        )
+        .await
+        {
+            Ok(n) => n,
+            Err(e) => {
+                warn!("{e}");
+                inc_retries(net.as_str(), &mut nonce_get_retries_count, provider_metrics).await;
+                continue;
+            }
+        };
+        break nonce;
+    };
 
     loop {
         debug!("loop begin; transaction_retries_count={transaction_retries_count} in network `{net}` block height {block_height} with transaction_retries_count_limit = {transaction_retries_count_limit} and transaction_retry_timeout_secs = {transaction_retry_timeout_secs}");
@@ -291,6 +318,34 @@ pub async fn eth_batch_send_to_contract(
         if transaction_retries_count > transaction_retries_count_limit {
             return Ok(("timeout".to_string(), feeds_to_update_ids));
         }
+
+        match get_nonce(
+            &net,
+            rpc_handle,
+            &sender_address,
+            block_height,
+            transaction_retry_timeout_secs,
+            false,
+        )
+        .await
+        {
+            Ok(latest_nonce) => {
+                if latest_nonce > nonce {
+                    //TODO: Check the tx hashes of all posted/retried txs for block inclusion
+                    return Ok(("true".to_string(), feeds_to_update_ids));
+                }
+            }
+            Err(err) => {
+                warn!("{err}");
+                inc_retries(
+                    net.as_str(),
+                    &mut transaction_retries_count,
+                    provider_metrics,
+                )
+                .await;
+                continue;
+            }
+        };
 
         let gas_price = match get_gas_price(
             net.as_str(),
@@ -306,7 +361,7 @@ pub async fn eth_batch_send_to_contract(
             }
             Err(err) => {
                 warn!("get_gas_price error {err} for {transaction_retries_count}-th time in network `{net}` block height {block_height}");
-                inc_transaction_retries(
+                inc_retries(
                     net.as_str(),
                     &mut transaction_retries_count,
                     provider_metrics,
@@ -332,7 +387,7 @@ pub async fn eth_batch_send_to_contract(
             }
             Err(err) => {
                 warn!("get_chain_id error {err} for {transaction_retries_count}-th time in network `{net}` block height {block_height}");
-                inc_transaction_retries(
+                inc_retries(
                     net.as_str(),
                     &mut transaction_retries_count,
                     provider_metrics,
@@ -346,6 +401,7 @@ pub async fn eth_batch_send_to_contract(
         if transaction_retries_count == 0 {
             tx = TransactionRequest::default()
                 .to(contract_address)
+                .nonce(nonce)
                 .from(sender_address)
                 .with_chain_id(chain_id)
                 .input(Some(input.clone()).into());
@@ -355,7 +411,7 @@ pub async fn eth_batch_send_to_contract(
                 "Retrying to send updates in network `{net}` block height {block_height} for {transaction_retries_count}-th time"
             );
 
-            let (nonce, max_fee_per_gas, priority_fee) = match get_tx_retry_params(
+            let (max_fee_per_gas, priority_fee) = match get_tx_retry_params(
                 net.as_str(),
                 rpc_handle,
                 &sender_address,
@@ -369,7 +425,7 @@ pub async fn eth_batch_send_to_contract(
                 Err(e) => {
                     let block_height = updates.block_height;
                     warn!("Timed out on get_tx_retry_params for {transaction_retries_count}-th time in network `{net}` block height {block_height}: {e}!");
-                    inc_transaction_retries(
+                    inc_retries(
                         net.as_str(),
                         &mut transaction_retries_count,
                         provider_metrics,
@@ -404,7 +460,7 @@ pub async fn eth_batch_send_to_contract(
                     }
                     Err(err) => {
                         warn!("Error while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
-                        inc_transaction_retries(
+                        inc_retries(
                             net.as_str(),
                             &mut transaction_retries_count,
                             provider_metrics,
@@ -414,8 +470,8 @@ pub async fn eth_batch_send_to_contract(
                     }
                 },
                 Err(err) => {
-                    warn!("Error while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
-                    inc_transaction_retries(
+                    warn!("Error timeout while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
+                    inc_retries(
                         net.as_str(),
                         &mut transaction_retries_count,
                         provider_metrics,
@@ -455,7 +511,7 @@ pub async fn eth_batch_send_to_contract(
                                 }
                                 None => {
                                     warn!("Get tx_receipt returned None in network `{net}` block height {block_height}");
-                                    inc_transaction_retries(
+                                    inc_retries(
                                         net.as_str(),
                                         &mut transaction_retries_count,
                                         provider_metrics,
@@ -466,7 +522,7 @@ pub async fn eth_batch_send_to_contract(
                             },
                             Err(err) => {
                                 warn!("Error getting tx_receipt in network `{net}` block height {block_height}: {err}");
-                                inc_transaction_retries(
+                                inc_retries(
                                     net.as_str(),
                                     &mut transaction_retries_count,
                                     provider_metrics,
@@ -477,7 +533,7 @@ pub async fn eth_batch_send_to_contract(
                         },
                         Err(e) => {
                             warn!("Timed out while trying to get receipt for tx_hash={tx_hash} in network `{net}` block height {block_height}: {e}");
-                            inc_transaction_retries(
+                            inc_retries(
                                 net.as_str(),
                                 &mut transaction_retries_count,
                                 provider_metrics,
@@ -519,7 +575,41 @@ pub async fn eth_batch_send_to_contract(
     Ok((receipt.status().to_string(), feeds_to_update_ids))
 }
 
-pub async fn inc_transaction_retries(
+pub async fn get_nonce(
+    net: &str,
+    rpc_handle: &ProviderType,
+    sender_address: &Address,
+    block_height: u64,
+    transaction_retry_timeout_secs: u64,
+    pending: bool,
+) -> Result<u64> {
+    debug!("Getting pending nonce for network {net} and address {sender_address}...");
+
+    let future = if pending {
+        rpc_handle.get_transaction_count(*sender_address).pending()
+    } else {
+        rpc_handle.get_transaction_count(*sender_address).latest()
+    };
+
+    match actix_web::rt::time::timeout(Duration::from_secs(transaction_retry_timeout_secs), future)
+        .await
+    {
+        Ok(nonce_result) => match nonce_result {
+            Ok(nonce) => {
+                debug!("Got nonce={nonce} for network `{net}` block height {block_height} and address {sender_address}");
+                Ok(nonce)
+            }
+            Err(err) => {
+                bail!("Failed to get nonce for network `{net}` block height {block_height} and address {sender_address} due to {err}");
+            }
+        },
+        Err(err) => {
+            bail!("Timed out while getting nonce for network `{net}` block height {block_height} and address {sender_address} due to {err}");
+        }
+    }
+}
+
+pub async fn inc_retries(
     net: &str,
     transaction_retries_count: &mut u64,
     provider_metrics: &Arc<RwLock<ProviderMetrics>>,
@@ -663,30 +753,7 @@ pub async fn get_tx_retry_params(
     transaction_retry_timeout_secs: u64,
     transaction_retries_count: u64,
     retry_fee_increment_fraction: f64,
-) -> Result<(u64, u128, u128)> {
-    debug!("Getting nonce for network {net} and address {sender_address}...");
-    let nonce = match actix_web::rt::time::timeout(
-        Duration::from_secs(transaction_retry_timeout_secs),
-        rpc_handle.get_transaction_count(*sender_address).latest(),
-    )
-    .await
-    {
-        Ok(nonce_result) => match nonce_result {
-            Ok(nonce) => {
-                debug!("Got nonce={nonce} for network {net} and address {sender_address}");
-                nonce
-            }
-            Err(err) => {
-                debug!("Failed to get nonce for network {net} and address {sender_address} due to {err}");
-                return Err(err.into());
-            }
-        },
-        Err(err) => {
-            warn!("Timed out while getting nonce for network {net} and address {sender_address} due to {err}");
-            bail!("Timed out");
-        }
-    };
-
+) -> Result<(u128, u128)> {
     let price_increment = 1.0 + (transaction_retries_count as f64 * retry_fee_increment_fraction);
 
     debug!("Getting gas_price for network {net}...");
@@ -739,7 +806,7 @@ pub async fn get_tx_retry_params(
     let mut max_fee_per_gas = gas_price + gas_price + priority_fee;
     max_fee_per_gas = (max_fee_per_gas as f64 * price_increment) as u128;
 
-    Ok((nonce, max_fee_per_gas, priority_fee))
+    Ok((max_fee_per_gas, priority_fee))
 }
 
 pub async fn eth_batch_send_to_all_contracts(
