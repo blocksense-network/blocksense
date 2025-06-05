@@ -3,7 +3,7 @@
   # Libraries used when cargo-check builds libraries
   packages = self'.legacyPackages.commonLibDeps;
 
-  pre-commit.hooks = {
+  git-hooks.hooks = {
     nixfmt-rfc-style.enable = true;
     editorconfig-checker = {
       excludes = [ "libs/sdk/wit/deps" ];
