@@ -17,6 +17,13 @@ pub struct VotedFeedUpdate {
     pub end_slot_timestamp: Timestamp,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EncodedVotedFeedUpdate {
+    pub feed_id: u32,
+    pub value: Vec<u8>,
+    pub end_slot_timestamp: Timestamp,
+}
+
 #[derive(Debug, Clone)]
 pub struct VotedFeedUpdateWithProof {
     pub update: VotedFeedUpdate,
@@ -177,6 +184,12 @@ pub fn naive_packing(
 pub struct BatchedAggegratesToSend {
     pub block_height: u64,
     pub updates: Vec<VotedFeedUpdate>,
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct EncodedBatchedAggegratesToSend {
+    pub block_height: u64,
+    pub updates: Vec<EncodedVotedFeedUpdate>,
 }
 
 #[derive(Clone, Debug)]
