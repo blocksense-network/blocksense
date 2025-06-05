@@ -17,6 +17,53 @@ direnv allow
 
 ---
 
+## 🚀 Development Workflow
+
+### Building and Testing
+
+```bash
+# Build TypeScript packages
+just build-ts
+
+# Test TypeScript packages
+just test-ts
+
+# Build Rust workspace
+cargo build --release
+
+# Build the full Blocksense system
+just build-blocksense
+
+# Start the system
+just start-blocksense
+```
+
+### Oracle Development
+
+```bash
+# Build a specific oracle
+just build-oracle crypto-price-feeds
+
+# Start an oracle with hot reload
+just start-oracle crypto-price-feeds
+```
+
+### Working with Smart Contracts
+
+```bash
+# Navigate to contracts directory
+cd libs/ts/contracts
+
+# Compile contracts
+yarn hardhat compile
+
+# Run tests
+yarn hardhat test
+
+# Deploy to a network
+yarn hardhat run scripts/deploy.ts --network <network>
+```
+
 # ⚡ Running the System
 
 ## ✅ Supported Deployment Options

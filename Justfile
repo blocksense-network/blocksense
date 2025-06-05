@@ -56,3 +56,116 @@ clean:
     -e .vscode \
     -e .pre-commit-config.yaml \
     -- {{root-dir}}
+
+# === FORMATTING COMMANDS ===
+
+format-js:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  echo "📝 Formatting TypeScript/JavaScript/Markdown files..."
+  yarn prettier --write .
+
+format-rust:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  echo "🦀 Formatting Rust files..."
+  cargo fmt
+
+format-nix:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  echo "❄️  Formatting Nix files..."
+  nix fmt
+
+format:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  echo "🔧 Running all formatters..."
+  just format-js
+  just format-rust
+  just format-nix
+  echo "✅ All formatting complete!"
+
+# === LINTING COMMANDS ===
+
+lint-rust:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  echo "🦀 Running Clippy (Rust linter)..."
+  cargo clippy --all-targets --all-features
+
+lint-nix:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  echo "❄️  Running Statix (Nix linter)..."
+  statix check .
+
+lint-nix-deadcode:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  echo "🧹 Checking for dead Nix code..."
+  deadnix .
+
+lint:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  echo "🔍 Running all linters..."
+  just lint-rust
+  just lint-nix
+  just lint-nix-deadcode
+  echo "✅ All linting complete!"
+
+# === LINTING FIX COMMANDS ===
+
+fix-lint-rust:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  echo "🦀 Running Clippy with fixes..."
+  cargo clippy --fix --allow-dirty --allow-staged
+
+fix-lint-nix:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  echo "❄️  Running Statix fixes..."
+  statix fix .
+
+fix-lint-nix-deadcode:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  echo "🧹 Running Deadnix cleanup..."
+  deadnix --edit .
+
+lint-fix:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  echo "🔍 Running linters with auto-fix..."
+  just fix-lint-rust
+  just fix-lint-nix
+  just fix-lint-nix-deadcode
+  echo "✅ All linting fixes complete!"
+
+# === EDITORCONFIG ===
+
+check-editorconfig:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  echo "⚙️  Checking EditorConfig compliance..."
+  editorconfig-checker
+
+# === COMBINED COMMANDS ===
+
+check-all:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  echo "🔍 Running all checks (formatting + linting + editorconfig)..."
+  just lint
+  just check-editorconfig
+  echo "✅ All checks complete!"
+
+fix-all:
+  #!/usr/bin/env bash
+  set -euo pipefail
+  echo "🔧 Running all fixes (formatting + linting)..."
+  just format
+  just lint-fix
+  echo "✅ All fixes complete!"
