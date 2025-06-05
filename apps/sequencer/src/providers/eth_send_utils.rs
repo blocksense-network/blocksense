@@ -1,4 +1,4 @@
-use actix_web::{rt::spawn, web::Data};
+use actix_web::web::Data;
 use alloy::{
     hex,
     network::TransactionBuilder,
@@ -790,23 +790,32 @@ pub async fn eth_batch_send_to_all_contracts(
 
                 let updates = updates.clone();
                 let provider = provider.clone();
+                let blocksense_block_height = updates.block_height;
 
                 let feeds_config = feeds_config.clone();
                 let provider_settings = provider_settings.clone();
-                collected_futures.push(spawn(async move {
-                    let result = eth_batch_send_to_contract(
-                        net.clone(),
-                        provider.clone(),
-                        provider_settings,
-                        updates,
-                        feed_type,
-                        feeds_config,
-                        transaction_retry_timeout_secs,
-                        transaction_retries_count_limit,
-                        retry_fee_increment_fraction,
-                    );
-                    (result, net, provider)
-                }));
+                let sender_name = format!("batch_sender_{blocksense_block_height}_{net}");
+                let err_msg = format!("Failed to spawn {sender_name}!");
+                collected_futures.push(
+                    tokio::task::Builder::new()
+                        .name(sender_name.as_str())
+                        .spawn(async move {
+                            let result = eth_batch_send_to_contract(
+                                net.clone(),
+                                provider.clone(),
+                                provider_settings,
+                                updates,
+                                feed_type,
+                                feeds_config,
+                                transaction_retry_timeout_secs,
+                                transaction_retries_count_limit,
+                                retry_fee_increment_fraction,
+                            )
+                            .await;
+                            (result, net, provider)
+                        })
+                        .unwrap_or_else(|_| panic!("{}", err_msg)),
+                );
             } else {
                 warn!(
                     "Network `{net}` is not configured in sequencer; skipping it during reporting"
@@ -828,7 +837,7 @@ pub async fn eth_batch_send_to_all_contracts(
     let block_height = updates.block_height;
     for v in result {
         match v {
-            Ok((result, net, provider)) => match result.await {
+            Ok((result, net, provider)) => match result {
                 Ok((status, updated_feeds)) => {
                     all_results += &format!("result from network {net} and block height {block_height}: Ok -> status: {status}");
                     if status == "true" {

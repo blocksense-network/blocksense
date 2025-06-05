@@ -45,7 +45,7 @@ pub async fn votes_result_sender_loop(
 
                         info!("sending updates to contract:");
                         let sequencer_state = sequencer_state.clone();
-                        async_send_to_contracts(sequencer_state, updates, batch_count);
+                        async_send_to_all_networks(sequencer_state, updates, batch_count);
                     }
                     None => {
                         panic!("Sender got RecvError"); // This error indicates a severe internal error.
@@ -60,15 +60,18 @@ pub async fn votes_result_sender_loop(
         .expect("Failed to spawn votes result sender!")
 }
 
-fn async_send_to_contracts(
+fn async_send_to_all_networks(
     sequencer_state: Data<SequencerState>,
     updates: BatchedAggegratesToSend,
     batch_count: usize,
 ) {
+    let blocksense_block_height = updates.block_height;
     let sender = tokio::task::Builder::new()
-        .name(format!("batch_sender_{batch_count}").as_str())
+        .name(
+            format!("async_send_to_all_networks_{blocksense_block_height}_{batch_count}").as_str(),
+        )
         .spawn_local(async move {
-            debug!("Spawned batch_sender_{batch_count}");
+            debug!("Spawned async_send_to_all_networks_{blocksense_block_height}_{batch_count}");
             match eth_batch_send_to_all_contracts(sequencer_state, updates, Periodic).await {
                 Ok(res) => info!("Sending updates complete {res}."),
                 Err(err) => error!("ERROR Sending updates {err}"),
