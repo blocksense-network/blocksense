@@ -9,7 +9,9 @@ use alloy::hex::{self, ToHexExt};
 use alloy::providers::Provider;
 use alloy_primitives::map::HashMap;
 use alloy_primitives::{Address, Bytes, Uint, U256};
-use blocksense_data_feeds::feeds_processing::BatchedAggegratesToSend;
+use blocksense_data_feeds::feeds_processing::{
+    BatchedAggegratesToSend, EncodedBatchedAggegratesToSend, EncodedVotedFeedUpdate,
+};
 use blocksense_feed_registry::types::Repeatability::Periodic;
 use blocksense_gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use blocksense_gnosis_safe::utils::{create_safe_tx, generate_transaction_hash, SafeMultisig};
@@ -68,7 +70,6 @@ pub async fn votes_result_sender_loop(
         .expect("Failed to spawn votes result sender!")
 }
 
-
 async fn aggregated_updates_to_publishers(
     sequencer_state: &Data<SequencerState>,
     updates: &BatchedAggegratesToSend,
@@ -80,7 +81,45 @@ async fn aggregated_updates_to_publishers(
 
     let block_height = updates.block_height;
 
-    match serde_json::to_string(updates) {
+    let encoded_updates = EncodedBatchedAggegratesToSend {
+        block_height,
+        updates: {
+            let mut encoded_voted_feed_updates = Vec::new();
+            for v in &updates.updates {
+                let feed_id = &v.feed_id;
+                debug!("Acquiring a read lock on feeds_config; feed_id={feed_id}");
+                let Some(feed_config) = sequencer_state
+                    .active_feeds
+                    .read()
+                    .await
+                    .get(feed_id)
+                    .cloned()
+                else {
+                    error!("Acquired and released a read lock on feeds_config; feed_id={feed_id} but feed_id not in registry!");
+                    continue;
+                };
+                debug!("Acquired and released a read lock on feeds_config; feed_id={feed_id}");
+
+                encoded_voted_feed_updates.push(EncodedVotedFeedUpdate {
+                    feed_id: *feed_id,
+                    value: match v.value.as_bytes(
+                        feed_config.additional_feed_info.decimals as usize,
+                        v.end_slot_timestamp as u64,
+                    ) {
+                        Ok(bytes) => bytes,
+                        Err(e) => {
+                            error!("Could not serialize {v:?}' value to bytes: {e}");
+                            continue;
+                        }
+                    },
+                    end_slot_timestamp: v.end_slot_timestamp,
+                });
+            }
+            encoded_voted_feed_updates
+        },
+    };
+
+    match serde_json::to_string(&encoded_updates) {
         Ok(json) => {
             match send_to_msg_stream(
                 kafka_endpoint,
@@ -274,7 +313,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             }
         };
 
-        info!("About to send feed values to kafka; network={net}, serialized_updates={serialized_updates}");
+        info!("About to send feed values to kafka, serialized_updates={serialized_updates}");
         match send_to_msg_stream(
             kafka_endpoint,
             &serialized_updates,
