@@ -56,3 +56,27 @@ clean:
     -e .vscode \
     -e .pre-commit-config.yaml \
     -- {{root-dir}}
+
+publish-ui version="patch":
+  #!/usr/bin/env bash
+  set -euo pipefail
+
+  cd "{{root-dir}}/libs/ts/ui"
+
+  echo "🚀 Publishing @blocksense/ui..."
+
+  # Update version
+  npm version {{version}}
+
+  # Build package
+  yarn build-tailwind
+
+  # Publish
+  npm publish
+
+  # Create git tag
+  git add package.json
+  git commit -m "chore: release @blocksense/ui@$(node -p "require('./package.json').version")"
+  git tag "ui-v$(node -p "require('./package.json').version")"
+
+  echo "✅ Published @blocksense/ui@$(node -p "require('./package.json').version")"
