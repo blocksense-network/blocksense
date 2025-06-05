@@ -188,9 +188,9 @@ async fn main() -> std::io::Result<()> {
             }
             _ => {
                 if arg.starts_with('-') {
-                    println!("Unknown argument {}", arg);
+                    println!("Unknown argument {arg}");
                 } else {
-                    println!("Unknown positional argument {}", arg);
+                    println!("Unknown positional argument {arg}");
                 }
             }
         }
@@ -253,11 +253,11 @@ async fn main() -> std::io::Result<()> {
             Ok(res) => match res {
                 Ok(x) => x,
                 Err(e) => {
-                    panic!("TaskError: {}", e);
+                    panic!("TaskError: {e}");
                 }
             },
             Err(e) => {
-                panic!("JoinError: {} ", e);
+                panic!("JoinError: {e} ");
             }
         }
     }

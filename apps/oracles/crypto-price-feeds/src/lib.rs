@@ -196,17 +196,11 @@ fn print_results(
         ]));
     }
 
-    println!(
-        "\n{} Pairs with no exchange data:",
-        pairs_with_missing_exchange_data_count
-    );
-    println!("[{}]", pairs_with_missing_exchange_data);
+    println!("\n{pairs_with_missing_exchange_data_count} Pairs with no exchange data:");
+    println!("[{pairs_with_missing_exchange_data}]");
 
-    println!(
-        "\n{} Pairs with missing price / volume data from exchange:",
-        missing_prices_count
-    );
-    println!("[{}]", missing_prices);
+    println!("\n{missing_prices_count} Pairs with missing price / volume data from exchange:");
+    println!("[{missing_prices}]");
 
     println!("\nResults:");
     table.printstd();

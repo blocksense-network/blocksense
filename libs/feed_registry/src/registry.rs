@@ -432,7 +432,7 @@ mod tests {
 
         let mut current_time_as_ms = current_unix_time();
 
-        println!("fmdr.get_keys()={:?}", fmdr);
+        println!("fmdr.get_keys()={fmdr:?}");
         assert!(
             fmdr.get(0)
                 .expect("ID not present in registry")
@@ -517,7 +517,7 @@ mod tests {
 
         let feed = fmdr.get(DATA_FEED_ID).expect("ID not present in registry");
 
-        println!("fmdr.get_keys()={:?}", fmdr);
+        println!("fmdr.get_keys()={fmdr:?}");
         assert!(
             feed.read()
                 .await
@@ -750,7 +750,7 @@ mod tests {
                     )
                     .await;
 
-                println!("this is thread number {}", i);
+                println!("this is thread number {i}");
             }));
         }
 

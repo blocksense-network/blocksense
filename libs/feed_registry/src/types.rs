@@ -258,9 +258,9 @@ impl FeedType {
 
     pub fn parse_to_string(&self) -> String {
         match self {
-            FeedType::Numerical(val) => format!("{}", val),
+            FeedType::Numerical(val) => format!("{val}"),
             FeedType::Text(s) => s.clone(),
-            FeedType::Bytes(bytes) => format!("{:?}", bytes),
+            FeedType::Bytes(bytes) => format!("{bytes:?}"),
         }
     }
 
@@ -290,7 +290,7 @@ impl FeedType {
 
                 let val = match str_val.parse::<f64>() {
                     Ok(v) => v,
-                    Err(e) => return Err(format!("Bytes cannot be parsed as f64: {}", e)),
+                    Err(e) => return Err(format!("Bytes cannot be parsed as f64: {e}")),
                 };
 
                 Ok(FeedType::Numerical(val))

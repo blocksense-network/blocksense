@@ -195,17 +195,11 @@ fn print_results(resources: &[ResourcePairData], results: &PairToResults, payloa
         ]));
     }
 
-    println!(
-        "\n{} Pairs with no provider data:",
-        pairs_with_missing_provider_data_count
-    );
-    println!("[{}]", pairs_with_missing_provider_data);
+    println!("\n{pairs_with_missing_provider_data_count} Pairs with no provider data:");
+    println!("[{pairs_with_missing_provider_data}]");
 
-    println!(
-        "\n{} Pairs with missing price / volume data from provider:",
-        missing_prices_count
-    );
-    println!("[{}]", missing_prices);
+    println!("\n{missing_prices_count} Pairs with missing price / volume data from provider:");
+    println!("[{missing_prices}]");
 
     println!("\nResults:");
     table.printstd();

@@ -7,5 +7,5 @@ fn main() {
 
     let detector_result = make_f64_hdbscan(values_array).unwrap();
 
-    println!("{:?}", detector_result);
+    println!("{detector_result:?}");
 }
