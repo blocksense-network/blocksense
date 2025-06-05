@@ -23,12 +23,12 @@ pub fn generate_signature(
             match value_bytes_result {
                 Ok(bytes) => byte_buffer.extend(bytes),
                 Err(error) => {
-                    log::warn!("Error converting to bytes recvd result of vote: {}", error)
+                    log::warn!("Error converting to bytes recvd result of vote: {error}")
                 }
             }
         }
         Err(error) => {
-            log::warn!("Error parsing recvd result of vote: {}", error);
+            log::warn!("Error parsing recvd result of vote: {error}");
         }
     };
 

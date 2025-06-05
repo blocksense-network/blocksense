@@ -191,7 +191,7 @@ async fn handle_feeds_slots_manager_cmd(
                     info!("Registering feed id {new_id} complete!");
                 }
                 Err(e) => {
-                    error!("{}", e);
+                    error!("{e}");
                 }
             };
         }

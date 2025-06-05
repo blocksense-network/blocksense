@@ -56,8 +56,7 @@ pub async fn get_key_from_contract(
     let mut selector = key;
     selector.replace_range(0..1, "8"); // 8 indicates we want to take the latest value.
                                        // key: 0x00000000
-    let input =
-        Bytes::from_hex(selector).map_err(|e| eyre!("Key is not valid hex string: {}", e))?;
+    let input = Bytes::from_hex(selector).map_err(|e| eyre!("Key is not valid hex string: {e}"))?;
     let tx = TransactionRequest::default()
         .to(contract_address)
         .from(signer.address())
@@ -72,7 +71,7 @@ pub async fn get_key_from_contract(
         match FeedType::from_bytes(result.to_vec(), FeedType::Numerical(0.0), decimals as usize) {
             Ok(val) => val,
             Err(e) => {
-                return Err(eyre!("Could not deserialize feed from bytes {}", e));
+                return Err(eyre!("Could not deserialize feed from bytes {e}"));
             }
         };
     info!("Call result: {:?}", return_val);
@@ -728,7 +727,7 @@ mod tests {
         for feed_type in feed_types {
             // Test deploy contract
             let req = test::TestRequest::get()
-                .uri(&format!("/deploy/{}/{}", network, feed_type))
+                .uri(&format!("/deploy/{network}/{feed_type}"))
                 .to_request();
 
             let resp = test::call_service(&app, req).await;
@@ -736,15 +735,15 @@ mod tests {
             assert_eq!(resp.status(), HTTP_STATUS_SUCCESS);
             let body = test::read_body(resp).await;
             let body_str = std::str::from_utf8(&body).expect("Failed to read body");
-            println!("body_str: {:?}", body_str);
+            println!("body_str: {body_str:?}");
             let contract_address = extract_eth_address(body_str).unwrap();
-            println!("contract_address: {:?}", contract_address);
+            println!("contract_address: {contract_address:?}");
             assert_eq!(body_str.len(), 66);
         }
 
         // Test deploy unknown feed type returns 400
         let req = test::TestRequest::get()
-            .uri(&format!("/deploy/{}/unknown_feed", network))
+            .uri(&format!("/deploy/{network}/unknown_feed"))
             .to_request();
 
         let resp = test::call_service(&app, req).await;

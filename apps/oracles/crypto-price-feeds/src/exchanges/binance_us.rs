@@ -37,7 +37,7 @@ impl<'a> PricesFetcher<'a> for BinanceUsPriceFetcher<'a> {
         async {
             let req_symbols = format!(
                 "[{}]",
-                self.symbols.iter().map(|s| format!("\"{}\"", s)).join(",")
+                self.symbols.iter().map(|s| format!("\"{s}\"")).join(",")
             );
 
             let response = http_get_json::<BinanceUsPriceResponse>(

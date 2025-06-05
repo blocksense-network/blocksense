@@ -131,7 +131,7 @@ pub async fn consume_reports(
                             ad_score_opt = Some(ad_score)
                         }
                         Err(e) => {
-                            warn!("Anomaly Detection failed with error - {}", e);
+                            warn!("Anomaly Detection failed with error - {e}");
                         }
                     }
                     {
@@ -643,8 +643,7 @@ pub mod tests {
 
         assert_eq!(
             error_message, expected_error,
-            "Unexpected error message: {}",
-            error_message
+            "Unexpected error message: {error_message}"
         );
     }
 }

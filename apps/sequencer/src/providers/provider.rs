@@ -133,15 +133,12 @@ async fn get_rpc_providers(
             .unwrap_or_else(|_| panic!("Not a valid url provided for {net}!"));
         let priv_key_path = &p.private_key_path;
         let priv_key = fs::read_to_string(priv_key_path.clone()).unwrap_or_else(|_| {
-            panic!(
-                "Failed to read private key for {} from {}",
-                net, priv_key_path
-            )
+            panic!("Failed to read private key for {net} from {priv_key_path}")
         });
         let signer: PrivateKeySigner = priv_key
             .trim()
             .parse()
-            .unwrap_or_else(|_| panic!("Incorrect private key specified {}.", priv_key));
+            .unwrap_or_else(|_| panic!("Incorrect private key specified {priv_key}."));
 
         let rpc_provider = RpcProvider::new(
             net.as_str(),
@@ -545,7 +542,7 @@ impl RpcProvider {
             deploy_time.elapsed().as_millis()
         );
         self.set_contract_address(contract_name, &contract_address);
-        Ok(format!("CONTRACT_ADDRESS set to {}", contract_address))
+        Ok(format!("CONTRACT_ADDRESS set to {contract_address}"))
     }
 
     pub async fn can_read_contract_bytecode(

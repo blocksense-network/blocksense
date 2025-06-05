@@ -7,7 +7,7 @@ async fn push_to_buffer(data: web::Data<AppState>, body: String) -> impl Respond
     let mut buffer = data.buffer.lock().unwrap();
     buffer.clear();
     buffer.push_str(&body);
-    HttpResponse::Ok().body(format!("Buffer updated: {}", buffer))
+    HttpResponse::Ok().body(format!("Buffer updated: {buffer}"))
 }
 
 #[get("/pull")]

@@ -154,8 +154,7 @@ async fn wait_for_sequencer_to_accept_votes(max_time_to_wait_secs: u64) {
                 Ok(elapsed) => {
                     if elapsed.as_secs() > max_time_to_wait_secs {
                         panic!(
-                            "Sequencer took more than {} seconds to start listening for reports",
-                            max_time_to_wait_secs
+                            "Sequencer took more than {max_time_to_wait_secs} seconds to start listening for reports"
                         );
                     }
                 }
@@ -170,11 +169,7 @@ async fn wait_for_sequencer_to_accept_votes(max_time_to_wait_secs: u64) {
 fn deploy_contract_to_networks(networks: Vec<&str>) {
     for net in networks {
         send_get_request(
-            format!(
-                "http://127.0.0.1:{}/deploy/{}/price_feed",
-                SEQUENCER_ADMIN_PORT, net
-            )
-            .as_str(),
+            format!("http://127.0.0.1:{SEQUENCER_ADMIN_PORT}/deploy/{net}/price_feed").as_str(),
         );
     }
 }
@@ -224,11 +219,8 @@ fn send_report(endpoint: &str, payload_json: serde_json::Value) -> String {
 
 async fn wait_for_value_to_be_updated_to_contracts() -> Result<()> {
     let report_time_interval_ms: u64 = send_get_request(
-        format!(
-            "http://127.0.0.1:{}/get_feed_report_interval/{}",
-            SEQUENCER_ADMIN_PORT, FEED_ID
-        )
-        .as_str(),
+        format!("http://127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_feed_report_interval/{FEED_ID}")
+            .as_str(),
     )
     .parse()?;
     await_time(report_time_interval_ms + 1000).await; // give 1 second tolerance
@@ -239,27 +231,27 @@ fn verify_expected_data_in_contracts(expected_value: f64) {
     println!(
         "ETH1 value = {}",
         send_get_request(
-            format!("127.0.0.1:{}/get_key/ETH1/00000001", SEQUENCER_ADMIN_PORT).as_str()
+            format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH1/00000001").as_str()
         )
     );
     println!(
         "ETH2 value = {}",
         send_get_request(
-            format!("127.0.0.1:{}/get_key/ETH2/00000001", SEQUENCER_ADMIN_PORT).as_str()
+            format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH2/00000001").as_str()
         )
     );
 
     // Verify expected data is set to contract in ETH1
     assert!(
         send_get_request(
-            format!("127.0.0.1:{}/get_key/ETH1/00000001", SEQUENCER_ADMIN_PORT).as_str()
-        ) == format!("{}", expected_value)
+            format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH1/00000001").as_str()
+        ) == format!("{expected_value}")
     );
     // Verify expected data is set to contract in ETH2
     assert!(
         send_get_request(
-            format!("127.0.0.1:{}/get_key/ETH2/00000001", SEQUENCER_ADMIN_PORT).as_str()
-        ) == format!("{}", expected_value)
+            format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH2/00000001").as_str()
+        ) == format!("{expected_value}")
     );
 }
 
@@ -267,7 +259,7 @@ fn cleanup_spawned_processes() {
     let mut children = vec![];
     {
         let process = "sequencer";
-        println!("Killing process: {}", process);
+        println!("Killing process: {process}");
         children.push(thread::spawn(move || {
             let mut command = Command::new("pkill");
             let command = command.args(["-x", "-9", process]);
@@ -391,7 +383,7 @@ async fn main() -> Result<()> {
   "ETH2": "AwaitingFirstUpdate"
 }"#;
         let actual_response = send_get_request(
-            format!("127.0.0.1:{}/list_provider_status", SEQUENCER_ADMIN_PORT).as_str(),
+            format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/list_provider_status").as_str(),
         );
         assert_eq!(expected_response, actual_response);
     }
@@ -422,7 +414,7 @@ async fn main() -> Result<()> {
             Err(_) => panic!("Failed serialization of payload!"), //TODO(snikolov): Handle without panic
         };
 
-        println!("serialized_payload={}", serialized_payload);
+        println!("serialized_payload={serialized_payload}");
 
         send_report("post_report", serialized_payload);
 
@@ -440,7 +432,7 @@ async fn main() -> Result<()> {
   "ETH2": "LastUpdateSucceeded"
 }"#;
         let actual_response = send_get_request(
-            format!("127.0.0.1:{}/list_provider_status", SEQUENCER_ADMIN_PORT).as_str(),
+            format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/list_provider_status").as_str(),
         );
         assert_eq!(expected_response, actual_response);
     }
@@ -475,7 +467,7 @@ async fn main() -> Result<()> {
             Err(_) => panic!("Failed serialization of payload!"), //TODO(snikolov): Handle without panic
         };
 
-        println!("serialized_payload={}", serialized_payload);
+        println!("serialized_payload={serialized_payload}");
 
         send_report("post_reports_batch", serialized_payload);
 
@@ -523,7 +515,7 @@ async fn main() -> Result<()> {
             Err(_) => panic!("Failed serialization of payload!"), //TODO(snikolov): Handle without panic
         };
 
-        println!("serialized_payload={}", serialized_payload);
+        println!("serialized_payload={serialized_payload}");
 
         assert!(send_report("post_reports_batch", serialized_payload).contains("401 Unauthorized"));
 
@@ -537,7 +529,7 @@ async fn main() -> Result<()> {
     println!("\n * Assert provider status is 'Disabled' after disabling provider:\n");
     {
         let response_from_disable = send_post_request(
-            format!("127.0.0.1:{}/disable_provider/ETH1", SEQUENCER_ADMIN_PORT).as_str(),
+            format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/disable_provider/ETH1").as_str(),
         );
 
         assert_eq!("", response_from_disable);
@@ -547,7 +539,7 @@ async fn main() -> Result<()> {
   "ETH2": "LastUpdateSucceeded"
 }"#;
         let actual_response = send_get_request(
-            format!("127.0.0.1:{}/list_provider_status", SEQUENCER_ADMIN_PORT).as_str(),
+            format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/list_provider_status").as_str(),
         );
         assert_eq!(expected_response, actual_response);
     }
@@ -561,7 +553,7 @@ async fn main() -> Result<()> {
     println!("\n * Get history returns history of the updates:\n");
     {
         let actual_response =
-            send_get_request(format!("127.0.0.1:{}/get_history", SEQUENCER_ADMIN_PORT).as_str());
+            send_get_request(format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_history").as_str());
 
         let actual_response = mask_timestamps(actual_response.as_str());
 
@@ -602,7 +594,7 @@ async fn main() -> Result<()> {
             println!("Sequencer thread done.");
         }
         Err(e) => {
-            println!("sequencer thread err {:?}", e);
+            println!("sequencer thread err {e:?}");
         }
     }
 
