@@ -8,9 +8,9 @@ edition.workspace = true
 [dependencies]
 blocksense-macro = { path = "macro" }
 async-trait = "0.1"
-anyhow = "1.0.82"
+anyhow = "1.0.98"
 wit-bindgen = "0.16.0"
-spin-sdk = "3.0.1"
+spin-sdk = "3.1.1"
 reqwest = "0.12"
 url = "2.5"
 serde = { version = "1.0", features = ["derive"] }
