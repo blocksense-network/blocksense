@@ -1,0 +1,22 @@
+[package]
+name = "alpaca-core"
+version.workspace = true
+authors.workspace = true
+license.workspace = true
+edition.workspace = true
+
+description = """
+Tools for working with Alpaca core
+"""
+
+[lib]
+name = "alpaca_core"
+
+[dependencies]
+anyhow = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+log = { workspace = true }
+reqwest = { workspace = true }
+url = { workspace = true }
+
