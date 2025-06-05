@@ -112,15 +112,151 @@ Please see our [security policy](/.github/SECURITY.md).
 
 ---
 
-### 💾 Formatting & Saving Code Before Commit
+## 💾 Formatting & Saving Code Before Commit
 
-Before committing, **format your code** using:
+### 📝 Editor Configuration
 
-**yarn format:write**
+1. **Install EditorConfig plugin** for your editor
+2. **Configure your editor** to:
+   - Use spaces (not tabs) for indentation
+   - Trim trailing whitespace on save
+   - Ensure files end with a newline
+   - Use LF line endings (not CRLF)
+
+### Recommended VS Code Extensions
+
+- EditorConfig for VS Code
+- Prettier - Code formatter
+- rust-analyzer
+- Nix IDE
+
+### 🔧 Pre-commit Hooks
+
+This project uses pre-commit hooks to maintain code quality and consistency. When you make a commit, several tools automatically check your code:
+
+#### Enabled Tools
+
+| Tool             | Purpose                    | Files Checked                    |
+| ---------------- | -------------------------- | -------------------------------- |
+| **Prettier**     | Code formatting            | TypeScript, JavaScript, Markdown |
+| **Rustfmt**      | Code formatting            | Rust files (\*.rs)               |
+| **Nixfmt**       | Code formatting            | Nix files (\*.nix)               |
+| **Clippy**       | Rust linting               | Rust files (\*.rs)               |
+| **Statix**       | Nix linting                | Nix files (\*.nix)               |
+| **Deadnix**      | Dead code detection        | Nix files (\*.nix)               |
+| **EditorConfig** | Consistent editor settings | All files                        |
+
+#### When Hooks Fail
+
+Pre-commit hooks behave differently depending on their purpose:
+
+##### 🔧 Auto-Fixing Hooks (Fix and Reject)
+
+These hooks automatically fix issues but reject the commit so you can review changes:
+
+| Hook         | What it fixes             | Next steps                                                |
+| ------------ | ------------------------- | --------------------------------------------------------- |
+| **Prettier** | JS/TS/Markdown formatting | Review with `git diff`, then `git add .` and commit again |
+| **Rustfmt**  | Rust code formatting      | Review with `git diff`, then `git add .` and commit again |
+| **Nixfmt**   | Nix code formatting       | Review with `git diff`, then `git add .` and commit again |
+
+##### ❌ Check-Only Hooks (Reject Only)
+
+These hooks only check and reject commits - you must fix issues manually:
+
+| Hook             | What it checks              | How to fix                                       |
+| ---------------- | --------------------------- | ------------------------------------------------ |
+| **Clippy**       | Rust code quality           | `just fix-lint-rust` (auto-fixes some issues)    |
+| **Statix**       | Nix best practices          | `just fix-lint-nix` (auto-fixes most issues)     |
+| **Deadnix**      | Unused Nix code             | `just fix-lint-nix-deadcode` (removes dead code) |
+| **EditorConfig** | File formatting consistency | Manual fixes for whitespace, line endings, etc.  |
+
+### Quick Fixes Through the Lint Tool Itself
+
+```bash
+# After auto-fixing hooks (prettier, rustfmt, nixfmt):
+git diff                # Review the automatic changes
+git add .               # Stage the fixes
+git commit              # Try committing again
+
+# After check-only hooks (clippy, statix, deadnix):
+just fix-lint-rust      # Fix Clippy issues (auto-fixable ones)
+just fix-lint-nix       # Fix Statix issues
+just fix-lint-nix-deadcode  # Remove dead Nix code
+
+# For EditorConfig issues:
+just check-editorconfig # See specific violations
+# Then manually fix whitespace, line endings, etc.
+```
+
+### Composite Commands
+
+```bash
+# Fix all formatting at once
+just format
+
+# Fix all linting at once
+just lint-fix
+
+# Fix everything
+just fix-all
+
+# Check everything (without fixes)
+just check-all
+```
+
+### Manual Hook Management
+
+```bash
+# Run hooks manually on all files
+pre-commit run --all-files
+
+# Run specific hook
+pre-commit run prettier --all-files
+
+# Skip hooks for a commit (use sparingly)
+git commit --no-verify
+```
+
+### 🔍 Code Quality Commands
+
+#### Formatting
+
+| Command            | Description                           |
+| ------------------ | ------------------------------------- |
+| `just format`      | Format all code (JS/TS, Rust, Nix)    |
+| `just format-js`   | Format JavaScript/TypeScript/Markdown |
+| `just format-rust` | Format Rust code                      |
+| `just format-nix`  | Format Nix code                       |
+
+#### Linting
+
+| Command                  | Description                  |
+| ------------------------ | ---------------------------- |
+| `just lint`              | Run all linters (check only) |
+| `just lint-rust`         | Run Clippy on Rust code      |
+| `just lint-nix`          | Run Statix on Nix code       |
+| `just lint-nix-deadcode` | Check for dead Nix code      |
+
+#### Linting with Fixes
+
+| Command                      | Description                     |
+| ---------------------------- | ------------------------------- |
+| `just lint-fix`              | Run all linters with auto-fixes |
+| `just fix-lint-rust`         | Fix Rust issues with Clippy     |
+| `just fix-lint-nix`          | Fix Nix issues with Statix      |
+| `just fix-lint-nix-deadcode` | Remove dead Nix code            |
+
+#### Combined Commands
+
+| Command          | Description                          |
+| ---------------- | ------------------------------------ |
+| `just check-all` | Run all checks without fixes         |
+| `just fix-all`   | Run all formatting and linting fixes |
 
 ---
 
-### ✨ Commit Messages
+## ✨ Commit Messages
 
 ```
 <type><scope>: <subject>
@@ -154,7 +290,7 @@ Before committing, **format your code** using:
   - Must be parse-able by git interpret-trailers
   - BREAKING CHANGE: - needed for commits
 
-#### Commit Types
+### Commit Types
 
 - feat (_feature_) - Add new user-facing functionality or update a public API.
   - If the commit changes a library (and so its users are developers, not actual end-users), feat relates to its public API
@@ -210,5 +346,37 @@ Before committing, **format your code** using:
 
 Whenever you're stuck or do not know how to proceed, you can always ask for help.
 We invite you to use our [public Discord](https://discord.gg/b3xmcWs4Qp) to ask questions.
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+#### Pre-commit hooks taking too long
+
+```bash
+# Clear pre-commit cache
+pre-commit clean
+pre-commit install
+```
+
+#### Nix development shell issues
+
+```bash
+# Reload the environment
+direnv reload
+
+# Force rebuild
+nix develop --rebuild
+```
+
+#### Cargo/Rust build issues
+
+```bash
+# Clean build artifacts
+cargo clean
+
+# Update dependencies
+cargo update
+```
 
 ## [Git Tips & Tricks](./GITTIPS.md)
