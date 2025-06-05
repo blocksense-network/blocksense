@@ -13,9 +13,7 @@ export abstract class HistoricalDataFeedStoreBaseWrapper
     HistoricalDataFeedStore | GenericHistoricalDataFeedStore
   >
   implements
-    IHistoricalWrapper<
-      HistoricalDataFeedStore | GenericHistoricalDataFeedStore
-    >
+    IHistoricalWrapper<HistoricalDataFeedStore | GenericHistoricalDataFeedStore>
 {
   public async checkSetValues(
     keys: number[],
