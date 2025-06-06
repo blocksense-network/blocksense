@@ -112,10 +112,12 @@ let
         "SEQUENCER_LOG_LEVEL=${lib.toUpper cfg.sequencer.log-level}"
       ];
       shutdown.signal = 9;
-      depends_on = {
-        "anvil-impersonate-and-fund-ethereum-sepolia".condition = "process_completed_successfully";
-        "anvil-impersonate-and-fund-ink-sepolia".condition = "process_completed_successfully";
-      };
+      depends_on = lib.mapAttrs' (name: value: {
+        name = "anvil-impersonate-and-fund-${name}";
+        value = {
+          condition = "process_completed_successfully";
+        };
+      }) cfg.sequencer.providers;
       log_configuration = logsConfig;
       log_location = cfg.logsDir + "/sequencer.log";
     };
