@@ -1,6 +1,6 @@
 {
   "name": "@blocksense/monorepo",
-  "packageManager": "yarn@4.9.1+sha512.f95ce356460e05be48d66401c1ae64ef84d163dd689964962c6888a9810865e39097a5e9de748876c2e0bf89b232d583c33982773e9903ae7a76257270986538",
+  "packageManager": "yarn@4.9.1",
   "workspaces": [
     "apps/*",
     "libs/ts/*",
@@ -11,14 +11,17 @@
     "format:check": "pre-commit run --all",
     "format:write": "pre-commit run --all || pre-commit run --all",
     "generate-data-feeds-config": "yarn workspace '@blocksense/data-feeds-config-generator' generate",
-    "build": "yarn build:recursive",
+    "build": "yarn build:recursive '@blocksense/monorepo'",
     "build-single": "yarn workspace $0 run build",
-    "build:recursive": "yarn workspaces foreach --from $0 -Rp --topological-dev run build",
+    "build:recursive": "yarn workspaces foreach --exclude '@blocksense/monorepo' --from $0 -Rp --topological-dev run build",
     "build:with-deps": "yarn build:recursive $(jq -r .name $INIT_CWD/package.json)",
-    "build:all": "yarn workspaces foreach --all -p --topological-dev run build",
+    "build:plugin": "yarn workspace '@blocksense/yarn-plugin-nix-berry' run build",
+    "build:plugin-dev": "yarn workspace '@blocksense/yarn-plugin-nix-berry' run build:dev",
+    "build:all": "yarn workspaces foreach --all --exclude '@blocksense/monorepo' -p --topological-dev run build",
     "test": "yarn workspaces foreach --from $0 -Rp --topological-dev run test",
     "test-single": "yarn workspace $0 run test",
-    "test:all": "yarn workspaces foreach --all -p --topological-dev run test"
+    "test:all": "yarn workspaces foreach --all -p --topological-dev run test",
+    "install:plugin": "yarn workspace '@blocksense/yarn-plugin-nix-berry' run install"
   },
   "dependenciesMeta": {
     "@openzeppelin/contracts@5.0.2": {
@@ -45,6 +48,7 @@
   "devDependencies": {
     "@blocksense/base-utils": "workspace:*",
     "@types/node": "^22.14.1",
+    "@yarnpkg/builder": "^4.2.1",
     "prettier": "^3.4.2",
     "react": "^18.3.1",
     "ts-node": "^10.9.2",
@@ -53,5 +57,14 @@
   },
   "resolutions": {
     "babel-plugin-react-compiler": "patch:babel-plugin-react-compiler@0.0.0-experimental-22c6e49-20241219#./.yarn/patches/babel-plugin-react-compiler@0.0.0-experimental-22c6e49-20241219.patch"
+  },
+  "dependencies": {
+    "viem": "^2.30.1"
+  },
+  "peerDependencies": {
+    "@types/react": "*",
+    "next": "*",
+    "react": "*",
+    "react-dom": "*"
   }
 }

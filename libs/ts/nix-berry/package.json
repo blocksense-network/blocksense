@@ -1,0 +1,23 @@
+{
+  "name": "@blocksense/yarn-plugin-nix-berry",
+  "private": true,
+  "main": "./sources/index.ts",
+  "dependencies": {
+    "@yarnpkg/cli": "^4.7.0",
+    "@yarnpkg/core": "^4.2.1",
+    "@yarnpkg/parsers": "^3.0.3",
+    "clipanion": "^4.0.0-rc.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@yarnpkg/builder": "^4.2.1",
+    "rimraf": "5.0.0",
+    "typescript": "^5.5.2"
+  },
+  "scripts": {
+    "build": "builder build plugin",
+    "build:dev": "builder build plugin --no-minify",
+    "install": "yarn build && yarn plugin import ./bundles/@yarnpkg/plugin-nix-berry.js",
+    "clean": "rimraf bundles"
+  }
+}

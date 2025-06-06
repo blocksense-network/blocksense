@@ -44,6 +44,8 @@
       mkSpinStateDir = pkgs.callPackage ./spin-plugin {
         spin = lib.getExe' inputs'.nixpkgs-unstable.legacyPackages.fermyon-spin "spin";
       };
+
+      yarnProject = import ./yarn { inherit pkgs lib; };
     in
     {
       apps = {
@@ -58,6 +60,7 @@
         inherit blocksense-rs;
       };
       legacyPackages = {
+        inherit yarnProject;
         oracle-scripts = {
           crypto-price-feeds = mkOracleScript /apps/oracles/crypto-price-feeds false;
           exsat-holdings = mkOracleScript /apps/oracles/exsat-holdings false;

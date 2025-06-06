@@ -37,7 +37,6 @@ const startPrometheusServer = (host: string, port: number): void => {
 };
 
 const main = async (): Promise<void> => {
-  const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
   const argv = await yargs(hideBin(process.argv))
     .usage(
       'Usage: $0 [--address <ethereum address>] [--network <name>] [--rpc <url1,url2,...>] [--prometheus] [--host <host>] [--port <port>]',
@@ -46,7 +45,7 @@ const main = async (): Promise<void> => {
       alias: 'a',
       describe: 'Ethereum address to fetch balance for',
       type: 'string',
-      default: sequencerAddress,
+      default: null,
     })
     .option('network', {
       alias: 'n',
@@ -80,19 +79,15 @@ const main = async (): Promise<void> => {
     .alias('help', 'h')
     .parse();
 
-  const address = parseEthereumAddress(argv.address);
+  const address = parseEthereumAddress(
+    argv.address ?? getEnvStringNotAssert('SEQUENCER_ADDRESS'),
+  );
 
   if (argv.prometheus) {
     startPrometheusServer(argv.host, argv.port);
   }
 
-  console.log(
-    chalk.cyan(
-      `Using Ethereum address: ${address} (sequencer: ${
-        address === sequencerAddress
-      })\n`,
-    ),
-  );
+  console.log(chalk.cyan(`Using Ethereum address: ${address}\n`));
 
   if (argv.rpc) {
     const rpcList = argv.rpc

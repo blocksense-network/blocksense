@@ -41,7 +41,7 @@ export const deployedNetworks = [
   'world-chain-sepolia',
 ] satisfies NetworkName[];
 
-export const API_KEYS: Record<string, string> = {
+export const API_KEYS = (): Record<string, string> => ({
   ethereumHolesky: getEnvStringNotAssert('ETHERSCAN_API_KEY'),
   ethereumSepolia: getEnvStringNotAssert('ETHERSCAN_API_KEY'),
   arbitrumSepolia: getEnvStringNotAssert('ARBRITRUM_SEPOLIA_API_KEY'),
@@ -57,7 +57,7 @@ export const API_KEYS: Record<string, string> = {
   polygonZkevmCardona: getEnvStringNotAssert('POLYGON_ZKEVM_CARDONA_API_KEY'),
   scrollSepolia: getEnvStringNotAssert('SCROLL_SEPOLIA_API_KEY'),
   sonicBlaze: getEnvStringNotAssert('SONIC_BLAZE_API_KEY'),
-};
+});
 
 export const API_ENDPOINTS = {
   arbitrumSepolia: 'https://api-sepolia.arbiscan.io/api',

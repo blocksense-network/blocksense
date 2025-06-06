@@ -149,7 +149,7 @@ const fetchTransactionsForNetwork = async (
     network,
   ) as keyof typeof API_ENDPOINTS;
   const apiUrl = API_ENDPOINTS[snakeCaseNetwork];
-  const apikey = API_KEYS[snakeCaseNetwork];
+  const apikey = API_KEYS()[snakeCaseNetwork];
   if (!apiUrl) {
     console.log(chalk.red(`Skipping ${network}: Missing API configuration`));
     return { transactions: [], firstTxTime: '', lastTxTime: '' };
