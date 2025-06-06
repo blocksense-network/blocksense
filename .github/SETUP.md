@@ -15,6 +15,47 @@ nix develop --impure
 direnv allow
 ```
 
+## 🎛️ Customizing Your Dev Environment
+
+By default, you'll enter the **full development shell** with all tools. You can customize which dev shell to use by creating a local `.env` file.
+
+**Available dev shells:**
+
+- `default` - Full development environment (all tools)
+- `rust` - Rust-specific development environment
+- `js` - JavaScript/TypeScript development environment
+- `pre-commit` - Linting and code quality tools (mostly useful for CI jobs)
+
+### Quick Method (Recommended)
+
+Use the `just` command to easily switch between dev shells:
+
+```sh
+# Switch to Rust-only environment
+just change-devshell rust
+
+# Switch to JavaScript/TypeScript environment
+just change-devshell js
+
+# Switch to pre-commit tools only
+just change-devshell pre-commit
+
+# Switch back to the full development environment
+just change-devshell default
+```
+
+The command will automatically create or update your `.env` file and reload direnv for you.
+
+### Manual Method
+
+If you prefer to manage the `.env` file manually, just set the ENV var `DEV_SHELL` within it.
+
+```sh
+DEV_SHELL=rust
+```
+
+> The change in `.env` will trigger direnv to reload your environment automatically once you enter your terminal.
+
 ---
 
 # ⚡ Running the System
