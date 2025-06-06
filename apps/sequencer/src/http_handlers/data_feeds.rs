@@ -132,11 +132,12 @@ async fn process_report(
 
     // check if the time stamp in the msg is <= current_time_as_ms
     // and check if it is inside the current active slot frame.
-    let (report_relevance, always_publish_heartbeat_ms) = {
+    let (report_relevance, always_publish_heartbeat_ms, feed_name) = {
         let feed = feed.read().await;
         let report_relevance = feed.check_report_relevance(current_time_as_ms, msg_timestamp);
         let always_publish_heartbeat_ms = feed.always_publish_heartbeat_ms.unwrap_or(0);
-        (report_relevance, always_publish_heartbeat_ms)
+        let feed_name = feed.get_name().clone();
+        (report_relevance, always_publish_heartbeat_ms, feed_name)
     };
 
     match report_relevance {
@@ -145,7 +146,7 @@ async fn process_report(
             match reports.push(feed_id, reporter_id, data_feed).await {
                 VoteStatus::FirstVoteForSlot => {
                     debug!(
-                        "Recvd timely vote (result/error) from reporter_id = {} for feed_id = {}",
+                        "Recvd timely vote (result/error) from reporter_id = {} for feed_id = {}, feed_name = {feed_name}",
                         reporter_id, feed_id
                     );
                     inc_vec_metric!(
@@ -153,12 +154,13 @@ async fn process_report(
                         timely_reports_per_feed,
                         reporter_id,
                         feed_id,
+                        feed_name,
                         always_publish_heartbeat_ms
                     );
                 }
                 VoteStatus::RevoteForSlot(prev_vote) => {
                     debug!(
-                        "Recvd revote from reporter_id = {} for feed_id = {} prev_vote = {:?}",
+                        "Recvd revote from reporter_id = {} for feed_id = {}, feed_name = {feed_name}, prev_vote = {:?}",
                         reporter_id, feed_id, prev_vote
                     );
                     inc_vec_metric!(
@@ -166,6 +168,7 @@ async fn process_report(
                         total_revotes_for_same_slot_per_feed,
                         reporter_id,
                         feed_id,
+                        feed_name,
                         always_publish_heartbeat_ms
                     );
                 }
@@ -174,7 +177,7 @@ async fn process_report(
         }
         ReportRelevance::NonRelevantOld => {
             debug!(
-                "Recvd late vote from reporter_id = {} for feed_id = {}",
+                "Recvd late vote from reporter_id = {} for feed_id = {}, feed_name = {feed_name}",
                 reporter_id, feed_id
             );
             inc_vec_metric!(
@@ -182,12 +185,13 @@ async fn process_report(
                 late_reports_per_feed,
                 reporter_id,
                 feed_id,
+                feed_name,
                 always_publish_heartbeat_ms
             );
         }
         ReportRelevance::NonRelevantInFuture => {
             debug!(
-                "Recvd vote for future slot from reporter_id = {} for feed_id = {}",
+                "Recvd vote for future slot from reporter_id = {} for feed_id = {}, feed_name = {feed_name}",
                 reporter_id, feed_id
             );
             inc_vec_metric!(
@@ -195,6 +199,7 @@ async fn process_report(
                 in_future_reports_per_feed,
                 reporter_id,
                 feed_id,
+                feed_name,
                 always_publish_heartbeat_ms
             );
         }
@@ -565,7 +570,7 @@ pub async fn register_feed(
         Some(x) => x,
         None => {
             return Err(ErrorInternalServerError(format!(
-                "Error when reading from feed registry for feed_id={feed_id}"
+                "Error when reading from feed registry for feed_id = {feed_id}"
             )));
         }
     };
