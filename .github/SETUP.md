@@ -91,3 +91,11 @@ process-compose up
 - 🛠 **Configurable feeds & reporters**
 
 ---
+
+# 📦 Publishing Packages
+
+## UI Component Library
+
+📖 **For detailed publishing instructions**, see [`libs/ts/ui/MAINTAINERS.md`](../libs/ts/ui/MAINTAINERS.md)
+
+---
