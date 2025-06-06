@@ -2,6 +2,8 @@ use actix_web::{web, App, HttpServer};
 use blocksense_feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_gnosis_safe::utils::SignatureWithAddress;
+#[cfg(feature = "profile")]
+use pprof::ProfilerGuard;
 use sequencer::providers::provider::init_shared_rpc_providers;
 use sequencer::sequencer_state::SequencerState;
 use tokio::sync::mpsc;
@@ -246,6 +248,38 @@ async fn main() -> std::io::Result<()> {
             .expect("Failed to spawn prometheus server!");
         collected_futures.push(prometheus_http_server_fut);
     }
+
+    #[cfg(feature = "profile")]
+    let guard = ProfilerGuard::new(1000).unwrap();
+    #[cfg(feature = "profile")]
+    collected_futures.push(
+        tokio::task::Builder::new()
+            .name("prof_task")
+            .spawn(async move {
+                loop {
+                    let time_to_await = std::time::Duration::from_secs(10 * 60);
+                    let mut interval = tokio::time::interval(time_to_await);
+                    interval.tick().await;
+                    // The first tick completes immediately.
+                    interval.tick().await;
+                    info!("Producing Flamegraph ...");
+                    if let Ok(report) = guard.report().build() {
+                        let timestamp =
+                            chrono::Local::now().format("%Y-%m-%d_%H:%M:%S").to_string();
+                        let filename = format!("flamegraph_{timestamp}.svg");
+                        let file = std::fs::File::create(filename.as_str())
+                            .expect("Could not create {filename}");
+                        report
+                            .flamegraph(file)
+                            .expect("Could not write data to {filename}");
+                        info!("Flamegraph written to {filename}");
+                    } else {
+                        tracing::error!("Error writing Flamegraph to flamegraph.svg");
+                    }
+                }
+            })
+            .expect("Failed to spawn profiling task!"),
+    );
 
     let result = futures::future::join_all(collected_futures).await;
     for v in result {
