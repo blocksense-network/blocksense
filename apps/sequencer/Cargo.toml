@@ -5,6 +5,9 @@ authors.workspace = true
 license.workspace = true
 edition.workspace = true
 
+[features]
+profile = []
+
 [dependencies]
 blocksense-data-feeds = { workspace = true }
 blocksense-feeds-processing = { workspace = true }
@@ -38,6 +41,8 @@ alloy = { workspace = true, features = [
     "transport-ws",
     "pubsub",
 ] }
+
+pprof = { version = "0.11", features = ["flamegraph"] }
 
 alloy-primitives = { workspace = true }
 
