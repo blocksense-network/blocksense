@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+source "${BASH_SOURCE%/*}/../utils/ansi.sh"
+
 # Script to list available dev shell environments
 # Shows which shell is currently active
 
@@ -15,9 +17,9 @@ AVAILABLE_SHELLS=$("$ROOT_DIR/scripts/dev-shell/get-available-shells.sh")
 
 echo "$AVAILABLE_SHELLS" | while read -r shell; do
     if [[ -f "$ENV_FILE" ]] && grep -q "^DEV_SHELL=$shell$" "$ENV_FILE"; then
-        echo "  • $shell (currently active)"
+        echo -e "  • ${BOLD}$shell${RESET} (currently active)"
     else
-        echo "  • $shell"
+        echo -e "  • ${BOLD}$shell${RESET}"
     fi
 done
 
