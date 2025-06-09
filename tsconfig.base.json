@@ -32,7 +32,7 @@
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
+    "skipDefaultLibCheck": true
   },
   "exclude": [".yarn/unplugged", "tmp"]
 }

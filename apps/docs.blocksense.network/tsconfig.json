@@ -18,12 +18,8 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@/sol-contracts-components/*": [
-        "components/sol-contracts/*"
-      ]
+      "@/*": ["./*"],
+      "@/sol-contracts-components/*": ["components/sol-contracts/*"]
     },
     "plugins": [
       {
@@ -36,10 +32,7 @@
     "checkMdx": true
   },
   "files": [],
-  "include": [
-    ".next/types/**/*.ts",
-    "dist/types/**/*.ts"
-  ],
+  "include": [".next/types/**/*.ts", "dist/types/**/*.ts"],
   "references": [
     {
       "path": "./tsconfig.lib.json"
