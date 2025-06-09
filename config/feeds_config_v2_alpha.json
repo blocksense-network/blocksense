@@ -29,45 +29,25 @@
         "arguments": {
           "exchanges": {
             "Binance": {
-              "symbol": [
-                "BTCUSDC",
-                "BTCUSDT"
-              ]
+              "symbol": ["BTCUSDC", "BTCUSDT"]
             },
             "BinanceTR": {
-              "symbol": [
-                "BTC_USDT"
-              ]
+              "symbol": ["BTC_USDT"]
             },
             "BinanceUS": {
-              "symbol": [
-                "BTCUSDC",
-                "BTCUSDT"
-              ]
+              "symbol": ["BTCUSDC", "BTCUSDT"]
             },
             "Bitfinex": {
-              "symbol": [
-                "BTCUSD"
-              ]
+              "symbol": ["BTCUSD"]
             },
             "Bitget": {
-              "symbol": [
-                "BTCUSDC_SPBL",
-                "BTCUSDT_SPBL"
-              ]
+              "symbol": ["BTCUSDC_SPBL", "BTCUSDT_SPBL"]
             },
             "Bybit": {
-              "symbol": [
-                "BTCUSDC",
-                "BTCUSDT"
-              ]
+              "symbol": ["BTCUSDC", "BTCUSDT"]
             },
             "Coinbase": {
-              "id": [
-                "BTC-USD",
-                "BTC-USDC",
-                "BTC-USDT"
-              ]
+              "id": ["BTC-USD", "BTC-USDC", "BTC-USDT"]
             },
             "CryptoCom": {
               "instrument_name": [
@@ -81,58 +61,28 @@
               ]
             },
             "GateIo": {
-              "id": [
-                "BTC_USDC",
-                "BTC_USDT"
-              ]
+              "id": ["BTC_USDC", "BTC_USDT"]
             },
             "Gemini": {
-              "symbol": [
-                "BTCUSD",
-                "BTCUSDT"
-              ]
+              "symbol": ["BTCUSD", "BTCUSDT"]
             },
             "KuCoin": {
-              "symbol": [
-                "BTC-USDC",
-                "BTC-USDT"
-              ]
+              "symbol": ["BTC-USDC", "BTC-USDT"]
             },
             "MEXC": {
-              "symbol": [
-                "BTCUSDC",
-                "BTCUSDT"
-              ]
+              "symbol": ["BTCUSDC", "BTCUSDT"]
             },
             "OKX": {
-              "instId": [
-                "BTC-USD",
-                "BTC-USDC",
-                "BTC-USDT"
-              ]
+              "instId": ["BTC-USD", "BTC-USDC", "BTC-USDT"]
             },
             "Upbit": {
-              "market": [
-                "USDT-BTC"
-              ]
+              "market": ["USDT-BTC"]
             }
           },
           "aggregators": {
             "CoinMarketCap": {
-              "symbol": [
-                "BTC",
-                "BTC",
-                "BTC",
-                "BTC",
-                "BTC"
-              ],
-              "id": [
-                1,
-                31469,
-                31652,
-                32295,
-                34316
-              ]
+              "symbol": ["BTC", "BTC", "BTC", "BTC", "BTC"],
+              "id": [1, 31469, 31652, 32295, 34316]
             }
           }
         },
@@ -170,45 +120,25 @@
         "arguments": {
           "exchanges": {
             "Binance": {
-              "symbol": [
-                "ETHUSDC",
-                "ETHUSDT"
-              ]
+              "symbol": ["ETHUSDC", "ETHUSDT"]
             },
             "BinanceTR": {
-              "symbol": [
-                "ETH_USDT"
-              ]
+              "symbol": ["ETH_USDT"]
             },
             "BinanceUS": {
-              "symbol": [
-                "ETHUSDC",
-                "ETHUSDT"
-              ]
+              "symbol": ["ETHUSDC", "ETHUSDT"]
             },
             "Bitfinex": {
-              "symbol": [
-                "ETHUSD"
-              ]
+              "symbol": ["ETHUSD"]
             },
             "Bitget": {
-              "symbol": [
-                "ETHUSDC_SPBL",
-                "ETHUSDT_SPBL"
-              ]
+              "symbol": ["ETHUSDC_SPBL", "ETHUSDT_SPBL"]
             },
             "Bybit": {
-              "symbol": [
-                "ETHUSDC",
-                "ETHUSDT"
-              ]
+              "symbol": ["ETHUSDC", "ETHUSDT"]
             },
             "Coinbase": {
-              "id": [
-                "ETH-USD",
-                "ETH-USDC",
-                "ETH-USDT"
-              ]
+              "id": ["ETH-USD", "ETH-USDC", "ETH-USDT"]
             },
             "CryptoCom": {
               "instrument_name": [
@@ -222,66 +152,32 @@
               ]
             },
             "GateIo": {
-              "id": [
-                "ETH_USDC",
-                "ETH_USDT"
-              ]
+              "id": ["ETH_USDC", "ETH_USDT"]
             },
             "Gemini": {
-              "symbol": [
-                "ETHUSD",
-                "ETHUSDT"
-              ]
+              "symbol": ["ETHUSD", "ETHUSDT"]
             },
             "Kraken": {
-              "pair": [
-                "ETHUSDC",
-                "ETHUSDT",
-                "XETHZUSD"
-              ],
-              "wsname": [
-                "ETH/USD",
-                "ETH/USDC",
-                "ETH/USDT"
-              ]
+              "pair": ["ETHUSDC", "ETHUSDT", "XETHZUSD"],
+              "wsname": ["ETH/USD", "ETH/USDC", "ETH/USDT"]
             },
             "KuCoin": {
-              "symbol": [
-                "ETH-USDC",
-                "ETH-USDT"
-              ]
+              "symbol": ["ETH-USDC", "ETH-USDT"]
             },
             "MEXC": {
-              "symbol": [
-                "ETHUSDC",
-                "ETHUSDT"
-              ]
+              "symbol": ["ETHUSDC", "ETHUSDT"]
             },
             "OKX": {
-              "instId": [
-                "ETH-USD",
-                "ETH-USDC",
-                "ETH-USDT"
-              ]
+              "instId": ["ETH-USD", "ETH-USDC", "ETH-USDT"]
             },
             "Upbit": {
-              "market": [
-                "USDT-ETH"
-              ]
+              "market": ["USDT-ETH"]
             }
           },
           "aggregators": {
             "CoinMarketCap": {
-              "symbol": [
-                "ETH",
-                "ETH",
-                "ETH"
-              ],
-              "id": [
-                1027,
-                29991,
-                33661
-              ]
+              "symbol": ["ETH", "ETH", "ETH"],
+              "id": [1027, 29991, 33661]
             }
           }
         },
@@ -319,66 +215,37 @@
         "arguments": {
           "exchanges": {
             "Binance": {
-              "symbol": [
-                "BNBUSDC",
-                "BNBUSDT"
-              ]
+              "symbol": ["BNBUSDC", "BNBUSDT"]
             },
             "BinanceTR": {
-              "symbol": [
-                "BNB_USDT"
-              ]
+              "symbol": ["BNB_USDT"]
             },
             "BinanceUS": {
-              "symbol": [
-                "BNBUSDT"
-              ]
+              "symbol": ["BNBUSDT"]
             },
             "Bitget": {
-              "symbol": [
-                "BNBUSDC_SPBL",
-                "BNBUSDT_SPBL"
-              ]
+              "symbol": ["BNBUSDC_SPBL", "BNBUSDT_SPBL"]
             },
             "Bybit": {
-              "symbol": [
-                "BNBUSDC",
-                "BNBUSDT"
-              ]
+              "symbol": ["BNBUSDC", "BNBUSDT"]
             },
             "GateIo": {
-              "id": [
-                "BNB_USDC",
-                "BNB_USDT"
-              ]
+              "id": ["BNB_USDC", "BNB_USDT"]
             },
             "KuCoin": {
-              "symbol": [
-                "BNB-USDC",
-                "BNB-USDT"
-              ]
+              "symbol": ["BNB-USDC", "BNB-USDT"]
             },
             "MEXC": {
-              "symbol": [
-                "BNBUSDC",
-                "BNBUSDT"
-              ]
+              "symbol": ["BNBUSDC", "BNBUSDT"]
             },
             "OKX": {
-              "instId": [
-                "BNB-USDC",
-                "BNB-USDT"
-              ]
+              "instId": ["BNB-USDC", "BNB-USDT"]
             }
           },
           "aggregators": {
             "CoinMarketCap": {
-              "symbol": [
-                "BNB"
-              ],
-              "id": [
-                1839
-              ]
+              "symbol": ["BNB"],
+              "id": [1839]
             }
           }
         },
@@ -416,112 +283,56 @@
         "arguments": {
           "exchanges": {
             "Binance": {
-              "symbol": [
-                "SOLUSDC",
-                "SOLUSDT"
-              ]
+              "symbol": ["SOLUSDC", "SOLUSDT"]
             },
             "BinanceTR": {
-              "symbol": [
-                "SOL_USDT"
-              ]
+              "symbol": ["SOL_USDT"]
             },
             "BinanceUS": {
-              "symbol": [
-                "SOLUSDC",
-                "SOLUSDT"
-              ]
+              "symbol": ["SOLUSDC", "SOLUSDT"]
             },
             "Bitfinex": {
-              "symbol": [
-                "SOLUSD"
-              ]
+              "symbol": ["SOLUSD"]
             },
             "Bitget": {
-              "symbol": [
-                "SOLUSDC_SPBL",
-                "SOLUSDT_SPBL"
-              ]
+              "symbol": ["SOLUSDC_SPBL", "SOLUSDT_SPBL"]
             },
             "Bybit": {
-              "symbol": [
-                "SOLUSDC",
-                "SOLUSDT"
-              ]
+              "symbol": ["SOLUSDC", "SOLUSDT"]
             },
             "Coinbase": {
-              "id": [
-                "SOL-USD",
-                "SOL-USDT"
-              ]
+              "id": ["SOL-USD", "SOL-USDT"]
             },
             "CryptoCom": {
-              "instrument_name": [
-                "SOLUSD-PERP",
-                "SOL_USD",
-                "SOL_USDT"
-              ]
+              "instrument_name": ["SOLUSD-PERP", "SOL_USD", "SOL_USDT"]
             },
             "GateIo": {
-              "id": [
-                "SOL_USDC",
-                "SOL_USDT"
-              ]
+              "id": ["SOL_USDC", "SOL_USDT"]
             },
             "Gemini": {
-              "symbol": [
-                "SOLUSD"
-              ]
+              "symbol": ["SOLUSD"]
             },
             "Kraken": {
-              "pair": [
-                "SOLUSD",
-                "SOLUSDC",
-                "SOLUSDT"
-              ],
-              "wsname": [
-                "SOL/USD",
-                "SOL/USDC",
-                "SOL/USDT"
-              ]
+              "pair": ["SOLUSD", "SOLUSDC", "SOLUSDT"],
+              "wsname": ["SOL/USD", "SOL/USDC", "SOL/USDT"]
             },
             "KuCoin": {
-              "symbol": [
-                "SOL-USDC",
-                "SOL-USDT"
-              ]
+              "symbol": ["SOL-USDC", "SOL-USDT"]
             },
             "MEXC": {
-              "symbol": [
-                "SOLUSDC",
-                "SOLUSDT"
-              ]
+              "symbol": ["SOLUSDC", "SOLUSDT"]
             },
             "OKX": {
-              "instId": [
-                "SOL-USD",
-                "SOL-USDC",
-                "SOL-USDT"
-              ]
+              "instId": ["SOL-USD", "SOL-USDC", "SOL-USDT"]
             },
             "Upbit": {
-              "market": [
-                "USDT-SOL"
-              ]
+              "market": ["USDT-SOL"]
             }
           },
           "aggregators": {
             "CoinMarketCap": {
-              "symbol": [
-                "SOL",
-                "SOL",
-                "SOL"
-              ],
-              "id": [
-                16116,
-                28825,
-                5426
-              ]
+              "symbol": ["SOL", "SOL", "SOL"],
+              "id": [16116, 28825, 5426]
             }
           }
         },
@@ -559,102 +370,53 @@
         "arguments": {
           "exchanges": {
             "Binance": {
-              "symbol": [
-                "LINKUSDC",
-                "LINKUSDT"
-              ]
+              "symbol": ["LINKUSDC", "LINKUSDT"]
             },
             "BinanceTR": {
-              "symbol": [
-                "LINK_USDT"
-              ]
+              "symbol": ["LINK_USDT"]
             },
             "BinanceUS": {
-              "symbol": [
-                "LINKUSDT"
-              ]
+              "symbol": ["LINKUSDT"]
             },
             "Bitfinex": {
-              "symbol": [
-                "LINK:USD"
-              ]
+              "symbol": ["LINK:USD"]
             },
             "Bitget": {
-              "symbol": [
-                "LINKUSDC_SPBL",
-                "LINKUSDT_SPBL"
-              ]
+              "symbol": ["LINKUSDC_SPBL", "LINKUSDT_SPBL"]
             },
             "Bybit": {
-              "symbol": [
-                "LINKUSDC",
-                "LINKUSDT"
-              ]
+              "symbol": ["LINKUSDC", "LINKUSDT"]
             },
             "Coinbase": {
-              "id": [
-                "LINK-USD",
-                "LINK-USDT"
-              ]
+              "id": ["LINK-USD", "LINK-USDT"]
             },
             "CryptoCom": {
-              "instrument_name": [
-                "LINKUSD-PERP",
-                "LINK_USD",
-                "LINK_USDT"
-              ]
+              "instrument_name": ["LINKUSD-PERP", "LINK_USD", "LINK_USDT"]
             },
             "GateIo": {
-              "id": [
-                "LINK_USDC",
-                "LINK_USDT"
-              ]
+              "id": ["LINK_USDC", "LINK_USDT"]
             },
             "Gemini": {
-              "symbol": [
-                "LINKUSD"
-              ]
+              "symbol": ["LINKUSD"]
             },
             "Kraken": {
-              "pair": [
-                "LINKUSD",
-                "LINKUSDC",
-                "LINKUSDT"
-              ],
-              "wsname": [
-                "LINK/USD",
-                "LINK/USDC",
-                "LINK/USDT"
-              ]
+              "pair": ["LINKUSD", "LINKUSDC", "LINKUSDT"],
+              "wsname": ["LINK/USD", "LINK/USDC", "LINK/USDT"]
             },
             "KuCoin": {
-              "symbol": [
-                "LINK-USDC",
-                "LINK-USDT"
-              ]
+              "symbol": ["LINK-USDC", "LINK-USDT"]
             },
             "MEXC": {
-              "symbol": [
-                "LINKUSDC",
-                "LINKUSDT"
-              ]
+              "symbol": ["LINKUSDC", "LINKUSDT"]
             },
             "OKX": {
-              "instId": [
-                "LINK-USD",
-                "LINK-USDC",
-                "LINK-USDT"
-              ]
+              "instId": ["LINK-USD", "LINK-USDC", "LINK-USDT"]
             }
           },
           "aggregators": {
             "CoinMarketCap": {
-              "symbol": [
-                "LINK"
-              ],
-              "id": [
-                1975
-              ]
+              "symbol": ["LINK"],
+              "id": [1975]
             }
           }
         },
@@ -692,100 +454,53 @@
         "arguments": {
           "exchanges": {
             "Binance": {
-              "symbol": [
-                "UNIUSDC",
-                "UNIUSDT"
-              ]
+              "symbol": ["UNIUSDC", "UNIUSDT"]
             },
             "BinanceUS": {
-              "symbol": [
-                "UNIUSDT"
-              ]
+              "symbol": ["UNIUSDT"]
             },
             "Bitfinex": {
-              "symbol": [
-                "UNIUSD"
-              ]
+              "symbol": ["UNIUSD"]
             },
             "Bitget": {
-              "symbol": [
-                "UNIUSDC_SPBL",
-                "UNIUSDT_SPBL"
-              ]
+              "symbol": ["UNIUSDC_SPBL", "UNIUSDT_SPBL"]
             },
             "Bybit": {
-              "symbol": [
-                "UNIUSDC",
-                "UNIUSDT"
-              ]
+              "symbol": ["UNIUSDC", "UNIUSDT"]
             },
             "Coinbase": {
-              "id": [
-                "UNI-USD"
-              ]
+              "id": ["UNI-USD"]
             },
             "CryptoCom": {
-              "instrument_name": [
-                "UNIUSD-PERP",
-                "UNI_USD",
-                "UNI_USDT"
-              ]
+              "instrument_name": ["UNIUSD-PERP", "UNI_USD", "UNI_USDT"]
             },
             "GateIo": {
-              "id": [
-                "UNI_USDC",
-                "UNI_USDT"
-              ]
+              "id": ["UNI_USDC", "UNI_USDT"]
             },
             "Gemini": {
-              "symbol": [
-                "UNIUSD"
-              ]
+              "symbol": ["UNIUSD"]
             },
             "Kraken": {
-              "pair": [
-                "UNIUSD"
-              ],
-              "wsname": [
-                "UNI/USD"
-              ]
+              "pair": ["UNIUSD"],
+              "wsname": ["UNI/USD"]
             },
             "KuCoin": {
-              "symbol": [
-                "UNI-USDT"
-              ]
+              "symbol": ["UNI-USDT"]
             },
             "MEXC": {
-              "symbol": [
-                "UNIUSDC",
-                "UNIUSDT"
-              ]
+              "symbol": ["UNIUSDC", "UNIUSDT"]
             },
             "OKX": {
-              "instId": [
-                "UNI-USD",
-                "UNI-USDC",
-                "UNI-USDT"
-              ]
+              "instId": ["UNI-USD", "UNI-USDC", "UNI-USDT"]
             },
             "Upbit": {
-              "market": [
-                "USDT-UNI"
-              ]
+              "market": ["USDT-UNI"]
             }
           },
           "aggregators": {
             "CoinMarketCap": {
-              "symbol": [
-                "UNI",
-                "UNI",
-                "UNI"
-              ],
-              "id": [
-                33433,
-                4307,
-                7083
-              ]
+              "symbol": ["UNI", "UNI", "UNI"],
+              "id": [33433, 4307, 7083]
             }
           }
         },
@@ -823,89 +538,50 @@
         "arguments": {
           "exchanges": {
             "Binance": {
-              "symbol": [
-                "AAVEUSDC",
-                "AAVEUSDT"
-              ]
+              "symbol": ["AAVEUSDC", "AAVEUSDT"]
             },
             "BinanceUS": {
-              "symbol": [
-                "AAVEUSDT"
-              ]
+              "symbol": ["AAVEUSDT"]
             },
             "Bitfinex": {
-              "symbol": [
-                "AAVE:USD"
-              ]
+              "symbol": ["AAVE:USD"]
             },
             "Bitget": {
-              "symbol": [
-                "AAVEUSDC_SPBL",
-                "AAVEUSDT_SPBL"
-              ]
+              "symbol": ["AAVEUSDC_SPBL", "AAVEUSDT_SPBL"]
             },
             "Bybit": {
-              "symbol": [
-                "AAVEUSDT"
-              ]
+              "symbol": ["AAVEUSDT"]
             },
             "Coinbase": {
-              "id": [
-                "AAVE-USD"
-              ]
+              "id": ["AAVE-USD"]
             },
             "CryptoCom": {
-              "instrument_name": [
-                "AAVEUSD-PERP",
-                "AAVE_USD",
-                "AAVE_USDT"
-              ]
+              "instrument_name": ["AAVEUSD-PERP", "AAVE_USD", "AAVE_USDT"]
             },
             "GateIo": {
-              "id": [
-                "AAVE_USDT"
-              ]
+              "id": ["AAVE_USDT"]
             },
             "Gemini": {
-              "symbol": [
-                "AAVEUSD"
-              ]
+              "symbol": ["AAVEUSD"]
             },
             "Kraken": {
-              "pair": [
-                "AAVEUSD"
-              ],
-              "wsname": [
-                "AAVE/USD"
-              ]
+              "pair": ["AAVEUSD"],
+              "wsname": ["AAVE/USD"]
             },
             "KuCoin": {
-              "symbol": [
-                "AAVE-USDT"
-              ]
+              "symbol": ["AAVE-USDT"]
             },
             "MEXC": {
-              "symbol": [
-                "AAVEUSDC",
-                "AAVEUSDT"
-              ]
+              "symbol": ["AAVEUSDC", "AAVEUSDT"]
             },
             "OKX": {
-              "instId": [
-                "AAVE-USD",
-                "AAVE-USDC",
-                "AAVE-USDT"
-              ]
+              "instId": ["AAVE-USD", "AAVE-USDC", "AAVE-USDT"]
             }
           },
           "aggregators": {
             "CoinMarketCap": {
-              "symbol": [
-                "AAVE"
-              ],
-              "id": [
-                7278
-              ]
+              "symbol": ["AAVE"],
+              "id": [7278]
             }
           }
         },
@@ -943,61 +619,35 @@
         "arguments": {
           "exchanges": {
             "Binance": {
-              "symbol": [
-                "TAOUSDC",
-                "TAOUSDT"
-              ]
+              "symbol": ["TAOUSDC", "TAOUSDT"]
             },
             "Bitget": {
-              "symbol": [
-                "TAOUSDC_SPBL",
-                "TAOUSDT_SPBL"
-              ]
+              "symbol": ["TAOUSDC_SPBL", "TAOUSDT_SPBL"]
             },
             "Coinbase": {
-              "id": [
-                "TAO-USD"
-              ]
+              "id": ["TAO-USD"]
             },
             "CryptoCom": {
-              "instrument_name": [
-                "TAOUSD-PERP",
-                "TAO_USD"
-              ]
+              "instrument_name": ["TAOUSD-PERP", "TAO_USD"]
             },
             "GateIo": {
-              "id": [
-                "TAO_USDT"
-              ]
+              "id": ["TAO_USDT"]
             },
             "Kraken": {
-              "pair": [
-                "TAOUSD"
-              ],
-              "wsname": [
-                "TAO/USD"
-              ]
+              "pair": ["TAOUSD"],
+              "wsname": ["TAO/USD"]
             },
             "KuCoin": {
-              "symbol": [
-                "TAO-USDT"
-              ]
+              "symbol": ["TAO-USDT"]
             },
             "MEXC": {
-              "symbol": [
-                "TAOUSDC",
-                "TAOUSDT"
-              ]
+              "symbol": ["TAOUSDC", "TAOUSDT"]
             }
           },
           "aggregators": {
             "CoinMarketCap": {
-              "symbol": [
-                "TAO"
-              ],
-              "id": [
-                22974
-              ]
+              "symbol": ["TAO"],
+              "id": [22974]
             }
           }
         },
@@ -1035,75 +685,44 @@
         "arguments": {
           "exchanges": {
             "Binance": {
-              "symbol": [
-                "1INCHUSDT"
-              ]
+              "symbol": ["1INCHUSDT"]
             },
             "BinanceUS": {
-              "symbol": [
-                "1INCHUSDT"
-              ]
+              "symbol": ["1INCHUSDT"]
             },
             "Bitget": {
-              "symbol": [
-                "1INCHUSDT_SPBL"
-              ]
+              "symbol": ["1INCHUSDT_SPBL"]
             },
             "Bybit": {
-              "symbol": [
-                "1INCHUSDT"
-              ]
+              "symbol": ["1INCHUSDT"]
             },
             "Coinbase": {
-              "id": [
-                "1INCH-USD"
-              ]
+              "id": ["1INCH-USD"]
             },
             "CryptoCom": {
-              "instrument_name": [
-                "1INCHUSD-PERP",
-                "1INCH_USD",
-                "1INCH_USDT"
-              ]
+              "instrument_name": ["1INCHUSD-PERP", "1INCH_USD", "1INCH_USDT"]
             },
             "GateIo": {
-              "id": [
-                "1INCH_USDT"
-              ]
+              "id": ["1INCH_USDT"]
             },
             "Kraken": {
-              "pair": [
-                "1INCHUSD"
-              ],
-              "wsname": [
-                "1INCH/USD"
-              ]
+              "pair": ["1INCHUSD"],
+              "wsname": ["1INCH/USD"]
             },
             "KuCoin": {
-              "symbol": [
-                "1INCH-USDT"
-              ]
+              "symbol": ["1INCH-USDT"]
             },
             "MEXC": {
-              "symbol": [
-                "1INCHUSDT"
-              ]
+              "symbol": ["1INCHUSDT"]
             },
             "OKX": {
-              "instId": [
-                "1INCH-USDC",
-                "1INCH-USDT"
-              ]
+              "instId": ["1INCH-USDC", "1INCH-USDT"]
             }
           },
           "aggregators": {
             "CoinMarketCap": {
-              "symbol": [
-                "1INCH"
-              ],
-              "id": [
-                8104
-              ]
+              "symbol": ["1INCH"],
+              "id": [8104]
             }
           }
         },
