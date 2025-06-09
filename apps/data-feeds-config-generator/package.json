@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "@blocksense/config-types": "workspace:*",
+    "chalk": "^5.4.1",
     "cli-table3": "^0.6.5",
     "web3": "^4.16.0"
   }

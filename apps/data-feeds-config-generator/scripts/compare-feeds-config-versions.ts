@@ -7,6 +7,7 @@ import {
 } from '@blocksense/base-utils';
 import { Effect, Schema as S } from 'effect';
 import { readConfig, readEvmDeployment } from '@blocksense/config-types';
+import chalk from 'chalk';
 
 const fields = ['description', 'address', 'decimals', 'base', 'quote'] as const;
 type Field = (typeof fields)[number];
@@ -28,7 +29,7 @@ type Diff = {
 };
 
 const ProviderSchema = S.Struct({
-  allow_feeds: S.Array(S.Number),
+  allow_feeds: S.NullishOr(S.Array(S.Number)),
 });
 type Provider = typeof ProviderSchema.Type;
 
@@ -53,13 +54,7 @@ const ModifiedSequencerDeploymentConfigSchema = S.transformOrFail(
         providers: transformedProviders,
       } as SequencerDeploymentConfig);
     },
-    encode: (outputSchema, _, ast) => {
-      const rawProviders: Record<string, Provider> = {};
-      for (const [key, value] of Object.entries(outputSchema.providers)) {
-        rawProviders[key.replace(/[-]/g, '_')] = value;
-      }
-      return Effect.succeed({ providers: rawProviders });
-    },
+    encode: (outputSchema, _, ast) => Effect.succeed({ providers: {} }),
   },
 );
 
@@ -69,52 +64,78 @@ function printDiffs(diffs: Diff[]) {
   }
 
   const table = initTable();
-  diffs.forEach(diff =>
-    table.push([
-      diff.feed,
-      diff.oldEntry.address,
-      diff.newEntry.address,
-      diff.oldEntry.decimals,
-      diff.newEntry.decimals,
-      diff.oldEntry.base,
-      diff.newEntry.base,
-      diff.oldEntry.quote,
-      diff.newEntry.quote,
-    ]),
-  );
+  diffs.forEach(diff => table.push(colorRow(diff)));
 
   console.log(table.toString());
 }
 
+function colorRow(diff: Diff) {
+  const oldValues = Object.values(diff.oldEntry);
+  const newValues = Object.values(diff.newEntry);
+
+  const color =
+    oldValues.every(v => !v) && newValues.some(v => v)
+      ? chalk.green
+      : oldValues.some(v => v) && newValues.every(v => !v)
+        ? chalk.red
+        : chalk.yellow;
+
+  const row = [
+    diff.feed,
+    diff.oldEntry.address,
+    diff.newEntry.address,
+    diff.oldEntry.decimals !== null ? diff.oldEntry.decimals : '-',
+    diff.newEntry.decimals !== null ? diff.newEntry.decimals : '-',
+    diff.oldEntry.base,
+    diff.newEntry.base,
+    diff.oldEntry.quote,
+    diff.newEntry.quote,
+  ].map(text => color(text));
+  return row;
+}
+
 function initTable(): Table.Table {
+  const wrapWidth = 20;
   return new Table({
     head: [
-      'feed name',
-      'old address',
-      'new address',
-      'old decimals',
-      'new decimals',
-      'old base',
-      'new base',
-      'old quote',
-      'new quote',
+      'Feed Name',
+      'Old Address',
+      'New Address',
+      'Old Decimals',
+      'New Decimals',
+      'Old Base Address',
+      'New Base Address',
+      'Old Quote Address',
+      'New Quote Address',
     ],
-    colWidths: [18, 30, 30, 4, 4, 30, 30, 30, 30],
+    style: {
+      head: [],
+    },
+    colWidths: [18, 44, 44, 10, 10, 44, 44, 44, 44],
     wordWrap: true,
-    wrapOnWordBoundary: false,
   });
 }
 
 function getNetworkParameter(): NetworkName {
-  return parseNetworkName(process.argv[2]);
+  const network = process.argv[2];
+  if (!network) {
+    console.error('Please provide <network> parameter!');
+    process.exit(1);
+  }
+  try {
+    return parseNetworkName(network);
+  } catch (error) {
+    console.error('Network is incorrect/not supported!');
+    process.exit(1);
+  }
 }
 
 async function fetchOldDataFeeds(
   config: SequencerDeploymentConfig,
+  network: NetworkName,
 ): Promise<CompareEntry[]> {
-  const network = getNetworkParameter();
   const { feeds } = await readConfig('feeds_config_v1');
-  const oldFeeds = config.providers[network].allow_feeds
+  const oldFeeds = (await getAllowedFeedIds(config, 'feeds_config_v1', network))
     .map(id => feeds.find(feed => feed.id === id))
     .filter(feed => feed !== undefined);
   const deploymentConfig = await readConfig('evm_contracts_deployment_v1');
@@ -129,7 +150,7 @@ async function fetchOldDataFeeds(
 
     data.push({
       description: feed.description,
-      decimals: feed.decimals,
+      decimals: feed.decimals ?? null,
       address: contract?.address ?? null,
       base: contract?.base ?? null,
       quote: contract?.quote ?? null,
@@ -141,33 +162,47 @@ async function fetchOldDataFeeds(
 
 async function fetchNewDataFeeds(
   config: SequencerDeploymentConfig,
+  network: NetworkName,
 ): Promise<CompareEntry[]> {
-  const network = getNetworkParameter();
-
   const { feeds } = await readConfig('feeds_config_v2');
-  const newFeeds = config.providers[network].allow_feeds
+  const newFeeds = (await getAllowedFeedIds(config, 'feeds_config_v2', network))
     .map(id => feeds.find(feed => feed.id === id))
     .filter(feed => feed !== undefined);
 
-  const deploymentData = await readEvmDeployment(network);
-  if (!deploymentData) {
-    console.error(`Deployment data not found for network: '${network}'`);
-    process.exit(1);
+  let deploymentData;
+  try {
+    deploymentData = await readEvmDeployment(network);
+  } catch (error) {
+    console.error(`Deployment data for v2 not found for network: '${network}'`);
+    deploymentData = [];
   }
 
   const data: CompareEntry[] = [];
   newFeeds.forEach(feed => {
-    const contract = deploymentData.contracts.CLAggregatorAdapter[feed.id];
+    const contract = deploymentData?.contracts?.CLAggregatorAdapter[feed.id];
     data.push({
       description: feed.full_name,
-      decimals: contract.constructorArgs[1] as number,
-      address: contract.address,
-      base: contract.base,
-      quote: contract.quote,
+      decimals: contract?.constructorArgs[1],
+      address: contract?.address ?? null,
+      base: contract?.base ?? null,
+      quote: contract?.quote ?? null,
     });
   });
 
   return data;
+}
+
+async function getAllowedFeedIds(
+  config: SequencerDeploymentConfig,
+  configName: 'feeds_config_v1' | 'feeds_config_v2',
+  network: NetworkName,
+): Promise<readonly number[]> {
+  const { feeds } = await readConfig(configName);
+  if (!config.providers[network]) return [];
+
+  return config.providers[network]?.allow_feeds?.length
+    ? config.providers[network].allow_feeds
+    : feeds.map(feed => feed.id);
 }
 
 function findDifferences(
@@ -187,8 +222,8 @@ function findDifferences(
       let oldEntry: DiffEntry = {};
       let newEntry: DiffEntry = {};
       for (const field of fields) {
-        oldEntry[field] = v1?.[field];
-        newEntry[field] = v2?.[field];
+        oldEntry[field] = v1?.[field] ?? null;
+        newEntry[field] = v2?.[field] ?? null;
       }
       diffs.push({
         feed: descriptions[i] as string,
@@ -201,26 +236,87 @@ function findDifferences(
   return diffs;
 }
 
+async function findFeedsConfigsDiffs(network: NetworkName): Promise<Diff[]> {
+  const { feeds: feedsV1 } = await readConfig('feeds_config_v1');
+  const { feeds: feedsV2 } = await readConfig('feeds_config_v2');
+  const deploymentDataV1 = await readConfig('evm_contracts_deployment_v1');
+  const deploymentDataV2 = await readEvmDeployment(network);
+
+  const compareDataV1 = feedsV1.map(feed => {
+    const contract = deploymentDataV1[
+      network
+    ]?.contracts.CLAggregatorAdapter.find(
+      adapter => adapter.constructorArgs[2] === feed.id,
+    );
+
+    return {
+      description: feed.description,
+      decimals: feed.decimals ?? null,
+      address: contract?.address ?? null,
+      base: contract?.base ?? null,
+      quote: contract?.quote ?? null,
+    };
+  });
+
+  const compareDataV2 = feedsV2.map(feed => {
+    const contract = deploymentDataV2?.contracts?.CLAggregatorAdapter[feed.id];
+    return {
+      description: feed.full_name,
+      decimals: (contract?.constructorArgs[1] as number) ?? null,
+      address: contract?.address ?? null,
+      base: contract?.base ?? null,
+      quote: contract?.quote ?? null,
+    };
+  });
+
+  return findDifferences(compareDataV1, compareDataV2);
+}
+
+function fetchNewSequencerDeploymentConfig() {
+  const url = 'http://sequencer-testnet-001:5556/get_sequencer_config';
+  return fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch JSON from ${url}; status=${response.status}`,
+        );
+      }
+      return response.json();
+    })
+    .then(json =>
+      S.decodeUnknownSync(ModifiedSequencerDeploymentConfigSchema)(json),
+    );
+}
+
+async function main() {
+  const network = getNetworkParameter();
+
+  const { readJSON } = selectDirectory(configDir);
+  const oldSequencerDeploymentConfig = await readJSON({
+    name: 'sequencer_config_v1',
+    ext: '.json',
+  });
+
+  const decodedOldConfig = S.decodeSync(
+    ModifiedSequencerDeploymentConfigSchema,
+  )(oldSequencerDeploymentConfig) as SequencerDeploymentConfig;
+  const dataFeedsV1 = await fetchOldDataFeeds(decodedOldConfig, network);
+
+  const decodedNewConfig = await fetchNewSequencerDeploymentConfig();
+  const dataFeedsV2 = await fetchNewDataFeeds(decodedNewConfig, network);
+
+  let diffs: Diff[];
+  if (
+    (decodedOldConfig.providers?.[network]?.allow_feeds?.length ?? 0) !== 0 &&
+    (decodedNewConfig.providers?.[network]?.allow_feeds?.length ?? 0) !== 0
+  ) {
+    diffs = findDifferences(dataFeedsV1, dataFeedsV2);
+  } else {
+    console.log('Comparing feeds_config_v1 and feeds_config_v2:');
+    diffs = await findFeedsConfigsDiffs(network);
+  }
+  printDiffs(diffs);
+}
+
 // -- Execution --
-const { readJSON } = selectDirectory(configDir);
-const oldSequencerDeploymentConfig = await readJSON({
-  name: 'sequencer_config_v1',
-  ext: '.json',
-});
-const newSequencerDeploymentConfig = await readJSON({
-  name: 'sequencer_config_v2',
-  ext: '.json',
-});
-
-const decodedOldConfig = S.decodeSync(ModifiedSequencerDeploymentConfigSchema)(
-  oldSequencerDeploymentConfig,
-) as SequencerDeploymentConfig;
-const dataFeedsV1 = await fetchOldDataFeeds(decodedOldConfig);
-
-const decodedNewConfig = S.decodeSync(ModifiedSequencerDeploymentConfigSchema)(
-  newSequencerDeploymentConfig,
-) as SequencerDeploymentConfig;
-const dataFeedsV2 = await fetchNewDataFeeds(decodedNewConfig);
-
-const diffs = findDifferences(dataFeedsV1, dataFeedsV2);
-printDiffs(diffs);
+await main();
