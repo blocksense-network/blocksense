@@ -41670,6 +41670,42 @@
       }
     },
     {
+      "id": "1000007",
+      "full_name": "oLP / USD",
+      "description": "Price of ostiumLP (oLP) in USD on Arbitrum (0x20d419a8e12c45f88fda7c5760bb6923cee27f98)",
+      "type": "price-feed",
+      "oracle_id": "gecko-terminal",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 100,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "oLP",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": [
+          {
+            "network": "arbitrum",
+            "pool": "0x09e6a7adfb8c06f22adfefd872de73059d955be3",
+            "reverse": false,
+            "min_volume_usd": 0
+          }
+        ]
+      }
+    },
+    {
       "id": "2000000",
       "full_name": "IBIT / USD",
       "description": "Price of iShares Bitcoin Trust ETF ($IBIT) in USD",
