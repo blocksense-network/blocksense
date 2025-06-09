@@ -460,13 +460,7 @@ pub async fn eth_batch_send_to_contract(
                     }
                     Err(err) => {
                         warn!("Error while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
-                        inc_retries(
-                            net.as_str(),
-                            &mut transaction_retries_count,
-                            provider_metrics,
-                        )
-                        .await;
-                        continue;
+                        return Ok(("false".to_string(), feeds_to_update_ids));
                     }
                 },
                 Err(err) => {
