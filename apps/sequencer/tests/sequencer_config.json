@@ -8,14 +8,49 @@
     "block_generation_period": 500,
     "aggregation_consensus_discard_period_blocks": 1000
   },
-  "providers": {
-  },
-  "feeds" : [
-    {"id": 0, "name": "DOGE/USD", "report_interval_ms": 60000, "quorum_percentage": 60.0, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 1, "name": "BTS/USD", "report_interval_ms": 30000, "quorum_percentage": 60.0, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 2, "name": "ETH/USD", "report_interval_ms": 60000, "quorum_percentage": 60.0, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}},
-    {"id": 3, "name": "SHIB/USD", "report_interval_ms": 20000, "quorum_percentage": 60.0, "first_report_start_time": {"secs_since_epoch":0, "nanos_since_epoch": 0}}
+  "providers": {},
+  "feeds": [
+    {
+      "id": 0,
+      "name": "DOGE/USD",
+      "report_interval_ms": 60000,
+      "quorum_percentage": 60.0,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 1,
+      "name": "BTS/USD",
+      "report_interval_ms": 30000,
+      "quorum_percentage": 60.0,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 2,
+      "name": "ETH/USD",
+      "report_interval_ms": 60000,
+      "quorum_percentage": 60.0,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    },
+    {
+      "id": 3,
+      "name": "SHIB/USD",
+      "report_interval_ms": 20000,
+      "quorum_percentage": 60.0,
+      "first_report_start_time": {
+        "secs_since_epoch": 0,
+        "nanos_since_epoch": 0
+      }
+    }
   ],
-  "reporters":[],
+  "reporters": [],
   "kafka_report_endpoint": {}
 }
