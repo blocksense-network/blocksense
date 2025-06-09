@@ -516,12 +516,18 @@ impl RpcProvider {
             get_chain_id
         )?;
 
+        let nonce = provider
+            .get_transaction_count(signer.address())
+            .pending()
+            .await?;
+
         let message_value = DynSolValue::Tuple(vec![DynSolValue::Address(signer.address())]);
 
         let mut encoded_arg = message_value.abi_encode();
         bytecode.append(&mut encoded_arg);
 
         let tx = TransactionRequest::default()
+            .nonce(nonce)
             .from(signer.address())
             .with_chain_id(chain_id)
             .with_deploy_code(bytecode);
