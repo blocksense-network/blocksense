@@ -1,12 +1,12 @@
 mod common;
 mod exchanges;
 mod fetch_prices;
-mod vwap;
 
 use anyhow::{Context, Result};
 use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
+    wap::vwap::compute_vwap,
 };
 use common::{ExchangeName, ExchangesSymbols, ResourcePairData};
 use itertools::Itertools;
@@ -57,7 +57,7 @@ fn process_results(results: &TradingPairToResults) -> Result<Payload> {
     for (feed_id, results) in results.iter() {
         let price_points = results.exchanges_data.values();
 
-        payload.values.push(match vwap::compute_vwap(price_points) {
+        payload.values.push(match compute_vwap(price_points) {
             Ok(price) => DataFeedResult {
                 id: feed_id.to_string(),
                 value: DataFeedResultValue::Numerical(price),
