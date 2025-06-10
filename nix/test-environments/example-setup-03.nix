@@ -41,7 +41,7 @@ in
           transaction-gas-limit = 20000000;
           impersonated-anvil-account = impersonationAddress;
           allow-feeds = [
-            # crypto-price-feeds oracle feeds
+            # cex-price-feeds oracle feeds
             0 # BTC / USD
             3 # ETH / USD
             7 # USDT / USD
@@ -202,7 +202,7 @@ in
     reporters.a.default-exec-interval = lib.mkForce 10;
 
     oracles = {
-      crypto-price-feeds.exec-interval = lib.mkForce 10;
+      cex-price-feeds.exec-interval = lib.mkForce 10;
       exsat-holdings.exec-interval = lib.mkForce 10;
       gecko-terminal.exec-interval = lib.mkForce 10;
       eth-rpc.exec-interval = lib.mkForce 10;

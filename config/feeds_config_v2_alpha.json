@@ -5,7 +5,7 @@
       "full_name": "BTC / USD",
       "description": "Bitcoin",
       "type": "price-feed",
-      "oracle_id": "crypto-price-feeds",
+      "oracle_id": "cex-price-feeds",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -96,7 +96,7 @@
       "full_name": "ETH / USD",
       "description": "Ethereum",
       "type": "price-feed",
-      "oracle_id": "crypto-price-feeds",
+      "oracle_id": "cex-price-feeds",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -191,7 +191,7 @@
       "full_name": "BNB / USD",
       "description": "BNB",
       "type": "price-feed",
-      "oracle_id": "crypto-price-feeds",
+      "oracle_id": "cex-price-feeds",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -259,7 +259,7 @@
       "full_name": "SOL / USD",
       "description": "Solana",
       "type": "price-feed",
-      "oracle_id": "crypto-price-feeds",
+      "oracle_id": "cex-price-feeds",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -346,7 +346,7 @@
       "full_name": "LINK / USD",
       "description": "Chainlink",
       "type": "price-feed",
-      "oracle_id": "crypto-price-feeds",
+      "oracle_id": "cex-price-feeds",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -430,7 +430,7 @@
       "full_name": "UNI / USD",
       "description": "Uniswap",
       "type": "price-feed",
-      "oracle_id": "crypto-price-feeds",
+      "oracle_id": "cex-price-feeds",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -514,7 +514,7 @@
       "full_name": "AAVE / USD",
       "description": "Aave",
       "type": "price-feed",
-      "oracle_id": "crypto-price-feeds",
+      "oracle_id": "cex-price-feeds",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -595,7 +595,7 @@
       "full_name": "TAO / USD",
       "description": "Bittensor",
       "type": "price-feed",
-      "oracle_id": "crypto-price-feeds",
+      "oracle_id": "cex-price-feeds",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -661,7 +661,7 @@
       "full_name": "1INCH / USD",
       "description": "1inch",
       "type": "price-feed",
-      "oracle_id": "crypto-price-feeds",
+      "oracle_id": "cex-price-feeds",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {

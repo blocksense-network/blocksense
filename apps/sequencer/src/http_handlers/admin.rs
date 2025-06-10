@@ -553,11 +553,11 @@ pub async fn get_oracle_scripts(
                 capabilities: HashSet::new(),
             },
             OracleScript {
-                id: "crypto-price-feeds".to_string(),
+                id: "cex-price-feeds".to_string(),
                 interval_time_in_seconds: None,
                 name: None,
                 description: None,
-                oracle_script_wasm: "crypto-price-feeds.wasm".to_string(),
+                oracle_script_wasm: "cex-price-feeds.wasm".to_string(),
                 allowed_outbound_hosts: vec![
                     "https://api.kraken.com".to_string(),
                     "https://api.bybit.com".to_string(),

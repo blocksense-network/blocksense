@@ -1,7 +1,7 @@
 import { Schema as S } from 'effect';
 
 import {
-  cryptoPriceFeedsArgsSchema,
+  cexPriceFeedsArgsSchema,
   NewFeedsConfig,
   readConfig,
 } from '@blocksense/config-types';
@@ -22,7 +22,7 @@ import { getCryptoProvidersData } from '../../data-services/processors/crypto-pr
  * This function retrieves the current feeds configuration, fetches crypto providers data,
  * normalizes the providers data, and updates the feeds configuration with the appropriate
  * exchange arguments for each feed. It ensures that only feeds with the oracle ID
- * 'crypto-price-feeds' and containing 'aggregators' in their arguments are updated.
+ * 'cex-price-feeds' and containing 'aggregators' in their arguments are updated.
  *
  */
 export async function updateExchangesArgumentConfig(): Promise<NewFeedsConfig> {
@@ -60,8 +60,8 @@ export async function updateExchangesArgumentConfig(): Promise<NewFeedsConfig> {
     );
 
     if (
-      feed.oracle_id !== 'crypto-price-feeds' ||
-      !S.is(cryptoPriceFeedsArgsSchema)(feed.additional_feed_info.arguments)
+      feed.oracle_id !== 'cex-price-feeds' ||
+      !S.is(cexPriceFeedsArgsSchema)(feed.additional_feed_info.arguments)
     )
       return feed;
 

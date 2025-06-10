@@ -113,7 +113,7 @@ struct ResultInfo {
 }
 
 /*TODO:(EmilIvanichkovv):
-    The `print_results` function is very similar to the one we use in `crypto-price-feeds` oracle.
+    The `print_results` function is very similar to the one we use in `cex-price-feeds` oracle.
     It should be moved to blocksense-sdk
 */
 fn print_results(resources: &[ResourcePairData], results: &PairToResults, payload: &Payload) {
@@ -206,7 +206,7 @@ fn print_results(resources: &[ResourcePairData], results: &PairToResults, payloa
 }
 
 /*TODO:(EmilIvanichkovv):
-    This is a copy-paste from the `crypto-price-feeds` oracle.
+    This is a copy-paste from the `cex-price-feeds` oracle.
     It should be moved to blocksense-sdk
 */
 pub fn compute_vwap<'a>(price_points: impl IntoIterator<Item = &'a PricePoint>) -> Result<f64> {

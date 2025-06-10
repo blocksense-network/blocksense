@@ -59,7 +59,7 @@
       };
       legacyPackages = {
         oracle-scripts = {
-          crypto-price-feeds = mkOracleScript /apps/oracles/crypto-price-feeds false;
+          cex-price-feeds = mkOracleScript /apps/oracles/cex-price-feeds false;
           exsat-holdings = mkOracleScript /apps/oracles/exsat-holdings false;
           gecko-terminal = mkOracleScript /apps/oracles/gecko-terminal false;
           eth-rpc = mkOracleScript /apps/oracles/eth-rpc false;

@@ -1,7 +1,7 @@
 import { Schema as S } from 'effect';
 
-// `crypto-price-feeds` Oracle related Types
-export const cryptoProviderInfo = S.mutable(
+// `cex-price-feeds` Oracle related Types
+export const cexProviderInfo = S.mutable(
   S.Record({
     key: S.String,
     value: S.mutable(
@@ -13,14 +13,14 @@ export const cryptoProviderInfo = S.mutable(
   }),
 );
 
-export const cryptoPriceFeedsArgsSchema = S.mutable(
+export const cexPriceFeedsArgsSchema = S.mutable(
   S.Struct({
-    exchanges: S.optional(cryptoProviderInfo),
-    aggregators: S.optional(cryptoProviderInfo),
+    exchanges: S.optional(cexProviderInfo),
+    aggregators: S.optional(cexProviderInfo),
   }),
 );
 
-export type CryptoPriceFeedsArgs = typeof cryptoPriceFeedsArgsSchema.Type;
+export type CexPriceFeedsArgs = typeof cexPriceFeedsArgsSchema.Type;
 
 // `gecko-terminal` Oracle related Types
 export const geckoTerminalArgsSchema = S.mutable(
