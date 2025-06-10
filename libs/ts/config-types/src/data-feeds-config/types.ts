@@ -1,7 +1,7 @@
 import { Schema as S } from 'effect';
 
 import {
-  cryptoPriceFeedsArgsSchema,
+  cexPriceFeedsArgsSchema,
   ethRpcArgsSchema,
   geckoTerminalArgsSchema,
   stockPriceFeedsArgsSchema,
@@ -196,7 +196,7 @@ export const NewFeedSchema = S.mutable(
         market_hours: S.NullishOr(MarketHoursSchema),
         arguments: S.Union(
           stockPriceFeedsArgsSchema,
-          cryptoPriceFeedsArgsSchema,
+          cexPriceFeedsArgsSchema,
           geckoTerminalArgsSchema,
           ethRpcArgsSchema,
         ),

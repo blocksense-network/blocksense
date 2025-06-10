@@ -147,7 +147,7 @@ in
     };
 
     oracles = {
-      crypto-price-feeds = {
+      cex-price-feeds = {
         exec-interval = 40;
         allowed-outbound-hosts = [
           "https://api.kraken.com"

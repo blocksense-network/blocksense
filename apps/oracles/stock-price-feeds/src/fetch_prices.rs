@@ -49,7 +49,7 @@ impl SymbolsData {
 }
 
 /*TODO:(EmilIvanichkovv):
-    The `fetch_all_prices` function is very similar to the one we use in `crypto-price-feeds` oracle.
+    The `fetch_all_prices` function is very similar to the one we use in `cex-price-feeds` oracle.
     It should be moved to blocksense-sdk
 */
 pub async fn fetch_all_prices(

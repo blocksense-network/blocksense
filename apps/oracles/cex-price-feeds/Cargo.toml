@@ -1,5 +1,5 @@
 [package]
-name = "crypto-price-feeds"
+name = "cex-price-feeds"
 authors = ["Antoni Dikov"]
 description = ""
 version = "0.1.0"

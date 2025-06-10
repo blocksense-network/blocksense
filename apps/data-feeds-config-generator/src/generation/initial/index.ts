@@ -76,7 +76,7 @@ export async function generateFeedConfig(
       ...simplifiedFeed,
       id: BigInt(id),
       type: 'price-feed',
-      oracle_id: 'crypto-price-feeds',
+      oracle_id: 'cex-price-feeds',
       value_type: 'numerical',
       stride: 0,
       quorum: {
