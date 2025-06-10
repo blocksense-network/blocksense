@@ -1,1 +1,6 @@
-{ imports = [ ./blocksense ]; }
+{
+  imports = [
+    ./blocksense
+    ./get-wallets-balances
+  ];
+}

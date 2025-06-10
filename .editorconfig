@@ -41,3 +41,10 @@ indent_size = 2
 [*.rs]
 indent_size = unset
 
+[**/missing-hash.json]
+end_of_line = unset
+insert_final_newline = unset
+
+[**/nix-hash.txt]
+end_of_line = unset
+insert_final_newline = unset
