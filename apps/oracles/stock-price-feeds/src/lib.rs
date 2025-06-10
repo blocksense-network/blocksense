@@ -12,7 +12,7 @@ use prettytable::{format, Cell, Row, Table};
 use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
-    traits::prices_fetcher::PricePoint,
+    wap::vwap::compute_vwap,
 };
 use chrono::Utc;
 use chrono_tz::US::Eastern;
@@ -203,18 +203,4 @@ fn print_results(resources: &[ResourcePairData], results: &PairToResults, payloa
 
     println!("\nResults:");
     table.printstd();
-}
-
-/*TODO:(EmilIvanichkovv):
-    This is a copy-paste from the `cex-price-feeds` oracle.
-    It should be moved to blocksense-sdk
-*/
-pub fn compute_vwap<'a>(price_points: impl IntoIterator<Item = &'a PricePoint>) -> Result<f64> {
-    price_points
-        .into_iter()
-        .filter(|pp| pp.volume > 0.0)
-        .map(|PricePoint { price, volume }| (price * volume, *volume))
-        .reduce(|(num, denom), (weighted_price, volume)| (num + weighted_price, denom + volume))
-        .context("No price points found")
-        .map(|(weighted_prices_sum, total_volume)| weighted_prices_sum / total_volume)
 }
