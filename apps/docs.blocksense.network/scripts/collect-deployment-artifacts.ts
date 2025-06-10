@@ -1,7 +1,8 @@
 import { readdir } from 'fs/promises';
 
 import { artifactsFolder } from '@/src/constants';
-import { selectDirectory, parseNetworkName } from '@blocksense/base-utils';
+import { selectDirectory } from '@blocksense/base-utils/fs';
+import { parseNetworkName } from '@blocksense/base-utils/evm';
 import { configDirs, readEvmDeployment } from '@blocksense/config-types';
 
 export async function collectDeploymentData() {
