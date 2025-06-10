@@ -287,6 +287,7 @@ pub async fn aggregation_batch_consensus_loop(
                                             let (max_fee_per_gas, priority_fee) = match get_tx_retry_params(
                                                 net.as_str(),
                                                 &provider.provider,
+                                                &provider.provider_metrics,
                                                 &sender_address,
                                                 transaction_retry_timeout_secs,
                                                 transaction_retries_count,

@@ -414,6 +414,7 @@ pub async fn eth_batch_send_to_contract(
             let (max_fee_per_gas, priority_fee) = match get_tx_retry_params(
                 net.as_str(),
                 rpc_handle,
+                provider_metrics,
                 &sender_address,
                 transaction_retry_timeout_secs,
                 transaction_retries_count,
@@ -486,6 +487,7 @@ pub async fn eth_batch_send_to_contract(
             {
                 Ok(v) => {
                     debug!("Successfully got receipt from RPC in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash}");
+                    inc_metric!(provider_metrics, net, success_get_receipt);
                     v
                 }
                 Err(err) => {
@@ -501,10 +503,12 @@ pub async fn eth_batch_send_to_contract(
                             Ok(v) => match v {
                                 Some(v) => {
                                     debug!("Successfully got tx_receipt in network `{net}` block height {block_height}");
+                                    inc_metric!(provider_metrics, net, success_get_receipt);
                                     v
                                 }
                                 None => {
                                     warn!("Get tx_receipt returned None in network `{net}` block height {block_height}");
+                                    inc_metric!(provider_metrics, net, failed_get_receipt);
                                     inc_retries(
                                         net.as_str(),
                                         &mut transaction_retries_count,
@@ -516,6 +520,7 @@ pub async fn eth_batch_send_to_contract(
                             },
                             Err(err) => {
                                 warn!("Error getting tx_receipt in network `{net}` block height {block_height}: {err}");
+                                inc_metric!(provider_metrics, net, failed_get_receipt);
                                 inc_retries(
                                     net.as_str(),
                                     &mut transaction_retries_count,
@@ -527,6 +532,7 @@ pub async fn eth_batch_send_to_contract(
                         },
                         Err(e) => {
                             warn!("Timed out while trying to get receipt for tx_hash={tx_hash} in network `{net}` block height {block_height}: {e}");
+                            inc_metric!(provider_metrics, net, failed_get_receipt);
                             inc_retries(
                                 net.as_str(),
                                 &mut transaction_retries_count,
@@ -743,6 +749,7 @@ pub async fn log_provider_enabled(
 pub async fn get_tx_retry_params(
     net: &str,
     rpc_handle: &ProviderType,
+    provider_metrics: &Arc<RwLock<ProviderMetrics>>,
     sender_address: &Address,
     transaction_retry_timeout_secs: u64,
     transaction_retries_count: u64,
@@ -759,15 +766,18 @@ pub async fn get_tx_retry_params(
     {
         Ok(gas_price_result) => match gas_price_result {
             Ok(gas_price) => {
+                inc_metric!(provider_metrics, net, success_get_gas_price);
                 debug!("Got gas_price={gas_price} for network {net}");
                 gas_price
             }
             Err(err) => {
+                inc_metric!(provider_metrics, net, failed_get_gas_price);
                 debug!("Failed to get gas_price for network {net} due to {err}");
                 return Err(err.into());
             }
         },
         Err(err) => {
+            inc_metric!(provider_metrics, net, failed_get_gas_price);
             warn!("Timed out while getting gas_price for network {net} and address {sender_address} due to {err}");
             bail!("Timed out");
         }
@@ -782,15 +792,18 @@ pub async fn get_tx_retry_params(
     {
         Ok(priority_fee_result) => match priority_fee_result {
             Ok(priority_fee) => {
+                inc_metric!(provider_metrics, net, success_get_max_priority_fee_per_gas);
                 debug!("Got priority_fee={priority_fee} for network {net}");
                 priority_fee
             }
             Err(err) => {
+                inc_metric!(provider_metrics, net, failed_get_max_priority_fee_per_gas);
                 debug!("Failed to get priority_fee for network {net} due to {err}");
                 return Err(err.into());
             }
         },
         Err(err) => {
+            inc_metric!(provider_metrics, net, failed_get_max_priority_fee_per_gas);
             warn!("Timed out while getting priority_fee for network {net} and address {sender_address} due to {err}");
             bail!("Timed out");
         }
@@ -925,21 +938,25 @@ pub async fn eth_batch_send_to_all_contracts(
                             net.as_str(),
                         )
                         .await;
+                        {
+                            let provider = provider.lock().await;
+                            let provider_metrics = &provider.provider_metrics;
+                            inc_metric!(provider_metrics, net, success_send_tx);
+                        }
                         let mut status_map = sequencer_state.provider_status.write().await;
                         status_map.insert(net, ProviderStatus::LastUpdateSucceeded);
                     } else if status == "false" || status == "timeout" {
+                        let mut provider = provider.lock().await;
                         all_results +=
                             &format!(", failed to update feeds: {updated_feeds:?} due to {status}");
-                        decrement_feeds_round_indexes(
-                            &updated_feeds,
-                            net.as_str(),
-                            &mut (*provider.lock().await),
-                        )
-                        .await;
+                        decrement_feeds_round_indexes(&updated_feeds, net.as_str(), &mut provider)
+                            .await;
+
+                        let provider_metrics = &provider.provider_metrics;
                         if status == "timeout" {
-                            let provider = provider.lock().await;
-                            let provider_metrics = provider.provider_metrics.clone();
                             inc_metric!(provider_metrics, net, total_timed_out_tx);
+                        } else if status == "false" {
+                            inc_metric!(provider_metrics, net, failed_send_tx);
                         }
                         let mut status_map = sequencer_state.provider_status.write().await;
                         status_map.insert(net, ProviderStatus::LastUpdateFailed);
