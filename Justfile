@@ -64,3 +64,7 @@ clean:
     -e .vscode \
     -e .pre-commit-config.yaml \
     -- {{root-dir}}
+
+[working-directory: 'libs/ts/contracts']
+deploy-evm-contracts network-name:
+  yarn hardhat deploy --networks {{network-name}}
