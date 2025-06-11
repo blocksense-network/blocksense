@@ -76,7 +76,7 @@ export async function deployMultisig({ config, type }: Params): Promise<Safe> {
     transactionHash.hash,
   );
 
-  console.log('    ✅ Safe deployment tx hash:', transactionReceipt?.hash);
+  console.log('     ✅ Safe deployment tx hash:', transactionReceipt?.hash);
 
   return protocolKit.connect({ safeAddress });
 }
