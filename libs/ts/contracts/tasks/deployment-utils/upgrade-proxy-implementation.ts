@@ -10,6 +10,7 @@ import { ContractsConfigV2 } from '@blocksense/config-types/evm-contracts-deploy
 
 import { ContractNames, NetworkConfig } from '../types';
 import { ProxyOp } from '../../test/utils/wrappers/types';
+import { executeMultisigTransaction } from './multisig-tx-exec';
 
 type Params = {
   deployData: ContractsConfigV2;
@@ -50,7 +51,7 @@ export async function upgradeProxyImplementation({
     `Upgrading proxy implementation to ${deployData.coreContracts.AggregatedDataFeedStore.address}`,
   );
 
-  await run('multisig-tx-exec', {
+  await executeMultisigTransaction({
     transactions: [safeTransactionData],
     safe,
     config,
