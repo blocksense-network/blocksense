@@ -42,6 +42,11 @@
       "import": "./dist/esm/evm/index.mjs",
       "types": "./src/evm/index.ts"
     },
+    "./evm/functions": {
+      "require": "./dist/cjs/evm/functions.cjs",
+      "import": "./dist/esm/evm/functions.mjs",
+      "types": "./src/evm/functions.ts"
+    },
     "./evm/networks": {
       "require": "./dist/cjs/evm/networks.cjs",
       "import": "./dist/esm/evm/networks.mjs",
