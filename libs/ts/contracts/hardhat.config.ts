@@ -9,7 +9,7 @@ import 'solidity-coverage';
 import '@typechain/hardhat';
 import 'hardhat-contract-sizer';
 import 'hardhat-gas-reporter';
-import '../sol-reflector/src';
+import '@blocksense/sol-reflector';
 
 import { fromEntries } from '@blocksense/base-utils/array-iter';
 import {
