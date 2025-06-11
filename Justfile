@@ -22,7 +22,7 @@ build-ts package="all":
     yarn build-single @blocksense/contracts
     yarn build-single @blocksense/data-feeds-config-generator
   else
-    yarn workspace {{package}} run build
+    yarn build:recursive {{package}}
   fi
 
 test-ts:
