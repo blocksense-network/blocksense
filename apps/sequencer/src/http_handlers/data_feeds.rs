@@ -63,7 +63,7 @@ async fn process_report(
                     Ok(val) => val,
                     Err(e) => {
                         inc_metric!(reporter_metrics, reporter_id, non_valid_feed_id_reports);
-                        debug!("Error parsing input's feed_id: {}", e);
+                        debug!("Error parsing input's feed_id: {e}");
                         return HttpResponse::BadRequest().into();
                     }
                 };
@@ -765,11 +765,11 @@ pub mod tests {
                     Ok(res) => match res {
                         Ok(x) => x,
                         Err(e) => {
-                            panic!("TaskError: {}", e);
+                            panic!("TaskError: {e}");
                         }
                     },
                     Err(e) => {
-                        panic!("JoinError: {} ", e);
+                        panic!("JoinError: {e} ");
                     }
                 }
             }
@@ -787,7 +787,7 @@ pub mod tests {
 
         // Deploy event_feed contract
         let req = test::TestRequest::get()
-            .uri(&format!("/deploy/{}/event_feed", network))
+            .uri(&format!("/deploy/{network}/event_feed"))
             .to_request();
 
         let resp = test::call_service(&app, req).await;

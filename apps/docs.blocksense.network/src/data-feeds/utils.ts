@@ -1,4 +1,4 @@
-import { keysOf } from '@blocksense/base-utils';
+import { keysOf } from '@blocksense/base-utils/array-iter';
 import { decodeNewFeedsConfig, NewFeed } from '@blocksense/config-types';
 import DATA_FEEDS from '@blocksense/data-feeds-config-generator/feeds_config';
 
@@ -13,7 +13,7 @@ export function getFeedsConfig() {
 
 export function getDataSources(feed: NewFeed) {
   switch (feed.oracle_id) {
-    case 'crypto-price-feeds':
+    case 'cex-price-feeds':
       const exchanges = (feed.additional_feed_info.arguments as any)[
         'exchanges'
       ];

@@ -8,8 +8,8 @@
     "noPropertyAccessFromIndexSignature": false,
     "moduleResolution": "NodeNext",
     "outDir": "dist",
-    "rootDir": ".",
+    "rootDir": "."
   },
   "include": ["**/*.ts"],
-  "exclude": ["artifacts", "cache", "contracts", "dist"],
+  "exclude": ["artifacts", "cache", "contracts", "dist"]
 }

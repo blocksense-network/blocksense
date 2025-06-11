@@ -12,7 +12,7 @@ use blocksense_sdk::{
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct BinancePriceData {
+pub struct BinanceUsPriceData {
     pub symbol: String,
     #[serde(deserialize_with = "as_f64")]
     pub last_price: f64,
@@ -20,14 +20,14 @@ pub struct BinancePriceData {
     pub volume: f64,
 }
 
-type BinancePriceResponse = Vec<BinancePriceData>;
+type BinanceUsPriceResponse = Vec<BinanceUsPriceData>;
 
-pub struct BinancePriceFetcher<'a> {
+pub struct BinanceUsPriceFetcher<'a> {
     pub symbols: &'a [String],
 }
 
-impl<'a> PricesFetcher<'a> for BinancePriceFetcher<'a> {
-    const NAME: &'static str = "Binance";
+impl<'a> PricesFetcher<'a> for BinanceUsPriceFetcher<'a> {
+    const NAME: &'static str = "Binance US";
 
     fn new(symbols: &'a [String], _api_key: Option<&'a str>) -> Self {
         Self { symbols }
@@ -37,11 +37,11 @@ impl<'a> PricesFetcher<'a> for BinancePriceFetcher<'a> {
         async {
             let req_symbols = format!(
                 "[{}]",
-                self.symbols.iter().map(|s| format!("\"{}\"", s)).join(",")
+                self.symbols.iter().map(|s| format!("\"{s}\"")).join(",")
             );
 
-            let response = http_get_json::<BinancePriceResponse>(
-                "https://api1.binance.com/api/v3/ticker/24hr",
+            let response = http_get_json::<BinanceUsPriceResponse>(
+                "https://api.binance.us/api/v3/ticker/24hr",
                 Some(&[("symbols", req_symbols.as_str())]),
                 None,
             )

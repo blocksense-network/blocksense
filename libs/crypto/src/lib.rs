@@ -26,8 +26,8 @@ pub fn serialize_public_key(pk: &PublicKey) -> String {
 }
 
 pub fn deserialize_public_key(hex: &str) -> Result<PublicKey, String> {
-    let bytes = decode(hex).map_err(|e| format!("Invalid hex string: {}", e))?;
-    PublicKey::from_bytes(&bytes).map_err(|e| format!("Failed to deserialize public key: {:?}", e))
+    let bytes = decode(hex).map_err(|e| format!("Invalid hex string: {e}"))?;
+    PublicKey::from_bytes(&bytes).map_err(|e| format!("Failed to deserialize public key: {e:?}"))
 }
 
 pub fn serialize_priv_key(sk: &SecretKey) -> String {
@@ -35,8 +35,8 @@ pub fn serialize_priv_key(sk: &SecretKey) -> String {
 }
 
 pub fn deserialize_priv_key(hex: &str) -> Result<SecretKey, String> {
-    let bytes = decode(hex).map_err(|e| format!("Invalid hex string: {}", e))?;
-    SecretKey::from_bytes(&bytes).map_err(|e| format!("Failed to deserialize public key: {:?}", e))
+    let bytes = decode(hex).map_err(|e| format!("Invalid hex string: {e}"))?;
+    SecretKey::from_bytes(&bytes).map_err(|e| format!("Failed to deserialize public key: {e:?}"))
 }
 
 #[derive(Debug, Clone)]
@@ -55,10 +55,10 @@ impl<'de> Deserialize<'de> for JsonSerializableSignature {
         let hex: String = Deserialize::deserialize(deser)?;
         let decoded_hex = match hex::decode(hex) {
             Ok(v) => v,
-            Err(e) => return Err(<D::Error as serde::de::Error>::custom(format!("{:?}", e))),
+            Err(e) => return Err(<D::Error as serde::de::Error>::custom(format!("{e:?}"))),
         };
         let sig = Signature::deserialize(&decoded_hex)
-            .map_err(|e| <D::Error as serde::de::Error>::custom(format!("{:?}", e)))?;
+            .map_err(|e| <D::Error as serde::de::Error>::custom(format!("{e:?}")))?;
         Ok(JsonSerializableSignature { sig })
     }
 }

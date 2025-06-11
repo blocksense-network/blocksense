@@ -4,6 +4,14 @@ spin-data-dir := root-dir + "/target/spin-artifacts"
 default:
   @just --list
 
+# Switch to a different dev shell environment
+change-devshell shell="default":
+  @{{root-dir}}/scripts/dev-shell/change-devshell.sh {{shell}}
+
+# List available dev shell environments
+list-devshells:
+  @{{root-dir}}/scripts/dev-shell/list-devshells.sh
+
 build-ts package="all":
   #!/usr/bin/env bash
   set -euo pipefail

@@ -182,14 +182,9 @@ jobs:
             path: libs/ts/ui/storybook-static
             project_name: blocksense-ui
             build_command: yarn workspace @blocksense/ui build-storybook
-          - project: nft.blocksense.network
-            path: apps/nft.blocksense.network/out
-            project_name: blocksense-nft
-            build_command: yarn workspace @blocksense/nft.blocksense.network build:with-deps
     outputs:
       docsDeploymentMessage: ${{ steps.docs-ws-url.outputs.url }}
       uiDeploymentMessage: ${{ steps.ui-ws-url.outputs.url }}
-      nftDeploymentMessage: ${{ steps.nft-ws-url.outputs.url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -213,12 +208,6 @@ jobs:
         run: yarn install
 
       - name: Build
-        env:
-          NEXT_PUBLIC_VERIFICATION_API_KEY: ${{ secrets.NEXT_PUBLIC_VERIFICATION_API_KEY }}
-          NEXT_PUBLIC_VERIFICATION_API_URL: ${{ secrets.NEXT_PUBLIC_VERIFICATION_API_URL }}
-          NEXT_PUBLIC_NFT_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_NFT_CLIENT_ID }}
-          NEXT_PUBLIC_NFT_SMART_CONTRACT_ADDRESS: ${{ secrets.NEXT_PUBLIC_NFT_SMART_CONTRACT_ADDRESS }}
-          NEXT_PUBLIC_X_BLOCKSENSE_TWEET_ID: ${{ secrets.NEXT_PUBLIC_X_BLOCKSENSE_TWEET_ID }}
         id: build
         run: ${{ matrix.build_command }}
 
@@ -248,14 +237,6 @@ jobs:
         run: |
           echo "url=$UI_DEPLOY_URL" >> $GITHUB_OUTPUT
 
-      - name: Collect NFT Deployment URL
-        id: nft-ws-url
-        if: matrix.project == 'nft.blocksense.network'
-        env:
-          NFT_DEPLOY_URL: ${{ steps.deploy-website.outputs.deployment-url }}
-        run: |
-          echo "url=$NFT_DEPLOY_URL" >> $GITHUB_OUTPUT
-
   comment_on_pr:
     needs: [deploy_websites]
     runs-on: self-hosted
@@ -278,4 +259,3 @@ jobs:
             |---------------------|----------|----------------------------------------------------------------------|
             | 🌱 [Documentation](${{ needs.deploy_websites.outputs.docsDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |
             | 📖 [UI Components](${{ needs.deploy_websites.outputs.uiDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |
-            | 🏴‍☠ [NFT website](${{ needs.deploy_websites.outputs.nftDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |

@@ -4,7 +4,7 @@ members = [
   "apps/sequencer",
   "apps/sequencer_tests",
   "apps/trigger-oracle",
-  "apps/oracles/crypto-price-feeds",
+  "apps/oracles/cex-price-feeds",
   "apps/oracles/exsat-holdings",
   "apps/oracles/gecko-terminal",
   "apps/oracles/eth-rpc",

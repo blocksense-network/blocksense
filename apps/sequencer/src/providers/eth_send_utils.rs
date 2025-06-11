@@ -1139,10 +1139,10 @@ mod tests {
             String::from("0000000100000002000000030000000400000005000000060000000700000008");
         let slot2 =
             String::from("0000000900000001000000000000000000000000000000000000000000000000");
-        let payload: String = format!("{}{}", slot1, slot2);
+        let payload: String = format!("{slot1}{slot2}");
         let description =
             String::from("0000000000000000000000000000000000000000000000000000000000000000");
-        let result_value = format!("{}{}{}", number_of_slots, payload, description);
+        let result_value = format!("{number_of_slots}{payload}{description}");
 
         let end_slot_timestamp = 0_u128;
         let voted_update = VotedFeedUpdate::new_decode(
@@ -1201,7 +1201,7 @@ mod tests {
                 ..Default::default()
             })
             .await;
-        println!("@@0b result: {:?}", result);
+        println!("@@0b result: {result:?}");
         assert!(result.is_ok(), "Call to getFeedById failed");
         let output = result.unwrap();
         assert_eq!(output.len(), 64, "Invalid output length");

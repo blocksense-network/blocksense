@@ -42,6 +42,11 @@
       "import": "./dist/esm/evm/index.mjs",
       "types": "./src/evm/index.ts"
     },
+    "./evm/networks": {
+      "require": "./dist/cjs/evm/networks.cjs",
+      "import": "./dist/esm/evm/networks.mjs",
+      "types": "./src/evm/networks.ts"
+    },
     "./env": {
       "require": "./dist/cjs/env/index.cjs",
       "import": "./dist/esm/env/index.mjs",
@@ -66,6 +71,11 @@
       "require": "./dist/cjs/string.cjs",
       "import": "./dist/esm/string.mjs",
       "types": "./src/string.ts"
+    },
+    "./tty": {
+      "require": "./dist/cjs/tty.cjs",
+      "import": "./dist/esm/tty.mjs",
+      "types": "./src/tty.ts"
     },
     "./type-level": {
       "require": "./dist/cjs/type-level.cjs",

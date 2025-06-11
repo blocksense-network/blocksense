@@ -13,5 +13,5 @@ fn main() {
 
     let result = forest.score(&[0.]);
 
-    println!("{}", result);
+    println!("{result}");
 }

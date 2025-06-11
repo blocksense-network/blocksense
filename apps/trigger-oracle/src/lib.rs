@@ -525,7 +525,7 @@ impl OracleTrigger {
             );
             join_handles.push(
                 tokio::task::Builder::new()
-                    .name(format!("orchestrator-{}", key).as_str())
+                    .name(format!("orchestrator-{key}").as_str())
                     .spawn(future)
                     .expect("orchestrator failed to start"),
             );
@@ -633,8 +633,7 @@ impl OracleTrigger {
             Err(err) => {
                 tracing::error!("Error while creating kafka consumer: {:?}", err);
                 return TerminationReason::Other(format!(
-                    "Error while creating kafka consumer: {:?}",
-                    err
+                    "Error while creating kafka consumer: {err:?}"
                 ));
             }
         };
@@ -642,8 +641,7 @@ impl OracleTrigger {
         // Subscribe to the desired topic(s)
         if let Err(err) = consumer.subscribe(&["aggregation_consensus"]) {
             return TerminationReason::Other(format!(
-                "Error while subscribing to kafka topic: {:?}",
-                err
+                "Error while subscribing to kafka topic: {err:?}"
             ));
         };
 
@@ -684,10 +682,7 @@ impl OracleTrigger {
                     tracing::error!("Error while consuming: {:?}", err);
                     total_err_messages += 1;
                     if total_err_messages >= TOTAL_RETRIES_FOR_KAFKA_READ {
-                        return TerminationReason::Other(format!(
-                            "Error while consuming: {:?}",
-                            err
-                        ));
+                        return TerminationReason::Other(format!("Error while consuming: {err:?}"));
                     }
                     let _ = sleep(Duration::from_millis(TIME_BEFORE_KAFKA_READ_RETRY_IN_MS)).await;
                     continue;
@@ -1013,7 +1008,7 @@ impl OutboundWasiHttpHandler for HttpRuntimeData {
                 terminal::warn!("A component tried to make a HTTP request to the same component but it does not have permission.");
                 "self".into()
             };
-            eprintln!("To allow requests, add 'allowed_outbound_hosts = [\"{}\"]' to the manifest component section.", host);
+            eprintln!("To allow requests, add 'allowed_outbound_hosts = [\"{host}\"]' to the manifest component section.");
             return Err(ErrorCode::HttpRequestDenied.into());
         }
 
