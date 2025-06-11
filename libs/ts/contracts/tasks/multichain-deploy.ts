@@ -89,7 +89,9 @@ task('deploy', 'Deploy contracts')
       console.log(`// Signer: ${await signer.getAddress()}`);
       console.log(`// Balance: ${fmtEth(signerBalance)}`);
       console.log(`// `);
-      console.log(`// Admin MultiSig:`);
+      console.log(
+        `// Admin MultiSig: ${config.adminMultisig.threshold > 0 ? '✅' : '❌'}`,
+      );
       console.log(`//   threshold: ${config.adminMultisig.threshold}`);
       console.log(`//      owners: ${config.adminMultisig.owners}`);
       console.log(`// `);
