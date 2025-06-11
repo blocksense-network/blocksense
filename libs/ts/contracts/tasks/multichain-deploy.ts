@@ -21,6 +21,7 @@ import { predictAddress } from './utils';
 import { initChain } from './deployment-utils/init-chain';
 import { setUpAccessControl } from './deployment-utils/access-control';
 import { deployContracts } from './deployment-utils/deploy-contracts';
+import { deployMultisig } from './deployment-utils/deploy-multisig';
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
@@ -131,7 +132,7 @@ task('deploy', 'Deploy contracts')
 
       console.log('---------------------------\n');
 
-      const adminMultisig = await run('deploy-multisig', {
+      const adminMultisig = await deployMultisig({
         config,
         type: 'adminMultisig',
       });
@@ -208,7 +209,7 @@ task('deploy', 'Deploy contracts')
       let sequencerMultisigAddress = parseEthereumAddress(ethers.ZeroAddress);
 
       if (config.deployWithSequencerMultisig) {
-        sequencerMultisig = await run('deploy-multisig', {
+        sequencerMultisig = await deployMultisig({
           config,
           type: 'sequencerMultisig',
         });
