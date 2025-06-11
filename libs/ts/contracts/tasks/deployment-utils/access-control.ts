@@ -10,6 +10,7 @@ import {
 
 import { getEnvString, getOptionalEnvString } from '@blocksense/base-utils';
 import { ContractNames, NetworkConfig } from '../types';
+import { executeMultisigTransaction } from './multisig-tx-exec';
 
 export type Params = {
   config: NetworkConfig;
@@ -135,7 +136,7 @@ export async function setUpAccessControl({
   }
 
   if (transactions.length > 0) {
-    await run('multisig-tx-exec', {
+    await executeMultisigTransaction({
       transactions,
       safe: adminMultisig,
       config,
@@ -199,7 +200,7 @@ export async function setUpAccessControl({
       };
       sequencerTransactions.push(safeTxRemoveOwner);
 
-      await run('multisig-tx-exec', {
+      await executeMultisigTransaction({
         transactions: sequencerTransactions,
         safe: sequencerMultisig,
         config,

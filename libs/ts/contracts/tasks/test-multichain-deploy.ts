@@ -15,6 +15,7 @@ import { Feed, WriteOp } from '../test/utils/wrappers/types';
 
 import { expect } from 'chai';
 import { initChain } from './deployment-utils/init-chain';
+import { executeMultisigTransaction } from './deployment-utils/multisig-tx-exec';
 
 task(
   'test-deploy',
@@ -215,7 +216,7 @@ task(
     operation: OperationType.Call,
   };
 
-  await run('multisig-tx-exec', {
+  await executeMultisigTransaction({
     transactions: [changeSequencerTxData],
     safe: adminMultisig,
     config,
@@ -276,7 +277,7 @@ task(
     operation: OperationType.Call,
   };
 
-  await run('multisig-tx-exec', {
+  await executeMultisigTransaction({
     transactions: [changeAccessControlTxData],
     safe: adminMultisig,
     config,
