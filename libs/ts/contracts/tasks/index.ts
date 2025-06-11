@@ -5,5 +5,4 @@ import './verify';
 import './ms-change-sequencer';
 
 import './deployment-utils/multisig-tx-exec';
-import './deployment-utils/register-cl-adapters';
 import './deployment-utils/upgrade-proxy-implementation';
