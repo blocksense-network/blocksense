@@ -66,7 +66,14 @@ export async function initChain(
   const parsedEnv = parseDeploymentEnvConfig(envSchema, networkName);
 
   parsedEnv.mergedConfig.adfsUpgradeableProxySalt ??= parseHexDataString(
-    id('upgradeableProxy'),
+    // When the deployer address is the default Hardhat address,
+    // use custom UpgradeableProxy CREATE2 salt, such that the
+    // UpgradeableProxy address starts with '0xADF5a...',
+    // otherwise, use the default salt:
+    parsedEnv.mergedConfig.deployerAddress ===
+      '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
+      ? '0xf8f3965692216a43513fd1ea951d2b3c9d48fac5a96a95a159ce854886f7c1bd'
+      : id('upgradeableProxy'),
   );
   parsedEnv.mergedConfig.isSafeOriginalDeployment ??= true;
 
