@@ -162,7 +162,6 @@ export const sszEncodeData = async (
   values: any[],
 ): Promise<string> => {
   const ssz = await import('@chainsafe/ssz');
-  const sszUtils = await import('@lodestar/utils');
 
   /**
    * Populates input data into a format compatible with SSZ serialization.
@@ -189,12 +188,12 @@ export const sszEncodeData = async (
       return convertNumberEndianness(values, schema.byteLength);
     } else if (schema instanceof ssz.ByteVectorType) {
       return ethers.isHexString(values)
-        ? sszUtils.fromHex(values)
+        ? ethers.toBeArray(values)
         : // for uint/int when not power ot 2, e.g. uint48
           convertNumberEndianness(values, schema.lengthBytes, false);
     } else if (schema instanceof ssz.ByteListType) {
       if (ethers.isHexString(values)) {
-        return sszUtils.fromHex(values);
+        return ethers.toBeArray(values);
       }
       return ethers.toUtf8Bytes(values);
     }
@@ -203,7 +202,7 @@ export const sszEncodeData = async (
 
   const schema = await createSchema(fields);
   const populatedData = populateInputData(schema, values);
-  return sszUtils.toHex(schema.serialize(populatedData));
+  return ethers.hexlify(schema.serialize(populatedData));
 };
 
 export const sszSchema = async (
