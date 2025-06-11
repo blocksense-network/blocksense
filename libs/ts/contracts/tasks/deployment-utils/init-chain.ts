@@ -13,11 +13,14 @@ import {
   asVarSchema,
   hexDataString,
   networkName,
+  parseHexDataString,
+} from '@blocksense/base-utils';
+
+import {
   DeploymentEnvSchema,
   parseDeploymentEnvConfig,
   validateAndPrintDeploymentEnvConfig,
-  parseHexDataString,
-} from '@blocksense/base-utils';
+} from '@blocksense/base-utils/evm/functions';
 
 import type { NetworkConfig } from '../types';
 
