@@ -7,13 +7,8 @@ import { Schema, sszSchema } from './utils';
 import { TupleField, organizeFieldsIntoStructs } from '../utils';
 import { generateDecoderLines } from './helpers';
 
-export const generateDecoder = async (
-  templatePath: string,
-  tempFilePath: string,
-  fields: TupleField,
-) => {
+export const generateDecoder = async (template: string, fields: TupleField) => {
   const schema: Schema[] = await sszSchema(fields);
-  const template = await fs.readFile(templatePath, 'utf-8');
 
   const structs = organizeFieldsIntoStructs(fields);
   const mainStructName =
@@ -46,5 +41,6 @@ export const generateDecoder = async (
     singleQuote: false,
     bracketSpacing: false,
   });
-  await fs.writeFile(tempFilePath, formattedCode, 'utf-8');
+
+  return formattedCode;
 };
