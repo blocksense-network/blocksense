@@ -45,7 +45,6 @@
     "@blocksense/config-types": "workspace:*",
     "@blocksense/sol-reflector": "workspace:*",
     "@chainsafe/ssz": "^1.0.2",
-    "@lodestar/utils": "^1.27.0",
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.8",
     "@nomicfoundation/hardhat-ethers": "^3.0.8",
     "@nomicfoundation/hardhat-ledger": "^1.0.3",
