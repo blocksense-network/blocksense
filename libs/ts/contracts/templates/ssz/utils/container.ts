@@ -1,4 +1,4 @@
-import { generateBigEndianConversion } from '../helpers/convertToBE';
+import { generateSwapEndianness32bit } from '../helpers/convertToBE';
 import { Schema, BytesRange, Offset, addOffsets } from '../utils';
 
 export const handleFieldRanges = (
@@ -84,7 +84,7 @@ const handleVariableOffsets = (
       // Get offset
       let ${offset} := and(shr(224, mload(add(data, ${addOffsets(shouldAppend ? lines : undefined, start, variableOffsetsPosition[i])}))), 0xFFFFFFFF)
     `);
-    lines.push(generateBigEndianConversion(offset));
+    lines.push(generateSwapEndianness32bit(offset));
     offsets[i] = {
       value: offset,
       isGenerated: false,

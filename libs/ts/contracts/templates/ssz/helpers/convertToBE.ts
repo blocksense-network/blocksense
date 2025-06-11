@@ -1,4 +1,4 @@
-export const generateBigEndianConversion = (name: string) => {
+export const generateSwapEndianness32bit = (name: string) => {
   return `
     // Convert ${name} to big endian
     {

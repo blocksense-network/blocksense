@@ -1,5 +1,5 @@
 import { Schema, Offset } from '../utils';
-import { generateBigEndianConversion } from './convertToBE';
+import { generateSwapEndianness32bit } from './convertToBE';
 
 export const generateNestedDynamic = (
   currentSchema: Schema,
@@ -75,7 +75,7 @@ export const generateNestedDynamic = (
           shr(224, mload(add(data, ${start}))),
           0xFFFFFFFF
         )
-      ${generateBigEndianConversion(firstArrayName)}
+      ${generateSwapEndianness32bit(firstArrayName)}
 
       ${
         currentSchema.sszFixedSize
@@ -92,7 +92,6 @@ export const generateNestedDynamic = (
       ${currentSchema.isFirst ? '' : 'let'} ${name} := mload(0x40)
 
       ${
-        // currentSchema.sszFixedSize ||
         currentSchema.typeName.startsWith('Vector')
           ? `mstore(0x40, add(${name}, mul(${size}, 0x20)))`
           : `
@@ -122,7 +121,7 @@ export const generateNestedDynamic = (
           shr(224, mload(add(data, add(${start}, mul(${name}_i, 4))))),
           0xFFFFFFFF
         )
-        ${generateBigEndianConversion('innerArrayPos')}
+        ${generateSwapEndianness32bit('innerArrayPos')}
 
         innerArrayPos := add(innerArrayPos, ${start})
 
