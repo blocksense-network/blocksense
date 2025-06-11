@@ -579,7 +579,7 @@ pub async fn register_feed(
 
     if let Err(err) = tokio::task::Builder::new()
         .name(format!("manual_feed_processor_{feed_id}").as_str())
-        .spawn_local(async move {
+        .spawn(async move {
             feed_slots_processor
                 .start_loop(
                     &sequencer_state,

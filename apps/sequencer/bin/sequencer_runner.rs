@@ -53,7 +53,7 @@ pub async fn prepare_sequencer_state(
 
     tokio::task::Builder::new()
         .name("interrupt_watcher")
-        .spawn_local(async move {
+        .spawn(async move {
             info!("Watching for Ctrl-C...");
             tokio::signal::ctrl_c().await.unwrap();
             info!("Ctrl-C detected; terminating...");
@@ -103,7 +103,7 @@ pub async fn prepare_http_servers(
     let main_sequencer_state: Data<SequencerState> = sequencer_state.clone();
     let main_http_server_fut: JoinHandle<std::io::Result<()>> = tokio::task::Builder::new()
         .name("main_http_server")
-        .spawn_local(async move {
+        .spawn(async move {
             info!("Starting main HTTP server on port {sequencer_config_main_port}...");
             HttpServer::new(move || {
                 App::new()
@@ -120,7 +120,7 @@ pub async fn prepare_http_servers(
     let admin_sequencer_state: Data<SequencerState> = sequencer_state.clone();
     let admin_http_server_fut: JoinHandle<std::io::Result<()>> = tokio::task::Builder::new()
         .name("admin_http_server")
-        .spawn_local(async move {
+        .spawn(async move {
             info!("Starting admin HTTP server on port {admin_port}...");
             HttpServer::new(move || {
                 App::new()
@@ -235,7 +235,7 @@ async fn main() -> std::io::Result<()> {
     if start_metrics_server {
         let prometheus_http_server_fut = tokio::task::Builder::new()
             .name("prometheus_http_server")
-            .spawn_local(async move {
+            .spawn(async move {
                 let port = sequencer_config.prometheus_port;
                 info!("Starting prometheus HTTP server on port {port}...");
                 HttpServer::new(move || App::new().service(metrics))
