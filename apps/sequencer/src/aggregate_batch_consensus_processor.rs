@@ -11,7 +11,8 @@ use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, warn};
 
 use crate::providers::eth_send_utils::{
-    decrement_feeds_round_indexes, get_nonce, get_tx_retry_params, inc_retries, log_gas_used,
+    decrement_feeds_round_indexes, get_nonce, get_tx_retry_params, inc_retries_with_backoff,
+    log_gas_used,
 };
 use crate::providers::provider::{parse_eth_address, RpcProvider, GNOSIS_SAFE_CONTRACT_NAME};
 use crate::sequencer_state::SequencerState;
@@ -155,6 +156,7 @@ pub async fn aggregation_batch_consensus_loop(
                                     let mut transaction_retries_count = 0;
                                     let mut nonce_get_retries_count = 0;
                                     let ids_vec: Vec<_> = quorum.updated_feeds_ids.iter().copied().collect();
+                                    let backoff_secs = 1;
 
                                     let block_height = signed_aggregate.block_height;
                                     let net = &signed_aggregate.network;
@@ -199,7 +201,7 @@ pub async fn aggregation_batch_consensus_loop(
                                             Ok(n) => n,
                                             Err(e) => {
                                                 warn!("{e}");
-                                                inc_retries(net.as_str(), &mut nonce_get_retries_count, &provider_metrics).await;
+                                                inc_retries_with_backoff(net.as_str(), &mut nonce_get_retries_count, &provider_metrics, backoff_secs).await;
                                                 continue;
                                             },
                                         };
@@ -223,7 +225,7 @@ pub async fn aggregation_batch_consensus_loop(
                                             Ok(v) => v,
                                             Err(err) => {
                                                 warn!("Timed out while trying to get safe nonce for network {net} and address {safe_address} due to {err}");
-                                                inc_retries(net.as_str(), &mut transaction_retries_count, &provider_metrics).await;
+                                                inc_retries_with_backoff(net.as_str(), &mut transaction_retries_count, &provider_metrics, backoff_secs).await;
                                                 continue;
                                             },
                                         };
@@ -232,7 +234,7 @@ pub async fn aggregation_batch_consensus_loop(
                                             Ok(n) => n,
                                             Err(e) => {
                                                 warn!("Failed to get the nonce of gnosis safe contract at address {safe_address} in network {net}: {e}! Blocksense block height: {block_height}");
-                                                inc_retries(net.as_str(), &mut transaction_retries_count, &provider_metrics).await;
+                                                inc_retries_with_backoff(net.as_str(), &mut transaction_retries_count, &provider_metrics, backoff_secs).await;
                                                 continue;
                                             }
                                         };
@@ -240,7 +242,7 @@ pub async fn aggregation_batch_consensus_loop(
                                         if latest_safe_nonce != safe_tx.nonce {
                                             warn!("Nonce in safe contract {} not as expected {}! Blocksense block height: {block_height}", latest_safe_nonce, safe_tx.nonce);
                                             inc_metric!(provider_metrics, net, total_mismatched_gnosis_safe_nonce);
-                                            inc_retries(net.as_str(), &mut transaction_retries_count, &provider_metrics).await;
+                                            inc_retries_with_backoff(net.as_str(), &mut transaction_retries_count, &provider_metrics, backoff_secs).await;
                                             continue;
                                         }
 
@@ -296,7 +298,7 @@ pub async fn aggregation_batch_consensus_loop(
                                                 Ok(res) => res,
                                                 Err(e) => {
                                                     warn!("Timed out on get_tx_retry_params for {transaction_retries_count}-th time for network {net}, Blocksense block height: {block_height}: {e}!");
-                                                    inc_retries(net.as_str(), &mut transaction_retries_count, &provider_metrics).await;
+                                                    inc_retries_with_backoff(net.as_str(), &mut transaction_retries_count, &provider_metrics, backoff_secs).await;
                                                     continue;
                                                 },
                                             };
@@ -318,7 +320,7 @@ pub async fn aggregation_batch_consensus_loop(
                                             Ok(post_tx_res) => post_tx_res,
                                             Err(err) => {
                                                 warn!("Timed out while trying to post tx to RPC for network {net} and address {safe_address} due to {err}");
-                                                inc_retries(net.as_str(), &mut transaction_retries_count, &provider_metrics).await;
+                                                inc_retries_with_backoff(net.as_str(), &mut transaction_retries_count, &provider_metrics, backoff_secs).await;
                                                 continue;
                                             }
                                         };
@@ -336,7 +338,7 @@ pub async fn aggregation_batch_consensus_loop(
                                                     Ok(r) => r,
                                                     Err(err) => {
                                                         warn!("Timed out while trying to post tx to RPC for network {net} and address {safe_address} due to {err}");
-                                                        inc_retries(net.as_str(), &mut transaction_retries_count, &provider_metrics).await;
+                                                        inc_retries_with_backoff(net.as_str(), &mut transaction_retries_count, &provider_metrics, backoff_secs).await;
                                                         continue;
                                                     }
                                                 };

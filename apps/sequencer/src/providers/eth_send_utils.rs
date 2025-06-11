@@ -3,7 +3,7 @@ use alloy::{
     hex,
     network::TransactionBuilder,
     primitives::{Address, Bytes},
-    providers::Provider,
+    providers::{Provider, ProviderBuilder},
     rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
 use blocksense_config::FeedStrideAndDecimals;
@@ -16,8 +16,8 @@ use tokio::{sync::Mutex, sync::RwLock, time::Duration};
 
 use crate::{
     providers::provider::{
-        ProviderStatus, ProviderType, RpcProvider, SharedRpcProviders, EVENT_FEED_CONTRACT_NAME,
-        PRICE_FEED_CONTRACT_NAME,
+        parse_eth_address, ProviderStatus, ProviderType, RpcProvider, SharedRpcProviders,
+        EVENT_FEED_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME,
     },
     sequencer_state::SequencerState,
 };
@@ -275,16 +275,26 @@ pub async fn eth_batch_send_to_contract(
     let receipt;
     let tx_time = Instant::now();
 
-    let sender_address = {
-        debug!(
-            "Using signer address: {} in network `{net}` block height {block_height}",
-            signer.address()
-        );
-        signer.address()
+    let (sender_address, is_impersonated) = match &provider_settings.impersonated_anvil_account {
+        Some(impersonated_anvil_account) => {
+            debug!(
+                "Using impersonated anvil account with address: {} in network `{net}` block height {block_height}",
+                impersonated_anvil_account
+            );
+            (parse_eth_address(impersonated_anvil_account).unwrap(), true)
+        }
+        None => {
+            debug!(
+                "Using signer address: {} in network `{net}` block height {block_height}",
+                signer.address()
+            );
+            (signer.address(), false)
+        }
     };
 
     let mut transaction_retries_count = 0;
     let mut nonce_get_retries_count = 0;
+    let backoff_secs = 1;
 
     // First get the correct nonce
     let nonce = loop {
@@ -305,7 +315,13 @@ pub async fn eth_batch_send_to_contract(
             Ok(n) => n,
             Err(e) => {
                 warn!("{e}");
-                inc_retries(net.as_str(), &mut nonce_get_retries_count, provider_metrics).await;
+                inc_retries_with_backoff(
+                    net.as_str(),
+                    &mut nonce_get_retries_count,
+                    provider_metrics,
+                    backoff_secs,
+                )
+                .await;
                 continue;
             }
         };
@@ -337,10 +353,11 @@ pub async fn eth_batch_send_to_contract(
             }
             Err(err) => {
                 warn!("{err}");
-                inc_retries(
+                inc_retries_with_backoff(
                     net.as_str(),
                     &mut transaction_retries_count,
                     provider_metrics,
+                    backoff_secs,
                 )
                 .await;
                 continue;
@@ -361,10 +378,11 @@ pub async fn eth_batch_send_to_contract(
             }
             Err(err) => {
                 warn!("get_gas_price error {err} for {transaction_retries_count}-th time in network `{net}` block height {block_height}");
-                inc_retries(
+                inc_retries_with_backoff(
                     net.as_str(),
                     &mut transaction_retries_count,
                     provider_metrics,
+                    backoff_secs,
                 )
                 .await;
                 continue;
@@ -387,10 +405,11 @@ pub async fn eth_batch_send_to_contract(
             }
             Err(err) => {
                 warn!("get_chain_id error {err} for {transaction_retries_count}-th time in network `{net}` block height {block_height}");
-                inc_retries(
+                inc_retries_with_backoff(
                     net.as_str(),
                     &mut transaction_retries_count,
                     provider_metrics,
+                    backoff_secs,
                 )
                 .await;
                 continue;
@@ -426,10 +445,11 @@ pub async fn eth_batch_send_to_contract(
                 Err(e) => {
                     let block_height = updates.block_height;
                     warn!("Timed out on get_tx_retry_params for {transaction_retries_count}-th time in network `{net}` block height {block_height}: {e}!");
-                    inc_retries(
+                    inc_retries_with_backoff(
                         net.as_str(),
                         &mut transaction_retries_count,
                         provider_metrics,
+                        backoff_secs,
                     )
                     .await;
                     continue;
@@ -448,9 +468,18 @@ pub async fn eth_batch_send_to_contract(
         }
 
         let tx_receipt = {
+            let rpc_impersonated_handle;
+            let send_transaction_future = if is_impersonated {
+                let rpc_impersonated_url = provider.url();
+                rpc_impersonated_handle = ProviderBuilder::new().connect_http(rpc_impersonated_url);
+                debug!("Sending impersonated price feed update transaction in network `{net}` block height {block_height}...");
+                rpc_impersonated_handle.send_transaction(tx)
+            } else {
+                rpc_handle.send_transaction(tx)
+            };
             let tx_hash_result = match actix_web::rt::time::timeout(
                 Duration::from_secs(transaction_retry_timeout_secs),
-                rpc_handle.send_transaction(tx),
+                send_transaction_future,
             )
             .await
             {
@@ -466,10 +495,11 @@ pub async fn eth_batch_send_to_contract(
                 },
                 Err(err) => {
                     warn!("Error timeout while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
-                    inc_retries(
+                    inc_retries_with_backoff(
                         net.as_str(),
                         &mut transaction_retries_count,
                         provider_metrics,
+                        backoff_secs,
                     )
                     .await;
                     continue;
@@ -509,10 +539,11 @@ pub async fn eth_batch_send_to_contract(
                                 None => {
                                     warn!("Get tx_receipt returned None in network `{net}` block height {block_height}");
                                     inc_metric!(provider_metrics, net, failed_get_receipt);
-                                    inc_retries(
+                                    inc_retries_with_backoff(
                                         net.as_str(),
                                         &mut transaction_retries_count,
                                         provider_metrics,
+                                        backoff_secs,
                                     )
                                     .await;
                                     continue;
@@ -521,10 +552,11 @@ pub async fn eth_batch_send_to_contract(
                             Err(err) => {
                                 warn!("Error getting tx_receipt in network `{net}` block height {block_height}: {err}");
                                 inc_metric!(provider_metrics, net, failed_get_receipt);
-                                inc_retries(
+                                inc_retries_with_backoff(
                                     net.as_str(),
                                     &mut transaction_retries_count,
                                     provider_metrics,
+                                    backoff_secs,
                                 )
                                 .await;
                                 continue;
@@ -533,10 +565,11 @@ pub async fn eth_batch_send_to_contract(
                         Err(e) => {
                             warn!("Timed out while trying to get receipt for tx_hash={tx_hash} in network `{net}` block height {block_height}: {e}");
                             inc_metric!(provider_metrics, net, failed_get_receipt);
-                            inc_retries(
+                            inc_retries_with_backoff(
                                 net.as_str(),
                                 &mut transaction_retries_count,
                                 provider_metrics,
+                                backoff_secs,
                             )
                             .await;
                             continue;
@@ -609,19 +642,20 @@ pub async fn get_nonce(
     }
 }
 
-pub async fn inc_retries(
+pub async fn inc_retries_with_backoff(
     net: &str,
     transaction_retries_count: &mut u64,
     provider_metrics: &Arc<RwLock<ProviderMetrics>>,
+    backoff_secs: u64,
 ) {
+    *transaction_retries_count += 1;
+    inc_metric!(provider_metrics, net, total_tx_sent);
     // Wait before sending the next request
-    let time_to_await: Duration = Duration::from_secs(1);
+    let time_to_await: Duration = Duration::from_secs(backoff_secs);
     let mut interval = interval(time_to_await);
     interval.tick().await;
     // The first tick completes immediately.
     interval.tick().await;
-    *transaction_retries_count += 1;
-    inc_metric!(provider_metrics, net, total_tx_sent);
 }
 
 pub async fn get_gas_price(
