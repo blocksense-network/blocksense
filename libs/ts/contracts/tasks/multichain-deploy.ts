@@ -23,6 +23,7 @@ import { setUpAccessControl } from './deployment-utils/access-control';
 import { deployContracts } from './deployment-utils/deploy-contracts';
 import { deployMultisig } from './deployment-utils/deploy-multisig';
 import { registerCLAdapters } from './deployment-utils/register-cl-adapters';
+import { upgradeProxyImplementation } from './deployment-utils/upgrade-proxy-implementation';
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
@@ -270,10 +271,12 @@ task('deploy', 'Deploy contracts')
       console.log(`// balance: ${fmtEth(signerBalancePost)}`);
       console.log(`//    diff: ${fmtEth(signerBalance - signerBalancePost)}`);
 
-      await run('upgrade-proxy-implementation', {
+      await upgradeProxyImplementation({
         config,
         safe: adminMultisig,
         deployData,
+        run,
+        artifacts,
       });
 
       await registerCLAdapters({
