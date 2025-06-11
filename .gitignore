@@ -172,3 +172,6 @@ libs/ts/ui/storybook-static
 # wasm artifacts
 .spin/
 *.wasm
+
+# Local EVM contracts deployment artifacts
+config/evm_contracts_deployment_v2/local.json
