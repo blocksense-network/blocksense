@@ -12,6 +12,7 @@ import {
 } from '@blocksense/config-types/evm-contracts-deployment';
 
 import { ContractNames, NetworkConfig } from '../types';
+import { executeMultisigTransaction } from './multisig-tx-exec';
 
 type Params = {
   deployData: ContractsConfigV2;
@@ -94,7 +95,7 @@ export async function registerCLAdapters({
       `Registering ${batch.length} CLAggregatorAdapters in CLFeedRegistryAdapter`,
     );
 
-    await run('multisig-tx-exec', {
+    await executeMultisigTransaction({
       transactions: [safeTransactionData],
       safe,
       config,

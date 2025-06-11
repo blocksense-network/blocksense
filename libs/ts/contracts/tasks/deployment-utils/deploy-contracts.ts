@@ -12,6 +12,7 @@ import { ContractsConfigV2 } from '@blocksense/config-types/evm-contracts-deploy
 
 import { DeployContract, ContractNames, NetworkConfig } from '../types';
 import { predictAddress, checkAddressExists } from '../utils';
+import { executeMultisigTransaction } from './multisig-tx-exec';
 
 type Params = {
   config: NetworkConfig;
@@ -108,7 +109,7 @@ export async function deployContracts({
       transactions.length === BATCH_LENGTH ||
       (index === contracts.length - 1 && transactions.length > 0)
     ) {
-      await run('multisig-tx-exec', {
+      await executeMultisigTransaction({
         transactions,
         safe: adminMultisig,
         config,
