@@ -1,30 +1,34 @@
-import { ContractsConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
-import { task } from 'hardhat/config';
-import { ContractNames, NetworkConfig } from '../types';
+import { Contract } from 'ethers';
+import { Artifacts, RunTaskFunction } from 'hardhat/types';
 import Safe from '@safe-global/protocol-kit';
 import {
   OperationType,
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
+
+import { ContractsConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
+
+import { ContractNames, NetworkConfig } from '../types';
 import { ProxyOp } from '../../test/utils/wrappers/types';
 
-task(
-  'upgrade-proxy-implementation',
-  '[UTILS] Upgrade upgradeable proxy implementation address',
-).setAction(async (args, { ethers, artifacts, run }) => {
-  const {
-    deployData,
-    config,
-    safe,
-  }: {
-    deployData: ContractsConfigV2;
-    config: NetworkConfig;
-    safe: Safe;
-  } = args;
+type Params = {
+  deployData: ContractsConfigV2;
+  config: NetworkConfig;
+  safe: Safe;
+  run: RunTaskFunction;
+  artifacts: Artifacts;
+};
 
+export async function upgradeProxyImplementation({
+  deployData,
+  config,
+  safe,
+  run,
+  artifacts,
+}: Params) {
   const signer = config.adminMultisig.signer || config.ledgerAccount!;
 
-  const proxy = new ethers.Contract(
+  const proxy = new Contract(
     deployData.coreContracts.UpgradeableProxyADFS.address,
     artifacts.readArtifactSync(ContractNames.UpgradeableProxyADFS).abi,
     signer,
@@ -51,4 +55,4 @@ task(
     safe,
     config,
   });
-});
+}
