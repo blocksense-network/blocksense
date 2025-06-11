@@ -29,7 +29,7 @@ pub async fn aggregation_batch_consensus_loop(
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
         .name("aggregation_batch_consensus_loop")
-        .spawn_local(async move {
+        .spawn(async move {
             let block_height_tracker = SlotTimeTracker::new(
                 "aggregation_batch_consensus_loop".to_string(),
                 Duration::from_millis(block_config.block_generation_period),
@@ -151,7 +151,7 @@ pub async fn aggregation_batch_consensus_loop(
                         collected_futures.push(
                             tokio::task::Builder::new()
                                 .name(format!("safe_tx_sender network={net} block={block_height}").as_str())
-                                .spawn_local(async move {
+                                .spawn(async move {
 
                                     let mut transaction_retries_count = 0;
                                     let mut nonce_get_retries_count = 0;

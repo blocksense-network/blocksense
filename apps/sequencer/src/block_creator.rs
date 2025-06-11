@@ -38,7 +38,7 @@ pub async fn block_creator_loop(
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
         .name("block_creator")
-        .spawn_local(async move {
+        .spawn(async move {
             let span = info_span!("BlockCreator");
             let _guard = span.enter();
             let mut max_feed_updates_to_batch = block_config.max_feed_updates_to_batch;
