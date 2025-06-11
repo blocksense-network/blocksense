@@ -33,12 +33,23 @@ describe('Template Decoder @skip-coverage', function () {
   });
 
   async function generateAndDeployDecoders(fields: utils.TupleField) {
-    await generateDecoderEP(
+    const templateEP = await fs.promises.readFile(
       encodePacked.templatePath,
-      encodePacked.tempFilePath,
-      fields,
+      'utf-8',
     );
-    await generateDecoderSSZ(ssz.templatePath, ssz.tempFilePath, fields);
+    const templateSSZ = await fs.promises.readFile(ssz.templatePath, 'utf-8');
+
+    await fs.promises.writeFile(
+      encodePacked.tempFilePath,
+      await generateDecoderEP(templateEP, fields),
+      'utf-8',
+    );
+    await fs.promises.writeFile(
+      ssz.tempFilePath,
+      await generateDecoderSSZ(templateSSZ, fields),
+      'utf-8',
+    );
+
     await run('compile');
 
     const DecoderFactoryEP = await ethers.getContractFactory(
@@ -68,7 +79,7 @@ describe('Template Decoder @skip-coverage', function () {
     expect(sszResult).to.deep.equal(values);
   }
 
-  afterEach(() => {
+  afterEach(async () => {
     if (fs.existsSync(encodePacked.tempFilePath)) {
       fs.rmSync(encodePacked.tempFilePath, { force: true });
     }
