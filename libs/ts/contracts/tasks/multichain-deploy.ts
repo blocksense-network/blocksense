@@ -22,6 +22,7 @@ import { initChain } from './deployment-utils/init-chain';
 import { setUpAccessControl } from './deployment-utils/access-control';
 import { deployContracts } from './deployment-utils/deploy-contracts';
 import { deployMultisig } from './deployment-utils/deploy-multisig';
+import { registerCLAdapters } from './deployment-utils/register-cl-adapters';
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
@@ -275,10 +276,12 @@ task('deploy', 'Deploy contracts')
         deployData,
       });
 
-      await run('register-cl-adapters', {
+      await registerCLAdapters({
         config,
         safe: adminMultisig,
         deployData,
+        run,
+        artifacts,
       });
 
       await setUpAccessControl({
