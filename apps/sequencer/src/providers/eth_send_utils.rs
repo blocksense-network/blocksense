@@ -294,7 +294,7 @@ pub async fn eth_batch_send_to_contract(
 
     let mut transaction_retries_count = 0;
     let mut nonce_get_retries_count = 0;
-    let backoff_secs = 1;
+    const BACKOFF_SECS: u64 = 1;
 
     // First get the correct nonce
     let nonce = loop {
@@ -319,7 +319,7 @@ pub async fn eth_batch_send_to_contract(
                     net.as_str(),
                     &mut nonce_get_retries_count,
                     provider_metrics,
-                    backoff_secs,
+                    BACKOFF_SECS,
                 )
                 .await;
                 continue;
@@ -357,7 +357,7 @@ pub async fn eth_batch_send_to_contract(
                     net.as_str(),
                     &mut transaction_retries_count,
                     provider_metrics,
-                    backoff_secs,
+                    BACKOFF_SECS,
                 )
                 .await;
                 continue;
@@ -382,7 +382,7 @@ pub async fn eth_batch_send_to_contract(
                     net.as_str(),
                     &mut transaction_retries_count,
                     provider_metrics,
-                    backoff_secs,
+                    BACKOFF_SECS,
                 )
                 .await;
                 continue;
@@ -409,7 +409,7 @@ pub async fn eth_batch_send_to_contract(
                     net.as_str(),
                     &mut transaction_retries_count,
                     provider_metrics,
-                    backoff_secs,
+                    BACKOFF_SECS,
                 )
                 .await;
                 continue;
@@ -449,7 +449,7 @@ pub async fn eth_batch_send_to_contract(
                         net.as_str(),
                         &mut transaction_retries_count,
                         provider_metrics,
-                        backoff_secs,
+                        BACKOFF_SECS,
                     )
                     .await;
                     continue;
@@ -499,7 +499,7 @@ pub async fn eth_batch_send_to_contract(
                         net.as_str(),
                         &mut transaction_retries_count,
                         provider_metrics,
-                        backoff_secs,
+                        BACKOFF_SECS,
                     )
                     .await;
                     continue;
@@ -543,7 +543,7 @@ pub async fn eth_batch_send_to_contract(
                                         net.as_str(),
                                         &mut transaction_retries_count,
                                         provider_metrics,
-                                        backoff_secs,
+                                        BACKOFF_SECS,
                                     )
                                     .await;
                                     continue;
@@ -556,7 +556,7 @@ pub async fn eth_batch_send_to_contract(
                                     net.as_str(),
                                     &mut transaction_retries_count,
                                     provider_metrics,
-                                    backoff_secs,
+                                    BACKOFF_SECS,
                                 )
                                 .await;
                                 continue;
@@ -569,7 +569,7 @@ pub async fn eth_batch_send_to_contract(
                                 net.as_str(),
                                 &mut transaction_retries_count,
                                 provider_metrics,
-                                backoff_secs,
+                                BACKOFF_SECS,
                             )
                             .await;
                             continue;
