@@ -3,8 +3,8 @@ import ejs from 'ejs';
 import * as prettier from 'prettier/standalone';
 import solidityPlugin from 'prettier-plugin-solidity';
 
-import { sszSchema } from './utils';
-import { Schema, TupleField, organizeFieldsIntoStructs } from '../utils';
+import { Schema, sszSchema } from './utils';
+import { TupleField, organizeFieldsIntoStructs } from '../utils';
 import { generateDecoderLines } from './helpers';
 
 export const generateDecoder = async (
