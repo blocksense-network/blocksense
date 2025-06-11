@@ -20,6 +20,7 @@ import { NetworkConfig, ContractNames, DeployContract } from './types';
 import { predictAddress } from './utils';
 import { initChain } from './deployment-utils/init-chain';
 import { setUpAccessControl } from './deployment-utils/access-control';
+import { deployContracts } from './deployment-utils/deploy-contracts';
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
@@ -235,10 +236,12 @@ task('deploy', 'Deploy contracts')
         });
       }
 
-      const deployData = await run('deploy-contracts', {
+      const deployData = await deployContracts({
         config,
         adminMultisig,
         contracts,
+        run,
+        artifacts,
       });
 
       deployData.coreContracts.OnlySequencerGuard ??= {
