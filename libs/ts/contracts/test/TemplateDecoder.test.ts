@@ -52,19 +52,17 @@ describe('Template Decoder @skip-coverage', function () {
   }
 
   async function testDecoder(fields: utils.TupleField, values: any[]) {
-    const clone = (items: any) =>
-      items.map((item: any) => (Array.isArray(item) ? clone(item) : item));
-    const compareValues = clone(values);
-    const sszValues = clone(values);
-
-    const sszData = await sszUtils.sszEncodeData(fields, sszValues);
-    const [, packedValues] = processFieldsAndEncodeData([fields], [values]);
+    const sszData = await sszUtils.sszEncodeData(fields, values);
+    const [, packedValues] = processFieldsAndEncodeData(
+      [fields],
+      [structuredClone(values)],
+    );
     const { decoderEP, decoderSSZ } = await generateAndDeployDecoders(fields);
 
     const result = await decoderEP.decode(packedValues[0]);
     const sszResult = await decoderSSZ.decode(sszData);
-    expect(result).to.deep.equal(compareValues);
-    expect(sszResult).to.deep.equal(compareValues);
+    expect(result).to.deep.equal(values);
+    expect(sszResult).to.deep.equal(values);
   }
 
   afterEach(() => {

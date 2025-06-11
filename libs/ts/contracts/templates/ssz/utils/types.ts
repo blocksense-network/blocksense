@@ -25,12 +25,18 @@ export type BytesRange = {
   end: { value: Offset; isGenerated: boolean };
 };
 
+/**
+ * Checks if the schema has fields
+ */
 export const hasFields = (
   schema: Schema,
 ): schema is Schema & { fields: Schema[] } => {
   return (schema as Schema & { fields: Schema[] }).fields !== undefined;
 };
 
+/**
+ * Checks if the schema is a vector and has a length
+ */
 export const isVector = (
   schema: Schema,
 ): schema is Schema & { length: number } => {

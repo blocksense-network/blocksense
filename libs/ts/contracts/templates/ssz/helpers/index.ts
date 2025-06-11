@@ -11,7 +11,6 @@ export const generateDecoderLines = (schema: Schema, name: string) => {
     schema: Schema,
     location: string,
     index = 0,
-    // TODO make these BytesRange and have isGenerated
     start: Offset = 0,
     end: Offset = 0,
     prevSszFixedSize: number | null,
@@ -55,7 +54,6 @@ export const generateDecoderLines = (schema: Schema, name: string) => {
                       }, 0x20)
                     ), ${innerName})`
                   : `mstore(${index ? `add(${location}, ${index * 32})` : location}, ${innerName})`
-                // `mstore(${index ? `add(${location}, ${index * 32})` : location}, ${innerName})`
               }
             `);
         } else if (!schema.isFirst) {
@@ -67,7 +65,6 @@ export const generateDecoderLines = (schema: Schema, name: string) => {
           // main container which is not a Vector or List
           innerName = location;
         }
-
         schema.fields.forEach((subSchema, i) => {
           let newStart = ranges[i].start.value;
           if (!ranges[i].start.isGenerated) {
@@ -143,7 +140,6 @@ export const generateDecoderLines = (schema: Schema, name: string) => {
 
         dynamicIndex++;
       } else if (isVector(schema)) {
-        // TODO add typeguard for schema length
         // vector here
         if (schema.sszFixedSize) {
           // basic
@@ -154,7 +150,6 @@ export const generateDecoderLines = (schema: Schema, name: string) => {
             // Vector Basic for ${fieldName}
             {
           `);
-          // if (false) {
           if (schema.isNested) {
             lines.push(`
               // Create new vector space
