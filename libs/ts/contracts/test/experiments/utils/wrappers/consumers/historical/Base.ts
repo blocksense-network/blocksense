@@ -14,8 +14,8 @@ export abstract class HistoricalDataFeedStoreConsumerBaseWrapper<
   extends DataFeedStoreConsumerBaseWrapper<U>
   implements IHistoricalConsumerWrapper<HistoricalConsumer, U>
 {
-  public override contract!: HistoricalConsumer;
-  public override wrapper!: IHistoricalWrapper<U>;
+  declare public contract: HistoricalConsumer;
+  declare public wrapper: IHistoricalWrapper<U>;
 
   public override async checkSetValues(
     keys: number[],

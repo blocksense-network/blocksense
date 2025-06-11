@@ -25,7 +25,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v16
+        uses: DeterminateSystems/nix-installer-action@v17
         if: ${{ runner.environment == 'github-hosted' }}
         with:
           extra-conf: accept-flake-config = true
@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v16
+        uses: DeterminateSystems/nix-installer-action@v17
         if: ${{ runner.environment == 'github-hosted' }}
         with:
           extra-conf: accept-flake-config = true
@@ -80,7 +80,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v16
+        uses: DeterminateSystems/nix-installer-action@v17
         if: ${{ runner.environment == 'github-hosted' }}
         with:
           extra-conf: accept-flake-config = true
@@ -140,7 +140,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v16
+        uses: DeterminateSystems/nix-installer-action@v17
         if: ${{ runner.environment == 'github-hosted' }}
         with:
           extra-conf: accept-flake-config = true
@@ -176,25 +176,20 @@ jobs:
         include:
           - project: docs.blocksense.network
             path: apps/docs.blocksense.network/dist
-            project_name: blocksense
+            project_name: blocksense-docs
             build_command: yarn workspace @blocksense/docs.blocksense.network build:with-deps
           - project: ui.blocksense.network
             path: libs/ts/ui/storybook-static
             project_name: blocksense-ui
             build_command: yarn workspace @blocksense/ui build-storybook
-          - project: nft.blocksense.network
-            path: apps/nft.blocksense.network/out
-            project_name: blocksense-nft
-            build_command: yarn workspace @blocksense/nft.blocksense.network build:with-deps
     outputs:
       docsDeploymentMessage: ${{ steps.docs-ws-url.outputs.url }}
       uiDeploymentMessage: ${{ steps.ui-ws-url.outputs.url }}
-      nftDeploymentMessage: ${{ steps.nft-ws-url.outputs.url }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v16
+        uses: DeterminateSystems/nix-installer-action@v17
         if: ${{ runner.environment == 'github-hosted' }}
         with:
           extra-conf: accept-flake-config = true
@@ -242,14 +237,6 @@ jobs:
         run: |
           echo "url=$UI_DEPLOY_URL" >> $GITHUB_OUTPUT
 
-      - name: Collect NFT Deployment URL
-        id: nft-ws-url
-        if: matrix.project == 'nft.blocksense.network'
-        env:
-          NFT_DEPLOY_URL: ${{ steps.deploy-website.outputs.deployment-url }}
-        run: |
-          echo "url=$NFT_DEPLOY_URL" >> $GITHUB_OUTPUT
-
   comment_on_pr:
     needs: [deploy_websites]
     runs-on: self-hosted
@@ -272,4 +259,3 @@ jobs:
             |---------------------|----------|----------------------------------------------------------------------|
             | 🌱 [Documentation](${{ needs.deploy_websites.outputs.docsDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |
             | 📖 [UI Components](${{ needs.deploy_websites.outputs.uiDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |
-            | 🏴‍☠ [NFT website](${{ needs.deploy_websites.outputs.nftDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |

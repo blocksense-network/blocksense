@@ -14,9 +14,9 @@ use alloy::{
     },
     signers::local::PrivateKeySigner,
 };
-
 use alloy_primitives::Bytes;
 use blocksense_feeds_processing::adfs_gen_calldata::RoundCounters;
+use futures::future::join_all;
 use reqwest::Url;
 
 use blocksense_config::{AllFeedsConfig, PublishCriteria, SequencerConfig};
@@ -33,6 +33,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::{fs, mem};
+use tokio::join;
 use tokio::sync::{Mutex, RwLock};
 use tokio::time::error::Elapsed;
 use tokio::time::Duration;
@@ -88,6 +89,7 @@ pub struct RpcProvider {
     pub contracts: Vec<Contract>,
     pub rpc_url: Url,
     pub round_counters: RoundCounters,
+    num_tx_in_progress: u32,
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -122,6 +124,8 @@ async fn get_rpc_providers(
         ProviderMetrics::new(prefix).expect("Failed to allocate ProviderMetrics"),
     ));
 
+    let mut check_contracts_in_networks_tasks = Vec::new();
+
     for (net, p) in &conf.providers {
         let rpc_url: Url = p
             .url
@@ -129,15 +133,12 @@ async fn get_rpc_providers(
             .unwrap_or_else(|_| panic!("Not a valid url provided for {net}!"));
         let priv_key_path = &p.private_key_path;
         let priv_key = fs::read_to_string(priv_key_path.clone()).unwrap_or_else(|_| {
-            panic!(
-                "Failed to read private key for {} from {}",
-                net, priv_key_path
-            )
+            panic!("Failed to read private key for {net} from {priv_key_path}")
         });
         let signer: PrivateKeySigner = priv_key
             .trim()
             .parse()
-            .unwrap_or_else(|_| panic!("Incorrect private key specified {}.", priv_key));
+            .unwrap_or_else(|_| panic!("Incorrect private key specified {priv_key}."));
 
         let rpc_provider = RpcProvider::new(
             net.as_str(),
@@ -147,17 +148,15 @@ async fn get_rpc_providers(
             &provider_metrics,
             feeds_config,
         );
-        rpc_provider
-            .log_if_contract_exists(PRICE_FEED_CONTRACT_NAME)
-            .await;
-        rpc_provider
-            .log_if_contract_exists(EVENT_FEED_CONTRACT_NAME)
-            .await;
 
         let rpc_provider = Arc::new(Mutex::new(rpc_provider));
 
+        check_contracts_in_networks_tasks.push(log_if_contracts_exist(rpc_provider.clone()));
+
         providers.insert(net.clone(), rpc_provider.clone());
     }
+
+    join_all(check_contracts_in_networks_tasks).await;
 
     debug!("List of providers:");
     for (key, value) in &providers {
@@ -166,6 +165,14 @@ async fn get_rpc_providers(
     }
 
     providers
+}
+
+async fn log_if_contracts_exist(provider_mutex: Arc<Mutex<RpcProvider>>) {
+    let rpc_provider = provider_mutex.lock().await;
+    join!(
+        rpc_provider.log_if_contract_exists(PRICE_FEED_CONTRACT_NAME),
+        rpc_provider.log_if_contract_exists(EVENT_FEED_CONTRACT_NAME),
+    );
 }
 
 impl RpcProvider {
@@ -217,6 +224,7 @@ impl RpcProvider {
             contracts,
             rpc_url,
             round_counters: HashMap::new(),
+            num_tx_in_progress: 0,
         }
     }
 
@@ -499,14 +507,14 @@ impl RpcProvider {
             network,
             provider_metrics,
             get_max_priority_fee_per_gas
-        );
+        )?;
 
         let chain_id = process_provider_getter!(
             provider.get_chain_id().await,
             network,
             provider_metrics,
             get_chain_id
-        );
+        )?;
 
         let message_value = DynSolValue::Tuple(vec![DynSolValue::Address(signer.address())]);
 
@@ -534,7 +542,7 @@ impl RpcProvider {
             deploy_time.elapsed().as_millis()
         );
         self.set_contract_address(contract_name, &contract_address);
-        Ok(format!("CONTRACT_ADDRESS set to {}", contract_address))
+        Ok(format!("CONTRACT_ADDRESS set to {contract_address}"))
     }
 
     pub async fn can_read_contract_bytecode(
@@ -579,7 +587,10 @@ impl RpcProvider {
                 }
             };
         } else {
-            warn!("No contract address set for network {}", network);
+            warn!(
+                "No contract address for {contract_name} set for network {}",
+                network
+            );
         }
     }
 
@@ -643,6 +654,22 @@ impl RpcProvider {
         } else {
             Ok(0)
         }
+    }
+
+    pub fn inc_num_tx_in_progress(&mut self) {
+        self.num_tx_in_progress += 1;
+    }
+
+    pub fn dec_num_tx_in_progress(&mut self) {
+        if self.num_tx_in_progress == 0 {
+            error!("Logical error! Trying to reduce the number of tx_in_progress, but there are 0 pending!");
+        } else {
+            self.num_tx_in_progress -= 1;
+        }
+    }
+
+    pub fn get_num_tx_in_progress(&self) -> u32 {
+        self.num_tx_in_progress
     }
 }
 // pub fn print_type<T>(_: &T) {

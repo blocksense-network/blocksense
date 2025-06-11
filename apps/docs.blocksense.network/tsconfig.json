@@ -1,24 +1,25 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true,
     "lib": [
       "ES2022",
       "DOM",
-      "DOM.Iterable"
+      "DOM.Iterable",
+      "ES2024.Promise" // polyfilled in @blocksense/base-utils
     ],
+    "noEmit": true,
     "allowJs": true,
+    // Required to enable strict type checking in MDX files, as they are
+    // transpiled to JS.
+    "checkJs": true,
     "incremental": true,
+    "composite": true,
     "module": "esnext",
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@/sol-contracts-components/*": [
-        "components/sol-contracts/*"
-      ]
+      "@/*": ["./*"],
+      "@/sol-contracts-components/*": ["components/sol-contracts/*"]
     },
     "plugins": [
       {
@@ -26,11 +27,12 @@
       }
     ]
   },
+  "mdx": {
+    // Enable strict type checking in MDX files.
+    "checkMdx": true
+  },
   "files": [],
-  "include": [
-    ".next/types/**/*.ts",
-    "dist/types/**/*.ts"
-  ],
+  "include": [".next/types/**/*.ts", "dist/types/**/*.ts"],
   "references": [
     {
       "path": "./tsconfig.lib.json"

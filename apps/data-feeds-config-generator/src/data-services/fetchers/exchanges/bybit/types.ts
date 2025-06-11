@@ -12,7 +12,7 @@ const BybitAssetInfoSchema = S.mutable(
   }),
 );
 
-export type BybitAssetInfo = S.Schema.Type<typeof BybitAssetInfoSchema>;
+export type BybitAssetInfo = typeof BybitAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about symbols received from Bybit.
@@ -31,9 +31,8 @@ export const BybitInstrumentsInfoRespSchema = S.Struct({
   }),
 });
 
-export type BybitInstrumentsInfoResp = S.Schema.Type<
-  typeof BybitInstrumentsInfoRespSchema
->;
+export type BybitInstrumentsInfoResp =
+  typeof BybitInstrumentsInfoRespSchema.Type;
 
 export const BybitPriceSchema = S.mutable(
   S.Struct({
@@ -50,7 +49,7 @@ export const BybitPriceSchema = S.mutable(
   }),
 );
 
-export type BybitPrice = S.Schema.Type<typeof BybitPriceSchema>;
+export type BybitPrice = typeof BybitPriceSchema.Type;
 
 /**
  * Function to decode Bybit symbol information.

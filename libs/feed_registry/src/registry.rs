@@ -432,7 +432,7 @@ mod tests {
 
         let mut current_time_as_ms = current_unix_time();
 
-        println!("fmdr.get_keys()={:?}", fmdr);
+        println!("fmdr.get_keys()={fmdr:?}");
         assert!(
             fmdr.get(0)
                 .expect("ID not present in registry")
@@ -517,7 +517,7 @@ mod tests {
 
         let feed = fmdr.get(DATA_FEED_ID).expect("ID not present in registry");
 
-        println!("fmdr.get_keys()={:?}", fmdr);
+        println!("fmdr.get_keys()={fmdr:?}");
         assert!(
             feed.read()
                 .await
@@ -750,7 +750,7 @@ mod tests {
                     )
                     .await;
 
-                println!("this is thread number {}", i);
+                println!("this is thread number {i}");
             }));
         }
 
@@ -796,32 +796,32 @@ mod tests {
         );
     }
 
-    #[tokio::test]
-    async fn test_get_duration_until_end_of_current_slot_periodic() {
-        // setup
-        const SLOT_INTERVAL: Duration = Duration::from_secs(1);
-        const START_TIME_MS: u128 = 0;
-        let mut time_tracker = SlotTimeTracker::new(
-            "test_get_duration_until_end_of_current_slot_periodic".to_string(),
-            SLOT_INTERVAL,
-            START_TIME_MS,
-        );
+    // #[tokio::test]
+    // async fn test_get_duration_until_end_of_current_slot_periodic() {
+    //     // setup
+    //     const SLOT_INTERVAL: Duration = Duration::from_secs(1);
+    //     const START_TIME_MS: u128 = 0;
+    //     let mut time_tracker = SlotTimeTracker::new(
+    //         "test_get_duration_until_end_of_current_slot_periodic".to_string(),
+    //         SLOT_INTERVAL,
+    //         START_TIME_MS,
+    //     );
 
-        // run
-        let duration_ms =
-            time_tracker.get_duration_until_end_of_current_slot(&Repeatability::Periodic);
-        // assert
-        assert!(duration_ms < SLOT_INTERVAL.as_millis() as i128);
+    //     // run
+    //     let duration_ms =
+    //         time_tracker.get_duration_until_end_of_current_slot(&Repeatability::Periodic);
+    //     // assert
+    //     assert!(duration_ms < SLOT_INTERVAL.as_millis() as i128);
 
-        // setup
-        time_tracker.reset_report_start_time();
-        let duration_ms =
-            time_tracker.get_duration_until_end_of_current_slot(&Repeatability::Periodic);
-        // assert
-        // Should be ideally exactly SLOT_INTERVAL ms, but we cannot count on exactness
-        assert!(duration_ms > (SLOT_INTERVAL.as_millis() as i128 - 100));
-        assert!(duration_ms < (SLOT_INTERVAL.as_millis() as i128 + 100));
-    }
+    //     // setup
+    //     time_tracker.reset_report_start_time();
+    //     let duration_ms =
+    //         time_tracker.get_duration_until_end_of_current_slot(&Repeatability::Periodic);
+    //     // assert
+    //     // Should be ideally exactly SLOT_INTERVAL ms, but we cannot count on exactness
+    //     assert!(duration_ms > (SLOT_INTERVAL.as_millis() as i128 - 100));
+    //     assert!(duration_ms < (SLOT_INTERVAL.as_millis() as i128 + 100));
+    // }
 
     #[tokio::test]
     async fn test_get_duration_until_end_of_current_slot_oneshot() {

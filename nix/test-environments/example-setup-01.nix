@@ -19,6 +19,9 @@ let
   impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
 in
 {
+  services.kafka = {
+    enable = true;
+  };
   services.blocksense = {
     enable = true;
 
@@ -109,7 +112,6 @@ in
         ink-sepolia = {
           private-key-path = "${testKeysDir}/sequencer-private-key";
           contract-address = upgradeableProxyADFSContractAddressInk;
-          safe-address = "0x23BC561ea93063B0cD12b6E3c690D40c93e29692";
           contract-version = 2;
           transaction-gas-limit = 20000000;
           impersonated-anvil-account = impersonationAddress;
@@ -134,12 +136,18 @@ in
         id = 0;
         default-exec-interval = 30;
         secret-key-path = "${testKeysDir}/reporter_secret_key";
-        api-keys = { };
+        second-consensus-secret-key-path = "${testKeysDir}/reporter_second_consensus_secret_key";
+        api-keys = {
+          ALPHAVANTAGE_API_KEY = "${testKeysDir}/ALPHAVANTAGE_API_KEY";
+          YAHOO_FINANCE_API_KEY = "${testKeysDir}/YAHOO_FINANCE_API_KEY";
+          TWELVEDATA_API_KEY = "${testKeysDir}/TWELVEDATA_API_KEY";
+          FMP_API_KEY = "${testKeysDir}/FMP_API_KEY";
+        };
       };
     };
 
     oracles = {
-      crypto-price-feeds = {
+      cex-price-feeds = {
         exec-interval = 40;
         allowed-outbound-hosts = [
           "https://api.kraken.com"
@@ -182,12 +190,27 @@ in
         allowed-outbound-hosts = [
           "https://eth.llamarpc.com"
           "https://rpc.eth.gateway.fm"
+          "https://ethereum-rpc.publicnode.com"
+          "https://binance.llamarpc.com"
+          "https://bsc.meowrpc.com"
+          "https://bsc.drpc.org"
         ];
       };
 
       stock-price-feeds = {
         exec-interval = 60;
-        allowed-outbound-hosts = [ ];
+        allowed-outbound-hosts = [
+          "https://www.alphavantage.co"
+          "https://yfapi.net"
+          "https://api.twelvedata.com"
+          "https://financialmodelingprep.com"
+        ];
+        api-keys = [
+          "ALPHAVANTAGE_API_KEY"
+          "YAHOO_FINANCE_API_KEY"
+          "TWELVEDATA_API_KEY"
+          "FMP_API_KEY"
+        ];
       };
     };
   };

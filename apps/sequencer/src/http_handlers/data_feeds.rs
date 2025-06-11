@@ -63,7 +63,7 @@ async fn process_report(
                     Ok(val) => val,
                     Err(e) => {
                         inc_metric!(reporter_metrics, reporter_id, non_valid_feed_id_reports);
-                        debug!("Error parsing input's feed_id: {}", e);
+                        debug!("Error parsing input's feed_id: {e}");
                         return HttpResponse::BadRequest().into();
                     }
                 };
@@ -78,8 +78,8 @@ async fn process_report(
                     ) {
                         drop(rlocked_reporter);
                         warn!(
-                            "Signature check failed for feed_id: {} from reporter_id: {}",
-                            feed_id, reporter_id
+                            "Signature check failed for feed_id: {} from reporter_id: {} data_feed: {:?}",
+                            feed_id, reporter_id, data_feed
                         );
                         inc_metric!(reporter_metrics, reporter_id, non_valid_signature);
                         return HttpResponse::Unauthorized().into();
@@ -132,9 +132,11 @@ async fn process_report(
 
     // check if the time stamp in the msg is <= current_time_as_ms
     // and check if it is inside the current active slot frame.
-    let report_relevance = {
+    let (report_relevance, always_publish_heartbeat_ms) = {
         let feed = feed.read().await;
-        feed.check_report_relevance(current_time_as_ms, msg_timestamp)
+        let report_relevance = feed.check_report_relevance(current_time_as_ms, msg_timestamp);
+        let always_publish_heartbeat_ms = feed.always_publish_heartbeat_ms.unwrap_or(0);
+        (report_relevance, always_publish_heartbeat_ms)
     };
 
     match report_relevance {
@@ -148,9 +150,10 @@ async fn process_report(
                     );
                     inc_vec_metric!(
                         reporter_metrics,
-                        reporter_id,
                         timely_reports_per_feed,
-                        feed_id
+                        reporter_id,
+                        feed_id,
+                        always_publish_heartbeat_ms
                     );
                 }
                 VoteStatus::RevoteForSlot(prev_vote) => {
@@ -160,9 +163,10 @@ async fn process_report(
                     );
                     inc_vec_metric!(
                         reporter_metrics,
-                        reporter_id,
                         total_revotes_for_same_slot_per_feed,
-                        feed_id
+                        reporter_id,
+                        feed_id,
+                        always_publish_heartbeat_ms
                     );
                 }
             }
@@ -175,9 +179,10 @@ async fn process_report(
             );
             inc_vec_metric!(
                 reporter_metrics,
-                reporter_id,
                 late_reports_per_feed,
-                feed_id
+                reporter_id,
+                feed_id,
+                always_publish_heartbeat_ms
             );
         }
         ReportRelevance::NonRelevantInFuture => {
@@ -187,9 +192,10 @@ async fn process_report(
             );
             inc_vec_metric!(
                 reporter_metrics,
-                reporter_id,
                 in_future_reports_per_feed,
-                feed_id
+                reporter_id,
+                feed_id,
+                always_publish_heartbeat_ms
             );
         }
     }
@@ -759,11 +765,11 @@ pub mod tests {
                     Ok(res) => match res {
                         Ok(x) => x,
                         Err(e) => {
-                            panic!("TaskError: {}", e);
+                            panic!("TaskError: {e}");
                         }
                     },
                     Err(e) => {
-                        panic!("JoinError: {} ", e);
+                        panic!("JoinError: {e} ");
                     }
                 }
             }
@@ -781,7 +787,7 @@ pub mod tests {
 
         // Deploy event_feed contract
         let req = test::TestRequest::get()
-            .uri(&format!("/deploy/{}/event_feed", network))
+            .uri(&format!("/deploy/{network}/event_feed"))
             .to_request();
 
         let resp = test::call_service(&app, req).await;

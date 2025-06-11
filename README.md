@@ -5,7 +5,7 @@
       <pre>The programmable oracle for trustless compute.</pre>
     </td>
     <td valign="center">
-      <a href="https://docs.blocksense.network" target="_blank">
+      <a href="https://blocksense.network" target="_blank">
         <img src="./docs/assets/img/blocksense-logo.jpg" align="center" width="120">
       </a>
     </td>
@@ -21,7 +21,7 @@
 
 ## 🚀 Overview
 
-Blocksense is a **permissionless oracle network** that enables builders to bring **real-world data on-chain** with maximum flexibility and efficiency. Designed for **ZK-enabled applications** and decentralized compute, Blocksense offers:
+Blocksense is a **permissionless oracle network** that enables builders to bring **real-world data on-chain** with maximum flexibility and efficiency. Our WebAssembly-based [SDK](libs/sdk/README.md) enables the seamless creation of blockchain oracles that can leverage both CPU and GPU computations.
 
 - ✅ **Cost-effective, verifiable data feeds** for DeFi, prediction markets, and beyond.
 - 🔒 **SchellingCoin-based consensus & ZK-proof-secured reporting.**
@@ -46,7 +46,7 @@ Blocksense is a **permissionless oracle network** that enables builders to bring
 
 Join the Blocksense community! 🎉
 
-[![Discord](https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white&style=for-the-badge)](https://discord.gg/b3xmcWs4Qp)
+[![Discord](https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white&style=for-the-badge)](https://discord.gg/blocksense)
 [![Twitter/X](https://img.shields.io/badge/X-000000?logo=x&logoColor=white&style=for-the-badge)](https://x.com/blocksense_)
 [![Telegram](https://img.shields.io/badge/Telegram-26A5E4?logo=telegram&logoColor=white&style=for-the-badge)](https://t.me/BlocksenseNetwork)
 

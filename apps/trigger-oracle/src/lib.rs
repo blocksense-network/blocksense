@@ -23,7 +23,7 @@ use tokio::{
         RwLock,
     },
     task::{spawn, Builder, JoinHandle},
-    time::{sleep, Duration},
+    time::{sleep, timeout, Duration},
 };
 use tracing::Instrument;
 use url::Url;
@@ -300,7 +300,7 @@ impl TriggerExecutor for OracleTrigger {
 
         tracing::info!("Sequencer URL provided: {}", &self.sequencer);
         let (data_feed_sender, data_feed_receiver) = unbounded_channel();
-        let (signal_data_feed_sender, _) = channel(16);
+        let (signal_data_feed_sender, _) = channel(64);
         let data_feed_results: DataFeedResults = Arc::new(RwLock::new(HashMap::new()));
         let mut feeds_config = HashMap::new();
         //TODO(adikov): Move all the logic to a different struct and handle
@@ -456,14 +456,32 @@ impl OracleTrigger {
                 intersection.len()
             );
 
-            let payload = match Self::execute_wasm(engine.clone(), &component, intersection).await {
-                Ok(payload) => {
-                    tracing::trace!("Component `{component_id}` executed successfully");
-                    payload
+            let payload = match timeout(
+                Duration::from_secs(component.interval_time_in_seconds),
+                Self::execute_wasm(engine.clone(), &component, intersection),
+            )
+            .await
+            {
+                Ok(result) => {
+                    match result {
+                        Ok(payload) => {
+                            tracing::trace!("Component `{component_id}` executed successfully");
+                            payload
+                        }
+                        Err(error) => {
+                            tracing::error!(
+                                "Component - ({component_id}) execution ended with error {}",
+                                error
+                            );
+                            //TODO(adikov): We need to come up with proper way of handling errors in wasm
+                            //components.
+                            continue;
+                        }
+                    }
                 }
                 Err(error) => {
                     tracing::error!(
-                        "Component - ({component_id}) execution ended with error {}",
+                        "Component - ({component_id}) execution ended with timout - {}",
                         error
                     );
                     //TODO(adikov): We need to come up with proper way of handling errors in wasm
@@ -507,7 +525,7 @@ impl OracleTrigger {
             );
             join_handles.push(
                 tokio::task::Builder::new()
-                    .name(format!("orchestrator-{}", key).as_str())
+                    .name(format!("orchestrator-{key}").as_str())
                     .spawn(future)
                     .expect("orchestrator failed to start"),
             );
@@ -615,8 +633,7 @@ impl OracleTrigger {
             Err(err) => {
                 tracing::error!("Error while creating kafka consumer: {:?}", err);
                 return TerminationReason::Other(format!(
-                    "Error while creating kafka consumer: {:?}",
-                    err
+                    "Error while creating kafka consumer: {err:?}"
                 ));
             }
         };
@@ -624,8 +641,7 @@ impl OracleTrigger {
         // Subscribe to the desired topic(s)
         if let Err(err) = consumer.subscribe(&["aggregation_consensus"]) {
             return TerminationReason::Other(format!(
-                "Error while subscribing to kafka topic: {:?}",
-                err
+                "Error while subscribing to kafka topic: {err:?}"
             ));
         };
 
@@ -666,10 +682,7 @@ impl OracleTrigger {
                     tracing::error!("Error while consuming: {:?}", err);
                     total_err_messages += 1;
                     if total_err_messages >= TOTAL_RETRIES_FOR_KAFKA_READ {
-                        return TerminationReason::Other(format!(
-                            "Error while consuming: {:?}",
-                            err
-                        ));
+                        return TerminationReason::Other(format!("Error while consuming: {err:?}"));
                     }
                     let _ = sleep(Duration::from_millis(TIME_BEFORE_KAFKA_READ_RETRY_IN_MS)).await;
                     continue;
@@ -813,12 +826,12 @@ impl OracleTrigger {
             {
                 Ok(_) => {
                     tracing::info!(
-                        "Validated batch to post to contract: block_height={block_height}"
+                        "Validated batch to post to contract: block height = {block_height}"
                     );
                 }
                 Err(e) => {
                     tracing::error!(
-                        "Failed to validate second consensus for block_height={block_height}: {}",
+                        "Failed to validate second consensus for block height = {block_height}: {}",
                         &e
                     );
                     continue;
@@ -995,7 +1008,7 @@ impl OutboundWasiHttpHandler for HttpRuntimeData {
                 terminal::warn!("A component tried to make a HTTP request to the same component but it does not have permission.");
                 "self".into()
             };
-            eprintln!("To allow requests, add 'allowed_outbound_hosts = [\"{}\"]' to the manifest component section.", host);
+            eprintln!("To allow requests, add 'allowed_outbound_hosts = [\"{host}\"]' to the manifest component section.");
             return Err(ErrorCode::HttpRequestDenied.into());
         }
 

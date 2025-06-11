@@ -14,7 +14,8 @@
     "lib": [
       "ES2022",
       "DOM",
-      "DOM.Iterable"
+      "DOM.Iterable",
+      "ES2024.Promise" // polyfilled in @blocksense/base-utils
     ],
     "module": "ESNext",
     "jsx": "preserve",
@@ -36,5 +37,5 @@
     "**/*.cjs",
     "**/*.js",
     ".next/types/**/*.ts"
-  ],
+  ]
 }

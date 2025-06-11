@@ -15,6 +15,8 @@
     "build-single": "yarn workspace $0 run build",
     "build:recursive": "yarn workspaces foreach --from $0 -Rp --topological-dev run build",
     "build:with-deps": "yarn build:recursive $(jq -r .name $INIT_CWD/package.json)",
+    "build:typecheck": "rm -rf $INIT_CWD/dist && tsc -p $INIT_CWD/tsconfig.json",
+    "build:typecheck-rec": "yarn workspaces foreach -Rp --topological-dev --from $(jq -r .name $INIT_CWD/package.json) run tsc -p $INIT_CWD/tsconfig.json",
     "build:all": "yarn workspaces foreach --all -p --topological-dev run build",
     "test": "yarn workspaces foreach --from $0 -Rp --topological-dev run test",
     "test-single": "yarn workspace $0 run test",
@@ -49,7 +51,7 @@
     "react": "^18.3.1",
     "ts-node": "^10.9.2",
     "typescript": "5.8.3",
-    "wrangler": "^3.109.2"
+    "wrangler": "^4.15.2"
   },
   "resolutions": {
     "babel-plugin-react-compiler": "patch:babel-plugin-react-compiler@0.0.0-experimental-22c6e49-20241219#./.yarn/patches/babel-plugin-react-compiler@0.0.0-experimental-22c6e49-20241219.patch"

@@ -1,6 +1,7 @@
 use blocksense_gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_gnosis_safe::utils::{SafeTx, SignatureWithAddress};
+use std::collections::HashSet;
 use std::collections::{HashMap, VecDeque};
 use tracing::{debug, error, warn};
 
@@ -15,6 +16,7 @@ pub struct CallDataWithSignatures {
     pub tx_hash: String,
     pub safe_tx: SafeTx,
     pub signatures: HashMap<u64, SignatureWithAddress>,
+    pub updated_feeds_ids: HashSet<u32>,
 }
 
 pub struct AggregationBatchConsensus {
@@ -68,6 +70,7 @@ impl AggregationBatchConsensus {
                 tx_hash: batch.tx_hash.clone(),
                 safe_tx: safe_transaction,
                 signatures: HashMap::new(),
+                updated_feeds_ids: batch.updates.iter().map(|update| update.feed_id).collect(),
             },
         );
     }
@@ -105,7 +108,9 @@ impl AggregationBatchConsensus {
         &mut self,
         current_block_height: u64,
         retention_time_blocks: u64,
-    ) {
+    ) -> Vec<(String, CallDataWithSignatures)> {
+        // Return all timed out batches
+        let mut timed_out_batches = Vec::new();
         // Pop elements older than time_point and check if they also need to be removed from in_progress_batches
         while let Some(key) = self.backlog_batches.front() {
             if key.block_height + retention_time_blocks >= current_block_height {
@@ -113,16 +118,18 @@ impl AggregationBatchConsensus {
             }
             debug!("Cleanup call for: {key:?}");
             if let Some(calldata_with_signatures) = self.in_progress_batches.remove(key) {
-                warn!("Removing timed out (did not collect quorum of signatures as of block {}) entry for network: {}, block_height: {} with calldata: {:?}",
+                warn!("Removing timed out (did not collect quorum of signatures as of block {}) entry for network: {}, block height: {} with calldata: {:?}",
                     current_block_height,
                     key.network,
                     key.block_height,
                     calldata_with_signatures);
+                timed_out_batches.push((key.network.clone(), calldata_with_signatures));
             } else {
                 debug!("{key:?} has collected quorum of signatures");
             }
             self.backlog_batches.pop_front();
         }
+        timed_out_batches
     }
 }
 

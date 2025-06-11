@@ -8,8 +8,7 @@ where
     match serde_json::from_str::<Value>(data_str) {
         Ok(json_value) => json_value.serialize(serializer),
         Err(e) => Err(S::Error::custom(format!(
-            "Failed to parse data field as JSON: {}. Content: '{}'",
-            e, data_str
+            "Failed to parse data field as JSON: {e}. Content: '{data_str}'"
         ))),
     }
 }

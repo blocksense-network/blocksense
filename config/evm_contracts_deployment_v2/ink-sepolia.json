@@ -5,15 +5,11 @@
     "coreContracts": {
       "AccessControl": {
         "address": "0x7A5dC9839F54674FDEc55FD7a55135cc0C63721C",
-        "constructorArgs": [
-          "0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De"
-        ]
+        "constructorArgs": ["0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De"]
       },
       "AggregatedDataFeedStore": {
         "address": "0x949eC8967A04FeaAc6E36a691A98558e4c5166C3",
-        "constructorArgs": [
-          "0x7A5dC9839F54674FDEc55FD7a55135cc0C63721C"
-        ]
+        "constructorArgs": ["0x7A5dC9839F54674FDEc55FD7a55135cc0C63721C"]
       },
       "UpgradeableProxyADFS": {
         "address": "0xADF5aa44AD27a0a657cf19b573261cBcfA4D7Cf3",

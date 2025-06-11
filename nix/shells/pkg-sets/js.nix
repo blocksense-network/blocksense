@@ -1,9 +1,13 @@
 { pkgs, lib, ... }:
 let
-  nodejs = pkgs.nodejs_23;
+  nodejs = pkgs.nodejs_24;
   corepack = pkgs.corepack.override { inherit nodejs; };
 in
 {
+  imports = [
+    ./anvil.nix
+  ];
+
   packages =
     [
       nodejs

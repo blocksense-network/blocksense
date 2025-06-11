@@ -1,126 +1,87 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-import {Blocksense} from '../../libraries/Blocksense.sol';
+import {ADFS} from '../../libraries/ADFS.sol';
 
 /**
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
  * DO NOT USE THIS CODE IN PRODUCTION.
  */
-contract BlocksenseADFSConsumer {
+contract ADFSConsumer {
   address public immutable adfs;
 
   constructor(address _adfs) {
     adfs = _adfs;
   }
 
-  function getLatestSingleFeedData(uint256 id) external view returns (bytes32) {
-    return Blocksense._getLatestSingleFeedData(adfs, id);
+  function getLatestSingleData(uint256 id) external view returns (bytes32) {
+    return ADFS.getLatestSingleData(adfs, id);
   }
 
-  function getLatestFeedData(
-    uint256 stride,
-    uint256 id
-  ) external view returns (bytes32[] memory) {
-    return Blocksense._getLatestFeedData(adfs, stride, id);
+  function getLatestData(uint256 id) external view returns (bytes32[] memory) {
+    return ADFS.getLatestData(adfs, id);
   }
 
-  function getLatestSlicedFeedData(
-    uint256 stride,
+  function getLatestDataSlice(
     uint256 id,
     uint256 startSlot,
     uint256 slotsCount
   ) external view returns (bytes32[] memory) {
-    return
-      Blocksense._getLatestSlicedFeedData(
-        adfs,
-        stride,
-        id,
-        startSlot,
-        slotsCount
-      );
+    return ADFS.getLatestDataSlice(adfs, id, startSlot, slotsCount);
   }
 
-  function getLatestRound(
-    uint256 stride,
-    uint256 id
-  ) external view returns (uint256 round) {
-    return Blocksense._getLatestRound(adfs, stride, id);
+  function getLatestIndex(uint256 id) external view returns (uint256 index) {
+    return ADFS.getLatestIndex(adfs, id);
   }
 
-  function getSingleFeedDataAtRound(
+  function getSingleDataAtIndex(
     uint256 id,
-    uint256 round
+    uint256 index
   ) external view returns (bytes32) {
-    return Blocksense._getSingleFeedDataAtRound(adfs, id, round);
+    return ADFS.getSingleDataAtIndex(adfs, id, index);
   }
 
-  function getFeedDataAtRound(
-    uint256 stride,
+  function getDataAtIndex(
     uint256 id,
-    uint256 round
+    uint256 index
   ) external view returns (bytes32[] memory) {
-    return Blocksense._getFeedDataAtRound(adfs, stride, id, round);
+    return ADFS.getDataAtIndex(adfs, id, index);
   }
 
-  function getSlicedFeedDataAtRound(
-    uint256 stride,
+  function getDataSliceAtIndex(
     uint256 id,
-    uint256 round,
+    uint256 index,
     uint256 startSlot,
     uint256 slotsCount
   ) external view returns (bytes32[] memory) {
-    return
-      Blocksense._getSlicedFeedDataAtRound(
-        adfs,
-        stride,
-        id,
-        round,
-        startSlot,
-        slotsCount
-      );
+    return ADFS.getDataSliceAtIndex(adfs, id, index, startSlot, slotsCount);
   }
 
-  function getLatestSingleFeedDataAndRound(
+  function getLatestSingleDataAndIndex(
     uint256 id
-  ) external view returns (bytes32 data, uint256 round) {
-    return Blocksense._getLatestSingleFeedDataAndRound(adfs, id);
+  ) external view returns (bytes32 data, uint256 index) {
+    return ADFS.getLatestSingleDataAndIndex(adfs, id);
   }
 
-  function getLatestFeedDataAndRound(
-    uint256 stride,
+  function getLatestDataAndIndex(
     uint256 id
-  ) external view returns (bytes32[] memory data, uint256 round) {
-    return Blocksense._getLatestFeedDataAndRound(adfs, stride, id);
+  ) external view returns (bytes32[] memory data, uint256 index) {
+    return ADFS.getLatestDataAndIndex(adfs, id);
   }
 
-  function getLatestSlicedFeedDataAndRound(
-    uint256 stride,
+  function getLatestDataSliceAndIndex(
     uint256 id,
     uint256 startSlot,
     uint256 slotsCount
-  ) external view returns (bytes32[] memory data, uint256 round) {
-    return
-      Blocksense._getLatestSlicedFeedDataAndRound(
-        adfs,
-        stride,
-        id,
-        startSlot,
-        slotsCount
-      );
+  ) external view returns (bytes32[] memory data, uint256 index) {
+    return ADFS.getLatestDataSliceAndIndex(adfs, id, startSlot, slotsCount);
   }
 
   function getEpochSeconds(uint256 id) external view returns (uint64) {
-    return
-      Blocksense._getEpochSeconds(
-        Blocksense._getLatestSingleFeedData(adfs, id)
-      );
+    return ADFS.getEpochSeconds(ADFS.getLatestSingleData(adfs, id));
   }
 
   function getEpochMilliseconds(uint256 id) external view returns (uint64) {
-    return
-      Blocksense._getEpochMilliseconds(
-        Blocksense._getLatestSingleFeedData(adfs, id)
-      );
+    return ADFS.getEpochMilliseconds(ADFS.getLatestSingleData(adfs, id));
   }
 }

@@ -9,8 +9,11 @@ import { Schema as S } from 'effect';
 
 import { getEnvString, getOptionalEnvString } from '../env/functions';
 import { EthereumAddress, TxHash } from './hex-types';
-import { KebabToSnakeCase, kebabToSnakeCase } from '../string';
-import { NumberFromSelfBigIntOrString } from '../numeric';
+import {
+  KebabToScreamingSnakeCase,
+  kebabToScreamingSnakeCase,
+} from '../string';
+import { NumberFromSelfBigIntOrString } from '../schemas';
 
 const networks = [
   'local',
@@ -46,6 +49,7 @@ const networks = [
   'cronos-testnet',
   'cyber-testnet',
   'expchain-testnet',
+  'exSat-testnet',
   'fantom-mainnet',
   'fantom-testnet',
   'flare-coston',
@@ -58,6 +62,7 @@ const networks = [
   'hemi-sepolia',
   'hoodi-testnet',
   'horizen-gobi',
+  'hyperliquid-evm-testnet',
   'inevm-testnet',
   'ink-mainnet',
   'ink-sepolia',
@@ -83,6 +88,7 @@ const networks = [
   'monad-testnet',
   'morph-mainnet',
   'morph-holesky',
+  'nexera-testnet',
   'okto-testnet',
   'ontology-testnet',
   'optimism-mainnet',
@@ -90,6 +96,7 @@ const networks = [
   'opbnb-testnet',
   'ozean-poseidon-testnet',
   'pharos-devnet',
+  'pharos-testnet',
   'plume-mainnet',
   'plume-testnet',
   'polygon-mainnet',
@@ -110,6 +117,7 @@ const networks = [
   'superseed-mainnet',
   'superseed-sepolia',
   'swellchain-testnet',
+  'tac-spb',
   'tac-turin',
   'taiko-mainnet',
   'taiko-hekla',
@@ -128,32 +136,56 @@ const chainIds = [
   99999999999, 1, 11155111, 17000, 11124, 1088, 42161, 421614, 1313161555,
   43114, 43113, 8453, 84532, 80094, 80084, 80069, 200901, 200810, 81457,
   168587773, 56288, 9728, 288, 28882, 56, 97, 325000, 42220, 44787, 5115, 66665,
-  338, 111557560, 18880, 250, 4002, 114, 252, 2522, 10888, 100, 10200,
-  1666700000, 743111, 560048, 1663, 2424, 57073, 763373, 2221, 2358, 1284, 1287,
-  1285, 59144, 59141, 4202, 994873017, 1952959480, 169, 3441006, 5000, 5003,
-  1750, 59902, 6342, 31611, 10143, 2818, 2810, 8801, 5851, 10, 11155420, 5611,
-  7849306, 50002, 98866, 98867, 137, 80002, 1101, 2442, 57000, 200018, 31,
-  534352, 534351, 11011, 50312, 16, 146, 57054, 1660990954, 5330, 53302, 1924,
-  2390, 167000, 167009, 5678, 842, 41, 130, 1301, 4801, 1417429182, 324, 300,
+  338, 111557560, 18880, 839999, 250, 4002, 114, 252, 2522, 10888, 100, 10200,
+  1666700000, 743111, 560048, 1663, 998, 2424, 57073, 763373, 2221, 2358, 1284,
+  1287, 1285, 59144, 59141, 4202, 994873017, 1952959480, 169, 3441006, 5000,
+  5003, 1740, 59902, 6342, 31611, 10143, 2818, 2810, 72080, 8801, 5851, 10,
+  11155420, 5611, 7849306, 50002, 688688, 98866, 98867, 137, 80002, 1101, 2442,
+  57000, 200018, 31, 534352, 534351, 11011, 50312, 16, 146, 57054, 1660990954,
+  5330, 53302, 1924, 2391, 2390, 167000, 167009, 5678, 842, 41, 130, 1301, 4801,
+  1417429182, 324, 300,
 ] as const;
 
-export const networkName = S.Literal(...networks);
+export const networkName = S.Literal(...networks).annotations({
+  identifier: 'NetworkName',
+});
 export const isNetworkName = S.is(networkName);
 export const parseNetworkName = S.decodeUnknownSync(networkName);
-export type NetworkName = S.Schema.Type<typeof networkName>;
+export type NetworkName = typeof networkName.Type;
 
 export const chainId = S.compose(
   NumberFromSelfBigIntOrString,
-  S.Literal(...chainIds),
+  S.Literal(...chainIds).annotations({ identifier: 'ChainId' }),
 );
 export const isChainId = S.is(chainId);
 export const parseChainId = S.decodeUnknownSync(chainId);
-export type ChainId = S.Schema.Type<typeof chainId>;
+export type ChainId = typeof chainId.Type;
 
 export const network = S.Union(networkName, chainId);
 export const isNetwork = S.is(network);
 export const parseNetwork = S.decodeUnknownSync(network);
-export type Network = S.Schema.Type<typeof network>;
+export type Network = typeof network.Type;
+
+export const networkKindSchema = S.Literal(
+  'local',
+  'testnet',
+  'mainnet',
+).annotations({ identifier: 'NetworkKind' });
+export type NetworkKind = typeof networkKindSchema.Type;
+
+export type NetworkNameToKind<N extends NetworkName> = N extends 'local'
+  ? 'local'
+  : (typeof networkMetadata)[N]['isTestnet'] extends true
+    ? 'testnet'
+    : 'mainnet';
+
+export function getNetworkKind<N extends NetworkName>(
+  network: N,
+): NetworkNameToKind<N> {
+  if (network === 'local') return 'local' as any;
+  if (isTestnet(network)) return 'testnet' as any;
+  return 'mainnet' as any;
+}
 
 export enum Currency {
   ETH = 'ETH',
@@ -170,6 +202,7 @@ export enum Currency {
   frxETH = 'frxETH',
   FTM = 'FTM',
   GLMR = 'GLMR',
+  HYPE = 'HYPE',
   INJ = 'INJ',
   KAVA = 'KAVA',
   LUMIA = 'LUMIA',
@@ -181,6 +214,7 @@ export enum Currency {
   OKTO = 'OKTO',
   ONE = 'ONE',
   ONG = 'ONG',
+  PHRS = 'PHRS',
   PLUME = 'PLUME',
   POL = 'POL',
   ROME = 'ROME',
@@ -195,6 +229,7 @@ export enum Currency {
   tFTM = 'tFTM',
   tGS = 'tGS',
   TLOS = 'TLOS',
+  tNXRA = 'tNXRA',
   tRBTC = 'tRBTC',
   TSYS = 'TSYS',
   tZEN = 'tZEN',
@@ -407,6 +442,12 @@ export const networkMetadata = {
     explorerUrl: 'https://blockscout-testnet.expchain.ai',
     currency: Currency.tZKJ,
   },
+  'exSat-testnet': {
+    chainId: 839999,
+    isTestnet: true,
+    explorerUrl: 'https://scan-testnet.exsat.network',
+    currency: Currency.BTC,
+  },
   'fantom-mainnet': {
     chainId: 250,
     isTestnet: false,
@@ -478,6 +519,12 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://gobi-explorer.horizenlabs.io/',
     currency: Currency.tZEN,
+  },
+  'hyperliquid-evm-testnet': {
+    chainId: 998,
+    isTestnet: true,
+    explorerUrl: 'https://testnet.purrsec.com/',
+    currency: Currency.HYPE,
   },
   'inevm-testnet': {
     chainId: 2424,
@@ -582,7 +629,7 @@ export const networkMetadata = {
     currency: Currency.MNT,
   },
   'metal-l2-testnet': {
-    chainId: 1750,
+    chainId: 1740,
     isTestnet: true,
     explorerUrl: 'https://testnet.explorer.metall2.com',
     currency: Currency.ETH,
@@ -629,6 +676,12 @@ export const networkMetadata = {
     explorerUrl: 'https://explorer-holesky.morphl2.io',
     currency: Currency.ETH,
   },
+  'nexera-testnet': {
+    chainId: 72080,
+    isTestnet: true,
+    explorerUrl: 'https://explorer.testnet.nexera.network/',
+    currency: Currency.tNXRA,
+  },
   'okto-testnet': {
     chainId: 8801,
     isTestnet: true,
@@ -670,6 +723,12 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://pharosscan.xyz',
     currency: Currency.ETH,
+  },
+  'pharos-testnet': {
+    chainId: 688688,
+    isTestnet: true,
+    explorerUrl: 'https://testnet.pharosscan.xyz',
+    currency: Currency.PHRS,
   },
   'plume-mainnet': {
     chainId: 98866,
@@ -791,6 +850,12 @@ export const networkMetadata = {
     explorerUrl: 'https://swell-testnet-explorer.alt.technology',
     currency: Currency.ETH,
   },
+  'tac-spb': {
+    chainId: 2391,
+    isTestnet: true,
+    explorerUrl: 'https://spb.explorer.tac.build',
+    currency: Currency.TAC,
+  },
   'tac-turin': {
     chainId: 2390,
     isTestnet: true,
@@ -893,14 +958,14 @@ export function getAddressExplorerUrl(
 }
 
 export type NetworkNameToEnvVar<Net extends NetworkName> =
-  `RPC_URL_${KebabToSnakeCase<Net>}`;
+  `RPC_URL_${KebabToScreamingSnakeCase<Net>}`;
 
 export type RpcUrlEnvVarNames = NetworkNameToEnvVar<NetworkName>;
 
 export function getRpcUrlEnvVar<Net extends NetworkName>(
   network: Net,
 ): NetworkNameToEnvVar<Net> {
-  return `RPC_URL_${kebabToSnakeCase(network)}`;
+  return `RPC_URL_${kebabToScreamingSnakeCase(network)}`;
 }
 
 export function getRpcUrl(network: NetworkName): string {

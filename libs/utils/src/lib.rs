@@ -42,7 +42,7 @@ pub fn to_hex_string(mut bytes: Vec<u8>, padding_to: Option<usize>) -> String {
     }
     bytes
         .iter()
-        .map(|b| format!("{:02x}", b))
+        .map(|b| format!("{b:02x}"))
         .collect::<Vec<_>>()
         .join("")
 }

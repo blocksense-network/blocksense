@@ -5,9 +5,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x8849444D0730129D646f568d16B8C19D10A74b99",
-          "constructorArgs": [
-            "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
-          ]
+          "constructorArgs": ["0x70997970C51812dc3A010C7d01b50e0d17dc79C8"]
         },
         "UpgradeableProxy": {
           "address": "0xc04b335A75C5Fa14246152178f6834E3eBc2DC7C",
@@ -3119,9 +3117,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -6233,9 +6229,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -9347,9 +9341,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -12461,9 +12453,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -15575,9 +15565,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -18689,9 +18677,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -21803,9 +21789,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -24917,9 +24901,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -28031,9 +28013,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -31145,9 +31125,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -34259,9 +34237,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -37373,9 +37349,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -40487,9 +40461,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -43601,9 +43573,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -46715,9 +46685,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -49829,9 +49797,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -52943,9 +52909,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -56057,9 +56021,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -59171,9 +59133,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -62285,9 +62245,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -65399,9 +65357,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -68513,9 +68469,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -71627,9 +71581,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -74741,9 +74693,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -77855,9 +77805,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -80969,9 +80917,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -84083,9 +84029,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -87197,9 +87141,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -90311,9 +90253,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -93425,9 +93365,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -96539,9 +96477,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -99653,9 +99589,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -102767,9 +102701,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -105881,9 +105813,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -108995,9 +108925,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -112109,9 +112037,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",
@@ -115223,9 +115149,7 @@
       "coreContracts": {
         "HistoricalDataFeedStoreV2": {
           "address": "0x9408a6DE3c7BA7e80c25a053aBaf2a1a9338Fef7",
-          "constructorArgs": [
-            "0xd756119012CcabBC59910dE0ecEbE406B5b952bE"
-          ]
+          "constructorArgs": ["0xd756119012CcabBC59910dE0ecEbE406B5b952bE"]
         },
         "UpgradeableProxy": {
           "address": "0xeE5a4826068C5326a7f06fD6c7cBf816F096846c",

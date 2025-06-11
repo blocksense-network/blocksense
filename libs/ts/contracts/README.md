@@ -17,7 +17,7 @@ contracts
 │   ├── ICLAggregatorAdapter.sol
 │   └── ICLFeedRegistryAdapter.sol
 ├── libraries
-│   ├── Blocksense.sol
+│   ├── ADFS.sol
 │   └── CLAdapterLib.sol
 ├── safe
 │   └── OnlySequencerGuard.sol
@@ -37,7 +37,7 @@ The `cl-adapters` folder contains the Chainlink aggregator contract - CLAggregat
 
 The `interfaces` folder contains the interfaces for the Chainlink aggregator contract - IChainlinkAggregator.sol, the data feed store contract - ICLFeedRegistryAdapter.sol, the modified aggregator contract which extends the functionality of IChainlinkAggregator.sol - ICLAggregatorAdapter.sol.
 
-The `libraries` folder contains the Blocksense library which is used to make calls to the upgradeable ADFS proxy. The CLAdapterLib is used by the Chainlink aggregator contracts and the CLFeedRegistryAdapter contract.
+The `libraries` folder contains the ADFS library which is used to make calls to the upgradeable ADFS proxy. The CLAdapterLib is used by the Chainlink aggregator contracts and the CLFeedRegistryAdapter contract.
 
 The `safe` folder contains the OnlySequencerGuard contract which is used to restrict access when writing data to the ADFS contract.
 
@@ -63,12 +63,12 @@ All read calls must start with the first bit set to 1, where the whole selector 
 - Setter:
   - `0x01`: setFeeds
 - Getters:
-  - `0x86`: getFeedAtRound(uint8 stride, uint120 feedId, uint16 round, uint32 startSlot?, uint32 slots?) returns (bytes)
-  - `0x81`: getLatestRound(uint8 stride, uint120 feedId) returns (uint16)
+  - `0x86`: getDataAtIndex(uint8 stride, uint120 feedId, uint16 index, uint32 startSlot?, uint32 slots?) returns (bytes)
+  - `0x81`: getLatestIndex(uint8 stride, uint120 feedId) returns (uint16)
   - `0x82`: getLatestSingleData(uint8 stride, uint120 feedId) returns (bytes)
   - `0x84`: getLatestData(uint8 stride, uint120 feedId, uint32 startSlot?, uint32 slots?) returns (bytes)
-  - `0x83` will call both **getLatestRound** and **getLatestSingleData**.
-  - `0x85` will call both **getLatestRound** and **getLatestData**.
+  - `0x83` will call both **getLatestIndex** and **getLatestSingleData**.
+  - `0x85` will call both **getLatestIndex** and **getLatestData**.
 
 > [!IMPORTANT]
 > Selector `0x00` is reserved for use by an Upgradeable Proxy:
@@ -79,8 +79,8 @@ All read calls must start with the first bit set to 1, where the whole selector 
 ### Storage layout representation
 
 The slots between 0 and 2\*\*128-2\*\*116 - 1 are considered management slots. These values are used for admin functionality.
-The slots between 2\*\*128-2\*\*116 and 2\*\*128 - 1 are considered Round table slots. These values are used to store the latest round of a feed. Each slot consists of 16 packed rounds (2 bytes each).
-The slots between 2\*\*128 and 2\*\*160 - 1 are considered Data feed slots. Here all data feeds are stored along with their historical data. Data feeds are of different slot sizes based on the stride (powers of 2). For example, stride 0 is 32b (1 slot) data, stride 1 is 64b, stride 2 is 128b and so on. Data feeds have historical data stored up to 8192 rounds. CL-compatible contracts make use of only stride 0 data feeds. There are 32 strides in total (stride 0 to stride 31) which leaves us with 2\*\*115 feed IDs in each stride (2\*\*115 \* 32 feed IDs combined).
+The slots between 2\*\*128-2\*\*116 and 2\*\*128 - 1 are considered Ring buffer index table slots. These values are used to store the latest ring buffer index of a feed. Each slot consists of 16 packed indices (2 bytes each).
+The slots between 2\*\*128 and 2\*\*160 - 1 are considered Data feed slots. Here all data feeds are stored along with their historical data. Data feeds are of different slot sizes based on the stride (powers of 2). For example, stride 0 is 32b (1 slot) data, stride 1 is 64b, stride 2 is 128b and so on. Data feeds have historical data stored up to 8192 indices. CL-compatible contracts make use of only stride 0 data feeds. There are 32 strides in total (stride 0 to stride 31) which leaves us with 2\*\*115 feed IDs in each stride (2\*\*115 \* 32 feed IDs combined).
 
 ### Events
 

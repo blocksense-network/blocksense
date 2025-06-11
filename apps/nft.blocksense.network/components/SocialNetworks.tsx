@@ -29,7 +29,7 @@ export const SocialNetworks = () => {
         <a
           href={network.url}
           key={network.name}
-          className="social-network bg-[var(--gray-dark)] rounded-[0.5rem] w-12 h-12 flex items-center justify-center"
+          className="social-network bg-[var(--gray-dark)] hover:bg-[#666] transition-colors duration-350 rounded-[0.5rem] w-12 h-12 flex items-center justify-center"
           aria-label={network.name}
           title={network.name}
           target="_blank"

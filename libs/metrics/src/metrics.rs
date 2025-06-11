@@ -80,7 +80,7 @@ macro_rules! process_provider_getter {
                     .[<success_ $_metric>]
                     .with_label_values(&[&$_net.to_string()])
                     .inc();
-                    res
+                    Ok(res)
                 },
                 Err(e) => {
                     $_provider_metrics.read() // Holding a read lock here suffice, since the counters are atomic.
@@ -88,7 +88,7 @@ macro_rules! process_provider_getter {
                     .[<failed_ $_metric>]
                     .with_label_values(&[&$_net.to_string()])
                     .inc();
-                    return Err(e.into());
+                    Err(e)
                 },
             }
         }
@@ -127,16 +127,16 @@ macro_rules! set_metric (
 );
 
 #[macro_export]
-macro_rules! inc_vec_metric (
-($_component: ident, $_comp_index: ident, $_metric: ident, $_index: ident) => (
-    $_component
-    .read() // Holding a read lock here suffice, since the counters are atomic.
-    .await
-    .$_metric
-    .with_label_values(&[&$_comp_index.to_string(), &$_index.to_string()])
-    .inc();
-);
-);
+macro_rules! inc_vec_metric {
+    ($component:ident, $metric:ident, $( $label:expr ),+ ) => {
+        $component
+            .read()
+            .await
+            .$metric
+            .with_label_values(&[ $( &$label.to_string() ),+ ])
+            .inc();
+    };
+}
 
 #[derive(Debug)]
 pub struct ProviderMetrics {
@@ -156,6 +156,8 @@ pub struct ProviderMetrics {
     pub success_get_max_priority_fee_per_gas: IntCounterVec,
     pub success_get_chain_id: IntCounterVec,
     pub total_timed_out_tx: IntCounterVec,
+    pub total_transaction_retries: IntCounterVec,
+    pub total_mismatched_gnosis_safe_nonce: IntCounterVec,
     pub is_enabled: IntGaugeVec,
 }
 
@@ -243,6 +245,16 @@ impl ProviderMetrics {
                 "Total number of tx sent that reached the configured timeout before completion for network",
                 &["Network"]
             )?,
+            total_transaction_retries: register_int_counter_vec!(
+                format!("{}total_transaction_retries", prefix),
+                "Total number of tx retries for network",
+                &["Network"]
+            )?,
+            total_mismatched_gnosis_safe_nonce: register_int_counter_vec!(
+                format!("{}total_mismatched_gnosis_safe_nonce", prefix),
+                "Total number of times we got a mismatching safe nonce prior to tx send for network",
+                &["Network"]
+            )?,
             is_enabled: register_int_gauge_vec!(
                 format!("{}is_enabled", prefix),
                 "Whether the network is currently enabled or not",
@@ -290,22 +302,22 @@ impl ReporterMetrics {
             timely_reports_per_feed: register_int_counter_vec!(
                 format!("{}reporter_timely_reports_per_feed", prefix),
                 "Per feed accepted (valid) feed reports from reporter",
-                &["ReporterId", "FeedId"]
+                &["ReporterId", "FeedId", "HeartbeatMs"]
             )?,
             late_reports_per_feed: register_int_counter_vec!(
-                format!("{}reporter_late_reporte_per_feed", prefix),
+                format!("{}reporter_late_reports_per_feed", prefix),
                 "Per feed recvd reports for a past slot from reporter",
-                &["ReporterId", "FeedId"]
+                &["ReporterId", "FeedId", "HeartbeatMs"]
             )?,
             in_future_reports_per_feed: register_int_counter_vec!(
                 format!("{}reporter_in_future_reports_per_feed", prefix),
                 "Per feed recvd reports for a future slot from reporter",
-                &["ReporterId", "FeedId"]
+                &["ReporterId", "FeedId", "HeartbeatMs"]
             )?,
             total_revotes_for_same_slot_per_feed: register_int_counter_vec!(
                 format!("{}reporter_total_revotes_for_same_slot_per_feed", prefix),
                 "Total recvd revotes for the same slot from reporter",
-                &["ReporterId", "FeedId"]
+                &["ReporterId", "FeedId", "HeartbeatMs"]
             )?,
         })
     }

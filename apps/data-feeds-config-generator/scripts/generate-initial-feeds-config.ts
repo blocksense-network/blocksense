@@ -2,7 +2,7 @@
  * @deprecated This script is deprecated and should no longer be used.
  */
 
-import { Schema, ParseResult } from 'effect';
+import { Schema as S, ParseResult } from 'effect';
 const { decodeUnknownSync } = ParseResult;
 
 import { selectDirectory } from '@blocksense/base-utils/fs';
@@ -30,7 +30,7 @@ import {
 
 async function createArtifact<A, I = A>(
   name: string,
-  schema: Schema.Schema<A, I, never> | null,
+  schema: S.Schema<A, I, never> | null,
   create: () => Promise<A>,
   artifacts: any[],
 ) {

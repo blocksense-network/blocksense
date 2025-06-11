@@ -2,7 +2,7 @@ import { GenericHistoricalDataFeedStore } from '../../helpers/common';
 import { HistoricalDataFeedStoreBaseWrapper } from './Base';
 
 export abstract class HistoricalDataFeedStoreGenericBaseWrapper extends HistoricalDataFeedStoreBaseWrapper {
-  public contract!: GenericHistoricalDataFeedStore;
+  declare public contract: GenericHistoricalDataFeedStore;
 
   public override getLatestValueData(key: number): string {
     return this.contract.interface.encodeFunctionData('getDataFeed', [key]);

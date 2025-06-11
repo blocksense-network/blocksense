@@ -348,7 +348,7 @@ pub fn test_feed_config(id: u32, stride: u16) -> FeedConfig {
         full_name: "FOXY".to_owned(),
         description: "FOXY / USD".to_owned(),
         feed_type: "price-feed".to_owned(),
-        oracle_id: "crypto-price-feeds".to_owned(),
+        oracle_id: "cex-price-feeds".to_owned(),
         value_type: "numerical".to_owned(),
         stride,
         quorum: FeedQuorum {

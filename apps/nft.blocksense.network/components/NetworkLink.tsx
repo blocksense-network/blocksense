@@ -1,60 +1,55 @@
 import Image from 'next/image';
 
-import blocksenseEllipseIcon from '/public/icons/blocksense-ellipse.svg';
-import sendArrowIcon from '/public/icons/send-arrow.svg';
-import { StatusMessage, StatusType } from './StatusMessage';
+import xIcon from '/public/icons/x-form.svg';
+import discordIcon from '/public/icons/discord-form.svg';
 
-type NetworkLinkProps = {
-  title: string;
-  description?: string;
-  link: string;
-  status?: StatusType;
-  message?: string;
+const networkLinks = {
+  x: {
+    title: 'Blocksense Network',
+    description: '@blocksense_',
+    url: 'https://x.com/blocksense_',
+    icon: xIcon,
+  },
+  discord: {
+    title: 'Community',
+    description: '+80k members',
+    url: 'https://discord.com/invite/mYujUXwrMr',
+    icon: discordIcon,
+  },
 };
 
-export const NetworkLink = ({
-  title,
-  description,
-  link,
-  status,
-  message,
-}: NetworkLinkProps) => {
+type NetworkLinkProps = {
+  type: keyof typeof networkLinks;
+};
+
+export const NetworkLink = ({ type }: NetworkLinkProps) => {
+  const { title, description, url, icon } = networkLinks[type];
+
   return (
-    <article className="network-link__container flex flex-col gap-2">
-      <a
-        href={link}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="network_link"
-      >
-        <section
-          className={`flex items-center justify-between bg-[var(--gray-dark)] border border-[var(--gray-dark)] px-4 py-3 rounded-2xl ${status === 'error' && 'border-[var(--red)]'} ${status === 'success' && 'border-[var(--green)]'}`}
-        >
-          <article className="flex items-center md:gap-[0.875rem] gap-2">
-            <Image
-              src={blocksenseEllipseIcon}
-              alt="Blocksense Ellipse"
-              className="network-link__blocksense-icon"
-            />
-            <section>
-              <p className="network-link__title text-[var(--white)] md:text-base text-sm">
-                {title}
-              </p>
-              {description && (
-                <p className="network-link__description text-[var(--gray-medium)] md:text-sm text-xs">
-                  {description}
-                </p>
-              )}
-            </section>
-          </article>
-          <Image
-            src={sendArrowIcon}
-            alt="Send Arrow"
-            className="network-link__send-icon"
-          />
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="network_link w-full"
+    >
+      <section className="bg-[var(--gray-dark)] flex items-center gap-4 border border-[var(--gray-dark)] px-4 py-3 rounded-xl">
+        <Image
+          src={icon}
+          alt="Blocksense Ellipse"
+          className="network-link__blocksense-icon md:w-[1.125rem] md:h-[1.125rem] w-6 h-6"
+        />
+        <div className="network-link__vertical-line bg-[var(--gray-medium)] w-[1px] h-[2.125rem]" />
+        <section>
+          <p className="network-link__title text-[var(--white)] text-sm">
+            {title}
+          </p>
+          {description && (
+            <p className="network-link__description text-[var(--gray-medium)] text-sm">
+              {description}
+            </p>
+          )}
         </section>
-      </a>
-      <StatusMessage status={status} message={message} />
-    </article>
+      </section>
+    </a>
   );
 };

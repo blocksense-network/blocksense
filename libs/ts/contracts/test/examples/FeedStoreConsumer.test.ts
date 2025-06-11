@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { deployContract } from '../experiments/utils/helpers/common';
-import { BlocksenseADFSConsumer, RawCallADFSConsumer } from '../../typechain';
+import { ADFSConsumer, RawCallADFSConsumer } from '../../typechain';
 import * as utils from './utils/feedStoreConsumer';
 import { expect } from 'chai';
 import { ADFSWrapper } from '../utils/wrappers';
@@ -11,19 +11,19 @@ import { Feed } from '../utils/wrappers/types';
 const feeds: Feed[] = [
   {
     id: 1n,
-    round: 1n,
+    index: 1n,
     stride: 0n,
     data: ethers.hexlify(ethers.randomBytes(32)),
   },
   {
     id: 1n,
-    round: 8191n,
+    index: 8191n,
     stride: 0n,
     data: ethers.hexlify(ethers.randomBytes(32)),
   },
   {
     id: 1n,
-    round: 1n,
+    index: 1n,
     stride: 4n,
     data: ethers.hexlify(ethers.randomBytes(2 ** 4 * 32)),
   },
@@ -31,12 +31,12 @@ const feeds: Feed[] = [
 
 describe('Example: ADFSConsumer', function () {
   let dataFeedStore: ADFSWrapper;
-  let blocksenseADFSConsumer: BlocksenseADFSConsumer;
+  let adfsConsumer: ADFSConsumer;
   let rawCallADFSConsumer: RawCallADFSConsumer;
   let sequencer: HardhatEthersSigner;
 
-  const key = 1;
-  const round = 1n;
+  const id = 1n;
+  const index = 1n;
 
   beforeEach(async function () {
     sequencer = (await ethers.getSigners())[0];
@@ -52,8 +52,8 @@ describe('Example: ADFSConsumer', function () {
 
     await dataFeedStore.setFeeds(sequencer, feeds);
 
-    blocksenseADFSConsumer = await deployContract<BlocksenseADFSConsumer>(
-      'BlocksenseADFSConsumer',
+    adfsConsumer = await deployContract<ADFSConsumer>(
+      'ADFSConsumer',
       dataFeedStore.contract.target,
     );
     rawCallADFSConsumer = await deployContract<RawCallADFSConsumer>(
@@ -63,43 +63,40 @@ describe('Example: ADFSConsumer', function () {
   });
 
   [
-    { title: 'get latest single feed', fnName: 'getLatestSingleFeedData' },
+    { title: 'get latest single data', fnName: 'getLatestSingleData' },
     {
-      title: 'get latest single feed and round',
-      fnName: 'getLatestSingleFeedDataAndRound',
+      title: 'get latest single data and index',
+      fnName: 'getLatestSingleDataAndIndex',
     },
     {
-      title: 'get single feed data at round',
-      fnName: 'getSingleFeedDataAtRound',
+      title: 'get single data at index',
+      fnName: 'getSingleDataAtIndex',
     },
   ].forEach(data => {
     it(`Should ${data.title}`, async function () {
-      await getAndCompareData(
-        [null, key, round],
-        data.fnName as keyof typeof utils,
-      );
+      await getAndCompareData([id, index], data.fnName as keyof typeof utils);
     });
   });
 
   [
     {
-      title: 'get latest feed',
-      fnName: 'getLatestFeedData',
+      title: 'get latest data',
+      fnName: 'getLatestData',
     },
     {
-      title: 'get latest feed and round',
-      fnName: 'getLatestFeedDataAndRound',
+      title: 'get latest data and index',
+      fnName: 'getLatestDataAndIndex',
     },
     {
-      title: 'get feed data at round',
-      fnName: 'getFeedDataAtRound',
+      title: 'get data at index',
+      fnName: 'getDataAtIndex',
     },
   ].forEach(data => {
     const feedsWithMultipleSlots = feeds.filter(feed => feed.stride > 0);
     for (const feed of feedsWithMultipleSlots) {
       it(`Should ${data.title} for stride ${feed.stride}`, async function () {
         await getAndCompareData(
-          [feed.stride, key, round],
+          [mergeStrideAndFeedId(feed.stride, id), index],
           data.fnName as keyof typeof utils,
         );
       });
@@ -108,16 +105,16 @@ describe('Example: ADFSConsumer', function () {
 
   [
     {
-      title: 'get latest sliced feed',
-      fnName: 'getLatestSlicedFeedData',
+      title: 'get latest sliced data',
+      fnName: 'getLatestDataSlice',
     },
     {
-      title: 'get latest sliced feed and round',
-      fnName: 'getLatestSlicedFeedDataAndRound',
+      title: 'get latest data slice and index',
+      fnName: 'getLatestDataSliceAndIndex',
     },
     {
-      title: 'get sliced feed data at round',
-      fnName: 'getSlicedFeedDataAtRound',
+      title: 'get data slice at index',
+      fnName: 'getDataSliceAtIndex',
     },
   ].forEach(data => {
     const feedsWithMultipleSlots = feeds.filter(feed => feed.stride > 0);
@@ -126,9 +123,8 @@ describe('Example: ADFSConsumer', function () {
         it(`Should ${data.title} for stride ${feed.stride} and slice(${i}, ${Number(2n ** feed.stride) - i})`, async function () {
           await getAndCompareData(
             [
-              feed.stride,
-              key,
-              data.fnName === 'getSlicedFeedDataAtRound' ? round : null,
+              mergeStrideAndFeedId(feed.stride, id),
+              data.fnName === 'getDataSliceAtIndex' ? index : null,
               i,
               Number(2n ** feed.stride) - i,
             ],
@@ -140,8 +136,11 @@ describe('Example: ADFSConsumer', function () {
   });
 
   for (const feed of feeds) {
-    it(`Should get latest round for stride ${feed.stride}`, async function () {
-      await getAndCompareData([feed.stride, feed.id], 'getLatestRound');
+    it(`Should get latest index for stride ${feed.stride}`, async function () {
+      await getAndCompareData(
+        [mergeStrideAndFeedId(feed.stride, feed.id)],
+        'getLatestIndex',
+      );
     });
   }
 
@@ -150,13 +149,13 @@ describe('Example: ADFSConsumer', function () {
     const feedData = encodeDataAndTimestamp(1234, timestampNow);
     const feed = {
       id: 1n,
-      round: 1n,
+      index: 1n,
       stride: 0n,
       data: feedData,
     };
     await dataFeedStore.setFeeds(sequencer, [feed]);
 
-    const timestamp = await blocksenseADFSConsumer.getEpochSeconds(feed.id);
+    const timestamp = await adfsConsumer.getEpochSeconds(feed.id);
     expect(timestamp).to.be.equal(Math.floor(timestampNow / 1000));
   });
 
@@ -165,29 +164,33 @@ describe('Example: ADFSConsumer', function () {
     const feedData = encodeDataAndTimestamp(1234, timestampNow);
     const feed = {
       id: 1n,
-      round: 1n,
+      index: 1n,
       stride: 0n,
       data: feedData,
     };
     await dataFeedStore.setFeeds(sequencer, [feed]);
 
-    const timestamp = await blocksenseADFSConsumer.getEpochMilliseconds(
-      feed.id,
-    );
+    const timestamp = await adfsConsumer.getEpochMilliseconds(feed.id);
     expect(timestamp).to.be.equal(timestampNow);
   });
+
+  const mergeStrideAndFeedId = (stride: bigint, feedId: bigint) => {
+    stride = stride << 120n;
+    const id = stride | feedId;
+    return id;
+  };
 
   const getAndCompareData = async (
     data: any[],
     functionName: keyof typeof utils,
   ) => {
     const inputsCount =
-      blocksenseADFSConsumer.interface.getFunction(functionName).inputs.length;
+      adfsConsumer.interface.getFunction(functionName).inputs.length;
     const filteredData = data.filter(v => v !== null).slice(0, inputsCount);
 
-    const blocksenseData = await blocksenseADFSConsumer.getFunction(
-      functionName,
-    )(...filteredData);
+    const adfsData = await adfsConsumer.getFunction(functionName)(
+      ...filteredData,
+    );
     const rawCallData = await rawCallADFSConsumer.getFunction(functionName)(
       ...filteredData,
     );
@@ -197,7 +200,7 @@ describe('Example: ADFSConsumer', function () {
       data,
     );
 
-    expect(blocksenseData).to.deep.equal(utilData);
+    expect(adfsData).to.deep.equal(utilData);
     expect(rawCallData).to.deep.equal(utilData);
   };
 });

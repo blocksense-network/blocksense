@@ -10,8 +10,8 @@ export const setFeeds = async (
   contractWrappers: IADFSWrapper[] | IUpgradeableProxyADFSWrapper[],
   valuesCount: number,
   adfsData?: {
-    skip?: number; // used to skip feeds so to make testing round table write
-    round?: bigint;
+    skip?: number; // used to skip feeds so to make testing ring buffer index table write
+    index?: bigint;
     stride?: bigint;
   },
   start: number = 0,
@@ -21,7 +21,7 @@ export const setFeeds = async (
   for (let i = start; i < valuesCount; i++) {
     feeds.push({
       id: BigInt(i * (adfsData?.skip ?? 1)),
-      round: adfsData?.round ?? 1n,
+      index: adfsData?.index ?? 1n,
       stride: adfsData?.stride ?? 0n,
       data: ethers.hexlify(ethers.randomBytes(24)),
     });
@@ -77,7 +77,7 @@ export const generateRandomFeeds = (count: number): Feed[] => {
       // random number between 0 and 2**115
       id: BigInt(Math.floor(Math.random() * (2 ** 115 + 1))),
       // random number between 0 and 2**13
-      round: BigInt(Math.floor(Math.random() * 2 ** 13 + 1)),
+      index: BigInt(Math.floor(Math.random() * 2 ** 13 + 1)),
       // random number between 0 and 31
       stride,
       // random bytes depending on the stride (here we won't use max numbers to avoid overflow)

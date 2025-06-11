@@ -6,5 +6,5 @@ export * from './env';
 export * from './evm';
 export * from './fs';
 export * from './logging';
-export * from './numeric';
+export * from './schemas';
 export * from './string';

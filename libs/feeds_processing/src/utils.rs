@@ -43,7 +43,14 @@ pub fn check_signature(
         .collect();
 
     if let Ok(result) = feed_result {
-        byte_buffer.extend(result.as_bytes(18, timestamp as u64));
+        match result.as_bytes(18, timestamp as u64) {
+            Ok(bytes) => {
+                byte_buffer.extend(bytes);
+            }
+            Err(e) => {
+                warn!("Could not convert vlaue of feed id {feed_id} to bytes: {e}");
+            }
+        };
     }
     verify_signature(pub_key, signature, &byte_buffer)
 }
@@ -124,7 +131,7 @@ pub async fn consume_reports(
                             ad_score_opt = Some(ad_score)
                         }
                         Err(e) => {
-                            warn!("Anomaly Detection failed with error - {}", e);
+                            warn!("Anomaly Detection failed with error - {e}");
                         }
                     }
                     {
@@ -291,9 +298,9 @@ fn check_aggregated_votes_deviation(
         let deviated_by_percent = (difference / reporter_voted_value) * 100.0;
 
         if update_aggregate_value < lower_bound || update_aggregate_value > upper_bound {
-            errors.push(format!("Final answer for feed={feed_id}, block_height={block_height}, deviates by more than {tolerated_diff_percent}% ({deviated_by_percent}%). Reported value is {reporter_voted_value}. Sequencer reported {update_aggregate_value}"));
+            errors.push(format!("Final answer for feed={feed_id}, block height = {block_height}, deviates by more than {tolerated_diff_percent}% ({deviated_by_percent}%). Reported value is {reporter_voted_value}. Sequencer reported {update_aggregate_value}"));
         }
-        debug!("Final answer for feed={feed_id}, block_height={block_height}, deviates by {deviated_by_percent}%");
+        debug!("Final answer for feed={feed_id}, block height = {block_height}, deviates by {deviated_by_percent}%");
     }
 
     if !errors.is_empty() {
@@ -389,7 +396,7 @@ pub async fn validate(
         let block_height = batch.block_height;
         let recvd_calldata = batch.calldata;
         anyhow::bail!(
-            "tx_hash mismatch, block_height = {block_height}; recvd: {} generated: {}; calc_calldata = {}; recvd_calldata = {recvd_calldata}",
+            "tx_hash mismatch, block height = {block_height}; recvd: {} generated: {}; calc_calldata = {}; recvd_calldata = {recvd_calldata}",
             batch.tx_hash,
             hex::encode(tx_hash),
             hex::encode(calldata),
@@ -636,8 +643,7 @@ pub mod tests {
 
         assert_eq!(
             error_message, expected_error,
-            "Unexpected error message: {}",
-            error_message
+            "Unexpected error message: {error_message}"
         );
     }
 }

@@ -1,5 +1,5 @@
 import { keysOf } from '@blocksense/base-utils/array-iter';
-import { Pair, CryptoPriceFeedsArgs } from '@blocksense/config-types';
+import { Pair, CexPriceFeedsArgs } from '@blocksense/config-types';
 import { AssetInfo } from '../../fetchers/exchanges/exchange-assets';
 import { equalsCaseInsensitive } from '@blocksense/base-utils/string';
 import { CryptoProviderData } from './types';
@@ -9,8 +9,8 @@ import { stableCoins } from './constants';
 export function getAllProvidersForPair(
   pair: Pair,
   providersData: CryptoProviderData[],
-): CryptoPriceFeedsArgs {
-  const providers: CryptoPriceFeedsArgs = {};
+): CexPriceFeedsArgs {
+  const providers: CexPriceFeedsArgs = {};
 
   for (const { name, type, data } of providersData) {
     const resources = getProviderResourcesForPair(pair, data);
