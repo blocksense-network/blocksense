@@ -665,6 +665,7 @@ pub mod tests {
             feeds_management_cmd_to_block_creator_send,
             feeds_slots_manager_cmd_send,
             aggregate_batch_sig_send,
+            Arc::new(RwLock::new(HashMap::new())),
         ));
 
         let app = test::init_service(
@@ -754,6 +755,7 @@ pub mod tests {
             feeds_management_cmd_to_block_creator_recv,
             feeds_slots_manager_cmd_recv,
             aggregate_batch_sig_recv,
+            HashMap::new(),
         )
         .await;
 

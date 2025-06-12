@@ -1,5 +1,6 @@
 use crate::feeds::consensus_second_round_manager::AggregationBatchConsensus;
 use crate::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
+use crate::providers::eth_send_utils::BatchOfUpdatesToProcess;
 use crate::providers::provider::ProviderStatus;
 use crate::providers::provider::SharedRpcProviders;
 use crate::providers::provider::{init_shared_rpc_providers, RpcProvider};
@@ -47,6 +48,8 @@ pub struct SequencerState {
     pub provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>>,
     pub batches_awaiting_consensus: Arc<RwLock<AggregationBatchConsensus>>,
     pub aggregate_batch_sig_send: UnboundedSender<(ReporterResponse, SignatureWithAddress)>,
+    pub relayers_send_channels:
+        Arc<RwLock<HashMap<String, UnboundedSender<BatchOfUpdatesToProcess>>>>,
     // pub voting_recv_channel: Arc<RwLock<mpsc::UnboundedReceiver<(String, String)>>>,
 }
 
@@ -63,6 +66,9 @@ impl SequencerState {
         feeds_management_cmd_to_block_creator_send: UnboundedSender<FeedsManagementCmds>,
         feeds_slots_manager_cmd_send: UnboundedSender<FeedsManagementCmds>,
         aggregate_batch_sig_send: UnboundedSender<(ReporterResponse, SignatureWithAddress)>,
+        relayers_send_channels: Arc<
+            RwLock<HashMap<String, UnboundedSender<BatchOfUpdatesToProcess>>>,
+        >,
     ) -> SequencerState {
         let provider_status: HashMap<String, ProviderStatus> = sequencer_config
             .providers
@@ -118,6 +124,7 @@ impl SequencerState {
             provider_status,
             batches_awaiting_consensus: Arc::new(RwLock::new(AggregationBatchConsensus::new())),
             aggregate_batch_sig_send,
+            relayers_send_channels,
         }
     }
 
@@ -172,6 +179,7 @@ pub async fn create_sequencer_state_from_sequencer_config(
         feeds_management_cmd_to_block_creator_send,
         feeds_slots_manager_cmd_send,
         aggregate_batch_sig_send,
+        Arc::new(RwLock::new(HashMap::new())),
     );
 
     (

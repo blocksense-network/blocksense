@@ -359,7 +359,7 @@ mod tests {
     use crate::providers::provider::init_shared_rpc_providers;
     use blocksense_config::{test_feed_config, AllFeedsConfig, SequencerConfig};
     use blocksense_feed_registry::types::{test_payload_from_result, FeedType};
-    use std::time::Duration;
+    use std::{collections::HashMap, time::Duration};
 
     use blocksense_config::get_test_config_with_no_providers;
 
@@ -406,6 +406,7 @@ mod tests {
             feeds_management_cmd_to_block_creator_send,
             feeds_slots_manager_cmd_send,
             aggregate_batch_sig_send,
+            Arc::new(RwLock::new(HashMap::new())),
         ));
 
         sequencer_state
