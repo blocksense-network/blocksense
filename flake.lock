@@ -37,6 +37,22 @@
         "type": "github"
       }
     },
+    "blama": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1751530694,
+        "narHash": "sha256-4JXxOIMXHffOzQrNcHyy2YnuYUhUaAbyoV6MW+8pehs=",
+        "owner": "blocksense-network",
+        "repo": "blama",
+        "rev": "133ca6892368781c41bfad0cc388feb2d1665d85",
+        "type": "github"
+      },
+      "original": {
+        "owner": "blocksense-network",
+        "repo": "blama",
+        "type": "github"
+      }
+    },
     "cachix": {
       "inputs": {
         "devenv": [
@@ -1203,6 +1219,7 @@
     },
     "root": {
       "inputs": {
+        "blama": "blama",
         "devenv": [
           "mcl-blockchain",
           "devenv"
