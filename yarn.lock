@@ -2365,6 +2365,7 @@ __metadata:
   resolution: "@blocksense/onchain-interactions@workspace:libs/ts/onchain-interactions"
   dependencies:
     "@blocksense/base-utils": "workspace:*"
+    "@blocksense/contracts": "workspace:*"
     "@types/express": "npm:^5"
     "@types/node": "npm:^22.10.1"
     "@types/yargs": "npm:^17.0.33"

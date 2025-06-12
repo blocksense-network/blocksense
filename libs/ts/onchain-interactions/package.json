@@ -9,6 +9,8 @@
     "check-pending-tx": "yarn ts src/scripts/check-pending-tx.ts"
   },
   "dependencies": {
+    "@blocksense/base-utils": "workspace:*",
+    "@blocksense/contracts": "workspace:*",
     "@types/node": "^22.10.1",
     "axios": "^1.7.9",
     "chalk": "^5.3.0",
@@ -21,7 +23,6 @@
     "yargs": "^17.7.2"
   },
   "devDependencies": {
-    "@blocksense/base-utils": "workspace:*",
     "@types/express": "^5",
     "@types/yargs": "^17.0.33",
     "tsx": "^4.19.2"
