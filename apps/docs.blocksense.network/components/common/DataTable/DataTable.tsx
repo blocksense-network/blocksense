@@ -19,7 +19,6 @@ import { DataTablePagination } from './DataTablePagination';
 import { DataTableToolbar } from './DataTableToolbar';
 import { DataTableColumnHeader } from './DataTableColumnHeader';
 import {
-  DataRowType,
   DataTableProps,
   getSortingState,
   cellHaveContent,

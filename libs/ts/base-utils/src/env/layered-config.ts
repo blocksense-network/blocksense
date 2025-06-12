@@ -152,7 +152,6 @@ export function reportParsedEnvConfig<
   Layers extends Record<LayerNames[number], EnvSchema>,
 >(
   config: LayeredEnvSchemaToConfig<LayerNames, Layers>,
-  tty = true,
 ): {
   missingEnvVariables: string[];
   validationMessage: string;

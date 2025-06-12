@@ -1,7 +1,7 @@
 import path from 'path';
 
 import { Config, defaults } from './config';
-import { writeArtifactFile, generateFileTree } from './utils/common';
+import { generateFileTree } from './utils/common';
 import { TreeNode } from './types';
 import { rootDir, selectDirectory } from '@blocksense/base-utils';
 
