@@ -44,6 +44,9 @@
       mkSpinStateDir = pkgs.callPackage ./spin-plugin {
         spin = lib.getExe' inputs'.nixpkgs-unstable.legacyPackages.fermyon-spin "spin";
       };
+
+      # Blama
+      blama = pkgs.callPackage ./blama { blama-src = inputs.blama.outPath; };
     in
     {
       apps = {
@@ -56,6 +59,7 @@
       };
       packages = {
         inherit blocksense-rs;
+        inherit blama;
       };
       legacyPackages = {
         oracle-scripts = {
