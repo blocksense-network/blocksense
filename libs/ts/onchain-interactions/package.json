@@ -1,7 +1,6 @@
 {
   "name": "@blocksense/onchain-interactions",
   "type": "module",
-  "packageManager": "yarn@4.3.1",
   "scripts": {
     "ts": "yarn node --import tsx --no-deprecation",
     "get-wallets-balances": "yarn ts src/scripts/balance-script.ts",
