@@ -8,6 +8,7 @@ import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import sortDestructureKeys from 'eslint-plugin-sort-destructure-keys';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import effectEsLintPlugin from '@effect/eslint-plugin';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,13 +20,30 @@ const compat = new FlatCompat({
 
 export default [
   {
-    ignores: ['**/dist', '**/build', '**/docs', '**/*.md'],
+    ignores: [
+      '**/dist',
+      '**/build',
+      '**/docs',
+      '**/*.md',
+      '.yarn/**',
+      '.pnp.cjs',
+      '.prettierrc.cjs',
+      'libs/ts/contracts/typechain',
+      'libs/aztec_contracts',
+      'libs/base-utils',
+      'libs/ts',
+      'apps/data-feeds-config-generator',
+      'apps/docs.blocksense.network',
+      'apps/nft.blocksense.network',
+      'apps/social-verification',
+      'apps/rollup',
+      'scripts/',
+    ],
   },
   ...compat.extends(
     'eslint:recommended',
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:@effect/recommended',
   ),
   {
     plugins: {
@@ -33,6 +51,7 @@ export default [
       'sort-destructure-keys': sortDestructureKeys,
       'simple-import-sort': simpleImportSort,
       codegen,
+      effectEsLintPlugin,
     },
 
     languageOptions: {
@@ -113,21 +132,6 @@ export default [
       '@typescript-eslint/no-array-constructor': 'off',
       '@typescript-eslint/no-use-before-define': 'off',
       '@typescript-eslint/no-namespace': 'off',
-
-      '@effect/dprint': [
-        'error',
-        {
-          config: {
-            indentWidth: 2,
-            lineWidth: 120,
-            semiColons: 'asi',
-            quoteStyle: 'alwaysDouble',
-            trailingCommas: 'never',
-            operatorPosition: 'maintain',
-            'arrowFunction.useParentheses': 'force',
-          },
-        },
-      ],
     },
   },
 ];
