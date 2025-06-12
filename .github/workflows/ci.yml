@@ -24,11 +24,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # - name: Install Nix
+      #   uses: DeterminateSystems/nix-installer-action@v17
+      #   if: ${{ runner.environment == 'github-hosted' }}
+      #   with:
+      #     extra-conf: accept-flake-config = true
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v17
-        if: ${{ runner.environment == 'github-hosted' }}
+        uses: metacraft-labs/nixos-modules/.github/install-nix@main
         with:
-          extra-conf: accept-flake-config = true
+          nix-github-token: ${{ secrets.NIX_GITHUB_TOKEN }}
+          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          cachix-cache: ${{ vars.CACHIX_CACHE }}
+          trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
+          substituters: ${{ vars.SUBSTITUTERS }}
 
       - uses: cachix/cachix-action@v16
         with:
