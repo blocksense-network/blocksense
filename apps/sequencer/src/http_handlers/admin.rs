@@ -632,8 +632,10 @@ mod tests {
 
     use blocksense_utils::logging::init_shared_logging_handle;
     use blocksense_utils::test_env::get_test_private_key_path;
+    use std::collections::HashMap;
     use std::path::PathBuf;
-    use tokio::sync::mpsc;
+    use std::sync::Arc;
+    use tokio::sync::{mpsc, RwLock};
 
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
 
@@ -672,6 +674,7 @@ mod tests {
             feeds_management_cmd_to_block_creator_send,
             feeds_slots_manager_cmd_send,
             aggregate_batch_sig_send,
+            Arc::new(RwLock::new(HashMap::new())),
         ));
 
         let app = test::init_service(

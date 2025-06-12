@@ -12,6 +12,7 @@ use blocksense_feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_gnosis_safe::utils::SignatureWithAddress;
 use futures_util::stream::FuturesUnordered;
+use std::collections::HashMap;
 use std::io::Error;
 use tokio::sync::mpsc;
 use tokio::sync::mpsc::UnboundedReceiver;
@@ -30,6 +31,7 @@ pub async fn prepare_app_workers(
     feeds_management_cmd_to_block_creator_recv: UnboundedReceiver<FeedsManagementCmds>,
     feeds_slots_manager_cmd_recv: UnboundedReceiver<FeedsManagementCmds>,
     aggregate_batch_sig_recv: UnboundedReceiver<(ReporterResponse, SignatureWithAddress)>,
+    relayers_recv_channels: HashMap<String, UnboundedReceiver<String>>,
 ) -> FuturesUnordered<JoinHandle<Result<(), Error>>> {
     let (batched_votes_send, batched_votes_recv) = mpsc::unbounded_channel();
 
@@ -67,6 +69,21 @@ pub async fn prepare_app_workers(
     collected_futures.push(metrics_collector);
     collected_futures.push(blocks_reader);
     collected_futures.push(aggregation_batch_consensus);
+
+    for (net, mut chan) in relayers_recv_channels.into_iter() {
+        let relayer_name = format!("relayer_for_network{net}");
+        collected_futures.push( tokio::task::Builder::new()
+        .name(relayer_name.clone().as_str())
+        .spawn(async move {
+            tracing::info!("Starting {relayer_name} loop...");
+
+            loop {
+                let cmd = chan.recv().await;
+                tracing::info!("{relayer_name} received {cmd:?}");
+            }
+        })
+        .expect("Failed to spawn metrics collector loop!"));
+    }
 
     collected_futures
 }
