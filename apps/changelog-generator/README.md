@@ -9,7 +9,7 @@ This template leverages [tsx](https://tsx.is) to allow execution of TypeScript f
 To execute a file with `tsx`:
 
 ```sh
-pnpm tsx ./path/to/the/file.ts
+yarn tsx ./path/to/the/file.ts
 ```
 
 ## Operations
@@ -19,7 +19,7 @@ pnpm tsx ./path/to/the/file.ts
 To build the package:
 
 ```sh
-pnpm build
+yarn build
 ```
 
 **Testing**
@@ -27,5 +27,5 @@ pnpm build
 To test the package:
 
 ```sh
-pnpm test
+yarn test
 ```
