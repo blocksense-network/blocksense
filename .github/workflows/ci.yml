@@ -36,7 +36,7 @@ jobs:
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
 
       - name: Check formatting
-        run: nix develop --impure .#pre-commit -c pre-commit run --all-files
+        run: nix develop --impure .#pre-commit -c sh -c 'yarn && pre-commit run --all-files'
 
       - name: nix flake check
         run: nix flake check --impure
