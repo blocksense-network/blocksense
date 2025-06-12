@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
-import { Schema as S, ParseResult, Either } from 'effect';
+import { Schema as S, Either } from 'effect';
 
 /**  An object whose properties represent significant elements of the path. */
 // ┌─────────────────────┬────────────┐
