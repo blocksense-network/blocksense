@@ -25,15 +25,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v17
-        if: ${{ runner.environment == 'github-hosted' }}
+        uses: metacraft-labs/nixos-modules/.github/install-nix@main
         with:
-          extra-conf: accept-flake-config = true
-
-      - uses: cachix/cachix-action@v16
-        with:
-          name: ${{ vars.CACHIX_CACHE }}
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          cachix-cache: ${{ vars.CACHIX_CACHE }}
+          trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
+          substituters: ${{ vars.SUBSTITUTERS }}
 
       - name: Check formatting
         run: nix develop --impure .#pre-commit -c sh -c 'yarn && pre-commit run --all-files'
@@ -48,15 +45,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v17
-        if: ${{ runner.environment == 'github-hosted' }}
+        uses: metacraft-labs/nixos-modules/.github/install-nix@main
         with:
-          extra-conf: accept-flake-config = true
-
-      - uses: cachix/cachix-action@v16
-        with:
-          name: ${{ vars.CACHIX_CACHE }}
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          cachix-cache: ${{ vars.CACHIX_CACHE }}
+          trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
+          substituters: ${{ vars.SUBSTITUTERS }}
 
       - name: Build & activate the Nix Dev Shell
         run: |
@@ -80,15 +74,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v17
-        if: ${{ runner.environment == 'github-hosted' }}
+        uses: metacraft-labs/nixos-modules/.github/install-nix@main
         with:
-          extra-conf: accept-flake-config = true
-
-      - uses: cachix/cachix-action@v16
-        with:
-          name: ${{ vars.CACHIX_CACHE }}
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          cachix-cache: ${{ vars.CACHIX_CACHE }}
+          trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
+          substituters: ${{ vars.SUBSTITUTERS }}
 
       - name: Build & activate the Nix Dev Shell
         run: |
@@ -140,15 +131,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v17
-        if: ${{ runner.environment == 'github-hosted' }}
+        uses: metacraft-labs/nixos-modules/.github/install-nix@main
         with:
-          extra-conf: accept-flake-config = true
-
-      - uses: cachix/cachix-action@v16
-        with:
-          name: ${{ vars.CACHIX_CACHE }}
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          cachix-cache: ${{ vars.CACHIX_CACHE }}
+          trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
+          substituters: ${{ vars.SUBSTITUTERS }}
 
       - name: Install current Bash on macOS
         if: runner.os == 'macOS'
@@ -194,15 +182,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v17
-        if: ${{ runner.environment == 'github-hosted' }}
+        uses: metacraft-labs/nixos-modules/.github/install-nix@main
         with:
-          extra-conf: accept-flake-config = true
-
-      - uses: cachix/cachix-action@v16
-        with:
-          name: ${{ vars.CACHIX_CACHE }}
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          cachix-cache: ${{ vars.CACHIX_CACHE }}
+          trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
+          substituters: ${{ vars.SUBSTITUTERS }}
 
       - name: Build & activate the Nix Dev Shell
         run: |
