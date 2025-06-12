@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig.base.json",
+  "extends": "./tsconfig.json",
   "include": [
     "scripts",
     "eslint.config.mjs",
@@ -7,9 +7,7 @@
     "vitest.config.ts"
   ],
   "compilerOptions": {
-    "types": ["node"],
-    "tsBuildInfoFile": ".tsbuildinfo/scripts.tsbuildinfo",
     "rootDir": ".",
-    "noEmit": true
+    "tsBuildInfoFile": ".tsbuildinfo/scripts.tsbuildinfo"
   }
 }
