@@ -40,6 +40,11 @@ in
       };
     };
 
+    blama = {
+      enable = true;
+      port = 4312;
+    };
+
     sequencer = {
       id = 1;
 

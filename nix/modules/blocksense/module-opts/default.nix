@@ -51,6 +51,12 @@ in
     description = mdDoc "The Anvil instance to use.";
   };
 
+  blama = mkOption {
+    type = mkSubmodule ./blama.nix;
+    default = { };
+    description = mdDoc "The Blama instance to use.";
+  };
+
   config-files = mkOption {
     type = types.attrsOf (mkSubmodule ./config-files/submodule.nix);
     default = import ./config-files { inherit self cfg lib; };
