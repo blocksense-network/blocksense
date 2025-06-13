@@ -1,6 +1,6 @@
 {
-  "network": "tac-turin",
-  "chainId": "2390",
+  "network": "taraxa-testnet",
+  "chainId": "842",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {
