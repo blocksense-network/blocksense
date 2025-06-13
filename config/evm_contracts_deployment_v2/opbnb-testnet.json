@@ -1,6 +1,6 @@
 {
-  "network": "manta-sepolia",
-  "chainId": "3441006",
+  "network": "opbnb-testnet",
+  "chainId": "5611",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {

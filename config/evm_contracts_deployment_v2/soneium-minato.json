@@ -1,6 +1,6 @@
 {
-  "network": "manta-sepolia",
-  "chainId": "3441006",
+  "network": "soneium-minato",
+  "chainId": "1946",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {
