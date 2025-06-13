@@ -950,10 +950,12 @@ pub async fn eth_batch_send_to_all_contracts(
     sequencer_state: Data<SequencerState>,
     updates: BatchedAggegratesToSend,
     feed_type: Repeatability,
-) -> Result<String> {
+) -> Result<()> {
     let span = info_span!("eth_batch_send_to_all_contracts");
     let _guard = span.enter();
     debug!("updates: {:?}", updates.updates);
+
+    let mut errors_vec = Vec::new();
 
     // drop all the locks as soon as we are done using the data
     {
@@ -1028,6 +1030,9 @@ pub async fn eth_batch_send_to_all_contracts(
                     let relayer_opt = relayers.get(net.as_str());
                     if let Some(relayer) = relayer_opt {
                         relayer.send(batch_of_updates_to_process).unwrap();
+                    } else {
+                        let error_msg = format!("Network `{net}` has no registered relayer; skipping it during reporting");
+                        errors_vec.push(error_msg);
                     }
                 }
             } else {
@@ -1041,8 +1046,8 @@ pub async fn eth_batch_send_to_all_contracts(
         debug!("Releasing a read lock on sequencer_state.sequencer_config");
         debug!("Releasing a read lock on sequencer_state.providers");
     }
-
-    Ok("".to_string())
+    error!("{}", errors_vec.join("; "));
+    Ok(())
 }
 
 async fn log_round_counters(
@@ -1524,11 +1529,11 @@ mod tests {
             let mut p = providers.get(network1).unwrap().lock().await;
             p.history.register_feed(feed.id, 100);
         }
+        let interval_ms = feed.schedule.interval_ms as u128;
         {
             // Some arbitrary point in time in the past, nothing special about this value
             let first_report_start_time = UNIX_EPOCH + Duration::from_secs(1524885322);
             let end_slot_timestamp = first_report_start_time.elapsed().unwrap().as_millis();
-            let interval_ms = feed.schedule.interval_ms as u128;
             let v1 = VotedFeedUpdate {
                 feed_id: feed.id,
                 value: FeedType::Numerical(103082.01f64),
@@ -1571,6 +1576,12 @@ mod tests {
                 eth_batch_send_to_all_contracts(sequencer_state.clone(), updates3, Periodic).await;
             assert!(p3.is_ok());
         }
+        //TODO: instantiate relayers in test sequencer state correctly!
+        let time_to_await: Duration = Duration::from_millis((interval_ms * 4) as u64);
+        let mut interval = interval(time_to_await);
+        interval.tick().await;
+        // The first tick completes immediately.
+        interval.tick().await;
 
         /////////////////////////////////////////////////////////////////////
         // BIG STEP THREE - Read data from contract and verify that it's correct

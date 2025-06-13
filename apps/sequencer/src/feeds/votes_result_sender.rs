@@ -43,9 +43,13 @@ pub async fn votes_result_sender_loop(
                         )
                         .await;
 
-                        info!("sending updates to contract:");
                         let sequencer_state = sequencer_state.clone();
-                        async_send_to_all_networks(sequencer_state, updates, batch_count).await;
+                        let blocksense_block_height = updates.block_height;
+                        debug!("Processing eth_batch_send_to_all_contracts{blocksense_block_height}_{batch_count}");
+                        match eth_batch_send_to_all_contracts(sequencer_state, updates, Periodic).await {
+                            Ok(_) => info!("Sending updates to relayers complete."),
+                            Err(err) => error!("ERROR Sending updates to relayers: {err}"),
+                        };
                     }
                     None => {
                         panic!("Sender got RecvError"); // This error indicates a severe internal error.
@@ -58,20 +62,6 @@ pub async fn votes_result_sender_loop(
             }
         })
         .expect("Failed to spawn votes result sender!")
-}
-
-async fn async_send_to_all_networks(
-    sequencer_state: Data<SequencerState>,
-    updates: BatchedAggegratesToSend,
-    batch_count: usize,
-) {
-    let blocksense_block_height = updates.block_height;
-
-    debug!("Processing async_send_to_all_networks_{blocksense_block_height}_{batch_count}");
-    match eth_batch_send_to_all_contracts(sequencer_state, updates, Periodic).await {
-        Ok(res) => info!("Sending updates complete {res}."),
-        Err(err) => error!("ERROR Sending updates {err}"),
-    };
 }
 
 async fn try_send_aggregation_consensus_trigger_to_reporters(
