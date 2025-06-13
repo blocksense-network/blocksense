@@ -1,21 +1,27 @@
 {
-  "network": "tac-turin",
-  "chainId": "2390",
+  "network": "soneium-minato",
+  "chainId": "1946",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {
         "address": "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F",
-        "constructorArgs": ["0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De"],
+        "constructorArgs": [
+          "0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De"
+        ],
         "salt": "0x36d946ba08b13b7ec8aec7effec798658cf99491873a73e9c652b8ab3b96756a"
       },
       "AggregatedDataFeedStore": {
         "address": "0x6bF1BF2765A1644554CB6060d964FA7ce2FBe6eA",
-        "constructorArgs": ["0xCCC260a4228420B9Da421aDB477Eb028162CE042"],
+        "constructorArgs": [
+          "0xCCC260a4228420B9Da421aDB477Eb028162CE042"
+        ],
         "salt": "0x71b411ccc58b0bf522c76bab9a977992a03cfbc078d3852ee8ee8b6d5311a477"
       },
       "AccessControl": {
         "address": "0xCCC260a4228420B9Da421aDB477Eb028162CE042",
-        "constructorArgs": ["0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De"],
+        "constructorArgs": [
+          "0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De"
+        ],
         "salt": "0x26186f5256760fb01ab0053f874a1674c76a40b87c3031918056ef3ace009aac"
       },
       "CLFeedRegistryAdapter": {
