@@ -49,7 +49,7 @@ pub async fn prepare_sequencer_state(
     UnboundedReceiver<FeedsManagementCmds>,      // feeds_management_cmd_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>,      // feeds_slots_manager_cmd_recv
     UnboundedReceiver<(ReporterResponse, SignatureWithAddress)>, // aggregate_batch_sig_recv
-    HashMap<String, UnboundedReceiver<String>>,
+    HashMap<String, UnboundedReceiver<String>>,  // relayers_recv_channels
     Data<SequencerState>,
 ) {
     let log_handle: SharedLoggingHandle = get_shared_logging_handle();

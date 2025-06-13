@@ -916,6 +916,16 @@ pub async fn eth_batch_send_to_all_contracts(
                 let provider = provider.clone();
                 let blocksense_block_height = updates.block_height;
 
+                {
+                    let relayers = sequencer_state.relayers_send_channels.read().await;
+                    let relayer_opt = relayers.get(net.as_str());
+                    if let Some(relayer) = relayer_opt {
+                        relayer
+                            .send(format!("Hello from {net}: updates = {updates:?}"))
+                            .unwrap();
+                    }
+                }
+
                 let feeds_config = feeds_config.clone();
                 let provider_settings = provider_settings.clone();
                 let sender_name = format!("batch_sender_{blocksense_block_height}_{net}");

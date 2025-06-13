@@ -71,18 +71,20 @@ pub async fn prepare_app_workers(
     collected_futures.push(aggregation_batch_consensus);
 
     for (net, mut chan) in relayers_recv_channels.into_iter() {
-        let relayer_name = format!("relayer_for_network{net}");
-        collected_futures.push( tokio::task::Builder::new()
-        .name(relayer_name.clone().as_str())
-        .spawn(async move {
-            tracing::info!("Starting {relayer_name} loop...");
+        let relayer_name = format!("relayer_for_network {net}");
+        collected_futures.push(
+            tokio::task::Builder::new()
+                .name(relayer_name.clone().as_str())
+                .spawn(async move {
+                    tracing::info!("Starting {relayer_name} loop...");
 
-            loop {
-                let cmd = chan.recv().await;
-                tracing::info!("{relayer_name} received {cmd:?}");
-            }
-        })
-        .expect("Failed to spawn metrics collector loop!"));
+                    loop {
+                        let cmd = chan.recv().await;
+                        tracing::info!("{relayer_name} received {cmd:?}");
+                    }
+                })
+                .expect("Failed to spawn metrics collector loop!"),
+        );
     }
 
     collected_futures

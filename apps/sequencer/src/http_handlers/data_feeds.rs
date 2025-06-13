@@ -755,6 +755,7 @@ pub mod tests {
             feeds_management_cmd_to_block_creator_recv,
             feeds_slots_manager_cmd_recv,
             aggregate_batch_sig_recv,
+            HashMap::new(),
         )
         .await;
 
