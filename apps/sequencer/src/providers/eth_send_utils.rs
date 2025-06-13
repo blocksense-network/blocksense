@@ -33,7 +33,6 @@ use blocksense_metrics::{
     metrics::{FeedsMetrics, ProviderMetrics},
     process_provider_getter, set_metric,
 };
-use futures::stream::FuturesUnordered;
 use paste::paste;
 use std::time::Instant;
 use tracing::{debug, error, info, info_span, warn};
@@ -208,28 +207,97 @@ pub async fn get_serialized_updates_for_network(
     Ok(serialized_updates)
 }
 
-struct BatchOfUpdatesToProcess {
-    net: String,
-    provider: Arc<Mutex<RpcProvider>>,
-    provider_settings: blocksense_config::Provider,
-    updates: BatchedAggegratesToSend,
-    feed_type: Repeatability,
-    feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
-    transaction_retry_timeout_secs: u64,
-    transaction_retries_count_limit: u64,
-    retry_fee_increment_fraction: f64,
+pub struct BatchOfUpdatesToProcess {
+    pub net: String,
+    pub provider: Arc<Mutex<RpcProvider>>,
+    pub provider_settings: blocksense_config::Provider,
+    pub updates: BatchedAggegratesToSend,
+    pub feed_type: Repeatability,
+    pub feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
+    pub transaction_retry_timeout_secs: u64,
+    pub transaction_retries_count_limit: u64,
+    pub retry_fee_increment_fraction: f64,
 }
 
 pub async fn loop_processing_batch_of_updates(
+    net: String,
     relayer_name: String,
-    mut chan: UnboundedReceiver<String>,
-    // batch_of_updates_to_process: BatchOfUpdatesToProcess
+    feeds_metrics: Arc<RwLock<FeedsMetrics>>,
+    provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>>,
+    mut chan: UnboundedReceiver<BatchOfUpdatesToProcess>,
 ) {
     tracing::info!("Starting {relayer_name} loop...");
 
     loop {
-        let cmd = chan.recv().await;
-        tracing::info!("{relayer_name} received {cmd:?}");
+        let cmd_opt = chan.recv().await;
+        // tracing::info!("{relayer_name} received {cmd:?}");
+        match cmd_opt {
+            Some(cmd) => {
+                let block_height = cmd.updates.block_height;
+                let provider = cmd.provider.clone();
+                let result = eth_batch_send_to_contract(
+                    cmd.net,
+                    cmd.provider,
+                    cmd.provider_settings,
+                    cmd.updates,
+                    cmd.feed_type,
+                    cmd.feeds_config,
+                    cmd.transaction_retry_timeout_secs,
+                    cmd.transaction_retries_count_limit,
+                    cmd.retry_fee_increment_fraction,
+                )
+                .await;
+                match result {
+                    Ok((status, updated_feeds)) => {
+                        let mut result_str = String::new();
+                        result_str += &format!("result from network {net} and block height {block_height}: Ok -> status: {status}");
+                        if status == "true" {
+                            result_str += &format!(", updated_feeds: {updated_feeds:?}");
+                            increment_feeds_round_metrics(
+                                &updated_feeds,
+                                Some(feeds_metrics.clone()),
+                                net.as_str(),
+                            )
+                            .await;
+                            {
+                                let provider = provider.lock().await;
+                                let provider_metrics = &provider.provider_metrics;
+                                inc_metric!(provider_metrics, net, success_send_tx);
+                            }
+                            let mut status_map = provider_status.write().await;
+                            status_map.insert(net.clone(), ProviderStatus::LastUpdateSucceeded);
+                        } else if status == "false" || status == "timeout" {
+                            let mut provider = provider.lock().await;
+                            result_str += &format!(
+                                ", failed to update feeds: {updated_feeds:?} due to {status}"
+                            );
+                            decrement_feeds_round_indexes(
+                                &updated_feeds,
+                                net.as_str(),
+                                &mut provider,
+                            )
+                            .await;
+
+                            let provider_metrics = &provider.provider_metrics;
+                            if status == "timeout" {
+                                inc_metric!(provider_metrics, net, total_timed_out_tx);
+                            } else if status == "false" {
+                                inc_metric!(provider_metrics, net, failed_send_tx);
+                            }
+                            let mut status_map = provider_status.write().await;
+                            status_map.insert(net.clone(), ProviderStatus::LastUpdateFailed);
+                        }
+                        info!({ result_str });
+                    }
+                    Err(e) => {
+                        error!(
+                        "Got error sending to network {net} and block height {block_height}: {e}"
+                    );
+                    }
+                }
+            }
+            None => warn!("Relayer {relayer_name} woke up on empty channel"),
+        }
     }
 }
 
@@ -887,8 +955,6 @@ pub async fn eth_batch_send_to_all_contracts(
     let _guard = span.enter();
     debug!("updates: {:?}", updates.updates);
 
-    let collected_futures = FuturesUnordered::new();
-
     // drop all the locks as soon as we are done using the data
     {
         // Locks acquired here
@@ -942,42 +1008,28 @@ pub async fn eth_batch_send_to_all_contracts(
 
                 let updates = updates.clone();
                 let provider = provider.clone();
-                let blocksense_block_height = updates.block_height;
+                let feeds_config = feeds_config.clone();
+                let provider_settings = provider_settings.clone();
+
+                let batch_of_updates_to_process = BatchOfUpdatesToProcess {
+                    net: net.clone(),
+                    provider: provider.clone(),
+                    provider_settings,
+                    updates,
+                    feed_type,
+                    feeds_config,
+                    transaction_retry_timeout_secs,
+                    transaction_retries_count_limit,
+                    retry_fee_increment_fraction,
+                };
 
                 {
                     let relayers = sequencer_state.relayers_send_channels.read().await;
                     let relayer_opt = relayers.get(net.as_str());
                     if let Some(relayer) = relayer_opt {
-                        relayer
-                            .send(format!("Hello from {net}: updates = {updates:?}"))
-                            .unwrap();
+                        relayer.send(batch_of_updates_to_process).unwrap();
                     }
                 }
-
-                let feeds_config = feeds_config.clone();
-                let provider_settings = provider_settings.clone();
-                let sender_name = format!("batch_sender_{blocksense_block_height}_{net}");
-                let err_msg = format!("Failed to spawn {sender_name}!");
-                collected_futures.push(
-                    tokio::task::Builder::new()
-                        .name(sender_name.as_str())
-                        .spawn(async move {
-                            let result = eth_batch_send_to_contract(
-                                net.clone(),
-                                provider.clone(),
-                                provider_settings,
-                                updates,
-                                feed_type,
-                                feeds_config,
-                                transaction_retry_timeout_secs,
-                                transaction_retries_count_limit,
-                                retry_fee_increment_fraction,
-                            )
-                            .await;
-                            (result, net, provider)
-                        })
-                        .unwrap_or_else(|_| panic!("{}", err_msg)),
-                );
             } else {
                 warn!(
                     "Network `{net}` is not configured in sequencer; skipping it during reporting"
@@ -990,67 +1042,7 @@ pub async fn eth_batch_send_to_all_contracts(
         debug!("Releasing a read lock on sequencer_state.providers");
     }
 
-    if collected_futures.is_empty() {
-        warn!("There are no enabled networks; not reporting to anybody");
-    }
-
-    let result = futures::future::join_all(collected_futures).await;
-    let mut all_results = String::new();
-    let block_height = updates.block_height;
-    for v in result {
-        match v {
-            Ok((result, net, provider)) => match result {
-                Ok((status, updated_feeds)) => {
-                    all_results += &format!("result from network {net} and block height {block_height}: Ok -> status: {status}");
-                    if status == "true" {
-                        all_results += &format!(", updated_feeds: {updated_feeds:?}");
-                        increment_feeds_round_metrics(
-                            &updated_feeds,
-                            Some(sequencer_state.feeds_metrics.clone()),
-                            net.as_str(),
-                        )
-                        .await;
-                        {
-                            let provider = provider.lock().await;
-                            let provider_metrics = &provider.provider_metrics;
-                            inc_metric!(provider_metrics, net, success_send_tx);
-                        }
-                        let mut status_map = sequencer_state.provider_status.write().await;
-                        status_map.insert(net, ProviderStatus::LastUpdateSucceeded);
-                    } else if status == "false" || status == "timeout" {
-                        let mut provider = provider.lock().await;
-                        all_results +=
-                            &format!(", failed to update feeds: {updated_feeds:?} due to {status}");
-                        decrement_feeds_round_indexes(&updated_feeds, net.as_str(), &mut provider)
-                            .await;
-
-                        let provider_metrics = &provider.provider_metrics;
-                        if status == "timeout" {
-                            inc_metric!(provider_metrics, net, total_timed_out_tx);
-                        } else if status == "false" {
-                            inc_metric!(provider_metrics, net, failed_send_tx);
-                        }
-                        let mut status_map = sequencer_state.provider_status.write().await;
-                        status_map.insert(net, ProviderStatus::LastUpdateFailed);
-                    }
-                }
-                Err(e) => {
-                    error!(
-                        "Got error sending to network {net} and block height {block_height}: {e}"
-                    );
-                }
-            },
-            Err(e) => {
-                all_results += "JoinError:";
-                error!("JoinError: {}", e.to_string());
-                all_results += &e.to_string();
-                continue;
-            }
-        };
-
-        all_results += "\n"
-    }
-    Ok(all_results)
+    Ok("".to_string())
 }
 
 async fn log_round_counters(

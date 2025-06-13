@@ -4,6 +4,7 @@ use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_gnosis_safe::utils::SignatureWithAddress;
 #[cfg(feature = "profile")]
 use pprof::ProfilerGuard;
+use sequencer::providers::eth_send_utils::BatchOfUpdatesToProcess;
 use sequencer::providers::provider::init_shared_rpc_providers;
 use sequencer::sequencer_state::SequencerState;
 use tokio::sync::{mpsc, RwLock};
@@ -49,7 +50,7 @@ pub async fn prepare_sequencer_state(
     UnboundedReceiver<FeedsManagementCmds>,      // feeds_management_cmd_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>,      // feeds_slots_manager_cmd_recv
     UnboundedReceiver<(ReporterResponse, SignatureWithAddress)>, // aggregate_batch_sig_recv
-    HashMap<String, UnboundedReceiver<String>>,  // relayers_recv_channels
+    HashMap<String, UnboundedReceiver<BatchOfUpdatesToProcess>>, // relayers_recv_channels
     Data<SequencerState>,
 ) {
     let log_handle: SharedLoggingHandle = get_shared_logging_handle();
