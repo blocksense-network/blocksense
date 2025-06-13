@@ -9538,9 +9538,9 @@
         "quote": null
       },
       "50000": {
-        "address": "0x55eEB87a259825105EE7be3177D4ec5dF5B088fA",
+        "address": "0x331e1580ca26EDfEe0d49c2dA48214D31965677C",
         "constructorArgs": [
-          "USDT / USD Pegged",
+          "USDT / USD Peg-aware",
           8,
           "50000",
           "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
@@ -9551,9 +9551,9 @@
         "quote": null
       },
       "50001": {
-        "address": "0x17B25277FdD213e15d60b0Cee098E29F9bCdAF57",
+        "address": "0x22d5c6bdbDf6b7c4F383F7F1dE52921a8676C410",
         "constructorArgs": [
-          "USDC / USD Pegged",
+          "USDC / USD Peg-aware",
           8,
           "50001",
           "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
@@ -9564,9 +9564,9 @@
         "quote": null
       },
       "100000": {
-        "address": "0x7957145DC7475a36303daA28E0aD8CC33c9cD2a3",
+        "address": "0xA9c4f33A1B78ba02837C35304706f95A76a6dD2e",
         "constructorArgs": [
-          "ExSat BTC",
+          "exSat PoR BTC",
           0,
           "100000",
           "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
@@ -9577,15 +9577,41 @@
         "quote": null
       },
       "100001": {
-        "address": "0x6Dd4866419eCac4EE3B087593f10F6D5c1aEc525",
+        "address": "0xCBe710d40921EAB3110A3f5886Ade108a7c316c1",
         "constructorArgs": [
-          "YieldNest convertToAssets",
+          "ynETHx / WETH",
           0,
           "100001",
           "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "100001",
+        "base": null,
+        "quote": null
+      },
+      "100002": {
+        "address": "0x9202093091428187ef06303a2B862555f7b679DE",
+        "constructorArgs": [
+          "YUSD / USDC",
+          0,
+          "100002",
+          "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "100002",
+        "base": null,
+        "quote": null
+      },
+      "100003": {
+        "address": "0x5589B7AAa4E0bb468508090367D3cCDCBcB0cC8F",
+        "constructorArgs": [
+          "ynBNBx / WBNB",
+          0,
+          "100003",
+          "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "100003",
         "base": null,
         "quote": null
       },
@@ -9642,9 +9668,9 @@
         "quote": null
       },
       "1000004": {
-        "address": "0xd85275A629E8Fad4b6727D730FF98cB34F14D984",
+        "address": "0x401e09ddF0391AC421d6dEcfe2BcA0a36934aD7e",
         "constructorArgs": [
-          "MOYAKI / USD",
+          "YAKI / USD",
           8,
           "1000004",
           "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
@@ -9655,15 +9681,41 @@
         "quote": null
       },
       "1000005": {
-        "address": "0xD73e1f67f968d09F06fb7aE14c7F94ec5E077b49",
+        "address": "0x9ECc812337b61476CE36459A7122375fA44c4E00",
         "constructorArgs": [
-          "MONLANDAK / USD",
+          "DAK / USD",
           8,
           "1000005",
           "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "1000005",
+        "base": null,
+        "quote": null
+      },
+      "1000006": {
+        "address": "0xc7A09C16Cd982b3277FCAAA28A1E25CFa25FD64f",
+        "constructorArgs": [
+          "YUSD / USD Peg-aware",
+          8,
+          "1000006",
+          "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "1000006",
+        "base": null,
+        "quote": null
+      },
+      "1000007": {
+        "address": "0xa136E0f468141686Ae5D74b8A37876B3B9865fe8",
+        "constructorArgs": [
+          "oLP / USD",
+          8,
+          "1000007",
+          "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "1000007",
         "base": null,
         "quote": null
       },

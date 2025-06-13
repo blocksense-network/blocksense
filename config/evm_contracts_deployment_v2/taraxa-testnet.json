@@ -1,6 +1,6 @@
 {
-  "network": "manta-sepolia",
-  "chainId": "3441006",
+  "network": "taraxa-testnet",
+  "chainId": "842",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {
