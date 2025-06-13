@@ -134,7 +134,7 @@ pub struct ReporterConfig {
     pub full_batch: bool,
     pub batch_size: usize,
     pub sequencer_url: String,
-    pub prometheus_url: String,
+    pub metrics_url: String,
     pub poll_period_ms: u64, // TODO(snikolov): Move inside `Reporter` different poll periods are handled in reporter
 
     pub resources: HashMap<String, String>, // <`API`,`API_resource_dir`>
