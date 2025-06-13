@@ -12,7 +12,10 @@ use blocksense_registry::config::FeedConfig;
 use blocksense_utils::to_hex_string;
 use eyre::{bail, eyre, Result};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
-use tokio::{sync::Mutex, sync::RwLock, time::Duration};
+use tokio::{
+    sync::{mpsc::UnboundedReceiver, Mutex, RwLock},
+    time::Duration,
+};
 
 use crate::{
     providers::provider::{
@@ -203,6 +206,31 @@ pub async fn get_serialized_updates_for_network(
     };
 
     Ok(serialized_updates)
+}
+
+struct BatchOfUpdatesToProcess {
+    net: String,
+    provider: Arc<Mutex<RpcProvider>>,
+    provider_settings: blocksense_config::Provider,
+    updates: BatchedAggegratesToSend,
+    feed_type: Repeatability,
+    feeds_config: Arc<RwLock<HashMap<u32, FeedConfig>>>,
+    transaction_retry_timeout_secs: u64,
+    transaction_retries_count_limit: u64,
+    retry_fee_increment_fraction: f64,
+}
+
+pub async fn loop_processing_batch_of_updates(
+    relayer_name: String,
+    mut chan: UnboundedReceiver<String>,
+    // batch_of_updates_to_process: BatchOfUpdatesToProcess
+) {
+    tracing::info!("Starting {relayer_name} loop...");
+
+    loop {
+        let cmd = chan.recv().await;
+        tracing::info!("{relayer_name} received {cmd:?}");
+    }
 }
 
 #[allow(clippy::too_many_arguments)]

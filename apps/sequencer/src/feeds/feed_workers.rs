@@ -4,6 +4,7 @@ use crate::blocks_reader::blocks_reader_loop;
 use crate::feeds::feeds_slots_manager::feeds_slots_manager_loop;
 use crate::feeds::votes_result_sender::votes_result_sender_loop;
 use crate::metrics_collector::metrics_collector_loop;
+use crate::providers::eth_send_utils::loop_processing_batch_of_updates;
 use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
 use blocksense_config::SequencerConfig;
@@ -70,18 +71,14 @@ pub async fn prepare_app_workers(
     collected_futures.push(blocks_reader);
     collected_futures.push(aggregation_batch_consensus);
 
-    for (net, mut chan) in relayers_recv_channels.into_iter() {
+    for (net, chan) in relayers_recv_channels.into_iter() {
         let relayer_name = format!("relayer_for_network {net}");
         collected_futures.push(
             tokio::task::Builder::new()
                 .name(relayer_name.clone().as_str())
                 .spawn(async move {
-                    tracing::info!("Starting {relayer_name} loop...");
-
-                    loop {
-                        let cmd = chan.recv().await;
-                        tracing::info!("{relayer_name} received {cmd:?}");
-                    }
+                    loop_processing_batch_of_updates(relayer_name, chan).await;
+                    Ok(())
                 })
                 .expect("Failed to spawn metrics collector loop!"),
         );
