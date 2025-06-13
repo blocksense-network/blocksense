@@ -5,6 +5,7 @@ import {
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
 import Safe from '@safe-global/protocol-kit';
+import { entriesOf } from '@blocksense/base-utils/array-iter';
 
 import {
   CLAggregatorAdapterData,
@@ -33,7 +34,7 @@ export async function registerCLAdapters({
   console.log('\nRegistering CLAggregatorAdapters in CLFeedRegistryAdapter...');
   console.log('------------------------------------------------------------');
 
-  const signer = config.adminMultisig.signer || config.ledgerAccount!;
+  const signer = config.deployer;
 
   const registry = new Contract(
     deployData.coreContracts.CLFeedRegistryAdapter.address,
@@ -44,12 +45,11 @@ export async function registerCLAdapters({
   // Split into batches of 100
   const BATCH_LENGTH = 100;
   const batches: Array<Array<CLAggregatorAdapterData>> = [];
-  const aggregatorData = deployData.CLAggregatorAdapter.filter(d => d.base);
   const filteredData = [];
 
-  for (const data of aggregatorData) {
+  for (const [description, data] of entriesOf(deployData.CLAggregatorAdapter)) {
     if (!data.base || !data.quote) {
-      console.log(` -> Feed '${data.description}' has no base or quote`, '\n');
+      console.log(` -> Feed '${description}' has no base or quote`, '\n');
       continue;
     }
 
@@ -62,7 +62,7 @@ export async function registerCLAdapters({
       filteredData.push(data);
     } else {
       console.log(
-        ` -> Feed '${data.description}' already registered`,
+        ` -> Feed '${description}' already registered`,
         {
           base: data.base,
           quote: data.quote,

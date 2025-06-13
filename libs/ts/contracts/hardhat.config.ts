@@ -1,4 +1,4 @@
-import * as dotenv from 'dotenv';
+import { Schema as S } from 'effect';
 
 import { HardhatUserConfig } from 'hardhat/config';
 import '@nomicfoundation/hardhat-ethers';
@@ -16,12 +16,36 @@ import {
   getOptionalRpcUrl,
   networkName,
   networkMetadata,
+  ethereumAddress,
+  NetworkName,
 } from '@blocksense/base-utils/evm';
 
 import './tasks';
-import { getOptionalEnvString } from '@blocksense/base-utils';
+import { assertNotNull, asVarSchema } from '@blocksense/base-utils';
 
-dotenv.config();
+import {
+  DeploymentEnvSchema,
+  parseDeploymentEnvConfig,
+} from '@blocksense/base-utils/evm/functions';
+
+const deployerSchema = {
+  global: {},
+
+  perNetworkKind: {
+    deployerAddressIsLedger: asVarSchema(S.BooleanFromString),
+    deployerAddress: ethereumAddress,
+  },
+
+  perNetworkName: {
+    deployerAddressIsLedger: asVarSchema(S.BooleanFromString),
+    deployerAddress: ethereumAddress,
+  },
+} satisfies DeploymentEnvSchema;
+
+const deployerConfig = (network: NetworkName) =>
+  parseDeploymentEnvConfig(deployerSchema, network);
+
+const localDeployerConfig = deployerConfig('local').mergedConfig;
 
 const config: HardhatUserConfig = {
   reflect: {
@@ -52,12 +76,13 @@ const config: HardhatUserConfig = {
       chainId: 99999999999,
       forking: {
         blockNumber: 22044232,
-        enabled: process.env.FORKING === 'true',
+        enabled: process.env['FORKING'] === 'true',
         url: getOptionalRpcUrl('ethereum-mainnet'),
       },
-      ledgerAccounts: getOptionalEnvString('LEDGER_ACCOUNT', '')
-        ? [getOptionalEnvString('LEDGER_ACCOUNT', '')]
-        : undefined,
+      ledgerAccounts:
+        localDeployerConfig.deployerAddressIsLedger === true
+          ? [assertNotNull(localDeployerConfig.deployerAddress)]
+          : undefined,
     },
     ...fromEntries(
       networkName.literals.map(network => [
@@ -65,15 +90,20 @@ const config: HardhatUserConfig = {
         {
           url: getOptionalRpcUrl(network),
           chainId: networkMetadata[network].chainId,
-          ledgerAccounts: getOptionalEnvString('LEDGER_ACCOUNT', '')
-            ? [getOptionalEnvString('LEDGER_ACCOUNT', '')]
+          ledgerAccounts: deployerConfig(network).mergedConfig
+            .deployerAddressIsLedger
+            ? [
+                assertNotNull(
+                  deployerConfig(network).mergedConfig.deployerAddress,
+                ),
+              ]
             : undefined,
         },
       ]),
     ),
   },
   gasReporter: {
-    enabled: process.env.REPORT_GAS === 'true',
+    enabled: process.env['REPORT_GAS'] === 'true',
     currency: 'USD',
   },
   paths: {
@@ -83,7 +113,7 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     enabled: true,
-    apiKey: process.env.ETHERSCAN_API_KEY || '',
+    apiKey: process.env['ETHERSCAN_API_KEY'] || '',
   },
 };
 
