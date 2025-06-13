@@ -26,7 +26,7 @@ pub async fn votes_result_sender_loop(
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
         .name("votes_result_sender")
-        .spawn_local(async move {
+        .spawn(async move {
             let mut batch_count = 0;
             loop {
                 debug!("Awaiting batched votes over `batched_votes_recv`...");

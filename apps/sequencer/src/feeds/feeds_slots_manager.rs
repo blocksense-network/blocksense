@@ -22,7 +22,7 @@ pub async fn feeds_slots_manager_loop(
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
         .name("feeds_slots_manager")
-        .spawn_local(async move {
+        .spawn(async move {
             let mut collected_futures = FuturesUnordered::new();
 
             let reg = sequencer_state.registry.read().await;
@@ -57,7 +57,7 @@ pub async fn feeds_slots_manager_loop(
                 collected_futures.push(
                     tokio::task::Builder::new()
                         .name(format!("feed_processor_{key}").as_str())
-                        .spawn_local(async move {
+                        .spawn(async move {
                             feed_slots_processor
                                 .start_loop(
                                     &sequencer_state,
@@ -76,7 +76,7 @@ pub async fn feeds_slots_manager_loop(
             collected_futures.push(
                 tokio::task::Builder::new()
                     .name("fsm_command_watcher")
-                    .spawn_local(async move { read_next_feed_slots_manager_cmd(cmd_channel).await })
+                    .spawn(async move { read_next_feed_slots_manager_cmd(cmd_channel).await })
                     .expect("Failed to spawn feed slots manager command watcher!"),
             );
 
@@ -167,7 +167,7 @@ async fn handle_feeds_slots_manager_cmd(
                     let sequencer_state = sequencer_state.clone();
                     let processor_future = tokio::task::Builder::new()
                         .name(format!("dynamic_feed_processor_{new_id}").as_str())
-                        .spawn_local(async move {
+                        .spawn(async move {
                             let feed_aggregate_history =
                                 sequencer_state.feed_aggregate_history.clone();
                             let feeds_metrics = sequencer_state.feeds_metrics.clone();
@@ -236,7 +236,7 @@ async fn handle_feeds_slots_manager_cmd(
     //Register reader task again once the command is processed
     let command_watcher = tokio::task::Builder::new()
         .name("restarted_fsm_command_watcher")
-        .spawn_local(async move { read_next_feed_slots_manager_cmd(cmd_channel).await });
+        .spawn(async move { read_next_feed_slots_manager_cmd(cmd_channel).await });
     match command_watcher {
         Ok(command_watcher) => collected_futures.push(command_watcher),
         Err(err) => {
