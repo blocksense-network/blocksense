@@ -4,7 +4,9 @@ use crate::blocks_reader::blocks_reader_loop;
 use crate::feeds::feeds_slots_manager::feeds_slots_manager_loop;
 use crate::feeds::votes_result_sender::votes_result_sender_loop;
 use crate::metrics_collector::metrics_collector_loop;
-use crate::providers::eth_send_utils::{loop_processing_batch_of_updates, BatchOfUpdatesToProcess};
+use crate::providers::eth_send_utils::{
+    create_and_collect_relayers_futures, BatchOfUpdatesToProcess,
+};
 use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
 use blocksense_config::SequencerConfig;
@@ -74,27 +76,13 @@ pub async fn prepare_app_workers(
     let feeds_metrics = sequencer_state.feeds_metrics.clone();
     let provider_status = sequencer_state.provider_status.clone();
 
-    for (net, chan) in relayers_recv_channels.into_iter() {
-        let feed_metrics_clone = feeds_metrics.clone();
-        let provider_status_clone = provider_status.clone();
-        let relayer_name = format!("relayer_for_network {net}");
-        collected_futures.push(
-            tokio::task::Builder::new()
-                .name(relayer_name.clone().as_str())
-                .spawn(async move {
-                    loop_processing_batch_of_updates(
-                        net,
-                        relayer_name,
-                        feed_metrics_clone,
-                        provider_status_clone,
-                        chan,
-                    )
-                    .await;
-                    Ok(())
-                })
-                .expect("Failed to spawn metrics collector loop!"),
-        );
-    }
+    create_and_collect_relayers_futures(
+        &collected_futures,
+        feeds_metrics,
+        provider_status,
+        relayers_recv_channels,
+    )
+    .await;
 
     collected_futures
 }

@@ -740,6 +740,7 @@ pub mod tests {
             feeds_management_cmd_to_block_creator_recv,
             feeds_slots_manager_cmd_recv,
             aggregate_batch_sig_recv,
+            _,
         ) = create_sequencer_state_from_sequencer_config(
             cfg.clone(),
             "test_register_feed_success",
@@ -930,7 +931,7 @@ pub mod tests {
         let sequencer_config = get_test_config_with_no_providers();
         let feed_config = AllFeedsConfig { feeds: vec![] };
 
-        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_empty_success",
             feed_config,
@@ -963,7 +964,7 @@ pub mod tests {
     async fn test_get_last_published_value_and_timestamp_wrong_feed_id() {
         let sequencer_config = get_test_config_with_no_providers();
         let feed_config = AllFeedsConfig { feeds: vec![] };
-        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_wrong_feed_id",
             feed_config,
@@ -1010,7 +1011,7 @@ pub mod tests {
     async fn test_get_last_published_value_and_timestamp_unregistered_feed_id() {
         let sequencer_config = get_test_config_with_no_providers();
         let feed_config = AllFeedsConfig { feeds: vec![] };
-        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_unregistered_feed_id",
             feed_config,
@@ -1065,7 +1066,7 @@ pub mod tests {
             feeds: vec![test_feed_config(1, 0)],
         };
 
-        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_registered_feed_id_no_data",
             all_feeds_config,
@@ -1121,7 +1122,7 @@ pub mod tests {
             feeds: vec![test_feed_config(1, 0)],
         };
 
-        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_registered_feed_id_with_data",
             all_feeds_config,
@@ -1186,7 +1187,7 @@ pub mod tests {
             feeds: vec![test_feed_config(1, 0)],
         };
 
-        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_registered_feed_id_with_more_data",
             all_feeds_config,
