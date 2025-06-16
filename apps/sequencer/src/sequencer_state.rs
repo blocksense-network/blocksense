@@ -156,10 +156,22 @@ pub async fn create_sequencer_state_from_sequencer_config(
     UnboundedReceiver<FeedsManagementCmds>,      // feeds_management_cmd_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>,      // feeds_slots_manager_cmd_recv
     UnboundedReceiver<(ReporterResponse, SignatureWithAddress)>, // aggregate_batch_sig_recv
+    HashMap<String, UnboundedReceiver<BatchOfUpdatesToProcess>>, // relayers_recv_channels
 ) {
     let log_handle = init_shared_logging_handle("INFO", false);
     let providers =
         init_shared_rpc_providers(&sequencer_config, Some(metrics_prefix), &feeds_config).await;
+
+    let mut relayers_send_channels = HashMap::new();
+    let mut relayers_recv_channels = HashMap::new();
+    {
+        let providers = providers.read().await;
+        for (net_name, _provider) in providers.iter() {
+            let (s, r) = mpsc::unbounded_channel();
+            relayers_send_channels.insert(net_name.clone(), s);
+            relayers_recv_channels.insert(net_name.clone(), r);
+        }
+    }
 
     let (vote_send, vote_recv) = mpsc::unbounded_channel();
     let (feeds_management_cmd_to_block_creator_send, feeds_management_cmd_to_block_creator_recv) =
@@ -179,7 +191,7 @@ pub async fn create_sequencer_state_from_sequencer_config(
         feeds_management_cmd_to_block_creator_send,
         feeds_slots_manager_cmd_send,
         aggregate_batch_sig_send,
-        Arc::new(RwLock::new(HashMap::new())),
+        Arc::new(RwLock::new(relayers_send_channels)),
     );
 
     (
@@ -188,6 +200,7 @@ pub async fn create_sequencer_state_from_sequencer_config(
         feeds_management_cmd_to_block_creator_recv,
         feeds_slots_manager_cmd_recv,
         aggregate_batch_sig_recv,
+        relayers_recv_channels,
     )
 }
 

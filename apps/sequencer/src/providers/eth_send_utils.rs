@@ -37,6 +37,10 @@ use paste::paste;
 use std::time::Instant;
 use tracing::{debug, error, info, info_span, warn};
 
+use futures_util::stream::FuturesUnordered;
+use std::io::Error;
+use tokio::task::JoinHandle;
+
 pub async fn deploy_contract(
     network: &String,
     providers: &SharedRpcProviders,
@@ -217,6 +221,35 @@ pub struct BatchOfUpdatesToProcess {
     pub transaction_retry_timeout_secs: u64,
     pub transaction_retries_count_limit: u64,
     pub retry_fee_increment_fraction: f64,
+}
+
+pub async fn create_and_collect_relayers_futures(
+    collected_futures: &FuturesUnordered<JoinHandle<Result<(), Error>>>,
+    feeds_metrics: Arc<RwLock<FeedsMetrics>>,
+    provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>>,
+    relayers_recv_channels: HashMap<String, UnboundedReceiver<BatchOfUpdatesToProcess>>,
+) {
+    for (net, chan) in relayers_recv_channels.into_iter() {
+        let feed_metrics_clone = feeds_metrics.clone();
+        let provider_status_clone = provider_status.clone();
+        let relayer_name = format!("relayer_for_network {net}");
+        collected_futures.push(
+            tokio::task::Builder::new()
+                .name(relayer_name.clone().as_str())
+                .spawn(async move {
+                    loop_processing_batch_of_updates(
+                        net,
+                        relayer_name,
+                        feed_metrics_clone,
+                        provider_status_clone,
+                        chan,
+                    )
+                    .await;
+                    Ok(())
+                })
+                .expect("Failed to spawn metrics collector loop!"),
+        );
+    }
 }
 
 pub async fn loop_processing_batch_of_updates(
@@ -1164,10 +1197,13 @@ mod tests {
     use blocksense_feed_registry::registry::HistoryEntry;
     use blocksense_feed_registry::types::Repeatability::Oneshot;
     use blocksense_utils::test_env::get_test_private_key_path;
+
     use regex::Regex;
     use ringbuf::traits::Consumer;
+    use std::io::Error;
     use std::str::FromStr;
     use std::time::UNIX_EPOCH;
+    use tokio::task::JoinHandle;
 
     fn extract_address(message: &str) -> Option<String> {
         let re = Regex::new(r"0x[a-fA-F0-9]{40}").expect("Invalid regex");
@@ -1416,10 +1452,25 @@ mod tests {
         let feeds_config: AllFeedsConfig = AllFeedsConfig {
             feeds: vec![test_feed_config(1, 0)],
         };
-        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
-            sequencer_config,
-            metrics_prefix,
-            feeds_config,
+        let (sequencer_state, _, _, _, _, relayers_recv_channels) =
+            create_sequencer_state_from_sequencer_config(
+                sequencer_config,
+                metrics_prefix,
+                feeds_config,
+            )
+            .await;
+
+        let collected_futures: FuturesUnordered<JoinHandle<Result<(), Error>>> =
+            FuturesUnordered::new();
+
+        let feeds_metrics = sequencer_state.feeds_metrics.clone();
+        let provider_status = sequencer_state.provider_status.clone();
+
+        create_and_collect_relayers_futures(
+            &collected_futures,
+            feeds_metrics,
+            provider_status,
+            relayers_recv_channels,
         )
         .await;
 
@@ -1502,10 +1553,26 @@ mod tests {
         let feeds_config: AllFeedsConfig = AllFeedsConfig {
             feeds: vec![feed.clone()],
         };
-        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
-            sequencer_config,
-            metrics_prefix,
-            feeds_config,
+        let (sequencer_state, _, _, _, _, relayers_recv_channels) =
+            create_sequencer_state_from_sequencer_config(
+                sequencer_config,
+                metrics_prefix,
+                feeds_config,
+            )
+            .await;
+
+        let collected_futures: FuturesUnordered<JoinHandle<Result<(), Error>>> =
+            FuturesUnordered::new();
+
+        let feeds_metrics: Arc<RwLock<FeedsMetrics>> = sequencer_state.feeds_metrics.clone();
+        let provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>> =
+            sequencer_state.provider_status.clone();
+
+        create_and_collect_relayers_futures(
+            &collected_futures,
+            feeds_metrics,
+            provider_status,
+            relayers_recv_channels,
         )
         .await;
 
@@ -1584,7 +1651,8 @@ mod tests {
                 eth_batch_send_to_all_contracts(sequencer_state.clone(), updates3, Periodic).await;
             assert!(p3.is_ok());
         }
-        //TODO: instantiate relayers in test sequencer state correctly!
+
+        // wait for the updates to be published
         let time_to_await: Duration = Duration::from_millis((interval_ms * 4) as u64);
         let mut interval = interval(time_to_await);
         interval.tick().await;
