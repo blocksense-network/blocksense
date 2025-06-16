@@ -111,6 +111,7 @@ const networks = [
   'scroll-sepolia',
   'shape-sepolia',
   'somnia-testnet',
+  'soneium-mainnet',
   'soneium-minato',
   'songbird-coston',
   'sonic-mainnet',
@@ -143,9 +144,9 @@ const chainIds = [
   1284, 1287, 1285, 59144, 59141, 4202, 994873017, 1952959480, 169, 3441006,
   5000, 5003, 1740, 59902, 6342, 31611, 10143, 2818, 2810, 72080, 8801, 5851,
   10, 11155420, 5611, 7849306, 50002, 688688, 98866, 98867, 137, 80002, 1101,
-  2442, 57000, 200018, 31, 534352, 534351, 11011, 50312, 1946, 16, 146, 57054,
-  1660990954, 5330, 53302, 1924, 2391, 2390, 167000, 167009, 5678, 842, 41, 130,
-  1301, 4801, 1417429182, 324, 300,
+  2442, 57000, 200018, 31, 534352, 534351, 11011, 50312, 1868, 1946, 16, 146,
+  57054, 1660990954, 5330, 53302, 1924, 2391, 2390, 167000, 167009, 5678, 842,
+  41, 130, 1301, 4801, 1417429182, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks).annotations({
@@ -816,6 +817,12 @@ export const networkMetadata = {
     isTestnet: true,
     explorerUrl: 'https://somnia-testnet.socialscan.io',
     currency: Currency.STT,
+  },
+  'soneium-mainnet': {
+    chainId: 1868,
+    isTestnet: false,
+    explorerUrl: 'https://soneium.blockscout.com',
+    currency: Currency.ETH,
   },
   'soneium-minato': {
     chainId: 1946,
