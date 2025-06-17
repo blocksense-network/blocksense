@@ -20,19 +20,25 @@ component = "eth-rpc"
 id = "100001"
 stride = 0
 decimals = 0
-data = '{"pair":{"base":"","quote":""},"decimals":0,"category":"","market_hours":"Crypto","arguments":["https://eth.llamarpc.com", "https://ethereum-rpc.publicnode.com", "https://rpc.eth.gateway.fm"]}'
+data = '{"pair":{"base":"ynETHx","quote":"WETH"},"decimals":0,"category":"","market_hours":"Crypto","arguments":{"contracts":[{"address":"0x657d9ABA1DBb59e53f9F3eCAA878447dCfC96dCb","label":"ynETHx","method_name":"convertToAssets","param1":"1000000000000000000","rpc_urls":["https://eth.llamarpc.com","https://rpc.eth.gateway.fm","https://ethereum-rpc.publicnode.com"]}]}}'
 
 [[trigger.oracle.data_feeds]]
 id = "100002"
 stride = 0
 decimals = 0
-data = '{"pair":{"base":"","quote":""},"decimals":0,"category":"","market_hours":"Crypto","arguments":["https://eth.llamarpc.com", "https://rpc.eth.gateway.fm", "https://ethereum-rpc.publicnode.com"]}'
+data = '{"pair":{"base":"YUSD","quote":"USDC"},"decimals":0,"category":"","market_hours":"Crypto","arguments":{"contracts":[{"address":"0x19Ebd191f7A24ECE672ba13A302212b5eF7F35cb","label":"YieldFi yUSD","method_name":"exchangeRate","rpc_urls":["https://eth.llamarpc.com","https://rpc.eth.gateway.fm","https://ethereum-rpc.publicnode.com"]}],"divisor":1000000}}'
 
 [[trigger.oracle.data_feeds]]
 id = "100003"
 stride = 0
 decimals = 0
-data = '{"pair":{"base":"","quote":""},"decimals":0,"category":"","market_hours":"Crypto","arguments":["https://binance.llamarpc.com","https://bsc.meowrpc.com", "https://bsc.drpc.org"]}'
+data = '{"pair":{"base":"ynBNBx","quote":"WBNB"},"decimals":0,"category":"","market_hours":"Crypto","arguments":{"contracts":[{"address":"0x32c830f5c34122c6afb8ae87aba541b7900a2c5f","label":"yBNBx","method_name":"convertToAssets","param1":"1000000000000000000","rpc_urls":["https://binance.llamarpc.com","https://bsc.meowrpc.com","https://bsc.drpc.org"]}]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "100004"
+stride = 0
+decimals = 0
+data = '{"pair":{"base":"oLP","quote":"USDC"},"decimals":0,"category":"","market_hours":"Crypto","arguments":{"contracts":[{"address":"0x20d419a8e12c45f88fda7c5760bb6923cee27f98","label":"oLP","method_name":"convertToAssets","param1":"1000000000000000000","rpc_urls":["https://arbitrum-one-rpc.publicnode.com"]}]}}'
 
 [component.eth-rpc]
 source = "../../../target/wasm32-wasip1/release/eth_rpc.wasm"
@@ -42,7 +48,8 @@ allowed_outbound_hosts = [
   "https://ethereum-rpc.publicnode.com",
   "https://binance.llamarpc.com",
   "https://bsc.meowrpc.com",
-  "https://bsc.drpc.org"
+  "https://bsc.drpc.org",
+  "https://arbitrum-one-rpc.publicnode.com",
 ]
 
 [component.eth-rpc.build]
