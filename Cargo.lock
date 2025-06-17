@@ -3964,6 +3964,7 @@ dependencies = [
  "alloy",
  "anyhow",
  "blocksense-sdk",
+ "itertools 0.8.2",
  "prettytable-rs",
  "serde 1.0.217",
  "serde_json",

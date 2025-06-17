@@ -17,3 +17,4 @@ url = "2.5"
 serde = { version = "1.0", features = ["derive"] }
 prettytable-rs = "0.10"
 alloy = { workspace = true }
+itertools = "0.8"
