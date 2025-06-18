@@ -6,7 +6,7 @@ use blocksense_gnosis_safe::utils::SignatureWithAddress;
 use pprof::ProfilerGuard;
 use sequencer::providers::eth_send_utils::BatchOfUpdatesToProcess;
 use sequencer::providers::provider::init_shared_rpc_providers;
-use sequencer::sequencer_state::SequencerState;
+use sequencer::sequencer_state::{create_relayers_channels, SequencerState};
 use tokio::sync::{mpsc, RwLock};
 
 use blocksense_utils::logging::{
@@ -67,16 +67,10 @@ pub async fn prepare_sequencer_state(
 
     let providers =
         init_shared_rpc_providers(sequencer_config, metrics_prefix, &feeds_config).await;
-    let mut relayers_send_channels = HashMap::new();
-    let mut relayers_recv_channels = HashMap::new();
-    {
-        let providers = providers.read().await;
-        for (net_name, _provider) in providers.iter() {
-            let (s, r) = mpsc::unbounded_channel();
-            relayers_send_channels.insert(net_name.clone(), s);
-            relayers_recv_channels.insert(net_name.clone(), r);
-        }
-    }
+
+    let (relayers_send_channels, relayers_recv_channels) =
+        create_relayers_channels(&providers).await;
+
     let feed_id_allocator: ConcurrentAllocator = init_concurrent_allocator();
     let (aggregated_votes_to_block_creator_send, aggregated_votes_to_block_creator_recv): VoteChannel = mpsc::unbounded_channel();
     let (feeds_management_cmd_to_block_creator_send, feeds_management_cmd_to_block_creator_recv) =
