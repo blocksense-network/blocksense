@@ -20,6 +20,12 @@ with lib;
       description = "The url of the registry.";
     };
 
+    metrics-url = mkOption {
+      type = types.str;
+      default = "http://0.0.0.0:9091/metrics/job/reporter";
+      description = "The url of the metrics service.";
+    };
+
     default-exec-interval = mkOption {
       type = types.int;
       default = 10;

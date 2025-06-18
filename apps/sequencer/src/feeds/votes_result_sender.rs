@@ -43,9 +43,13 @@ pub async fn votes_result_sender_loop(
                         )
                         .await;
 
-                        info!("sending updates to contract:");
                         let sequencer_state = sequencer_state.clone();
-                        async_send_to_all_networks(sequencer_state, updates, batch_count);
+                        let blocksense_block_height = updates.block_height;
+                        debug!("Processing eth_batch_send_to_all_contracts{blocksense_block_height}_{batch_count}");
+                        match eth_batch_send_to_all_contracts(sequencer_state, updates, Periodic).await {
+                            Ok(_) => info!("Sending updates to relayers complete."),
+                            Err(err) => error!("ERROR Sending updates to relayers: {err}"),
+                        };
                     }
                     None => {
                         panic!("Sender got RecvError"); // This error indicates a severe internal error.
@@ -58,28 +62,6 @@ pub async fn votes_result_sender_loop(
             }
         })
         .expect("Failed to spawn votes result sender!")
-}
-
-fn async_send_to_all_networks(
-    sequencer_state: Data<SequencerState>,
-    updates: BatchedAggegratesToSend,
-    batch_count: usize,
-) {
-    let blocksense_block_height = updates.block_height;
-    let sender = tokio::task::Builder::new()
-        .name(
-            format!("async_send_to_all_networks_{blocksense_block_height}_{batch_count}").as_str(),
-        )
-        .spawn_local(async move {
-            debug!("Spawned async_send_to_all_networks_{blocksense_block_height}_{batch_count}");
-            match eth_batch_send_to_all_contracts(sequencer_state, updates, Periodic).await {
-                Ok(res) => info!("Sending updates complete {res}."),
-                Err(err) => error!("ERROR Sending updates {err}"),
-            };
-        });
-    if let Err(err) = sender {
-        error!("Failed to spawn batch sender {batch_count} due to {err}!");
-    }
 }
 
 async fn try_send_aggregation_consensus_trigger_to_reporters(
@@ -198,9 +180,9 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
 
             let calldata = Bytes::from(serialized_updates);
 
-            nonce._0 += Uint::from(num_tx_in_progress);
+            nonce += Uint::from(num_tx_in_progress);
 
-            let safe_transaction = create_safe_tx(contract_address, calldata, nonce._0);
+            let safe_transaction = create_safe_tx(contract_address, calldata, nonce);
 
             let chain_id = match provider.provider.get_chain_id().await {
                 Ok(c) => c,
@@ -231,7 +213,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             block_height,
             contract_address: contract_address.encode_hex(),
             safe_address: safe_address.encode_hex(),
-            nonce: nonce._0.to_string(),
+            nonce: nonce.to_string(),
             chain_id: chain_id.to_string(),
             tx_hash: tx_hash.to_string(),
             network: net.to_string(),

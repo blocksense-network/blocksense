@@ -186,7 +186,7 @@ impl RpcProvider {
     ) -> RpcProvider {
         let provider = ProviderBuilder::new()
             .wallet(EthereumWallet::from(signer.clone()))
-            .on_http(rpc_url.clone());
+            .connect_http(rpc_url.clone());
 
         let impersonated_anvil_account = p
             .impersonated_anvil_account
@@ -516,12 +516,18 @@ impl RpcProvider {
             get_chain_id
         )?;
 
+        let nonce = provider
+            .get_transaction_count(signer.address())
+            .pending()
+            .await?;
+
         let message_value = DynSolValue::Tuple(vec![DynSolValue::Address(signer.address())]);
 
         let mut encoded_arg = message_value.abi_encode();
         bytecode.append(&mut encoded_arg);
 
         let tx = TransactionRequest::default()
+            .nonce(nonce)
             .from(signer.address())
             .with_chain_id(chain_id)
             .with_deploy_code(bytecode);
@@ -757,7 +763,7 @@ mod tests {
     // Copied from the alloy source code as an example.
     #[tokio::test]
     async fn no_gas_price_or_limit() {
-        let provider = ProviderBuilder::new().on_anvil_with_wallet();
+        let provider = ProviderBuilder::new().connect_anvil_with_wallet();
 
         // GasEstimationLayer requires chain_id to be set to handle EIP-1559 tx
         let tx = TransactionRequest {

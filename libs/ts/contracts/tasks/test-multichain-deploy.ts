@@ -14,6 +14,8 @@ import { encodeDataAndTimestamp } from '../test/utils/helpers/common';
 import { Feed, WriteOp } from '../test/utils/wrappers/types';
 
 import { expect } from 'chai';
+import { initChain } from './deployment-utils/init-chain';
+import { executeMultisigTransaction } from './deployment-utils/multisig-tx-exec';
 
 task(
   'test-deploy',
@@ -21,9 +23,7 @@ task(
 ).setAction(async (_, { ethers, run }) => {
   const network = 'local';
 
-  const config: NetworkConfig = await run('init-chain', {
-    networkName: network,
-  });
+  const config = await initChain(ethers, network);
 
   if (!config.deployWithSequencerMultisig) {
     console.log('Test needs sequencer multisig set!');
@@ -216,7 +216,7 @@ task(
     operation: OperationType.Call,
   };
 
-  await run('multisig-tx-exec', {
+  await executeMultisigTransaction({
     transactions: [changeSequencerTxData],
     safe: adminMultisig,
     config,
@@ -277,7 +277,7 @@ task(
     operation: OperationType.Call,
   };
 
-  await run('multisig-tx-exec', {
+  await executeMultisigTransaction({
     transactions: [changeAccessControlTxData],
     safe: adminMultisig,
     config,

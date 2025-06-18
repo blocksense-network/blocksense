@@ -108,6 +108,18 @@ macro_rules! inc_metric (
 );
 
 #[macro_export]
+macro_rules! dec_metric (
+($_component: ident, $_comp_index: ident, $_metric: ident) => (
+    $_component
+    .read() // Holding a read lock here suffice, since the counters are atomic.
+    .await
+    .$_metric
+    .with_label_values(&[&$_comp_index.to_string()])
+    .dec();
+);
+);
+
+#[macro_export]
 macro_rules! set_metric (
 ($_component: ident, $_comp_index: ident, $_metric: ident, $_set_val: ident) => (
     debug!(
@@ -158,6 +170,7 @@ pub struct ProviderMetrics {
     pub total_timed_out_tx: IntCounterVec,
     pub total_transaction_retries: IntCounterVec,
     pub total_mismatched_gnosis_safe_nonce: IntCounterVec,
+    pub num_transactions_in_queue: IntGaugeVec,
     pub is_enabled: IntGaugeVec,
 }
 
@@ -253,6 +266,11 @@ impl ProviderMetrics {
             total_mismatched_gnosis_safe_nonce: register_int_counter_vec!(
                 format!("{}total_mismatched_gnosis_safe_nonce", prefix),
                 "Total number of times we got a mismatching safe nonce prior to tx send for network",
+                &["Network"]
+            )?,
+            num_transactions_in_queue: register_int_gauge_vec!(
+                format!("{}num_transactions_in_queue", prefix),
+                "Current number of transactions in queue for sending",
                 &["Network"]
             )?,
             is_enabled: register_int_gauge_vec!(

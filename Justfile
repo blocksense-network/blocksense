@@ -22,7 +22,7 @@ build-ts package="all":
     yarn build-single @blocksense/contracts
     yarn build-single @blocksense/data-feeds-config-generator
   else
-    yarn workspace {{package}} run build
+    yarn build:recursive {{package}}
   fi
 
 test-ts:
@@ -64,3 +64,7 @@ clean:
     -e .vscode \
     -e .pre-commit-config.yaml \
     -- {{root-dir}}
+
+[working-directory: 'libs/ts/contracts']
+deploy-evm-contracts network-name:
+  yarn hardhat deploy --networks {{network-name}}

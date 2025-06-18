@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { DeploymentConfigV2, NewFeed } from '@blocksense/config-types';
+import { DeploymentConfigV2 } from '@blocksense/config-types';
 import { NetworkName } from '@blocksense/base-utils/evm';
 
 import { useHash } from '@/hooks/useHash';

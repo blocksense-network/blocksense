@@ -1,5 +1,6 @@
 use crate::feeds::consensus_second_round_manager::AggregationBatchConsensus;
 use crate::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
+use crate::providers::eth_send_utils::BatchOfUpdatesToProcess;
 use crate::providers::provider::ProviderStatus;
 use crate::providers::provider::SharedRpcProviders;
 use crate::providers::provider::{init_shared_rpc_providers, RpcProvider};
@@ -47,6 +48,8 @@ pub struct SequencerState {
     pub provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>>,
     pub batches_awaiting_consensus: Arc<RwLock<AggregationBatchConsensus>>,
     pub aggregate_batch_sig_send: UnboundedSender<(ReporterResponse, SignatureWithAddress)>,
+    pub relayers_send_channels:
+        Arc<RwLock<HashMap<String, UnboundedSender<BatchOfUpdatesToProcess>>>>,
     // pub voting_recv_channel: Arc<RwLock<mpsc::UnboundedReceiver<(String, String)>>>,
 }
 
@@ -63,6 +66,9 @@ impl SequencerState {
         feeds_management_cmd_to_block_creator_send: UnboundedSender<FeedsManagementCmds>,
         feeds_slots_manager_cmd_send: UnboundedSender<FeedsManagementCmds>,
         aggregate_batch_sig_send: UnboundedSender<(ReporterResponse, SignatureWithAddress)>,
+        relayers_send_channels: Arc<
+            RwLock<HashMap<String, UnboundedSender<BatchOfUpdatesToProcess>>>,
+        >,
     ) -> SequencerState {
         let provider_status: HashMap<String, ProviderStatus> = sequencer_config
             .providers
@@ -118,6 +124,7 @@ impl SequencerState {
             provider_status,
             batches_awaiting_consensus: Arc::new(RwLock::new(AggregationBatchConsensus::new())),
             aggregate_batch_sig_send,
+            relayers_send_channels,
         }
     }
 
@@ -149,10 +156,14 @@ pub async fn create_sequencer_state_from_sequencer_config(
     UnboundedReceiver<FeedsManagementCmds>,      // feeds_management_cmd_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>,      // feeds_slots_manager_cmd_recv
     UnboundedReceiver<(ReporterResponse, SignatureWithAddress)>, // aggregate_batch_sig_recv
+    HashMap<String, UnboundedReceiver<BatchOfUpdatesToProcess>>, // relayers_recv_channels
 ) {
     let log_handle = init_shared_logging_handle("INFO", false);
     let providers =
         init_shared_rpc_providers(&sequencer_config, Some(metrics_prefix), &feeds_config).await;
+
+    let (relayers_send_channels, relayers_recv_channels) =
+        create_relayers_channels(&providers).await;
 
     let (vote_send, vote_recv) = mpsc::unbounded_channel();
     let (feeds_management_cmd_to_block_creator_send, feeds_management_cmd_to_block_creator_recv) =
@@ -172,6 +183,7 @@ pub async fn create_sequencer_state_from_sequencer_config(
         feeds_management_cmd_to_block_creator_send,
         feeds_slots_manager_cmd_send,
         aggregate_batch_sig_send,
+        Arc::new(RwLock::new(relayers_send_channels)),
     );
 
     (
@@ -180,6 +192,7 @@ pub async fn create_sequencer_state_from_sequencer_config(
         feeds_management_cmd_to_block_creator_recv,
         feeds_slots_manager_cmd_recv,
         aggregate_batch_sig_recv,
+        relayers_recv_channels,
     )
 }
 
@@ -190,4 +203,23 @@ fn create_kafka_producer(
         .set("bootstrap.servers", bootstrap_server)
         .set("queue.buffering.max.ms", "0")
         .create()?)
+}
+
+pub async fn create_relayers_channels(
+    providers: &SharedRpcProviders,
+) -> (
+    HashMap<String, UnboundedSender<BatchOfUpdatesToProcess>>,
+    HashMap<String, UnboundedReceiver<BatchOfUpdatesToProcess>>,
+) {
+    let mut relayers_send_channels = HashMap::new();
+    let mut relayers_recv_channels = HashMap::new();
+    {
+        let providers = providers.read().await;
+        for (net_name, _provider) in providers.iter() {
+            let (s, r) = mpsc::unbounded_channel();
+            relayers_send_channels.insert(net_name.clone(), s);
+            relayers_recv_channels.insert(net_name.clone(), r);
+        }
+    }
+    (relayers_send_channels, relayers_recv_channels)
 }

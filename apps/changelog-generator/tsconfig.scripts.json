@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "scripts",
+    "eslint.config.mjs",
+    "tsup.config.ts",
+    "vitest.config.ts"
+  ],
+  "compilerOptions": {
+    "rootDir": ".",
+    "tsBuildInfoFile": ".tsbuildinfo/scripts.tsbuildinfo"
+  }
+}

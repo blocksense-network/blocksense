@@ -3,6 +3,8 @@
   # Libraries used when cargo-check builds libraries
   packages = self'.legacyPackages.commonLibDeps;
 
+  imports = [ ./js.nix ];
+
   git-hooks.hooks = {
     nixfmt-rfc-style.enable = true;
     editorconfig-checker = {
@@ -45,6 +47,13 @@
         "--ignore-unknown"
         "--write"
       ];
+    };
+    eslint = {
+      enable = true;
+      settings = {
+        binPath = "yarn run -T eslint";
+        extensions = "\\.[jt]s(x?)$";
+      };
     };
   };
 }

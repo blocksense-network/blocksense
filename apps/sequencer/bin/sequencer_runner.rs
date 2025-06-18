@@ -4,9 +4,10 @@ use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_gnosis_safe::utils::SignatureWithAddress;
 #[cfg(feature = "profile")]
 use pprof::ProfilerGuard;
+use sequencer::providers::eth_send_utils::BatchOfUpdatesToProcess;
 use sequencer::providers::provider::init_shared_rpc_providers;
-use sequencer::sequencer_state::SequencerState;
-use tokio::sync::mpsc;
+use sequencer::sequencer_state::{create_relayers_channels, SequencerState};
+use tokio::sync::{mpsc, RwLock};
 
 use blocksense_utils::logging::{
     get_log_level, get_shared_logging_handle, init_shared_logging_handle, tokio_console_active,
@@ -20,7 +21,9 @@ use blocksense_config::{get_sequencer_and_feed_configs, AllFeedsConfig, Sequence
 use sequencer::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
 use sequencer::feeds::feed_workers::prepare_app_workers;
 use sequencer::http_handlers::admin::metrics;
+use std::collections::HashMap;
 use std::env;
+use std::sync::Arc;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::task::JoinHandle;
 use tracing::info;
@@ -47,6 +50,7 @@ pub async fn prepare_sequencer_state(
     UnboundedReceiver<FeedsManagementCmds>,      // feeds_management_cmd_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>,      // feeds_slots_manager_cmd_recv
     UnboundedReceiver<(ReporterResponse, SignatureWithAddress)>, // aggregate_batch_sig_recv
+    HashMap<String, UnboundedReceiver<BatchOfUpdatesToProcess>>, // relayers_recv_channels
     Data<SequencerState>,
 ) {
     let log_handle: SharedLoggingHandle = get_shared_logging_handle();
@@ -63,6 +67,10 @@ pub async fn prepare_sequencer_state(
 
     let providers =
         init_shared_rpc_providers(sequencer_config, metrics_prefix, &feeds_config).await;
+
+    let (relayers_send_channels, relayers_recv_channels) =
+        create_relayers_channels(&providers).await;
+
     let feed_id_allocator: ConcurrentAllocator = init_concurrent_allocator();
     let (aggregated_votes_to_block_creator_send, aggregated_votes_to_block_creator_recv): VoteChannel = mpsc::unbounded_channel();
     let (feeds_management_cmd_to_block_creator_send, feeds_management_cmd_to_block_creator_recv) =
@@ -81,6 +89,7 @@ pub async fn prepare_sequencer_state(
         feeds_management_cmd_to_block_creator_send,
         feeds_slots_manager_cmd_send,
         aggregate_batch_sig_send,
+        Arc::new(RwLock::new(relayers_send_channels)),
     ));
 
     (
@@ -88,6 +97,7 @@ pub async fn prepare_sequencer_state(
         feeds_management_cmd_to_block_creator_recv,
         feeds_slots_manager_cmd_recv,
         aggregate_batch_sig_recv,
+        relayers_recv_channels,
         sequencer_state,
     )
 }
@@ -209,6 +219,7 @@ async fn main() -> std::io::Result<()> {
         feeds_management_cmd_to_block_creator_recv,
         feeds_slots_manager_cmd_recv,
         aggregate_batch_sig_recv,
+        relayers_recv_channels,
         sequencer_state,
     ) = prepare_sequencer_state(&sequencer_config, feeds_config, None).await;
 
@@ -219,6 +230,7 @@ async fn main() -> std::io::Result<()> {
         feeds_management_cmd_to_block_creator_recv,
         feeds_slots_manager_cmd_recv,
         aggregate_batch_sig_recv,
+        relayers_recv_channels,
     )
     .await;
 

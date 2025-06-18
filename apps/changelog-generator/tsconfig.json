@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // consider enabling it globally
+    "downlevelIteration": true,
+    "exactOptionalPropertyTypes": true,
+    "plugins": [{ "name": "@effect/language-service" }],
+    "paths": {
+      "@template/cli": ["./src/index.js"],
+      "@template/cli/*": ["./src/*.js"]
+    }
+  },
+  "references": [
+    { "path": "tsconfig.src.json" },
+    { "path": "tsconfig.test.json" },
+    { "path": "tsconfig.scripts.json" }
+  ]
+}
