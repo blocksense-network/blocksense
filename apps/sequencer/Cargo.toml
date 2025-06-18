@@ -7,6 +7,7 @@ edition.workspace = true
 
 [features]
 profile = []
+pyroscope = []
 
 [dependencies]
 blocksense-data-feeds = { workspace = true }
@@ -76,6 +77,8 @@ ringbuf = { workspace = true }
 console-subscriber = { workspace = true }
 rdkafka = { workspace = true, features = ["dynamic-linking"] }
 tokio-stream = { workspace = true }
+pyroscope = "0.5.8"
+pyroscope_pprofrs = "0.2.10"
 
 [dev-dependencies]
 actix-test = { workspace = true }
