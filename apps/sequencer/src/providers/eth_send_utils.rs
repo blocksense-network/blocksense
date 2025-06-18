@@ -29,7 +29,7 @@ use blocksense_feeds_processing::adfs_gen_calldata::{
     adfs_serialize_updates, get_neighbour_feed_ids, RoundCounters,
 };
 use blocksense_metrics::{
-    inc_metric, inc_vec_metric,
+    dec_metric, inc_metric, inc_vec_metric,
     metrics::{FeedsMetrics, ProviderMetrics},
     process_provider_getter, set_metric,
 };
@@ -280,6 +280,10 @@ pub async fn loop_processing_batch_of_updates(
                     cmd.retry_fee_increment_fraction,
                 )
                 .await;
+
+                let provider_metrics = provider.lock().await.provider_metrics.clone();
+                dec_metric!(provider_metrics, net, num_transactions_in_queue);
+
                 match result {
                     Ok((status, updated_feeds)) => {
                         let mut result_str = String::new();
@@ -1060,12 +1064,14 @@ pub async fn eth_batch_send_to_all_contracts(
                 };
 
                 {
+                    let provider_metrics = provider.lock().await.provider_metrics.clone();
                     let relayers = sequencer_state.relayers_send_channels.read().await;
                     let relayer_opt = relayers.get(net.as_str());
                     if let Some(relayer) = relayer_opt {
                         match relayer.send(batch_of_updates_to_process) {
                             Ok(_) => {
                                 debug!("Sent updates to relayer for network {net} and block height {block_height}");
+                                inc_metric!(provider_metrics, net, num_transactions_in_queue);
                             }
                             Err(e) => {
                                 error!("Error while sending updates to relayer for network {net} and block height {block_height}: {e}")
