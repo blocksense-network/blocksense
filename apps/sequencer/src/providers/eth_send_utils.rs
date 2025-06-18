@@ -261,9 +261,10 @@ pub async fn loop_processing_batch_of_updates(
 ) {
     tracing::info!("Starting {relayer_name} loop...");
 
+    //TODO: Create a termination reason pattern in the future. At this point networks are not added/removed dynamically in the sequencer,
+    // therefore the loop in iterating over the lifetime of the sequencer.
     loop {
         let cmd_opt = chan.recv().await;
-        // tracing::info!("{relayer_name} received {cmd:?}");
         match cmd_opt {
             Some(cmd) => {
                 let block_height = cmd.updates.block_height;

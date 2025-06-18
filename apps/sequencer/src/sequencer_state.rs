@@ -162,16 +162,8 @@ pub async fn create_sequencer_state_from_sequencer_config(
     let providers =
         init_shared_rpc_providers(&sequencer_config, Some(metrics_prefix), &feeds_config).await;
 
-    let mut relayers_send_channels = HashMap::new();
-    let mut relayers_recv_channels = HashMap::new();
-    {
-        let providers = providers.read().await;
-        for (net_name, _provider) in providers.iter() {
-            let (s, r) = mpsc::unbounded_channel();
-            relayers_send_channels.insert(net_name.clone(), s);
-            relayers_recv_channels.insert(net_name.clone(), r);
-        }
-    }
+    let (relayers_send_channels, relayers_recv_channels) =
+        create_relayers_channels(&providers).await;
 
     let (vote_send, vote_recv) = mpsc::unbounded_channel();
     let (feeds_management_cmd_to_block_creator_send, feeds_management_cmd_to_block_creator_recv) =
@@ -211,4 +203,23 @@ fn create_kafka_producer(
         .set("bootstrap.servers", bootstrap_server)
         .set("queue.buffering.max.ms", "0")
         .create()?)
+}
+
+pub async fn create_relayers_channels(
+    providers: &SharedRpcProviders,
+) -> (
+    HashMap<String, UnboundedSender<BatchOfUpdatesToProcess>>,
+    HashMap<String, UnboundedReceiver<BatchOfUpdatesToProcess>>,
+) {
+    let mut relayers_send_channels = HashMap::new();
+    let mut relayers_recv_channels = HashMap::new();
+    {
+        let providers = providers.read().await;
+        for (net_name, _provider) in providers.iter() {
+            let (s, r) = mpsc::unbounded_channel();
+            relayers_send_channels.insert(net_name.clone(), s);
+            relayers_recv_channels.insert(net_name.clone(), r);
+        }
+    }
+    (relayers_send_channels, relayers_recv_channels)
 }
