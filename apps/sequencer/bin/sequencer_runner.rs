@@ -212,6 +212,11 @@ async fn main() -> std::io::Result<()> {
         tokio_console_active("SEQUENCER"),
     );
 
+    #[cfg(feature = "pyroscope")]
+    let agent = setup_pyroscope().await;
+    #[cfg(feature = "pyroscope")]
+    let _agent_running = agent.start().expect("Could not start PyroscopeAgent!");
+
     let (sequencer_config, feeds_config) = get_sequencer_and_feed_configs();
 
     let (
@@ -309,4 +314,33 @@ async fn main() -> std::io::Result<()> {
     }
 
     Ok(())
+}
+
+#[cfg(feature = "pyroscope")]
+async fn setup_pyroscope() -> pyroscope::PyroscopeAgent<pyroscope::pyroscope::PyroscopeAgentReady> {
+    let user = std::env::var("USER").expect("USER env variable has to be set");
+    let password = std::env::var("PASSWORD").expect("PASSWORD env variable has to be set");
+    let url = std::env::var("PYROSCOPE_URL").expect("PYROSCOPE_URL env variable has to be set");
+    let samplerate = std::env::var("SAMPLE_RATE")
+        .expect("SAMPLE_RATE env variable has to be set")
+        .to_string()
+        .parse()
+        .unwrap();
+    let application_name = "sequencer";
+
+    let agent = match pyroscope::PyroscopeAgent::builder(url, application_name.to_string())
+        .basic_auth(user, password)
+        .backend(pyroscope_pprofrs::pprof_backend(
+            pyroscope_pprofrs::PprofConfig::new().sample_rate(samplerate),
+        ))
+        .tags([("app", "sequencer")].to_vec())
+        .build()
+    {
+        Ok(a) => a,
+        Err(e) => {
+            panic!("Could not start PyroscopeAgent: {e}");
+        }
+    };
+
+    agent
 }
