@@ -8,7 +8,7 @@ use tracing::{error, info, trace};
 pub async fn metrics_collector_loop() -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
         .name("metrics_collector")
-        .spawn_local(async move {
+        .spawn(async move {
             info!("Starting metrics collector loop...");
             let mut interval = time::interval(Duration::from_millis(60000));
             loop {

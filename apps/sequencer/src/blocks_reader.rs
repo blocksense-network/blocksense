@@ -20,7 +20,7 @@ pub async fn blocks_reader_loop(
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
         .name("blocks_reader_loop")
-        .spawn_local(async move {
+        .spawn(async move {
             let Some(kafka_report_endpoint) = sequencer_state
                 .sequencer_config
                 .read()
