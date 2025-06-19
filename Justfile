@@ -1,5 +1,6 @@
 root-dir := justfile_directory()
 spin-data-dir := root-dir + "/target/spin-artifacts"
+system := `nix eval --raw --impure --expr 'builtins.currentSystem'`
 
 default:
   @just --list
