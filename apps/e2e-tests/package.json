@@ -1,0 +1,24 @@
+{
+  "name": "@blocksense/e2e-tests",
+  "type": "module",
+  "version": "0.0.0",
+  "types": "src/index.ts",
+  "scripts": {
+    "ts": "yarn node --import tsx",
+    "test": "yarn vitest -w false",
+    "test:unit": "yarn test --exclude src/e2e.spec.ts",
+    "test:e2e": "yarn test src/e2e.spec.ts"
+  },
+  "dependencies": {
+    "@blocksense/base-utils": "workspace:*",
+    "@effect/data": "^0.18.7",
+    "@effect/schema": "^0.71.1",
+    "@types/node": "^22.3.0",
+    "boxen": "^8.0.1",
+    "effect": "^3.7.0",
+    "execa": "^9.5.2",
+    "tsx": "^4.17.0",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.4"
+  }
+}
