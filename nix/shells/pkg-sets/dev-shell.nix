@@ -14,6 +14,7 @@
     curl
     oras
     just
+    findutils
   ];
 
   enterShell =
