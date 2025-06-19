@@ -1,6 +1,9 @@
 import { ethers } from 'hardhat';
 import { deployContract } from '../experiments/utils/helpers/common';
-import { ADFSConsumer, RawCallADFSConsumer } from '../../typechain';
+import {
+  ADFSConsumer,
+  RawCallADFSConsumer,
+} from '@blocksense/contracts/typechain';
 import * as utils from './utils/feedStoreConsumer';
 import { expect } from 'chai';
 import { ADFSWrapper } from '../utils/wrappers';

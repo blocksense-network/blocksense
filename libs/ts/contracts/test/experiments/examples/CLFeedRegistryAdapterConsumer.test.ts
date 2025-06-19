@@ -1,5 +1,5 @@
 import { artifacts, ethers } from 'hardhat';
-import { CLFeedRegistryAdapterConsumer } from '../../../typechain';
+import { CLFeedRegistryAdapterConsumer } from '@blocksense/contracts/typechain';
 import { TOKENS, deployContract } from '../utils/helpers/common';
 import {
   CLRegistryBaseWrapper,

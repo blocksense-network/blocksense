@@ -1,7 +1,7 @@
 import {
   HistoricalDataFeedStoreGenericV1,
   HistoricalDataFeedStoreGenericV1__factory,
-} from '../../../../../typechain';
+} from '@blocksense/contracts/typechain';
 import { HistoricalDataFeedStoreGenericBaseWrapper } from './WrapperGenericBase';
 import { TransmissionData, deployContract } from '../../helpers/common';
 import { ethers } from 'hardhat';

@@ -11,7 +11,7 @@ import {
   HistoricalDataFeedStoreGenericV1,
   HistoricalDataFeedStoreV1,
   HistoricalDataFeedStoreV2,
-} from '../../../../typechain';
+} from '@blocksense/contracts/typechain';
 import { RpcStructLog } from 'hardhat/internal/hardhat-network/provider/output';
 import { IBaseWrapper, IWrapper } from '../../utils/wrappers';
 

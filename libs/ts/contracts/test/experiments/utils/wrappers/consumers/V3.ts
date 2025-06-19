@@ -1,4 +1,4 @@
-import { DataFeedV2Consumer } from '../../../../../typechain';
+import { DataFeedV2Consumer } from '@blocksense/contracts/typechain';
 import { DataFeed, deployContract } from '../../helpers/common';
 import { DataFeedStoreV3Wrapper } from '../basic/V3';
 import { DataFeedStoreConsumerBaseWrapper } from './Base';

@@ -1,7 +1,7 @@
 import {
   DataFeedStoreGenericV2,
   DataFeedStoreGenericV2__factory,
-} from '../../../../../typechain';
+} from '@blocksense/contracts/typechain';
 import { deployContract } from '../../helpers/common';
 import { ethers } from 'hardhat';
 import { DataFeedStoreBaseWrapper } from './Base';

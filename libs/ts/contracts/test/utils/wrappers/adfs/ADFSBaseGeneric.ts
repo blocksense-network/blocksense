@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { IADFSWrapper } from '../interfaces/IADFSWrapper';
-import { AggregatedDataFeedStoreGeneric } from '../../../../typechain';
+import { AggregatedDataFeedStoreGeneric } from '@blocksense/contracts/typechain';
 import { AccessControlWrapper } from './AccessControl';
 import { Feed, ReadFeed, ReadOp } from '../types';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';

@@ -1,5 +1,5 @@
 import { artifacts, ethers } from 'hardhat';
-import { CLAggregatorAdapterConsumer } from '../../../typechain';
+import { CLAggregatorAdapterConsumer } from '@blocksense/contracts/typechain';
 import { deployContract } from '../utils/helpers/common';
 import {
   CLV2Wrapper,

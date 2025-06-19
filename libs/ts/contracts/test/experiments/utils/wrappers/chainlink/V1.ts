@@ -1,7 +1,7 @@
 import {
   CLAggregatorAdapterExp,
   HistoricalDataFeedStoreV1,
-} from '../../../../../typechain';
+} from '@blocksense/contracts/typechain';
 import { deployContract } from '../../helpers/common';
 import { CLBaseWrapper } from './Base';
 import { UpgradeableProxyHistoricalDataFeedStoreV1Wrapper } from '../upgradeable/historical/V1';
