@@ -19,7 +19,7 @@
       allEnvironments = lib.pipe allEnvironmentNames [
         (builtins.map (name: {
           inherit name;
-          file = config.devenv.shells.${name}.process.managers.process-compose.configFile;
+          value = config.devenv.shells.${name}.process.managers.process-compose.configFile;
         }))
       ];
 
@@ -27,7 +27,7 @@
         (builtins.map (x: {
           name = "run-${x.name}";
           value = pkgs.writeShellScriptBin "run-${x.name}" ''
-            ${lib.getExe pkgs.process-compose} -f ${x.file}
+            ${lib.getExe pkgs.process-compose} -f ${x.value}
           '';
         }))
         lib.listToAttrs
@@ -38,12 +38,16 @@
         (
           set -x
           ${lib.concatMapStringsSep "\n" (
-            x: "cp ${x.file} $out/${x.name}-process-compose.yaml"
+            x: "cp ${x.value} $out/${x.name}-process-compose.yaml"
           ) allEnvironments}
         )
       '';
     in
     {
+      legacyPackages = {
+        process-compose-environments = lib.listToAttrs allEnvironments;
+      };
+
       packages = {
         inherit allProcessComposeFiles;
       } // runEnvironments;
