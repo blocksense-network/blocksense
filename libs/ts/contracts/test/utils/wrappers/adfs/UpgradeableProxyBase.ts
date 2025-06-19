@@ -1,5 +1,5 @@
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
-import { UpgradeableProxyADFS } from '../../../../typechain';
+import { UpgradeableProxyADFS } from '@blocksense/contracts/typechain';
 import { ADFSWrapper } from './ADFS';
 import { Feed, ProxyOp, UpgradeableProxyCallMethods } from '../types';
 import { IUpgradeableProxyADFSWrapper } from '../interfaces/IUpgradeableProxyADFSWarpper';

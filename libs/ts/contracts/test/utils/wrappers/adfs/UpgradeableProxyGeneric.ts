@@ -1,5 +1,5 @@
 import { deployContract } from '../../../experiments/utils/helpers/common';
-import { UpgradeableProxyADFS } from '../../../../typechain';
+import { UpgradeableProxyADFS } from '@blocksense/contracts/typechain';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { ADFSGenericWrapper } from './ADFSGeneric';
 import { UpgradeableProxyADFSBaseWrapper } from './UpgradeableProxyBase';
