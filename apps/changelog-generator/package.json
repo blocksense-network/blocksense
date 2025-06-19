@@ -18,6 +18,8 @@
     "changeset-publish": "yarn build && TEST_DIST= yarn vitest && changeset publish"
   },
   "dependencies": {
+    "@blocksense/base-utils": "workspace:^",
+    "@blocksense/config-types": "workspace:^",
     "@effect/cli": "0.63.9",
     "@effect/cluster": "^0.38.14",
     "@effect/experimental": "^0.48.10",

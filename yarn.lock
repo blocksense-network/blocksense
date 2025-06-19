@@ -2095,7 +2095,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/base-utils@workspace:*, @blocksense/base-utils@workspace:libs/ts/base-utils":
+"@blocksense/base-utils@workspace:*, @blocksense/base-utils@workspace:^, @blocksense/base-utils@workspace:libs/ts/base-utils":
   version: 0.0.0-use.local
   resolution: "@blocksense/base-utils@workspace:libs/ts/base-utils"
   dependencies:
@@ -2113,6 +2113,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blocksense/changelog-generator@workspace:apps/changelog-generator"
   dependencies:
+    "@blocksense/base-utils": "workspace:^"
+    "@blocksense/config-types": "workspace:^"
     "@changesets/changelog-github": "npm:^0.5.1"
     "@changesets/cli": "npm:^2.29.4"
     "@effect/cli": "npm:0.63.9"
@@ -2139,7 +2141,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/config-types@workspace:*, @blocksense/config-types@workspace:libs/ts/config-types":
+"@blocksense/config-types@workspace:*, @blocksense/config-types@workspace:^, @blocksense/config-types@workspace:libs/ts/config-types":
   version: 0.0.0-use.local
   resolution: "@blocksense/config-types@workspace:libs/ts/config-types"
   dependencies:
