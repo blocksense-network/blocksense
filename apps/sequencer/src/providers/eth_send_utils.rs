@@ -442,7 +442,7 @@ pub async fn eth_batch_send_to_contract(
             &sender_address,
             block_height,
             transaction_retry_timeout_secs,
-            true,
+            false,
         )
         .await
         {
