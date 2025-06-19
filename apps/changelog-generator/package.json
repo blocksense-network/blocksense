@@ -7,7 +7,7 @@
   "bin": "./dist/bin.cjs",
   "scripts": {
     "build": "tsup --dts && yarn copy-package-json",
-    "ts": "yarn node --import tsx",
+    "start": "yarn node --import tsx ./src/bin.ts",
     "build:ts": "tsup",
     "lint": "yarn run -T eslint \"**/{src,test,examples,scripts,dtslint}/**/*.{ts,mjs}\"",
     "lint-fix": "yarn lint --fix",
