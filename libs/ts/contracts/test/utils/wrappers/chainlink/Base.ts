@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { UpgradeableProxyADFSBaseWrapper } from '../adfs/UpgradeableProxyBase';
-import { CLAggregatorAdapter } from '../../../../typechain';
+import { CLAggregatorAdapter } from '@blocksense/contracts/typechain';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { Feed, ReadOp } from '../types';
 

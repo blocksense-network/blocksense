@@ -1,4 +1,4 @@
-import { CLAggregatorAdapter } from '../../../../typechain';
+import { CLAggregatorAdapter } from '@blocksense/contracts/typechain';
 import { deployContract } from '../../../experiments/utils/helpers/common';
 import { UpgradeableProxyADFSWrapper } from '../adfs/UpgradeableProxy';
 import { UpgradeableProxyADFSBaseWrapper } from '../adfs/UpgradeableProxyBase';

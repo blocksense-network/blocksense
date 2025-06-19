@@ -1,4 +1,4 @@
-import { UpgradeableProxy } from '../../../../../typechain';
+import { UpgradeableProxy } from '@blocksense/contracts/typechain';
 import { GenericDataFeedStore, deployContract } from '../../helpers/common';
 import { UpgradeableProxyBaseWrapper } from './Base';
 import { DataFeedStoreGenericV1Wrapper } from '../basic/GenericV1';

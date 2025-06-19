@@ -2,7 +2,7 @@ import { artifacts, ethers } from 'hardhat';
 import {
   BlocksenseFeedStoreConsumer,
   RawCallFeedStoreConsumer,
-} from '../../../typechain';
+} from '@blocksense/contracts/typechain';
 import { deployContract } from '../utils/helpers/common';
 import { HistoricalDataFeedStoreV2Wrapper } from '../utils/wrappers';
 import * as utils from './utils/feedStoreConsumer';

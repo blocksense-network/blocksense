@@ -1,4 +1,4 @@
-import { HistoricalDataFeedGenericConsumer } from '../../../../../../typechain';
+import { HistoricalDataFeedGenericConsumer } from '@blocksense/contracts/typechain';
 import {
   GenericHistoricalDataFeedStore,
   deployContract,
