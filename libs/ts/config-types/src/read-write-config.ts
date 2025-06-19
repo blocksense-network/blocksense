@@ -131,6 +131,8 @@ export const configFiles = {
   };
 };
 
+export { configDir };
+
 export const configDirs = {
   ['evm_contracts_deployment_v2']: join(
     configDir,
