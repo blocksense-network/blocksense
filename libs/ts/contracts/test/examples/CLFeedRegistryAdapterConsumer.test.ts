@@ -1,8 +1,9 @@
-import { artifacts, ethers } from 'hardhat';
+import { ethers } from 'hardhat';
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
+import { expect } from 'chai';
+
 import { CLFeedRegistryAdapterConsumer } from '@blocksense/contracts/typechain';
 import { deployContract, TOKENS } from '../experiments/utils/helpers/common';
-import * as utils from './utils/clFeedRegistryAdapterConsumer';
-import { expect } from 'chai';
 import {
   CLAdapterWrapper,
   CLRegistryBaseWrapper,
@@ -30,6 +31,7 @@ const aggregatorData = [
 describe('Example: CLFeedRegistryAdapterConsumer', function () {
   let feedRegistry: CLRegistryBaseWrapper;
   let clFeedRegistryAdapterConsumer: CLFeedRegistryAdapterConsumer;
+  let caller: HardhatEthersSigner;
 
   beforeEach(async function () {
     let aggregators = [];
@@ -38,6 +40,7 @@ describe('Example: CLFeedRegistryAdapterConsumer', function () {
     const sequencer = (await ethers.getSigners())[10];
     const accessControlAdmin = (await ethers.getSigners())[5];
     const registryOwner = (await ethers.getSigners())[11];
+    caller = (await ethers.getSigners())[6];
 
     const proxy = new UpgradeableProxyADFSWrapper();
     await proxy.init(admin, accessControlAdmin);
@@ -52,8 +55,7 @@ describe('Example: CLFeedRegistryAdapterConsumer', function () {
       const newAdapter = new CLAdapterWrapper();
       await newAdapter.init(data.description, data.decimals, data.id, proxy);
       aggregators.push(newAdapter);
-
-      const value = encodeDataAndTimestamp(data.id * 1000, Date.now());
+      const value = encodeDataAndTimestamp(data.id * 1000, data.id * 100000);
       await newAdapter.setFeed(sequencer, value, 1n);
     }
 
@@ -77,55 +79,57 @@ describe('Example: CLFeedRegistryAdapterConsumer', function () {
       );
   });
 
-  [
-    { title: 'get decimals', fnName: 'getDecimals' },
-    { title: 'get description', fnName: 'getDescription' },
-    { title: 'get latest answer', fnName: 'getLatestAnswer' },
-    { title: 'get latest round', fnName: 'getLatestRound' },
-    { title: 'get latest round data', fnName: 'getLatestRoundData' },
-    { title: 'get feed', fnName: 'getFeed' },
-  ].forEach(data => {
-    it('Should ' + data.title, async function () {
-      await getAndCompareData(
-        [
-          [TOKENS.ETH, TOKENS.USD],
-          [TOKENS.BTC, TOKENS.USD],
-        ],
-        data.fnName as keyof typeof utils,
+  it('Should compare results from adapter with those from adapter consumer', async function () {
+    for (const { base, quote, description, decimals, id } of aggregatorData) {
+      await feedRegistry.checkFeed(
+        base,
+        quote,
+        await clFeedRegistryAdapterConsumer.getFeed(base, quote),
       );
-    });
+
+      await feedRegistry.checkDecimals(
+        base,
+        quote,
+        Number(await clFeedRegistryAdapterConsumer.getDecimals(base, quote)),
+      );
+      await feedRegistry.checkDecimals(base, quote, decimals);
+
+      await feedRegistry.checkDescription(
+        base,
+        quote,
+        await clFeedRegistryAdapterConsumer.getDescription(base, quote),
+      );
+      await feedRegistry.checkDescription(base, quote, description);
+
+      const answer = BigInt(id) * 1000n;
+      const timestamp = BigInt(id) * 100000n;
+      const encodedAnswer = encodeDataAndTimestamp(answer, timestamp);
+      await feedRegistry.checkLatestAnswer(caller, base, quote, encodedAnswer);
+
+      expect(
+        await clFeedRegistryAdapterConsumer.getLatestAnswer(base, quote),
+      ).to.deep.equal(answer);
+
+      expect(
+        await clFeedRegistryAdapterConsumer.getLatestRound(base, quote),
+      ).to.deep.equal(1n);
+
+      expect(
+        await clFeedRegistryAdapterConsumer.getRoundData(base, quote, 1n),
+      ).to.deep.equal([
+        /* roundId_: */ 1n,
+        /* answer_: */ answer,
+        /* startedAt_: */ timestamp / 1000n,
+        /* updatedAt_: */ timestamp / 1000n,
+        /* answeredInRound_: */ 1n,
+      ]);
+      await feedRegistry.checkLatestRoundData(
+        caller,
+        base,
+        quote,
+        encodedAnswer,
+        1n,
+      );
+    }
   });
-
-  it('Should get round data', async function () {
-    await getAndCompareData(
-      [
-        [TOKENS.ETH, TOKENS.USD, 1],
-        [TOKENS.BTC, TOKENS.USD, 1],
-      ],
-      'getRoundData',
-    );
-  });
-
-  const getAndCompareData = async (
-    data: any[],
-    functionName: keyof typeof utils,
-  ) => {
-    const contractData1 = await clFeedRegistryAdapterConsumer.getFunction(
-      functionName,
-    )(...data[0]);
-    const contractData2 = await clFeedRegistryAdapterConsumer.getFunction(
-      functionName,
-    )(...data[1]);
-
-    const config = {
-      address: feedRegistry.contract.target,
-      abiJson: (await artifacts.readArtifact('CLFeedRegistryAdapterExp')).abi,
-      provider: feedRegistry.contract.runner!,
-    };
-    const utilData1 = await utils[functionName](config, ...data[0]);
-    const utilData2 = await utils[functionName](config, ...data[1]);
-
-    expect(contractData1).to.deep.equal(utilData1);
-    expect(contractData2).to.deep.equal(utilData2);
-  };
 });
