@@ -361,3 +361,97 @@ export const drawBox =
     result.push(botBorder);
     return result;
   };
+
+export type TableCell = Element;
+export type TableRow = TableCell[];
+export type Align = 'left' | 'center' | 'right';
+
+interface TableOptions {
+  headers?: TableCell[];
+  align?: Align[];
+}
+
+export const drawTable =
+  (rows: TableRow[], options: TableOptions = {}) =>
+  (args: RenderArgs): string[] => {
+    const { headers, align = [] } = options;
+    const colCount = Math.max(...rows.map(r => r.length), headers?.length ?? 0);
+
+    const normalizedRows = rows.map(row =>
+      Array.from({ length: colCount }, (_, i) => row[i] ?? ''),
+    );
+    const normalizedHeaders = headers
+      ? Array.from({ length: colCount }, (_, i) => headers[i] ?? '')
+      : null;
+
+    const renderedCells: string[][][] = normalizedRows.map(row =>
+      row.map(cell => renderAllElements(args, cell)),
+    );
+    const renderedHeaders: string[][] | null = normalizedHeaders
+      ? normalizedHeaders.map(cell => renderAllElements(args, cell))
+      : null;
+
+    const colWidths: number[] = [];
+    for (let col = 0; col < colCount; col++) {
+      let maxWidth = 0;
+      for (const row of renderedCells) {
+        for (const line of row[col]) {
+          maxWidth = Math.max(maxWidth, getTextWidth(line));
+        }
+      }
+      if (renderedHeaders) {
+        for (const line of renderedHeaders[col]) {
+          maxWidth = Math.max(maxWidth, getTextWidth(line));
+        }
+      }
+      colWidths[col] = maxWidth;
+    }
+
+    const wrapAndAlign = (lines: string[], width: number, a: Align) =>
+      wrapLines(lines.join('\n'), width).map(l => alignText(l, width, a));
+
+    const renderRow = (row: string[][], isHeader = false): string[] => {
+      const wrapped = row.map((lines, i) =>
+        wrapAndAlign(lines, colWidths[i], align[i] ?? 'left'),
+      );
+      const height = Math.max(...wrapped.map(c => c.length));
+      for (const cell of wrapped) {
+        while (cell.length < height)
+          cell.push(' '.repeat(colWidths[wrapped.indexOf(cell)]));
+      }
+
+      return Array.from(
+        { length: height },
+        (_, i) => '│ ' + wrapped.map(cell => cell[i]).join(' │ ') + ' │',
+      );
+    };
+
+    const horizontal = (
+      left: string,
+      sep: string,
+      right: string,
+      filler = '─',
+    ) => left + colWidths.map(w => filler.repeat(w + 2)).join(sep) + right;
+
+    const lines: string[] = [];
+
+    lines.push(horizontal('┌', '┬', '┐'));
+
+    if (renderedHeaders) {
+      lines.push(
+        ...renderRow(renderedHeaders, true).map(line => color`{bold ${line}}`),
+      );
+      lines.push(horizontal('├', '┼', '┤'));
+    }
+
+    renderedCells.forEach((row, i) => {
+      lines.push(...renderRow(row));
+      if (i < renderedCells.length - 1) {
+        lines.push(horizontal('├', '┼', '┤'));
+      }
+    });
+
+    lines.push(horizontal('└', '┴', '┘'));
+
+    return lines;
+  };
