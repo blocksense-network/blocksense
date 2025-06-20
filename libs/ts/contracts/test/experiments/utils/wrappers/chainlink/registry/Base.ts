@@ -1,7 +1,7 @@
 import {
   CLFeedRegistryAdapterExp,
   UpgradeableProxy,
-} from '../../../../../../typechain';
+} from '@blocksense/contracts/typechain';
 import { CLBaseWrapper } from '../Base';
 import { expect } from 'chai';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';

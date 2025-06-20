@@ -1,5 +1,5 @@
 import { deployContract } from '../../../experiments/utils/helpers/common';
-import { AggregatedDataFeedStoreGeneric } from '../../../../typechain';
+import { AggregatedDataFeedStoreGeneric } from '@blocksense/contracts/typechain';
 import { AccessControlWrapper } from './AccessControl';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { ADFSBaseGenericWrapper } from './ADFSBaseGeneric';

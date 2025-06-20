@@ -1,4 +1,4 @@
-import { CLAggregatorAdapterExp } from '../../../../../typechain';
+import { CLAggregatorAdapterExp } from '@blocksense/contracts/typechain';
 import { BaseContract } from 'ethers';
 import { expect } from 'chai';
 import { UpgradeableProxyHistoricalBaseWrapper } from '../upgradeable/historical/Base';

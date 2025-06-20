@@ -11,7 +11,7 @@ import {
   HistoricalDataFeedStoreGenericV1,
   HistoricalDataFeedStoreV1,
   HistoricalDataFeedStoreV2,
-} from '../../../../typechain';
+} from '@blocksense/contracts/typechain';
 import { RpcStructLog } from 'hardhat/internal/hardhat-network/provider/output';
 import { IBaseWrapper, IWrapper } from '../../utils/wrappers';
 
@@ -120,7 +120,7 @@ export const logTable = async (
     ).toFixed(2);
   }
 
-  if (process.env.TRACE_TX === 'true') {
+  if (process.env['TRACE_TX'] === 'true') {
     for (const receipt of receipts.concat(receiptsGeneric)) {
       const res = await network.provider.send('debug_traceTransaction', [
         receipt.hash,

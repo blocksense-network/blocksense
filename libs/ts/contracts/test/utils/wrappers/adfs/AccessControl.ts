@@ -1,5 +1,5 @@
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
-import { AccessControl } from '../../../../typechain';
+import { AccessControl } from '@blocksense/contracts/typechain';
 import { deployContract } from '../../../experiments/utils/helpers/common';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';

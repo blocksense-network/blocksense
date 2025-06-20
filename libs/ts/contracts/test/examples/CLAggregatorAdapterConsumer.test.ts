@@ -3,7 +3,7 @@ import { artifacts, ethers } from 'hardhat';
 import * as utils from './utils/clAggregatorAdapterConsumer';
 import { expect } from 'chai';
 import { deployContract } from '../experiments/utils/helpers/common';
-import { CLAggregatorAdapterConsumer } from '../../typechain';
+import { CLAggregatorAdapterConsumer } from '@blocksense/contracts/typechain';
 import {
   CLAdapterWrapper,
   UpgradeableProxyADFSWrapper,
