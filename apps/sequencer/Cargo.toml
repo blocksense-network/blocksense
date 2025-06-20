@@ -7,7 +7,6 @@ edition.workspace = true
 
 [features]
 profile = []
-pyroscope = []
 
 [dependencies]
 blocksense-data-feeds = { workspace = true }
