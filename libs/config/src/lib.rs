@@ -260,6 +260,14 @@ pub struct KafkaReportEndpoint {
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct PyroscopeConfig {
+    pub user: String,
+    pub password_file_path: String,
+    pub url: String,
+    pub sample_rate: u32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct SequencerConfig {
     pub sequencer_id: u64,
     pub main_port: u16,
@@ -270,6 +278,7 @@ pub struct SequencerConfig {
     pub reporters: Vec<Reporter>,
     pub kafka_report_endpoint: KafkaReportEndpoint,
     pub http_input_buffer_size: Option<usize>,
+    pub pyroscope_config: Option<PyroscopeConfig>,
 }
 
 impl Validated for SequencerConfig {
@@ -433,6 +442,7 @@ pub fn get_test_config_with_no_providers() -> SequencerConfig {
         reporters: Vec::new(),
         kafka_report_endpoint: KafkaReportEndpoint { url: None },
         http_input_buffer_size: None,
+        pyroscope_config: None,
     }
 }
 
