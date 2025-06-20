@@ -3,21 +3,27 @@ import Web3 from 'web3';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
-import { API_ENDPOINTS, API_KEYS, Transaction } from '../types';
+import chalkTemplate from 'chalk-template';
+
 import {
   getOptionalRpcUrl,
   networkMetadata,
   NetworkName,
 } from '@blocksense/base-utils/evm';
-import { deployedNetworks } from '../types';
 import { kebabToCamelCase } from '@blocksense/base-utils/string';
 import {
   EthereumAddress,
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
-import chalkTemplate from 'chalk-template';
-import { throwError } from 'libs/ts/base-utils/src/errors';
+import { throwError } from '@blocksense/base-utils/errors';
+
+import {
+  API_ENDPOINTS,
+  API_KEYS,
+  Transaction,
+  deployedNetworks,
+} from '../types';
 
 function getHourDifference(transactions: Transaction[]): number {
   const txsLen = transactions.length;
