@@ -2,7 +2,7 @@ import { ethers } from 'hardhat';
 import {
   HistoricalDataFeedStoreV1,
   IDataFeedStore__factory,
-} from '../../../../../typechain';
+} from '@blocksense/contracts/typechain';
 import { deployContract } from '../../helpers/common';
 import { HistoricalDataFeedStoreWrapper } from './WrapperBase';
 

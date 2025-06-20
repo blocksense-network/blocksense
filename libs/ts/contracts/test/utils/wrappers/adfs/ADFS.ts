@@ -1,6 +1,6 @@
 import { ADFSBaseWrapper } from './ADFSBase';
 import { deployContract } from '../../../experiments/utils/helpers/common';
-import { AggregatedDataFeedStore } from '../../../../typechain';
+import { AggregatedDataFeedStore } from '@blocksense/contracts/typechain';
 import { AccessControlWrapper } from './AccessControl';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 

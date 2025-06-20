@@ -1,4 +1,4 @@
-import { Oracle } from '../../../../typechain';
+import { Oracle } from '@blocksense/contracts/typechain';
 import { deployContract } from '../../../experiments/utils/helpers/common';
 import { OracleUnderlier } from '../types';
 import { OracleBaseWrapper } from './Base';

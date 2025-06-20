@@ -1,21 +1,25 @@
-import { artifacts, ethers } from 'hardhat';
-import { CLFeedRegistryAdapterConsumer } from '../../../typechain';
+import { ethers } from 'hardhat';
+import { expect } from 'chai';
+
+import { CLFeedRegistryAdapterConsumer } from '@blocksense/contracts/typechain';
 import { TOKENS, deployContract } from '../utils/helpers/common';
 import {
   CLRegistryBaseWrapper,
   CLV2Wrapper,
   UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
 } from '../utils/wrappers';
-import * as utils from '../../examples/utils/clFeedRegistryAdapterConsumer';
-import { expect } from 'chai';
 
 const data = [
   {
+    base: TOKENS.ETH,
+    quote: TOKENS.USD,
     description: 'ETH/USD',
     decimals: 8,
     key: 3,
   },
   {
+    base: TOKENS.BTC,
+    quote: TOKENS.USD,
     description: 'BTC/USD',
     decimals: 6,
     key: 132,
@@ -73,55 +77,55 @@ describe('[Experiments] Example: CLFeedRegistryAdapterConsumer', function () {
       );
   });
 
-  [
-    { title: 'get decimals', fnName: 'getDecimals' },
-    { title: 'get description', fnName: 'getDescription' },
-    { title: 'get latest answer', fnName: 'getLatestAnswer' },
-    { title: 'get latest round', fnName: 'getLatestRound' },
-    { title: 'get latest round data', fnName: 'getLatestRoundData' },
-    { title: 'get feed', fnName: 'getFeed' },
-  ].forEach(data => {
-    it('Should ' + data.title, async function () {
-      await getAndCompareData(
-        [
-          [TOKENS.ETH, TOKENS.USD],
-          [TOKENS.BTC, TOKENS.USD],
-        ],
-        data.fnName as keyof typeof utils,
+  it('Should compare results from adapter with those from adapter consumer', async function () {
+    for (const { base, quote, key, description, decimals } of data) {
+      await feedRegistry.checkFeed(
+        base,
+        quote,
+        await clFeedRegistryAdapterConsumer.getFeed(base, quote),
       );
-    });
+
+      await feedRegistry.checkDecimals(
+        base,
+        quote,
+        Number(await clFeedRegistryAdapterConsumer.getDecimals(base, quote)),
+      );
+      await feedRegistry.checkDecimals(base, quote, decimals);
+
+      await feedRegistry.checkDescription(
+        base,
+        quote,
+        await clFeedRegistryAdapterConsumer.getDescription(base, quote),
+      );
+      await feedRegistry.checkDescription(base, quote, description);
+
+      const answer = await clFeedRegistryAdapterConsumer.getLatestAnswer(
+        base,
+        quote,
+      );
+      await feedRegistry.checkLatestAnswer(base, quote, answer);
+
+      expect(
+        await clFeedRegistryAdapterConsumer.getLatestRound(base, quote),
+      ).to.deep.equal(1n);
+
+      const roundData = await clFeedRegistryAdapterConsumer.getRoundData(
+        base,
+        quote,
+        1n,
+      );
+      expect(roundData).to.deep.equal([
+        /* roundId_: */ 1n,
+        /* answer_: */ answer,
+        /* startedAt_: */ roundData.startedAt,
+        /* updatedAt_: */ roundData.startedAt,
+        /* answeredInRound_: */ 1n,
+      ]);
+      await feedRegistry.checkLatestRoundData(base, quote, {
+        answer: answer,
+        roundId: 1n,
+        startedAt: Number(roundData.startedAt),
+      });
+    }
   });
-
-  it('Should get round data', async function () {
-    await getAndCompareData(
-      [
-        [TOKENS.ETH, TOKENS.USD, 1],
-        [TOKENS.BTC, TOKENS.USD, 1],
-      ],
-      'getRoundData',
-    );
-  });
-
-  const getAndCompareData = async (
-    data: any[],
-    functionName: keyof typeof utils,
-  ) => {
-    const contractData1 = await clFeedRegistryAdapterConsumer.getFunction(
-      functionName,
-    )(...data[0]);
-    const contractData2 = await clFeedRegistryAdapterConsumer.getFunction(
-      functionName,
-    )(...data[1]);
-
-    const config = {
-      address: feedRegistry.contract.target,
-      abiJson: (await artifacts.readArtifact('CLFeedRegistryAdapterExp')).abi,
-      provider: feedRegistry.contract.runner!,
-    };
-    const utilData1 = await utils[functionName](config, ...data[0]);
-    const utilData2 = await utils[functionName](config, ...data[1]);
-
-    expect(contractData1).to.deep.equal(utilData1);
-    expect(contractData2).to.deep.equal(utilData2);
-  };
 });

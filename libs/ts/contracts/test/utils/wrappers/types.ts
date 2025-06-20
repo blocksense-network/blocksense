@@ -2,7 +2,7 @@ import {
   CLAggregatorAdapterExp,
   CLAggregatorAdapter,
   IChainlinkAggregator,
-} from '../../../typechain';
+} from '@blocksense/contracts/typechain';
 import { IADFSWrapper } from './interfaces/IADFSWrapper';
 
 export enum ReadOp {

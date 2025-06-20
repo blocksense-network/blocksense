@@ -1,12 +1,10 @@
-import { artifacts, ethers } from 'hardhat';
-import { CLAggregatorAdapterConsumer } from '../../../typechain';
+import { ethers } from 'hardhat';
+import { CLAggregatorAdapterConsumer } from '@blocksense/contracts/typechain';
 import { deployContract } from '../utils/helpers/common';
 import {
   CLV2Wrapper,
   UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
 } from '../utils/wrappers';
-import * as utils from '../../examples/utils/clAggregatorAdapterConsumer';
-import { expect } from 'chai';
 
 describe('[Experiments] Example: CLAggregatorAdapterConsumer', function () {
   let clAggregatorAdapter: CLV2Wrapper;
@@ -32,37 +30,24 @@ describe('[Experiments] Example: CLAggregatorAdapterConsumer', function () {
       );
   });
 
-  [
-    { title: 'get decimals', fnName: 'getDecimals' },
-    { title: 'get description', fnName: 'getDescription' },
-    { title: 'get latest answer', fnName: 'getLatestAnswer' },
-    { title: 'get latest round', fnName: 'getLatestRound' },
-    { title: 'get latest round data', fnName: 'getLatestRoundData' },
-  ].forEach(data => {
-    it('Should ' + data.title, async function () {
-      await getAndCompareData([], data.fnName as keyof typeof utils);
+  it('Should compare results from adapter with those from adapter consumer', async function () {
+    await clAggregatorAdapter.checkDecimals(
+      Number(await clAggregatorAdapterConsumer.getDecimals()),
+    );
+    await clAggregatorAdapter.checkDescription(
+      await clAggregatorAdapterConsumer.getDescription(),
+    );
+    await clAggregatorAdapter.checkLatestAnswer(
+      await clAggregatorAdapterConsumer.getLatestAnswer(),
+    );
+    await clAggregatorAdapter.checkLatestRoundId(
+      Number(await clAggregatorAdapterConsumer.getLatestRound()),
+    );
+    const roundData = await clAggregatorAdapterConsumer.getRoundData(1);
+    await clAggregatorAdapter.checkLatestRoundData({
+      roundId: roundData.roundId_,
+      answer: roundData.answer,
+      startedAt: Number(roundData.startedAt),
     });
   });
-
-  it('Should get round data', async function () {
-    await getAndCompareData([1], 'getRoundData');
-  });
-
-  const getAndCompareData = async (
-    data: any[],
-    functionName: keyof typeof utils,
-  ) => {
-    const contractData = await clAggregatorAdapterConsumer.getFunction(
-      functionName,
-    )(...data);
-
-    const config = {
-      address: clAggregatorAdapter.contract.target,
-      abiJson: (await artifacts.readArtifact('CLAggregatorAdapterExp')).abi,
-      provider: clAggregatorAdapter.contract.runner!,
-    };
-    const utilData = await utils[functionName](config, ...data);
-
-    expect(contractData).to.deep.equal(utilData);
-  };
 });

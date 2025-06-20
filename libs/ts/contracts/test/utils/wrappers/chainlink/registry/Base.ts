@@ -4,7 +4,7 @@ import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import {
   CLFeedRegistryAdapter,
   UpgradeableProxyADFS,
-} from '../../../../../typechain';
+} from '@blocksense/contracts/typechain';
 import { deployContract } from '../../../../experiments/utils/helpers/common';
 
 export class CLRegistryBaseWrapper {
