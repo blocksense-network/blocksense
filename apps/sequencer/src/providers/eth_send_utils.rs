@@ -554,7 +554,7 @@ pub async fn eth_batch_send_to_contract(
         if transaction_retries_count == 0 {
             tx = TransactionRequest::default()
                 .to(contract_address)
-                .nonce(nonce)
+                .with_nonce(nonce)
                 .from(sender_address)
                 .with_chain_id(chain_id)
                 .input(Some(input.clone()).into());
@@ -750,7 +750,7 @@ pub async fn get_nonce(
     transaction_retry_timeout_secs: u64,
     pending: bool,
 ) -> Result<u64> {
-    debug!("Getting pending nonce for network {net} and address {sender_address}...");
+    debug!("Getting pending={pending} nonce for network {net} and address {sender_address}...");
 
     let future = if pending {
         rpc_handle.get_transaction_count(*sender_address).pending()
@@ -763,15 +763,15 @@ pub async fn get_nonce(
     {
         Ok(nonce_result) => match nonce_result {
             Ok(nonce) => {
-                debug!("Got nonce={nonce} for network `{net}` block height {block_height} and address {sender_address}");
+                debug!("Got nonce={nonce} pending={pending} for network `{net}` block height {block_height} and address {sender_address}");
                 Ok(nonce)
             }
             Err(err) => {
-                bail!("Failed to get nonce for network `{net}` block height {block_height} and address {sender_address} due to {err}");
+                bail!("Failed to get nonce pending={pending} for network `{net}` block height {block_height} and address {sender_address} due to {err}");
             }
         },
         Err(err) => {
-            bail!("Timed out while getting nonce for network `{net}` block height {block_height} and address {sender_address} due to {err}");
+            bail!("Timed out while getting nonce pending={pending} for network `{net}` block height {block_height} and address {sender_address} due to {err}");
         }
     }
 }
