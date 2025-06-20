@@ -555,7 +555,7 @@ pub async fn eth_batch_send_to_contract(
             tx = TransactionRequest::default()
                 .to(contract_address)
                 .with_nonce(nonce)
-                .from(sender_address)
+                .with_from(sender_address)
                 .with_chain_id(chain_id)
                 .input(Some(input.clone()).into());
             debug!("Sending initial tx: {tx:?} in network `{net}` block height {block_height}");
@@ -592,10 +592,10 @@ pub async fn eth_batch_send_to_contract(
 
             tx = TransactionRequest::default()
                 .to(contract_address)
-                .nonce(nonce)
-                .from(sender_address)
-                .max_fee_per_gas(max_fee_per_gas)
-                .max_priority_fee_per_gas(priority_fee)
+                .with_nonce(nonce)
+                .with_from(sender_address)
+                .with_max_fee_per_gas(max_fee_per_gas)
+                .with_max_priority_fee_per_gas(priority_fee)
                 .with_chain_id(chain_id)
                 .input(Some(input.clone()).into());
             debug!("Retrying for {transaction_retries_count}-th time in network `{net}` block height {block_height} tx: {tx:?}");
@@ -624,7 +624,18 @@ pub async fn eth_batch_send_to_contract(
                     }
                     Err(err) => {
                         warn!("Error while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
-                        return Ok(("false".to_string(), feeds_to_update_ids));
+                        if err.to_string().contains("execution revert") {
+                            return Ok(("false".to_string(), feeds_to_update_ids));
+                        } else {
+                            inc_retries_with_backoff(
+                                net.as_str(),
+                                &mut transaction_retries_count,
+                                provider_metrics,
+                                BACKOFF_SECS,
+                            )
+                            .await;
+                            continue;
+                        }
                     }
                 },
                 Err(err) => {

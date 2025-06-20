@@ -1,5 +1,6 @@
 root-dir := justfile_directory()
 spin-data-dir := root-dir + "/target/spin-artifacts"
+system := `nix eval --raw --impure --expr 'builtins.currentSystem'`
 
 default:
   @just --list
@@ -11,6 +12,35 @@ change-devshell shell="default":
 # List available dev shell environments
 list-devshells:
   @{{root-dir}}/scripts/dev-shell/list-devshells.sh
+
+# List available process compose environments
+list-environments:
+  #!/usr/bin/env bash
+  nix eval --impure -L --json --apply builtins.attrNames \
+    .#legacyPackages.{{system}}.process-compose-environments \
+    2>/dev/null \
+    | jq -r '.[]'
+
+# Build process compose artifacts for a specific environment or all environments
+build-environment environment="all":
+  #!/usr/bin/env bash
+  set -euo pipefail
+  PROCESS_COMPOSE_ARTIFACTS_DIR="$GIT_ROOT/config/generated/process-compose"
+  if [[ {{environment}} == "all" ]]; then
+    nix build --impure -L --json .#allProcessComposeFiles \
+      | jq -r '.[0].outputs.out' \
+      | xargs -I{} cp -rfs {}/. $PROCESS_COMPOSE_ARTIFACTS_DIR
+  else
+    nix build --impure -L --json .#legacyPackages.{{system}}.process-compose-environments.{{environment}} \
+      | jq -r '.[0].outputs.out' \
+      | xargs -I{} cp -rfs {} $PROCESS_COMPOSE_ARTIFACTS_DIR/{{environment}}-process-compose.yaml
+  fi
+  echo "Process Compose artifacts copied to $PROCESS_COMPOSE_ARTIFACTS_DIR"
+
+# Start a specific process compose environment
+start-environment environment:
+  #!/usr/bin/env bash
+  run-{{environment}}
 
 build-ts package="all":
   #!/usr/bin/env bash

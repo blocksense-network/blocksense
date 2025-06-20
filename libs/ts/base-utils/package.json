@@ -37,6 +37,11 @@
       "import": "./dist/esm/fs.mjs",
       "types": "./src/fs.ts"
     },
+    "./errors": {
+      "require": "./dist/cjs/errors.cjs",
+      "import": "./dist/esm/errors.mjs",
+      "types": "./src/errors.ts"
+    },
     "./evm": {
       "require": "./dist/cjs/evm/index.cjs",
       "import": "./dist/esm/evm/index.mjs",
