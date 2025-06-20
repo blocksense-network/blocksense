@@ -592,7 +592,7 @@ pub async fn eth_batch_send_to_contract(
 
             tx = TransactionRequest::default()
                 .to(contract_address)
-                .nonce(nonce)
+                .with_nonce(nonce)
                 .from(sender_address)
                 .max_fee_per_gas(max_fee_per_gas)
                 .max_priority_fee_per_gas(priority_fee)
