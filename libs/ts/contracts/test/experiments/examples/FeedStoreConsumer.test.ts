@@ -1,4 +1,10 @@
 import { artifacts, ethers } from 'hardhat';
+import { Addressable, ContractRunner } from 'ethers';
+type EthersContractParams = [
+  address: string | Addressable,
+  abiJson: any,
+  provider: ContractRunner,
+];
 import {
   BlocksenseFeedStoreConsumer,
   RawCallFeedStoreConsumer,
@@ -33,13 +39,24 @@ describe('[Experiments] Example: FeedStoreConsumer', function () {
     );
   });
 
-  [
-    { title: 'get latest answer', fnName: 'getLatestAnswer' },
-    { title: 'get latest round', fnName: 'getLatestRound' },
-    { title: 'get latest round data', fnName: 'getLatestRoundData' },
-  ].forEach(data => {
-    it('Should ' + data.title, async function () {
-      await getAndCompareData([key], data.fnName as keyof typeof utils);
+  type Functions = typeof utils;
+  type FunctionName = keyof Functions;
+  type FunctionParameters<F extends FunctionName> =
+    Parameters<Functions[F]> extends [EthersContractParams, ...infer Rest]
+      ? Rest extends [key: number, ...unknown[]]
+        ? Rest
+        : never
+      : never;
+
+  (
+    [
+      { title: 'get latest answer', fnName: 'getLatestAnswer' },
+      { title: 'get latest round', fnName: 'getLatestRound' },
+      { title: 'get latest round data', fnName: 'getLatestRoundData' },
+    ] satisfies { title: string; fnName: FunctionName }[]
+  ).forEach(({ title, fnName }) => {
+    it('Should ' + title, async function () {
+      await getAndCompareData([key], fnName);
     });
   });
 
@@ -47,9 +64,9 @@ describe('[Experiments] Example: FeedStoreConsumer', function () {
     await getAndCompareData([key, 1], 'getRoundData');
   });
 
-  const getAndCompareData = async (
-    data: any[],
-    functionName: keyof typeof utils,
+  const getAndCompareData = async <F extends FunctionName>(
+    data: FunctionParameters<F>,
+    functionName: F,
   ) => {
     const blocksenseData = await blocksenseFeedStoreConsumer.getFunction(
       functionName,
@@ -58,12 +75,16 @@ describe('[Experiments] Example: FeedStoreConsumer', function () {
       functionName,
     )(...data);
 
-    const config = {
-      address: dataFeedStore.contract.target,
-      abiJson: (await artifacts.readArtifact('HistoricalDataFeedStoreV2')).abi,
-      provider: dataFeedStore.contract.runner!,
-    };
-    const utilData = await utils[functionName](config, ...data);
+    const config: EthersContractParams = [
+      dataFeedStore.contract.target,
+      (await artifacts.readArtifact('HistoricalDataFeedStoreV2')).abi,
+      dataFeedStore.contract.runner!,
+    ];
+    const func = utils[functionName] as (
+      config: EthersContractParams,
+      ...args: FunctionParameters<F>
+    ) => Promise<any>;
+    const utilData = await func(config, ...data);
 
     expect(blocksenseData).to.deep.equal(utilData);
     expect(rawCallData).to.deep.equal(utilData);

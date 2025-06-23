@@ -1,4 +1,6 @@
 import { artifacts, ethers } from 'hardhat';
+import { Contract } from 'ethers';
+type EthersContractParams = ConstructorParameters<typeof Contract>;
 import { CLFeedRegistryAdapterConsumer } from '@blocksense/contracts/typechain';
 import { TOKENS, deployContract } from '../utils/helpers/common';
 import {
@@ -73,21 +75,32 @@ describe('[Experiments] Example: CLFeedRegistryAdapterConsumer', function () {
       );
   });
 
-  [
-    { title: 'get decimals', fnName: 'getDecimals' },
-    { title: 'get description', fnName: 'getDescription' },
-    { title: 'get latest answer', fnName: 'getLatestAnswer' },
-    { title: 'get latest round', fnName: 'getLatestRound' },
-    { title: 'get latest round data', fnName: 'getLatestRoundData' },
-    { title: 'get feed', fnName: 'getFeed' },
-  ].forEach(data => {
-    it('Should ' + data.title, async function () {
+  type Functions = typeof utils;
+  type FunctionName = keyof Functions;
+  type FunctionParameters<F extends FunctionName> =
+    Parameters<Functions[F]> extends [EthersContractParams, ...infer Rest]
+      ? Rest extends [base: string, quote: string, ...unknown[]]
+        ? Rest
+        : never
+      : never;
+
+  (
+    [
+      { title: 'get decimals', fnName: 'getDecimals' },
+      { title: 'get description', fnName: 'getDescription' },
+      { title: 'get latest answer', fnName: 'getLatestAnswer' },
+      { title: 'get latest round', fnName: 'getLatestRound' },
+      { title: 'get latest round data', fnName: 'getLatestRoundData' },
+      { title: 'get feed', fnName: 'getFeed' },
+    ] satisfies { title: string; fnName: FunctionName }[]
+  ).forEach(({ title, fnName }) => {
+    it('Should ' + title, async function () {
       await getAndCompareData(
         [
           [TOKENS.ETH, TOKENS.USD],
           [TOKENS.BTC, TOKENS.USD],
         ],
-        data.fnName as keyof typeof utils,
+        fnName,
       );
     });
   });
@@ -102,10 +115,10 @@ describe('[Experiments] Example: CLFeedRegistryAdapterConsumer', function () {
     );
   });
 
-  const getAndCompareData = async (
-    data: any[],
-    functionName: keyof typeof utils,
-  ) => {
+  async function getAndCompareData<F extends FunctionName>(
+    data: [FunctionParameters<F>, FunctionParameters<F>],
+    functionName: F,
+  ) {
     const contractData1 = await clFeedRegistryAdapterConsumer.getFunction(
       functionName,
     )(...data[0]);
@@ -113,15 +126,21 @@ describe('[Experiments] Example: CLFeedRegistryAdapterConsumer', function () {
       functionName,
     )(...data[1]);
 
-    const config = {
-      address: feedRegistry.contract.target,
-      abiJson: (await artifacts.readArtifact('CLFeedRegistryAdapterExp')).abi,
-      provider: feedRegistry.contract.runner!,
-    };
-    const utilData1 = await utils[functionName](config, ...data[0]);
-    const utilData2 = await utils[functionName](config, ...data[1]);
+    const config: EthersContractParams = [
+      feedRegistry.contract.target,
+      (await artifacts.readArtifact('CLFeedRegistryAdapterExp')).abi,
+      feedRegistry.contract.runner!,
+    ];
+
+    const func = utils[functionName] as (
+      config: EthersContractParams,
+      ...args: FunctionParameters<F>
+    ) => Promise<any>;
+
+    const utilData1 = await func(config, ...data[0]);
+    const utilData2 = await func(config, ...data[1]);
 
     expect(contractData1).to.deep.equal(utilData1);
     expect(contractData2).to.deep.equal(utilData2);
-  };
+  }
 });
