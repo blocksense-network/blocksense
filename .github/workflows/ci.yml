@@ -249,7 +249,7 @@ jobs:
           echo "latest_update=$(date +'%d.%m.%Y %H:%M:%S')" >> $GITHUB_OUTPUT
 
       - name: Comment Deployment Links on the PR
-        uses: marocchino/sticky-pull-request-comment@v2.9.2
+        uses: marocchino/sticky-pull-request-comment@v2.9.3
         with:
           recreate: true
           message: |
