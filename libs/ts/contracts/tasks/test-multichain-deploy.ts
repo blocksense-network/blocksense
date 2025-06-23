@@ -7,7 +7,7 @@ import {
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
 
-import { NetworkConfig, ContractNames } from './types';
+import { ContractNames } from './types';
 
 import { readEvmDeployment, readConfig } from '@blocksense/config-types';
 import { encodeDataAndTimestamp } from '../test/utils/helpers/common';
