@@ -1,6 +1,7 @@
 root-dir := justfile_directory()
 spin-data-dir := root-dir + "/target/spin-artifacts"
 system := `nix eval --raw --impure --expr 'builtins.currentSystem'`
+PROCESS_COMPOSE_ARTIFACTS_DIR := "$GIT_ROOT/config/generated/process-compose"
 
 default:
   @just --list
@@ -25,22 +26,26 @@ list-environments:
 build-environment environment="all":
   #!/usr/bin/env bash
   set -euo pipefail
-  PROCESS_COMPOSE_ARTIFACTS_DIR="$GIT_ROOT/config/generated/process-compose"
   if [[ {{environment}} == "all" ]]; then
     nix build --impure -L --json .#allProcessComposeFiles \
       | jq -r '.[0].outputs.out' \
-      | xargs -I{} cp -rfs {}/. $PROCESS_COMPOSE_ARTIFACTS_DIR
+      | xargs -I{} cp -rfs {}/. {{PROCESS_COMPOSE_ARTIFACTS_DIR}}
   else
     nix build --impure -L --json .#legacyPackages.{{system}}.process-compose-environments.{{environment}} \
       | jq -r '.[0].outputs.out' \
-      | xargs -I{} cp -rfs {} $PROCESS_COMPOSE_ARTIFACTS_DIR/{{environment}}-process-compose.yaml
+      | xargs -I{} cp -rfs {} {{PROCESS_COMPOSE_ARTIFACTS_DIR}}/{{environment}}-process-compose.yaml
   fi
-  echo "Process Compose artifacts copied to $PROCESS_COMPOSE_ARTIFACTS_DIR"
+  echo "Process Compose artifacts copied to {{PROCESS_COMPOSE_ARTIFACTS_DIR}}"
 
 # Start a specific process compose environment
 start-environment environment:
   #!/usr/bin/env bash
-  run-{{environment}}
+  PC_FILE="{{PROCESS_COMPOSE_ARTIFACTS_DIR}}/{{environment}}-process-compose.yaml"
+  if ! test -f "$PC_FILE"; then
+    just build-environment {{environment}}
+  fi
+
+  process-compose -f "$PC_FILE"
 
 build-ts package="all":
   #!/usr/bin/env bash
