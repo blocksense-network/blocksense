@@ -3780,6 +3780,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1aaf95b3e5c8f23aa320147307562d361db0ae0d51242340f558153b4eb2439b"
 
 [[package]]
+name = "dummy-oracle"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "blocksense-sdk",
+ "futures",
+ "itertools 0.14.0",
+ "url",
+ "wit-bindgen",
+]
+
+[[package]]
 name = "dunce"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -1,0 +1,17 @@
+[package]
+name = "dummy-oracle"
+authors = []
+description = ""
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wit-bindgen = { workspace = true }
+blocksense-sdk = { workspace = true }
+anyhow = { workspace = true }
+url = { workspace = true }
+futures = { workspace = true }
+itertools = { workspace = true }
