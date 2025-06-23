@@ -9,7 +9,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -89,7 +89,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -160,7 +160,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -219,7 +219,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -303,7 +303,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -377,7 +377,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -452,7 +452,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -515,7 +515,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -581,7 +581,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -625,7 +625,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -709,7 +709,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -747,7 +747,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -819,7 +819,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -879,7 +879,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -948,7 +948,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -1011,7 +1011,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -1068,7 +1068,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -1152,7 +1152,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -1224,7 +1224,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -1287,7 +1287,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -1362,7 +1362,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -1400,7 +1400,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -1466,7 +1466,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -1547,7 +1547,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -1585,7 +1585,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -1657,7 +1657,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -1720,7 +1720,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -1820,7 +1820,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -1888,7 +1888,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -1944,7 +1944,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2019,7 +2019,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2081,7 +2081,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2137,7 +2137,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2206,7 +2206,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2262,7 +2262,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2303,7 +2303,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2384,7 +2384,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2438,7 +2438,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2476,7 +2476,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2545,7 +2545,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2605,7 +2605,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2676,7 +2676,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2741,7 +2741,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2788,7 +2788,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2839,7 +2839,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2880,7 +2880,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2918,7 +2918,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -2999,7 +2999,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -3067,7 +3067,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -3120,7 +3120,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -3201,7 +3201,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -3270,7 +3270,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -3330,7 +3330,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -3411,7 +3411,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -3480,7 +3480,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -3540,7 +3540,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -3618,7 +3618,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -3680,7 +3680,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -3736,7 +3736,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -3774,7 +3774,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -3855,7 +3855,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -3924,7 +3924,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -3984,7 +3984,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -4022,7 +4022,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -4103,7 +4103,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -4169,7 +4169,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -4229,7 +4229,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -4298,7 +4298,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -4358,7 +4358,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -4412,7 +4412,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -4481,7 +4481,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -4537,7 +4537,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -4575,7 +4575,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -4656,7 +4656,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -4694,7 +4694,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -4763,7 +4763,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -4820,7 +4820,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -4876,7 +4876,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -4932,7 +4932,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -4982,7 +4982,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5023,7 +5023,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5073,7 +5073,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5114,7 +5114,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5192,7 +5192,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5230,7 +5230,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5290,7 +5290,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5331,7 +5331,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5384,7 +5384,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5431,7 +5431,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5488,7 +5488,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5536,7 +5536,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5581,7 +5581,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5665,7 +5665,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5703,7 +5703,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5748,7 +5748,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5813,7 +5813,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5866,7 +5866,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -5944,7 +5944,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -6009,7 +6009,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -6062,7 +6062,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -6143,7 +6143,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -6211,7 +6211,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -6267,7 +6267,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -6377,7 +6377,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -6442,7 +6442,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -6498,7 +6498,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -6579,7 +6579,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -6644,7 +6644,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -6688,7 +6688,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -6763,7 +6763,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -6825,7 +6825,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -6878,7 +6878,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -6956,7 +6956,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7021,7 +7021,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7074,7 +7074,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7155,7 +7155,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7200,7 +7200,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7262,7 +7262,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7309,7 +7309,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7369,7 +7369,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7419,7 +7419,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7460,7 +7460,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7526,7 +7526,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7576,7 +7576,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7623,7 +7623,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7691,7 +7691,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7750,7 +7750,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7800,7 +7800,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7844,7 +7844,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7882,7 +7882,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -7960,7 +7960,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -8022,7 +8022,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -8072,7 +8072,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -8150,7 +8150,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -8191,7 +8191,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -8253,7 +8253,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -8294,7 +8294,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -8378,7 +8378,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -8426,7 +8426,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -8491,7 +8491,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -8544,7 +8544,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -8583,7 +8583,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -8615,7 +8615,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -8690,7 +8690,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -8756,7 +8756,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -8813,7 +8813,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -8891,7 +8891,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -8956,7 +8956,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -9003,7 +9003,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -9081,7 +9081,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -9150,7 +9150,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -9207,7 +9207,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -9288,7 +9288,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -9350,7 +9350,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -9400,7 +9400,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -9478,7 +9478,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -9543,7 +9543,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -9590,7 +9590,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -9668,7 +9668,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -9733,7 +9733,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -9789,7 +9789,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -9861,7 +9861,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -9924,7 +9924,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -9972,7 +9972,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -10053,7 +10053,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -10118,7 +10118,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -10168,7 +10168,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -10237,7 +10237,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -10293,7 +10293,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -10343,7 +10343,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -10424,7 +10424,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -10462,7 +10462,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -10524,7 +10524,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -10565,7 +10565,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -10615,7 +10615,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -10659,7 +10659,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -10734,7 +10734,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -10796,7 +10796,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -10843,7 +10843,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -10921,7 +10921,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -10983,7 +10983,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -11036,7 +11036,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -11114,7 +11114,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -11179,7 +11179,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -11211,7 +11211,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -11286,7 +11286,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -11348,7 +11348,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -11420,7 +11420,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -11479,7 +11479,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -11529,7 +11529,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -11591,7 +11591,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -11647,7 +11647,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -11685,7 +11685,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -11763,7 +11763,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -11801,7 +11801,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -11863,7 +11863,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -11901,7 +11901,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -11973,7 +11973,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -12029,7 +12029,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -12073,7 +12073,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -12157,7 +12157,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -12222,7 +12222,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -12269,7 +12269,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -12350,7 +12350,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -12412,7 +12412,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -12462,7 +12462,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -12540,7 +12540,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -12578,7 +12578,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -12644,7 +12644,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -12701,7 +12701,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -12776,7 +12776,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -12835,7 +12835,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -12879,7 +12879,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -12942,7 +12942,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -12995,7 +12995,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -13033,7 +13033,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -13114,7 +13114,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -13180,7 +13180,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -13222,7 +13222,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -13303,7 +13303,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -13368,7 +13368,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -13412,7 +13412,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -13487,7 +13487,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -13550,7 +13550,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -13595,7 +13595,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -13673,7 +13673,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -13735,7 +13735,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -13779,7 +13779,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -13854,7 +13854,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -13919,7 +13919,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -13951,7 +13951,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -14032,7 +14032,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -14094,7 +14094,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -14144,7 +14144,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -14222,7 +14222,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -14287,7 +14287,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -14334,7 +14334,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -14412,7 +14412,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -14456,7 +14456,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -14522,7 +14522,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -14564,7 +14564,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -14645,7 +14645,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -14689,7 +14689,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -14751,7 +14751,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -14798,7 +14798,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -14873,7 +14873,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -14932,7 +14932,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -14973,7 +14973,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15054,7 +15054,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15119,7 +15119,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15157,7 +15157,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15210,7 +15210,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15257,7 +15257,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15289,7 +15289,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15367,7 +15367,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15432,7 +15432,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15464,7 +15464,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15533,7 +15533,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15571,7 +15571,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15630,7 +15630,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15696,7 +15696,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15743,7 +15743,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15781,7 +15781,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15856,7 +15856,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15915,7 +15915,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -15984,7 +15984,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16043,7 +16043,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16087,7 +16087,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16147,7 +16147,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16194,7 +16194,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16275,7 +16275,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16337,7 +16337,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16387,7 +16387,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16462,7 +16462,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16521,7 +16521,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16568,7 +16568,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16631,7 +16631,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16669,7 +16669,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16722,7 +16722,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16760,7 +16760,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16820,7 +16820,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16868,7 +16868,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16910,7 +16910,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -16976,7 +16976,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17026,7 +17026,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17107,7 +17107,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17172,7 +17172,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17216,7 +17216,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17260,7 +17260,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17298,7 +17298,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17354,7 +17354,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17404,7 +17404,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17436,7 +17436,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17502,7 +17502,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17558,7 +17558,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17602,7 +17602,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17671,7 +17671,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17730,7 +17730,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17774,7 +17774,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17833,7 +17833,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17886,7 +17886,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17927,7 +17927,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -17968,7 +17968,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -18027,7 +18027,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -18080,7 +18080,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -18118,7 +18118,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -18199,7 +18199,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -18237,7 +18237,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -18306,7 +18306,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -18360,7 +18360,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -18432,7 +18432,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -18498,7 +18498,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -18543,7 +18543,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -18621,7 +18621,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -18690,7 +18690,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -18735,7 +18735,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -18816,7 +18816,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -18878,7 +18878,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -18916,7 +18916,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -18972,7 +18972,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19019,7 +19019,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19091,7 +19091,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19150,7 +19150,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19191,7 +19191,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19251,7 +19251,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19298,7 +19298,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19361,7 +19361,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19408,7 +19408,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19477,7 +19477,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19530,7 +19530,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19568,7 +19568,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19637,7 +19637,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19693,7 +19693,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19731,7 +19731,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19795,7 +19795,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19845,7 +19845,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19883,7 +19883,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19946,7 +19946,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -19999,7 +19999,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20043,7 +20043,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20081,7 +20081,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20156,7 +20156,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20200,7 +20200,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20262,7 +20262,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20294,7 +20294,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20354,7 +20354,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20405,7 +20405,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20450,7 +20450,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20525,7 +20525,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20587,7 +20587,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20625,7 +20625,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20685,7 +20685,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20732,7 +20732,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20810,7 +20810,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20869,7 +20869,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20910,7 +20910,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -20982,7 +20982,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21041,7 +21041,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21085,7 +21085,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21160,7 +21160,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21222,7 +21222,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21254,7 +21254,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21313,7 +21313,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21366,7 +21366,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21398,7 +21398,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21470,7 +21470,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21532,7 +21532,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21564,7 +21564,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21632,7 +21632,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21694,7 +21694,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21732,7 +21732,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21804,7 +21804,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21857,7 +21857,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21895,7 +21895,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -21970,7 +21970,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22029,7 +22029,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22073,7 +22073,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22142,7 +22142,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22201,7 +22201,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22248,7 +22248,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22302,7 +22302,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22346,7 +22346,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22384,7 +22384,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22465,7 +22465,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22506,7 +22506,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22571,7 +22571,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22609,7 +22609,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22687,7 +22687,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22752,7 +22752,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22784,7 +22784,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22846,7 +22846,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22902,7 +22902,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -22934,7 +22934,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23018,7 +23018,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23056,7 +23056,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23118,7 +23118,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23150,7 +23150,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23228,7 +23228,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23290,7 +23290,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23334,7 +23334,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23390,7 +23390,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23440,7 +23440,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23496,7 +23496,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23546,7 +23546,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23611,7 +23611,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23670,7 +23670,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23711,7 +23711,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23783,7 +23783,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23842,7 +23842,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23874,7 +23874,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23937,7 +23937,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -23991,7 +23991,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24033,7 +24033,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24102,7 +24102,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24155,7 +24155,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24187,7 +24187,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24253,7 +24253,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24306,7 +24306,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24381,7 +24381,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24440,7 +24440,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24478,7 +24478,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24559,7 +24559,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24597,7 +24597,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24629,7 +24629,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24688,7 +24688,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24720,7 +24720,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24792,7 +24792,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24833,7 +24833,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24895,7 +24895,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -24933,7 +24933,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25011,7 +25011,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25073,7 +25073,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25117,7 +25117,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25185,7 +25185,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25247,7 +25247,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25285,7 +25285,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25357,7 +25357,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25413,7 +25413,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25451,7 +25451,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25532,7 +25532,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25564,7 +25564,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25626,7 +25626,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25658,7 +25658,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25726,7 +25726,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25782,7 +25782,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25854,7 +25854,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25910,7 +25910,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -25954,7 +25954,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26026,7 +26026,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26085,7 +26085,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26151,7 +26151,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26201,7 +26201,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26270,7 +26270,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26326,7 +26326,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26370,7 +26370,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26435,7 +26435,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26491,7 +26491,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26523,7 +26523,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26561,7 +26561,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26630,7 +26630,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26686,7 +26686,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26727,7 +26727,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26796,7 +26796,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26852,7 +26852,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26899,7 +26899,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -26937,7 +26937,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27009,7 +27009,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27065,7 +27065,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27109,7 +27109,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27178,7 +27178,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27234,7 +27234,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27299,7 +27299,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27355,7 +27355,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27396,7 +27396,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27452,7 +27452,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27502,7 +27502,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27561,7 +27561,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27611,7 +27611,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27649,7 +27649,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27718,7 +27718,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27774,7 +27774,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27806,7 +27806,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27881,7 +27881,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27940,7 +27940,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -27984,7 +27984,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28052,7 +28052,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28111,7 +28111,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28149,7 +28149,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28224,7 +28224,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28283,7 +28283,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28315,7 +28315,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28387,7 +28387,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28443,7 +28443,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28481,7 +28481,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28541,7 +28541,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28591,7 +28591,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28629,7 +28629,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28698,7 +28698,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28754,7 +28754,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28792,7 +28792,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28864,7 +28864,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28923,7 +28923,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -28955,7 +28955,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29036,7 +29036,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29095,7 +29095,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29136,7 +29136,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29207,7 +29207,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29260,7 +29260,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29298,7 +29298,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29373,7 +29373,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29429,7 +29429,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29461,7 +29461,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29517,7 +29517,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29567,7 +29567,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29626,7 +29626,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29679,7 +29679,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29720,7 +29720,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29783,7 +29783,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29830,7 +29830,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29871,7 +29871,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29943,7 +29943,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -29999,7 +29999,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30067,7 +30067,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30126,7 +30126,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30167,7 +30167,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30226,7 +30226,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30276,7 +30276,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30308,7 +30308,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30380,7 +30380,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30439,7 +30439,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30480,7 +30480,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30545,7 +30545,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30598,7 +30598,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30630,7 +30630,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30702,7 +30702,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30758,7 +30758,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30790,7 +30790,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30828,7 +30828,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30878,7 +30878,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30922,7 +30922,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -30985,7 +30985,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31038,7 +31038,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31097,7 +31097,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31147,7 +31147,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31212,7 +31212,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31265,7 +31265,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31337,7 +31337,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31396,7 +31396,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31434,7 +31434,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31502,7 +31502,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31561,7 +31561,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31614,7 +31614,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31661,7 +31661,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31723,7 +31723,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31779,7 +31779,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31820,7 +31820,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31882,7 +31882,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31935,7 +31935,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -31976,7 +31976,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32038,7 +32038,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32091,7 +32091,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32132,7 +32132,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32194,7 +32194,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32247,7 +32247,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32315,7 +32315,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32377,7 +32377,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32409,7 +32409,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32453,7 +32453,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32491,7 +32491,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32541,7 +32541,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32585,7 +32585,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32644,7 +32644,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32694,7 +32694,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32726,7 +32726,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32791,7 +32791,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32850,7 +32850,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32882,7 +32882,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -32959,7 +32959,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33018,7 +33018,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33062,7 +33062,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33115,7 +33115,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33162,7 +33162,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33213,7 +33213,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33254,7 +33254,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33323,7 +33323,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33376,7 +33376,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33448,7 +33448,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33489,7 +33489,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33545,7 +33545,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33577,7 +33577,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33636,7 +33636,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33689,7 +33689,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33730,7 +33730,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33777,7 +33777,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33818,7 +33818,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33881,7 +33881,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33934,7 +33934,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -33972,7 +33972,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34041,7 +34041,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34100,7 +34100,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34132,7 +34132,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34201,7 +34201,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34257,7 +34257,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34309,7 +34309,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34353,7 +34353,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34422,7 +34422,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34475,7 +34475,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34516,7 +34516,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34572,7 +34572,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34622,7 +34622,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34654,7 +34654,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34717,7 +34717,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34767,7 +34767,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34808,7 +34808,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34864,7 +34864,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34914,7 +34914,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -34973,7 +34973,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35020,7 +35020,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35086,7 +35086,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35139,7 +35139,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35198,7 +35198,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35251,7 +35251,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35289,7 +35289,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35351,7 +35351,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35401,7 +35401,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35463,7 +35463,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35513,7 +35513,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35572,7 +35572,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35622,7 +35622,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35681,7 +35681,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35731,7 +35731,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35788,7 +35788,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35835,7 +35835,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35904,7 +35904,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -35957,7 +35957,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36028,7 +36028,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36087,7 +36087,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36119,7 +36119,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36194,7 +36194,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36250,7 +36250,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36319,7 +36319,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36369,7 +36369,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36407,7 +36407,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36473,7 +36473,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36523,7 +36523,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36555,7 +36555,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36614,7 +36614,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36667,7 +36667,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36699,7 +36699,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36743,7 +36743,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36781,7 +36781,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36840,7 +36840,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36890,7 +36890,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -36956,7 +36956,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37009,7 +37009,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37041,7 +37041,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37097,7 +37097,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37147,7 +37147,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37194,7 +37194,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37235,7 +37235,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37291,7 +37291,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37341,7 +37341,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37401,7 +37401,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37451,7 +37451,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37511,7 +37511,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37561,7 +37561,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37626,7 +37626,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37682,7 +37682,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37720,7 +37720,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37783,7 +37783,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37815,7 +37815,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37862,7 +37862,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37894,7 +37894,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -37953,7 +37953,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38003,7 +38003,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38063,7 +38063,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38107,7 +38107,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38139,7 +38139,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38211,7 +38211,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38267,7 +38267,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38299,7 +38299,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38337,7 +38337,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38403,7 +38403,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38453,7 +38453,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38485,7 +38485,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38541,7 +38541,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38591,7 +38591,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38644,7 +38644,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38691,7 +38691,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38723,7 +38723,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38773,7 +38773,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38817,7 +38817,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38877,7 +38877,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38924,7 +38924,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -38971,7 +38971,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39012,7 +39012,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39120,7 +39120,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39189,7 +39189,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39243,7 +39243,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39302,7 +39302,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39355,7 +39355,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39408,7 +39408,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39455,7 +39455,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39518,7 +39518,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39568,7 +39568,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39627,7 +39627,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39680,7 +39680,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39727,7 +39727,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39768,7 +39768,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39819,7 +39819,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39860,7 +39860,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39920,7 +39920,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -39967,7 +39967,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40020,7 +40020,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40067,7 +40067,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40127,7 +40127,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40181,7 +40181,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40223,7 +40223,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40277,7 +40277,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40321,7 +40321,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40365,7 +40365,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40406,7 +40406,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40460,7 +40460,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40507,7 +40507,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40570,7 +40570,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40623,7 +40623,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40667,7 +40667,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40708,7 +40708,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40746,7 +40746,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40793,7 +40793,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40837,7 +40837,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40875,7 +40875,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40932,7 +40932,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -40998,7 +40998,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -41027,7 +41027,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -41060,7 +41060,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -41093,7 +41093,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -41126,7 +41126,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -41216,7 +41216,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -41306,7 +41306,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -41396,7 +41396,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -41462,7 +41462,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -41528,7 +41528,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -41594,7 +41594,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -41678,7 +41678,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -41714,7 +41714,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
@@ -41745,7 +41745,7 @@
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
-        "percentage": 100,
+        "percentage": 75,
         "aggregation": "median"
       },
       "schedule": {
