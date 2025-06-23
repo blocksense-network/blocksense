@@ -33,14 +33,14 @@ build-environment environment="all":
   else
     nix build --impure -L --json .#legacyPackages.{{system}}.process-compose-environments.{{environment}} \
       | jq -r '.[0].outputs.out' \
-      | xargs -I{} cp -rfs {} {{process-compose-artifacts-dir}}/{{environment}}-process-compose.yaml
+      | xargs -I{} cp -rfs {} {{process-compose-artifacts-dir}}/process-compose-{{environment}}.yaml
   fi
   echo "Process Compose artifacts copied to {{process-compose-artifacts-dir}}"
 
 # Start a specific process compose environment
 start-environment environment:
   #!/usr/bin/env bash
-  PC_FILE="{{process-compose-artifacts-dir}}/{{environment}}-process-compose.yaml"
+  PC_FILE="{{process-compose-artifacts-dir}}/process-compose-{{environment}}.yaml"
   if ! test -f "$PC_FILE"; then
     just build-environment {{environment}}
   fi

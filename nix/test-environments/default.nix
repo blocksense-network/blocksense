@@ -28,7 +28,7 @@
         (
           set -x
           ${lib.concatMapStringsSep "\n" (
-            x: "cp ${x.value} $out/${x.name}-process-compose.yaml"
+            x: "cp ${x.value} $out/process-compose-${x.name}.yaml"
           ) allEnvironments}
         )
       '';
