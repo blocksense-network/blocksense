@@ -120,7 +120,7 @@ export const generateDecoderLines = (
       depth = 0,
       parentIndex?: string,
     ) => {
-      const { config, field, location, index } = data;
+      const { field } = data;
       const lines: string[] = [];
       if (iterations) {
         lines.push(
