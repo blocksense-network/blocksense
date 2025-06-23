@@ -8,6 +8,7 @@ use blocksense_utils::from_hex_string;
 use log::error;
 use serde::Deserialize;
 use serde::Serialize;
+use std::cmp::Ordering;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VotedFeedUpdate {
@@ -20,6 +21,28 @@ pub struct VotedFeedUpdate {
 pub struct VotedFeedUpdateWithProof {
     pub update: VotedFeedUpdate,
     pub proof: Vec<DataFeedPayload>,
+}
+
+// Implement Eq and PartialEq
+impl PartialEq for VotedFeedUpdateWithProof {
+    fn eq(&self, other: &Self) -> bool {
+        self.update.feed_id == other.update.feed_id
+    }
+}
+
+impl Eq for VotedFeedUpdateWithProof {}
+
+// Implement Ord and PartialOrd
+impl PartialOrd for VotedFeedUpdateWithProof {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.update.feed_id.cmp(&other.update.feed_id))
+    }
+}
+
+impl Ord for VotedFeedUpdateWithProof {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.update.feed_id.cmp(&other.update.feed_id)
+    }
 }
 
 #[derive(Debug, PartialEq)]
