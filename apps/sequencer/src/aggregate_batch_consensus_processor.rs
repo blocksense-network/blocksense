@@ -6,6 +6,7 @@ use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_gnosis_safe::utils::{signature_to_bytes, SignatureWithAddress};
 use blocksense_metrics::{inc_metric, process_provider_getter};
 use blocksense_utils::time::current_unix_time;
+use blocksense_utils::FeedId;
 use paste::paste;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, warn};
@@ -377,7 +378,7 @@ pub async fn aggregation_batch_consensus_loop(
         .expect("Failed to spawn aggregation_batch_consensus_loop!")
 }
 
-async fn failed_tx(net: &str, ids_vec: &Vec<u32>, provider: &mut RpcProvider) {
+async fn failed_tx(net: &str, ids_vec: &Vec<FeedId>, provider: &mut RpcProvider) {
     decrement_feeds_round_indexes(ids_vec, net, provider).await;
     provider.dec_num_tx_in_progress();
 }
