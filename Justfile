@@ -43,9 +43,13 @@ build-environment environment="all":
 
 [group('Working with process-compose environments')]
 [doc('Start a process-compose environment')]
-start-environment environment:
+start-environment environment="example-setup-01":
   #!/usr/bin/env bash
+  set -euo pipefail
   PC_FILE="{{process-compose-artifacts-dir}}/process-compose-{{environment}}.yaml"
+
+  just build-blocksense
+
   if ! test -f "$PC_FILE"; then
     just build-environment {{environment}}
   fi
@@ -98,15 +102,6 @@ start-oracle oracle-name:
 [doc('Build Blocksense')]
 build-blocksense:
   @{{root-dir}}/scripts/build-blocksense.sh
-
-[group('blocksense')]
-[doc('Build Blocksense and start the default process-compose environment')]
-start-blocksense:
-  #!/usr/bin/env bash
-  set -euo pipefail
-
-  just build-blocksense
-  process-compose up
 
 [group('General')]
 [doc('Run a command to clean the repository of untracked files')]
