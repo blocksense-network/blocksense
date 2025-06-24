@@ -50,7 +50,7 @@ in
       };
 
       block-config = {
-        max-feed-updates-to-batch = 300;
+        max-feed-updates-to-batch = 20;
         block-generation-period = 500;
         genesis-block-timestamp-ms = 0;
       };

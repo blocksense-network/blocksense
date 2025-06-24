@@ -601,6 +601,21 @@ pub async fn eth_batch_send_to_contract(
             debug!("Retrying for {transaction_retries_count}-th time in network `{net}` block height {block_height} tx: {tx:?}");
         }
 
+        // Estimate gas
+        match actix_web::rt::time::timeout(
+            Duration::from_secs(transaction_retry_timeout_secs),
+            rpc_handle.estimate_gas(tx.clone()),
+        )
+        .await
+        {
+            Ok(gas_estimate) => {
+                info!("Estimated gas on {transaction_retries_count}-th retry for network `{net}` block height {block_height}: {gas_estimate:?}");
+            }
+            Err(e) => {
+                warn!("Could not estimate gas on {transaction_retries_count}-th retry for network `{net}` block height {block_height}: {e}");
+            }
+        };
+
         let tx_receipt = {
             let rpc_impersonated_handle;
             let send_transaction_future = if is_impersonated {
