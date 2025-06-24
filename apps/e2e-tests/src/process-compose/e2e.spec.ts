@@ -46,7 +46,7 @@ describe.sequential('E2E Tests with process-compose', () => {
           ),
         {
           schedule: Schedule.fixed(1000),
-          times: 10,
+          times: 30,
         },
       );
       // still validate the result
@@ -98,8 +98,10 @@ describe.sequential('E2E Tests with process-compose', () => {
 
       // Collect initial information for the feeds and their prices
       const url = config.providers[network].url;
-      const contractAddress = config.providers[network]
-        .contract_address as `0x${string}`;
+
+      const contractAddress = config.providers[network].contracts.find(
+        c => c.name === 'AggregatedDataFeedStore',
+      )!.address as `0x${string}`;
       const allow_feeds = config.providers[network].allow_feeds;
 
       const feedsConfig = yield* sequencer.getFeedsConfig();
