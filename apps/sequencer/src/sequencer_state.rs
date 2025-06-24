@@ -1,11 +1,13 @@
 use crate::feeds::consensus_second_round_manager::AggregationBatchConsensus;
 use crate::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
+use crate::providers::eth_send_utils::create_and_collect_relayers_futures;
 use crate::providers::eth_send_utils::BatchOfUpdatesToProcess;
 use crate::providers::provider::ProviderStatus;
 use crate::providers::provider::SharedRpcProviders;
 use crate::providers::provider::{init_shared_rpc_providers, RpcProvider};
 use crate::reporters::reporter::init_shared_reporters;
 use crate::reporters::reporter::SharedReporters;
+use actix_web::web::Data;
 use blocksense_blockchain_data_model::in_mem_db::InMemDb;
 use blocksense_config::{AllFeedsConfig, SequencerConfig};
 use blocksense_data_feeds::feeds_processing::VotedFeedUpdateWithProof;
@@ -21,6 +23,7 @@ use blocksense_registry::config::FeedConfig;
 use blocksense_utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
 use blocksense_utils::FeedId;
 use eyre::eyre;
+use futures::stream::FuturesUnordered;
 use rdkafka::producer::FutureProducer;
 use rdkafka::ClientConfig;
 use std::collections::HashMap;
@@ -29,6 +32,7 @@ use tokio::sync::mpsc;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 use tokio::sync::Mutex;
 use tokio::sync::RwLock;
+use tokio::task::JoinHandle;
 
 pub struct SequencerState {
     pub registry: Arc<RwLock<FeedMetaDataRegistry>>,
@@ -195,6 +199,38 @@ pub async fn create_sequencer_state_from_sequencer_config(
         aggregate_batch_sig_recv,
         relayers_recv_channels,
     )
+}
+
+pub async fn create_sequencer_state_and_collected_futures(
+    sequencer_config: SequencerConfig,
+    metrics_prefix: &str,
+    feeds_config: AllFeedsConfig,
+) -> (
+    Data<SequencerState>,
+    FuturesUnordered<JoinHandle<Result<(), std::io::Error>>>,
+) {
+    let (sequencer_state, _, _, _, _, relayers_recv_channels) =
+        create_sequencer_state_from_sequencer_config(
+            sequencer_config.clone(),
+            metrics_prefix,
+            feeds_config.clone(),
+        )
+        .await;
+    let collected_futures: FuturesUnordered<JoinHandle<Result<(), std::io::Error>>> =
+        FuturesUnordered::new();
+
+    let feeds_metrics = sequencer_state.feeds_metrics.clone();
+    let provider_status = sequencer_state.provider_status.clone();
+
+    create_and_collect_relayers_futures(
+        &collected_futures,
+        feeds_metrics,
+        provider_status,
+        relayers_recv_channels,
+    )
+    .await;
+
+    (sequencer_state, collected_futures)
 }
 
 fn create_kafka_producer(

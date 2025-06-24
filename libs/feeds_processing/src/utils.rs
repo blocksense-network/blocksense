@@ -313,7 +313,7 @@ fn check_aggregated_votes_deviation(
 
 pub async fn validate(
     feeds_config: HashMap<FeedId, FeedStrideAndDecimals>,
-    mut batch: ConsensusSecondRoundBatch,
+    batch: ConsensusSecondRoundBatch,
     last_votes: HashMap<FeedId, VotedFeedUpdate>,
     tolerated_deviations: HashMap<FeedId, f64>,
 ) -> Result<()> {
@@ -332,9 +332,8 @@ pub async fn validate(
     let calldata = match adfs_serialize_updates(
         &batch.network,
         &updates_to_serialize,
-        None,
+        &batch.feeds_rounds,
         feeds_config,
-        &mut batch.feeds_rounds,
     )
     .await
     {
@@ -511,9 +510,8 @@ pub mod tests {
         let calldata = adfs_serialize_updates(
             network.as_str(),
             &updates_to_serialize,
-            None,
+            &feeds_rounds,
             create_feeds_config(),
-            &mut feeds_rounds,
         )
         .await
         .unwrap();

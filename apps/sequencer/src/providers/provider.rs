@@ -1,10 +1,10 @@
 use alloy::providers::Provider;
-use alloy::rpc::types::TransactionRequest;
+use alloy::rpc::types::{TransactionInput, TransactionRequest};
 use alloy::{
     dyn_abi::DynSolValue,
     hex,
     network::{EthereumWallet, TransactionBuilder},
-    primitives::Address,
+    primitives::{Address, Bytes},
     providers::{
         fillers::{
             BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller,
@@ -14,27 +14,32 @@ use alloy::{
     },
     signers::local::PrivateKeySigner,
 };
-use alloy_primitives::Bytes;
+use alloy_primitives::U256;
 use blocksense_feeds_processing::adfs_gen_calldata::RoundCounters;
 use blocksense_utils::FeedId;
 use futures::future::join_all;
-use reqwest::Url;
+use reqwest::Url; // TODO @ymadzhunkov include URL directly from url crate
 
-use blocksense_config::{AllFeedsConfig, PublishCriteria, SequencerConfig};
+use blocksense_config::{
+    AllFeedsConfig, ContractConfig, PublishCriteria, SequencerConfig,
+    ADFS_ACCESS_CONTROL_CONTRACT_NAME, ADFS_CONTRACT_NAME,
+    HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME, MULTICALL_CONTRACT_NAME,
+    SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
+};
 use blocksense_data_feeds::feeds_processing::{
     BatchedAggregatesToSend, PublishedFeedUpdate, PublishedFeedUpdateError, VotedFeedUpdate,
 };
 use blocksense_feed_registry::registry::{FeedAggregateHistory, HistoryEntry};
 use blocksense_feed_registry::types::FeedType;
+use blocksense_feed_registry::types::Repeatability;
 use blocksense_metrics::{metrics::ProviderMetrics, process_provider_getter};
-use eyre::{eyre, Result};
+use eyre::{eyre, OptionExt, Result};
 use paste::paste;
 use ringbuf::traits::{Consumer, Observer, RingBuffer};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::{fs, mem};
-use tokio::join;
 use tokio::sync::{Mutex, RwLock};
 use tokio::time::error::Elapsed;
 use tokio::time::Duration;
@@ -64,14 +69,33 @@ pub fn parse_eth_address(addr: &str) -> Option<Address> {
 pub struct Contract {
     pub name: String,
     pub address: Option<Address>,
-    pub byte_code: Option<Vec<u8>>,
+    pub creation_byte_code: Option<Vec<u8>>,
+    pub deployed_byte_code: Option<Vec<u8>>,
     pub contract_version: u16,
 }
-
-pub const PRICE_FEED_CONTRACT_NAME: &str = "price_feed";
-pub const EVENT_FEED_CONTRACT_NAME: &str = "event_feed";
-pub const MULTICALL_CONTRACT_NAME: &str = "multicall";
-pub const GNOSIS_SAFE_CONTRACT_NAME: &str = "gnosis_safe";
+impl Contract {
+    pub fn new(config: &ContractConfig) -> Result<Contract> {
+        let address = config
+            .address
+            .as_ref()
+            .and_then(|x| parse_eth_address(x.as_str()));
+        let creation_byte_code = config
+            .creation_byte_code
+            .as_ref()
+            .and_then(|byte_code| hex::decode(byte_code.clone()).ok());
+        let deployed_byte_code = config
+            .deployed_byte_code
+            .as_ref()
+            .and_then(|byte_code| hex::decode(byte_code.clone()).ok());
+        Ok(Contract {
+            name: config.name.clone(),
+            address,
+            creation_byte_code,
+            deployed_byte_code,
+            contract_version: config.contract_version,
+        })
+    }
+}
 
 pub struct RpcProvider {
     pub network: String,
@@ -148,12 +172,10 @@ async fn get_rpc_providers(
             p,
             &provider_metrics,
             feeds_config,
-        );
-
+        )
+        .await;
         let rpc_provider = Arc::new(Mutex::new(rpc_provider));
-
         check_contracts_in_networks_tasks.push(log_if_contracts_exist(rpc_provider.clone()));
-
         providers.insert(net.clone(), rpc_provider.clone());
     }
 
@@ -168,16 +190,45 @@ async fn get_rpc_providers(
     providers
 }
 
+#[derive(Debug)]
+pub struct LatestRound {
+    pub feed_id: u128,
+    pub round: u16,
+}
+
+impl LatestRound {
+    pub fn new(feed_id: u128, data: &[u8]) -> LatestRound {
+        let l = data.len();
+        let round = if l > 1 {
+            u16::from_be_bytes([data[l - 2], data[l - 1]])
+        } else {
+            0_u16
+        };
+        LatestRound { feed_id, round }
+    }
+
+    pub fn calldata(feed_id: u128, stride: u32) -> Bytes {
+        let x: U256 = (U256::from(0x81_u8) << 248)
+            | (U256::from(stride) << 240)
+            | (U256::from(feed_id) << 120);
+        let b: [u8; 32] = x.to_be_bytes();
+        Bytes::copy_from_slice(&b)
+    }
+}
+
 async fn log_if_contracts_exist(provider_mutex: Arc<Mutex<RpcProvider>>) {
     let rpc_provider = provider_mutex.lock().await;
-    join!(
-        rpc_provider.log_if_contract_exists(PRICE_FEED_CONTRACT_NAME),
-        rpc_provider.log_if_contract_exists(EVENT_FEED_CONTRACT_NAME),
-    );
+    let _ = join_all(
+        rpc_provider
+            .contracts
+            .iter()
+            .map(|c| rpc_provider.log_if_contract_exists(&c.name)),
+    )
+    .await;
 }
 
 impl RpcProvider {
-    pub fn new(
+    pub async fn new(
         network: &str,
         rpc_url: Url,
         signer: &PrivateKeySigner,
@@ -194,7 +245,7 @@ impl RpcProvider {
             .as_ref()
             .and_then(|x| parse_eth_address(x.as_str()));
         let (history, publishing_criteria) = RpcProvider::prepare_history(p);
-        let contracts = RpcProvider::prepare_contracts(p);
+        let contracts = RpcProvider::prepare_contracts(p).expect("Error in prepare_contracts");
         let mut feeds_variants: HashMap<FeedId, (FeedType, usize)> = HashMap::new();
         for f in feeds_config.feeds.iter() {
             debug!("Registering feed for network; feed={f:?}; network={network}");
@@ -208,13 +259,17 @@ impl RpcProvider {
                 }
             }
         }
-        RpcProvider {
+        let round_counters =
+            RpcProvider::load_round_counters_from_chain(&provider, feeds_config, &contracts)
+                .await
+                .unwrap();
+        let mut r = RpcProvider {
             network: network.to_string(),
             provider,
             signer: signer.clone(),
             safe_min_quorum: p.safe_min_quorum,
             provider_metrics: provider_metrics.clone(),
-            transaction_retries_count_limit: p.transaction_retries_count_limit,
+            transaction_retries_count_limit: p.transaction_retries_count_before_give_up,
             transaction_retry_timeout_secs: p.transaction_retry_timeout_secs,
             retry_fee_increment_fraction: p.retry_fee_increment_fraction,
             transaction_gas_limit: p.transaction_gas_limit,
@@ -224,9 +279,58 @@ impl RpcProvider {
             feeds_variants,
             contracts,
             rpc_url,
-            round_counters: HashMap::new(),
+            round_counters,
             num_tx_in_progress: 0,
+        };
+
+        let res = r.load_history_from_chain().await;
+        info!("Loaded history from chaing = {res:?}");
+        r
+    }
+
+    pub async fn load_round_counters_from_chain(
+        provider: &ProviderType,
+        feeds_config: &AllFeedsConfig,
+        contracts: &[Contract],
+    ) -> Result<HashMap<FeedId, u64>> {
+        let mut res: HashMap<FeedId, u64> = HashMap::new();
+        let adfs_address_opt = contracts.iter().find_map(|x| {
+            if x.name == ADFS_CONTRACT_NAME {
+                x.address
+            } else {
+                None
+            }
+        });
+        if let Some(adfs_address) = adfs_address_opt {
+            let multicall = contracts
+                .iter()
+                .find_map(|x| {
+                    if x.name == MULTICALL_CONTRACT_NAME {
+                        x.address
+                    } else {
+                        None
+                    }
+                })
+                .ok_or_eyre(
+                    "Can't find MULTICALL contract address. Skipping loading or round counters",
+                )?;
+            for feed in feeds_config.feeds.iter() {
+                let feed_id = feed.id;
+                let stride = feed.stride;
+                let r = Self::get_latest_round_v2(
+                    multicall,
+                    adfs_address,
+                    provider,
+                    &feed_id,
+                    stride.into(),
+                )
+                .await?;
+                if let Some(r) = r.first() {
+                    let _v = res.insert(feed_id, r.round.into());
+                }
+            }
         }
+        Ok(res)
     }
 
     pub fn prepare_history(
@@ -248,60 +352,12 @@ impl RpcProvider {
         (history, publishing_criteria)
     }
 
-    pub fn prepare_contracts(p: &blocksense_config::Provider) -> Vec<Contract> {
-        let address = p
-            .contract_address
-            .as_ref()
-            .and_then(|x| parse_eth_address(x.as_str()));
-        let safe_address = p
-            .safe_address
-            .as_ref()
-            .and_then(|x| parse_eth_address(x.as_str()));
-        let event_address = p
-            .event_contract_address
-            .as_ref()
-            .and_then(|x| parse_eth_address(x.as_str()));
-        let multicall_address = p
-            .multicall_contract_address
-            .as_ref()
-            .and_then(|x| parse_eth_address(x.as_str()));
-
-        let mut contracts = vec![];
-        contracts.push(Contract {
-            name: PRICE_FEED_CONTRACT_NAME.to_string(),
-            address,
-            byte_code: p.data_feed_store_byte_code.clone().map(|byte_code| {
-                hex::decode(byte_code.clone())
-                    .expect("data_feed_store_byte_code for provider is not valid hex string!")
-            }),
-            contract_version: p.contract_version,
-        });
-
-        contracts.push(Contract {
-            name: EVENT_FEED_CONTRACT_NAME.to_string(),
-            address: event_address,
-            byte_code: p.data_feed_sports_byte_code.clone().map(|byte_code| {
-                hex::decode(byte_code.clone())
-                    .expect("data_feed_sports_byte_code for provider is not valid hex string!")
-            }),
-            contract_version: p.contract_version,
-        });
-
-        contracts.push(Contract {
-            name: GNOSIS_SAFE_CONTRACT_NAME.to_string(),
-            address: safe_address,
-            byte_code: None,
-            contract_version: 1,
-        });
-
-        contracts.push(Contract {
-            name: MULTICALL_CONTRACT_NAME.to_string(),
-            address: multicall_address,
-            byte_code: Some(Multicall::BYTECODE.to_vec()),
-            contract_version: 1,
-        });
-
-        contracts
+    pub fn prepare_contracts(p: &blocksense_config::Provider) -> Result<Vec<Contract>> {
+        let mut res = vec![];
+        for config in &p.contracts {
+            res.push(Contract::new(config)?);
+        }
+        Ok(res)
     }
 
     pub fn update_history(&mut self, updates: &[VotedFeedUpdate]) {
@@ -326,6 +382,57 @@ impl RpcProvider {
             .cloned()
             .collect::<Vec<VotedFeedUpdate>>();
         updates.updates = mem::take(&mut res);
+    }
+
+    pub fn get_latest_contract_version(&self, feeds_repeatability: Repeatability) -> u16 {
+        match feeds_repeatability {
+            Repeatability::Periodic => {
+                if self.is_deployed(ADFS_CONTRACT_NAME) {
+                    if let Some(contract) = self.get_contract(ADFS_CONTRACT_NAME) {
+                        return contract.contract_version;
+                    }
+                }
+                if self.is_deployed(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME) {
+                    if let Some(_v) = self
+                        .get_contract(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
+                        .map(|x| x.contract_version)
+                    {
+                        return 1;
+                    }
+                }
+                0
+            }
+            Repeatability::Oneshot => {
+                if self.is_deployed(SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME) {
+                    if let Some(_v) = self
+                        .get_contract(SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
+                        .map(|x| x.contract_version)
+                    {
+                        return 1;
+                    }
+                }
+                0
+            }
+        }
+    }
+
+    pub fn get_latest_contract(&self, feeds_repeatability: Repeatability) -> Option<Contract> {
+        if self.is_deployed(ADFS_CONTRACT_NAME) {
+            if let Some(contract) = self.get_contract(ADFS_CONTRACT_NAME) {
+                return Some(contract);
+            }
+        }
+        if self.is_deployed(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
+            && feeds_repeatability == Repeatability::Periodic
+        {
+            return self.get_contract(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME);
+        }
+        if self.is_deployed(SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
+            && feeds_repeatability == Repeatability::Oneshot
+        {
+            return self.get_contract(SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME);
+        }
+        None
     }
 
     pub fn peg_stable_coins_to_value(&self, updates: &mut BatchedAggregatesToSend) {
@@ -374,27 +481,67 @@ impl RpcProvider {
         }
     }
 
-    pub async fn get_latest_values(
+    pub fn set_deployed_code(&mut self, name: &str, deployed_code: &Bytes) {
+        for c in self.contracts.iter_mut() {
+            if c.name == name {
+                c.deployed_byte_code = Some(deployed_code.0.to_vec());
+            }
+        }
+    }
+
+    pub fn is_deployed(&self, name: &str) -> bool {
+        for c in &self.contracts {
+            if c.name == name {
+                return c.deployed_byte_code.is_some();
+            }
+        }
+        false
+    }
+
+    async fn get_latest_round_v2(
+        multicall: Address,
+        adfs_address: Address,
+        provider: &ProviderType,
+        feed_id: &u128,
+        stride: u32,
+    ) -> Result<Vec<LatestRound>, eyre::Error> {
+        let contract = MulticallInstance::new(multicall, provider.clone());
+        let calldata: Vec<Multicall::Call> = vec![Multicall::Call {
+            target: adfs_address,
+            callData: LatestRound::calldata(*feed_id, stride),
+        }];
+        let aggregate_return = contract.aggregate(calldata).call().await?;
+        let latest_rounds: Vec<LatestRound> = aggregate_return
+            .returnData
+            .into_iter()
+            .map(|data| LatestRound::new(*feed_id, &data.0))
+            .collect();
+        Ok(latest_rounds)
+    }
+
+    pub async fn get_latest_round(
+        &self,
+        feed_id: &u128,
+        stride: u32,
+    ) -> Result<Vec<LatestRound>, eyre::Error> {
+        let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
+        let adfs_address = self.get_contract_address(ADFS_CONTRACT_NAME)?;
+        Self::get_latest_round_v2(multicall, adfs_address, &self.provider, feed_id, stride).await
+    }
+
+    pub async fn get_latest_values_from_v1(
         &self,
         feed_ids: &[FeedId],
     ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>, eyre::Error> {
         let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
-        let data_feed = self.get_contract_address(PRICE_FEED_CONTRACT_NAME)?;
+        let data_feed = self.get_contract_address(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)?;
+        //let data_feed = self.get_contract_address(ADFS_CONTRACT_NAME)?;
         let contract = MulticallInstance::new(multicall, self.provider.clone());
         let calldata: Vec<Multicall::Call> = feed_ids
             .iter()
-            .map(|feed_id| {
-                let feed_id = *feed_id as u32;
-                let call_data = Bytes::copy_from_slice(&[
-                    (((feed_id >> 24) & 0xFF_u32) | 0xC0) as u8,
-                    ((feed_id >> 16) & 0xFF_u32) as u8,
-                    ((feed_id >> 8) & 0xFF_u32) as u8,
-                    (feed_id & 0xFF_u32) as u8,
-                ]);
-                Multicall::Call {
-                    target: data_feed,
-                    callData: call_data,
-                }
+            .map(|feed_id| Multicall::Call {
+                target: data_feed,
+                callData: Self::calldata_for_values_feed_v1(*feed_id),
             })
             .collect();
         let mut digits: Vec<usize> = vec![];
@@ -410,12 +557,14 @@ impl RpcProvider {
         }
 
         let aggregate_return = contract.aggregate(calldata).call().await?;
+
         let res = aggregate_return
             .returnData
             .into_iter()
             .enumerate()
             .map(|(count, data)| {
                 PublishedFeedUpdate::latest(
+                    1,
                     feed_ids[count],
                     variants[count].clone(),
                     digits[count],
@@ -426,35 +575,135 @@ impl RpcProvider {
         Ok(res)
     }
 
+    pub fn calldata_for_values_feed_v2(feed_id: FeedId) -> Bytes {
+        //let method_code = U256::from(0x83_u8);
+        let method_code = U256::from(0x83_u8);
+        let x = (method_code << 248) | (U256::from(feed_id) << 120);
+        Bytes::copy_from_slice(&DynSolValue::Uint(x, 256).abi_encode())
+    }
+
+    pub fn calldata_for_values_feed_v1(feed_id: FeedId) -> Bytes {
+        Bytes::copy_from_slice(&[
+            (((feed_id >> 24) & 0xFF) | 0xC0) as u8,
+            ((feed_id >> 16) & 0xFF) as u8,
+            ((feed_id >> 8) & 0xFF) as u8,
+            (feed_id & 0xFF) as u8,
+        ])
+    }
+
+    pub async fn get_latest_values_from_v2(
+        &self,
+        feed_ids: &[FeedId],
+    ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>, eyre::Error> {
+        let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
+        let data_feed = self.get_contract_address(ADFS_CONTRACT_NAME)?;
+        let contract = MulticallInstance::new(multicall, self.provider.clone());
+        let calldata: Vec<Multicall::Call> = feed_ids
+            .iter()
+            .map(|feed_id| Multicall::Call {
+                target: data_feed,
+                callData: Self::calldata_for_values_feed_v2(*feed_id),
+            })
+            .collect();
+        info!("Calldata = {calldata:?}");
+        let mut digits: Vec<usize> = vec![];
+        let mut variants: Vec<FeedType> = vec![];
+        for feed_id in feed_ids.iter() {
+            let Some((variant, digits_in_fraction)) = self.feeds_variants.get(feed_id) else {
+                return Err(eyre!(
+                    "Unknown variant and number of digits for feed with id = {feed_id}"
+                ));
+            };
+            digits.push(*digits_in_fraction);
+            variants.push(variant.clone());
+        }
+
+        let aggregate_return = contract.aggregate(calldata).call().await?;
+
+        let res = aggregate_return
+            .returnData
+            .into_iter()
+            .enumerate()
+            .map(|(count, data)| {
+                PublishedFeedUpdate::latest(
+                    2,
+                    feed_ids[count],
+                    variants[count].clone(),
+                    digits[count],
+                    &data.0,
+                )
+            })
+            .collect();
+        Ok(res)
+    }
+
+    pub async fn get_latest_values(
+        &self,
+        feed_ids: &[FeedId],
+    ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>, eyre::Error> {
+        match self.get_latest_contract_version(Repeatability::Periodic) {
+            1 => self.get_latest_values_from_v1(feed_ids).await,
+            2 => self.get_latest_values_from_v2(feed_ids).await,
+            _ => Err(eyre!(
+                "Unknown contract version when trying to fetch latest values!"
+            )),
+        }
+    }
+
     pub async fn get_historical_values_for_feed(
         &self,
         feed_id: FeedId,
         updates: &[u128],
     ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>> {
+        match self.get_latest_contract_version(Repeatability::Periodic) {
+            1 => self.get_historical_values_for_feed_v1(feed_id, updates).await,
+            2 => self.get_historical_values_for_feed_v2(feed_id, updates).await,
+            _ => Err(eyre!(
+                "Unknown contract version when trying to fetch get_historical_values_for_feed {feed_id}!"
+            )),
+        }
+    }
+
+    pub fn nth_calldata_v1(feed_id: FeedId, update: u128) -> Bytes {
+        let mut a = [
+            (((feed_id >> 24) & 0xFF) | 0x20) as u8,
+            ((feed_id >> 16) & 0xFF) as u8,
+            ((feed_id >> 8) & 0xFF) as u8,
+            (feed_id & 0xFF) as u8,
+        ]
+        .to_vec();
+        a.append(&mut 0_u128.to_be_bytes().to_vec());
+        a.append(&mut update.to_be_bytes().to_vec());
+        Bytes::copy_from_slice(&a)
+    }
+
+    pub fn nth_calldata_v2(feed_id: FeedId, update: u128) -> Bytes {
+        //  ['0x86', stride, feed_id, roundId],
+        // abi.encodePacked(bytes1(0x86), stride, uint120(id), uint16(round))
+        let stride = 0_u8;
+        let call = DynSolValue::Tuple(vec![
+            DynSolValue::Uint(U256::from(0x86_u8), 8),
+            DynSolValue::Uint(U256::from(stride), 8),
+            DynSolValue::Uint(U256::from(feed_id), 120),
+            DynSolValue::Uint(U256::from(update), 16),
+        ]);
+        // PACKED is very important :) !!!
+        Bytes::copy_from_slice(&call.abi_encode_packed())
+    }
+
+    pub async fn get_historical_values_for_feed_v1(
+        &self,
+        feed_id: FeedId,
+        updates: &[u128],
+    ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>> {
         let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
-        let data_feed = self.get_contract_address(PRICE_FEED_CONTRACT_NAME)?;
-
+        let data_feed = self.get_contract_address(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)?;
         let contract = MulticallInstance::new(multicall, self.provider.clone());
-
         let calldata: Vec<Multicall::Call> = updates
             .iter()
-            .map(|update| {
-                let feed_id = feed_id as u32;
-                let mut a = [
-                    (((feed_id >> 24) & 0xFF_u32) | 0x20) as u8,
-                    ((feed_id >> 16) & 0xFF_u32) as u8,
-                    ((feed_id >> 8) & 0xFF_u32) as u8,
-                    (feed_id & 0xFF_u32) as u8,
-                ]
-                .to_vec();
-                a.append(&mut 0_u128.to_be_bytes().to_vec());
-                a.append(&mut update.to_be_bytes().to_vec());
-
-                let call_data = Bytes::copy_from_slice(&a);
-                Multicall::Call {
-                    target: data_feed,
-                    callData: call_data,
-                }
+            .map(|update| Multicall::Call {
+                target: data_feed,
+                callData: Self::nth_calldata_v1(feed_id, *update),
             })
             .collect();
         let Some((variant, digits_in_fraction)) = self.feeds_variants.get(&feed_id) else {
@@ -468,7 +717,46 @@ impl RpcProvider {
             .into_iter()
             .enumerate()
             .map(|(count, data)| {
-                PublishedFeedUpdate::nth(
+                PublishedFeedUpdate::nth_v1(
+                    feed_id,
+                    updates[count],
+                    variant.clone(),
+                    *digits_in_fraction,
+                    &data.0,
+                )
+            })
+            .collect();
+        Ok(res)
+    }
+
+    pub async fn get_historical_values_for_feed_v2(
+        &self,
+        feed_id: FeedId,
+        updates: &[u128],
+    ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>> {
+        info!("get_historical_values_for_feed {feed_id} {updates:?}");
+        let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
+        let data_feed = self.get_contract_address(ADFS_CONTRACT_NAME)?;
+        let contract = MulticallInstance::new(multicall, self.provider.clone());
+        let calldata: Vec<Multicall::Call> = updates
+            .iter()
+            .map(|update| Multicall::Call {
+                target: data_feed,
+                callData: Bytes::copy_from_slice(&Self::nth_calldata_v2(feed_id, *update)),
+            })
+            .collect();
+        let Some((variant, digits_in_fraction)) = self.feeds_variants.get(&feed_id) else {
+            return Err(eyre!(
+                "Unknown variant and number of digits for feed with id = {feed_id}"
+            ));
+        };
+        let aggregate_return = contract.aggregate(calldata).call().await?;
+        let res = aggregate_return
+            .returnData
+            .into_iter()
+            .enumerate()
+            .map(|(count, data)| {
+                PublishedFeedUpdate::nth_v2(
                     feed_id,
                     updates[count],
                     variant.clone(),
@@ -492,16 +780,23 @@ impl RpcProvider {
 
     pub async fn deploy_contract(&mut self, contract_name: &str) -> Result<String> {
         let signer = &self.signer;
+        let sender_address = signer.address();
         let provider = &self.provider;
         let provider_metrics = &self.provider_metrics;
-
-        let mut bytecode = self
+        let contract = self
             .get_contract(contract_name)
-            .ok_or(eyre!("{contract_name} contract is not set!"))?
-            .byte_code
-            .ok_or(eyre!(
-                "Byte code unavailable for contract named {contract_name}"
-            ))?;
+            .ok_or(eyre!("{contract_name} contract is not set!"))?;
+        let timeout_duration = Duration::from_secs(1);
+        if let Some(addr) = contract.address {
+            let read_byte_code = self.read_contract_bytecode(&addr, timeout_duration).await?;
+            let msg = format!(
+                "Contract {contract_name} on address {addr} has byte code {read_byte_code}"
+            );
+            return Ok(msg);
+        }
+        let mut bytecode = contract.creation_byte_code.ok_or(eyre!(
+            "Byte code unavailable to create contract named {contract_name}"
+        ))?;
 
         // Deploy the contract.
         let network = self.network.clone();
@@ -524,25 +819,36 @@ impl RpcProvider {
             .pending()
             .await?;
 
-        let message_value = DynSolValue::Tuple(vec![DynSolValue::Address(signer.address())]);
-
-        let mut encoded_arg = message_value.abi_encode();
-        bytecode.append(&mut encoded_arg);
+        match contract_name {
+            ADFS_CONTRACT_NAME => {
+                let access_control_address = self
+                    .contracts
+                    .iter()
+                    .find(|con| con.name == ADFS_ACCESS_CONTROL_CONTRACT_NAME)
+                    .and_then(|v| v.address)
+                    .unwrap();
+                extend_byte_code_with_address(access_control_address, &mut bytecode);
+            }
+            ADFS_ACCESS_CONTROL_CONTRACT_NAME => {
+                extend_byte_code_with_address(sender_address, &mut bytecode);
+            }
+            HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME => {
+                extend_byte_code_with_address(sender_address, &mut bytecode);
+            }
+            _ => {}
+        };
 
         let tx = TransactionRequest::default()
             .nonce(nonce)
             .from(signer.address())
             .with_chain_id(chain_id)
             .with_deploy_code(bytecode);
-
         let deploy_time = Instant::now();
-        let contract_address = provider
-            .send_transaction(tx)
-            .await?
-            .get_receipt()
-            .await?
+        let pending_transaction = provider.send_transaction(tx).await?;
+        let transaction_reciept = pending_transaction.get_receipt().await?;
+        let contract_address = transaction_reciept
             .contract_address
-            .expect("Failed to get contract address");
+            .ok_or(eyre!("Failed to get contract address"))?;
 
         info!(
             "Deployed {:?} contract at address: {:?} took {} ms\n",
@@ -550,8 +856,30 @@ impl RpcProvider {
             contract_address.to_string(),
             deploy_time.elapsed().as_millis()
         );
+
+        perform_post_deployment_transaction(
+            provider,
+            contract_name,
+            sender_address,
+            chain_id,
+            contract_address,
+        )
+        .await?;
+
         self.set_contract_address(contract_name, &contract_address);
-        Ok(format!("CONTRACT_ADDRESS set to {contract_address}"))
+
+        match self
+            .read_contract_bytecode(&contract_address, timeout_duration)
+            .await
+        {
+            Ok(read_byte_code) => {
+                self.set_deployed_code(contract_name, &read_byte_code);
+            }
+            Err(e) => {
+                error!("Can't read deployed code for contract {contract_name} Error -> {e}");
+            }
+        };
+        Ok(format!("{contract_name} address set to {contract_address}"))
     }
 
     pub async fn can_read_contract_bytecode(
@@ -564,6 +892,17 @@ impl RpcProvider {
             .map(|r| r.is_ok_and(|bytecode| bytecode.to_string() != "0x"))
     }
 
+    pub async fn read_contract_bytecode(
+        &self,
+        addr: &Address,
+        timeout_duration: Duration,
+    ) -> Result<Bytes> {
+        Ok(
+            actix_web::rt::time::timeout(timeout_duration, self.provider.get_code_at(*addr))
+                .await??,
+        )
+    }
+
     pub fn url(&self) -> Url {
         self.rpc_url.clone()
     }
@@ -572,23 +911,29 @@ impl RpcProvider {
         let address = self.get_contract_address(contract_name).ok();
         let network = self.network.as_str();
         if let Some(addr) = address {
-            info!("Contract {contract_name} for network {network} address set to {addr}. Checking if contract exists ...");
-
             let result = self
-                .can_read_contract_bytecode(&addr, Duration::from_secs(5))
+                .read_contract_bytecode(&addr, Duration::from_secs(5))
                 .await;
             match result {
-                Ok(exists) => {
+                Ok(byte_code) => {
+                    let exists = !byte_code.is_empty();
                     if exists {
-                        info!(
-                            "Contract for network {} exists on address {}",
-                            network, addr
-                        );
+                        if let Some(expected_byte_code) = self
+                            .get_contract(contract_name)
+                            .and_then(|x| x.deployed_byte_code)
+                        {
+                            let a = byte_code.0.to_vec();
+                            let same_byte_code = expected_byte_code.eq(&a);
+                            if same_byte_code {
+                                info!("Contract {contract_name} exists in network {network} on {addr} matching byte code!");
+                            } else {
+                                warn!("Contract {contract_name} exists in network {network} on {addr} but bytecode differs! Found {byte_code:?} expected {expected_byte_code:?}");
+                            }
+                        } else {
+                            warn!("Contract {contract_name} exists in network {network} on {addr} and reference code provided");
+                        }
                     } else {
-                        warn!(
-                            "No contract for network {} exists on address {}",
-                            network, addr
-                        );
+                        warn!("Contract {contract_name} not found in network {network} on {addr}");
                     }
                 }
                 Err(e) => {
@@ -596,14 +941,11 @@ impl RpcProvider {
                 }
             };
         } else {
-            warn!(
-                "No contract address for {contract_name} set for network {}",
-                network
-            );
+            warn!("Contract {contract_name} no address set for network {network}");
         }
     }
 
-    pub async fn load_history_from_chain(
+    pub async fn load_history_from_chain_for_feed(
         &mut self,
         feed_id: FeedId,
         limit_entries: u32,
@@ -619,6 +961,7 @@ impl RpcProvider {
             } else {
                 num_updates as u32
             };
+
             let Some(capacity) = self.get_history_capacity(feed_id) else {
                 return Err(eyre!("History is not registered for feed id = {feed_id}"));
             };
@@ -627,17 +970,15 @@ impl RpcProvider {
             } else {
                 limit as u32
             };
-
             let end_update_num = num_updates + 1;
             let mut start_update_num = (num_updates + 1) - (limit as u128);
-
             let last_update_num = self.get_last_update_num_from_history(feed_id);
+
             if start_update_num < last_update_num + 1 {
                 start_update_num = last_update_num + 1
             }
 
             let range = start_update_num..end_update_num;
-
             let updates = range.collect::<Vec<u128>>();
             let values = self
                 .get_historical_values_for_feed(feed_id, &updates)
@@ -665,6 +1006,22 @@ impl RpcProvider {
         }
     }
 
+    pub async fn load_history_from_chain(&mut self) -> Result<u32> {
+        let mut f: Vec<(FeedId, u32)> = vec![];
+        for (feed_id, buff) in &self.history.aggregate_history {
+            if buff.occupied_len() == 0 {
+                let len = buff.vacant_len().try_into().unwrap();
+                f.push((*feed_id, len));
+            }
+        }
+        let mut total = 0_u32;
+        for (feed_id, len) in f {
+            let entries = self.load_history_from_chain_for_feed(feed_id, len).await?;
+            total += entries;
+        }
+        Ok(total)
+    }
+
     pub fn inc_num_tx_in_progress(&mut self) {
         self.num_tx_in_progress += 1;
     }
@@ -681,6 +1038,40 @@ impl RpcProvider {
         self.num_tx_in_progress
     }
 }
+
+async fn perform_post_deployment_transaction(
+    provider: &ProviderType,
+    contract_name: &str,
+    sender_address: Address,
+    chain_id: u64,
+    to_address: Address,
+) -> Result<(), eyre::Error> {
+    if contract_name == ADFS_ACCESS_CONTROL_CONTRACT_NAME {
+        let input = DynSolValue::Tuple(vec![
+            DynSolValue::Address(sender_address),
+            DynSolValue::Bool(true),
+        ])
+        .abi_encode_packed();
+
+        let tx_input = TransactionInput::new(Bytes::from(input));
+        let tx = TransactionRequest::default()
+            .to(to_address)
+            .from(sender_address)
+            .with_chain_id(chain_id)
+            .input(tx_input);
+
+        let pending_transaction = provider.send_transaction(tx).await?;
+        let transaction_reciept = pending_transaction.get_receipt().await?;
+        info!("Performed post deployment transaction reciept = {transaction_reciept:?}");
+    };
+    Ok(())
+}
+
+fn extend_byte_code_with_address(address: Address, bytecode: &mut Vec<u8>) {
+    let message_value = DynSolValue::Tuple(vec![DynSolValue::Address(address)]);
+    let mut encoded_arg = message_value.abi_encode();
+    bytecode.append(&mut encoded_arg);
+}
 // pub fn print_type<T>(_: &T) {
 //     println!("{:?}", std::any::type_name::<T>());
 // }
@@ -693,12 +1084,20 @@ mod tests {
         rpc::types::eth::request::TransactionRequest,
     };
     use alloy_primitives::address;
+    use blocksense_registry::config::FeedConfig;
     use blocksense_utils::test_env::get_test_private_key_path;
+    use tracing::info_span;
 
+    use crate::providers::eth_send_utils::eth_batch_send_to_all_contracts;
     use crate::providers::provider::get_rpc_providers;
+    use crate::sequencer_state::create_sequencer_state_and_collected_futures;
     use alloy::consensus::Transaction;
     use alloy::providers::Provider as AlloyProvider;
-    use blocksense_config::get_test_config_with_single_provider;
+    use blocksense_config::{
+        get_test_config_with_single_provider, test_feed_config, ADFS_ACCESS_CONTROL_CONTRACT_NAME,
+    };
+    use blocksense_feed_registry::types::Repeatability::Periodic;
+    use std::time::UNIX_EPOCH;
 
     #[tokio::test]
     async fn basic_test_provider() -> Result<()> {
@@ -807,5 +1206,238 @@ mod tests {
 
         // assert
         assert_eq!(result.len(), 1);
+    }
+
+    #[actix_web::test]
+    async fn test_reading_adfs_counters_and_values() -> Result<()> {
+        let metrics_prefix = "test_reading_adfs_counters_and_values";
+
+        let span = info_span!("test_reading_adfs_counters_and_values");
+        let _guard = span.enter();
+
+        let network = "ETH4378";
+        //let fork_url = "https://rpc-gel-sepolia.inkonchain.com";
+        //let anvil = Anvil::new().fork(fork_url).try_spawn()?;
+        let anvil = Anvil::new().try_spawn()?;
+
+        let key_path = get_test_private_key_path();
+
+        let mut sequencer_config =
+            get_test_config_with_single_provider(network, key_path.as_path(), &anvil.endpoint());
+
+        let feed_id = 31;
+        let stride = 0;
+        let feeds: Vec<FeedConfig> = (16..32)
+            .map(|feed_id| test_feed_config(feed_id, stride))
+            .collect();
+        let feeds_config = AllFeedsConfig { feeds };
+
+        let p_entry = sequencer_config.providers.entry(network.to_string());
+        p_entry.and_modify(|p| {
+            if let Some(x) = p
+                .contracts
+                .iter_mut()
+                .find(|x| x.name == MULTICALL_CONTRACT_NAME)
+            {
+                x.address = None;
+                x.creation_byte_code = Some(Multicall::BYTECODE.to_string());
+            }
+        });
+
+        let (sequencer_state, collected_futures) = create_sequencer_state_and_collected_futures(
+            sequencer_config.clone(),
+            metrics_prefix,
+            feeds_config.clone(),
+        )
+        .await;
+        let msg = sequencer_state
+            .deploy_contract(network, ADFS_ACCESS_CONTROL_CONTRACT_NAME)
+            .await
+            .expect("ADFS access control contract deployment failed!");
+        info!("{msg}");
+        let msg = sequencer_state
+            .deploy_contract(network, ADFS_CONTRACT_NAME)
+            .await
+            .expect("Data feed publishing contract deployment failed!");
+        info!("{msg}");
+        let msg = sequencer_state
+            .deploy_contract(network, MULTICALL_CONTRACT_NAME)
+            .await
+            .expect("Error when deploying multicall contract!");
+        info!("{msg}");
+        let rpc_provider_mutex = sequencer_state.get_provider(network).await.clone().unwrap();
+        let (adfs_address, multicall_address, adfs_deployed_byte_code) = {
+            let mut rpc_provider = rpc_provider_mutex.lock().await;
+            rpc_provider.history.register_feed(feed_id, 100);
+            let contract_version = rpc_provider.get_latest_contract_version(Periodic);
+            assert_eq!(contract_version, 2);
+
+            let block_number = rpc_provider.provider.get_block_number().await.unwrap();
+            //println!("Block number from provider = {number}");
+            //let block_num_at_time_of_writing_this_test = 16500374_u64;
+            let block_num_at_time_of_writing_this_test = 0_u64;
+            assert!(block_number > block_num_at_time_of_writing_this_test);
+            let last_round = rpc_provider
+                .get_latest_round(&feed_id, stride.into())
+                .await
+                .unwrap();
+            let r = last_round.first().expect("One round is expected");
+            assert_eq!(r.feed_id, feed_id);
+            assert_eq!(r.round, 0);
+            (
+                rpc_provider
+                    .get_contract(ADFS_CONTRACT_NAME)
+                    .unwrap()
+                    .address
+                    .unwrap(),
+                rpc_provider
+                    .get_contract(MULTICALL_CONTRACT_NAME)
+                    .unwrap()
+                    .address
+                    .unwrap(),
+                blocksense_utils::to_hex_string(
+                    rpc_provider
+                        .get_contract(ADFS_CONTRACT_NAME)
+                        .unwrap()
+                        .deployed_byte_code
+                        .unwrap(),
+                    None,
+                ),
+            )
+        };
+
+        {
+            let feed = test_feed_config(feed_id, stride);
+            // Some arbitrary point in time in the past, nothing special about this value
+            let first_report_start_time = UNIX_EPOCH + Duration::from_secs(1524885322);
+            let end_slot_timestamp = first_report_start_time.elapsed().unwrap().as_millis();
+            let interval_ms = feed.schedule.interval_ms as u128;
+            let v1 = VotedFeedUpdate {
+                feed_id: feed.id,
+                value: FeedType::Numerical(103082.01f64),
+                end_slot_timestamp: end_slot_timestamp + interval_ms,
+            };
+            let v2 = VotedFeedUpdate {
+                feed_id: feed.id,
+                value: FeedType::Numerical(103012.21f64),
+                end_slot_timestamp: end_slot_timestamp + interval_ms * 2,
+            };
+
+            let v3 = VotedFeedUpdate {
+                feed_id: feed.id,
+                value: FeedType::Numerical(104011.78f64),
+                end_slot_timestamp: end_slot_timestamp + interval_ms * 3,
+            };
+
+            let updates1 = BatchedAggregatesToSend {
+                block_height: 1,
+                updates: vec![v1],
+            };
+            let updates2 = BatchedAggregatesToSend {
+                block_height: 2,
+                updates: vec![v2],
+            };
+            let updates3 = BatchedAggregatesToSend {
+                block_height: 3,
+                updates: vec![v3],
+            };
+
+            let p1 =
+                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates1, Periodic).await;
+            assert!(p1.is_ok());
+
+            let p2 =
+                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates2, Periodic).await;
+            assert!(p2.is_ok());
+
+            let p3 =
+                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates3, Periodic).await;
+            assert!(p3.is_ok());
+        }
+
+        tokio::time::sleep(Duration::from_millis(2000)).await;
+
+        {
+            let rpc_provider = rpc_provider_mutex.lock().await;
+            let contract_version = rpc_provider.get_latest_contract_version(Periodic);
+            assert_eq!(contract_version, 2);
+
+            let block_number = rpc_provider.provider.get_block_number().await.unwrap();
+            let block_num_at_time_of_writing_this_test = 3_u64;
+            assert!(block_number > block_num_at_time_of_writing_this_test);
+
+            let last_values = rpc_provider.get_latest_values(&[feed_id]).await;
+            info!("last_values = {last_values:?}");
+
+            let last_round = rpc_provider
+                .get_latest_round(&feed_id, stride.into())
+                .await
+                .unwrap();
+            let r = last_round.first().expect("One round is expected");
+            assert_eq!(r.feed_id, feed_id);
+            assert_eq!(r.round, 2)
+        }
+        // Wait for all threads to JOIN
+        for x in collected_futures.iter() {
+            info!("Aborting future = {:?}", x.id());
+            x.abort();
+        }
+        // this simulates a second boot of the sequencer
+        // contracts are already deployed
+        let mut sequencer_config2 = sequencer_config.clone();
+        let p_entry = sequencer_config2.providers.entry(network.to_string());
+        p_entry.and_modify(|p| {
+            if let Some(x) = p
+                .contracts
+                .iter_mut()
+                .find(|x| x.name == MULTICALL_CONTRACT_NAME)
+            {
+                x.address = Some(multicall_address.to_string());
+            }
+            if let Some(x) = p
+                .contracts
+                .iter_mut()
+                .find(|x| x.name == ADFS_CONTRACT_NAME)
+            {
+                x.address = Some(adfs_address.to_string());
+                x.deployed_byte_code = Some(adfs_deployed_byte_code)
+            }
+            p.publishing_criteria.push(PublishCriteria {
+                feed_id,
+                skip_publish_if_less_then_percentage: 0.5,
+                always_publish_heartbeat_ms: Some(864000),
+                peg_to_value: None,
+                peg_tolerance_percentage: 0.5,
+            });
+        });
+
+        let metrics_prefix2 = "test_reading_adfs_counters_and_values2";
+        let new_rpc_providers =
+            init_shared_rpc_providers(&sequencer_config2, Some(metrics_prefix2), &feeds_config)
+                .await;
+        {
+            let new_rpc_provider = new_rpc_providers
+                .read()
+                .await
+                .get(network)
+                .cloned()
+                .unwrap();
+            let provider = new_rpc_provider.lock().await;
+            let counters = &provider.round_counters;
+            assert_eq!(Some(2), counters.get(&feed_id).copied());
+
+            let x = provider.get_latest_values(&[feed_id]).await.unwrap();
+            assert_eq!(x.len(), 1);
+            let v = x[0].clone().unwrap();
+            assert_eq!(v.num_updates, 2);
+            assert_eq!(v.value, FeedType::Numerical(104011.78f64));
+
+            let v = provider.history.get(feed_id).unwrap();
+            let v = v.last().unwrap();
+            assert_eq!(v.update_number, 2);
+            assert_eq!(v.value, FeedType::Numerical(104011.78f64));
+        }
+
+        Ok(())
     }
 }
