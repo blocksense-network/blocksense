@@ -815,7 +815,10 @@ pub mod tests {
             let body = test::read_body(resp).await;
             let body_str = std::str::from_utf8(&body).expect("Failed to read body");
             let contract_address = extract_eth_address(body_str).unwrap();
-            assert_eq!(body_str.len(), 66);
+            assert_eq!(
+                contract_address,
+                "0xef11D1c2aA48826D4c41e54ab82D1Ff5Ad8A64Ca"
+            );
 
             // Assert we can read bytecode from that address
             let extracted_address = Address::from_str(&contract_address).ok().unwrap();
