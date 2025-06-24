@@ -3925,6 +3925,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "eth_relayer"
+version = "0.1.1"
+dependencies = [
+ "alloy",
+ "anyhow",
+ "blocksense-config",
+ "blocksense-crypto",
+ "blocksense-data-feeds",
+ "blocksense-feed-registry",
+ "blocksense-utils",
+ "curl",
+ "futures",
+ "json-patch",
+ "port_scanner",
+ "regex",
+ "reqwest 0.12.12",
+ "serde 1.0.217",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "url",
+]
+
+[[package]]
 name = "event-listener"
 version = "2.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"

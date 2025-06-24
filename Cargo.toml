@@ -3,6 +3,7 @@ members = [
   "apps/cli",
   "apps/sequencer",
   "apps/sequencer_tests",
+  "apps/eth_relayer",
   "apps/trigger-oracle",
   "libs/alpaca_core",
   "libs/anomaly_detection",
