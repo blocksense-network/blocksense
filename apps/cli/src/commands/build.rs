@@ -119,7 +119,7 @@ impl BuildConfig {
 
         let retry_policy = ExponentialBackoff::builder()
             .retry_bounds(Duration::from_secs(1), Duration::from_secs(6))
-            .build_with_total_retry_duration_and_max_retries(Duration::from_secs(24));
+            .build_with_total_retry_duration_and_max_retries(Duration::from_secs(124));
         let client = ClientBuilder::new(reqwest::Client::new())
             // Retry failed requests.
             .with(RetryTransientMiddleware::new_with_policy(retry_policy))
