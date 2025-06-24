@@ -93,6 +93,7 @@ let
           environment = [
             "RUST_LOG=${log-level}"
             "SPIN_DATA_DIR=${config.devenv.root}/target/spin-artifacts"
+            "LD_LIBRARY_PATH=${lib.makeLibraryPath self'.legacyPackages.commonLibDeps}"
           ];
           depends_on = {
             blocksense-sequencer.condition = "process_healthy";
@@ -112,13 +113,16 @@ let
             -H 'content-type: application/json'
         '';
         initial_delay_seconds = 0;
-        period_seconds = 1;
+        period_seconds = 10;
         timeout_seconds = 30;
+        success_threshold = 1;
+        failure_threshold = 10;
       };
       environment = [
         "FEEDS_CONFIG_DIR=${feedsConfigDir}"
         "SEQUENCER_CONFIG_DIR=${cfg.config-dir}"
         "SEQUENCER_LOG_LEVEL=${lib.toUpper cfg.sequencer.log-level}"
+        "LD_LIBRARY_PATH=${lib.makeLibraryPath self'.legacyPackages.commonLibDeps}"
       ];
       shutdown.signal = 9;
       depends_on = lib.mapAttrs' (name: value: {

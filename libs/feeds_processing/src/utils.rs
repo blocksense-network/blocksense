@@ -409,6 +409,7 @@ pub async fn validate(
 
 #[cfg(test)]
 pub mod tests {
+    use crate::adfs_gen_calldata::RoundCounters;
     use std::collections::HashSet;
 
     use super::*;
@@ -493,8 +494,7 @@ pub mod tests {
                 end_slot_timestamp: 1677654323,
             },
         ];
-
-        let mut feeds_rounds: HashMap<FeedId, u64> = HashMap::new();
+        let mut feeds_rounds: RoundCounters = HashMap::new();
         feeds_rounds.insert(1, 1000);
         feeds_rounds.insert(5, 2000);
         feeds_rounds.insert(11, 3000);
