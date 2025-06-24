@@ -3,6 +3,7 @@ members = [
   "apps/cli",
   "apps/sequencer",
   "apps/sequencer_tests",
+  "apps/eth_relayer",
   "apps/trigger-oracle",
   "apps/oracles/cex-price-feeds",
   "apps/oracles/exsat-holdings",
