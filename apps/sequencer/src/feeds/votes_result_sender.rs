@@ -70,7 +70,6 @@ pub async fn votes_result_sender_loop(
         .expect("Failed to spawn votes result sender!")
 }
 
-
 async fn aggregated_updates_to_publishers(
     sequencer_state: &Data<SequencerState>,
     updates: &BatchedAggegratesToSend,
