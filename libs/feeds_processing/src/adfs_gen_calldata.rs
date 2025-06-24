@@ -275,7 +275,7 @@ pub mod tests {
 
     fn setup_updates_rounds_and_config() -> (
         BatchedAggregatesToSend,
-        HashMap<FeedId, u64>,
+        RoundCounters,
         HashMap<FeedId, FeedStrideAndDecimals>,
     ) {
         let updates = BatchedAggregatesToSend {

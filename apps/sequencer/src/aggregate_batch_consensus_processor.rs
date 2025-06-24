@@ -1,27 +1,27 @@
-use actix_web::web::Data;
-use alloy::hex::ToHexExt;
-use blocksense_config::BlockConfig;
-use blocksense_feed_registry::{registry::SlotTimeTracker, types::Repeatability};
-use blocksense_gnosis_safe::data_types::ReporterResponse;
-use blocksense_gnosis_safe::utils::{signature_to_bytes, SignatureWithAddress};
-use blocksense_metrics::{inc_metric, process_provider_getter};
-use blocksense_utils::time::current_unix_time;
-use blocksense_utils::FeedId;
-use paste::paste;
-use tokio::sync::mpsc::UnboundedReceiver;
-use tracing::{debug, error, info, warn};
-
 use crate::providers::eth_send_utils::{
     decrement_feeds_round_indexes, get_nonce, get_tx_retry_params, inc_retries_with_backoff,
     log_gas_used,
 };
-use crate::providers::provider::{parse_eth_address, RpcProvider, GNOSIS_SAFE_CONTRACT_NAME};
+use crate::providers::provider::{parse_eth_address, RpcProvider};
 use crate::sequencer_state::SequencerState;
+use actix_web::web::Data;
+use alloy::hex::ToHexExt;
 use alloy_primitives::{Address, Bytes};
+use blocksense_config::BlockConfig;
+use blocksense_config::GNOSIS_SAFE_CONTRACT_NAME;
+use blocksense_feed_registry::{registry::SlotTimeTracker, types::Repeatability};
+use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_gnosis_safe::utils::SafeMultisig;
+use blocksense_gnosis_safe::utils::{signature_to_bytes, SignatureWithAddress};
+use blocksense_metrics::{inc_metric, process_provider_getter};
+use blocksense_utils::time::current_unix_time;
+use blocksense_utils::FeedId;
 use futures_util::stream::{FuturesUnordered, StreamExt};
+use paste::paste;
 use std::time::Instant;
 use std::{io::Error, time::Duration};
+use tokio::sync::mpsc::UnboundedReceiver;
+use tracing::{debug, error, info, warn};
 
 pub async fn aggregation_batch_consensus_loop(
     sequencer_state: Data<SequencerState>,
@@ -113,9 +113,26 @@ pub async fn aggregation_batch_consensus_loop(
 
                         // Get quorum size from config before locking batches_awaiting_consensus!
                         let safe_min_quorum = {
-                            let sequencer_config = sequencer_state.sequencer_config.read().await;
-                            match sequencer_config.providers.get(net) {
-                                Some(v) => v.safe_min_quorum,
+                            let sequencer_providers = sequencer_state.providers.read().await;
+                            match sequencer_providers.get(net) {
+                                Some(p) => {
+                                    let contract_opt = p.lock().await.get_contract(GNOSIS_SAFE_CONTRACT_NAME);
+                                    let contract = match contract_opt {
+                                        Some(c) => c,
+                                        None => {
+                                            error!("No safe contract set for network {net}!");
+                                            continue;
+                                        }
+                                    };
+
+                                    match contract.min_quorum {
+                                        Some(q) => q,
+                                        None => {
+                                            error!("Variable safe_min_quorum not set for network {net}!");
+                                            continue;
+                                        }
+                                    }
+                                }
                                 None => {
                                     error!("Trying to get the quorum size of a non existent network!");
                                     continue

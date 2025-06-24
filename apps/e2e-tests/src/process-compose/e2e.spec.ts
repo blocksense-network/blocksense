@@ -55,7 +55,9 @@ describe.sequential('E2E Tests with process-compose', async () => {
         }
       },
       1000,
-      10,
+      // Wait for the processes to start - start time is 2 mins but it still has status "pending"
+      // so add 1 more minute to ensure they are started
+      180,
     );
     expect(equal).toBe(true);
   });
@@ -75,8 +77,9 @@ describe.sequential('E2E Tests with process-compose', async () => {
 
     // Collect initial information for the feeds and their prices
     const url = sequencerConfig.providers[network].url;
-    const contractAddress = sequencerConfig.providers[network]
-      .contract_address as `0x${string}`;
+    const contractAddress = sequencerConfig.providers[network].contracts.find(
+      c => c.name === 'AggregatedDataFeedStore',
+    )!.address as `0x${string}`;
     const allow_feeds = sequencerConfig.providers[network].allow_feeds;
 
     feedIds = allow_feeds?.length
