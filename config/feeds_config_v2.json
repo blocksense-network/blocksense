@@ -41706,6 +41706,150 @@
       }
     },
     {
+      "id": "1000008",
+      "full_name": "cbETH / USD",
+      "description": "Price of Coinbase Wrapped Staked ETH (cbETH) in USD",
+      "type": "price-feed",
+      "oracle_id": "gecko-terminal",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "cbETH",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": [
+          {
+            "network": "base",
+            "pool": "0x47ca96ea59c13f72745928887f84c9f52c3d7348",
+            "reverse": false,
+            "min_volume_usd": 0
+          },
+          {
+            "network": "base",
+            "pool": "0x11c1fbd4b3de66bc0565779b35171a6cf3e71f59",
+            "reverse": false,
+            "min_volume_usd": 0
+          },
+          {
+            "network": "base",
+            "pool": "0x257fcbae4ac6b26a02e4fc5e1a11e4174b5ce395",
+            "reverse": false,
+            "min_volume_usd": 0
+          },
+          {
+            "network": "base",
+            "pool": "0x9bb646bf0f4da44bfaf3d899e774de065731edfe",
+            "reverse": false,
+            "min_volume_usd": 0
+          },
+          {
+            "network": "base",
+            "pool": "0xc715096eecc3f4a0fdbff055a3db2926adc83244",
+            "reverse": false,
+            "min_volume_usd": 0
+          },
+          {
+            "network": "base",
+            "pool": "0x39f44f152b989575f31366ad60c31bfe96f1bef5",
+            "reverse": false,
+            "min_volume_usd": 0
+          },
+          {
+            "network": "base",
+            "pool": "0xa9dafa443a02fbc907cb0093276b3e6f4ef02a46",
+            "reverse": false,
+            "min_volume_usd": 0
+          },
+          {
+            "network": "base",
+            "pool": "0x4dcec147060ee0337f1fc22d43a3912ad979fce9",
+            "reverse": false,
+            "min_volume_usd": 0
+          }
+        ]
+      }
+    },
+    {
+      "id": "1000009",
+      "full_name": "cbBTC / USD",
+      "description": "Price of Coinbase Wrapped BTC (cbBTC) in USD",
+      "type": "price-feed",
+      "oracle_id": "gecko-terminal",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "cbBTC",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": [
+          {
+            "network": "base",
+            "pool": "0x70acdf2ad0bf2402c957154f944c19ef4e1cbae1",
+            "reverse": false,
+            "min_volume_usd": 0
+          },
+          {
+            "network": "base",
+            "pool": "0x4e962bb3889bf030368f56810a9c96b83cb3e778",
+            "reverse": false,
+            "min_volume_usd": 0
+          },
+          {
+            "network": "base",
+            "pool": "0xc211e1f853a898bd1302385ccde55f33a8c4b3f3",
+            "reverse": false,
+            "min_volume_usd": 0
+          },
+          {
+            "network": "base",
+            "pool": "0xfbb6eed8e7aa03b138556eedaf5d271a5e1e43ef",
+            "reverse": false,
+            "min_volume_usd": 0
+          },
+          {
+            "network": "base",
+            "pool": "0xb94b22332abf5f89877a14cc88f2abc48c34b3df",
+            "reverse": false,
+            "min_volume_usd": 0
+          },
+          {
+            "network": "base",
+            "pool": "0x8c7080564b5a792a33ef2fd473fba6364d5495e5",
+            "reverse": false,
+            "min_volume_usd": 0
+          }
+        ]
+      }
+    },
+    {
       "id": "2000000",
       "full_name": "IBIT / USD",
       "description": "Price of iShares Bitcoin Trust ETF ($IBIT) in USD",
