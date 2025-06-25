@@ -1,9 +1,9 @@
 {
   "name": "@blocksense/changelog-generator",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "license": "MIT",
-  "description": "An Effect app related with Release notes functionality",
+  "description": "Blocksense Changelog Generator",
   "bin": "./dist/bin.cjs",
   "scripts": {
     "build": "tsup --dts && yarn copy-package-json",
