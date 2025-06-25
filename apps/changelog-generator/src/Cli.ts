@@ -1,5 +1,7 @@
 import { Command } from '@effect/cli';
 
+import packageJson from '../package.json';
+
 import { listFeeds } from './commands/list-feeds';
 
 const command = Command.make('changelog-generator').pipe(
@@ -7,6 +9,6 @@ const command = Command.make('changelog-generator').pipe(
 );
 
 export const run = Command.run(command, {
-  name: 'Changelog Generator',
-  version: '0.1.0',
+  name: packageJson.description,
+  version: packageJson.version,
 });
