@@ -28,7 +28,7 @@ with lib;
 
     default-exec-interval = mkOption {
       type = types.int;
-      default = 10;
+      default = 1;
       description = "Default component execution interval in seconds";
     };
 

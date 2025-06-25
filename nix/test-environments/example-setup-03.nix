@@ -199,10 +199,10 @@ in
       };
     };
 
-    reporters.a.default-exec-interval = lib.mkForce 10;
+    reporters.a.default-exec-interval = lib.mkForce 1;
 
     oracles = {
-      cex-price-feeds.exec-interval = lib.mkForce 10;
+      cex-price-feeds.exec-interval = lib.mkForce 1;
       exsat-holdings.exec-interval = lib.mkForce 10;
       gecko-terminal.exec-interval = lib.mkForce 10;
       eth-rpc.exec-interval = lib.mkForce 10;
