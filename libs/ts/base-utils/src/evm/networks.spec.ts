@@ -109,17 +109,17 @@ describe('Network constants tests', () => {
     );
 
     expect(getTxHashExplorerUrl('ethereum-mainnet', txHash)).toEqual(
-      `https://eth.blockscout.com/tx/${txHash}`,
+      `https://etherscan.io/tx/${txHash}`,
     );
     expect(getAddressExplorerUrl('ethereum-mainnet', address)).toEqual(
-      `https://eth.blockscout.com/address/${address}`,
+      `https://etherscan.io/address/${address}`,
     );
 
     expect(getTxHashExplorerUrl('ethereum-sepolia', txHash)).toEqual(
-      `https://eth-sepolia.blockscout.com/tx/${txHash}`,
+      `https://sepolia.etherscan.io/tx/${txHash}`,
     );
     expect(getAddressExplorerUrl('ethereum-sepolia', address)).toEqual(
-      `https://eth-sepolia.blockscout.com/address/${address}`,
+      `https://sepolia.etherscan.io/address/${address}`,
     );
   });
 });
