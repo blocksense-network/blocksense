@@ -1,4 +1,9 @@
-{ lib, cfg, ... }:
+{
+  lib,
+  cfg,
+  name,
+  ...
+}:
 with lib;
 {
   options = {
@@ -22,7 +27,7 @@ with lib;
 
     metrics-url = mkOption {
       type = types.str;
-      default = "http://0.0.0.0:9091/metrics/job/reporter";
+      default = "http://observatory:9091/metrics/job/reporter-${name}";
       description = "The url of the metrics service.";
     };
 
