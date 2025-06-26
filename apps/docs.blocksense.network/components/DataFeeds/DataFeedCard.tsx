@@ -4,7 +4,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from '@blocksense/ui/Card';
+} from '@blocksense/docs-ui/Card';
 import { DataFeedCardContent } from '@/components/DataFeeds/DataFeedCardContent';
 
 type DataFeedCardProps = {

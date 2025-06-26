@@ -5,8 +5,8 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-} from '@blocksense/ui/Card';
-import { InfoTip } from '@blocksense/ui/InfoTip';
+} from '@blocksense/docs-ui/Card';
+import { InfoTip } from '@blocksense/docs-ui/InfoTip';
 import { DataFeedCardContent } from '@/components/DataFeeds/DataFeedCardContent';
 
 type DataFeedCardSectionProps = {

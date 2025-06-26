@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Button } from 'nextra/components';
 
-import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
+import { ImageWrapper } from '@blocksense/docs-ui/ImageWrapper';
 import { capitalizeWords } from '@/src/utils';
 
 type NetworkIconProps = {

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import type { FC } from 'react';
 
 import { gettingStartedConfig } from '@/config';
-import { Button } from '@blocksense/ui/Button';
+import { Button } from '@blocksense/docs-ui/Button';
 
 export const metadata: Metadata = {
   title: 'Home',

@@ -2,7 +2,7 @@ import React from 'react';
 
 import Link from 'next/link';
 
-import { Icon } from '@blocksense/ui/Icon';
+import { Icon } from '@blocksense/docs-ui/Icon';
 import { config } from '@/config';
 import { ghContractFolder } from '@/src/constants';
 

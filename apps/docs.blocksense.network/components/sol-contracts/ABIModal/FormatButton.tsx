@@ -1,8 +1,8 @@
 import React from 'react';
 
-import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
+import { ImageWrapper } from '@blocksense/docs-ui/ImageWrapper';
 
-import { Button } from '@blocksense/ui/Button';
+import { Button } from '@blocksense/docs-ui/Button';
 
 type FormatButtonProps = {
   formatHandler: () => void;

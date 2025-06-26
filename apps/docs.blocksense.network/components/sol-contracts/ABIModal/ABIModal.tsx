@@ -9,8 +9,8 @@ import {
   DialogTitle,
   DialogClose,
   DialogTrigger,
-} from '@blocksense/ui/Dialog';
-import { ScrollArea } from '@blocksense/ui/ScrollArea';
+} from '@blocksense/docs-ui/Dialog';
+import { ScrollArea } from '@blocksense/docs-ui/ScrollArea';
 import { CodeBlock } from '@/components/common/CodeBlock';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import {
@@ -19,7 +19,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from '@blocksense/ui/Drawer';
+} from '@blocksense/docs-ui/Drawer';
 import { TriggerButton } from '@/components/sol-contracts/ABIModal/TriggerButton';
 import { FormatButton } from '@/components/sol-contracts/ABIModal/FormatButton';
 import { shikiDefaultThemes } from '@/config';
