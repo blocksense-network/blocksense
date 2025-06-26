@@ -1,4 +1,4 @@
-import { artifacts, ethers } from 'hardhat';
+import { artifacts, ethers, viem } from 'hardhat';
 
 import * as utils from './utils/clAggregatorAdapterConsumer';
 import { expect } from 'chai';
@@ -10,9 +10,14 @@ import {
 } from '../utils/wrappers';
 import { encodeDataAndTimestamp } from '../utils/helpers/common';
 
+import { CLAggregatorAdapter as CLAggregatorAdapterViem } from '../../src/CLAggregatorAdapter';
+import { parseEther } from 'viem';
+import { parseEthereumAddress } from '@blocksense/base-utils';
+
 describe('Example: CLAggregatorAdapterConsumer', function () {
   let clAggregatorAdapter: CLAdapterWrapper;
   let clAggregatorAdapterConsumer: CLAggregatorAdapterConsumer;
+  let clAggregatorAdapterViem: CLAggregatorAdapterViem;
 
   beforeEach(async function () {
     const admin = (await ethers.getSigners())[9];
@@ -39,6 +44,18 @@ describe('Example: CLAggregatorAdapterConsumer', function () {
         'CLAggregatorAdapterConsumer',
         clAggregatorAdapter.contract.target,
       );
+
+    const viemPublicClient = await viem.getPublicClient();
+    clAggregatorAdapterViem = new CLAggregatorAdapterViem(
+      parseEthereumAddress(clAggregatorAdapter.contract.target),
+      viemPublicClient,
+    );
+  });
+
+  it.only('Should get decimals with VIEM', async function () {
+    const decimals = await clAggregatorAdapterViem.decimals();
+    console.log('Decimals from VIEM:', decimals);
+    expect(decimals).to.equal(8);
   });
 
   [
