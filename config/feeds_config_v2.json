@@ -557,7 +557,7 @@
               "symbol": ["USDT-USDC"]
             },
             "OKX": {
-              "instId": ["USDT-USD", "USDT-USDC"]
+              "instId": ["USDT-USD"]
             }
           },
           "aggregators": {
@@ -605,9 +605,6 @@
             },
             "KuCoin": {
               "symbol": ["USDT-USDC"]
-            },
-            "OKX": {
-              "instId": ["USDT-USDC"]
             }
           }
         },
@@ -2634,7 +2631,7 @@
               "symbol": ["HBARUSDT"]
             },
             "Bybit": {
-              "symbol": ["HBARUSDT"]
+              "symbol": ["HBARUSDC", "HBARUSDT"]
             },
             "Coinbase": {
               "id": ["HBAR-USD", "HBAR-USDT"]
@@ -2761,6 +2758,9 @@
         "arguments": {
           "exchanges": {
             "Binance": {
+              "symbol": ["HBARUSDC"]
+            },
+            "Bybit": {
               "symbol": ["HBARUSDC"]
             },
             "KuCoin": {
@@ -4458,6 +4458,9 @@
             },
             "OKX": {
               "instId": ["OM-USD", "OM-USDT"]
+            },
+            "Upbit": {
+              "market": ["USDT-OM"]
             }
           },
           "aggregators": {
@@ -4520,6 +4523,9 @@
             },
             "OKX": {
               "instId": ["OM-USDT"]
+            },
+            "Upbit": {
+              "market": ["USDT-OM"]
             }
           }
         },
@@ -5350,6 +5356,9 @@
         "market_hours": "Crypto",
         "arguments": {
           "exchanges": {
+            "BinanceUS": {
+              "symbol": ["HYPEUSD", "HYPEUSDT"]
+            },
             "Bitget": {
               "symbol": ["HYPEUSDT"]
             },
@@ -5360,7 +5369,7 @@
               "symbol": ["HYPE-USDC", "HYPE-USDT"]
             },
             "MEXC": {
-              "symbol": ["HYPEUSDT"]
+              "symbol": ["HYPEUSDC", "HYPEUSDT"]
             }
           },
           "aggregators": {
@@ -5403,6 +5412,9 @@
         "market_hours": "Crypto",
         "arguments": {
           "exchanges": {
+            "BinanceUS": {
+              "symbol": ["HYPEUSDT"]
+            },
             "Bitget": {
               "symbol": ["HYPEUSDT"]
             },
@@ -7106,7 +7118,7 @@
               "symbol": ["AAVEUSDC", "AAVEUSDT"]
             },
             "Bybit": {
-              "symbol": ["AAVEUSDT"]
+              "symbol": ["AAVEUSDC", "AAVEUSDT"]
             },
             "Coinbase": {
               "id": ["AAVE-USD"]
@@ -7285,6 +7297,9 @@
               "symbol": ["AAVEUSDC"]
             },
             "Bitget": {
+              "symbol": ["AAVEUSDC"]
+            },
+            "Bybit": {
               "symbol": ["AAVEUSDC"]
             },
             "MEXC": {
@@ -8104,7 +8119,7 @@
               "symbol": ["POLUSDC", "POLUSDT"]
             },
             "Bybit": {
-              "symbol": ["POLUSDT"]
+              "symbol": ["POLUSDC", "POLUSDT"]
             },
             "Coinbase": {
               "id": ["POL-USD"]
@@ -8276,6 +8291,9 @@
               "symbol": ["POLUSDC"]
             },
             "Bitget": {
+              "symbol": ["POLUSDC"]
+            },
+            "Bybit": {
               "symbol": ["POLUSDC"]
             }
           }
@@ -8644,7 +8662,7 @@
               "symbol": ["ALGOUSDC", "ALGOUSDT"]
             },
             "Bybit": {
-              "symbol": ["ALGOUSDT"]
+              "symbol": ["ALGOUSDC", "ALGOUSDT"]
             },
             "Coinbase": {
               "id": ["ALGO-USD"]
@@ -8781,6 +8799,9 @@
             "Bitget": {
               "symbol": ["ALGOUSDC"]
             },
+            "Bybit": {
+              "symbol": ["ALGOUSDC"]
+            },
             "GateIo": {
               "id": ["ALGO_USDC"]
             },
@@ -8842,7 +8863,7 @@
               "symbol": ["RENDERUSDC", "RENDERUSDT"]
             },
             "Bybit": {
-              "symbol": ["RENDERUSDT"]
+              "symbol": ["RENDERUSDC", "RENDERUSDT"]
             },
             "Coinbase": {
               "id": ["RENDER-USD"]
@@ -8979,6 +9000,9 @@
               "symbol": ["RENDERUSDC"]
             },
             "Bitget": {
+              "symbol": ["RENDERUSDC"]
+            },
+            "Bybit": {
               "symbol": ["RENDERUSDC"]
             },
             "GateIo": {
@@ -9432,7 +9456,7 @@
               "symbol": ["JUPUSDT"]
             },
             "Bybit": {
-              "symbol": ["JUPUSDT"]
+              "symbol": ["JUPUSDC", "JUPUSDT"]
             },
             "CryptoCom": {
               "symbol": ["JUP_USD", "JUP_USDT"]
@@ -9563,6 +9587,9 @@
         "arguments": {
           "exchanges": {
             "Binance": {
+              "symbol": ["JUPUSDC"]
+            },
+            "Bybit": {
               "symbol": ["JUPUSDC"]
             },
             "GateIo": {
@@ -9820,6 +9847,9 @@
             "Bybit": {
               "symbol": ["SUSDT"]
             },
+            "Coinbase": {
+              "id": ["S-USD"]
+            },
             "CryptoCom": {
               "symbol": ["S_USD"]
             },
@@ -10023,7 +10053,7 @@
               "wsname": ["FET/USD"]
             },
             "KuCoin": {
-              "symbol": ["FET-USDT"]
+              "symbol": ["FET-USDC", "FET-USDT"]
             },
             "MEXC": {
               "symbol": ["FETUSDC", "FETUSDT"]
@@ -10149,6 +10179,9 @@
             "GateIo": {
               "id": ["FET_USDC"]
             },
+            "KuCoin": {
+              "symbol": ["FET-USDC"]
+            },
             "MEXC": {
               "symbol": ["FETUSDC"]
             }
@@ -10190,6 +10223,9 @@
             "Binance": {
               "symbol": ["ENAUSDC", "ENAUSDT"]
             },
+            "BinanceUS": {
+              "symbol": ["ENAUSDT"]
+            },
             "Bitfinex": {
               "symbol": ["tENAUSD"]
             },
@@ -10197,7 +10233,10 @@
               "symbol": ["ENAUSDC", "ENAUSDT"]
             },
             "Bybit": {
-              "symbol": ["ENAUSDT"]
+              "symbol": ["ENAUSDC", "ENAUSDT"]
+            },
+            "Coinbase": {
+              "id": ["ENA-USD"]
             },
             "CryptoCom": {
               "symbol": ["ENA_USD", "ENA_USDT"]
@@ -10259,6 +10298,9 @@
             "Binance": {
               "symbol": ["ENAUSDT"]
             },
+            "BinanceUS": {
+              "symbol": ["ENAUSDT"]
+            },
             "Bitget": {
               "symbol": ["ENAUSDT"]
             },
@@ -10316,6 +10358,9 @@
               "symbol": ["ENAUSDC"]
             },
             "Bitget": {
+              "symbol": ["ENAUSDC"]
+            },
+            "Bybit": {
               "symbol": ["ENAUSDC"]
             },
             "GateIo": {
@@ -10584,9 +10629,6 @@
         "market_hours": "Crypto",
         "arguments": {
           "exchanges": {
-            "Bitget": {
-              "symbol": ["ZBUUSDT"]
-            },
             "GateIo": {
               "id": ["ZBU_USDT"]
             },
@@ -10634,9 +10676,6 @@
         "market_hours": "Crypto",
         "arguments": {
           "exchanges": {
-            "Bitget": {
-              "symbol": ["ZBUUSDT"]
-            },
             "GateIo": {
               "id": ["ZBU_USDT"]
             },
@@ -12493,30 +12532,12 @@
             "Bitget": {
               "symbol": ["EOSUSDT"]
             },
-            "Bybit": {
-              "symbol": ["EOSUSDC", "EOSUSDT"]
-            },
             "Coinbase": {
               "id": ["EOS-USD"]
-            },
-            "CryptoCom": {
-              "symbol": ["EOS_USD", "EOS_USDT"]
-            },
-            "GateIo": {
-              "id": ["EOS_USDC", "EOS_USDT"]
             },
             "Kraken": {
               "pair": ["EOSUSD", "EOSUSDC", "EOSUSDT"],
               "wsname": ["EOS/USD", "EOS/USDC", "EOS/USDT"]
-            },
-            "KuCoin": {
-              "symbol": ["EOS-USDC", "EOS-USDT"]
-            },
-            "MEXC": {
-              "symbol": ["EOSUSDC", "EOSUSDT"]
-            },
-            "OKX": {
-              "instId": ["EOS-USD", "EOS-USDC", "EOS-USDT"]
             }
           },
           "aggregators": {
@@ -12606,27 +12627,9 @@
             "Bitget": {
               "symbol": ["EOSUSDT"]
             },
-            "Bybit": {
-              "symbol": ["EOSUSDT"]
-            },
-            "CryptoCom": {
-              "symbol": ["EOS_USDT"]
-            },
-            "GateIo": {
-              "id": ["EOS_USDT"]
-            },
             "Kraken": {
               "pair": ["EOSUSDT"],
               "wsname": ["EOS/USDT"]
-            },
-            "KuCoin": {
-              "symbol": ["EOS-USDT"]
-            },
-            "MEXC": {
-              "symbol": ["EOSUSDT"]
-            },
-            "OKX": {
-              "instId": ["EOS-USDT"]
             }
           }
         },
@@ -12666,24 +12669,9 @@
             "Binance": {
               "symbol": ["EOSUSDC"]
             },
-            "Bybit": {
-              "symbol": ["EOSUSDC"]
-            },
-            "GateIo": {
-              "id": ["EOS_USDC"]
-            },
             "Kraken": {
               "pair": ["EOSUSDC"],
               "wsname": ["EOS/USDC"]
-            },
-            "KuCoin": {
-              "symbol": ["EOS-USDC"]
-            },
-            "MEXC": {
-              "symbol": ["EOSUSDC"]
-            },
-            "OKX": {
-              "instId": ["EOS-USDC"]
             }
           }
         },
@@ -12733,7 +12721,7 @@
               "symbol": ["GALAUSDT"]
             },
             "Bybit": {
-              "symbol": ["GALAUSDT"]
+              "symbol": ["GALAUSDC", "GALAUSDT"]
             },
             "CryptoCom": {
               "symbol": ["GALA_USD", "GALA_USDT"]
@@ -12855,6 +12843,9 @@
         "arguments": {
           "exchanges": {
             "Binance": {
+              "symbol": ["GALAUSDC"]
+            },
+            "Bybit": {
               "symbol": ["GALAUSDC"]
             },
             "GateIo": {
@@ -13438,7 +13429,7 @@
               "symbol": ["BERAUSDT"]
             },
             "Bybit": {
-              "symbol": ["BERAUSDT"]
+              "symbol": ["BERAUSDC", "BERAUSDT"]
             },
             "Coinbase": {
               "id": ["BERA-USD"]
@@ -13572,6 +13563,9 @@
             "Binance": {
               "symbol": ["BERAUSDC"]
             },
+            "Bybit": {
+              "symbol": ["BERAUSDC"]
+            },
             "Kraken": {
               "pair": ["BERAUSDC"],
               "wsname": ["BERA/USDC"]
@@ -13634,6 +13628,9 @@
             },
             "GateIo": {
               "id": ["JTO_USDC", "JTO_USDT"]
+            },
+            "Gemini": {
+              "symbol": ["JTOUSD"]
             },
             "Kraken": {
               "pair": ["JTOUSD"],
@@ -14596,7 +14593,7 @@
               "symbol": ["CRVUSDT"]
             },
             "Bybit": {
-              "symbol": ["CRVUSDT"]
+              "symbol": ["CRVUSDC", "CRVUSDT"]
             },
             "Coinbase": {
               "id": ["CRV-USD"]
@@ -14771,6 +14768,9 @@
         "arguments": {
           "exchanges": {
             "Binance": {
+              "symbol": ["CRVUSDC"]
+            },
+            "Bybit": {
               "symbol": ["CRVUSDC"]
             },
             "GateIo": {
@@ -15328,9 +15328,6 @@
             },
             "GateIo": {
               "id": ["AXS_USDT"]
-            },
-            "Gemini": {
-              "symbol": ["AXSUSD"]
             },
             "Kraken": {
               "pair": ["AXSUSD"],
@@ -15938,7 +15935,7 @@
               "symbol": ["DYDXUSDC", "DYDXUSDT"]
             },
             "Bitget": {
-              "symbol": ["DYDXUSDC", "DYDXUSDT"]
+              "symbol": ["DYDXUSDT"]
             },
             "Bybit": {
               "symbol": ["DYDXUSDT"]
@@ -16063,9 +16060,6 @@
         "arguments": {
           "exchanges": {
             "Binance": {
-              "symbol": ["DYDXUSDC"]
-            },
-            "Bitget": {
               "symbol": ["DYDXUSDC"]
             },
             "OKX": {
@@ -16596,6 +16590,9 @@
             "Bybit": {
               "symbol": ["CAKEUSDT"]
             },
+            "Coinbase": {
+              "id": ["CAKE-USD"]
+            },
             "GateIo": {
               "id": ["CAKE_USDT"]
             },
@@ -16793,10 +16790,6 @@
             },
             "Gemini": {
               "symbol": ["MATICUSD"]
-            },
-            "Kraken": {
-              "pair": ["MATICUSD", "MATICUSDC", "MATICUSDT"],
-              "wsname": ["MATIC/USD", "MATIC/USDC", "MATIC/USDT"]
             }
           },
           "aggregators": {
@@ -16847,10 +16840,6 @@
             },
             "Coinbase": {
               "id": ["MATIC-USDT"]
-            },
-            "Kraken": {
-              "pair": ["MATICUSDT"],
-              "wsname": ["MATIC/USDT"]
             }
           }
         },
@@ -16889,10 +16878,6 @@
           "exchanges": {
             "Binance": {
               "symbol": ["MATICUSDC"]
-            },
-            "Kraken": {
-              "pair": ["MATICUSDC"],
-              "wsname": ["MATIC/USDC"]
             }
           }
         },
@@ -18949,6 +18934,9 @@
             },
             "CryptoCom": {
               "symbol": ["AXL_USD", "AXL_USDT"]
+            },
+            "Upbit": {
+              "market": ["USDT-AXL"]
             }
           },
           "aggregators": {
@@ -19002,6 +18990,9 @@
             },
             "CryptoCom": {
               "symbol": ["AXL_USDT"]
+            },
+            "Upbit": {
+              "market": ["USDT-AXL"]
             }
           }
         },
@@ -19210,6 +19201,9 @@
         "market_hours": "Crypto",
         "arguments": {
           "exchanges": {
+            "BinanceUS": {
+              "symbol": ["SPXUSDT"]
+            },
             "Bybit": {
               "symbol": ["SPXUSDT"]
             },
@@ -19270,6 +19264,9 @@
         "market_hours": "Crypto",
         "arguments": {
           "exchanges": {
+            "BinanceUS": {
+              "symbol": ["SPXUSDT"]
+            },
             "Bybit": {
               "symbol": ["SPXUSDT"]
             },
@@ -20313,8 +20310,14 @@
         "market_hours": "Crypto",
         "arguments": {
           "exchanges": {
+            "BinanceUS": {
+              "symbol": ["FARTCOINUSDT"]
+            },
             "Bitget": {
               "symbol": ["FARTCOINUSDT"]
+            },
+            "Coinbase": {
+              "id": ["FARTCOIN-USD"]
             },
             "CryptoCom": {
               "symbol": ["FARTCOIN_USD"]
@@ -20373,6 +20376,9 @@
         "market_hours": "Crypto",
         "arguments": {
           "exchanges": {
+            "BinanceUS": {
+              "symbol": ["FARTCOINUSDT"]
+            },
             "Bitget": {
               "symbol": ["FARTCOINUSDT"]
             },
@@ -20764,7 +20770,7 @@
               "symbol": ["EIGENUSDT"]
             },
             "Bybit": {
-              "symbol": ["EIGENUSDT"]
+              "symbol": ["EIGENUSDC", "EIGENUSDT"]
             },
             "Coinbase": {
               "id": ["EIGEN-USD"]
@@ -20889,6 +20895,9 @@
         "arguments": {
           "exchanges": {
             "Binance": {
+              "symbol": ["EIGENUSDC"]
+            },
+            "Bybit": {
               "symbol": ["EIGENUSDC"]
             },
             "OKX": {
@@ -22279,6 +22288,9 @@
             },
             "KuCoin": {
               "symbol": ["USDD-USDC", "USDD-USDT"]
+            },
+            "MEXC": {
+              "symbol": ["USDDUSDT"]
             }
           },
           "aggregators": {
@@ -22329,6 +22341,9 @@
             },
             "KuCoin": {
               "symbol": ["USDD-USDT"]
+            },
+            "MEXC": {
+              "symbol": ["USDDUSDT"]
             }
           }
         },
@@ -22629,7 +22644,7 @@
         "arguments": {
           "exchanges": {
             "Binance": {
-              "symbol": ["MASKUSDT"]
+              "symbol": ["MASKUSDC", "MASKUSDT"]
             },
             "BinanceUS": {
               "symbol": ["MASKUSD", "MASKUSDT"]
@@ -22769,7 +22784,13 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
-        "arguments": {},
+        "arguments": {
+          "exchanges": {
+            "Binance": {
+              "symbol": ["MASKUSDC"]
+            }
+          }
+        },
         "compatibility_info": {
           "chainlink": "MASK / USD"
         }
@@ -22976,9 +22997,6 @@
             },
             "GateIo": {
               "id": ["ZRX_USDT"]
-            },
-            "Gemini": {
-              "symbol": ["ZRXUSD"]
             },
             "Kraken": {
               "pair": ["ZRXUSD"],
@@ -23575,7 +23593,7 @@
               "symbol": ["ORDIUSDT"]
             },
             "CryptoCom": {
-              "symbol": ["ORDI_USD", "ORDI_USDT"]
+              "symbol": ["ORDI_USD"]
             },
             "GateIo": {
               "id": ["ORDI_USDC", "ORDI_USDT"]
@@ -23638,9 +23656,6 @@
             },
             "Bybit": {
               "symbol": ["ORDIUSDT"]
-            },
-            "CryptoCom": {
-              "symbol": ["ORDI_USDT"]
             },
             "GateIo": {
               "id": ["ORDI_USDT"]
@@ -25471,7 +25486,7 @@
         "arguments": {
           "exchanges": {
             "Binance": {
-              "symbol": ["SUSHIUSDT"]
+              "symbol": ["SUSHIUSDC", "SUSHIUSDT"]
             },
             "BinanceUS": {
               "symbol": ["SUSHIUSD", "SUSHIUSDT"]
@@ -25643,7 +25658,13 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
-        "arguments": {},
+        "arguments": {
+          "exchanges": {
+            "Binance": {
+              "symbol": ["SUSHIUSDC"]
+            }
+          }
+        },
         "compatibility_info": {
           "chainlink": "SUSHI / USD"
         }
@@ -26104,6 +26125,9 @@
         "market_hours": "Crypto",
         "arguments": {
           "exchanges": {
+            "BinanceUS": {
+              "symbol": ["POPCATUSDT"]
+            },
             "Bybit": {
               "symbol": ["POPCATUSDT"]
             },
@@ -26170,6 +26194,9 @@
         "market_hours": "Crypto",
         "arguments": {
           "exchanges": {
+            "BinanceUS": {
+              "symbol": ["POPCATUSDT"]
+            },
             "Bybit": {
               "symbol": ["POPCATUSDT"]
             },
@@ -26222,6 +26249,9 @@
           "exchanges": {
             "Binance": {
               "symbol": ["TURBOUSDC", "TURBOUSDT"]
+            },
+            "BinanceUS": {
+              "symbol": ["TURBOUSDT"]
             },
             "Bitget": {
               "symbol": ["TURBOUSDT"]
@@ -26290,6 +26320,9 @@
         "arguments": {
           "exchanges": {
             "Binance": {
+              "symbol": ["TURBOUSDT"]
+            },
+            "BinanceUS": {
               "symbol": ["TURBOUSDT"]
             },
             "Bitget": {
@@ -27140,9 +27173,6 @@
             "CryptoCom": {
               "symbol": ["FXS_USD"]
             },
-            "GateIo": {
-              "id": ["FXS_USDT"]
-            },
             "Kraken": {
               "pair": ["FXSUSD"],
               "wsname": ["FXS/USD"]
@@ -27205,9 +27235,6 @@
             },
             "Bybit": {
               "symbol": ["FXSUSDT"]
-            },
-            "GateIo": {
-              "id": ["FXS_USDT"]
             },
             "KuCoin": {
               "symbol": ["FXS-USDT"]
@@ -29760,6 +29787,9 @@
             },
             "MEXC": {
               "symbol": ["ALTUSDT"]
+            },
+            "Upbit": {
+              "market": ["USDT-ALT"]
             }
           },
           "aggregators": {
@@ -29813,6 +29843,9 @@
             },
             "MEXC": {
               "symbol": ["ALTUSDT"]
+            },
+            "Upbit": {
+              "market": ["USDT-ALT"]
             }
           }
         },
@@ -29909,7 +29942,7 @@
               "id": ["SPELL-USD"]
             },
             "CryptoCom": {
-              "symbol": ["SPELL_USD", "SPELL_USDT"]
+              "symbol": ["SPELL_USD"]
             },
             "GateIo": {
               "id": ["SPELL_USDT"]
@@ -29973,9 +30006,6 @@
             },
             "Bybit": {
               "symbol": ["SPELLUSDT"]
-            },
-            "CryptoCom": {
-              "symbol": ["SPELL_USDT"]
             },
             "GateIo": {
               "id": ["SPELL_USDT"]
@@ -30200,9 +30230,6 @@
             },
             "MEXC": {
               "symbol": ["IQUSDT"]
-            },
-            "OKX": {
-              "instId": ["IQ-USD", "IQ-USDT"]
             }
           },
           "aggregators": {
@@ -30256,9 +30283,6 @@
             },
             "MEXC": {
               "symbol": ["IQUSDT"]
-            },
-            "OKX": {
-              "instId": ["IQ-USDT"]
             }
           }
         },
@@ -35320,6 +35344,10 @@
             "GateIo": {
               "id": ["DEGEN_USDT"]
             },
+            "Kraken": {
+              "pair": ["DEGENUSD"],
+              "wsname": ["DEGEN/USD"]
+            },
             "KuCoin": {
               "symbol": ["DEGEN-USDT"]
             },
@@ -36289,7 +36317,7 @@
               "wsname": ["MOODENG/USD"]
             },
             "KuCoin": {
-              "symbol": ["MOODENG-USDT"]
+              "symbol": ["MOODENG-USDC", "MOODENG-USDT"]
             },
             "MEXC": {
               "symbol": ["MOODENGUSDT"]
@@ -36388,6 +36416,9 @@
         "market_hours": "Crypto",
         "arguments": {
           "exchanges": {
+            "KuCoin": {
+              "symbol": ["MOODENG-USDC"]
+            },
             "OKX": {
               "instId": ["MOODENG-USDC"]
             }
@@ -36434,9 +36465,6 @@
             },
             "Coinbase": {
               "id": ["BADGER-USD"]
-            },
-            "CryptoCom": {
-              "symbol": ["BADGER_USD"]
             },
             "GateIo": {
               "id": ["BADGER_USDT"]
@@ -38037,9 +38065,6 @@
             "Kraken": {
               "pair": ["ALCXUSD"],
               "wsname": ["ALCX/USD"]
-            },
-            "OKX": {
-              "instId": ["ALCX-USD", "ALCX-USDT"]
             }
           },
           "aggregators": {
@@ -38087,9 +38112,6 @@
             },
             "GateIo": {
               "id": ["ALCX_USDT"]
-            },
-            "OKX": {
-              "instId": ["ALCX-USDT"]
             }
           }
         },
@@ -38618,9 +38640,6 @@
             },
             "MEXC": {
               "symbol": ["NULSUSDT"]
-            },
-            "OKX": {
-              "instId": ["NULS-USD", "NULS-USDT"]
             }
           },
           "aggregators": {
@@ -38671,9 +38690,6 @@
             },
             "MEXC": {
               "symbol": ["NULSUSDT"]
-            },
-            "OKX": {
-              "instId": ["NULS-USDT"]
             }
           }
         },
@@ -38945,9 +38961,6 @@
           "exchanges": {
             "Binance": {
               "symbol": ["LINAUSDT"]
-            },
-            "GateIo": {
-              "id": ["LINA_USDT"]
             }
           },
           "aggregators": {
@@ -38992,9 +39005,6 @@
           "exchanges": {
             "Binance": {
               "symbol": ["LINAUSDT"]
-            },
-            "GateIo": {
-              "id": ["LINA_USDT"]
             }
           }
         },
@@ -39051,6 +39061,9 @@
             },
             "GateIo": {
               "id": ["TRUMP_USDT"]
+            },
+            "Gemini": {
+              "symbol": ["TRUMPUSD"]
             },
             "Kraken": {
               "pair": ["TRUMPUSD", "TRUMPUSDC", "TRUMPUSDT"],
@@ -39377,9 +39390,6 @@
             "Binance": {
               "symbol": ["ALPACAUSDT"]
             },
-            "Bitget": {
-              "symbol": ["ALPACAUSDT"]
-            },
             "GateIo": {
               "id": ["ALPACA_USDT"]
             },
@@ -39428,9 +39438,6 @@
         "arguments": {
           "exchanges": {
             "Binance": {
-              "symbol": ["ALPACAUSDT"]
-            },
-            "Bitget": {
               "symbol": ["ALPACAUSDT"]
             },
             "GateIo": {
@@ -39482,9 +39489,6 @@
             },
             "GateIo": {
               "id": ["REN_USDT"]
-            },
-            "Gemini": {
-              "symbol": ["RENUSD"]
             },
             "Kraken": {
               "pair": ["RENUSD"],
@@ -39698,14 +39702,6 @@
         "category": "",
         "market_hours": null,
         "arguments": {
-          "exchanges": {
-            "GateIo": {
-              "id": ["KLIMA_USDT"]
-            },
-            "MEXC": {
-              "symbol": ["KLIMAUSDT"]
-            }
-          },
           "aggregators": {
             "CoinMarketCap": {
               "symbol": ["KLIMA"],
@@ -39744,16 +39740,7 @@
         "decimals": 8,
         "category": "",
         "market_hours": null,
-        "arguments": {
-          "exchanges": {
-            "GateIo": {
-              "id": ["KLIMA_USDT"]
-            },
-            "MEXC": {
-              "symbol": ["KLIMAUSDT"]
-            }
-          }
-        },
+        "arguments": {},
         "compatibility_info": {
           "chainlink": "KLIMA / USD"
         }
@@ -40892,7 +40879,13 @@
         "decimals": 8,
         "category": "Crypto",
         "market_hours": "Crypto",
-        "arguments": {}
+        "arguments": {
+          "exchanges": {
+            "Coinbase": {
+              "id": ["CBETH-USD"]
+            }
+          }
+        }
       }
     },
     {
@@ -40946,7 +40939,7 @@
               "symbol": ["USDT-USDC"]
             },
             "OKX": {
-              "instId": ["USDT-USD", "USDT-USDC"]
+              "instId": ["USDT-USD"]
             }
           }
         }
