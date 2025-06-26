@@ -40867,6 +40867,35 @@
       }
     },
     {
+      "id": "731",
+      "full_name": "cbETH / USD",
+      "description": "Price of Coinbase Wrapped Staked ETH (cbETH) in USD",
+      "type": "price-feed",
+      "oracle_id": "cex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "cbETH",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {}
+      }
+    },
+    {
       "id": "50000",
       "full_name": "USDT / USD Peg-aware",
       "description": "Peg-aware price of USDT in USD",
