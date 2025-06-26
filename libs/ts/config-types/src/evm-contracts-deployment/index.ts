@@ -73,6 +73,8 @@ export const DeploymentConfigSchemaV1 = S.mutable(
   identifier: 'DeploymentConfigV1',
 });
 
+export type DeploymentConfigV1 = typeof DeploymentConfigSchemaV1.Type;
+
 export const DeploymentConfigSchemaV2 = S.mutable(
   S.Struct({
     name: networkName,
