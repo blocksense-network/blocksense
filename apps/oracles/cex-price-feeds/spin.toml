@@ -64,13 +64,13 @@ data = '{"pair":{"base":"ETH","quote":"USDC"},"decimals":8,"category":"Crypto","
 id = "7"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"USDT","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[825],"symbol":["USDT"]}},"exchanges":{"BinanceUS":{"symbol":["USDTUSD"]},"Coinbase":{"id":["USDT-USD","USDT-USDC"]},"CryptoCom":{"symbol":["USDT_USD"]},"GateIo":{"id":["USDT_USD"]},"Gemini":{"symbol":["USDTUSD"]},"Kraken":{"pair":["USDTZUSD"],"wsname":["USDT/USD"]},"KuCoin":{"symbol":["USDT-USDC"]},"OKX":{"instId":["USDT-USD","USDT-USDC"]}}}}'
+data = '{"pair":{"base":"USDT","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[825],"symbol":["USDT"]}},"exchanges":{"BinanceUS":{"symbol":["USDTUSD"]},"Coinbase":{"id":["USDT-USD","USDT-USDC"]},"CryptoCom":{"symbol":["USDT_USD"]},"GateIo":{"id":["USDT_USD"]},"Gemini":{"symbol":["USDTUSD"]},"Kraken":{"pair":["USDTZUSD"],"wsname":["USDT/USD"]},"KuCoin":{"symbol":["USDT-USDC"]},"OKX":{"instId":["USDT-USD"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "8"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"USDT","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Coinbase":{"id":["USDT-USDC"]},"KuCoin":{"symbol":["USDT-USDC"]},"OKX":{"instId":["USDT-USDC"]}}}}'
+data = '{"pair":{"base":"USDT","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Coinbase":{"id":["USDT-USDC"]},"KuCoin":{"symbol":["USDT-USDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "9"
@@ -262,7 +262,7 @@ data = '{"pair":{"base":"LINK","quote":"USDC"},"decimals":8,"category":"Crypto",
 id = "40"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"HBAR","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[4642],"symbol":["HBAR"]}},"exchanges":{"Binance":{"symbol":["HBARUSDC","HBARUSDT"]},"BinanceUS":{"symbol":["HBARUSD","HBARUSDT"]},"Bitget":{"symbol":["HBARUSDT"]},"Bybit":{"symbol":["HBARUSDT"]},"Coinbase":{"id":["HBAR-USD","HBAR-USDT"]},"CryptoCom":{"symbol":["HBAR_USD","HBAR_USDT"]},"GateIo":{"id":["HBAR_USDT"]},"KuCoin":{"symbol":["HBAR-USDC","HBAR-USDT"]},"MEXC":{"symbol":["HBARUSDC","HBARUSDT"]},"OKX":{"instId":["HBAR-USD","HBAR-USDC","HBAR-USDT"]}}}}'
+data = '{"pair":{"base":"HBAR","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[4642],"symbol":["HBAR"]}},"exchanges":{"Binance":{"symbol":["HBARUSDC","HBARUSDT"]},"BinanceUS":{"symbol":["HBARUSD","HBARUSDT"]},"Bitget":{"symbol":["HBARUSDT"]},"Bybit":{"symbol":["HBARUSDC","HBARUSDT"]},"Coinbase":{"id":["HBAR-USD","HBAR-USDT"]},"CryptoCom":{"symbol":["HBAR_USD","HBAR_USDT"]},"GateIo":{"id":["HBAR_USDT"]},"KuCoin":{"symbol":["HBAR-USDC","HBAR-USDT"]},"MEXC":{"symbol":["HBARUSDC","HBARUSDT"]},"OKX":{"instId":["HBAR-USD","HBAR-USDC","HBAR-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "41"
@@ -274,7 +274,7 @@ data = '{"pair":{"base":"HBAR","quote":"USDT"},"decimals":8,"category":"Crypto",
 id = "42"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"HBAR","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["HBARUSDC"]},"KuCoin":{"symbol":["HBAR-USDC"]},"MEXC":{"symbol":["HBARUSDC"]},"OKX":{"instId":["HBAR-USDC"]}}}}'
+data = '{"pair":{"base":"HBAR","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["HBARUSDC"]},"Bybit":{"symbol":["HBARUSDC"]},"KuCoin":{"symbol":["HBAR-USDC"]},"MEXC":{"symbol":["HBARUSDC"]},"OKX":{"instId":["HBAR-USDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "43"
@@ -436,13 +436,13 @@ data = '{"pair":{"base":"TON","quote":"USDC"},"decimals":18,"category":"Crypto",
 id = "69"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"OM","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[6536],"symbol":["OM"]}},"exchanges":{"Binance":{"symbol":["OMUSDC","OMUSDT"]},"Bitget":{"symbol":["OMUSDT"]},"Bybit":{"symbol":["OMUSDT"]},"CryptoCom":{"symbol":["OM_USD"]},"GateIo":{"id":["OM_USDT"]},"Kraken":{"pair":["OMUSD"],"wsname":["OM/USD"]},"KuCoin":{"symbol":["OM-USDT"]},"MEXC":{"symbol":["OMUSDT"]},"OKX":{"instId":["OM-USD","OM-USDT"]}}}}'
+data = '{"pair":{"base":"OM","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[6536],"symbol":["OM"]}},"exchanges":{"Binance":{"symbol":["OMUSDC","OMUSDT"]},"Bitget":{"symbol":["OMUSDT"]},"Bybit":{"symbol":["OMUSDT"]},"CryptoCom":{"symbol":["OM_USD"]},"GateIo":{"id":["OM_USDT"]},"Kraken":{"pair":["OMUSD"],"wsname":["OM/USD"]},"KuCoin":{"symbol":["OM-USDT"]},"MEXC":{"symbol":["OMUSDT"]},"OKX":{"instId":["OM-USD","OM-USDT"]},"Upbit":{"market":["USDT-OM"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "70"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"OM","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["OMUSDT"]},"Bitget":{"symbol":["OMUSDT"]},"Bybit":{"symbol":["OMUSDT"]},"GateIo":{"id":["OM_USDT"]},"KuCoin":{"symbol":["OM-USDT"]},"MEXC":{"symbol":["OMUSDT"]},"OKX":{"instId":["OM-USDT"]}}}}'
+data = '{"pair":{"base":"OM","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["OMUSDT"]},"Bitget":{"symbol":["OMUSDT"]},"Bybit":{"symbol":["OMUSDT"]},"GateIo":{"id":["OM_USDT"]},"KuCoin":{"symbol":["OM-USDT"]},"MEXC":{"symbol":["OMUSDT"]},"OKX":{"instId":["OM-USDT"]},"Upbit":{"market":["USDT-OM"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "71"
@@ -538,13 +538,13 @@ data = '{"pair":{"base":"DAI","quote":"USDC"},"decimals":8,"category":"Crypto","
 id = "86"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"HYPE","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[32196],"symbol":["HYPE"]}},"exchanges":{"Bitget":{"symbol":["HYPEUSDT"]},"GateIo":{"id":["HYPE_USDT"]},"KuCoin":{"symbol":["HYPE-USDC","HYPE-USDT"]},"MEXC":{"symbol":["HYPEUSDT"]}}}}'
+data = '{"pair":{"base":"HYPE","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[32196],"symbol":["HYPE"]}},"exchanges":{"BinanceUS":{"symbol":["HYPEUSD","HYPEUSDT"]},"Bitget":{"symbol":["HYPEUSDT"]},"GateIo":{"id":["HYPE_USDT"]},"KuCoin":{"symbol":["HYPE-USDC","HYPE-USDT"]},"MEXC":{"symbol":["HYPEUSDC","HYPEUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "87"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"HYPE","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Bitget":{"symbol":["HYPEUSDT"]},"GateIo":{"id":["HYPE_USDT"]},"KuCoin":{"symbol":["HYPE-USDT"]},"MEXC":{"symbol":["HYPEUSDT"]}}}}'
+data = '{"pair":{"base":"HYPE","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"BinanceUS":{"symbol":["HYPEUSDT"]},"Bitget":{"symbol":["HYPEUSDT"]},"GateIo":{"id":["HYPE_USDT"]},"KuCoin":{"symbol":["HYPE-USDT"]},"MEXC":{"symbol":["HYPEUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "88"
@@ -706,7 +706,7 @@ data = '{"pair":{"base":"ICP","quote":"USDC"},"decimals":8,"category":"Crypto","
 id = "114"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"AAVE","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[7278],"symbol":["AAVE"]}},"exchanges":{"Binance":{"symbol":["AAVEUSDC","AAVEUSDT"]},"BinanceUS":{"symbol":["AAVEUSD","AAVEUSDT"]},"Bitfinex":{"symbol":["tAAVE:USD"]},"Bitget":{"symbol":["AAVEUSDC","AAVEUSDT"]},"Bybit":{"symbol":["AAVEUSDT"]},"Coinbase":{"id":["AAVE-USD"]},"CryptoCom":{"symbol":["AAVE_USD","AAVE_USDT"]},"GateIo":{"id":["AAVE_USDT"]},"Gemini":{"symbol":["AAVEUSD"]},"Kraken":{"pair":["AAVEUSD"],"wsname":["AAVE/USD"]},"KuCoin":{"symbol":["AAVE-USDT"]},"MEXC":{"symbol":["AAVEUSDC","AAVEUSDT"]},"OKX":{"instId":["AAVE-USD","AAVE-USDC","AAVE-USDT"]}}}}'
+data = '{"pair":{"base":"AAVE","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[7278],"symbol":["AAVE"]}},"exchanges":{"Binance":{"symbol":["AAVEUSDC","AAVEUSDT"]},"BinanceUS":{"symbol":["AAVEUSD","AAVEUSDT"]},"Bitfinex":{"symbol":["tAAVE:USD"]},"Bitget":{"symbol":["AAVEUSDC","AAVEUSDT"]},"Bybit":{"symbol":["AAVEUSDC","AAVEUSDT"]},"Coinbase":{"id":["AAVE-USD"]},"CryptoCom":{"symbol":["AAVE_USD","AAVE_USDT"]},"GateIo":{"id":["AAVE_USDT"]},"Gemini":{"symbol":["AAVEUSD"]},"Kraken":{"pair":["AAVEUSD"],"wsname":["AAVE/USD"]},"KuCoin":{"symbol":["AAVE-USDT"]},"MEXC":{"symbol":["AAVEUSDC","AAVEUSDT"]},"OKX":{"instId":["AAVE-USD","AAVE-USDC","AAVE-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "115"
@@ -724,7 +724,7 @@ data = '{"pair":{"base":"AAVE","quote":"USDT"},"decimals":8,"category":"Crypto",
 id = "117"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"AAVE","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["AAVEUSDC"]},"Bitget":{"symbol":["AAVEUSDC"]},"MEXC":{"symbol":["AAVEUSDC"]},"OKX":{"instId":["AAVE-USDC"]}}}}'
+data = '{"pair":{"base":"AAVE","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["AAVEUSDC"]},"Bitget":{"symbol":["AAVEUSDC"]},"Bybit":{"symbol":["AAVEUSDC"]},"MEXC":{"symbol":["AAVEUSDC"]},"OKX":{"instId":["AAVE-USDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "118"
@@ -796,13 +796,13 @@ data = '{"pair":{"base":"FDUSD","quote":"USDC"},"decimals":8,"category":"Crypto"
 id = "129"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"TIA","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[22861],"symbol":["TIA"]}},"exchanges":{"Binance":{"symbol":["TIAUSDC","TIAUSDT"]},"Bitfinex":{"symbol":["tTIAUSD"]},"Bitget":{"symbol":["TIAUSDT"]},"Bybit":{"symbol":["TIAUSDC","TIAUSDT"]},"Coinbase":{"id":["TIA-USD"]},"CryptoCom":{"symbol":["TIA_USD","TIA_USDT"]},"GateIo":{"id":["TIA_USDC","TIA_USDT"]},"Kraken":{"pair":["TIAUSD"],"wsname":["TIA/USD"]},"KuCoin":{"symbol":["TIA-USDT"]},"MEXC":{"symbol":["TIAUSDC","TIAUSDT"]},"OKX":{"instId":["TIA-USD","TIA-USDC","TIA-USDT"]}}}}'
+data = '{"pair":{"base":"TIA","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[22861],"symbol":["TIA"]}},"exchanges":{"Binance":{"symbol":["TIAUSDC","TIAUSDT"]},"Bitfinex":{"symbol":["tTIAUSD"]},"Bitget":{"symbol":["TIAUSDT"]},"Bybit":{"symbol":["TIAUSDC","TIAUSDT"]},"Coinbase":{"id":["TIA-USD"]},"CryptoCom":{"symbol":["TIA_USD","TIA_USDT"]},"GateIo":{"id":["TIA_USDC","TIA_USDT"]},"Kraken":{"pair":["TIAUSD"],"wsname":["TIA/USD"]},"KuCoin":{"symbol":["TIA-USDT"]},"MEXC":{"symbol":["TIAUSDC","TIAUSDT"]},"OKX":{"instId":["TIA-USD","TIA-USDC","TIA-USDT"]},"Upbit":{"market":["USDT-TIA"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "130"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"TIA","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["TIAUSDT"]},"Bitget":{"symbol":["TIAUSDT"]},"Bybit":{"symbol":["TIAUSDT"]},"CryptoCom":{"symbol":["TIA_USDT"]},"GateIo":{"id":["TIA_USDT"]},"KuCoin":{"symbol":["TIA-USDT"]},"MEXC":{"symbol":["TIAUSDT"]},"OKX":{"instId":["TIA-USDT"]}}}}'
+data = '{"pair":{"base":"TIA","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["TIAUSDT"]},"Bitget":{"symbol":["TIAUSDT"]},"Bybit":{"symbol":["TIAUSDT"]},"CryptoCom":{"symbol":["TIA_USDT"]},"GateIo":{"id":["TIA_USDT"]},"KuCoin":{"symbol":["TIA-USDT"]},"MEXC":{"symbol":["TIAUSDT"]},"OKX":{"instId":["TIA-USDT"]},"Upbit":{"market":["USDT-TIA"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "131"
@@ -814,7 +814,7 @@ data = '{"pair":{"base":"TIA","quote":"USDC"},"decimals":18,"category":"Crypto",
 id = "132"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"POL","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[28321],"symbol":["POL"]}},"exchanges":{"Binance":{"symbol":["POLUSDC","POLUSDT"]},"BinanceUS":{"symbol":["POLUSD","POLUSDT"]},"Bitfinex":{"symbol":["tPOLUSD"]},"Bitget":{"symbol":["POLUSDC","POLUSDT"]},"Bybit":{"symbol":["POLUSDT"]},"Coinbase":{"id":["POL-USD"]},"CryptoCom":{"symbol":["POL_USD","POL_USDT"]},"GateIo":{"id":["POL_USDT"]},"Kraken":{"pair":["POLUSD"],"wsname":["POL/USD"]},"KuCoin":{"symbol":["POL-USDT"]},"MEXC":{"symbol":["POLUSDT"]},"OKX":{"instId":["POL-USD","POL-USDT"]}}}}'
+data = '{"pair":{"base":"POL","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[28321],"symbol":["POL"]}},"exchanges":{"Binance":{"symbol":["POLUSDC","POLUSDT"]},"BinanceUS":{"symbol":["POLUSD","POLUSDT"]},"Bitfinex":{"symbol":["tPOLUSD"]},"Bitget":{"symbol":["POLUSDC","POLUSDT"]},"Bybit":{"symbol":["POLUSDC","POLUSDT"]},"Coinbase":{"id":["POL-USD"]},"CryptoCom":{"symbol":["POL_USD","POL_USDT"]},"GateIo":{"id":["POL_USDT"]},"Kraken":{"pair":["POLUSD"],"wsname":["POL/USD"]},"KuCoin":{"symbol":["POL-USDT"]},"MEXC":{"symbol":["POLUSDT"]},"OKX":{"instId":["POL-USD","POL-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "133"
@@ -832,7 +832,7 @@ data = '{"pair":{"base":"POL","quote":"USDT"},"decimals":8,"category":"Crypto","
 id = "135"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"POL","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["POLUSDC"]},"Bitget":{"symbol":["POLUSDC"]}}}}'
+data = '{"pair":{"base":"POL","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["POLUSDC"]},"Bitget":{"symbol":["POLUSDC"]},"Bybit":{"symbol":["POLUSDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "136"
@@ -862,19 +862,19 @@ data = '{"pair":{"base":"FIL","quote":"USDC"},"decimals":8,"category":"Crypto","
 id = "140"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"LBTC","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[2335,33652],"symbol":["LBTC","LBTC"]}},"exchanges":{"MEXC":{"symbol":["LBTCUSDT"]}}}}'
+data = '{"pair":{"base":"LBTC","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[2335,33652],"symbol":["LBTC","LBTC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "141"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"LBTC","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"MEXC":{"symbol":["LBTCUSDT"]}}}}'
+data = '{"pair":{"base":"LBTC","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
 
 [[trigger.oracle.data_feeds]]
 id = "142"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"ALGO","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[4030],"symbol":["ALGO"]}},"exchanges":{"Binance":{"symbol":["ALGOUSDC","ALGOUSDT"]},"BinanceUS":{"symbol":["ALGOUSD","ALGOUSDT"]},"Bitget":{"symbol":["ALGOUSDC","ALGOUSDT"]},"Bybit":{"symbol":["ALGOUSDT"]},"Coinbase":{"id":["ALGO-USD"]},"CryptoCom":{"symbol":["ALGO_USD","ALGO_USDT"]},"GateIo":{"id":["ALGO_USDC","ALGO_USDT"]},"Kraken":{"pair":["ALGOUSD","ALGOUSDC","ALGOUSDT"],"wsname":["ALGO/USD","ALGO/USDC","ALGO/USDT"]},"KuCoin":{"symbol":["ALGO-USDC","ALGO-USDT"]},"MEXC":{"symbol":["ALGOUSDC","ALGOUSDT"]},"OKX":{"instId":["ALGO-USD","ALGO-USDC","ALGO-USDT"]}}}}'
+data = '{"pair":{"base":"ALGO","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[4030],"symbol":["ALGO"]}},"exchanges":{"Binance":{"symbol":["ALGOUSDC","ALGOUSDT"]},"BinanceUS":{"symbol":["ALGOUSD","ALGOUSDT"]},"Bitget":{"symbol":["ALGOUSDC","ALGOUSDT"]},"Bybit":{"symbol":["ALGOUSDC","ALGOUSDT"]},"Coinbase":{"id":["ALGO-USD"]},"CryptoCom":{"symbol":["ALGO_USD","ALGO_USDT"]},"GateIo":{"id":["ALGO_USDC","ALGO_USDT"]},"Kraken":{"pair":["ALGOUSD","ALGOUSDC","ALGOUSDT"],"wsname":["ALGO/USD","ALGO/USDC","ALGO/USDT"]},"KuCoin":{"symbol":["ALGO-USDC","ALGO-USDT"]},"MEXC":{"symbol":["ALGOUSDC","ALGOUSDT"]},"OKX":{"instId":["ALGO-USD","ALGO-USDC","ALGO-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "143"
@@ -886,13 +886,13 @@ data = '{"pair":{"base":"ALGO","quote":"USDT"},"decimals":18,"category":"Crypto"
 id = "144"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"ALGO","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["ALGOUSDC"]},"Bitget":{"symbol":["ALGOUSDC"]},"GateIo":{"id":["ALGO_USDC"]},"Kraken":{"pair":["ALGOUSDC"],"wsname":["ALGO/USDC"]},"KuCoin":{"symbol":["ALGO-USDC"]},"MEXC":{"symbol":["ALGOUSDC"]},"OKX":{"instId":["ALGO-USDC"]}}}}'
+data = '{"pair":{"base":"ALGO","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["ALGOUSDC"]},"Bitget":{"symbol":["ALGOUSDC"]},"Bybit":{"symbol":["ALGOUSDC"]},"GateIo":{"id":["ALGO_USDC"]},"Kraken":{"pair":["ALGOUSDC"],"wsname":["ALGO/USDC"]},"KuCoin":{"symbol":["ALGO-USDC"]},"MEXC":{"symbol":["ALGOUSDC"]},"OKX":{"instId":["ALGO-USDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "145"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"RENDER","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[5690],"symbol":["RENDER"]}},"exchanges":{"Binance":{"symbol":["RENDERUSDC","RENDERUSDT"]},"BinanceUS":{"symbol":["RENDERUSD","RENDERUSDT"]},"Bitget":{"symbol":["RENDERUSDC","RENDERUSDT"]},"Bybit":{"symbol":["RENDERUSDT"]},"Coinbase":{"id":["RENDER-USD"]},"CryptoCom":{"symbol":["RENDER_USD","RENDER_USDT"]},"GateIo":{"id":["RENDER_USDC","RENDER_USDT"]},"Kraken":{"pair":["RENDERUSD"],"wsname":["RENDER/USD"]},"KuCoin":{"symbol":["RENDER-USDT"]},"MEXC":{"symbol":["RENDERUSDC","RENDERUSDT"]},"OKX":{"instId":["RENDER-USD","RENDER-USDT"]},"Upbit":{"market":["USDT-RENDER"]}}}}'
+data = '{"pair":{"base":"RENDER","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[5690],"symbol":["RENDER"]}},"exchanges":{"Binance":{"symbol":["RENDERUSDC","RENDERUSDT"]},"BinanceUS":{"symbol":["RENDERUSD","RENDERUSDT"]},"Bitget":{"symbol":["RENDERUSDC","RENDERUSDT"]},"Bybit":{"symbol":["RENDERUSDC","RENDERUSDT"]},"Coinbase":{"id":["RENDER-USD"]},"CryptoCom":{"symbol":["RENDER_USD","RENDER_USDT"]},"GateIo":{"id":["RENDER_USDC","RENDER_USDT"]},"Kraken":{"pair":["RENDERUSD"],"wsname":["RENDER/USD"]},"KuCoin":{"symbol":["RENDER-USDT"]},"MEXC":{"symbol":["RENDERUSDC","RENDERUSDT"]},"OKX":{"instId":["RENDER-USD","RENDER-USDT"]},"Upbit":{"market":["USDT-RENDER"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "146"
@@ -904,7 +904,7 @@ data = '{"pair":{"base":"RENDER","quote":"USDT"},"decimals":18,"category":"Crypt
 id = "147"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"RENDER","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["RENDERUSDC"]},"Bitget":{"symbol":["RENDERUSDC"]},"GateIo":{"id":["RENDER_USDC"]},"MEXC":{"symbol":["RENDERUSDC"]}}}}'
+data = '{"pair":{"base":"RENDER","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["RENDERUSDC"]},"Bitget":{"symbol":["RENDERUSDC"]},"Bybit":{"symbol":["RENDERUSDC"]},"GateIo":{"id":["RENDER_USDC"]},"MEXC":{"symbol":["RENDERUSDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "148"
@@ -946,7 +946,7 @@ data = '{"pair":{"base":"ARB","quote":"USDC"},"decimals":8,"category":"Crypto","
 id = "154"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"JUP","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[1503,29210],"symbol":["JUP","JUP"]}},"exchanges":{"Binance":{"symbol":["JUPUSDC","JUPUSDT"]},"BinanceUS":{"symbol":["JUPUSD","JUPUSDT"]},"Bitfinex":{"symbol":["tJUPUSD"]},"Bitget":{"symbol":["JUPUSDT"]},"Bybit":{"symbol":["JUPUSDT"]},"CryptoCom":{"symbol":["JUP_USD","JUP_USDT"]},"GateIo":{"id":["JUP_USDC","JUP_USDT"]},"Kraken":{"pair":["JUPUSD"],"wsname":["JUP/USD"]},"KuCoin":{"symbol":["JUP-USDC","JUP-USDT"]},"MEXC":{"symbol":["JUPUSDT"]},"OKX":{"instId":["JUP-USD","JUP-USDC","JUP-USDT"]},"Upbit":{"market":["USDT-JUP"]}}}}'
+data = '{"pair":{"base":"JUP","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[1503,29210],"symbol":["JUP","JUP"]}},"exchanges":{"Binance":{"symbol":["JUPUSDC","JUPUSDT"]},"BinanceUS":{"symbol":["JUPUSD","JUPUSDT"]},"Bitfinex":{"symbol":["tJUPUSD"]},"Bitget":{"symbol":["JUPUSDT"]},"Bybit":{"symbol":["JUPUSDC","JUPUSDT"]},"CryptoCom":{"symbol":["JUP_USD","JUP_USDT"]},"GateIo":{"id":["JUP_USDC","JUP_USDT"]},"Kraken":{"pair":["JUPUSD"],"wsname":["JUP/USD"]},"KuCoin":{"symbol":["JUP-USDC","JUP-USDT"]},"MEXC":{"symbol":["JUPUSDT"]},"OKX":{"instId":["JUP-USD","JUP-USDC","JUP-USDT"]},"Upbit":{"market":["USDT-JUP"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "155"
@@ -958,7 +958,7 @@ data = '{"pair":{"base":"JUP","quote":"USDT"},"decimals":18,"category":"Crypto",
 id = "156"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"JUP","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["JUPUSDC"]},"GateIo":{"id":["JUP_USDC"]},"KuCoin":{"symbol":["JUP-USDC"]},"OKX":{"instId":["JUP-USDC"]}}}}'
+data = '{"pair":{"base":"JUP","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["JUPUSDC"]},"Bybit":{"symbol":["JUPUSDC"]},"GateIo":{"id":["JUP_USDC"]},"KuCoin":{"symbol":["JUP-USDC"]},"OKX":{"instId":["JUP-USDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "157"
@@ -982,25 +982,25 @@ data = '{"pair":{"base":"OP","quote":"USDC"},"decimals":8,"category":"Crypto","m
 id = "160"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"S","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[32684,33167],"symbol":["S","S"]}},"exchanges":{"Binance":{"symbol":["SUSDC","SUSDT"]},"BinanceUS":{"symbol":["SUSD","SUSDT"]},"Bitget":{"symbol":["SUSDT"]},"Bybit":{"symbol":["SUSDT"]},"CryptoCom":{"symbol":["S_USD"]},"GateIo":{"id":["S_USDT"]},"KuCoin":{"symbol":["S-USDC","S-USDT"]},"MEXC":{"symbol":["SUSDC","SUSDT"]},"OKX":{"instId":["S-USD","S-USDT"]}}}}'
+data = '{"pair":{"base":"S","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[32684,33167],"symbol":["S","S"]}},"exchanges":{"Binance":{"symbol":["SUSDC","SUSDT"]},"BinanceUS":{"symbol":["SUSD","SUSDT"]},"Bitget":{"symbol":["SUSDT"]},"Bybit":{"symbol":["SUSDT"]},"Coinbase":{"id":["S-USD"]},"CryptoCom":{"symbol":["S_USD"]},"GateIo":{"id":["S_USDT"]},"Kraken":{"pair":["SUSD","SUSDC","SUSDT"],"wsname":["S/USD","S/USDC","S/USDT"]},"KuCoin":{"symbol":["S-USDC","S-USDT"]},"MEXC":{"symbol":["SUSDC","SUSDT"]},"OKX":{"instId":["S-USD","S-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "161"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"S","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["SUSDT"]},"BinanceUS":{"symbol":["SUSDT"]},"Bitget":{"symbol":["SUSDT"]},"Bybit":{"symbol":["SUSDT"]},"GateIo":{"id":["S_USDT"]},"KuCoin":{"symbol":["S-USDT"]},"MEXC":{"symbol":["SUSDT"]},"OKX":{"instId":["S-USDT"]}}}}'
+data = '{"pair":{"base":"S","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["SUSDT"]},"BinanceUS":{"symbol":["SUSDT"]},"Bitget":{"symbol":["SUSDT"]},"Bybit":{"symbol":["SUSDT"]},"GateIo":{"id":["S_USDT"]},"Kraken":{"pair":["SUSDT"],"wsname":["S/USDT"]},"KuCoin":{"symbol":["S-USDT"]},"MEXC":{"symbol":["SUSDT"]},"OKX":{"instId":["S-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "162"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"S","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["SUSDC"]},"KuCoin":{"symbol":["S-USDC"]},"MEXC":{"symbol":["SUSDC"]}}}}'
+data = '{"pair":{"base":"S","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["SUSDC"]},"Kraken":{"pair":["SUSDC"],"wsname":["S/USDC"]},"KuCoin":{"symbol":["S-USDC"]},"MEXC":{"symbol":["SUSDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "163"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"FET","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[3773],"symbol":["FET"]}},"exchanges":{"Binance":{"symbol":["FETUSDC","FETUSDT"]},"BinanceUS":{"symbol":["FETUSD","FETUSDT"]},"Bitfinex":{"symbol":["tFETUSD"]},"Bitget":{"symbol":["FETUSDC","FETUSDT"]},"Bybit":{"symbol":["FETUSDC","FETUSDT"]},"Coinbase":{"id":["FET-USD","FET-USDT"]},"CryptoCom":{"symbol":["FET_USD","FET_USDT"]},"GateIo":{"id":["FET_USDC","FET_USDT"]},"Gemini":{"symbol":["FETUSD"]},"Kraken":{"pair":["FETUSD"],"wsname":["FET/USD"]},"KuCoin":{"symbol":["FET-USDT"]},"MEXC":{"symbol":["FETUSDC","FETUSDT"]},"OKX":{"instId":["FET-USDT"]}}}}'
+data = '{"pair":{"base":"FET","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[3773],"symbol":["FET"]}},"exchanges":{"Binance":{"symbol":["FETUSDC","FETUSDT"]},"BinanceUS":{"symbol":["FETUSD","FETUSDT"]},"Bitfinex":{"symbol":["tFETUSD"]},"Bitget":{"symbol":["FETUSDC","FETUSDT"]},"Bybit":{"symbol":["FETUSDC","FETUSDT"]},"Coinbase":{"id":["FET-USD","FET-USDT"]},"CryptoCom":{"symbol":["FET_USD","FET_USDT"]},"GateIo":{"id":["FET_USDC","FET_USDT"]},"Gemini":{"symbol":["FETUSD"]},"Kraken":{"pair":["FETUSD"],"wsname":["FET/USD"]},"KuCoin":{"symbol":["FET-USDC","FET-USDT"]},"MEXC":{"symbol":["FETUSDC","FETUSDT"]},"OKX":{"instId":["FET-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "164"
@@ -1012,25 +1012,25 @@ data = '{"pair":{"base":"FET","quote":"USDT"},"decimals":8,"category":"Crypto","
 id = "165"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"FET","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["FETUSDC"]},"Bitget":{"symbol":["FETUSDC"]},"Bybit":{"symbol":["FETUSDC"]},"GateIo":{"id":["FET_USDC"]},"MEXC":{"symbol":["FETUSDC"]}}}}'
+data = '{"pair":{"base":"FET","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["FETUSDC"]},"Bitget":{"symbol":["FETUSDC"]},"Bybit":{"symbol":["FETUSDC"]},"GateIo":{"id":["FET_USDC"]},"KuCoin":{"symbol":["FET-USDC"]},"MEXC":{"symbol":["FETUSDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "166"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"ENA","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[30171],"symbol":["ENA"]}},"exchanges":{"Binance":{"symbol":["ENAUSDC","ENAUSDT"]},"Bitfinex":{"symbol":["tENAUSD"]},"Bitget":{"symbol":["ENAUSDC","ENAUSDT"]},"Bybit":{"symbol":["ENAUSDT"]},"CryptoCom":{"symbol":["ENA_USD","ENA_USDT"]},"GateIo":{"id":["ENA_USDC","ENA_USDT"]},"Kraken":{"pair":["ENAUSD"],"wsname":["ENA/USD"]},"KuCoin":{"symbol":["ENA-USDC","ENA-USDT"]},"MEXC":{"symbol":["ENAUSDC","ENAUSDT"]}}}}'
+data = '{"pair":{"base":"ENA","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[30171],"symbol":["ENA"]}},"exchanges":{"Binance":{"symbol":["ENAUSDC","ENAUSDT"]},"BinanceUS":{"symbol":["ENAUSDT"]},"Bitfinex":{"symbol":["tENAUSD"]},"Bitget":{"symbol":["ENAUSDC","ENAUSDT"]},"Bybit":{"symbol":["ENAUSDC","ENAUSDT"]},"Coinbase":{"id":["ENA-USD"]},"CryptoCom":{"symbol":["ENA_USD","ENA_USDT"]},"GateIo":{"id":["ENA_USDC","ENA_USDT"]},"Kraken":{"pair":["ENAUSD"],"wsname":["ENA/USD"]},"KuCoin":{"symbol":["ENA-USDC","ENA-USDT"]},"MEXC":{"symbol":["ENAUSDC","ENAUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "167"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"ENA","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["ENAUSDT"]},"Bitget":{"symbol":["ENAUSDT"]},"Bybit":{"symbol":["ENAUSDT"]},"CryptoCom":{"symbol":["ENA_USDT"]},"GateIo":{"id":["ENA_USDT"]},"KuCoin":{"symbol":["ENA-USDT"]},"MEXC":{"symbol":["ENAUSDT"]}}}}'
+data = '{"pair":{"base":"ENA","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["ENAUSDT"]},"BinanceUS":{"symbol":["ENAUSDT"]},"Bitget":{"symbol":["ENAUSDT"]},"Bybit":{"symbol":["ENAUSDT"]},"CryptoCom":{"symbol":["ENA_USDT"]},"GateIo":{"id":["ENA_USDT"]},"KuCoin":{"symbol":["ENA-USDT"]},"MEXC":{"symbol":["ENAUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "168"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"ENA","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["ENAUSDC"]},"Bitget":{"symbol":["ENAUSDC"]},"GateIo":{"id":["ENA_USDC"]},"KuCoin":{"symbol":["ENA-USDC"]},"MEXC":{"symbol":["ENAUSDC"]}}}}'
+data = '{"pair":{"base":"ENA","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["ENAUSDC"]},"Bitget":{"symbol":["ENAUSDC"]},"Bybit":{"symbol":["ENAUSDC"]},"GateIo":{"id":["ENA_USDC"]},"KuCoin":{"symbol":["ENA-USDC"]},"MEXC":{"symbol":["ENAUSDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "169"
@@ -1060,13 +1060,13 @@ data = '{"pair":{"base":"MKR","quote":"USDC"},"decimals":8,"category":"Crypto","
 id = "173"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"ZBU","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[27765],"symbol":["ZBU"]}},"exchanges":{"Bitget":{"symbol":["ZBUUSDT"]},"GateIo":{"id":["ZBU_USDT"]},"MEXC":{"symbol":["ZBUUSDT"]}}}}'
+data = '{"pair":{"base":"ZBU","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[27765],"symbol":["ZBU"]}},"exchanges":{"GateIo":{"id":["ZBU_USDT"]},"MEXC":{"symbol":["ZBUUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "174"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"ZBU","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Bitget":{"symbol":["ZBUUSDT"]},"GateIo":{"id":["ZBU_USDT"]},"MEXC":{"symbol":["ZBUUSDT"]}}}}'
+data = '{"pair":{"base":"ZBU","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"GateIo":{"id":["ZBU_USDT"]},"MEXC":{"symbol":["ZBUUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "175"
@@ -1138,7 +1138,7 @@ data = '{"pair":{"base":"QNT","quote":"USDT"},"decimals":18,"category":"Crypto",
 id = "186"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"WLD","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[13502],"symbol":["WLD"]}},"exchanges":{"Binance":{"symbol":["WLDUSDC","WLDUSDT"]},"Bitget":{"symbol":["WLDUSDC","WLDUSDT"]},"Bybit":{"symbol":["WLDUSDC","WLDUSDT"]},"CryptoCom":{"symbol":["WLD_USD","WLD_USDT"]},"GateIo":{"id":["WLD_USDC","WLD_USDT"]},"Kraken":{"pair":["WLDUSD"],"wsname":["WLD/USD"]},"KuCoin":{"symbol":["WLD-USDT"]},"MEXC":{"symbol":["WLDUSDT"]},"OKX":{"instId":["WLD-USD","WLD-USDC","WLD-USDT"]}}}}'
+data = '{"pair":{"base":"WLD","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[13502],"symbol":["WLD"]}},"exchanges":{"Binance":{"symbol":["WLDUSDC","WLDUSDT"]},"Bitget":{"symbol":["WLDUSDC","WLDUSDT"]},"Bybit":{"symbol":["WLDUSDC","WLDUSDT"]},"Coinbase":{"id":["WLD-USD"]},"CryptoCom":{"symbol":["WLD_USD","WLD_USDT"]},"GateIo":{"id":["WLD_USDC","WLD_USDT"]},"Kraken":{"pair":["WLDUSD"],"wsname":["WLD/USD"]},"KuCoin":{"symbol":["WLD-USDT"]},"MEXC":{"symbol":["WLDUSDT"]},"OKX":{"instId":["WLD-USD","WLD-USDC","WLD-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "187"
@@ -1174,7 +1174,7 @@ data = '{"pair":{"base":"THETA","quote":"USDC"},"decimals":8,"category":"Crypto"
 id = "192"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"GRT","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[6719],"symbol":["GRT"]}},"exchanges":{"Binance":{"symbol":["GRTUSDT"]},"BinanceUS":{"symbol":["GRTUSD","GRTUSDT"]},"Bitfinex":{"symbol":["tGRTUSD"]},"Bitget":{"symbol":["GRTUSDT"]},"Bybit":{"symbol":["GRTUSDT"]},"Coinbase":{"id":["GRT-USD"]},"CryptoCom":{"symbol":["GRT_USD","GRT_USDT"]},"GateIo":{"id":["GRT_USDT"]},"Gemini":{"symbol":["GRTUSD"]},"Kraken":{"pair":["GRTUSD"],"wsname":["GRT/USD"]},"KuCoin":{"symbol":["GRT-USDT"]},"MEXC":{"symbol":["GRTUSDT"]},"OKX":{"instId":["GRT-USD","GRT-USDC","GRT-USDT"]}}}}'
+data = '{"pair":{"base":"GRT","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[6719],"symbol":["GRT"]}},"exchanges":{"Binance":{"symbol":["GRTUSDT"]},"BinanceUS":{"symbol":["GRTUSD","GRTUSDT"]},"Bitget":{"symbol":["GRTUSDT"]},"Bybit":{"symbol":["GRTUSDT"]},"Coinbase":{"id":["GRT-USD"]},"CryptoCom":{"symbol":["GRT_USD","GRT_USDT"]},"GateIo":{"id":["GRT_USDT"]},"Gemini":{"symbol":["GRTUSD"]},"Kraken":{"pair":["GRTUSD"],"wsname":["GRT/USD"]},"KuCoin":{"symbol":["GRT-USDT"]},"MEXC":{"symbol":["GRTUSDT"]},"OKX":{"instId":["GRT-USD","GRT-USDC","GRT-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "193"
@@ -1252,7 +1252,7 @@ data = '{"pair":{"base":"LDO","quote":"USDC"},"decimals":18,"category":"Crypto",
 id = "205"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"EOS","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[1765],"symbol":["EOS"]}},"exchanges":{"Binance":{"symbol":["EOSUSDC","EOSUSDT"]},"BinanceUS":{"symbol":["EOSUSD","EOSUSDT"]},"Bitfinex":{"symbol":["tEOSUSD"]},"Bitget":{"symbol":["EOSUSDT"]},"Bybit":{"symbol":["EOSUSDC","EOSUSDT"]},"Coinbase":{"id":["EOS-USD"]},"CryptoCom":{"symbol":["EOS_USD","EOS_USDT"]},"GateIo":{"id":["EOS_USDC","EOS_USDT"]},"Kraken":{"pair":["EOSUSD","EOSUSDC","EOSUSDT"],"wsname":["EOS/USD","EOS/USDC","EOS/USDT"]},"KuCoin":{"symbol":["EOS-USDC","EOS-USDT"]},"MEXC":{"symbol":["EOSUSDC","EOSUSDT"]},"OKX":{"instId":["EOS-USD","EOS-USDC","EOS-USDT"]}}}}'
+data = '{"pair":{"base":"EOS","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[1765],"symbol":["EOS"]}},"exchanges":{"Binance":{"symbol":["EOSUSDC","EOSUSDT"]},"BinanceUS":{"symbol":["EOSUSD","EOSUSDT"]},"Bitfinex":{"symbol":["tEOSUSD"]},"Bitget":{"symbol":["EOSUSDT"]},"Coinbase":{"id":["EOS-USD"]},"Kraken":{"pair":["EOSUSD","EOSUSDC","EOSUSDT"],"wsname":["EOS/USD","EOS/USDC","EOS/USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "206"
@@ -1264,19 +1264,19 @@ data = '{"pair":{"base":"EOS","quote":"BNB"},"decimals":18,"category":"Crypto","
 id = "207"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"EOS","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["EOSUSDT"]},"BinanceUS":{"symbol":["EOSUSDT"]},"Bitget":{"symbol":["EOSUSDT"]},"Bybit":{"symbol":["EOSUSDT"]},"CryptoCom":{"symbol":["EOS_USDT"]},"GateIo":{"id":["EOS_USDT"]},"Kraken":{"pair":["EOSUSDT"],"wsname":["EOS/USDT"]},"KuCoin":{"symbol":["EOS-USDT"]},"MEXC":{"symbol":["EOSUSDT"]},"OKX":{"instId":["EOS-USDT"]}}}}'
+data = '{"pair":{"base":"EOS","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["EOSUSDT"]},"BinanceUS":{"symbol":["EOSUSDT"]},"Bitget":{"symbol":["EOSUSDT"]},"Kraken":{"pair":["EOSUSDT"],"wsname":["EOS/USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "208"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"EOS","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["EOSUSDC"]},"Bybit":{"symbol":["EOSUSDC"]},"GateIo":{"id":["EOS_USDC"]},"Kraken":{"pair":["EOSUSDC"],"wsname":["EOS/USDC"]},"KuCoin":{"symbol":["EOS-USDC"]},"MEXC":{"symbol":["EOSUSDC"]},"OKX":{"instId":["EOS-USDC"]}}}}'
+data = '{"pair":{"base":"EOS","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["EOSUSDC"]},"Kraken":{"pair":["EOSUSDC"],"wsname":["EOS/USDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "209"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"GALA","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[7080],"symbol":["GALA"]}},"exchanges":{"Binance":{"symbol":["GALAUSDC","GALAUSDT"]},"BinanceUS":{"symbol":["GALAUSD","GALAUSDT"]},"Bitfinex":{"symbol":["tGALA:USD"]},"Bitget":{"symbol":["GALAUSDT"]},"Bybit":{"symbol":["GALAUSDT"]},"CryptoCom":{"symbol":["GALA_USD","GALA_USDT"]},"GateIo":{"id":["GALA_USDC","GALA_USDT"]},"Gemini":{"symbol":["GALAUSD"]},"Kraken":{"pair":["GALAUSD"],"wsname":["GALA/USD"]},"MEXC":{"symbol":["GALAUSDT"]},"OKX":{"instId":["GALA-USD","GALA-USDC","GALA-USDT"]}}}}'
+data = '{"pair":{"base":"GALA","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[7080],"symbol":["GALA"]}},"exchanges":{"Binance":{"symbol":["GALAUSDC","GALAUSDT"]},"BinanceUS":{"symbol":["GALAUSD","GALAUSDT"]},"Bitfinex":{"symbol":["tGALA:USD"]},"Bitget":{"symbol":["GALAUSDT"]},"Bybit":{"symbol":["GALAUSDC","GALAUSDT"]},"CryptoCom":{"symbol":["GALA_USD","GALA_USDT"]},"GateIo":{"id":["GALA_USDC","GALA_USDT"]},"Gemini":{"symbol":["GALAUSD"]},"Kraken":{"pair":["GALAUSD"],"wsname":["GALA/USD"]},"MEXC":{"symbol":["GALAUSDT"]},"OKX":{"instId":["GALA-USD","GALA-USDC","GALA-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "210"
@@ -1288,7 +1288,7 @@ data = '{"pair":{"base":"GALA","quote":"USDT"},"decimals":18,"category":"Crypto"
 id = "211"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"GALA","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["GALAUSDC"]},"GateIo":{"id":["GALA_USDC"]},"OKX":{"instId":["GALA-USDC"]}}}}'
+data = '{"pair":{"base":"GALA","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["GALAUSDC"]},"Bybit":{"symbol":["GALAUSDC"]},"GateIo":{"id":["GALA_USDC"]},"OKX":{"instId":["GALA-USDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "212"
@@ -1348,7 +1348,7 @@ data = '{"pair":{"base":"SAND","quote":"USDC"},"decimals":8,"category":"Crypto",
 id = "221"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"BERA","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[24647],"symbol":["BERA"]}},"exchanges":{"Binance":{"symbol":["BERAUSDC","BERAUSDT"]},"Bitget":{"symbol":["BERAUSDT"]},"Bybit":{"symbol":["BERAUSDT"]},"Coinbase":{"id":["BERA-USD"]},"CryptoCom":{"symbol":["BERA_USD"]},"GateIo":{"id":["BERA_USDT"]},"Kraken":{"pair":["BERAUSD","BERAUSDC","BERAUSDT"],"wsname":["BERA/USD","BERA/USDC","BERA/USDT"]},"KuCoin":{"symbol":["BERA-USDT"]},"MEXC":{"symbol":["BERAUSDC","BERAUSDT"]},"OKX":{"instId":["BERA-USD","BERA-USDT"]},"Upbit":{"market":["USDT-BERA"]}}}}'
+data = '{"pair":{"base":"BERA","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[24647],"symbol":["BERA"]}},"exchanges":{"Binance":{"symbol":["BERAUSDC","BERAUSDT"]},"Bitget":{"symbol":["BERAUSDT"]},"Bybit":{"symbol":["BERAUSDC","BERAUSDT"]},"Coinbase":{"id":["BERA-USD"]},"CryptoCom":{"symbol":["BERA_USD"]},"GateIo":{"id":["BERA_USDT"]},"Kraken":{"pair":["BERAUSD","BERAUSDC","BERAUSDT"],"wsname":["BERA/USD","BERA/USDC","BERA/USDT"]},"KuCoin":{"symbol":["BERA-USDT"]},"MEXC":{"symbol":["BERAUSDC","BERAUSDT"]},"OKX":{"instId":["BERA-USD","BERA-USDT"]},"Upbit":{"market":["USDT-BERA"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "222"
@@ -1360,13 +1360,13 @@ data = '{"pair":{"base":"BERA","quote":"USDT"},"decimals":18,"category":"Crypto"
 id = "223"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"BERA","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["BERAUSDC"]},"Kraken":{"pair":["BERAUSDC"],"wsname":["BERA/USDC"]},"MEXC":{"symbol":["BERAUSDC"]}}}}'
+data = '{"pair":{"base":"BERA","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["BERAUSDC"]},"Bybit":{"symbol":["BERAUSDC"]},"Kraken":{"pair":["BERAUSDC"],"wsname":["BERA/USDC"]},"MEXC":{"symbol":["BERAUSDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "224"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"JTO","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[28541],"symbol":["JTO"]}},"exchanges":{"Binance":{"symbol":["JTOUSDC","JTOUSDT"]},"BinanceUS":{"symbol":["JTOUSDT"]},"Bitget":{"symbol":["JTOUSDT"]},"Bybit":{"symbol":["JTOUSDT"]},"Coinbase":{"id":["JTO-USD"]},"CryptoCom":{"symbol":["JTO_USD"]},"GateIo":{"id":["JTO_USDC","JTO_USDT"]},"Kraken":{"pair":["JTOUSD"],"wsname":["JTO/USD"]},"KuCoin":{"symbol":["JTO-USDT"]},"MEXC":{"symbol":["JTOUSDT"]},"OKX":{"instId":["JTO-USD","JTO-USDC","JTO-USDT"]},"Upbit":{"market":["USDT-JTO"]}}}}'
+data = '{"pair":{"base":"JTO","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[28541],"symbol":["JTO"]}},"exchanges":{"Binance":{"symbol":["JTOUSDC","JTOUSDT"]},"BinanceUS":{"symbol":["JTOUSDT"]},"Bitget":{"symbol":["JTOUSDT"]},"Bybit":{"symbol":["JTOUSDT"]},"Coinbase":{"id":["JTO-USD"]},"CryptoCom":{"symbol":["JTO_USD"]},"GateIo":{"id":["JTO_USDC","JTO_USDT"]},"Gemini":{"symbol":["JTOUSD"]},"Kraken":{"pair":["JTOUSD"],"wsname":["JTO/USD"]},"KuCoin":{"symbol":["JTO-USDT"]},"MEXC":{"symbol":["JTOUSDT"]},"OKX":{"instId":["JTO-USD","JTO-USDC","JTO-USDT"]},"Upbit":{"market":["USDT-JTO"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "225"
@@ -1462,7 +1462,7 @@ data = '{"pair":{"base":"MANA","quote":"USDC"},"decimals":8,"category":"Crypto",
 id = "240"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"CRV","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[6538],"symbol":["CRV"]}},"exchanges":{"Binance":{"symbol":["CRVUSDC","CRVUSDT"]},"BinanceUS":{"symbol":["CRVUSD","CRVUSDT"]},"Bitfinex":{"symbol":["tCRVUSD"]},"Bitget":{"symbol":["CRVUSDT"]},"Bybit":{"symbol":["CRVUSDT"]},"Coinbase":{"id":["CRV-USD"]},"CryptoCom":{"symbol":["CRV_USD","CRV_USDT"]},"GateIo":{"id":["CRV_USDC","CRV_USDT"]},"Gemini":{"symbol":["CRVUSD"]},"Kraken":{"pair":["CRVUSD"],"wsname":["CRV/USD"]},"KuCoin":{"symbol":["CRV-USDT"]},"MEXC":{"symbol":["CRVUSDC","CRVUSDT"]},"OKX":{"instId":["CRV-USD","CRV-USDC","CRV-USDT"]}}}}'
+data = '{"pair":{"base":"CRV","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[6538],"symbol":["CRV"]}},"exchanges":{"Binance":{"symbol":["CRVUSDC","CRVUSDT"]},"BinanceUS":{"symbol":["CRVUSD","CRVUSDT"]},"Bitfinex":{"symbol":["tCRVUSD"]},"Bitget":{"symbol":["CRVUSDT"]},"Bybit":{"symbol":["CRVUSDC","CRVUSDT"]},"Coinbase":{"id":["CRV-USD"]},"CryptoCom":{"symbol":["CRV_USD","CRV_USDT"]},"GateIo":{"id":["CRV_USDC","CRV_USDT"]},"Gemini":{"symbol":["CRVUSD"]},"Kraken":{"pair":["CRVUSD"],"wsname":["CRV/USD"]},"KuCoin":{"symbol":["CRV-USDT"]},"MEXC":{"symbol":["CRVUSDC","CRVUSDT"]},"OKX":{"instId":["CRV-USD","CRV-USDC","CRV-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "241"
@@ -1480,7 +1480,7 @@ data = '{"pair":{"base":"CRV","quote":"USDT"},"decimals":8,"category":"Crypto","
 id = "243"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"CRV","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["CRVUSDC"]},"GateIo":{"id":["CRV_USDC"]},"MEXC":{"symbol":["CRVUSDC"]},"OKX":{"instId":["CRV-USDC"]}}}}'
+data = '{"pair":{"base":"CRV","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["CRVUSDC"]},"Bybit":{"symbol":["CRVUSDC"]},"GateIo":{"id":["CRV_USDC"]},"MEXC":{"symbol":["CRVUSDC"]},"OKX":{"instId":["CRV-USDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "244"
@@ -1540,7 +1540,7 @@ data = '{"pair":{"base":"RON","quote":"USDC"},"decimals":8,"category":"Crypto","
 id = "253"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"AXS","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[6783],"symbol":["AXS"]}},"exchanges":{"Binance":{"symbol":["AXSUSDT"]},"BinanceUS":{"symbol":["AXSUSD","AXSUSDT"]},"Bitget":{"symbol":["AXSUSDT"]},"Bybit":{"symbol":["AXSUSDT"]},"Coinbase":{"id":["AXS-USD","AXS-USDT"]},"CryptoCom":{"symbol":["AXS_USD","AXS_USDT"]},"GateIo":{"id":["AXS_USDT"]},"Gemini":{"symbol":["AXSUSD"]},"Kraken":{"pair":["AXSUSD"],"wsname":["AXS/USD"]},"KuCoin":{"symbol":["AXS-USDT"]},"MEXC":{"symbol":["AXSUSDT"]},"OKX":{"instId":["AXS-USD","AXS-USDT"]}}}}'
+data = '{"pair":{"base":"AXS","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[6783],"symbol":["AXS"]}},"exchanges":{"Binance":{"symbol":["AXSUSDT"]},"BinanceUS":{"symbol":["AXSUSD","AXSUSDT"]},"Bitget":{"symbol":["AXSUSDT"]},"Bybit":{"symbol":["AXSUSDT"]},"Coinbase":{"id":["AXS-USD","AXS-USDT"]},"CryptoCom":{"symbol":["AXS_USD","AXS_USDT"]},"GateIo":{"id":["AXS_USDT"]},"Kraken":{"pair":["AXSUSD"],"wsname":["AXS/USD"]},"KuCoin":{"symbol":["AXS-USDT"]},"MEXC":{"symbol":["AXSUSDT"]},"OKX":{"instId":["AXS-USD","AXS-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "254"
@@ -1606,7 +1606,7 @@ data = '{"pair":{"base":"KAVA","quote":"USDT"},"decimals":8,"category":"Crypto",
 id = "264"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"DYDX","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[28324],"symbol":["DYDX"]}},"exchanges":{"Binance":{"symbol":["DYDXUSDC","DYDXUSDT"]},"Bitget":{"symbol":["DYDXUSDC","DYDXUSDT"]},"Bybit":{"symbol":["DYDXUSDT"]},"CryptoCom":{"symbol":["DYDX_USD","DYDX_USDT"]},"GateIo":{"id":["DYDX_USDT"]},"Kraken":{"pair":["DYDXUSD"],"wsname":["DYDX/USD"]},"KuCoin":{"symbol":["DYDX-USDT"]},"MEXC":{"symbol":["DYDXUSDT"]},"OKX":{"instId":["DYDX-USD","DYDX-USDC","DYDX-USDT"]}}}}'
+data = '{"pair":{"base":"DYDX","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[28324],"symbol":["DYDX"]}},"exchanges":{"Binance":{"symbol":["DYDXUSDC","DYDXUSDT"]},"Bitget":{"symbol":["DYDXUSDT"]},"Bybit":{"symbol":["DYDXUSDT"]},"CryptoCom":{"symbol":["DYDX_USD","DYDX_USDT"]},"GateIo":{"id":["DYDX_USDT"]},"Kraken":{"pair":["DYDXUSD"],"wsname":["DYDX/USD"]},"KuCoin":{"symbol":["DYDX-USDT"]},"MEXC":{"symbol":["DYDXUSDT"]},"OKX":{"instId":["DYDX-USD","DYDX-USDC","DYDX-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "265"
@@ -1618,7 +1618,7 @@ data = '{"pair":{"base":"DYDX","quote":"USDT"},"decimals":18,"category":"Crypto"
 id = "266"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"DYDX","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["DYDXUSDC"]},"Bitget":{"symbol":["DYDXUSDC"]},"OKX":{"instId":["DYDX-USDC"]}}}}'
+data = '{"pair":{"base":"DYDX","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["DYDXUSDC"]},"OKX":{"instId":["DYDX-USDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "267"
@@ -1672,7 +1672,7 @@ data = '{"pair":{"base":"STRK","quote":"USDC"},"decimals":18,"category":"Crypto"
 id = "275"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"CAKE","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[7186],"symbol":["CAKE"]}},"exchanges":{"Binance":{"symbol":["CAKEUSDC","CAKEUSDT"]},"Bitget":{"symbol":["CAKEUSDT"]},"Bybit":{"symbol":["CAKEUSDT"]},"GateIo":{"id":["CAKE_USDT"]},"KuCoin":{"symbol":["CAKE-USDT"]},"MEXC":{"symbol":["CAKEUSDT"]}}}}'
+data = '{"pair":{"base":"CAKE","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[7186],"symbol":["CAKE"]}},"exchanges":{"Binance":{"symbol":["CAKEUSDC","CAKEUSDT"]},"Bitget":{"symbol":["CAKEUSDT"]},"Bybit":{"symbol":["CAKEUSDT"]},"Coinbase":{"id":["CAKE-USD"]},"GateIo":{"id":["CAKE_USDT"]},"Kraken":{"pair":["CAKEUSD"],"wsname":["CAKE/USD"]},"KuCoin":{"symbol":["CAKE-USDT"]},"MEXC":{"symbol":["CAKEUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "276"
@@ -1696,19 +1696,19 @@ data = '{"pair":{"base":"CAKE","quote":"USDC"},"decimals":8,"category":"Crypto",
 id = "279"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"MATIC","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[3890],"symbol":["MATIC"]}},"exchanges":{"Binance":{"symbol":["MATICUSDC","MATICUSDT"]},"BinanceUS":{"symbol":["MATICUSD","MATICUSDT"]},"Bitfinex":{"symbol":["tMATIC:USD"]},"Coinbase":{"id":["MATIC-USD","MATIC-USDT"]},"Gemini":{"symbol":["MATICUSD"]},"Kraken":{"pair":["MATICUSD","MATICUSDC","MATICUSDT"],"wsname":["MATIC/USD","MATIC/USDC","MATIC/USDT"]}}}}'
+data = '{"pair":{"base":"MATIC","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[3890],"symbol":["MATIC"]}},"exchanges":{"Binance":{"symbol":["MATICUSDC","MATICUSDT"]},"BinanceUS":{"symbol":["MATICUSD","MATICUSDT"]},"Bitfinex":{"symbol":["tMATIC:USD"]},"Coinbase":{"id":["MATIC-USD","MATIC-USDT"]},"Gemini":{"symbol":["MATICUSD"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "280"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"MATIC","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["MATICUSDT"]},"BinanceUS":{"symbol":["MATICUSDT"]},"Coinbase":{"id":["MATIC-USDT"]},"Kraken":{"pair":["MATICUSDT"],"wsname":["MATIC/USDT"]}}}}'
+data = '{"pair":{"base":"MATIC","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["MATICUSDT"]},"BinanceUS":{"symbol":["MATICUSDT"]},"Coinbase":{"id":["MATIC-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "281"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"MATIC","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["MATICUSDC"]},"Kraken":{"pair":["MATICUSDC"],"wsname":["MATIC/USDC"]}}}}'
+data = '{"pair":{"base":"MATIC","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["MATICUSDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "282"
@@ -1876,13 +1876,13 @@ data = '{"pair":{"base":"APE","quote":"USDC"},"decimals":8,"category":"Crypto","
 id = "309"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"VIRTUAL","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[29420],"symbol":["VIRTUAL"]}},"exchanges":{"Binance":{"symbol":["VIRTUALUSDC","VIRTUALUSDT"]},"Bitget":{"symbol":["VIRTUALUSDT"]},"Bybit":{"symbol":["VIRTUALUSDT"]},"CryptoCom":{"symbol":["VIRTUAL_USD","VIRTUAL_USDT"]},"GateIo":{"id":["VIRTUAL_USDT"]},"Kraken":{"pair":["VIRTUALUSD","VIRTUALUSDC","VIRTUALUSDT"],"wsname":["VIRTUAL/USD","VIRTUAL/USDC","VIRTUAL/USDT"]},"KuCoin":{"symbol":["VIRTUAL-USDT"]},"MEXC":{"symbol":["VIRTUALUSDC","VIRTUALUSDT"]},"Upbit":{"market":["USDT-VIRTUAL"]}}}}'
+data = '{"pair":{"base":"VIRTUAL","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[29420],"symbol":["VIRTUAL"]}},"exchanges":{"Binance":{"symbol":["VIRTUALUSDC","VIRTUALUSDT"]},"BinanceUS":{"symbol":["VIRTUALUSDT"]},"Bitget":{"symbol":["VIRTUALUSDT"]},"Bybit":{"symbol":["VIRTUALUSDT"]},"CryptoCom":{"symbol":["VIRTUAL_USD","VIRTUAL_USDT"]},"GateIo":{"id":["VIRTUAL_USDT"]},"Kraken":{"pair":["VIRTUALUSD","VIRTUALUSDC","VIRTUALUSDT"],"wsname":["VIRTUAL/USD","VIRTUAL/USDC","VIRTUAL/USDT"]},"KuCoin":{"symbol":["VIRTUAL-USDT"]},"MEXC":{"symbol":["VIRTUALUSDC","VIRTUALUSDT"]},"Upbit":{"market":["USDT-VIRTUAL"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "310"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"VIRTUAL","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["VIRTUALUSDT"]},"Bitget":{"symbol":["VIRTUALUSDT"]},"Bybit":{"symbol":["VIRTUALUSDT"]},"CryptoCom":{"symbol":["VIRTUAL_USDT"]},"GateIo":{"id":["VIRTUAL_USDT"]},"Kraken":{"pair":["VIRTUALUSDT"],"wsname":["VIRTUAL/USDT"]},"KuCoin":{"symbol":["VIRTUAL-USDT"]},"MEXC":{"symbol":["VIRTUALUSDT"]},"Upbit":{"market":["USDT-VIRTUAL"]}}}}'
+data = '{"pair":{"base":"VIRTUAL","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["VIRTUALUSDT"]},"BinanceUS":{"symbol":["VIRTUALUSDT"]},"Bitget":{"symbol":["VIRTUALUSDT"]},"Bybit":{"symbol":["VIRTUALUSDT"]},"CryptoCom":{"symbol":["VIRTUAL_USDT"]},"GateIo":{"id":["VIRTUAL_USDT"]},"Kraken":{"pair":["VIRTUALUSDT"],"wsname":["VIRTUAL/USDT"]},"KuCoin":{"symbol":["VIRTUAL-USDT"]},"MEXC":{"symbol":["VIRTUALUSDT"]},"Upbit":{"market":["USDT-VIRTUAL"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "311"
@@ -1894,13 +1894,13 @@ data = '{"pair":{"base":"VIRTUAL","quote":"USDC"},"decimals":18,"category":"Cryp
 id = "312"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"PENGU","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[34466],"symbol":["PENGU"]}},"exchanges":{"Binance":{"symbol":["PENGUUSDC","PENGUUSDT"]},"BinanceUS":{"symbol":["PENGUUSDT"]},"Bitget":{"symbol":["PENGUUSDT"]},"Bybit":{"symbol":["PENGUUSDT"]},"Coinbase":{"id":["PENGU-USD"]},"CryptoCom":{"symbol":["PENGU_USD","PENGU_USDT"]},"GateIo":{"id":["PENGU_USDT"]},"Kraken":{"pair":["PENGUUSD","PENGUUSDC","PENGUUSDT"],"wsname":["PENGU/USD","PENGU/USDC","PENGU/USDT"]},"KuCoin":{"symbol":["PENGU-USDT"]},"MEXC":{"symbol":["PENGUUSDC","PENGUUSDT"]},"OKX":{"instId":["PENGU-USD","PENGU-USDT"]}}}}'
+data = '{"pair":{"base":"PENGU","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[34466],"symbol":["PENGU"]}},"exchanges":{"Binance":{"symbol":["PENGUUSDC","PENGUUSDT"]},"BinanceUS":{"symbol":["PENGUUSDT"]},"Bitget":{"symbol":["PENGUUSDT"]},"Bybit":{"symbol":["PENGUUSDT"]},"Coinbase":{"id":["PENGU-USD"]},"CryptoCom":{"symbol":["PENGU_USD","PENGU_USDT"]},"GateIo":{"id":["PENGU_USDT"]},"Kraken":{"pair":["PENGUUSD","PENGUUSDC","PENGUUSDT"],"wsname":["PENGU/USD","PENGU/USDC","PENGU/USDT"]},"KuCoin":{"symbol":["PENGU-USDT"]},"MEXC":{"symbol":["PENGUUSDC","PENGUUSDT"]},"OKX":{"instId":["PENGU-USD","PENGU-USDT"]},"Upbit":{"market":["USDT-PENGU"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "313"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"PENGU","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["PENGUUSDT"]},"BinanceUS":{"symbol":["PENGUUSDT"]},"Bitget":{"symbol":["PENGUUSDT"]},"Bybit":{"symbol":["PENGUUSDT"]},"CryptoCom":{"symbol":["PENGU_USDT"]},"GateIo":{"id":["PENGU_USDT"]},"Kraken":{"pair":["PENGUUSDT"],"wsname":["PENGU/USDT"]},"KuCoin":{"symbol":["PENGU-USDT"]},"MEXC":{"symbol":["PENGUUSDT"]},"OKX":{"instId":["PENGU-USDT"]}}}}'
+data = '{"pair":{"base":"PENGU","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["PENGUUSDT"]},"BinanceUS":{"symbol":["PENGUUSDT"]},"Bitget":{"symbol":["PENGUUSDT"]},"Bybit":{"symbol":["PENGUUSDT"]},"CryptoCom":{"symbol":["PENGU_USDT"]},"GateIo":{"id":["PENGU_USDT"]},"Kraken":{"pair":["PENGUUSDT"],"wsname":["PENGU/USDT"]},"KuCoin":{"symbol":["PENGU-USDT"]},"MEXC":{"symbol":["PENGUUSDT"]},"OKX":{"instId":["PENGU-USDT"]},"Upbit":{"market":["USDT-PENGU"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "314"
@@ -1930,13 +1930,13 @@ data = '{"pair":{"base":"COMP","quote":"USDC"},"decimals":8,"category":"Crypto",
 id = "318"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"AXL","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[15853,17799],"symbol":["AXL","AXL"]}},"exchanges":{"Binance":{"symbol":["AXLUSDT"]},"BinanceUS":{"symbol":["AXLUSD","AXLUSDT"]},"Bybit":{"symbol":["AXLUSDT"]},"Coinbase":{"id":["AXL-USD"]},"CryptoCom":{"symbol":["AXL_USD","AXL_USDT"]}}}}'
+data = '{"pair":{"base":"AXL","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[15853,17799],"symbol":["AXL","AXL"]}},"exchanges":{"Binance":{"symbol":["AXLUSDT"]},"BinanceUS":{"symbol":["AXLUSD","AXLUSDT"]},"Bybit":{"symbol":["AXLUSDT"]},"Coinbase":{"id":["AXL-USD"]},"CryptoCom":{"symbol":["AXL_USD","AXL_USDT"]},"Upbit":{"market":["USDT-AXL"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "319"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"AXL","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["AXLUSDT"]},"BinanceUS":{"symbol":["AXLUSDT"]},"Bybit":{"symbol":["AXLUSDT"]},"CryptoCom":{"symbol":["AXL_USDT"]}}}}'
+data = '{"pair":{"base":"AXL","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["AXLUSDT"]},"BinanceUS":{"symbol":["AXLUSDT"]},"Bybit":{"symbol":["AXLUSDT"]},"CryptoCom":{"symbol":["AXL_USDT"]},"Upbit":{"market":["USDT-AXL"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "320"
@@ -1960,13 +1960,13 @@ data = '{"pair":{"base":"PENDLE","quote":"USDC"},"decimals":8,"category":"Crypto
 id = "323"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"SPX","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[28081],"symbol":["SPX"]}},"exchanges":{"Bybit":{"symbol":["SPXUSDT"]},"CryptoCom":{"symbol":["SPX_USD"]},"GateIo":{"id":["SPX_USDT"]},"Kraken":{"pair":["SPXUSD"],"wsname":["SPX/USD"]},"KuCoin":{"symbol":["SPX-USDT"]},"MEXC":{"symbol":["SPXUSDC","SPXUSDT"]}}}}'
+data = '{"pair":{"base":"SPX","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[28081],"symbol":["SPX"]}},"exchanges":{"BinanceUS":{"symbol":["SPXUSDT"]},"Bybit":{"symbol":["SPXUSDT"]},"CryptoCom":{"symbol":["SPX_USD"]},"GateIo":{"id":["SPX_USDT"]},"Kraken":{"pair":["SPXUSD"],"wsname":["SPX/USD"]},"KuCoin":{"symbol":["SPX-USDT"]},"MEXC":{"symbol":["SPXUSDC","SPXUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "324"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"SPX","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Bybit":{"symbol":["SPXUSDT"]},"GateIo":{"id":["SPX_USDT"]},"KuCoin":{"symbol":["SPX-USDT"]},"MEXC":{"symbol":["SPXUSDT"]}}}}'
+data = '{"pair":{"base":"SPX","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"BinanceUS":{"symbol":["SPXUSDT"]},"Bybit":{"symbol":["SPXUSDT"]},"GateIo":{"id":["SPX_USDT"]},"KuCoin":{"symbol":["SPX-USDT"]},"MEXC":{"symbol":["SPXUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "325"
@@ -2086,13 +2086,13 @@ data = '{"pair":{"base":"SNX","quote":"USDC"},"decimals":8,"category":"Crypto","
 id = "344"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"FARTCOIN","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[33597,34814],"symbol":["FARTCOIN","FARTCOIN"]}},"exchanges":{"Bitget":{"symbol":["FARTCOINUSDT"]},"CryptoCom":{"symbol":["FARTCOIN_USD"]},"GateIo":{"id":["FARTCOIN_USDT"]},"Kraken":{"pair":["FARTCOINUSD","FARTCOINUSDC","FARTCOINUSDT"],"wsname":["FARTCOIN/USD","FARTCOIN/USDC","FARTCOIN/USDT"]},"KuCoin":{"symbol":["FARTCOIN-USDC","FARTCOIN-USDT"]},"MEXC":{"symbol":["FARTCOINUSDC","FARTCOINUSDT"]}}}}'
+data = '{"pair":{"base":"FARTCOIN","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[33597,34814],"symbol":["FARTCOIN","FARTCOIN"]}},"exchanges":{"BinanceUS":{"symbol":["FARTCOINUSDT"]},"Bitget":{"symbol":["FARTCOINUSDT"]},"Coinbase":{"id":["FARTCOIN-USD"]},"CryptoCom":{"symbol":["FARTCOIN_USD"]},"GateIo":{"id":["FARTCOIN_USDT"]},"Kraken":{"pair":["FARTCOINUSD","FARTCOINUSDC","FARTCOINUSDT"],"wsname":["FARTCOIN/USD","FARTCOIN/USDC","FARTCOIN/USDT"]},"KuCoin":{"symbol":["FARTCOIN-USDC","FARTCOIN-USDT"]},"MEXC":{"symbol":["FARTCOINUSDC","FARTCOINUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "345"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"FARTCOIN","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Bitget":{"symbol":["FARTCOINUSDT"]},"GateIo":{"id":["FARTCOIN_USDT"]},"Kraken":{"pair":["FARTCOINUSDT"],"wsname":["FARTCOIN/USDT"]},"KuCoin":{"symbol":["FARTCOIN-USDT"]},"MEXC":{"symbol":["FARTCOINUSDT"]}}}}'
+data = '{"pair":{"base":"FARTCOIN","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"BinanceUS":{"symbol":["FARTCOINUSDT"]},"Bitget":{"symbol":["FARTCOINUSDT"]},"GateIo":{"id":["FARTCOIN_USDT"]},"Kraken":{"pair":["FARTCOINUSDT"],"wsname":["FARTCOIN/USDT"]},"KuCoin":{"symbol":["FARTCOIN-USDT"]},"MEXC":{"symbol":["FARTCOINUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "346"
@@ -2134,7 +2134,7 @@ data = '{"pair":{"base":"DASH","quote":"USDT"},"decimals":8,"category":"Crypto",
 id = "352"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"EIGEN","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[30494],"symbol":["EIGEN"]}},"exchanges":{"Binance":{"symbol":["EIGENUSDC","EIGENUSDT"]},"BinanceUS":{"symbol":["EIGENUSD","EIGENUSDT"]},"Bitfinex":{"symbol":["tEIGEN:USD"]},"Bitget":{"symbol":["EIGENUSDT"]},"Bybit":{"symbol":["EIGENUSDT"]},"Coinbase":{"id":["EIGEN-USD"]},"CryptoCom":{"symbol":["EIGEN_USD"]},"GateIo":{"id":["EIGEN_USDT"]},"Kraken":{"pair":["EIGENUSD"],"wsname":["EIGEN/USD"]},"KuCoin":{"symbol":["EIGEN-USDT"]},"MEXC":{"symbol":["EIGENUSDT"]},"OKX":{"instId":["EIGEN-USD","EIGEN-USDC","EIGEN-USDT"]}}}}'
+data = '{"pair":{"base":"EIGEN","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[30494],"symbol":["EIGEN"]}},"exchanges":{"Binance":{"symbol":["EIGENUSDC","EIGENUSDT"]},"BinanceUS":{"symbol":["EIGENUSD","EIGENUSDT"]},"Bitfinex":{"symbol":["tEIGEN:USD"]},"Bitget":{"symbol":["EIGENUSDT"]},"Bybit":{"symbol":["EIGENUSDC","EIGENUSDT"]},"Coinbase":{"id":["EIGEN-USD"]},"CryptoCom":{"symbol":["EIGEN_USD"]},"GateIo":{"id":["EIGEN_USDT"]},"Kraken":{"pair":["EIGENUSD"],"wsname":["EIGEN/USD"]},"KuCoin":{"symbol":["EIGEN-USDT"]},"MEXC":{"symbol":["EIGENUSDT"]},"OKX":{"instId":["EIGEN-USD","EIGEN-USDC","EIGEN-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "353"
@@ -2146,7 +2146,7 @@ data = '{"pair":{"base":"EIGEN","quote":"USDT"},"decimals":18,"category":"Crypto
 id = "354"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"EIGEN","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["EIGENUSDC"]},"OKX":{"instId":["EIGEN-USDC"]}}}}'
+data = '{"pair":{"base":"EIGEN","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["EIGENUSDC"]},"Bybit":{"symbol":["EIGENUSDC"]},"OKX":{"instId":["EIGEN-USDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "355"
@@ -2278,7 +2278,7 @@ data = '{"pair":{"base":"BLUR","quote":"USDC"},"decimals":18,"category":"Crypto"
 id = "376"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"NOT","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[28850],"symbol":["NOT"]}},"exchanges":{"Binance":{"symbol":["NOTUSDC","NOTUSDT"]},"Bitfinex":{"symbol":["tNOTUSD"]},"Bitget":{"symbol":["NOTUSDT"]},"Bybit":{"symbol":["NOTUSDC","NOTUSDT"]},"CryptoCom":{"symbol":["NOT_USD","NOT_USDT"]},"GateIo":{"id":["NOT_USDC","NOT_USDT"]},"Kraken":{"pair":["NOTUSD"],"wsname":["NOT/USD"]},"KuCoin":{"symbol":["NOT-USDT"]},"MEXC":{"symbol":["NOTUSDT"]},"OKX":{"instId":["NOT-USD","NOT-USDC","NOT-USDT"]}}}}'
+data = '{"pair":{"base":"NOT","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[28850],"symbol":["NOT"]}},"exchanges":{"Binance":{"symbol":["NOTUSDC","NOTUSDT"]},"Bitget":{"symbol":["NOTUSDT"]},"Bybit":{"symbol":["NOTUSDC","NOTUSDT"]},"CryptoCom":{"symbol":["NOT_USD","NOT_USDT"]},"GateIo":{"id":["NOT_USDC","NOT_USDT"]},"Kraken":{"pair":["NOTUSD"],"wsname":["NOT/USD"]},"KuCoin":{"symbol":["NOT-USDT"]},"MEXC":{"symbol":["NOTUSDT"]},"OKX":{"instId":["NOT-USD","NOT-USDC","NOT-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "377"
@@ -2296,13 +2296,13 @@ data = '{"pair":{"base":"NOT","quote":"USDC"},"decimals":18,"category":"Crypto",
 id = "379"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"USDD","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[19891],"symbol":["USDD"]}},"exchanges":{"Bybit":{"symbol":["USDDUSDT"]},"GateIo":{"id":["USDD_USDT"]},"Kraken":{"pair":["USDDUSD"],"wsname":["USDD/USD"]},"KuCoin":{"symbol":["USDD-USDC","USDD-USDT"]}}}}'
+data = '{"pair":{"base":"USDD","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[19891],"symbol":["USDD"]}},"exchanges":{"Bybit":{"symbol":["USDDUSDT"]},"GateIo":{"id":["USDD_USDT"]},"Kraken":{"pair":["USDDUSD"],"wsname":["USDD/USD"]},"KuCoin":{"symbol":["USDD-USDC","USDD-USDT"]},"MEXC":{"symbol":["USDDUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "380"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"USDD","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Bybit":{"symbol":["USDDUSDT"]},"GateIo":{"id":["USDD_USDT"]},"KuCoin":{"symbol":["USDD-USDT"]}}}}'
+data = '{"pair":{"base":"USDD","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Bybit":{"symbol":["USDDUSDT"]},"GateIo":{"id":["USDD_USDT"]},"KuCoin":{"symbol":["USDD-USDT"]},"MEXC":{"symbol":["USDDUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "381"
@@ -2338,7 +2338,7 @@ data = '{"pair":{"base":"BAT","quote":"USDC"},"decimals":8,"category":"Crypto","
 id = "386"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"MASK","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[8536],"symbol":["MASK"]}},"exchanges":{"Binance":{"symbol":["MASKUSDT"]},"BinanceUS":{"symbol":["MASKUSD","MASKUSDT"]},"Bitget":{"symbol":["MASKUSDT"]},"Bybit":{"symbol":["MASKUSDT"]},"Coinbase":{"id":["MASK-USD","MASK-USDT"]},"CryptoCom":{"symbol":["MASK_USD","MASK_USDT"]},"GateIo":{"id":["MASK_USDT"]},"Gemini":{"symbol":["MASKUSD"]},"Kraken":{"pair":["MASKUSD"],"wsname":["MASK/USD"]},"KuCoin":{"symbol":["MASK-USDT"]},"MEXC":{"symbol":["MASKUSDT"]},"OKX":{"instId":["MASK-USD","MASK-USDT"]}}}}'
+data = '{"pair":{"base":"MASK","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[8536],"symbol":["MASK"]}},"exchanges":{"Binance":{"symbol":["MASKUSDC","MASKUSDT"]},"BinanceUS":{"symbol":["MASKUSD","MASKUSDT"]},"Bitget":{"symbol":["MASKUSDT"]},"Bybit":{"symbol":["MASKUSDT"]},"Coinbase":{"id":["MASK-USD","MASK-USDT"]},"CryptoCom":{"symbol":["MASK_USD","MASK_USDT"]},"GateIo":{"id":["MASK_USDT"]},"Gemini":{"symbol":["MASKUSD"]},"Kraken":{"pair":["MASKUSD"],"wsname":["MASK/USD"]},"KuCoin":{"symbol":["MASK-USDT"]},"MEXC":{"symbol":["MASKUSDT"]},"OKX":{"instId":["MASK-USD","MASK-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "387"
@@ -2350,7 +2350,7 @@ data = '{"pair":{"base":"MASK","quote":"USDT"},"decimals":8,"category":"Crypto",
 id = "388"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"MASK","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
+data = '{"pair":{"base":"MASK","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["MASKUSDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "389"
@@ -2374,7 +2374,7 @@ data = '{"pair":{"base":"ID","quote":"USDC"},"decimals":18,"category":"Crypto","
 id = "392"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"ZRX","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[1896],"symbol":["ZRX"]}},"exchanges":{"Binance":{"symbol":["ZRXUSDT"]},"BinanceUS":{"symbol":["ZRXUSD","ZRXUSDT"]},"Bitfinex":{"symbol":["tZRXUSD"]},"Bitget":{"symbol":["ZRXUSDT"]},"Bybit":{"symbol":["ZRXUSDT"]},"Coinbase":{"id":["ZRX-USD"]},"CryptoCom":{"symbol":["ZRX_USD"]},"GateIo":{"id":["ZRX_USDT"]},"Gemini":{"symbol":["ZRXUSD"]},"Kraken":{"pair":["ZRXUSD"],"wsname":["ZRX/USD"]},"KuCoin":{"symbol":["ZRX-USDT"]},"MEXC":{"symbol":["ZRXUSDT"]},"OKX":{"instId":["ZRX-USD","ZRX-USDT"]},"Upbit":{"market":["USDT-ZRX"]}}}}'
+data = '{"pair":{"base":"ZRX","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[1896],"symbol":["ZRX"]}},"exchanges":{"Binance":{"symbol":["ZRXUSDT"]},"BinanceUS":{"symbol":["ZRXUSD","ZRXUSDT"]},"Bitfinex":{"symbol":["tZRXUSD"]},"Bitget":{"symbol":["ZRXUSDT"]},"Bybit":{"symbol":["ZRXUSDT"]},"Coinbase":{"id":["ZRX-USD"]},"CryptoCom":{"symbol":["ZRX_USD"]},"GateIo":{"id":["ZRX_USDT"]},"Kraken":{"pair":["ZRXUSD"],"wsname":["ZRX/USD"]},"KuCoin":{"symbol":["ZRX-USDT"]},"MEXC":{"symbol":["ZRXUSDT"]},"OKX":{"instId":["ZRX-USD","ZRX-USDT"]},"Upbit":{"market":["USDT-ZRX"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "393"
@@ -2416,19 +2416,19 @@ data = '{"pair":{"base":"ZRO","quote":"USDC"},"decimals":18,"category":"Crypto",
 id = "399"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"HOT","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[20493,2430,2682],"symbol":["HOT","HOT","HOT"]}},"exchanges":{"Binance":{"symbol":["HOTUSDT"]},"Bitget":{"symbol":["HOTUSDT"]},"Bybit":{"symbol":["HOTUSDT"]},"CryptoCom":{"symbol":["HOT_USD","HOT_USDT"]},"GateIo":{"id":["HOT_USDT"]},"MEXC":{"symbol":["HOTUSDT"]}}}}'
+data = '{"pair":{"base":"HOT","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[20493,2430,2682],"symbol":["HOT","HOT","HOT"]}},"exchanges":{"Binance":{"symbol":["HOTUSDT"]},"Bitget":{"symbol":["HOTUSDT"]},"CryptoCom":{"symbol":["HOT_USD","HOT_USDT"]},"GateIo":{"id":["HOT_USDT"]},"MEXC":{"symbol":["HOTUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "400"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"HOT","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["HOTUSDT"]},"Bitget":{"symbol":["HOTUSDT"]},"Bybit":{"symbol":["HOTUSDT"]},"CryptoCom":{"symbol":["HOT_USDT"]},"GateIo":{"id":["HOT_USDT"]},"MEXC":{"symbol":["HOTUSDT"]}}}}'
+data = '{"pair":{"base":"HOT","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["HOTUSDT"]},"Bitget":{"symbol":["HOTUSDT"]},"CryptoCom":{"symbol":["HOT_USDT"]},"GateIo":{"id":["HOT_USDT"]},"MEXC":{"symbol":["HOTUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "401"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"WEMIX","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[7548],"symbol":["WEMIX"]}},"exchanges":{"Bitget":{"symbol":["WEMIXUSDT"]},"Bybit":{"symbol":["WEMIXUSDT"]},"CryptoCom":{"symbol":["WEMIX_USD"]},"GateIo":{"id":["WEMIX_USDT"]},"KuCoin":{"symbol":["WEMIX-USDT"]},"MEXC":{"symbol":["WEMIXUSDT"]}}}}'
+data = '{"pair":{"base":"WEMIX","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[7548],"symbol":["WEMIX"]}},"exchanges":{"Bitget":{"symbol":["WEMIXUSDT"]},"Bybit":{"symbol":["WEMIXUSDT"]},"GateIo":{"id":["WEMIX_USDT"]},"KuCoin":{"symbol":["WEMIX-USDT"]},"MEXC":{"symbol":["WEMIXUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "402"
@@ -2440,13 +2440,13 @@ data = '{"pair":{"base":"WEMIX","quote":"USDT"},"decimals":8,"category":"Crypto"
 id = "403"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"ORDI","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[25028],"symbol":["ORDI"]}},"exchanges":{"Binance":{"symbol":["ORDIUSDC","ORDIUSDT"]},"Bitget":{"symbol":["ORDIUSDT"]},"Bybit":{"symbol":["ORDIUSDT"]},"CryptoCom":{"symbol":["ORDI_USD","ORDI_USDT"]},"GateIo":{"id":["ORDI_USDC","ORDI_USDT"]},"KuCoin":{"symbol":["ORDI-USDT"]},"MEXC":{"symbol":["ORDIUSDT"]},"OKX":{"instId":["ORDI-USD","ORDI-USDT"]}}}}'
+data = '{"pair":{"base":"ORDI","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[25028],"symbol":["ORDI"]}},"exchanges":{"Binance":{"symbol":["ORDIUSDC","ORDIUSDT"]},"Bitget":{"symbol":["ORDIUSDT"]},"Bybit":{"symbol":["ORDIUSDT"]},"CryptoCom":{"symbol":["ORDI_USD"]},"GateIo":{"id":["ORDI_USDC","ORDI_USDT"]},"KuCoin":{"symbol":["ORDI-USDT"]},"MEXC":{"symbol":["ORDIUSDT"]},"OKX":{"instId":["ORDI-USD","ORDI-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "404"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"ORDI","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["ORDIUSDT"]},"Bitget":{"symbol":["ORDIUSDT"]},"Bybit":{"symbol":["ORDIUSDT"]},"CryptoCom":{"symbol":["ORDI_USDT"]},"GateIo":{"id":["ORDI_USDT"]},"KuCoin":{"symbol":["ORDI-USDT"]},"MEXC":{"symbol":["ORDIUSDT"]},"OKX":{"instId":["ORDI-USDT"]}}}}'
+data = '{"pair":{"base":"ORDI","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["ORDIUSDT"]},"Bitget":{"symbol":["ORDIUSDT"]},"Bybit":{"symbol":["ORDIUSDT"]},"GateIo":{"id":["ORDI_USDT"]},"KuCoin":{"symbol":["ORDI-USDT"]},"MEXC":{"symbol":["ORDIUSDT"]},"OKX":{"instId":["ORDI-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "405"
@@ -2572,7 +2572,7 @@ data = '{"pair":{"base":"YFI","quote":"USDC"},"decimals":8,"category":"Crypto","
 id = "425"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"ENJ","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[2130],"symbol":["ENJ"]}},"exchanges":{"Binance":{"symbol":["ENJUSDT"]},"BinanceUS":{"symbol":["ENJUSD","ENJUSDT"]},"Bitget":{"symbol":["ENJUSDT"]},"Bybit":{"symbol":["ENJUSDT"]},"CryptoCom":{"symbol":["ENJ_USD","ENJ_USDT"]},"GateIo":{"id":["ENJ_USDT"]},"Kraken":{"pair":["ENJUSD"],"wsname":["ENJ/USD"]},"KuCoin":{"symbol":["ENJ-USDT"]},"MEXC":{"symbol":["ENJUSDT"]},"OKX":{"instId":["ENJ-USD","ENJ-USDT"]}}}}'
+data = '{"pair":{"base":"ENJ","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[2130],"symbol":["ENJ"]}},"exchanges":{"Binance":{"symbol":["ENJUSDC","ENJUSDT"]},"BinanceUS":{"symbol":["ENJUSD","ENJUSDT"]},"Bitget":{"symbol":["ENJUSDT"]},"Bybit":{"symbol":["ENJUSDT"]},"CryptoCom":{"symbol":["ENJ_USD","ENJ_USDT"]},"GateIo":{"id":["ENJ_USDT"]},"Kraken":{"pair":["ENJUSD"],"wsname":["ENJ/USD"]},"KuCoin":{"symbol":["ENJ-USDT"]},"MEXC":{"symbol":["ENJUSDT"]},"OKX":{"instId":["ENJ-USD","ENJ-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "426"
@@ -2590,7 +2590,7 @@ data = '{"pair":{"base":"ENJ","quote":"USDT"},"decimals":8,"category":"Crypto","
 id = "428"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"ENJ","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
+data = '{"pair":{"base":"ENJ","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["ENJUSDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "429"
@@ -2650,7 +2650,7 @@ data = '{"pair":{"base":"MEW","quote":"USDC"},"decimals":18,"category":"Crypto",
 id = "438"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"SUSHI","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[6758],"symbol":["SUSHI"]}},"exchanges":{"Binance":{"symbol":["SUSHIUSDT"]},"BinanceUS":{"symbol":["SUSHIUSD","SUSHIUSDT"]},"Bitfinex":{"symbol":["tSUSHI:USD"]},"Bitget":{"symbol":["SUSHIUSDT"]},"Bybit":{"symbol":["SUSHIUSDT"]},"Coinbase":{"id":["SUSHI-USD"]},"CryptoCom":{"symbol":["SUSHI_USD","SUSHI_USDT"]},"GateIo":{"id":["SUSHI_USDT"]},"Gemini":{"symbol":["SUSHIUSD"]},"Kraken":{"pair":["SUSHIUSD"],"wsname":["SUSHI/USD"]},"KuCoin":{"symbol":["SUSHI-USDT"]},"MEXC":{"symbol":["SUSHIUSDT"]},"OKX":{"instId":["SUSHI-USD","SUSHI-USDT"]}}}}'
+data = '{"pair":{"base":"SUSHI","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[6758],"symbol":["SUSHI"]}},"exchanges":{"Binance":{"symbol":["SUSHIUSDC","SUSHIUSDT"]},"BinanceUS":{"symbol":["SUSHIUSD","SUSHIUSDT"]},"Bitfinex":{"symbol":["tSUSHI:USD"]},"Bitget":{"symbol":["SUSHIUSDT"]},"Bybit":{"symbol":["SUSHIUSDT"]},"Coinbase":{"id":["SUSHI-USD"]},"CryptoCom":{"symbol":["SUSHI_USD","SUSHI_USDT"]},"GateIo":{"id":["SUSHI_USDT"]},"Gemini":{"symbol":["SUSHIUSD"]},"Kraken":{"pair":["SUSHIUSD"],"wsname":["SUSHI/USD"]},"KuCoin":{"symbol":["SUSHI-USDT"]},"MEXC":{"symbol":["SUSHIUSDT"]},"OKX":{"instId":["SUSHI-USD","SUSHI-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "439"
@@ -2668,7 +2668,7 @@ data = '{"pair":{"base":"SUSHI","quote":"USDT"},"decimals":8,"category":"Crypto"
 id = "441"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"SUSHI","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
+data = '{"pair":{"base":"SUSHI","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["SUSHIUSDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "442"
@@ -2716,25 +2716,25 @@ data = '{"pair":{"base":"WOO","quote":"USDT"},"decimals":8,"category":"Crypto","
 id = "449"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"POPCAT","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[28782,33470],"symbol":["POPCAT","POPCAT"]}},"exchanges":{"Bybit":{"symbol":["POPCATUSDT"]},"Coinbase":{"id":["POPCAT-USD"]},"CryptoCom":{"symbol":["POPCAT_USD","POPCAT_USDT"]},"GateIo":{"id":["POPCAT_USDT"]},"Gemini":{"symbol":["POPCATUSD"]},"Kraken":{"pair":["POPCATUSD"],"wsname":["POPCAT/USD"]},"KuCoin":{"symbol":["POPCAT-USDT"]},"MEXC":{"symbol":["POPCATUSDC","POPCATUSDT"]}}}}'
+data = '{"pair":{"base":"POPCAT","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[28782,33470],"symbol":["POPCAT","POPCAT"]}},"exchanges":{"BinanceUS":{"symbol":["POPCATUSDT"]},"Bybit":{"symbol":["POPCATUSDT"]},"Coinbase":{"id":["POPCAT-USD"]},"CryptoCom":{"symbol":["POPCAT_USD","POPCAT_USDT"]},"GateIo":{"id":["POPCAT_USDT"]},"Gemini":{"symbol":["POPCATUSD"]},"Kraken":{"pair":["POPCATUSD"],"wsname":["POPCAT/USD"]},"KuCoin":{"symbol":["POPCAT-USDT"]},"MEXC":{"symbol":["POPCATUSDC","POPCATUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "450"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"POPCAT","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Bybit":{"symbol":["POPCATUSDT"]},"CryptoCom":{"symbol":["POPCAT_USDT"]},"GateIo":{"id":["POPCAT_USDT"]},"KuCoin":{"symbol":["POPCAT-USDT"]},"MEXC":{"symbol":["POPCATUSDT"]}}}}'
+data = '{"pair":{"base":"POPCAT","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"BinanceUS":{"symbol":["POPCATUSDT"]},"Bybit":{"symbol":["POPCATUSDT"]},"CryptoCom":{"symbol":["POPCAT_USDT"]},"GateIo":{"id":["POPCAT_USDT"]},"KuCoin":{"symbol":["POPCAT-USDT"]},"MEXC":{"symbol":["POPCATUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "451"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"TURBO","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[24911,33724,34733],"symbol":["TURBO","TURBO","TURBO"]}},"exchanges":{"Binance":{"symbol":["TURBOUSDC","TURBOUSDT"]},"Bitfinex":{"symbol":["tTURBO:USD"]},"Bitget":{"symbol":["TURBOUSDT"]},"Coinbase":{"id":["TURBO-USD"]},"CryptoCom":{"symbol":["TURBO_USD","TURBO_USDT"]},"GateIo":{"id":["TURBO_USDT"]},"Kraken":{"pair":["TURBOUSD"],"wsname":["TURBO/USD"]},"KuCoin":{"symbol":["TURBO-USDT"]},"MEXC":{"symbol":["TURBOUSDC","TURBOUSDT"]},"OKX":{"instId":["TURBO-USD","TURBO-USDC","TURBO-USDT"]}}}}'
+data = '{"pair":{"base":"TURBO","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[24911,33724,34733],"symbol":["TURBO","TURBO","TURBO"]}},"exchanges":{"Binance":{"symbol":["TURBOUSDC","TURBOUSDT"]},"BinanceUS":{"symbol":["TURBOUSDT"]},"Bitget":{"symbol":["TURBOUSDT"]},"Coinbase":{"id":["TURBO-USD"]},"CryptoCom":{"symbol":["TURBO_USD","TURBO_USDT"]},"GateIo":{"id":["TURBO_USDT"]},"Kraken":{"pair":["TURBOUSD"],"wsname":["TURBO/USD"]},"KuCoin":{"symbol":["TURBO-USDT"]},"MEXC":{"symbol":["TURBOUSDC","TURBOUSDT"]},"OKX":{"instId":["TURBO-USD","TURBO-USDC","TURBO-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "452"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"TURBO","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["TURBOUSDT"]},"Bitget":{"symbol":["TURBOUSDT"]},"CryptoCom":{"symbol":["TURBO_USDT"]},"GateIo":{"id":["TURBO_USDT"]},"KuCoin":{"symbol":["TURBO-USDT"]},"MEXC":{"symbol":["TURBOUSDT"]},"OKX":{"instId":["TURBO-USDT"]}}}}'
+data = '{"pair":{"base":"TURBO","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["TURBOUSDT"]},"BinanceUS":{"symbol":["TURBOUSDT"]},"Bitget":{"symbol":["TURBOUSDT"]},"CryptoCom":{"symbol":["TURBO_USDT"]},"GateIo":{"id":["TURBO_USDT"]},"KuCoin":{"symbol":["TURBO-USDT"]},"MEXC":{"symbol":["TURBOUSDT"]},"OKX":{"instId":["TURBO-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "453"
@@ -2770,7 +2770,7 @@ data = '{"pair":{"base":"LRC","quote":"ETH"},"decimals":18,"category":"Crypto","
 id = "458"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"HMSTR","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[32195],"symbol":["HMSTR"]}},"exchanges":{"Binance":{"symbol":["HMSTRUSDC","HMSTRUSDT"]},"Bitfinex":{"symbol":["tHMSTR:USD"]},"Bitget":{"symbol":["HMSTRUSDT"]},"Bybit":{"symbol":["HMSTRUSDC","HMSTRUSDT"]},"CryptoCom":{"symbol":["HMSTR_USD"]},"GateIo":{"id":["HMSTR_USDT"]},"Kraken":{"pair":["HMSTRUSD"],"wsname":["HMSTR/USD"]},"KuCoin":{"symbol":["HMSTR-USDT"]},"MEXC":{"symbol":["HMSTRUSDT"]},"OKX":{"instId":["HMSTR-USD","HMSTR-USDT"]}}}}'
+data = '{"pair":{"base":"HMSTR","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[32195],"symbol":["HMSTR"]}},"exchanges":{"Binance":{"symbol":["HMSTRUSDC","HMSTRUSDT"]},"Bitget":{"symbol":["HMSTRUSDT"]},"Bybit":{"symbol":["HMSTRUSDC","HMSTRUSDT"]},"CryptoCom":{"symbol":["HMSTR_USD"]},"GateIo":{"id":["HMSTR_USDT"]},"Kraken":{"pair":["HMSTRUSD"],"wsname":["HMSTR/USD"]},"KuCoin":{"symbol":["HMSTR-USDT"]},"MEXC":{"symbol":["HMSTRUSDT"]},"OKX":{"instId":["HMSTR-USD","HMSTR-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "459"
@@ -2830,13 +2830,13 @@ data = '{"pair":{"base":"GMT","quote":"USDC"},"decimals":8,"category":"Crypto","
 id = "468"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"FXS","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[6953],"symbol":["FXS"]}},"exchanges":{"Binance":{"symbol":["FXSUSDT"]},"Bitget":{"symbol":["FXSUSDT"]},"Bybit":{"symbol":["FXSUSDT"]},"CryptoCom":{"symbol":["FXS_USD"]},"GateIo":{"id":["FXS_USDT"]},"Kraken":{"pair":["FXSUSD"],"wsname":["FXS/USD"]},"KuCoin":{"symbol":["FXS-USDT"]},"MEXC":{"symbol":["FXSUSDT"]},"OKX":{"instId":["FXS-USDT"]}}}}'
+data = '{"pair":{"base":"FXS","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[6953],"symbol":["FXS"]}},"exchanges":{"Binance":{"symbol":["FXSUSDT"]},"Bitget":{"symbol":["FXSUSDT"]},"Bybit":{"symbol":["FXSUSDT"]},"CryptoCom":{"symbol":["FXS_USD"]},"Kraken":{"pair":["FXSUSD"],"wsname":["FXS/USD"]},"KuCoin":{"symbol":["FXS-USDT"]},"MEXC":{"symbol":["FXSUSDT"]},"OKX":{"instId":["FXS-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "469"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"FXS","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["FXSUSDT"]},"Bitget":{"symbol":["FXSUSDT"]},"Bybit":{"symbol":["FXSUSDT"]},"GateIo":{"id":["FXS_USDT"]},"KuCoin":{"symbol":["FXS-USDT"]},"MEXC":{"symbol":["FXSUSDT"]},"OKX":{"instId":["FXS-USDT"]}}}}'
+data = '{"pair":{"base":"FXS","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["FXSUSDT"]},"Bitget":{"symbol":["FXSUSDT"]},"Bybit":{"symbol":["FXSUSDT"]},"KuCoin":{"symbol":["FXS-USDT"]},"MEXC":{"symbol":["FXSUSDT"]},"OKX":{"instId":["FXS-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "470"
@@ -2926,13 +2926,13 @@ data = '{"pair":{"base":"ARKM","quote":"USDC"},"decimals":18,"category":"Crypto"
 id = "484"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"IO","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[29835],"symbol":["IO"]}},"exchanges":{"Binance":{"symbol":["IOUSDC","IOUSDT"]},"Bitget":{"symbol":["IOUSDT"]},"Bybit":{"symbol":["IOUSDT"]},"Coinbase":{"id":["IO-USD"]},"CryptoCom":{"symbol":["IO_USD","IO_USDT"]},"GateIo":{"id":["IO_USDT"]},"KuCoin":{"symbol":["IO-USDT"]},"MEXC":{"symbol":["IOUSDT"]}}}}'
+data = '{"pair":{"base":"IO","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[29835],"symbol":["IO"]}},"exchanges":{"Binance":{"symbol":["IOUSDC","IOUSDT"]},"Bitget":{"symbol":["IOUSDT"]},"Bybit":{"symbol":["IOUSDT"]},"Coinbase":{"id":["IO-USD"]},"CryptoCom":{"symbol":["IO_USD","IO_USDT"]},"GateIo":{"id":["IO_USDT"]},"KuCoin":{"symbol":["IO-USDT"]},"MEXC":{"symbol":["IOUSDT"]},"Upbit":{"market":["USDT-IO"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "485"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"IO","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["IOUSDT"]},"Bitget":{"symbol":["IOUSDT"]},"Bybit":{"symbol":["IOUSDT"]},"CryptoCom":{"symbol":["IO_USDT"]},"GateIo":{"id":["IO_USDT"]},"KuCoin":{"symbol":["IO-USDT"]},"MEXC":{"symbol":["IOUSDT"]}}}}'
+data = '{"pair":{"base":"IO","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["IOUSDT"]},"Bitget":{"symbol":["IOUSDT"]},"Bybit":{"symbol":["IOUSDT"]},"CryptoCom":{"symbol":["IO_USDT"]},"GateIo":{"id":["IO_USDT"]},"KuCoin":{"symbol":["IO-USDT"]},"MEXC":{"symbol":["IOUSDT"]},"Upbit":{"market":["USDT-IO"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "486"
@@ -3118,13 +3118,13 @@ data = '{"pair":{"base":"MANTA","quote":"USDC"},"decimals":18,"category":"Crypto
 id = "516"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"ALT","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[10897,22065,29073],"symbol":["ALT","ALT","ALT"]}},"exchanges":{"Binance":{"symbol":["ALTUSDC","ALTUSDT"]},"Bybit":{"symbol":["ALTUSDT"]},"Coinbase":{"id":["ALT-USD"]},"CryptoCom":{"symbol":["ALT_USD"]},"GateIo":{"id":["ALT_USDC","ALT_USDT"]},"Kraken":{"pair":["ALTUSD"],"wsname":["ALT/USD"]},"MEXC":{"symbol":["ALTUSDT"]}}}}'
+data = '{"pair":{"base":"ALT","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[10897,22065,29073],"symbol":["ALT","ALT","ALT"]}},"exchanges":{"Binance":{"symbol":["ALTUSDC","ALTUSDT"]},"Bybit":{"symbol":["ALTUSDT"]},"Coinbase":{"id":["ALT-USD"]},"CryptoCom":{"symbol":["ALT_USD"]},"GateIo":{"id":["ALT_USDC","ALT_USDT"]},"Kraken":{"pair":["ALTUSD"],"wsname":["ALT/USD"]},"MEXC":{"symbol":["ALTUSDT"]},"Upbit":{"market":["USDT-ALT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "517"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"ALT","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["ALTUSDT"]},"Bybit":{"symbol":["ALTUSDT"]},"GateIo":{"id":["ALT_USDT"]},"MEXC":{"symbol":["ALTUSDT"]}}}}'
+data = '{"pair":{"base":"ALT","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["ALTUSDT"]},"Bybit":{"symbol":["ALTUSDT"]},"GateIo":{"id":["ALT_USDT"]},"MEXC":{"symbol":["ALTUSDT"]},"Upbit":{"market":["USDT-ALT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "518"
@@ -3136,13 +3136,13 @@ data = '{"pair":{"base":"ALT","quote":"USDC"},"decimals":18,"category":"Crypto",
 id = "519"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"SPELL","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[11289],"symbol":["SPELL"]}},"exchanges":{"Binance":{"symbol":["SPELLUSDT"]},"BinanceUS":{"symbol":["SPELLUSD","SPELLUSDT"]},"Bitfinex":{"symbol":["tSPELL:USD"]},"Bitget":{"symbol":["SPELLUSDT"]},"Bybit":{"symbol":["SPELLUSDT"]},"Coinbase":{"id":["SPELL-USD"]},"CryptoCom":{"symbol":["SPELL_USD","SPELL_USDT"]},"GateIo":{"id":["SPELL_USDT"]},"Kraken":{"pair":["SPELLUSD"],"wsname":["SPELL/USD"]},"MEXC":{"symbol":["SPELLUSDT"]}}}}'
+data = '{"pair":{"base":"SPELL","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[11289],"symbol":["SPELL"]}},"exchanges":{"Binance":{"symbol":["SPELLUSDT"]},"BinanceUS":{"symbol":["SPELLUSD","SPELLUSDT"]},"Bitfinex":{"symbol":["tSPELL:USD"]},"Bitget":{"symbol":["SPELLUSDT"]},"Bybit":{"symbol":["SPELLUSDT"]},"Coinbase":{"id":["SPELL-USD"]},"CryptoCom":{"symbol":["SPELL_USD"]},"GateIo":{"id":["SPELL_USDT"]},"Kraken":{"pair":["SPELLUSD"],"wsname":["SPELL/USD"]},"MEXC":{"symbol":["SPELLUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "520"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"SPELL","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["SPELLUSDT"]},"BinanceUS":{"symbol":["SPELLUSDT"]},"Bitget":{"symbol":["SPELLUSDT"]},"Bybit":{"symbol":["SPELLUSDT"]},"CryptoCom":{"symbol":["SPELL_USDT"]},"GateIo":{"id":["SPELL_USDT"]},"MEXC":{"symbol":["SPELLUSDT"]}}}}'
+data = '{"pair":{"base":"SPELL","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["SPELLUSDT"]},"BinanceUS":{"symbol":["SPELLUSDT"]},"Bitget":{"symbol":["SPELLUSDT"]},"Bybit":{"symbol":["SPELLUSDT"]},"GateIo":{"id":["SPELL_USDT"]},"MEXC":{"symbol":["SPELLUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "521"
@@ -3166,13 +3166,13 @@ data = '{"pair":{"base":"BOME","quote":"USDC"},"decimals":18,"category":"Crypto"
 id = "524"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"IQ","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[2930],"symbol":["IQ"]}},"exchanges":{"Binance":{"symbol":["IQUSDT"]},"Bitget":{"symbol":["IQUSDT"]},"CryptoCom":{"symbol":["IQ_USD"]},"GateIo":{"id":["IQ_USDT"]},"MEXC":{"symbol":["IQUSDT"]},"OKX":{"instId":["IQ-USD","IQ-USDT"]}}}}'
+data = '{"pair":{"base":"IQ","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[2930],"symbol":["IQ"]}},"exchanges":{"Binance":{"symbol":["IQUSDT"]},"Bitget":{"symbol":["IQUSDT"]},"CryptoCom":{"symbol":["IQ_USD"]},"GateIo":{"id":["IQ_USDT"]},"MEXC":{"symbol":["IQUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "525"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"IQ","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["IQUSDT"]},"Bitget":{"symbol":["IQUSDT"]},"GateIo":{"id":["IQ_USDT"]},"MEXC":{"symbol":["IQUSDT"]},"OKX":{"instId":["IQ-USDT"]}}}}'
+data = '{"pair":{"base":"IQ","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["IQUSDT"]},"Bitget":{"symbol":["IQUSDT"]},"GateIo":{"id":["IQ_USDT"]},"MEXC":{"symbol":["IQUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "526"
@@ -3184,13 +3184,13 @@ data = '{"pair":{"base":"IQ","quote":"USDC"},"decimals":18,"category":"Crypto","
 id = "527"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"AIXBT","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[34103],"symbol":["AIXBT"]}},"exchanges":{"Binance":{"symbol":["AIXBTUSDC","AIXBTUSDT"]},"Bitget":{"symbol":["AIXBTUSDT"]},"Bybit":{"symbol":["AIXBTUSDT"]},"CryptoCom":{"symbol":["AIXBT_USD"]},"GateIo":{"id":["AIXBT_USDT"]},"Kraken":{"pair":["AIXBTUSD"],"wsname":["AIXBT/USD"]},"KuCoin":{"symbol":["AIXBT-USDT"]},"MEXC":{"symbol":["AIXBTUSDC","AIXBTUSDT"]},"OKX":{"instId":["AIXBT-USD","AIXBT-USDT"]}}}}'
+data = '{"pair":{"base":"AIXBT","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[34103],"symbol":["AIXBT"]}},"exchanges":{"Binance":{"symbol":["AIXBTUSDC","AIXBTUSDT"]},"BinanceUS":{"symbol":["AIXBTUSDT"]},"Bitget":{"symbol":["AIXBTUSDT"]},"Bybit":{"symbol":["AIXBTUSDT"]},"CryptoCom":{"symbol":["AIXBT_USD"]},"GateIo":{"id":["AIXBT_USDT"]},"Kraken":{"pair":["AIXBTUSD"],"wsname":["AIXBT/USD"]},"KuCoin":{"symbol":["AIXBT-USDT"]},"MEXC":{"symbol":["AIXBTUSDC","AIXBTUSDT"]},"OKX":{"instId":["AIXBT-USD","AIXBT-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "528"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"AIXBT","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["AIXBTUSDT"]},"Bitget":{"symbol":["AIXBTUSDT"]},"Bybit":{"symbol":["AIXBTUSDT"]},"GateIo":{"id":["AIXBT_USDT"]},"KuCoin":{"symbol":["AIXBT-USDT"]},"MEXC":{"symbol":["AIXBTUSDT"]},"OKX":{"instId":["AIXBT-USDT"]}}}}'
+data = '{"pair":{"base":"AIXBT","quote":"USDT"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["AIXBTUSDT"]},"BinanceUS":{"symbol":["AIXBTUSDT"]},"Bitget":{"symbol":["AIXBTUSDT"]},"Bybit":{"symbol":["AIXBTUSDT"]},"GateIo":{"id":["AIXBT_USDT"]},"KuCoin":{"symbol":["AIXBT-USDT"]},"MEXC":{"symbol":["AIXBTUSDT"]},"OKX":{"instId":["AIXBT-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "529"
@@ -3280,7 +3280,7 @@ data = '{"pair":{"base":"ONG","quote":"USDT"},"decimals":8,"category":"Crypto","
 id = "543"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"BLAST","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[28480,9967],"symbol":["BLAST","BLAST"]}},"exchanges":{"Bitfinex":{"symbol":["tBLAST:USD"]},"Bitget":{"symbol":["BLASTUSDT"]},"Bybit":{"symbol":["BLASTUSDT"]},"Coinbase":{"id":["BLAST-USD"]},"CryptoCom":{"symbol":["BLAST_USD"]},"GateIo":{"id":["BLAST_USDT"]},"KuCoin":{"symbol":["BLAST-USDT"]},"MEXC":{"symbol":["BLASTUSDT"]},"Upbit":{"market":["USDT-BLAST"]}}}}'
+data = '{"pair":{"base":"BLAST","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[28480,9967],"symbol":["BLAST","BLAST"]}},"exchanges":{"Bitget":{"symbol":["BLASTUSDT"]},"Bybit":{"symbol":["BLASTUSDT"]},"Coinbase":{"id":["BLAST-USD"]},"CryptoCom":{"symbol":["BLAST_USD"]},"GateIo":{"id":["BLAST_USDT"]},"KuCoin":{"symbol":["BLAST-USDT"]},"MEXC":{"symbol":["BLASTUSDT"]},"Upbit":{"market":["USDT-BLAST"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "544"
@@ -3754,7 +3754,7 @@ data = '{"pair":{"base":"MERL","quote":"USDC"},"decimals":18,"category":"Crypto"
 id = "622"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"DEGEN","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[24276,25514,28773,30096,34380],"symbol":["DEGEN","DEGEN","DEGEN","DEGEN","DEGEN"]}},"exchanges":{"Bybit":{"symbol":["DEGENUSDT"]},"Coinbase":{"id":["DEGEN-USD"]},"CryptoCom":{"symbol":["DEGEN_USD"]},"GateIo":{"id":["DEGEN_USDT"]},"KuCoin":{"symbol":["DEGEN-USDT"]},"MEXC":{"symbol":["DEGENUSDT"]},"OKX":{"instId":["DEGEN-USD","DEGEN-USDT"]}}}}'
+data = '{"pair":{"base":"DEGEN","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[24276,25514,28773,30096,34380],"symbol":["DEGEN","DEGEN","DEGEN","DEGEN","DEGEN"]}},"exchanges":{"Bybit":{"symbol":["DEGENUSDT"]},"Coinbase":{"id":["DEGEN-USD"]},"CryptoCom":{"symbol":["DEGEN_USD"]},"GateIo":{"id":["DEGEN_USDT"]},"Kraken":{"pair":["DEGENUSD"],"wsname":["DEGEN/USD"]},"KuCoin":{"symbol":["DEGEN-USDT"]},"MEXC":{"symbol":["DEGENUSDT"]},"OKX":{"instId":["DEGEN-USD","DEGEN-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "623"
@@ -3856,7 +3856,7 @@ data = '{"pair":{"base":"STG","quote":"USDT"},"decimals":8,"category":"Crypto","
 id = "639"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"MOODENG","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[33065,33076,33093,33647],"symbol":["MOODENG","MOODENG","MOODENG","MOODENG"]}},"exchanges":{"Bitget":{"symbol":["MOODENGUSDT"]},"Coinbase":{"id":["MOODENG-USD"]},"CryptoCom":{"symbol":["MOODENG_USD"]},"GateIo":{"id":["MOODENG_USDT"]},"Gemini":{"symbol":["MOODENGUSD"]},"Kraken":{"pair":["MOODENGUSD"],"wsname":["MOODENG/USD"]},"KuCoin":{"symbol":["MOODENG-USDT"]},"MEXC":{"symbol":["MOODENGUSDT"]},"OKX":{"instId":["MOODENG-USD","MOODENG-USDC","MOODENG-USDT"]}}}}'
+data = '{"pair":{"base":"MOODENG","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[33065,33076,33093,33647],"symbol":["MOODENG","MOODENG","MOODENG","MOODENG"]}},"exchanges":{"Bitget":{"symbol":["MOODENGUSDT"]},"Coinbase":{"id":["MOODENG-USD"]},"CryptoCom":{"symbol":["MOODENG_USD"]},"GateIo":{"id":["MOODENG_USDT"]},"Gemini":{"symbol":["MOODENGUSD"]},"Kraken":{"pair":["MOODENGUSD"],"wsname":["MOODENG/USD"]},"KuCoin":{"symbol":["MOODENG-USDC","MOODENG-USDT"]},"MEXC":{"symbol":["MOODENGUSDT"]},"OKX":{"instId":["MOODENG-USD","MOODENG-USDC","MOODENG-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "640"
@@ -3868,13 +3868,13 @@ data = '{"pair":{"base":"MOODENG","quote":"USDT"},"decimals":18,"category":"Cryp
 id = "641"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"MOODENG","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"OKX":{"instId":["MOODENG-USDC"]}}}}'
+data = '{"pair":{"base":"MOODENG","quote":"USDC"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"KuCoin":{"symbol":["MOODENG-USDC"]},"OKX":{"instId":["MOODENG-USDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "642"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"BADGER","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[7859],"symbol":["BADGER"]}},"exchanges":{"Binance":{"symbol":["BADGERUSDT"]},"Bitget":{"symbol":["BADGERUSDT"]},"Coinbase":{"id":["BADGER-USD"]},"CryptoCom":{"symbol":["BADGER_USD"]},"GateIo":{"id":["BADGER_USDT"]},"Kraken":{"pair":["BADGERUSD"],"wsname":["BADGER/USD"]},"MEXC":{"symbol":["BADGERUSDT"]},"OKX":{"instId":["BADGER-USD","BADGER-USDT"]}}}}'
+data = '{"pair":{"base":"BADGER","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[7859],"symbol":["BADGER"]}},"exchanges":{"Binance":{"symbol":["BADGERUSDT"]},"Bitget":{"symbol":["BADGERUSDT"]},"Coinbase":{"id":["BADGER-USD"]},"GateIo":{"id":["BADGER_USDT"]},"Kraken":{"pair":["BADGERUSD"],"wsname":["BADGER/USD"]},"MEXC":{"symbol":["BADGERUSDT"]},"OKX":{"instId":["BADGER-USD","BADGER-USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "643"
@@ -4066,13 +4066,13 @@ data = '{"pair":{"base":"QUICK","quote":"USDT"},"decimals":8,"category":"Crypto"
 id = "674"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"ALCX","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[8613],"symbol":["ALCX"]}},"exchanges":{"Binance":{"symbol":["ALCXUSDT"]},"Coinbase":{"id":["ALCX-USD"]},"CryptoCom":{"symbol":["ALCX_USD"]},"GateIo":{"id":["ALCX_USDT"]},"Kraken":{"pair":["ALCXUSD"],"wsname":["ALCX/USD"]},"OKX":{"instId":["ALCX-USD","ALCX-USDT"]}}}}'
+data = '{"pair":{"base":"ALCX","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[8613],"symbol":["ALCX"]}},"exchanges":{"Binance":{"symbol":["ALCXUSDT"]},"Coinbase":{"id":["ALCX-USD"]},"CryptoCom":{"symbol":["ALCX_USD"]},"GateIo":{"id":["ALCX_USDT"]},"Kraken":{"pair":["ALCXUSD"],"wsname":["ALCX/USD"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "675"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"ALCX","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["ALCXUSDT"]},"GateIo":{"id":["ALCX_USDT"]},"OKX":{"instId":["ALCX-USDT"]}}}}'
+data = '{"pair":{"base":"ALCX","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["ALCXUSDT"]},"GateIo":{"id":["ALCX_USDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "676"
@@ -4138,13 +4138,13 @@ data = '{"pair":{"base":"BSW","quote":"USDT"},"decimals":8,"category":"Crypto","
 id = "686"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"NULS","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[2092],"symbol":["NULS"]}},"exchanges":{"Binance":{"symbol":["NULSUSDT"]},"GateIo":{"id":["NULS_USDT"]},"MEXC":{"symbol":["NULSUSDT"]},"OKX":{"instId":["NULS-USD","NULS-USDT"]}}}}'
+data = '{"pair":{"base":"NULS","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[2092],"symbol":["NULS"]}},"exchanges":{"Binance":{"symbol":["NULSUSDT"]},"GateIo":{"id":["NULS_USDT"]},"MEXC":{"symbol":["NULSUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "687"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"NULS","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["NULSUSDT"]},"GateIo":{"id":["NULS_USDT"]},"MEXC":{"symbol":["NULSUSDT"]},"OKX":{"instId":["NULS-USDT"]}}}}'
+data = '{"pair":{"base":"NULS","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["NULSUSDT"]},"GateIo":{"id":["NULS_USDT"]},"MEXC":{"symbol":["NULSUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "688"
@@ -4156,13 +4156,13 @@ data = '{"pair":{"base":"NULS","quote":"USDC"},"decimals":8,"category":"Crypto",
 id = "689"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"WING","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[33798,7048],"symbol":["WING","WING"]}},"exchanges":{"Binance":{"symbol":["WINGUSDT"]},"Bitget":{"symbol":["WINGUSDT"]},"GateIo":{"id":["WING_USDT"]},"MEXC":{"symbol":["WINGUSDT"]}}}}'
+data = '{"pair":{"base":"WING","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[33798,7048],"symbol":["WING","WING"]}},"exchanges":{"Binance":{"symbol":["WINGUSDT"]},"GateIo":{"id":["WING_USDT"]},"MEXC":{"symbol":["WINGUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "690"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"WING","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["WINGUSDT"]},"Bitget":{"symbol":["WINGUSDT"]},"GateIo":{"id":["WING_USDT"]},"MEXC":{"symbol":["WINGUSDT"]}}}}'
+data = '{"pair":{"base":"WING","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["WINGUSDT"]},"GateIo":{"id":["WING_USDT"]},"MEXC":{"symbol":["WINGUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "691"
@@ -4180,19 +4180,19 @@ data = '{"pair":{"base":"TOKEN","quote":"USDT"},"decimals":18,"category":"Crypto
 id = "693"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"LINA","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[7102],"symbol":["LINA"]}},"exchanges":{"Binance":{"symbol":["LINAUSDT"]},"GateIo":{"id":["LINA_USDT"]},"MEXC":{"symbol":["LINAUSDT"]}}}}'
+data = '{"pair":{"base":"LINA","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[7102],"symbol":["LINA"]}},"exchanges":{"Binance":{"symbol":["LINAUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "694"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"LINA","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["LINAUSDT"]},"GateIo":{"id":["LINA_USDT"]},"MEXC":{"symbol":["LINAUSDT"]}}}}'
+data = '{"pair":{"base":"LINA","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["LINAUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "695"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"TRUMP","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[24615,26338,27872,28514,29382,29561,29602,31400,31553,31680,31692,31792,31846,31874,32305,32557,32835,32865,32929,32932,33561,33831,33888,34490,34589],"symbol":["TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP"]}},"exchanges":{"Binance":{"symbol":["TRUMPUSDC","TRUMPUSDT"]},"BinanceUS":{"symbol":["TRUMPUSD","TRUMPUSDT"]},"Bitget":{"symbol":["TRUMPUSDC","TRUMPUSDT"]},"Bybit":{"symbol":["TRUMPUSDC","TRUMPUSDT"]},"Coinbase":{"id":["TRUMP-USD"]},"CryptoCom":{"symbol":["TRUMP_USD","TRUMP_USDT"]},"GateIo":{"id":["TRUMP_USDT"]},"Kraken":{"pair":["TRUMPUSD","TRUMPUSDC","TRUMPUSDT"],"wsname":["TRUMP/USD","TRUMP/USDC","TRUMP/USDT"]},"KuCoin":{"symbol":["TRUMP-USDC","TRUMP-USDT"]},"MEXC":{"symbol":["TRUMPUSDC","TRUMPUSDT"]},"OKX":{"instId":["TRUMP-USD","TRUMP-USDT"]},"Upbit":{"market":["USDT-TRUMP"]}}}}'
+data = '{"pair":{"base":"TRUMP","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[24615,26338,27872,28514,29382,29561,29602,31400,31553,31680,31692,31792,31846,31874,32305,32557,32835,32865,32929,32932,33561,33831,33888,34490,34589],"symbol":["TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP","TRUMP"]}},"exchanges":{"Binance":{"symbol":["TRUMPUSDC","TRUMPUSDT"]},"BinanceUS":{"symbol":["TRUMPUSD","TRUMPUSDT"]},"Bitget":{"symbol":["TRUMPUSDC","TRUMPUSDT"]},"Bybit":{"symbol":["TRUMPUSDC","TRUMPUSDT"]},"Coinbase":{"id":["TRUMP-USD"]},"CryptoCom":{"symbol":["TRUMP_USD","TRUMP_USDT"]},"GateIo":{"id":["TRUMP_USDT"]},"Gemini":{"symbol":["TRUMPUSD"]},"Kraken":{"pair":["TRUMPUSD","TRUMPUSDC","TRUMPUSDT"],"wsname":["TRUMP/USD","TRUMP/USDC","TRUMP/USDT"]},"KuCoin":{"symbol":["TRUMP-USDC","TRUMP-USDT"]},"MEXC":{"symbol":["TRUMPUSDC","TRUMPUSDT"]},"OKX":{"instId":["TRUMP-USD","TRUMP-USDT"]},"Upbit":{"market":["USDT-TRUMP"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "696"
@@ -4222,25 +4222,25 @@ data = '{"pair":{"base":"ULTI","quote":"USDT"},"decimals":18,"category":"Crypto"
 id = "700"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"ALPACA","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[8707],"symbol":["ALPACA"]}},"exchanges":{"Binance":{"symbol":["ALPACAUSDT"]},"Bitget":{"symbol":["ALPACAUSDT"]},"GateIo":{"id":["ALPACA_USDT"]},"MEXC":{"symbol":["ALPACAUSDT"]}}}}'
+data = '{"pair":{"base":"ALPACA","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[8707],"symbol":["ALPACA"]}},"exchanges":{"Binance":{"symbol":["ALPACAUSDT"]},"GateIo":{"id":["ALPACA_USDT"]},"MEXC":{"symbol":["ALPACAUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "701"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"ALPACA","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["ALPACAUSDT"]},"Bitget":{"symbol":["ALPACAUSDT"]},"GateIo":{"id":["ALPACA_USDT"]},"MEXC":{"symbol":["ALPACAUSDT"]}}}}'
+data = '{"pair":{"base":"ALPACA","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["ALPACAUSDT"]},"GateIo":{"id":["ALPACA_USDT"]},"MEXC":{"symbol":["ALPACAUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "702"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"REN","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[2539],"symbol":["REN"]}},"exchanges":{"Binance":{"symbol":["RENUSDT"]},"BinanceUS":{"symbol":["RENUSD","RENUSDT"]},"Bitget":{"symbol":["RENUSDT"]},"GateIo":{"id":["REN_USDT"]},"Gemini":{"symbol":["RENUSD"]},"Kraken":{"pair":["RENUSD"],"wsname":["REN/USD"]},"KuCoin":{"symbol":["REN-USDT"]},"MEXC":{"symbol":["RENUSDT"]}}}}'
+data = '{"pair":{"base":"REN","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[2539],"symbol":["REN"]}},"exchanges":{"Binance":{"symbol":["RENUSDT"]},"BinanceUS":{"symbol":["RENUSD","RENUSDT"]},"GateIo":{"id":["REN_USDT"]},"Kraken":{"pair":["RENUSD"],"wsname":["REN/USD"]},"KuCoin":{"symbol":["REN-USDT"]},"MEXC":{"symbol":["RENUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "703"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"REN","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["RENUSDT"]},"BinanceUS":{"symbol":["RENUSDT"]},"Bitget":{"symbol":["RENUSDT"]},"GateIo":{"id":["REN_USDT"]},"KuCoin":{"symbol":["REN-USDT"]},"MEXC":{"symbol":["RENUSDT"]}}}}'
+data = '{"pair":{"base":"REN","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["RENUSDT"]},"BinanceUS":{"symbol":["RENUSDT"]},"GateIo":{"id":["REN_USDT"]},"KuCoin":{"symbol":["REN-USDT"]},"MEXC":{"symbol":["RENUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "704"
@@ -4258,13 +4258,13 @@ data = '{"pair":{"base":"MAVIA","quote":"USDT"},"decimals":8,"category":"Crypto"
 id = "706"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"KLIMA","quote":"USD"},"decimals":8,"category":"","market_hours":null,"arguments":{"aggregators":{"CoinMarketCap":{"id":[12873],"symbol":["KLIMA"]}},"exchanges":{"GateIo":{"id":["KLIMA_USDT"]},"MEXC":{"symbol":["KLIMAUSDT"]}}}}'
+data = '{"pair":{"base":"KLIMA","quote":"USD"},"decimals":8,"category":"","market_hours":null,"arguments":{"aggregators":{"CoinMarketCap":{"id":[12873],"symbol":["KLIMA"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "707"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"KLIMA","quote":"USDT"},"decimals":8,"category":"","market_hours":null,"arguments":{"exchanges":{"GateIo":{"id":["KLIMA_USDT"]},"MEXC":{"symbol":["KLIMAUSDT"]}}}}'
+data = '{"pair":{"base":"KLIMA","quote":"USDT"},"decimals":8,"category":"","market_hours":null,"arguments":{}}'
 
 [[trigger.oracle.data_feeds]]
 id = "708"
@@ -4282,13 +4282,13 @@ data = '{"pair":{"base":"SKY","quote":"USDT"},"decimals":8,"category":"Crypto","
 id = "710"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"WELL","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[20734],"symbol":["WELL"]}},"exchanges":{"Bitget":{"symbol":["WELLUSDT"]},"Bybit":{"symbol":["WELLUSDT"]},"Coinbase":{"id":["WELL-USD"]},"GateIo":{"id":["WELL_USDT"]},"Kraken":{"pair":["WELLUSD"],"wsname":["WELL/USD"]},"KuCoin":{"symbol":["WELL-USDT"]},"MEXC":{"symbol":["WELLUSDT"]}}}}'
+data = '{"pair":{"base":"WELL","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"aggregators":{"CoinMarketCap":{"id":[20734],"symbol":["WELL"]}},"exchanges":{"Bitget":{"symbol":["WELLUSDT"]},"Coinbase":{"id":["WELL-USD"]},"GateIo":{"id":["WELL_USDT"]},"Kraken":{"pair":["WELLUSD"],"wsname":["WELL/USD"]},"KuCoin":{"symbol":["WELL-USDT"]},"MEXC":{"symbol":["WELLUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "711"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"WELL","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Bitget":{"symbol":["WELLUSDT"]},"Bybit":{"symbol":["WELLUSDT"]},"GateIo":{"id":["WELL_USDT"]},"KuCoin":{"symbol":["WELL-USDT"]},"MEXC":{"symbol":["WELLUSDT"]}}}}'
+data = '{"pair":{"base":"WELL","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Bitget":{"symbol":["WELLUSDT"]},"GateIo":{"id":["WELL_USDT"]},"KuCoin":{"symbol":["WELL-USDT"]},"MEXC":{"symbol":["WELLUSDT"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "712"
@@ -4372,7 +4372,7 @@ data = '{"pair":{"base":"IP","quote":"USDT"},"decimals":18,"category":"Crypto","
 id = "725"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"FTM","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["FTMUSDC","FTMUSDT"]},"BinanceUS":{"symbol":["FTMUSD","FTMUSDT"]},"Gemini":{"symbol":["FTMUSD"]},"Kraken":{"pair":["FTMUSD"],"wsname":["FTM/USD"]}}}}'
+data = '{"pair":{"base":"FTM","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["FTMUSDC","FTMUSDT"]},"BinanceUS":{"symbol":["FTMUSD","FTMUSDT"]},"Gemini":{"symbol":["FTMUSD"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "726"
@@ -4405,16 +4405,23 @@ decimals = 8
 data = '{"pair":{"base":"RNDR","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["RNDRUSDC"]}}}}'
 
 [[trigger.oracle.data_feeds]]
+id = "731"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"cbETH","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Coinbase":{"id":["CBETH-USD"]}}}}'
+
+[[trigger.oracle.data_feeds]]
 id = "50000"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"USDT","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"BinanceUS":{"symbol":["USDTUSD"]},"Coinbase":{"id":["USDT-USD","USDT-USDC"]},"CryptoCom":{"symbol":["USDT_USD"]},"GateIo":{"id":["USDT_USD"]},"Gemini":{"symbol":["USDTUSD"]},"Kraken":{"pair":["USDTZUSD"],"wsname":["USDT/USD"]},"KuCoin":{"symbol":["USDT-USDC"]},"OKX":{"instId":["USDT-USD","USDT-USDC"]}}}}'
+data = '{"pair":{"base":"USDT","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"BinanceUS":{"symbol":["USDTUSD"]},"Coinbase":{"id":["USDT-USD","USDT-USDC"]},"CryptoCom":{"symbol":["USDT_USD"]},"GateIo":{"id":["USDT_USD"]},"Gemini":{"symbol":["USDTUSD"]},"Kraken":{"pair":["USDTZUSD"],"wsname":["USDT/USD"]},"KuCoin":{"symbol":["USDT-USDC"]},"OKX":{"instId":["USDT-USD"]}}}}'
 
 [[trigger.oracle.data_feeds]]
 id = "50001"
 stride = 0
 decimals = 8
 data = '{"pair":{"base":"USDC","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["USDCUSDT"]},"BinanceUS":{"symbol":["USDCUSD","USDCUSDT"]},"Bitget":{"symbol":["USDCUSDT"]},"Bybit":{"symbol":["USDCUSDT"]},"GateIo":{"id":["USDC_USDT"]},"Gemini":{"symbol":["USDCUSD"]},"Kraken":{"pair":["USDCUSD","USDCUSDT"],"wsname":["USDC/USD","USDC/USDT"]},"KuCoin":{"symbol":["USDC-USDT"]},"MEXC":{"symbol":["USDCUSDT"]},"OKX":{"instId":["USDC-USDT"]},"Upbit":{"market":["USDT-USDC"]}}}}'
+
 [component.cex-price-feeds]
 source = "../../../target/wasm32-wasip1/release/cex_price_feeds.wasm"
 allowed_outbound_hosts = [

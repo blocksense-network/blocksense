@@ -125,7 +125,7 @@ describe('CLFeedRegistryAdapter', async () => {
       await clAdapter.checkLatestRoundData(caller, value, 1n);
     }
 
-    for (const [i, d] of data.entries()) {
+    for (const d of data) {
       await clRegistry.checkLatestRoundData(caller, d.base, d.quote, value, 1n);
     }
   });
@@ -137,7 +137,7 @@ describe('CLFeedRegistryAdapter', async () => {
       await clAdapter.checkRoundData(caller, value, 1n);
     }
 
-    for (const [i, d] of data.entries()) {
+    for (const d of data) {
       await clRegistry.checkRoundData(caller, d.base, d.quote, value, 1n);
     }
   });

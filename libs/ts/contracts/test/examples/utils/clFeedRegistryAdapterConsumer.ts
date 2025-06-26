@@ -1,114 +1,67 @@
-import { Addressable, ContractRunner } from 'ethers';
-import { ethers } from 'hardhat';
+import { Contract } from 'ethers';
 
-interface RegistryConfig {
-  address: string | Addressable;
-  abiJson: any;
-  provider: ContractRunner;
-}
+type EthersContractParams = ConstructorParameters<typeof Contract>;
 
-export const getDecimals = async (
-  config: RegistryConfig,
+export const getDecimals = (
+  config: EthersContractParams,
   base: string,
   quote: string,
 ) => {
-  const registry = new ethers.Contract(
-    config.address,
-    config.abiJson,
-    config.provider,
-  );
-  const decimals = await registry.decimals(base, quote);
-
-  return decimals;
+  const registry = new Contract(...config);
+  return registry.decimals(base, quote);
 };
 
-export const getDescription = async (
-  config: RegistryConfig,
+export const getDescription = (
+  config: EthersContractParams,
   base: string,
   quote: string,
 ) => {
-  const registry = new ethers.Contract(
-    config.address,
-    config.abiJson,
-    config.provider,
-  );
-  const description = await registry.description(base, quote);
-
-  return description;
+  const registry = new Contract(...config);
+  return registry.description(base, quote);
 };
 
-export const getLatestAnswer = async (
-  config: RegistryConfig,
+export const getLatestAnswer = (
+  config: EthersContractParams,
   base: string,
   quote: string,
 ) => {
-  const registry = new ethers.Contract(
-    config.address,
-    config.abiJson,
-    config.provider,
-  );
-  const latestAnswer = await registry.latestAnswer(base, quote);
-
-  return latestAnswer;
+  const registry = new Contract(...config);
+  return registry.latestAnswer(base, quote);
 };
 
-export const getLatestRound = async (
-  config: RegistryConfig,
+export const getLatestRound = (
+  config: EthersContractParams,
   base: string,
   quote: string,
 ) => {
-  const registry = new ethers.Contract(
-    config.address,
-    config.abiJson,
-    config.provider,
-  );
-  const latestRound = await registry.latestRound(base, quote);
-
-  return latestRound;
+  const registry = new Contract(...config);
+  return registry.latestRound(base, quote);
 };
 
-export const getRoundData = async (
-  config: RegistryConfig,
+export const getRoundData = (
+  config: EthersContractParams,
   base: string,
   quote: string,
   roundId: number,
 ) => {
-  const registry = new ethers.Contract(
-    config.address,
-    config.abiJson,
-    config.provider,
-  );
-  const roundData = await registry.getRoundData(base, quote, roundId);
-
-  return roundData;
+  const registry = new Contract(...config);
+  return registry.getRoundData(base, quote, roundId);
 };
 
-export const getLatestRoundData = async (
-  config: RegistryConfig,
+export const getLatestRoundData = (
+  config: EthersContractParams,
   base: string,
   quote: string,
 ) => {
-  const registry = new ethers.Contract(
-    config.address,
-    config.abiJson,
-    config.provider,
-  );
-  const latestRoundData = await registry.latestRoundData(base, quote);
-
-  return latestRoundData;
+  const registry = new Contract(...config);
+  return registry.latestRoundData(base, quote);
 };
 
-export const getFeed = async (
-  config: RegistryConfig,
+export const getFeed = (
+  config: EthersContractParams,
   base: string,
   quote: string,
 ) => {
-  const registry = new ethers.Contract(
-    config.address,
-    config.abiJson,
-    config.provider,
-  );
-  const feed = await registry.getFeed(base, quote);
-
-  return feed;
+  const registry = new Contract(...config);
+  return registry.getFeed(base, quote);
 };

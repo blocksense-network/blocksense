@@ -16,7 +16,7 @@ use blocksense_utils::time::current_unix_time;
 use rdkafka::producer::FutureRecord;
 use rdkafka::util::Timeout;
 use serde_json::json;
-use std::collections::{HashMap, VecDeque};
+use std::collections::{BTreeSet, HashMap, VecDeque};
 use std::io::Error;
 use std::mem;
 use std::sync::Arc;
@@ -62,7 +62,7 @@ pub async fn block_creator_loop(
 
             // Updates that overflowed the capacity of a block
             let mut backlog_updates: VecDeque<VotedFeedUpdateWithProof> = Default::default();
-            let mut updates: Vec<VotedFeedUpdateWithProof> = Default::default();
+            let mut updates: BTreeSet<VotedFeedUpdateWithProof> = Default::default();
 
             let mut new_feeds_to_register = Vec::new();
             let mut feeds_ids_to_delete = Vec::new();
@@ -81,9 +81,11 @@ pub async fn block_creator_loop(
                     .await_end_of_current_slot(&Repeatability::Periodic) => {
                          // Only emit a block if data is present
                         if !updates.is_empty() || !new_feeds_to_register.is_empty() || !feeds_ids_to_delete.is_empty() {
+                            let mut updates_vec = std::mem::take(updates).into_iter().collect::<Vec<_>>();
+
                             debug!("Emitting block, since there is data present...");
                             if let Err(e) = generate_block(
-                                updates,
+                                &mut updates_vec,
                                 new_feeds_to_register,
                                 feeds_ids_to_delete,
                                 &batched_votes_send,
@@ -102,7 +104,7 @@ pub async fn block_creator_loop(
                                 if updates.len() == max_feed_updates_to_batch {
                                     break;
                                 }
-                                updates.push(v);
+                                updates.insert(v);
                             }
                         }
                     }
@@ -124,7 +126,7 @@ pub async fn block_creator_loop(
 // When we recv feed updates that have passed aggregation, we prepare them to be placed in the next generated block
 async fn recvd_feed_update_to_block(
     recvd_feed_update: Option<VotedFeedUpdateWithProof>,
-    updates_to_block: &mut Vec<VotedFeedUpdateWithProof>,
+    updates_to_block: &mut BTreeSet<VotedFeedUpdateWithProof>,
     backlog_updates: &mut VecDeque<VotedFeedUpdateWithProof>,
     max_feed_updates_to_batch: usize,
     feeds_config: &Arc<RwLock<HashMap<u32, FeedConfig>>>,
@@ -154,7 +156,7 @@ async fn recvd_feed_update_to_block(
             };
             info!("adding {:?} => {:?} to updates", key, val);
             if updates_to_block.len() < max_feed_updates_to_batch {
-                updates_to_block.push(voted_update);
+                updates_to_block.insert(voted_update);
             } else {
                 warn!(
                     "updates.keys().len() >= max_feed_updates_to_batch ({} >= {})",

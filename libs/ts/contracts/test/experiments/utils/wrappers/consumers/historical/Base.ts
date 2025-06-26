@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { HistoricalConsumer } from '../../../../../../typechain';
+import { HistoricalConsumer } from '@blocksense/contracts/typechain';
 import { BaseContract } from 'ethers';
 import { DataFeedStoreConsumerBaseWrapper } from '../Base';
 import { IHistoricalWrapper } from '../../../../utils/wrappers/interfaces/IHistoricalWrapper';

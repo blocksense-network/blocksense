@@ -21,7 +21,7 @@ import {
   UpgradeableProxyHistoricalDataFeedStoreV2Wrapper,
 } from './utils/wrappers';
 import { compareGasUsed } from './utils/helpers/dataFeedGasHelpers';
-import { ITransparentUpgradeableProxy__factory } from '../../typechain';
+import { ITransparentUpgradeableProxy__factory } from '@blocksense/contracts/typechain';
 
 let contractWrappers: UpgradeableProxyBaseWrapper<DataFeedStore>[] = [];
 let contractGenericWrappers: UpgradeableProxyBaseWrapper<GenericDataFeedStore>[] =

@@ -1,13 +1,13 @@
 {
   "name": "@blocksense/changelog-generator",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "license": "MIT",
-  "description": "An Effect app related with Release notes functionality",
+  "description": "Blocksense Changelog Generator",
   "bin": "./dist/bin.cjs",
   "scripts": {
     "build": "tsup --dts && yarn copy-package-json",
-    "ts": "yarn node --import tsx",
+    "start": "yarn node --import tsx ./src/bin.ts",
     "build:ts": "tsup",
     "lint": "yarn run -T eslint \"**/{src,test,examples,scripts,dtslint}/**/*.{ts,mjs}\"",
     "lint-fix": "yarn lint --fix",
@@ -18,6 +18,8 @@
     "changeset-publish": "yarn build && TEST_DIST= yarn vitest && changeset publish"
   },
   "dependencies": {
+    "@blocksense/base-utils": "workspace:^",
+    "@blocksense/config-types": "workspace:^",
     "@effect/cli": "0.63.9",
     "@effect/cluster": "^0.38.14",
     "@effect/experimental": "^0.48.10",

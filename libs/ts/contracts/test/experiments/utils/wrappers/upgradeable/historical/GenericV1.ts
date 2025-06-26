@@ -1,7 +1,7 @@
 import {
   HistoricalDataFeedStoreGenericV1,
   UpgradeableProxy,
-} from '../../../../../../typechain';
+} from '@blocksense/contracts/typechain';
 import { deployContract } from '../../../helpers/common';
 import { HistoricalDataFeedStoreGenericV1Wrapper } from '../../historical/GenericV1';
 import { UpgradeableProxyHistoricalBaseWrapper } from './Base';

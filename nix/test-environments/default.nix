@@ -23,22 +23,12 @@
         }))
       ];
 
-      runEnvironments = lib.pipe allEnvironments [
-        (builtins.map (x: {
-          name = "run-${x.name}";
-          value = pkgs.writeShellScriptBin "run-${x.name}" ''
-            ${lib.getExe pkgs.process-compose} -f ${x.value}
-          '';
-        }))
-        lib.listToAttrs
-      ];
-
       allProcessComposeFiles = pkgs.runCommand "allProcessComposeFiles" { } ''
         mkdir $out
         (
           set -x
           ${lib.concatMapStringsSep "\n" (
-            x: "cp ${x.value} $out/${x.name}-process-compose.yaml"
+            x: "cp ${x.value} $out/process-compose-${x.name}.yaml"
           ) allEnvironments}
         )
       '';
@@ -50,17 +40,13 @@
 
       packages = {
         inherit allProcessComposeFiles;
-      } // runEnvironments;
+      };
 
-      devenv.shells =
-        {
-          default.packages = builtins.attrValues runEnvironments;
-        }
-        // lib.genAttrs allEnvironmentNames (name: {
-          imports = [
-            self.nixosModules.blocksense-process-compose
-            ./${name}.nix
-          ];
-        });
+      devenv.shells = lib.genAttrs allEnvironmentNames (name: {
+        imports = [
+          self.nixosModules.blocksense-process-compose
+          ./${name}.nix
+        ];
+      });
     };
 }

@@ -3,6 +3,7 @@
   "include": ["test"],
   "compilerOptions": {
     "rootDir": "test",
-    "tsBuildInfoFile": ".tsbuildinfo/test.tsbuildinfo"
+    "tsBuildInfoFile": ".tsbuildinfo/test.tsbuildinfo",
+    "composite": true
   }
 }

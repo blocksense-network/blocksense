@@ -1,5 +1,8 @@
 import { ethers } from 'hardhat';
-import { ICLFeedRegistryAdapter, RegistryExp } from '../../../../../typechain';
+import {
+  ICLFeedRegistryAdapter,
+  RegistryExp,
+} from '@blocksense/contracts/typechain';
 import { OracleBaseWrapper } from '../Base';
 import { deployContract } from '../../../../experiments/utils/helpers/common';
 import { RegistryUnderlier } from '../../types';

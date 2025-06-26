@@ -1,77 +1,33 @@
-import { Addressable, ContractRunner } from 'ethers';
-import { ethers } from 'hardhat';
+import { Contract } from 'ethers';
 
-interface AggregatorConfig {
-  address: string | Addressable;
-  abiJson: any;
-  provider: ContractRunner;
-}
+type EthersContractParams = ConstructorParameters<typeof Contract>;
 
-export const getDecimals = async (config: AggregatorConfig) => {
-  const aggregator = new ethers.Contract(
-    config.address,
-    config.abiJson,
-    config.provider,
-  );
-  const decimals = await aggregator.decimals();
-
-  return decimals;
+export const getDecimals = (config: EthersContractParams) => {
+  const aggregator = new Contract(...config);
+  return aggregator.decimals();
 };
 
-export const getDescription = async (config: AggregatorConfig) => {
-  const aggregator = new ethers.Contract(
-    config.address,
-    config.abiJson,
-    config.provider,
-  );
-  const description = await aggregator.description();
-
-  return description;
+export const getDescription = (config: EthersContractParams) => {
+  const aggregator = new Contract(...config);
+  return aggregator.description();
 };
 
-export const getLatestAnswer = async (config: AggregatorConfig) => {
-  const aggregator = new ethers.Contract(
-    config.address,
-    config.abiJson,
-    config.provider,
-  );
-  const latestAnswer = await aggregator.latestAnswer();
-
-  return latestAnswer;
+export const getLatestAnswer = (config: EthersContractParams) => {
+  const aggregator = new Contract(...config);
+  return aggregator.latestAnswer();
 };
 
-export const getLatestRound = async (config: AggregatorConfig) => {
-  const aggregator = new ethers.Contract(
-    config.address,
-    config.abiJson,
-    config.provider,
-  );
-  const latestRound = await aggregator.latestRound();
-
-  return latestRound;
+export const getLatestRound = (config: EthersContractParams) => {
+  const aggregator = new Contract(...config);
+  return aggregator.latestRound();
 };
 
-export const getRoundData = async (
-  config: AggregatorConfig,
-  roundId: number,
-) => {
-  const aggregator = new ethers.Contract(
-    config.address,
-    config.abiJson,
-    config.provider,
-  );
-  const roundData = await aggregator.getRoundData(roundId);
-
-  return roundData;
+export const getRoundData = (config: EthersContractParams, roundId: number) => {
+  const aggregator = new Contract(...config);
+  return aggregator.getRoundData(roundId);
 };
 
-export const getLatestRoundData = async (config: AggregatorConfig) => {
-  const aggregator = new ethers.Contract(
-    config.address,
-    config.abiJson,
-    config.provider,
-  );
-  const latestRoundData = await aggregator.latestRoundData();
-
-  return latestRoundData;
+export const getLatestRoundData = (config: EthersContractParams) => {
+  const aggregator = new Contract(...config);
+  return aggregator.latestRoundData();
 };
