@@ -16,8 +16,8 @@
   },
   "dependencies": {
     "@blocksense/base-utils": "workspace:*",
+    "@blocksense/docs-ui": "workspace:*",
     "@blocksense/social-verification": "workspace:*",
-    "@blocksense/ui": "workspace:*",
     "@effect/platform": "^0.80.13",
     "@next/third-parties": "^15.3.1",
     "@tailwindcss/postcss": "^4.0.7",

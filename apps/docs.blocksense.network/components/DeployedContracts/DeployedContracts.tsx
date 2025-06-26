@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { Callout } from '@blocksense/ui/Callout';
+import { Callout } from '@blocksense/docs-ui/Callout';
 import { parseNetworkName } from '@blocksense/base-utils/evm/networks';
 
 import { capitalizeWords } from '@/src/utils';

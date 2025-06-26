@@ -167,7 +167,7 @@ apps/docs.blocksense.network/artifacts
 
 # Storybook
 *storybook.log
-libs/ts/ui/storybook-static
+libs/ts/docs-ui/storybook-static
 
 # wasm artifacts
 .spin/

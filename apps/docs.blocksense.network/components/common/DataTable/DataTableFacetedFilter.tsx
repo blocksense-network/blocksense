@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { Button } from '@blocksense/ui/Button';
+import { Button } from '@blocksense/docs-ui/Button';
 import {
   Command,
   CommandEmpty,
@@ -10,15 +10,15 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from '@blocksense/ui/Command';
+} from '@blocksense/docs-ui/Command';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@blocksense/ui/Popover';
-import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
-import { Checkbox } from '@blocksense/ui/Checkbox';
-import { Separator } from '@blocksense/ui';
+} from '@blocksense/docs-ui/Popover';
+import { ImageWrapper } from '@blocksense/docs-ui/ImageWrapper';
+import { Checkbox } from '@blocksense/docs-ui/Checkbox';
+import { Separator } from '@blocksense/docs-ui';
 
 interface DataTableFacetedFilterProps {
   title: string;

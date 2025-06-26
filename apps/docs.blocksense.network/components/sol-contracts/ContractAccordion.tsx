@@ -2,14 +2,14 @@
 
 import { ReactNode, useRef } from 'react';
 
-import { Label } from '@blocksense/ui/Label';
-import { Switch } from '@blocksense/ui/Switch';
+import { Label } from '@blocksense/docs-ui/Label';
+import { Switch } from '@blocksense/docs-ui/Switch';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@blocksense/ui/Accordion';
+} from '@blocksense/docs-ui/Accordion';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 import { useExpandCollapse } from '@/hooks/useExpandCollapse';
 

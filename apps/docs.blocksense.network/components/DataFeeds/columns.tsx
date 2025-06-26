@@ -1,4 +1,4 @@
-import { Tooltip } from '@blocksense/ui/Tooltip';
+import { Tooltip } from '@blocksense/docs-ui/Tooltip';
 
 import { DataTableColumnHeader } from '@/components/common/DataTable/DataTableColumnHeader';
 import { DataTableBadge } from '@/components/common/DataTable/DataTableBadge';

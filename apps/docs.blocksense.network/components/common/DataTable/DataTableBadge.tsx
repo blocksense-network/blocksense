@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react';
 
-import { Badge } from '@blocksense/ui/Badge';
+import { Badge } from '@blocksense/docs-ui/Badge';
 
 import { cellHaveContent, noCellData } from './dataTableUtils';
 
