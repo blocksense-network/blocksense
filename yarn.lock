@@ -2109,6 +2109,36 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@blocksense/chain-interactions@workspace:apps/chain-interactions":
+  version: 0.0.0-use.local
+  resolution: "@blocksense/chain-interactions@workspace:apps/chain-interactions"
+  dependencies:
+    "@changesets/changelog-github": "npm:^0.5.1"
+    "@changesets/cli": "npm:^2.29.4"
+    "@effect/cli": "npm:0.63.9"
+    "@effect/cluster": "npm:^0.38.14"
+    "@effect/experimental": "npm:^0.48.10"
+    "@effect/language-service": "npm:^0.20.1"
+    "@effect/platform": "npm:0.84.9"
+    "@effect/platform-node": "npm:0.85.14"
+    "@effect/printer": "npm:^0.44.5"
+    "@effect/printer-ansi": "npm:^0.44.5"
+    "@effect/rpc": "npm:^0.61.13"
+    "@effect/sql": "npm:^0.37.10"
+    "@effect/typeclass": "npm:^0.35.5"
+    "@effect/vitest": "npm:0.23.5"
+    "@types/node": "npm:^22.5.2"
+    "@vitest/coverage-v8": "npm:^3.2.3"
+    effect: "npm:^3.15.1"
+    tsup: "npm:^8.5.0"
+    tsx: "npm:^4.19.1"
+    typescript: "npm:5.8.3"
+    vitest: "npm:^3.1.3"
+  bin:
+    chain-interactions: ./dist/bin.cjs
+  languageName: unknown
+  linkType: soft
+
 "@blocksense/changelog-generator@workspace:apps/changelog-generator":
   version: 0.0.0-use.local
   resolution: "@blocksense/changelog-generator@workspace:apps/changelog-generator"
