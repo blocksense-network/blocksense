@@ -13,6 +13,7 @@ import {
   DeploymentConfigSchemaV2,
   DeploymentConfigV2,
 } from './evm-contracts-deployment';
+import { SequencerDeploymentConfigSchema } from './node-config';
 
 export function readConfig<Name extends ConfigFileName>(
   configName: Name,
@@ -124,6 +125,10 @@ export const configFiles = (configDir: string = defaultConfigDir) =>
     ['evm_contracts_deployment_v1']: {
       path: `${configDir}/evm_contracts_deployment_v1.json`,
       schema: DeploymentConfigSchemaV1,
+    },
+    ['sequencer_config_v1']: {
+      path: `${configDir}/sequencer_config_v1.json`,
+      schema: SequencerDeploymentConfigSchema,
     },
   }) satisfies {
     [name: string]: {
