@@ -22,7 +22,7 @@ with lib;
 
     metrics-url = mkOption {
       type = types.str;
-      default = "http://0.0.0.0:9091/metrics/job/reporter";
+      default = "";
       description = "The url of the metrics service.";
     };
 

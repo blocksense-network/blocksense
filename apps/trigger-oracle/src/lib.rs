@@ -271,7 +271,7 @@ impl TriggerExecutor for OracleTrigger {
     }
 
     async fn run(self, config: Self::RunConfig) -> anyhow::Result<()> {
-        tracing::trace!("Starting Blocksense Reporter");
+        tracing::trace!("Startg Blocksense Reporter");
 
         let engine = Arc::new(self.engine);
         if config.test {
