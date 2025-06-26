@@ -1,27 +1,22 @@
 import {
-  Chain,
+  Address,
   createPublicClient,
   getContract,
   http,
   type PublicClient,
 } from 'viem';
-import * as viemChains from 'viem/chains';
 
-import {
-  getRpcUrl,
-  networkMetadata,
-  NetworkName,
-} from '@blocksense/base-utils/evm';
-import { valuesOf } from '@blocksense/base-utils/array-iter';
+import { getRpcUrl, NetworkName } from '@blocksense/base-utils/evm';
 
 import { abi as clAdapterAbi } from './abi';
+import { getViemChain } from '../common';
 
 export class CLAggregatorAdapter {
   public contract;
   public client: PublicClient;
 
   constructor(
-    public contractAddress: `0x${string}`,
+    public contractAddress: Address,
     networkName: NetworkName,
   ) {
     this.client = createPublicClient({
@@ -30,7 +25,7 @@ export class CLAggregatorAdapter {
     });
 
     this.contract = getContract({
-      address: contractAddress,
+      address: this.contractAddress,
       abi: clAdapterAbi,
       client: this.client,
     });
@@ -40,7 +35,7 @@ export class CLAggregatorAdapter {
     return await this.contract.read.decimals();
   }
 
-  async dataFeedStore(): Promise<`0x${string}`> {
+  async dataFeedStore(): Promise<Address> {
     return await this.contract.read.dataFeedStore();
   }
 
@@ -92,7 +87,7 @@ export class CLAggregatorAdapter {
       return result;
     });
     return {
-      dataFeedStore: results[0].result as `0x${string}`,
+      dataFeedStore: results[0].result as Address,
       decimals: results[1].result as number,
       description: results[2].result as string,
       id: results[3].result as bigint,
@@ -117,7 +112,7 @@ export type CLAggregatorAdapterData = {
   id: bigint;
   decimals: number;
   description: string;
-  dataFeedStore: `0x${string}`;
+  dataFeedStore: Address;
   latestAnswer: bigint;
   latestRound: bigint;
   latestRoundData: RoundData;
@@ -133,14 +128,4 @@ function parseRoundData(
     updatedAt: roundData[3],
     answeredInRound: roundData[4],
   };
-}
-
-function getViemChain(network: NetworkName): Chain | undefined {
-  const id = networkMetadata[network].chainId;
-  const chain = valuesOf(viemChains).find(chain => chain.id === id);
-  if (!chain) {
-    console.error(`Viem chain definition not found for network: ${network}`);
-    return undefined;
-  }
-  return chain;
 }
