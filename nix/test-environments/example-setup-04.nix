@@ -23,9 +23,11 @@ in
 
     anvil = {
       ink-sepolia = {
-        port = 8547;
+        port = 8080;
+        # port = 8547;
         chain-id = 99999999999;
-        fork-url = "wss://ws-gel-sepolia.inkonchain.com";
+        fork-url = "http://localhost";
+        # fork-url = "wss://ws-gel-sepolia.inkonchain.com";
       };
     };
 
