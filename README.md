@@ -21,7 +21,7 @@
 
 ## 🚀 Overview
 
-Blocksense is a **permissionless oracle network** that enables builders to bring **real-world data on-chain** with maximum flexibility and efficiency. Our WebAssembly-based [SDK](libs/sdk/README.md) enables the seamless creation of blockchain oracles that can leverage both CPU and GPU computations.
+Blocksense is a **permissionless oracle network** that enables builders to bring **real-world data on-chain** with maximum flexibility and efficiency. Our WebAssembly-based [SDK](libs/sdk/README.md) enables the seamless creation of blockchain oracles that can leverage arbitrary internet sources and complex CPU and GPU computations.
 
 - ✅ **Cost-effective, verifiable data feeds** for DeFi, prediction markets, and beyond.
 - 🔒 **SchellingCoin-based consensus & ZK-proof-secured reporting.**
