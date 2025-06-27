@@ -2451,6 +2451,7 @@ __metadata:
     solidity-coverage: "npm:^0.8.12"
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
+    tsx: "npm:^4.19.2"
     typechain: "npm:^8.3.2"
     viem: "npm:^2.31.4"
   languageName: unknown
