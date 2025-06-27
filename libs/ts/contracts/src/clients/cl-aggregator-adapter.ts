@@ -1,28 +1,18 @@
-import {
-  Address,
-  createPublicClient,
-  getContract,
-  http,
-  type PublicClient,
-} from 'viem';
+import { getContract, PublicClient, Address } from 'viem';
 
-import { getRpcUrl, NetworkName } from '@blocksense/base-utils/evm';
+import { ContractConsumer } from './contract-consumer';
+import { abi as clAdapterAbi } from '../abi/cl-adapter';
 
-import { abi as clAdapterAbi } from './abi';
-import { getViemChain } from '../common';
-
-export class CLAggregatorAdapter {
+export class CLAggregatorAdapter extends ContractConsumer {
   public contract;
-  public client: PublicClient;
 
-  constructor(
-    public contractAddress: Address,
-    networkName: NetworkName,
-  ) {
-    this.client = createPublicClient({
-      chain: getViemChain(networkName),
-      transport: http(getRpcUrl(networkName)),
-    });
+  /**
+   * Constructs a CLAggregatorAdapter.
+   * @param contractAddress The address of the CLAggregatorAdapter contract.
+   * @param client The Viem PublicClient instance to use.
+   */
+  constructor(contractAddress: Address, client: PublicClient) {
+    super(contractAddress, client);
 
     this.contract = getContract({
       address: this.contractAddress,
