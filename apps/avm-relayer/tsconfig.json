@@ -10,6 +10,7 @@
       "@template/cli/*": ["./src/*.js"]
     }
   },
+  "exclude": ["dist"],
   "references": [
     { "path": "tsconfig.src.json" },
     { "path": "tsconfig.test.json" },

@@ -2294,7 +2294,6 @@ __metadata:
     "@types/node": "npm:^24.0.4"
     "@vitest/coverage-v8": "npm:^3.2.3"
     effect: "npm:^3.15.1"
-    kafkajs: "npm:^2.2.4"
     ts-node: "npm:^10.9.2"
     tsup: "npm:^8.5.0"
     tsx: "npm:^4.19.1"
@@ -22449,13 +22448,6 @@ __metadata:
     jwa: "npm:^2.0.0"
     safe-buffer: "npm:^5.0.1"
   checksum: 10c0/f1ca77ea5451e8dc5ee219cb7053b8a4f1254a79cb22417a2e1043c1eb8a569ae118c68f24d72a589e8a3dd1824697f47d6bd4fb4bebb93a3bdf53545e721661
-  languageName: node
-  linkType: hard
-
-"kafkajs@npm:^2.2.4":
-  version: 2.2.4
-  resolution: "kafkajs@npm:2.2.4"
-  checksum: 10c0/6eece1f682a257955f647b6142430e87681d11bf01e9ebe0a73b4bc0653b8f970c48ba72a3b25fdbb4205cfbb36e5ef93d954b8f8c5f7767ae2b4693bdec9d88
   languageName: node
   linkType: hard
 
