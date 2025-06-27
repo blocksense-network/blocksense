@@ -1,18 +1,7 @@
-import {
-  createPublicClient,
-  http,
-  type PublicClient,
-  Hex,
-  encodePacked,
-  Address,
-} from 'viem';
+import { PublicClient, Hex, encodePacked, Address } from 'viem';
+import { BaseDataFeedConsumer } from './base-contract-client';
 
-import { getRpcUrl, NetworkName } from '@blocksense/base-utils/evm';
-
-import { getViemChain } from '../common';
-
-export class AggregatedDataFeedStore {
-  public client: PublicClient;
+export class AggregatedDataFeedStore extends BaseDataFeedConsumer {
   private selectors = {
     getLatestIndex: '0x81',
     getLatestSingleData: '0x82',
@@ -22,14 +11,8 @@ export class AggregatedDataFeedStore {
     getFeedAtIndex: '0x86',
   } as const;
 
-  constructor(
-    public contractAddress: Address,
-    networkName: NetworkName,
-  ) {
-    this.client = createPublicClient({
-      chain: getViemChain(networkName),
-      transport: http(getRpcUrl(networkName)),
-    });
+  constructor(contractAddress: Address, client: PublicClient) {
+    super(contractAddress, client);
   }
 
   private async call(encodedParams: Hex): Promise<Hex> {
