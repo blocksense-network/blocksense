@@ -34,7 +34,7 @@ const meta: Meta<typeof Tooltip> = {
             </h2>
             <div className="grid grid-cols-2 gap-4">
               {styles.map((style, index) => (
-                <Tooltip position={position} contentClassName={style}>
+                <Tooltip key={index} position={position} contentClassName={style}>
                   <Tooltip.Content>Tooltip works!</Tooltip.Content>
                   <button className="px-4 py-2 bg-blue-500 text-white rounded">
                     hover
