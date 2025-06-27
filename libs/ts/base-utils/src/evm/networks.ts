@@ -252,716 +252,1520 @@ export const networkMetadata = {
   local: {
     chainId: 99999999999,
     isTestnet: false,
-    explorerUrl: undefined,
+    explorers: [
+      {
+        type: 'unknown',
+        webUrl: '',
+        apiUrl: null,
+      },
+    ],
     currency: Currency.ETH,
   },
   'ethereum-mainnet': {
     chainId: 1,
     isTestnet: false,
-    explorerUrl: 'https://etherscan.io',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://etherscan.io',
+        apiUrl: 'https://api.etherscan.io/api',
+      },
+      {
+        type: 'blockscout',
+        webUrl: 'https://eth.blockscout.com',
+        apiUrl: 'https://eth.blockscout.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'ethereum-sepolia': {
     chainId: 11155111,
     isTestnet: true,
-    explorerUrl: 'https://sepolia.etherscan.io',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://sepolia.etherscan.io',
+        apiUrl: 'https://api-sepolia.etherscan.io/api',
+      },
+      {
+        type: 'blockscout',
+        webUrl: 'https://eth-sepolia.blockscout.com',
+        apiUrl: 'https://eth-sepolia.blockscout.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'ethereum-holesky': {
     chainId: 17000,
     isTestnet: true,
-    explorerUrl: 'https://holesky.etherscan.io',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://holesky.etherscan.io',
+        apiUrl: 'https://api-holesky.etherscan.io/api',
+      },
+      {
+        type: 'blockscout',
+        webUrl: 'https://eth-holesky.blockscout.com',
+        apiUrl: 'https://eth-holesky.blockscout.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'abstract-testnet': {
     chainId: 11124,
     isTestnet: true,
-    explorerUrl: 'https://explorer.testnet.abs.xyz',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://sepolia.abscan.org',
+        apiUrl: 'https://api-sepolia.abscan.org/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'arbitrum-mainnet': {
     chainId: 42161,
     isTestnet: false,
-    explorerUrl: 'https://arbiscan.io',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://arbitrum.blockscout.com',
+        apiUrl: 'https://arbitrum.blockscout.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'arbitrum-sepolia': {
     chainId: 421614,
     isTestnet: true,
-    explorerUrl: 'https://sepolia.arbiscan.io',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://arbitrum-sepolia.blockscout.com',
+        apiUrl: 'https://arbitrum-sepolia.blockscout.com/api',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://arbiscan.io/',
+        apiUrl: 'https://api-sepolia.arbiscan.io/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'aurora-testnet': {
     chainId: 1313161555,
     isTestnet: true,
-    explorerUrl: 'https://explorer.testnet.aurora.dev',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.testnet.aurora.dev',
+        apiUrl: 'https://explorer.testnet.aurora.dev/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'avalanche-mainnet': {
     chainId: 43114,
     isTestnet: false,
-    explorerUrl: 'https://snowtrace.io',
+    explorers: [
+      {
+        type: 'routescan',
+        webUrl: 'https://snowtrace.io',
+        apiUrl:
+          'https://api.routescan.io/v2/network/mainnet/evm/43114/etherscan',
+      },
+    ],
     currency: Currency.AVAX,
   },
   'avalanche-fuji': {
     chainId: 43113,
     isTestnet: true,
-    explorerUrl: 'https://testnet.snowtrace.io',
+    explorers: [
+      {
+        type: 'routescan',
+        webUrl: 'https://subnets-test.avax.network/c-chain',
+        apiUrl:
+          'https://api.routescan.io/v2/network/testnet/evm/43113/etherscan',
+      },
+    ],
     currency: Currency.AVAX,
   },
   'base-mainnet': {
     chainId: 8453,
     isTestnet: false,
-    explorerUrl: 'https://basescan.org',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://base.blockscout.com',
+        apiUrl: 'https://base.blockscout.com/api',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://basescan.org/',
+        apiUrl: 'https://api.basescan.org/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'base-sepolia': {
     chainId: 84532,
     isTestnet: true,
-    explorerUrl: 'https://sepolia.basescan.org',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://sepolia.basescan.org/',
+        apiUrl: 'https://api-sepolia.basescan.org/api',
+      },
+      {
+        type: 'blockscout',
+        webUrl: 'https://base-sepolia.blockscout.com',
+        apiUrl: 'https://base-sepolia.blockscout.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   basecamp: {
     chainId: 123420001114,
     isTestnet: true,
-    explorerUrl: 'https://basecamp.cloud.blockscout.com',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://basecamp.cloud.blockscout.com',
+        apiUrl: 'https://basecamp.cloud.blockscout.com/api',
+      },
+    ],
     currency: Currency.CAMP,
   },
   'berachain-mainnet': {
     chainId: 80094,
     isTestnet: false,
-    explorerUrl: 'https://berascan.com',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://berascan.com',
+        apiUrl: 'https://api.berascan.com/api',
+      },
+    ],
     currency: Currency.BERA,
   },
   'berachain-bartio': {
     chainId: 80084,
     isTestnet: true,
-    explorerUrl: 'https://bartio.beratrail.io',
+    explorers: [
+      {
+        type: 'routescan',
+        webUrl: 'https://bartio.beratrail.io',
+        apiUrl:
+          'https://api.routescan.io/v2/network/testnet/evm/80084/etherscan',
+      },
+    ],
     currency: Currency.BERA,
   },
   'berachain-bepolia': {
     chainId: 80069,
     isTestnet: true,
-    explorerUrl: 'https://bepolia.beratrail.io',
+    explorers: [
+      {
+        type: 'routescan',
+        webUrl: 'https://bepolia.beratrail.io',
+        apiUrl:
+          'https://api.routescan.io/v2/network/testnet/evm/80069/etherscan',
+      },
+    ],
     currency: Currency.BERA,
   },
   'bitlayer-mainnet': {
     chainId: 200901,
     isTestnet: false,
-    explorerUrl: 'https://www.btrscan.com',
+    explorers: [
+      {
+        type: 'bitlayer',
+        webUrl: 'https://btrscan.com',
+        apiUrl: 'https://api.btrscan.com/scan/api',
+      },
+    ],
     currency: Currency.BTC,
   },
   'bitlayer-testnet': {
     chainId: 200810,
     isTestnet: true,
-    explorerUrl: 'https://testnet-scan.bitlayer.org',
+    explorers: [
+      {
+        type: 'bitlayer',
+        webUrl: 'https://testnet-scan.bitlayer.org',
+        apiUrl: 'https://api-testnet.bitlayer.org/scan/api',
+      },
+    ],
     currency: Currency.BTC,
   },
   'blast-mainnet': {
     chainId: 81457,
     isTestnet: false,
-    explorerUrl: 'https://blastscan.io',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer-testnet.unit0.dev',
+        apiUrl: 'https://explorer-testnet.unit0.dev/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'blast-sepolia': {
     chainId: 168587773,
     isTestnet: true,
-    explorerUrl: 'https://sepolia.blastscan.io',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://sepolia.blastscan.io',
+        apiUrl: 'https://api-sepolia.blastscan.io/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'boba-bnb-mainnet': {
     chainId: 56288,
     isTestnet: false,
-    explorerUrl: 'https://bnb.bobascan.com/',
+    explorers: [
+      {
+        type: 'routescan',
+        webUrl: 'https://bnb.bobascan.com',
+        apiUrl:
+          'https://api.routescan.io/v2/network/mainnet/evm/56288/etherscan',
+      },
+    ],
     currency: Currency.ETH,
   },
   'boba-bnb-testnet': {
     chainId: 9728,
     isTestnet: true,
-    explorerUrl: 'https://bnb.testnet.bobascan.com/',
+    explorers: [
+      {
+        type: 'routescan',
+        webUrl: 'https://bnb.testnet.bobascan.com',
+        apiUrl:
+          'https://api.routescan.io/v2/network/testnet/evm/9728/etherscan',
+      },
+    ],
     currency: Currency.ETH,
   },
   'boba-mainnet': {
     chainId: 288,
     isTestnet: false,
-    explorerUrl: 'https://bobascan.com',
     currency: Currency.ETH,
+    explorers: [
+      {
+        type: 'routescan',
+        webUrl: 'https://bobascan.com',
+        apiUrl: 'https://api.routescan.io/v2/network/mainnet/evm/288/etherscan',
+      },
+    ],
   },
   'boba-sepolia': {
     chainId: 28882,
     isTestnet: true,
-    explorerUrl: 'https://sepolia.testnet.bobascan.com',
+    explorers: [
+      {
+        type: 'routescan',
+        webUrl: 'https://sepolia.testnet.bobascan.com',
+        apiUrl:
+          'https://api.routescan.io/v2/network/testnet/evm/28882/etherscan',
+      },
+    ],
     currency: Currency.ETH,
   },
   'bsc-mainnet': {
     chainId: 56,
     isTestnet: false,
-    explorerUrl: 'https://bscscan.com',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://bscscan.com',
+        apiUrl: 'https://api.bscscan.com/api',
+      },
+    ],
     currency: Currency.BNB,
   },
   'bsc-testnet': {
     chainId: 97,
     isTestnet: true,
-    explorerUrl: 'https://testnet.bscscan.com',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://testnet.bscscan.com',
+        apiUrl: 'https://api-testnet.bscscan.com/api',
+      },
+    ],
     currency: Currency.tBNB,
   },
   'camp-network-testnet-v2': {
     chainId: 325000,
     isTestnet: true,
-    explorerUrl: 'https://camp-network-testnet.blockscout.com',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://camp-network-testnet.blockscout.com',
+        apiUrl: null,
+      },
+    ],
     currency: Currency.ETH,
   },
   'celo-mainnet': {
     chainId: 42220,
     isTestnet: false,
-    explorerUrl: 'https://celoscan.com',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://celo.blockscout.com',
+        apiUrl: 'https://celo.blockscout.com/api',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://celoscan.io',
+        apiUrl: 'https://api.celoscan.io/api',
+      },
+    ],
     currency: Currency.CELO,
   },
   'celo-alfajores': {
     chainId: 44787,
     isTestnet: true,
-    explorerUrl: 'https://alfajores.celoscan.com',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://celo-alfajores.blockscout.com',
+        apiUrl: 'https://celo-alfajores.blockscout.com/api',
+      },
+    ],
     currency: Currency.CELO,
   },
   'citrea-testnet': {
     chainId: 5115,
     isTestnet: true,
-    explorerUrl: 'https://explorer.testnet.citrea.xyz',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.testnet.citrea.xyz',
+        apiUrl: 'https://explorer.testnet.citrea.xyz/api',
+      },
+    ],
     currency: Currency.cBTC,
   },
   'creator-chain-testnet': {
     chainId: 66665,
     isTestnet: true,
-    explorerUrl: 'https://explorer.creatorchain.io',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.creatorchain.io',
+        apiUrl: 'https://explorer.creatorchain.io/api',
+      },
+    ],
     currency: Currency.CETH,
   },
   'cronos-testnet': {
     chainId: 338,
     isTestnet: true,
-    explorerUrl: 'https://explorer.cronos.org/testnet',
+    explorers: [
+      {
+        type: 'cronos',
+        webUrl: 'https://explorer.cronos.org/testnet',
+        apiUrl: 'https://explorer-api.cronos.org/testnet/api/v1',
+      },
+    ],
     currency: Currency.TCRO,
   },
   'cyber-testnet': {
     chainId: 111557560,
     isTestnet: true,
-    explorerUrl: 'https://cyber-testnet.socialscan.io',
+    explorers: [
+      {
+        type: 'socialscan',
+        webUrl: 'https://cyber-testnet.socialscan.io',
+        apiUrl: 'https://api.socialscan.io/cyber-testnet/v1',
+      },
+    ],
     currency: Currency.ETH,
   },
   'expchain-testnet': {
     chainId: 18880,
     isTestnet: true,
-    explorerUrl: 'https://blockscout-testnet.expchain.ai',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://blockscout-testnet.expchain.ai',
+        apiUrl: 'https://blockscout-testnet.gadsgcxobnadfogadsihg.com/api/v2',
+      },
+    ],
     currency: Currency.tZKJ,
   },
   'exSat-testnet': {
     chainId: 839999,
     isTestnet: true,
-    explorerUrl: 'https://scan-testnet.exsat.network',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://scan-testnet.exsat.network',
+        apiUrl: 'https://scan-testnet.exsat.network/api',
+      },
+    ],
     currency: Currency.BTC,
   },
   'fantom-mainnet': {
     chainId: 250,
     isTestnet: false,
-    explorerUrl: 'https://ftmscan.com',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://ftmscan.com',
+        apiUrl: 'https://ftmscout.com/api',
+      },
+    ],
     currency: Currency.FTM,
   },
   'fantom-testnet': {
     chainId: 4002,
     isTestnet: true,
-    explorerUrl: 'https://testnet.ftmscan.com',
+    explorers: [
+      {
+        type: 'unknown',
+        webUrl: 'https://explorer.testnet.fantom.network',
+        apiUrl: 'https://xapi.testnet.fantom.network/api',
+      },
+    ],
     currency: Currency.tFTM,
   },
   'flare-coston': {
     chainId: 114,
     isTestnet: true,
-    explorerUrl: 'https://coston2.testnet.flarescan.com',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://coston2-explorer.flare.network',
+        apiUrl: 'https://coston2-explorer.flare.network/api',
+      },
+    ],
     currency: Currency.C2FLR,
   },
   'fraxtal-mainnet': {
     chainId: 252,
     isTestnet: false,
-    explorerUrl: 'https://fraxscan.com',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://fraxscan.com',
+        apiUrl: 'https://api.fraxscan.com/api',
+      },
+    ],
     currency: Currency.frxETH,
   },
   'fraxtal-testnet': {
     chainId: 2522,
     isTestnet: true,
-    explorerUrl: 'https://holesky.fraxscan.com',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://holesky.fraxscan.com',
+        apiUrl: 'https://api-holesky.fraxscan.com/api',
+      },
+    ],
     currency: Currency.frxETH,
   },
   'gameswift-chain-testnet': {
     chainId: 10888,
     isTestnet: true,
-    explorerUrl: 'https://testnet.gameswift.io',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://testnet.gameswift.io',
+        apiUrl: 'https://testnet.gameswift.io/api',
+      },
+    ],
     currency: Currency.tGS,
   },
   'gnosis-mainnet': {
     chainId: 100,
     isTestnet: false,
-    explorerUrl: 'https://gnosisscan.io',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://gnosisscan.io',
+        apiUrl: 'https://api.gnosisscan.io/api',
+      },
+    ],
     currency: Currency.xDAI,
   },
   'gnosis-chiado': {
     chainId: 10200,
     isTestnet: true,
-    explorerUrl: 'https://gnosis-chiado.blockscout.com',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://gnosis-chiado.blockscout.com',
+        apiUrl: 'https://gnosis-chiado.blockscout.com/api',
+      },
+    ],
     currency: Currency.xDAI,
   },
   'harmony-testnet-shard0': {
     chainId: 1666700000,
     isTestnet: true,
-    explorerUrl: 'https://explorer.testnet.harmony.one/',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.testnet.harmony.one',
+        apiUrl: 'https://explorer.testnet.harmony.one/api',
+      },
+    ],
     currency: Currency.ONE,
   },
   'hemi-sepolia': {
     chainId: 743111,
     isTestnet: true,
-    explorerUrl: 'https://testnet.explorer.hemi.xyz',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://testnet.explorer.hemi.xyz',
+        apiUrl: 'https://testnet.explorer.hemi.xyz/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'hoodi-testnet': {
     chainId: 560048,
     isTestnet: true,
-    explorerUrl: 'https://testnet.explorer.hemi.xyz',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://eth-hoodi.blockscout.com',
+        apiUrl: 'https://eth-hoodi.blockscout.com/api',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://hoodi.etherscan.io',
+        apiUrl: 'https://api-hoodi.etherscan.io/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'horizen-gobi': {
     chainId: 1663,
     isTestnet: true,
-    explorerUrl: 'https://gobi-explorer.horizenlabs.io/',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://gobi-explorer.horizenlabs.io',
+        apiUrl: 'https://gobi-explorer-api.horizenlabs.io/api',
+      },
+    ],
     currency: Currency.tZEN,
   },
   'hyperliquid-evm-testnet': {
     chainId: 998,
     isTestnet: true,
-    explorerUrl: 'https://testnet.purrsec.com/',
+    explorers: [
+      {
+        type: 'unknown',
+        webUrl: 'https://testnet.purrsec.com',
+        apiUrl: 'https://api.parsec.finance/api',
+      },
+    ],
     currency: Currency.HYPE,
   },
   'inevm-testnet': {
     chainId: 2424,
     isTestnet: true,
-    explorerUrl: 'https://testnet.explorer.inevm.com/',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://testnet.explorer.inevm.com',
+        apiUrl: 'https://testnet.explorer.inevm.com/api',
+      },
+    ],
     currency: Currency.INJ,
   },
   'ink-mainnet': {
     chainId: 57073,
     isTestnet: false,
-    explorerUrl: 'https://explorer.inkonchain.com',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.inkonchain.com',
+        apiUrl: 'https://explorer.inkonchain.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'ink-sepolia': {
     chainId: 763373,
     isTestnet: true,
-    explorerUrl: 'https://explorer-sepolia.inkonchain.com/',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer-sepolia.inkonchain.com',
+        apiUrl: 'https://explorer-sepolia.inkonchain.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'kava-testnet': {
     chainId: 2221,
     isTestnet: true,
-    explorerUrl: '',
+    explorers: [
+      {
+        type: 'kava',
+        webUrl: 'https://testnet.kavascan.com/',
+        apiUrl: 'https://api.verify.mintscan.io/evm/api/0x8ad',
+      },
+    ],
     currency: Currency.KAVA,
   },
   'kroma-sepolia': {
     chainId: 2358,
     isTestnet: true,
-    explorerUrl: 'https://blockscout.sepolia.kroma.network',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://blockscout.sepolia.kroma.network',
+        apiUrl: 'https://blockscout.sepolia.kroma.network/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'kusama-moonbeam': {
     chainId: 1284,
     isTestnet: false,
-    explorerUrl: 'https://moonbeam.moonscan.io',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://moonbeam.moonscan.io',
+        apiUrl: 'https://api-moonbeam.moonscan.io/api',
+      },
+    ],
     currency: Currency.GLMR,
   },
   'kusama-moonbase-alpha': {
     chainId: 1287,
     isTestnet: true,
-    explorerUrl: 'https://moonbase.moonscan.io',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://moonbase.moonscan.io',
+        apiUrl: 'https://api-moonbase.moonscan.io/api',
+      },
+    ],
     currency: Currency.DEV,
   },
   'kusama-moonriver': {
     chainId: 1285,
     isTestnet: false,
-    explorerUrl: 'https://moonriver.moonscan.io',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://moonriver.moonscan.io',
+        apiUrl: 'https://api-moonriver.moonscan.io/api',
+      },
+    ],
     currency: Currency.MOVR,
   },
   'linea-mainnet': {
     chainId: 59144,
     isTestnet: false,
-    explorerUrl: 'https://lineascan.build',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.linea.build/',
+        apiUrl: 'https://api-explorer.linea.build/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'linea-sepolia': {
     chainId: 59141,
     isTestnet: true,
-    explorerUrl: 'https://sepolia.lineascan.build',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.sepolia.linea.build',
+        apiUrl: 'https://api-explorer.sepolia.linea.build/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'lisk-sepolia': {
     chainId: 4202,
     isTestnet: true,
-    explorerUrl: 'https://sepolia-blockscout.lisk.com',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://sepolia-blockscout.lisk.com',
+        apiUrl: 'https://sepolia-blockscout.lisk.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'lumia-mainnet': {
     chainId: 994873017,
     isTestnet: false,
-    explorerUrl: 'https://explorer.lumia.org',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.lumia.org',
+        apiUrl: 'https://explorer.lumia.org/api',
+      },
+    ],
     currency: Currency.LUMIA,
   },
   'lumia-testnet': {
     chainId: 1952959480,
     isTestnet: true,
-    explorerUrl: 'https://testnet-explorer.lumia.org',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://testnet-explorer.lumia.org',
+        apiUrl: 'https://testnet-explorer.lumia.org/api',
+      },
+    ],
     currency: Currency.LUMIA,
   },
   'manta-mainnet': {
     chainId: 169,
     isTestnet: false,
-    explorerUrl: 'https://pacific-explorer.manta.network',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://pacific-explorer.manta.network',
+        apiUrl: 'https://pacific-explorer.manta.network/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'manta-sepolia': {
     chainId: 3441006,
     isTestnet: true,
-    explorerUrl: 'https://pacific-explorer.sepolia-testnet.manta.network',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://pacific-explorer.sepolia-testnet.manta.network',
+        apiUrl: 'https://pacific-explorer.sepolia-testnet.manta.network/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'mantle-mainnet': {
     chainId: 5000,
     isTestnet: false,
-    explorerUrl: 'https://mantlescan.xyz',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://mantlescan.xyz',
+        apiUrl: 'https://api.mantlescan.xyz',
+      },
+    ],
     currency: Currency.MNT,
   },
   'mantle-sepolia': {
     chainId: 5003,
     isTestnet: true,
-    explorerUrl: 'https://sepolia.mantlescan.xyz/',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://sepolia.mantlescan.xyz',
+        apiUrl: 'https://api-sepolia.mantlescan.xyz/api',
+      },
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.sepolia.mantle.xyz',
+        apiUrl: 'https://explorer.sepolia.mantle.xyz/api',
+      },
+    ],
     currency: Currency.MNT,
   },
   'metal-l2-testnet': {
     chainId: 1740,
     isTestnet: true,
-    explorerUrl: 'https://testnet.explorer.metall2.com',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://testnet.explorer.metall2.com',
+        apiUrl: 'https://testnet.explorer.metall2.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'metis-andromeda-mainnet': {
     chainId: 1088,
     isTestnet: false,
-    explorerUrl: 'https://andromeda.guru.com',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://andromeda-explorer.metis.io',
+        apiUrl: 'https://andromeda-explorer.metis.io/api',
+      },
+    ],
     currency: Currency.METIS,
   },
   'metis-sepolia': {
     chainId: 59902,
     isTestnet: true,
-    explorerUrl: 'https://sepolia-explorer.metisdevops.link',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://sepolia-explorer.metisdevops.link',
+        apiUrl: 'https://sepolia-explorer-api.metisdevops.link/api/v2',
+      },
+    ],
     currency: Currency.sMETIS,
   },
   'megaeth-testnet': {
     chainId: 6342,
     isTestnet: true,
-    explorerUrl: 'https://www.megaexplorer.xyz',
+    explorers: [
+      {
+        type: 'megaeth',
+        webUrl: 'https://megaexplorer.xyz',
+        apiUrl: 'https://megaexplorer.xyz/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'mezo-matsnet-testnet': {
     chainId: 31611,
     isTestnet: true,
-    explorerUrl: 'https://explorer.test.mezo.org',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.test.mezo.org',
+        apiUrl: 'https://api.explorer.test.mezo.org/api/v2/',
+      },
+    ],
     currency: Currency.BTC,
   },
   'monad-testnet': {
     chainId: 10143,
     isTestnet: true,
-    explorerUrl: 'https://testnet.monadexplorer.com',
+    explorers: [
+      {
+        type: 'blockvision',
+        webUrl: 'https://testnet.monadexplorer.com',
+        apiUrl: 'https://api.socialscan.io/monad-testnet/v1/developer/api?', //
+      },
+    ],
     currency: Currency.MON,
   },
   'morph-mainnet': {
     chainId: 2818,
     isTestnet: false,
-    explorerUrl: 'https://explorer.morphl2.io',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.morphl2.io',
+        apiUrl: 'https://explorer-api.morphl2.io/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'morph-holesky': {
     chainId: 2810,
     isTestnet: true,
-    explorerUrl: 'https://explorer-holesky.morphl2.io',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer-holesky.morphl2.io',
+        apiUrl: 'https://explorer-holesky.morphl2.io/api', //to do
+      },
+    ],
     currency: Currency.ETH,
   },
   'nexera-testnet': {
     chainId: 72080,
     isTestnet: true,
-    explorerUrl: 'https://explorer.testnet.nexera.network/',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.testnet.nexera.network',
+        apiUrl: 'https://explorer.testnet.nexera.network/api',
+      },
+    ],
     currency: Currency.tNXRA,
   },
   'okto-testnet': {
     chainId: 8801,
     isTestnet: true,
-    explorerUrl: 'https://testnet.okto.tech',
+    explorers: [
+      {
+        type: 'unknown',
+        webUrl: 'https://testnet.okto.tech',
+        apiUrl: 'https://sandbox-api.okto.tech',
+      },
+    ],
     currency: Currency.OKTO,
   },
   'ontology-testnet': {
     chainId: 5851,
     isTestnet: true,
-    explorerUrl: 'https://explorer.ont.io/testnet',
+    explorers: [
+      {
+        type: 'ontology',
+        webUrl: 'https://explorer.ont.io/testnet',
+        apiUrl: 'https://explorer.ont.io/testnet/api',
+      },
+    ],
     currency: Currency.ONG,
   },
   'optimism-mainnet': {
     chainId: 10,
     isTestnet: false,
-    explorerUrl: 'https://optimistic.etherscan.io',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://optimism.blockscout.com/',
+        apiUrl: 'https://optimism.blockscout.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'optimism-sepolia': {
     chainId: 11155420,
     isTestnet: true,
-    explorerUrl: 'https://sepolia-optimism.etherscan.io',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://sepolia-optimism.etherscan.io',
+        apiUrl: 'https://api-sepolia-optimistic.etherscan.io/api',
+      },
+      {
+        type: 'blockscout', //test again
+        webUrl: 'https://optimism-sepolia.blockscout.com',
+        apiUrl: 'https://optimism-sepolia.blockscout.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'opbnb-testnet': {
     chainId: 5611,
     isTestnet: true,
-    explorerUrl: 'https://opbnb-testnet.bscscan.com',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://opbnb-testnet.bscscan.com',
+        apiUrl: 'https://api-opbnb-testnet.bscscan.com/api',
+      },
+    ],
     currency: Currency.tBNB,
   },
   'ozean-poseidon-testnet': {
     chainId: 7849306,
     isTestnet: true,
-    explorerUrl: 'https://ozean-testnet.explorer.caldera.xyz',
+    explorers: [
+      {
+        type: 'unknown',
+        webUrl: 'https://ozean-testnet.explorer.caldera.xyz',
+        apiUrl: 'https://poseidon-testnet.explorer.caldera.xyz/api/v2',
+      },
+    ],
     currency: Currency.USDX,
   },
   'pharos-devnet': {
     chainId: 50002,
     isTestnet: true,
-    explorerUrl: 'https://pharosscan.xyz',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://pharosscan.xyz',
+        apiUrl: 'https://pharosscan.xyz/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'pharos-testnet': {
     chainId: 688688,
     isTestnet: true,
-    explorerUrl: 'https://testnet.pharosscan.xyz',
+    explorers: [
+      {
+        type: 'unknown',
+        webUrl: 'https://testnet.pharosscan.xyz',
+        apiUrl: 'https://api.socialscan.io/pharos-testnet', //
+      },
+    ],
     currency: Currency.PHRS,
   },
   'plume-mainnet': {
     chainId: 98866,
     isTestnet: false,
-    explorerUrl: 'https://phoenix-explorer.plumenetwork.xyz',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://phoenix-explorer.plumenetwork.xyz',
+        apiUrl: 'https://phoenix-explorer.plumenetwork.xyz/api',
+      },
+    ],
     currency: Currency.PLUME,
   },
   'plume-testnet': {
     chainId: 98867,
     isTestnet: true,
-    explorerUrl: 'https://testnet-explorer.plumenetwork.xyz',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://testnet-explorer.plumenetwork.xyz',
+        apiUrl: 'https://testnet-explorer.plumenetwork.xyz/api',
+      },
+    ],
     currency: Currency.PLUME,
   },
   'polygon-mainnet': {
     chainId: 137,
     isTestnet: false,
-    explorerUrl: 'https://polygonscan.com',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://polygonscan.com',
+        apiUrl: 'https://api.polygonscan.com/api',
+      },
+    ],
     currency: Currency.MATIC,
   },
   'polygon-amoy': {
     chainId: 80002,
     isTestnet: true,
-    explorerUrl: 'https://amoy.polygonscan.com',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://amoy.polygonscan.com',
+        apiUrl: 'https://api-amoy.polygonscan.com/api',
+      },
+    ],
     currency: Currency.POL,
   },
   'polygon-zkevm-mainnet': {
     chainId: 1101,
     isTestnet: false,
-    explorerUrl: 'https://zkevm.polygonscan.com',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://zkevm.polygonscan.com',
+        apiUrl: 'https://api-zkevm.polygonscan.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'polygon-zkevm-cardona': {
     chainId: 2442,
     isTestnet: true,
-    explorerUrl: 'https://cardona-zkevm.polygonscan.com',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://cardona-zkevm.polygonscan.com',
+        apiUrl: 'https://api-cardona-zkevm.polygonscan.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'rise-testnet': {
     chainId: 11155931,
     isTestnet: true,
-    explorerUrl: 'https://explorer.testnet.riselabs.xyz',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.testnet.riselabs.xyz',
+        apiUrl: 'https://explorer.testnet.riselabs.xyz/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'rollux-testnet': {
     chainId: 57000,
     isTestnet: true,
-    explorerUrl: 'https://rollux.tanenbaum.io',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://rollux.tanenbaum.io',
+        apiUrl: 'https://rollux.tanenbaum.io/api',
+      },
+    ],
     currency: Currency.TSYS,
   },
   'rome-testnet': {
     chainId: 200018,
     isTestnet: true,
-    explorerUrl: 'https://rome.testnet.romeprotocol.xyz:1000',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://rome.testnet.romeprotocol.xyz:1000',
+        apiUrl: 'https://rome.testnet.romeprotocol.xyz:1000/api',
+      },
+    ],
     currency: Currency.ROME,
   },
   'rootstock-testnet': {
     chainId: 31,
     isTestnet: true,
-    explorerUrl: 'https://explorer.testnet.rootstock.io',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://rootstock-testnet.blockscout.com/',
+        apiUrl: 'https://rootstock-testnet.blockscout.com/api',
+      },
+    ],
     currency: Currency.tRBTC,
   },
   'scroll-mainnet': {
     chainId: 534352,
     isTestnet: false,
-    explorerUrl: 'https://scroll.io',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://scroll.blockscout.com',
+        apiUrl: 'https://scroll.blockscout.com/api',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://scrollscan.com',
+        apiUrl: 'https://api.scrollscan.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'scroll-sepolia': {
     chainId: 534351,
     isTestnet: true,
-    explorerUrl: 'https://sepolia.scrollscan.com',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://scroll-sepolia.blockscout.com',
+        apiUrl: 'https://scroll-sepolia.blockscout.com/api',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://sepolia.scrollscan.com',
+        apiUrl: 'https://api-sepolia.scrollscan.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'shape-sepolia': {
     chainId: 11011,
     isTestnet: true,
-    explorerUrl: 'https://explorer.test.mezo.org',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer-sepolia.shape.network',
+        apiUrl: 'https://explorer-sepolia.shape.network/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'somnia-testnet': {
     chainId: 50312,
     isTestnet: true,
-    explorerUrl: 'https://somnia-testnet.socialscan.io',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://shannon-explorer.somnia.network/',
+        apiUrl: 'https://shannon-explorer.somnia.network/api',
+      },
+    ],
     currency: Currency.STT,
   },
   'soneium-mainnet': {
     chainId: 1868,
     isTestnet: false,
-    explorerUrl: 'https://soneium.blockscout.com',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://soneium.blockscout.com',
+        apiUrl: 'https://soneium.blockscout.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'soneium-minato': {
     chainId: 1946,
     isTestnet: true,
-    explorerUrl: 'https://soneium-minato.blockscout.com',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://soneium-minato.blockscout.com',
+        apiUrl: 'https://soneium-minato.blockscout.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'songbird-coston': {
     chainId: 16,
     isTestnet: true,
-    explorerUrl: 'https://coston-explorer.flare.network',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://coston-explorer.flare.network',
+        apiUrl: 'https://coston-explorer.flare.network/api',
+      },
+    ],
     currency: Currency.CFLR,
   },
   'sonic-mainnet': {
     chainId: 146,
     isTestnet: false,
-    explorerUrl: 'https://sonicscan.org',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://sonicscan.org',
+        apiUrl: 'https://api.sonicscan.org/api',
+      },
+    ],
     currency: Currency.S,
   },
   'sonic-blaze': {
     chainId: 57054,
     isTestnet: true,
-    explorerUrl: 'https://testnet.sonicscan.org/',
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://testnet.sonicscan.org',
+        apiUrl: 'https://api-testnet.sonicscan.org/api',
+      },
+    ],
     currency: Currency.S,
   },
   'status-network-sepolia': {
     chainId: 1660990954,
     isTestnet: true,
-    explorerUrl: 'https://sepoliascan.status.network',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://sepoliascan.status.network',
+        apiUrl: 'https://sepoliascan.status.network/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'superseed-mainnet': {
     chainId: 5330,
     isTestnet: false,
-    explorerUrl: 'https://explorer.superseed.xyz',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.superseed.xyz',
+        apiUrl: 'https://explorer.superseed.xyz/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'superseed-sepolia': {
     chainId: 53302,
     isTestnet: true,
-    explorerUrl: 'https://sepolia-explorer.superseed.xyz',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://sepolia-explorer.superseed.xyz',
+        apiUrl: 'https://sepolia-explorer.superseed.xyz/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'swellchain-testnet': {
     chainId: 1924,
     isTestnet: true,
-    explorerUrl: 'https://swell-testnet-explorer.alt.technology',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://swell-testnet-explorer.alt.technology',
+        apiUrl: 'https://swell-testnet-explorer.alt.technology/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'tac-spb': {
     chainId: 2391,
     isTestnet: true,
-    explorerUrl: 'https://spb.explorer.tac.build',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://spb.explorer.tac.build',
+        apiUrl: 'https://spb.explorer.tac.build/api',
+      },
+    ],
     currency: Currency.TAC,
   },
   'tac-turin': {
     chainId: 2390,
     isTestnet: true,
-    explorerUrl: 'https://turin.explorer.tac.build',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://turin.explorer.tac.build',
+        apiUrl: 'https://turin.explorer.tac.build/api',
+      },
+    ],
     currency: Currency.TAC,
   },
   'taiko-mainnet': {
     chainId: 167000,
     isTestnet: false,
-    explorerUrl: 'https://taikoscan.io',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://blockscout.mainnet.taiko.xyz',
+        apiUrl: 'https://blockscoutapi.mainnet.taiko.xyz/api',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://taikoscan.io',
+        apiUrl: 'https://api.taikoscan.io/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'taiko-hekla': {
     chainId: 167009,
     isTestnet: true,
-    explorerUrl: 'https://hekla.taikoscan.io',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.hekla.taiko.xyz',
+        apiUrl: 'https://blockscoutapi.hekla.taiko.xyz/api',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://hekla.taikoscan.io',
+        apiUrl: 'https://api-hekla.taikoscan.io/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'tanssi-demo': {
     chainId: 5678,
     isTestnet: true,
-    explorerUrl: 'https://fra-dancebox-3001-bs.a.dancebox.tanssi.network',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://dancelight-2001-blockscout.tanssi-chains.network',
+        apiUrl: 'https://dancelight-2001-blockscout.tanssi-chains.network/api',
+      },
+    ],
     currency: Currency.TANGO,
   },
   'taraxa-testnet': {
     chainId: 842,
     isTestnet: true,
-    explorerUrl: 'https://testnet.explorer.taraxa.io',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://testnet.to',
+        apiUrl: 'https://testnet.to/api',
+      },
+    ],
     currency: Currency.TARA,
   },
   'telos-testnet': {
     chainId: 41,
     isTestnet: true,
-    explorerUrl: 'https://testnet.teloscan.io',
+    explorers: [
+      {
+        type: 'telos',
+        webUrl: 'https://testnet.teloscan.io',
+        apiUrl: 'https://api.testnet.teloscan.io/v1',
+      },
+    ],
     currency: Currency.TLOS,
   },
   'unichain-mainnet': {
     chainId: 130,
     isTestnet: false,
-    explorerUrl: 'https://unichain.blockscout.com',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://unichain.blockscout.com',
+        apiUrl: 'https://unichain.blockscout.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'unichain-sepolia': {
     chainId: 1301,
     isTestnet: true,
-    explorerUrl: 'https://unichain-sepolia.blockscout.com',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://unichain-sepolia.blockscout.com',
+        apiUrl: 'https://unichain-sepolia.blockscout.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'world-chain-sepolia': {
     chainId: 4801,
     isTestnet: true,
-    explorerUrl: 'https://worldchain-sepolia.explorer.alchemy.com',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://worldchain-sepolia.explorer.alchemy.com/',
+        apiUrl: 'https://worldchain-sepolia.explorer.alchemy.com/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'zephyr-testnet': {
     chainId: 1417429182,
     isTestnet: true,
-    explorerUrl: 'https://zephyr-blockscout.eu-north-2.gateway.fm',
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://zephyr-blockscout.eu-north-2.gateway.fm',
+        apiUrl: 'https://api.zephyr-blockscout.eu-north-2.gateway.fm/api',
+      },
+    ],
     currency: Currency.Z,
   },
   'zksync-mainnet': {
     chainId: 324,
     isTestnet: false,
-    explorerUrl: 'https://zksync.blockscout.com',
+    explorers: [
+      {
+        type: 'zksync',
+        webUrl: 'https://explorer.zksync.io',
+        apiUrl: 'https://block-explorer-api.mainnet.zksync.io/api',
+      },
+    ],
     currency: Currency.ETH,
   },
   'zksync-sepolia': {
     chainId: 300,
     isTestnet: true,
-    explorerUrl: 'https://zksync-sepolia.blockscout.com',
+    explorers: [
+      {
+        type: 'zksync',
+        webUrl: 'https://sepolia.explorer.zksync.io',
+        apiUrl: 'https://block-explorer-api.sepolia.zksync.dev/api',
+      },
+    ],
+
     currency: Currency.ETH,
   },
 } satisfies {
   [Net in NetworkName]: {
     chainId: ChainId | undefined;
     isTestnet: boolean;
-    explorerUrl: string | undefined;
+    explorers: {
+      type:
+        | 'blockscout'
+        | 'blockvision'
+        | 'etherscan'
+        | 'routescan'
+        | 'lorescan'
+        | 'socialscan'
+        | 'cronos'
+        | 'ontology'
+        | 'telos'
+        | 'zksync'
+        | 'megaeth'
+        | 'bitlayer'
+        | 'kava'
+        | 'unknown';
+      webUrl: string;
+      apiUrl: string | null;
+    }[];
     currency: Currency;
   };
 };
@@ -976,24 +1780,24 @@ export function getTxHashExplorerUrl(
   network: NetworkName,
   txhash: TxHash,
 ): string {
-  return `${networkMetadata[network].explorerUrl}/tx/${txhash}`;
+  return `${networkMetadata[network].explorers[0]?.webUrl}/tx/${txhash}`;
 }
 
 export function getAddressExplorerUrl(
   network: NetworkName,
   address: EthereumAddress,
 ): string {
-  return `${networkMetadata[network].explorerUrl}/address/${address}`;
+  return `${networkMetadata[network].explorers[0]?.webUrl}/address/${address}`;
 }
 
-export type NetworkNameToEnvVar<Net extends NetworkName> =
+export type NetworkNameToRpcUrlEnvVar<Net extends NetworkName> =
   `RPC_URL_${KebabToScreamingSnakeCase<Net>}`;
 
-export type RpcUrlEnvVarNames = NetworkNameToEnvVar<NetworkName>;
+export type RpcUrlEnvVarNames = NetworkNameToRpcUrlEnvVar<NetworkName>;
 
 export function getRpcUrlEnvVar<Net extends NetworkName>(
   network: Net,
-): NetworkNameToEnvVar<Net> {
+): NetworkNameToRpcUrlEnvVar<Net> {
   return `RPC_URL_${kebabToScreamingSnakeCase(network)}`;
 }
 
@@ -1014,4 +1818,20 @@ export function getNetworkNameByChainId(chainId: ChainId): NetworkName {
     }
   }
   throw new Error(`Unknown network for Chain Id: ${chainId}`);
+}
+
+export type NetworkNameToApiKeyEnvVar<Net extends NetworkName> =
+  `${KebabToScreamingSnakeCase<Net>}_API_KEY`;
+
+export type ApiKeyEnvVarNames = NetworkNameToApiKeyEnvVar<NetworkName>;
+
+export function getApiKeyEnvVar<Net extends NetworkName>(
+  network: Net,
+): NetworkNameToApiKeyEnvVar<Net> {
+  return `${kebabToScreamingSnakeCase(network)}_API_KEY`;
+}
+
+export function getOptionalApiKey(network: NetworkName): string {
+  const envVar = getApiKeyEnvVar(network);
+  return getOptionalEnvString(envVar, '');
 }

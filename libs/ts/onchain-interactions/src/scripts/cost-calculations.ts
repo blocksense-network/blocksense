@@ -1,16 +1,16 @@
 import axios, { AxiosResponse } from 'axios';
-import Web3 from 'web3';
+import Web3, { net } from 'web3';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
 import chalkTemplate from 'chalk-template';
 
 import {
+  getOptionalApiKey,
   getOptionalRpcUrl,
   networkMetadata,
   NetworkName,
 } from '@blocksense/base-utils/evm';
-import { kebabToCamelCase } from '@blocksense/base-utils/string';
 import {
   EthereumAddress,
   parseEthereumAddress,
@@ -18,12 +18,7 @@ import {
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 import { throwError } from '@blocksense/base-utils/errors';
 
-import {
-  API_ENDPOINTS,
-  API_KEYS,
-  Transaction,
-  deployedNetworks,
-} from '../types';
+import { Transaction, deployedNetworks } from '../types';
 
 function getHourDifference(transactions: Transaction[]): number {
   const txsLen = transactions.length;
@@ -55,7 +50,7 @@ const calculateGasCosts = (
   let totalGasUsed = BigInt(0);
 
   for (const tx of transactions) {
-    const gasUsed = BigInt(tx.gasUsed ?? tx.gas_used ?? tx.gas);
+    const gasUsed = BigInt(tx.gasUsed ?? tx.gas_used ?? tx.gas ?? tx.gasused);
     const gasPrice = BigInt(tx.gasPrice ?? tx.gas_price);
     const txGasCost = gasUsed * gasPrice;
 
@@ -151,11 +146,8 @@ const fetchTransactionsForNetwork = async (
   firstTxTime: string;
   lastTxTime: string;
 }> => {
-  const snakeCaseNetwork = kebabToCamelCase(
-    network,
-  ) as keyof typeof API_ENDPOINTS;
-  const apiUrl = API_ENDPOINTS[snakeCaseNetwork];
-  const apikey = API_KEYS[snakeCaseNetwork];
+  const apiUrl = networkMetadata[network].explorers[0]?.apiUrl;
+  const apiKey = getOptionalApiKey(network);
   if (!apiUrl) {
     console.log(chalk.red(`Skipping ${network}: Missing API configuration`));
     return { transactions: [], firstTxTime: '', lastTxTime: '' };
@@ -165,9 +157,18 @@ const fetchTransactionsForNetwork = async (
     console.log('------------------------------------------------------------');
     console.log(chalk.green(network.toUpperCase()));
     console.log(chalk.blue(`Fetching transactions for ${network}...`));
+    const rpcUrl = getOptionalRpcUrl(network);
+    const web3 = new Web3(rpcUrl);
+    const latestBlock = await web3.eth.getBlockNumber();
+
     let response: AxiosResponse<any>;
     let rawTransactions: any[] = [];
-    if (network === 'morph-holesky') {
+    if (
+      network === 'morph-holesky' ||
+      network === 'expchain-testnet' ||
+      network === 'metis-sepolia' ||
+      network === 'mezo-matsnet-testnet'
+    ) {
       response = await axios.get(`${apiUrl}/addresses/${address}/transactions`);
       rawTransactions = response.data.items || [];
     } else if (network === 'telos-testnet') {
@@ -177,22 +178,46 @@ const fetchTransactionsForNetwork = async (
       let currentPage = 1;
       let totalPages = 1;
       do {
+        const page = await axios.get(
+          'https://explorer-api.cronos.org/testnet/api/v1/account/getTxsByAddress',
+          {
+            params: {
+              module: 'account',
+              action: 'txlist',
+              address,
+              startblock: 0,
+              endblock: latestBlock,
+              sort: 'desc',
+              apiKey,
+              limit: 100,
+              currentPage,
+            },
+          },
+        );
+        const txFromPage = page.data.result;
+        rawTransactions = rawTransactions.concat(txFromPage);
+        totalPages = page.data.pagination.totalPage;
+        currentPage += 1;
+      } while (currentPage <= totalPages);
+    } else if (network === 'monad-testnet') {
+      let currentPage = 1;
+      let totalPages = 10;
+
+      do {
         const page = await axios.get(apiUrl, {
           params: {
             module: 'account',
             action: 'txlist',
             address,
-            startblock: 0,
-            endblock: 99999999,
-            sort: 'desc',
-            apikey,
-            limit: 100,
+            startblock: latestBlock - 30000n,
+            endblock: latestBlock,
+            apikey: apiKey,
+            offset: 100,
             currentPage,
           },
         });
         const txFromPage = page.data.result;
         rawTransactions = rawTransactions.concat(txFromPage);
-        totalPages = page.data.pagination.totalPage;
         currentPage += 1;
       } while (currentPage <= totalPages);
     } else {
@@ -202,9 +227,9 @@ const fetchTransactionsForNetwork = async (
           action: 'txlist',
           address,
           startblock: 0,
-          endblock: 99999999,
+          endblock: latestBlock,
           sort: 'desc',
-          apikey,
+          apikey: apiKey,
         },
       });
 
@@ -214,6 +239,8 @@ const fetchTransactionsForNetwork = async (
       }
       rawTransactions = response.data.result;
     }
+    rawTransactions.sort((a, b) => b.nonce - a.nonce);
+
     let notSelfSent: any[];
     if (network == 'cronos-testnet') {
       notSelfSent = rawTransactions.filter(
@@ -221,12 +248,23 @@ const fetchTransactionsForNetwork = async (
           tx.from.address.toLowerCase() === address.toLowerCase() &&
           tx.to.address.toLowerCase() !== address.toLowerCase(),
       ); //cronos has a different call
-    } else if (network == 'morph-holesky') {
+    } else if (
+      network == 'morph-holesky' ||
+      network == 'expchain-testnet' ||
+      network == 'metis-sepolia' ||
+      network == 'mezo-matsnet-testnet'
+    ) {
       notSelfSent = rawTransactions.filter(
         (tx: any) =>
           tx.from.hash.toLowerCase() === address.toLowerCase() &&
           tx.to.hash.toLowerCase() !== address.toLowerCase(),
       ); //morph has a different call
+    } else if (network === 'monad-testnet') {
+      notSelfSent = rawTransactions.filter(
+        (tx: any) =>
+          tx.fromAddress.toLowerCase() === address.toLowerCase() &&
+          tx.toAddress.toLowerCase() !== address.toLowerCase(),
+      );
     } else {
       notSelfSent = rawTransactions.filter(
         (tx: any) =>
