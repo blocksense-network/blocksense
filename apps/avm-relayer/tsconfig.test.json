@@ -1,7 +1,9 @@
 {
   "extends": "./tsconfig.json",
-  "include": ["test", "src"],
+  "include": ["test"],
   "compilerOptions": {
-    "tsBuildInfoFile": ".tsbuildinfo/test.tsbuildinfo"
+    "rootDir": "test",
+    "tsBuildInfoFile": ".tsbuildinfo/test.tsbuildinfo",
+    "composite": true
   }
 }

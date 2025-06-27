@@ -8,6 +8,7 @@
   ],
   "compilerOptions": {
     "rootDir": ".",
-    "tsBuildInfoFile": ".tsbuildinfo/scripts.tsbuildinfo"
+    "tsBuildInfoFile": ".tsbuildinfo/scripts.tsbuildinfo",
+    "composite": true
   }
 }
