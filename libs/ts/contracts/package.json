@@ -24,7 +24,7 @@
   },
   "scripts": {
     "clean": "git clean -fdx -e .env",
-    "build": "hardhat compile",
+    "build": "hardhat compile && yarn build:typecheck",
     "sol-reflect": "hardhat reflect",
     "test": "hardhat test",
     "test:fork": "FORKING=true hardhat test --grep '@fork'",
