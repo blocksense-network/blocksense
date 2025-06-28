@@ -2,7 +2,7 @@ import { join } from 'node:path';
 
 import { Schema as S, Either } from 'effect';
 
-import { configDir } from '@blocksense/base-utils/env';
+import { configDir as defaultConfigDir } from '@blocksense/base-utils/env';
 import { selectDirectory } from '@blocksense/base-utils/fs';
 import { NetworkName, parseNetworkName } from '@blocksense/base-utils/evm';
 
@@ -13,23 +13,24 @@ import {
   DeploymentConfigSchemaV2,
   DeploymentConfigV2,
 } from './evm-contracts-deployment';
+import { SequencerDeploymentConfigSchema } from './node-config';
 
 export function readConfig<Name extends ConfigFileName>(
   configName: Name,
-  dir = configDir,
+  dir = defaultConfigDir,
 ): Promise<ConfigType<Name>> {
   const { decodeJSON } = selectDirectory(dir);
-  const { schema } = configFiles[configName];
+  const { schema } = defaultConfigTypes[configName];
   return decodeJSON({ name: configName }, schema as S.Schema<any>);
 }
 
 export function writeConfig<Name extends ConfigFileName>(
   configName: Name,
   content: ConfigType<Name>,
-  dir = configDir,
+  dir = defaultConfigDir,
 ): Promise<string> {
   const { writeJSON } = selectDirectory(dir);
-  const { schema } = configFiles[configName];
+  const { schema } = defaultConfigTypes[configName];
   if (!S.is(schema as S.Schema<unknown>)(content)) {
     throw new Error(`Attempt to write invalid config for '${configName}'.`);
   }
@@ -97,45 +98,52 @@ ${res.left}
   });
 }
 
-export type ConfigFileName = keyof typeof configFiles;
+export type ConfigFileName = keyof typeof defaultConfigTypes;
 
 export type ConfigType<Name extends ConfigFileName> = S.Schema.Type<
-  (typeof configFiles)[Name]['schema']
+  (typeof defaultConfigTypes)[Name]['schema']
 >;
 
-export const configFiles = {
-  ['feeds_config_v1']: {
-    path: `${configDir}/feeds_config_v1.json`,
-    schema: FeedsConfigSchema,
-  },
-  ['feeds_config_v2']: {
-    path: `${configDir}/feeds_config_v2.json`,
-    schema: NewFeedsConfigSchema,
-  },
-  ['chainlink_compatibility_v1']: {
-    path: `${configDir}/chainlink_compatibility_v1.json`,
-    schema: ChainlinkCompatibilityConfigSchema,
-  },
-  ['chainlink_compatibility_v2']: {
-    path: `${configDir}/chainlink_compatibility_v2.json`,
-    schema: ChainlinkCompatibilityConfigSchema,
-  },
-  ['evm_contracts_deployment_v1']: {
-    path: `${configDir}/evm_contracts_deployment_v1.json`,
-    schema: DeploymentConfigSchemaV1,
-  },
-} satisfies {
-  [name: string]: {
-    path: string;
-    schema: S.Schema<any>;
+export const configFiles = (configDir: string = defaultConfigDir) =>
+  ({
+    ['feeds_config_v1']: {
+      path: `${configDir}/feeds_config_v1.json`,
+      schema: FeedsConfigSchema,
+    },
+    ['feeds_config_v2']: {
+      path: `${configDir}/feeds_config_v2.json`,
+      schema: NewFeedsConfigSchema,
+    },
+    ['chainlink_compatibility_v1']: {
+      path: `${configDir}/chainlink_compatibility_v1.json`,
+      schema: ChainlinkCompatibilityConfigSchema,
+    },
+    ['chainlink_compatibility_v2']: {
+      path: `${configDir}/chainlink_compatibility_v2.json`,
+      schema: ChainlinkCompatibilityConfigSchema,
+    },
+    ['evm_contracts_deployment_v1']: {
+      path: `${configDir}/evm_contracts_deployment_v1.json`,
+      schema: DeploymentConfigSchemaV1,
+    },
+    ['sequencer_config_v1']: {
+      path: `${configDir}/sequencer_config_v1.json`,
+      schema: SequencerDeploymentConfigSchema,
+    },
+  }) satisfies {
+    [name: string]: {
+      path: string;
+      schema: S.Schema<any>;
+    };
   };
-};
 
-export { configDir };
+const defaultConfigTypes = configFiles();
+
+export { defaultConfigDir as configDir };
 
 export const configDirs = {
   ['evm_contracts_deployment_v2']: join(
-    configDir,
+    defaultConfigDir,
     'evm_contracts_deployment_v2',
   ),
 };
