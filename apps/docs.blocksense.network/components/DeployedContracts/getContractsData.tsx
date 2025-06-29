@@ -1,10 +1,11 @@
 import DEPLOYMENT_INFO from '@/artifacts/deployment_data.json';
 
-import { parseNetworkName } from '@blocksense/base-utils/evm';
+import { entriesOf } from '@blocksense/base-utils/array-iter';
 import { DeploymentConfigV2 } from '@blocksense/config-types';
 import {
   CoreContract,
   decodeDeploymentConfigArray,
+  ProxyContractData,
 } from '@/src/deployed-contracts/types';
 
 const getCoreContractsData = (networksData: DeploymentConfigV2[]) => {
@@ -12,8 +13,8 @@ const getCoreContractsData = (networksData: DeploymentConfigV2[]) => {
 
   networksData.map(data => {
     if (!data) return;
-    if (data.name === 'local') return;
-    const networkName = parseNetworkName(data.name);
+    const networkName = data.network;
+    if (networkName === 'local') return;
     const coreContracts = data.contracts.coreContracts;
     const skipContracts = ['AccessControl', 'OnlySequencerGuard'];
 
@@ -42,25 +43,32 @@ const getProxyContractsContent = (networksData: DeploymentConfigV2[]) => {
   const supportedNetworks = networksData
     .map(data => {
       if (!data) return [];
-      if (data.name === 'local') return [];
-      const networkName = parseNetworkName(data.name);
+      const networkName = data.network;
+      if (networkName === 'local') return [];
       const { CLAggregatorAdapter } = data.contracts;
 
-      return CLAggregatorAdapter.map(proxy => {
-        let id = proxy.constructorArgs[2].toString();
-        return {
-          ...proxy,
-          id,
-          network: networkName,
-        };
-      });
+      return entriesOf(CLAggregatorAdapter).map(
+        ([id, proxy]): ProxyContractData => {
+          return {
+            id,
+            address: proxy.address,
+            name: proxy.constructorArgs[0] as string,
+            base: proxy.base,
+            quote: proxy.quote,
+            network: networkName,
+          };
+        },
+      );
     })
     .flat();
 
   return supportedNetworks;
 };
 
-export function getContractsData() {
+export function getContractsData(): {
+  parsedCoreContracts: CoreContract[];
+  parsedProxyContracts: ProxyContractData[];
+} {
   const networksData = decodeDeploymentConfigArray(DEPLOYMENT_INFO);
   const parsedCoreContracts = getCoreContractsData(networksData);
   const parsedProxyContracts = getProxyContractsContent(networksData);
