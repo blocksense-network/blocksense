@@ -3,20 +3,22 @@ import { DeploymentConfigArray } from './types';
 
 export function prepareDeploymentData(
   deploymentConfig: DeploymentConfigArray,
-  feedName: string,
+  feedId: string,
 ): DeploymentConfigV2[] {
   return deploymentConfig.map(data => {
-    const cLAggregatorAdapter = data.contracts.CLAggregatorAdapter.find(
-      adapter => adapter.description === feedName,
-    );
+    const clAggregatorAdapter = data.contracts.CLAggregatorAdapter[feedId];
     return {
-      name: data.name,
+      network: data.network,
       chainId: data.chainId,
       contracts: {
-        coreContracts: data.contracts.coreContracts!,
-        CLAggregatorAdapter: [cLAggregatorAdapter!],
-        ReporterMultisig: data.contracts.ReporterMultisig,
-        AdminMultisig: data.contracts.AdminMultisig,
+        coreContracts: data.contracts.coreContracts,
+        CLAggregatorAdapter: { [feedId]: clAggregatorAdapter },
+        safe: {
+          ReporterMultisig: data.contracts.safe.ReporterMultisig,
+          AdminMultisig: data.contracts.safe.AdminMultisig,
+          OnlySequencerGuard: null,
+          AdminExecutorModule: null,
+        },
       },
     };
   });
