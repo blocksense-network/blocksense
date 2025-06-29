@@ -9,18 +9,18 @@ import { checkAddressExists } from '../utils';
 
 type Params = {
   config: NetworkConfig;
-  type: keyof Pick<NetworkConfig, 'adminMultisig' | 'sequencerMultisig'>;
+  type: keyof Pick<NetworkConfig, 'adminMultisig' | 'reporterMultisig'>;
 };
 
 export async function deployMultisig({ config, type }: Params): Promise<Safe> {
   const safeVersion = '1.4.1';
 
-  const signer = config[type].signer;
+  const signer = config.deployerIsLedger
+    ? undefined
+    : config.deployer.privateKey;
 
   const safeAccountConfig: SafeAccountConfig = {
-    owners: [
-      signer ? signer.address : await config.ledgerAccount!.getAddress(),
-    ],
+    owners: [config.deployerAddress],
     threshold: 1,
   };
 
@@ -36,7 +36,7 @@ export async function deployMultisig({ config, type }: Params): Promise<Safe> {
 
   const protocolKit = await Safe.init({
     provider: config.rpc,
-    signer: signer?.privateKey,
+    signer,
     predictedSafe,
     contractNetworks: {
       [config.network.chainId.toString()]: config.safeAddresses,
@@ -49,34 +49,31 @@ export async function deployMultisig({ config, type }: Params): Promise<Safe> {
 
   if (await checkAddressExists(config, safeAddress)) {
     console.log(`  -> ✅ ${type} already deployed!`);
-    return protocolKit.connect({
-      provider: config.rpc,
-      signer: signer?.privateKey,
-      safeAddress,
-      contractNetworks: {
-        [config.network.chainId.toString()]: config.safeAddresses,
-      },
-    });
   } else {
     console.log(`  -> ⏳ ${type} not found, deploying...`);
+
+    const deploymentTransaction =
+      await protocolKit.createSafeDeploymentTransaction();
+
+    const transactionHash = await config.deployer.sendTransaction({
+      to: deploymentTransaction.to,
+      value: BigInt(deploymentTransaction.value),
+      data: deploymentTransaction.data as `0x${string}`,
+    });
+
+    const transactionReceipt = await config.provider.waitForTransaction(
+      transactionHash.hash,
+    );
+
+    console.log('     ✅ Safe deployment tx hash:', transactionReceipt?.hash);
   }
 
-  const deploymentTransaction =
-    await protocolKit.createSafeDeploymentTransaction();
-
-  const transactionHash = await (
-    signer ?? config.ledgerAccount!
-  ).sendTransaction({
-    to: deploymentTransaction.to,
-    value: BigInt(deploymentTransaction.value),
-    data: deploymentTransaction.data as `0x${string}`,
+  return protocolKit.connect({
+    provider: config.rpc,
+    signer,
+    safeAddress,
+    contractNetworks: {
+      [config.network.chainId.toString()]: config.safeAddresses,
+    },
   });
-
-  const transactionReceipt = await config.provider.waitForTransaction(
-    transactionHash.hash,
-  );
-
-  console.log('     ✅ Safe deployment tx hash:', transactionReceipt?.hash);
-
-  return protocolKit.connect({ safeAddress });
 }
