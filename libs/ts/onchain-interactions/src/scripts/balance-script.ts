@@ -8,6 +8,7 @@ import {
   networkMetadata,
   parseEthereumAddress,
   isChainId,
+  parseNetworkName,
 } from '@blocksense/base-utils/evm';
 import { deployedNetworks } from '../types';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
@@ -102,7 +103,7 @@ const main = async (): Promise<void> => {
       .map(url => url.trim())
       .filter(Boolean);
 
-    for (const [index, rpcUrl] of rpcList.entries()) {
+    for (const rpcUrl of rpcList) {
       const web3 = new Web3(rpcUrl);
       try {
         const balanceWei = await web3.eth.getBalance(address);
@@ -135,7 +136,8 @@ const main = async (): Promise<void> => {
     return;
   }
 
-  const networks = argv.network === '' ? deployedNetworks : [argv.network];
+  const networks =
+    argv.network == '' ? deployedNetworks : [parseNetworkName(argv.network)];
 
   for (const networkName of networks) {
     const rpcUrl = getOptionalRpcUrl(networkName);
@@ -148,7 +150,6 @@ const main = async (): Promise<void> => {
     try {
       const balanceWei = await web3.eth.getBalance(address);
       const balance = web3.utils.fromWei(balanceWei, 'ether');
-      const chainId = networkMetadata[networkName].chainId;
       const { currency } = networkMetadata[networkName];
       console.log(chalk.green(`${networkName}: ${balance} ${currency}`));
       if (argv.prometheus) {
