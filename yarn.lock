@@ -2425,6 +2425,7 @@ __metadata:
     "@nomicfoundation/hardhat-network-helpers": "npm:^1.0.12"
     "@nomicfoundation/hardhat-toolbox": "npm:^5.0.0"
     "@nomicfoundation/hardhat-verify": "npm:^2.0.12"
+    "@nomicfoundation/hardhat-viem": "npm:^2.0.6"
     "@nomiclabs/hardhat-ethers": "npm:^2.2.3"
     "@openzeppelin/contracts": "npm:^5.1.0"
     "@safe-global/api-kit": "npm:^3.0.0"
@@ -7395,6 +7396,19 @@ __metadata:
   peerDependencies:
     hardhat: ^2.0.4
   checksum: 10c0/551f11346480175362023807b4cebbdacc5627db70e2b4fb0afa04d8ec2c26c3b05d2e74821503e881ba745ec6e2c3a678af74206364099ec14e584a811b2564
+  languageName: node
+  linkType: hard
+
+"@nomicfoundation/hardhat-viem@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "@nomicfoundation/hardhat-viem@npm:2.0.6"
+  dependencies:
+    abitype: "npm:^0.9.8"
+    lodash.memoize: "npm:^4.1.2"
+  peerDependencies:
+    hardhat: ^2.17.0
+    viem: ^2.7.6
+  checksum: 10c0/81542d78399a38b504b4ce4ff7a5d57db2708d6ed7eef0c23f482e063e180f605c5b54e309f4aebe292896c09687006c9d2c92f334da80d73dc48afe68ca950e
   languageName: node
   linkType: hard
 
@@ -14284,6 +14298,21 @@ __metadata:
     zod:
       optional: true
   checksum: 10c0/d3393f32898c1f0f6da4eed2561da6830dcd0d5129a160fae9517214236ee6a6c8e5a0380b8b960c5bc1b949320bcbd015ec7f38b5d7444f8f2b854a1b5dd754
+  languageName: node
+  linkType: hard
+
+"abitype@npm:^0.9.8":
+  version: 0.9.10
+  resolution: "abitype@npm:0.9.10"
+  peerDependencies:
+    typescript: ">=5.0.4"
+    zod: ^3 >=3.22.0
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+    zod:
+      optional: true
+  checksum: 10c0/084c36e70f8034e2cbf029b6f067b9425dc5b25673341ec659089deb220fd5e61f802dddf2aa875d788969c62aa6975490250e583825372483fdb3a76e222d3f
   languageName: node
   linkType: hard
 
@@ -24295,6 +24324,13 @@ __metadata:
   version: 4.5.0
   resolution: "lodash.isequal@npm:4.5.0"
   checksum: 10c0/dfdb2356db19631a4b445d5f37868a095e2402292d59539a987f134a8778c62a2810c2452d11ae9e6dcac71fc9de40a6fedcb20e2952a15b431ad8b29e50e28f
+  languageName: node
+  linkType: hard
+
+"lodash.memoize@npm:^4.1.2":
+  version: 4.1.2
+  resolution: "lodash.memoize@npm:4.1.2"
+  checksum: 10c0/c8713e51eccc650422716a14cece1809cfe34bc5ab5e242b7f8b4e2241c2483697b971a604252807689b9dd69bfe3a98852e19a5b89d506b000b4187a1285df8
   languageName: node
   linkType: hard
 
