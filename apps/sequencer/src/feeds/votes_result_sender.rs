@@ -133,7 +133,7 @@ async fn aggregated_updates_to_publishers(
             {
                 Ok(_) => {
                     info!(
-                        "sent aggregated updates to publishers for block_height = {block_height}."
+                        "sent aggregated updates to publishers for block_height: {block_height}."
                     );
                 }
                 Err(e) => {
@@ -142,7 +142,7 @@ async fn aggregated_updates_to_publishers(
             }
         }
         Err(e) => {
-            error!("Could not serialize updates = {updates:?} due to: {e}")
+            error!("Could not serialize updates: {updates:?} due to Error: {e}")
         }
     };
 }
@@ -365,7 +365,7 @@ async fn send_to_msg_stream(
             Ok(())
         }
         Err(e) => {
-            eyre::bail!("Failed to send batch of aggregated feed values for network: {net}, topic: {topic}, block height: {block_height} to kafka endpoint! {e:?}");
+            eyre::bail!("Failed to send batch of aggregated feed values for network: {net}, topic: {topic}, block height: {block_height} to kafka endpoint! Error: {e:?}");
         }
     }
 }
