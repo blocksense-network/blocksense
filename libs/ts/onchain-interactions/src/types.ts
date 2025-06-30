@@ -75,9 +75,10 @@ export const deployedNetworks = [
 export type Transaction = {
   gasUsed?: string;
   gas_used?: string;
+  gasused?: string;
   gas: string;
   gasPrice?: string;
-  gas_price?: string;
+  gas_price: string;
   from: EthereumAddress;
   to: EthereumAddress;
 } & (

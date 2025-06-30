@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import Web3, { net } from 'web3';
+import Web3 from 'web3';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
@@ -10,6 +10,7 @@ import {
   getOptionalRpcUrl,
   networkMetadata,
   NetworkName,
+  parseNetworkName,
 } from '@blocksense/base-utils/evm';
 import {
   EthereumAddress,
@@ -84,7 +85,7 @@ const logGasCosts = async (
   balance: string,
   firstTransactionTime: string,
   lastTransactionTime: string,
-  hoursBetweenFirstLast: string,
+  hoursBetweenFirstLast: number,
 ): Promise<void> => {
   const { currency } = networkMetadata[network];
 
@@ -377,7 +378,8 @@ const main = async (): Promise<void> => {
     ),
   );
 
-  const networks = argv.network == '' ? deployedNetworks : [argv.network];
+  const networks =
+    argv.network == '' ? deployedNetworks : [parseNetworkName(argv.network)];
 
   for (const network of networks) {
     const { transactions, firstTxTime, lastTxTime } =
