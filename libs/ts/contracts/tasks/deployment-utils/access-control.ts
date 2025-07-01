@@ -1,4 +1,4 @@
-import { Artifacts, RunTaskFunction } from 'hardhat/types';
+import { Artifacts } from 'hardhat/types';
 import { AbiCoder, Contract, solidityPacked } from 'ethers';
 
 import { ContractsConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
@@ -17,12 +17,10 @@ export type Params = {
   deployData: ContractsConfigV2;
   adminMultisig: Safe;
   sequencerMultisig?: Safe;
-  run: RunTaskFunction;
   artifacts: Artifacts;
 };
 
 export async function setUpAccessControl({
-  run,
   artifacts,
   config,
   deployData,
