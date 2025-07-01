@@ -6226,6 +6226,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "mock"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "blocksense-sdk",
+ "futures",
+ "serde 1.0.217",
+ "serde-this-or-that",
+ "serde_derive",
+ "serde_json",
+ "url",
+ "wit-bindgen",
+]
+
+[[package]]
 name = "monostate"
 version = "0.1.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"

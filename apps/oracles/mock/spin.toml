@@ -1,0 +1,87 @@
+spin_manifest_version = 2
+
+[application]
+name = "Blocksense runtime"
+version = "0.1.0"
+authors = ["blocksense-network"]
+
+[application.trigger.settings]
+interval_time_in_seconds = 6
+reporter_id = 0
+sequencer = "http://127.0.0.1:8877/post_reports_batch"
+secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
+second_consensus_secret_key = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+kafka_endpoint = "http://127.0.0.1:9092"
+metrics_url = "http://127.0.0.1:9091"
+
+[[trigger.oracle]]
+component = "mock"
+capabilities = []
+
+[[trigger.oracle.data_feeds]]
+id = "1"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"BTC","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
+
+[[trigger.oracle.data_feeds]]
+id = "2"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"BTC","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
+
+[[trigger.oracle.data_feeds]]
+id = "4"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"ETH","quote":"BTC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
+
+[[trigger.oracle.data_feeds]]
+id = "5"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"ETH","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
+
+[[trigger.oracle.data_feeds]]
+id = "6"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"ETH","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"XRP","quote":"BNB"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
+
+[[trigger.oracle.data_feeds]]
+id = "11"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"XRP","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
+
+[[trigger.oracle.data_feeds]]
+id = "12"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"XRP","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
+
+[[trigger.oracle.data_feeds]]
+id = "14"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"BNB","quote":"USDT"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
+
+[[trigger.oracle.data_feeds]]
+id = "15"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"BNB","quote":"USDC"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
+
+[component.mock]
+source = "../../../target/wasm32-wasip1/release/mock.wasm"
+allowed_outbound_hosts = []
+key_value_stores = ["default"]
+
+[component.mock.build]
+command = "cargo build --target wasm32-wasip1 --release"
