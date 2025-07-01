@@ -1,5 +1,5 @@
 import { Contract } from 'ethers';
-import { Artifacts, RunTaskFunction } from 'hardhat/types';
+import { Artifacts } from 'hardhat/types';
 import Safe from '@safe-global/protocol-kit';
 import {
   OperationType,
@@ -16,7 +16,6 @@ type Params = {
   deployData: ContractsConfigV2;
   config: NetworkConfig;
   safe: Safe;
-  run: RunTaskFunction;
   artifacts: Artifacts;
 };
 
@@ -24,7 +23,6 @@ export async function upgradeProxyImplementation({
   deployData,
   config,
   safe,
-  run,
   artifacts,
 }: Params) {
   const signer = config.adminMultisig.signer || config.ledgerAccount!;

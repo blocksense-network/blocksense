@@ -5,7 +5,7 @@ import {
 import Safe from '@safe-global/protocol-kit';
 import { getCreateCallDeployment } from '@safe-global/safe-deployments';
 import { AbiCoder, Contract, solidityPacked } from 'ethers';
-import { Artifacts, RunTaskFunction } from 'hardhat/types';
+import { Artifacts } from 'hardhat/types';
 
 import { parseEthereumAddress } from '@blocksense/base-utils';
 import { ContractsConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
@@ -18,7 +18,6 @@ type Params = {
   config: NetworkConfig;
   adminMultisig: Safe;
   contracts: DeployContract[];
-  run: RunTaskFunction;
   artifacts: Artifacts;
 };
 
@@ -26,7 +25,6 @@ export async function deployContracts({
   config,
   adminMultisig,
   contracts,
-  run,
   artifacts,
 }: Params) {
   const signer = config.adminMultisig.signer || config.ledgerAccount;
