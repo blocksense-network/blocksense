@@ -10,13 +10,14 @@ use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
 };
-use blocksense_utils::FeedId;
 use itertools::zip;
 use prettytable::{format, Cell, Row, Table};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::str::FromStr;
 use url::Url;
+
+pub type FeedId = u128;
 
 sol!(
     #[allow(missing_docs)]
