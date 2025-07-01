@@ -1,15 +1,19 @@
-import { ethers } from 'hardhat';
-import { deployContract } from '../experiments/utils/helpers/common';
+import { ethers, viem } from 'hardhat';
+import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
+import { expect } from 'chai';
+
 import {
   ADFSConsumer,
   RawCallADFSConsumer,
 } from '@blocksense/contracts/typechain';
+import { isObject } from '@blocksense/base-utils/type-level';
+
+import { deployContract } from '../experiments/utils/helpers/common';
 import * as utils from './utils/feedStoreConsumer';
-import { expect } from 'chai';
 import { ADFSWrapper } from '../utils/wrappers';
 import { encodeDataAndTimestamp } from '../utils/helpers/common';
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { Feed } from '../utils/wrappers/types';
+import { AggregatedDataFeedStore as AggregatedDataFeedStoreViem } from '../../src/clients/aggregated-data-feed-store';
 
 const feeds: Feed[] = [
   {
@@ -36,6 +40,7 @@ describe('Example: ADFSConsumer', function () {
   let dataFeedStore: ADFSWrapper;
   let adfsConsumer: ADFSConsumer;
   let rawCallADFSConsumer: RawCallADFSConsumer;
+  let aggregatedDataFeedStoreViem: AggregatedDataFeedStoreViem;
   let sequencer: HardhatEthersSigner;
 
   const id = 1n;
@@ -62,6 +67,12 @@ describe('Example: ADFSConsumer', function () {
     rawCallADFSConsumer = await deployContract<RawCallADFSConsumer>(
       'RawCallADFSConsumer',
       dataFeedStore.contract.target,
+    );
+
+    const viemPublicClient = await viem.getPublicClient();
+    aggregatedDataFeedStoreViem = new AggregatedDataFeedStoreViem(
+      dataFeedStore.contract.target as `0x${string}`,
+      viemPublicClient,
     );
   });
 
@@ -197,6 +208,9 @@ describe('Example: ADFSConsumer', function () {
     const rawCallData = await rawCallADFSConsumer.getFunction(functionName)(
       ...filteredData,
     );
+    const viemAdfsData = await (
+      aggregatedDataFeedStoreViem[functionName] as (...args: any[]) => any
+    )(...filteredData);
 
     const utilData = await utils[functionName](
       await dataFeedStore.contract.getAddress(),
@@ -205,5 +219,8 @@ describe('Example: ADFSConsumer', function () {
 
     expect(adfsData).to.deep.equal(utilData);
     expect(rawCallData).to.deep.equal(utilData);
+    expect(
+      isObject(viemAdfsData) ? Object.values(viemAdfsData) : viemAdfsData,
+    ).to.deep.equal(utilData);
   };
 });
