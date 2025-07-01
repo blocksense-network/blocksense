@@ -1,5 +1,5 @@
 import { task } from 'hardhat/config';
-import { Wallet, ethers } from 'ethers';
+import { Wallet, ethers, solidityPacked, toBeHex } from 'ethers';
 
 import Safe from '@safe-global/protocol-kit';
 import { OperationType } from '@safe-global/safe-core-sdk-types';
@@ -324,7 +324,7 @@ task(
   await execMultisig({
     safe: adminMultisig,
     to: accessControlAddr,
-    data: ethers.solidityPacked(['address', 'bool'], [writer.address, false]),
+    data: solidityPacked(['address', 'bool'], [writer.address, false]),
   });
 
   const isAllowedAfter = await resolveBool(
@@ -341,9 +341,9 @@ const resolveBool = (value: Promise<string>) =>
 
 const encodeDataWrite = (feeds: Feed[], blockNumber?: number) => {
   blockNumber ??= Date.now() + 100;
-  const prefix = ethers.solidityPacked(
+  const prefix = solidityPacked(
     ['bytes1', 'uint64', 'uint32'],
-    [ethers.toBeHex(WriteOp.SetFeeds), blockNumber, feeds.length],
+    [toBeHex(WriteOp.SetFeeds), blockNumber, feeds.length],
   );
 
   const data = feeds.map(feed => {

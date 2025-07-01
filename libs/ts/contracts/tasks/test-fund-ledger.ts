@@ -1,5 +1,6 @@
 import { task } from 'hardhat/config';
 import { initChain } from './deployment-utils/init-chain';
+import { parseEther } from 'ethers';
 
 task('fund-ledger', '[UTILS] Fund the ledger account with ETH').setAction(
   async (_, { ethers }) => {
@@ -15,7 +16,7 @@ task('fund-ledger', '[UTILS] Fund the ledger account with ETH').setAction(
       .connect(config.provider)
       .sendTransaction({
         to: config.deployerAddress,
-        value: ethers.parseEther('10'),
+        value: parseEther('10'),
       });
     await tx.wait();
 
