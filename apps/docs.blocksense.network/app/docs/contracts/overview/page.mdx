@@ -8,17 +8,17 @@ import { Callout } from "nextra/components";
 
 # Introduction
 
-This document provides a quick-start guide to smart contracts as part of our Blocksense protocol. You can explore the structure and functionality of these contracts and unlock a deeper understanding of our cutting-edge data feed storage mechanism.
+This document provides a quick-start guide to smart contracts as part of our Blocksense protocol. Here you can get a high-level overview of the architecture and the role of smart contracts in the Blocksense network.
 
 ## Folder Structure
 
-Smart `contracts` for Blocksense network are stored inside our public GitHub repository. The contracts folder is organized as presented below:
+Smart contracts for Blocksense network are stored inside our public GitHub repository. The [`contracts`](https://github.com/blocksense-network/blocksense/tree/main/libs/ts/contracts/contracts) folder is organized as presented below:
 
 <ContractsFileTree data={contractsFileStructure} />
 
 ## Smart Contracts Architecture
 
-This diagram illustrates the role of smart contracts in ensuring data integrity and enabling trustless interactions. Blocksense leverages a protocol where clients interact with smart contracts deployed on the blockchain. These contracts utilize proxy patterns to allow seamless upgrade ability and employ historical data feeds for transparent data sourcing and verification.
+The Blocksense network utilizes a modular architecture, with smart contracts serving as the foundation for data storage and retrieval. The core components of the architecture include:
 
 ```mermaid
 ---
@@ -28,132 +28,48 @@ config:
 graph TD
     classDef clientNode display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace;
     classDef feedNode,proxyNode,dataNode display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace;
-    classDef feedNode:hover,proxyNode:hover,dataNode:hover fill:#fafafa,color:#0000EE,stroke:#e4e4e7,stroke-width:1px,shadow:2px 2px 5px #888888, display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace, text-decoration: underline, text-underline-offset: 4px;
+    classDef feedNode:hover,proxyNode:hover,dataNode:hover fill:#fafafa,color:#0000EE,stroke:#e4e4e7,stroke-width:1px,shadow: 5px #888888, display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace, text-decoration: underline, text-underline-offset: 4px;
 
     A[Client] -->|invoke| E
     A -->|invoke| B
-    B[CLFeedRegistryAdapter] -->|staticcall| C[UpgradeableProxyADFS]
-    C -->|delegatecall| D[AggregatedDataFeedStore]
-    E[CLAggregatorAdapter] -->|staticcall| C
+    B[CLFeedRegistryAdapter] -->|fetch data| C[AggregatedDataFeedStore]
+    A -->|fetch data| C
+    E[CLAggregatorAdapter] -->|fetch data| C
 
     click B "/docs/contracts/reference-documentation/contract/CLFeedRegistryAdapter" "Go to CLFeedRegistryAdapter"
     click E "/docs/contracts/reference-documentation/contract/CLAggregatorAdapter" "Go to CLAggregatorAdapter"
-    click C "/docs/contracts/reference-documentation/contract/UpgradeableProxyADFS" "Go to UpgradeableProxyADFS"
-    click D "/docs/contracts/reference-documentation/contract/AggregatedDataFeedStore" "Go to AggregatedDataFeedStore"
+    click C "/docs/contracts/reference-documentation/contract/AggregatedDataFeedStore" "Go to AggregatedDataFeedStore"
 
     class A clientNode
     class B,E feedNode
     class C proxyNode
     class D dataNode
     class A,B,E invokeEdge
-    class B,C,E staticcallEdge
-    class C,D delegatecallEdge
 ```
 
 ### Components Overview
 
-- **Client**: Represents users and external systems interacting with Blocksense protocol.
+- **Client**: Represents users and external systems interacting with the Blocksense protocol.
 
 - **CLFeedRegistryAdapter**: Represents an on-chain mapping of assets, base or quote pairs, to their corresponding feeds. It provides users and clients with Chainlink interface functions to query feed data using asset addresses, eliminating the need-to-know specific feed contract address.
 
-- **UpgradeableProxyADFS**: Proxy contracts designed to simplify upgrades of smart contract logic without disrupting storage layout. This ensures scalability and adaptability of the Blocksense platform over time.
-
-- **AggregatedDataFeedStore**: Secure repository for storing historical data feeds. It provides past record data inputs, enhancing audibility and traceability within the Blocksense network.
-
 - **CLAggregatorAdapter**: Proxy instance, that allows users and clients to retrieve data for a specific feed through Chainlink interface methods.
 
-### Functional Significance
-
-Each component plays an important role in maintaining the integrity and operational efficiency of Blocksense decentralized application infrastructure. Smart contracts automate and enforce agreements, ensuring that transactions are executed according to predefined rules without the need for intermediaries. This approach not only enhances transparency and trust but also reduces costs and eliminates single points of failure traditionally associated with centralized systems.
+- **AggregatedDataFeedStore**: Represents the data feed contract, which stores historical data feed values of different sizes, allowing users to retrieve past data points for specific data feed IDs.
 
 ## Core contracts
 
 ### AggregatedDataFeedStore (ADFS)
 
-This contract stores historical data feed values of different strides, allowing users to retrieve past data points for specific data feed IDs.
+The AggregatedDataFeedStore contract is the core contract responsible for storing and retrieving data feed values. It is designed to be upgradeable, allowing for future contract upgrades and improvements.
 
 <Callout type="warning" emoji="⚠️">
   In practice, the UpgradeableProxyADFS contract is the central storage for all data. The AggregatedDataFeedStore contract provides the logic for reading from and writing to the UpgradeableProxyADFS contract’s storage.
 </Callout>
 
-**EVM knowledge prerequisites:**
-- Storage is represented as chunks of 32 bytes called slots. Each chunk has an address.
-- Addresses are 20 bytes long data represented in hex.
-- You can access all storage directly by using an address, without allocating memory first.
-- Storing data is paid per the number of slots we write to.
+Each data feed is represented by a unique ID, which is used to identify and retrieve the corresponding data feed values. The contract supports multiple data feed sizes as well as historical data in the form of a ring buffer (i.e. the historical data is limited and will be overwritten with new data when the buffer is full).
 
-Data feeds in this contract are of different slot sizes based on the stride (powers of 2). For example, stride 0 is 32b (1 slot) data, stride 1 is 64b, stride 2 is 128b and so on. Data feeds have historical data stored up to 8192 rounds. CL-compatible contracts make use of only stride 0 data feeds.
-
-In the image below each box represents a slot (32b) where round (historical) data can be stored for a feed. Each feed has 2\*\*13 rounds and in a single stride, there are 2\*\*115 feed IDs. There are 32 strides.
-
-```
-          ┌───────────────────────────────┐
-          │          stride 0 (32b)       │
-          │───────────────────────────────│
-          ├───┌───┌───┌───┌───┌───┌───┌───┤
-feed id 0 │   │   │   │   │   │   │   │   │
-          ├───└───└───└───└───└───└───└───┤
-          │                               │
-          │   ...... 2**13 rounds ......  │
-          │                               │
-          ├───┌───┌───┌───┌───┌───┌───┌───┤
-feed id 1 │   │   │   │   │   │   │   │   │
-          ├───└───└───└───└───└───└───└───┤
-        . │                               │
-        . │   ...... 2**13 rounds ......  │
-          │                               │
-feed id N └───────────────────────────────┘
-```
-
-Storage representation for a greater stride (128b - 4 slots):
-
-```
-          ┌───────────────────────────────┐
-          │        stride 2 (128b)        │
-          │───────────────────────────────│
-          ├───────────────┌───────────────┤
-feed id 0 │   │   │   │   │   │   │   │   │
-          ├───────────────└───────────────┤
-          │                               │
-          │   ...... 2**13 rounds ......  │
-          │                               │
-          ├───────────────┌───────────────┤
-feed id 1 │   │   │   │   │   │   │   │   │
-          ├───────────────└───────────────┤
-        . │                               │
-        . │   ...... 2**13 rounds ......  │
-          │                               │
-feed id N └───────────────────────────────┘
-```
-
-When storing historical data, we also need to store the latest round. This is achieved in a separate space in the storage - the Round Table:
-
-```
-                    ┌───────────────────────────────────────┐
-                    │           latest round table          │
-                    │───────────────────────────────────────┤
-                    ├───┌───┌───┌───┌───┌───┌───┌───┌───┌───┤slot 0
-      feed id  0-15 │2b │2b │2b │ . │ . │ . │ . │2b │2b │2b │
-                    ├───└───└───└───└───└───└───└───└───└───┤ 32b
-                    │ 0   1   2   .   .   .   .  13  14  15 │
-                    │                                       │
-                    │                                       │
-                    │             .............             │
-                    │                                       │
-                    ├───┌───┌───┌───┌───┌───┌───┌───┌───┌───┤slot 312
-  feed id 4992-5008 │2b │2b │2b │ . │ . │ . │ . │2b │2b │2b │
-                    ├───└───└───└───└───└───└───└───└───└───┤ 32b
-                    │                                       │
-                    └───────────────────────────────────────┘
-
-                    max id: (2**115)*32        max slot: 2**116
-```
-
-In the Round Table, each slot contains 16 chunks where the latest round for a feed ID is stored. This way we achieve less frequent writing to the storage hence paying less gas.
-
-#### Optimised writing
-
-Keeping in mind the Round table above, when writing to the contract it will be less costly if data feeds of the same stride with IDs between `id%16 == 0` and `id%16 == 15` are packed together in a transaction due to single latest counter update.
+Data can be stored in any format and in any size (up to ~64GB).
 
 #### Subscribe to update events
 
@@ -163,42 +79,37 @@ When an update is posted to the contract, an event is emitted - “DataFeedsUpda
 
 See the [Integration guide](./integration-guide/using-data-feeds/aggregated-data-feed-store) for more information.
 
-Limitations: one can read a whole feed, i.e. all of its historical data, but cannot read more than one feed in a call. If a feed is of a greater stride (anything but stride 0), one can pass start slot and slots count (optional) parameters to read a specific data slice. For example, we have a data feed of stride 5 (i.e. 1024b or 32 slots) and we want to read only the last 3 slots, we would pass 29 (counting starts from 0) as start slot and 3 as slots count.
-
 ### Access Control
 
-This contract is called when writing to the ADFS storage. Its role is to check if the writer (caller of the transaction) has permission to write to the storage; if not - reverts the transaction.
+This contract ensures the caller has the necessary permissions to perform specific actions.
 
 ### CL Adapters
 
-  The `cl-adapters` folder contains Chainlink aggregator adapter contract (`CLAggregatorAdapter.sol`) and a feed registry contract (`/registries/CLFeedRegistryAdapter.sol`). The CL aggregator adapter contract implements the Chainlink aggregator interface, enabling it to interact with the `UpgradeableProxyADFS` contract to fetch stored data. The idea is that the `UpgradeableProxyADFS` holds the storage in itself and only uses the `AggegatedDataFeedStore` contract functions to know how to read or write to its own storage.
+The [`cl-adapters`](https://github.com/blocksense-network/blocksense/tree/main/libs/ts/contracts/contracts/cl-adapters) folder contains Chainlink aggregator adapter contract ([`CLAggregatorAdapter.sol`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/cl-adapters/CLAggregatorAdapter.sol)) and a feed registry contract ([`/registries/CLFeedRegistryAdapter.sol`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/cl-adapters/registries/CLFeedRegistryAdapter.sol)). The CL aggregator adapter contract implements the Chainlink aggregator interface, enabling it to interact with the [`ADFS`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/AggregatedDataFeedStore.sol) contract to fetch stored data. The feed registry contract is responsible for mapping asset addresses to their corresponding Chainlink data feeds. It provides a mechanism for users to retrieve the address of a specific data feed based on the asset address.
 
 ### Interfaces
 
-The `interfaces` folder includes the following key interfaces:
+The [`interfaces`](https://github.com/blocksense-network/blocksense/tree/main/libs/ts/contracts/contracts/interfaces) folder includes the following key interfaces:
 
-- `ICLAggregatorAdapter.sol`: Extends the functionality of `IChainlinkAggregator.sol`.
-- `/chainlink/IChainlinkAggregator.sol`: Defines the interface for the Chainlink aggregator contract.
-- `ICLFeedRegistryAdapter.sol`: Extends the functionality of `IChainlinkFeedRegistry.sol`.
-- `/chainlink/IChainlinkFeedRegistry.sol`: Defines the data feed registry contract interface.
+- [`ICLAggregatorAdapter.sol`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/interfaces/ICLAggregatorAdapter.sol): Extends the functionality of [`IChainlinkAggregator.sol`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/interfaces/chainlink/IChainlinkAggregator.sol).
+- [`/chainlink/IChainlinkAggregator.sol`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/interfaces/chainlink/IChainlinkAggregator.sol): Defines the interface for the Chainlink aggregator contract.
+- [`ICLFeedRegistryAdapter.sol`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/interfaces/ICLFeedRegistryAdapter.sol): Extends the functionality of [`IChainlinkFeedRegistry.sol`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/interfaces/chainlink/IChainlinkFeedRegistry.sol).
+- [`/chainlink/IChainlinkFeedRegistry.sol`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/interfaces/chainlink/IChainlinkFeedRegistry.sol): Defines the data feed registry contract interface.
 
 ### Libraries
 
-The `libraries` folder contains `CLAdapterLib.sol` - used as an internal library in `CLFeedRegistryAdapter`, `CLAggregatorAdapter`, and some of the test consumer contracts to call `UpgradeableProxyADFS`, and `Blocksense.sol` - used by the example contracts. Both provide utilities for low-level static calls to the mentioned contracts to ensure maximum gas optimizations. Moreover, `CLAdapterLib` enables historical data parsing handlers to decode raw data from the storage, whereas `Blocksense` is designed for client contracts as a low-gas call library.
+The [`libraries`](https://github.com/blocksense-network/blocksense/tree/main/libs/ts/contracts/contracts/libraries) folder contains [`CLAdapterLib.sol`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/libraries/CLAdapterLib.sol) - used as an internal library in [`CLFeedRegistryAdapter`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/cl-adapters/registries/CLFeedRegistryAdapter.sol), [`CLAggregatorAdapter`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/cl-adapters/CLAggregatorAdapter.sol) to call [`ADFS`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/AggregatedDataFeedStore.sol), and [`ADFS.sol`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/libraries/ADFS.sol) - used in the example contracts to demonstrate how the client can query [`ADFS`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/AggregatedDataFeedStore.sol) directly. Both provide utilities for low-level static calls to [`ADFS`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/AggregatedDataFeedStore.sol) or the CL adapters to ensure maximum gas optimizations. Moreover, [`CLAdapterLib`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/libraries/CLAdapterLib.sol) enables historical data parsing handlers to decode raw data from the storage in the form of a Chainlink aggregator, whereas the [`ADFS`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/libraries/ADFS.sol) library is designed for client contracts as a low-gas call library.
 
 ## Test Contracts
 
-**`test` folder:**
+**[`test`](https://github.com/blocksense-network/blocksense/tree/main/libs/ts/contracts/contracts/test) folder:**
 - This folder includes example consumer contracts and reference implementations primarily for gas comparison purposes during testing. These examples provide a basis for evaluation of the gas efficiency.
-
-**`experiments` folder:**
-- There are 2 experiment folders - `/contracts/experiments` and `test/experiments`. Both contain code related to deprecated contracts that are kept only as reference and for gas comparison. They are not to be used anywhere in the system aside from testing.
 
 ## Prologue Optimization
 
 ### Overview
 
-Prologue optimization aims to reduce gas costs associated with smart contract calls by skipping the Solidity dispatching prologue and instead using the selector as a data feed ID. This approach is intended to demonstrate potential cost savings compared to traditional methods like Chainlink.
+Prologue optimization aims to reduce gas costs associated with smart contract calls by skipping the Solidity dispatching prologue and instead using the selector as a data feed ID.
 
 ### Call Handling Mechanism
 
@@ -207,7 +118,7 @@ All calls are managed by a fallback function based on the selector, ensuring eff
 ### Key Points
 
 - A custom entry point, that bypasses the Solidity dispatching prologue.
-- Selectors use reserved bits to decide which function they should call, and the rest of the bits tell them which data feed they're supposed to work with.
+- Selectors utilize reserved bits to determine which function to call, while the remaining bits indicate the data feed they should handle.
 - The optimization reduces gas costs by eliminating the need for the Solidity compiler to generate "Linear If-Else Dispatcher" statements for different selectors.
 
 ### Benefits
