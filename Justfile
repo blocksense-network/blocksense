@@ -115,7 +115,6 @@ clean:
   git clean -fdx \
     -e .env \
     -e .direnv \
-    -e .yarn \
     -e .vscode \
     -e .pre-commit-config.yaml \
     -- {{root-dir}}
