@@ -1,5 +1,5 @@
 import { Artifacts } from 'hardhat/types';
-import { AbiCoder, Contract, solidityPacked } from 'ethers';
+import { AbiCoder, solidityPacked } from 'ethers';
 
 import { ContractsConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
 import Safe from '@safe-global/protocol-kit';
@@ -10,7 +10,7 @@ import {
 
 import { assertNotNull, EthereumAddress } from '@blocksense/base-utils';
 
-import { ContractNames, NetworkConfig } from '../types';
+import { NetworkConfig } from '../types';
 import { executeMultisigTransaction } from './multisig-tx-exec';
 
 export type Params = {
@@ -85,16 +85,12 @@ export async function setUpAccessControl({
     );
   }
 
-  const accessControl = new Contract(
-    deployData.coreContracts.AccessControl.address,
-    artifacts.readArtifactSync(ContractNames.AccessControl).abi,
-    deployer,
-  );
+  const accessControlAddress = deployData.coreContracts.AccessControl.address;
 
   const isAllowed = Boolean(
     Number(
       await deployer.call({
-        to: accessControl.target.toString(),
+        to: accessControlAddress,
         data: reporterMultisigAddress,
       }),
     ),
@@ -102,7 +98,7 @@ export async function setUpAccessControl({
 
   if (!isAllowed) {
     const safeTxSetAccessControl: SafeTransactionDataPartial = {
-      to: accessControl.target.toString(),
+      to: accessControlAddress,
       value: '0',
       data: solidityPacked(
         ['address', 'bool'],
