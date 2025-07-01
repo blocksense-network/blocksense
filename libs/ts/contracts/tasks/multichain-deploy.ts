@@ -1,4 +1,4 @@
-import { formatEther } from 'ethers';
+import { AbiCoder, formatEther, id, ZeroAddress } from 'ethers';
 import { task } from 'hardhat/config';
 
 import type Safe from '@safe-global/protocol-kit';
@@ -57,7 +57,7 @@ task('deploy', 'Deploy contracts')
 
     const chainsDeployment = {} as Record<NetworkName, DeploymentConfigV2>;
 
-    const abiCoder = ethers.AbiCoder.defaultAbiCoder();
+    const abiCoder = AbiCoder.defaultAbiCoder();
 
     for (const config of configs) {
       const feedsToDeploy = config.feedIds;
@@ -73,7 +73,7 @@ task('deploy', 'Deploy contracts')
         config.deployerAddress,
       );
 
-      const keccak256 = (str: string) => parseHexDataString(ethers.id(str));
+      const keccak256 = (str: string) => parseHexDataString(id(str));
 
       const create2ContractSalts = {
         upgradeableProxy: config.adfsUpgradeableProxySalt,
@@ -215,7 +215,7 @@ task('deploy', 'Deploy contracts')
       ];
 
       let reporterMultisig: Safe | undefined;
-      let reporterMultisigAddress = parseEthereumAddress(ethers.ZeroAddress);
+      let reporterMultisigAddress = parseEthereumAddress(ZeroAddress);
 
       if (config.deployWithReporterMultisig) {
         reporterMultisig = await deployMultisig({
@@ -261,7 +261,7 @@ task('deploy', 'Deploy contracts')
           safe: {
             AdminMultisig: adminMultisigAddress,
             ReporterMultisig:
-              reporterMultisigAddress === ethers.ZeroAddress
+              reporterMultisigAddress === ZeroAddress
                 ? null
                 : reporterMultisigAddress,
             AdminExecutorModule: deployData.safe.AdminExecutorModule,

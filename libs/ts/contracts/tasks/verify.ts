@@ -7,7 +7,7 @@ import {
 } from '@blocksense/base-utils';
 
 import { readEvmDeployment } from '@blocksense/config-types';
-import { ethers } from 'ethers';
+import { ZeroAddress } from 'ethers';
 
 type VerifyTaskArgs = {
   address: EthereumAddress;
@@ -39,7 +39,7 @@ task('etherscan-verify', 'Verify contracts on Etherscan').setAction(
     ];
 
     for (const [contractName, data] of contracts) {
-      if (!data || data.address === ethers.ZeroAddress) continue;
+      if (!data || data.address === ZeroAddress) continue;
 
       console.log('-> Verifying contract:', contractName, data.address);
       await verify(data);

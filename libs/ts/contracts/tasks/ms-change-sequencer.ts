@@ -10,6 +10,7 @@ import {
 import { adjustVInSignature } from '@safe-global/protocol-kit/dist/src/utils';
 import { readEvmDeployment } from '@blocksense/config-types';
 import { initChain } from './deployment-utils/init-chain';
+import { solidityPacked, toBeArray } from 'ethers';
 
 task('change-sequencer', 'Change sequencer role in Access Control contract')
   .addParam('networks', 'Network to deploy to')
@@ -56,7 +57,7 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
       const safeTxSetAccessControl: SafeTransactionDataPartial = {
         to: AccessControl.address,
         value: '0',
-        data: ethers.solidityPacked(
+        data: solidityPacked(
           ['address', 'bool'],
           [args.sequencerAddress, Boolean(JSON.parse(args.setRole))],
         ),
@@ -69,7 +70,7 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
 
       const safeTxHash = await adminMultisig.getTransactionHash(tx);
 
-      const typedDataHash = ethers.toBeArray(safeTxHash);
+      const typedDataHash = toBeArray(safeTxHash);
       const signedData = await config.deployer.signMessage(typedDataHash);
       const signature = await adjustVInSignature(
         SigningMethod.ETH_SIGN,
