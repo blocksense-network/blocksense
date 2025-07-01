@@ -20,6 +20,11 @@
     "./contractsFileStructure.json": {
       "require": "./artifacts/docs/contractsFileStructure.json",
       "import": "./artifacts/docs/contractsFileStructure.json"
+    },
+    "./viem": {
+      "require": "./dist/cjs/viem/index.cjs",
+      "import": "./dist/esm/viem/index.mjs",
+      "types": "./lib/viem/index.ts"
     }
   },
   "scripts": {
