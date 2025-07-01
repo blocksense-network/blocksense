@@ -245,7 +245,6 @@ task('deploy', 'Deploy contracts')
         config,
         adminMultisig,
         contracts,
-        run,
         artifacts,
       });
 
@@ -277,7 +276,6 @@ task('deploy', 'Deploy contracts')
         config,
         safe: adminMultisig,
         deployData,
-        run,
         artifacts,
       });
 
@@ -285,12 +283,10 @@ task('deploy', 'Deploy contracts')
         config,
         safe: adminMultisig,
         deployData,
-        run,
         artifacts,
       });
 
       await setUpAccessControl({
-        run,
         artifacts,
         config,
         deployData,

@@ -1,5 +1,5 @@
 import { Contract, ZeroAddress } from 'ethers';
-import { Artifacts, RunTaskFunction } from 'hardhat/types';
+import { Artifacts } from 'hardhat/types';
 import {
   OperationType,
   SafeTransactionDataPartial,
@@ -18,7 +18,6 @@ type Params = {
   deployData: ContractsConfigV2;
   config: NetworkConfig;
   safe: Safe;
-  run: RunTaskFunction;
   artifacts: Artifacts;
 };
 
@@ -27,7 +26,6 @@ export async function registerCLAdapters({
   config,
   safe,
   artifacts,
-  run,
 }: Params): Promise<void> {
   // The difference between setting n and n+1 feeds via CLFeedRegistryAdapter::setFeeds is slightly above 55k gas.
   console.log('\nRegistering CLAggregatorAdapters in CLFeedRegistryAdapter...');
