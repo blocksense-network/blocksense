@@ -26,6 +26,7 @@ async function main() {
   }
 
   const inputDir = process.argv[2];
+  const tsConfigName = process.env['TS_CONFIG_NAME'] ?? 'tsconfig.json';
   const relativeDir = path.relative(process.env['GIT_ROOT'] ?? '/', inputDir);
   const packageDir = `${path.resolve(inputDir)}/`;
 
@@ -37,8 +38,8 @@ async function main() {
   process.chdir(packageDir);
 
   await Promise.all([
-    build(packageDir, relativeDir, 'esm'), //
-    build(packageDir, relativeDir, 'cjs'),
+    build(packageDir, relativeDir, tsConfigName, 'esm'), //
+    build(packageDir, relativeDir, tsConfigName, 'cjs'),
   ]);
   await fs.rename(`${packageDir}/dist/esm/types`, `${packageDir}/dist/types`);
   console.log(
@@ -46,10 +47,10 @@ async function main() {
   );
 }
 
-async function build(packageDir, relativeDir, format) {
+async function build(packageDir, relativeDir, tsConfigName, format) {
   let bundle;
   try {
-    const config = createConfig(packageDir, format);
+    const config = createConfig(packageDir, tsConfigName, format);
     bundle = await rollup(config);
 
     for (const outputOptions of config.output) {
@@ -73,8 +74,8 @@ async function build(packageDir, relativeDir, format) {
   }
 }
 
-function createConfig(packageDir, format) {
-  const tsconfig = getTsconfig();
+function createConfig(packageDir, tsConfigName, format) {
+  const tsconfig = getTsconfig(packageDir, tsConfigName);
   const relativeRootDir = tsconfig.config.compilerOptions.rootDir;
   const sourceDir = path.resolve(packageDir, relativeRootDir ?? '.');
 
@@ -157,7 +158,7 @@ function createConfig(packageDir, format) {
         modulesOnly: true,
       }),
       typescript({
-        tsconfig: `${packageDir}/tsconfig.json`,
+        tsconfig: `${packageDir}/${tsConfigName}`,
         composite: false,
         declaration: format != 'cjs',
         declarationMap: format != 'cjs',
