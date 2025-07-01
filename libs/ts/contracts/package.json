@@ -25,6 +25,8 @@
   "scripts": {
     "clean": "git clean -fdx -e .env",
     "build": "hardhat compile && yarn build:typecheck",
+    "build:lib": "TS_CONFIG_NAME=tsconfig.lib.json yarn run rollup:build-workspace",
+    "build:all": "yarn build && yarn build:lib",
     "sol-reflect": "hardhat reflect",
     "test": "hardhat test",
     "test:fork": "FORKING=true hardhat test --grep '@fork'",
