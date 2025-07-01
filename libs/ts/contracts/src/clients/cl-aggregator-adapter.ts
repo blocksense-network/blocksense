@@ -22,31 +22,31 @@ export class CLAggregatorAdapterConsumer extends ContractConsumer {
     });
   }
 
-  async decimals(): Promise<number> {
+  async getDecimals(): Promise<number> {
     return this.contract.read.decimals();
   }
 
-  async dataFeedStore(): Promise<Address> {
+  async getDataFeedStore(): Promise<Address> {
     return this.contract.read.dataFeedStore();
   }
 
-  async description(): Promise<string> {
+  async getDescription(): Promise<string> {
     return this.contract.read.description();
   }
 
-  async id(): Promise<bigint> {
+  async getId(): Promise<bigint> {
     return this.contract.read.id();
   }
 
-  async latestAnswer(): Promise<bigint> {
+  async getLatestAnswer(): Promise<bigint> {
     return this.contract.read.latestAnswer();
   }
 
-  async latestRound(): Promise<bigint> {
+  async getLatestRound(): Promise<bigint> {
     return this.contract.read.latestRound();
   }
 
-  async latestRoundData(): Promise<RoundData> {
+  async getLatestRoundData(): Promise<RoundData> {
     const roundDataResult = await this.contract.read.latestRoundData();
     return parseRoundData(roundDataResult);
   }
