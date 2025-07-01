@@ -515,7 +515,7 @@ impl OracleTrigger {
         let mut join_handles = vec![];
         for (key, component) in components {
             let time_interval =
-                tokio::time::Duration::from_secs(component.interval_time_in_seconds);
+                tokio::time::Duration::from_millis(component.interval_time_in_seconds);
             let future = Self::signal_data_feeds(
                 key.clone(),
                 time_interval,
