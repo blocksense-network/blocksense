@@ -13,8 +13,6 @@ import {
   networkMetadata,
   NetworkName,
   parseNetworkName,
-} from '@blocksense/base-utils/evm';
-import {
   EthereumAddress,
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
