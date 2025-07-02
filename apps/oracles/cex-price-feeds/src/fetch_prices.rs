@@ -1,15 +1,16 @@
+use std::time::Instant;
+
 use anyhow::Result;
 use futures::stream::{FuturesUnordered, StreamExt};
 use serde::{Deserialize, Serialize};
 
-use std::time::Instant;
-
 use blocksense_data_providers_sdk::price_data::traits::prices_fetcher::{fetch, TradingPairSymbol};
+use blocksense_data_providers_sdk::price_data::types::{
+    PairsToResults, ProviderPriceData, ProvidersSymbols,
+};
 
 use crate::{
-    common::{
-        ExchangePriceData, ExchangesSymbols, ResourceData, ResourcePairData, TradingPairToResults,
-    },
+    common::{ResourceData, ResourcePairData},
     exchanges::{
         binance::BinancePriceFetcher, binance_us::BinanceUsPriceFetcher,
         bitfinex::BitfinexPriceFetcher, bitget::BitgetPriceFetcher, bybit::BybitPriceFetcher,
@@ -32,7 +33,7 @@ pub struct SymbolsData {
 }
 
 impl SymbolsData {
-    pub fn from_resources(exchanges_symbols: &ExchangesSymbols) -> Result<Self> {
+    pub fn from_resources(exchanges_symbols: &ProvidersSymbols) -> Result<Self> {
         Ok(Self {
             binance_us: exchanges_symbols
                 .get("BinanceUS")
@@ -56,7 +57,7 @@ impl SymbolsData {
     }
 }
 
-pub async fn fetch_all_prices(resources: &ResourceData) -> Result<TradingPairToResults> {
+pub async fn fetch_all_prices(resources: &ResourceData) -> Result<PairsToResults> {
     let symbols = SymbolsData::from_resources(&resources.symbols)?;
 
     let mut futures_set = FuturesUnordered::from_iter([
@@ -77,7 +78,7 @@ pub async fn fetch_all_prices(resources: &ResourceData) -> Result<TradingPairToR
     ]);
 
     let before_fetch = Instant::now();
-    let mut results = TradingPairToResults::new();
+    let mut results = PairsToResults::new();
 
     // Process results as they complete
     while let Some((exchange_id, result)) = futures_set.next().await {
@@ -85,7 +86,7 @@ pub async fn fetch_all_prices(resources: &ResourceData) -> Result<TradingPairToR
             Ok(prices) => {
                 let time_taken = before_fetch.elapsed();
                 println!("ℹ️  Successfully fetched prices from {exchange_id} in {time_taken:?}",);
-                let prices_per_exchange = ExchangePriceData {
+                let prices_per_exchange = ProviderPriceData {
                     name: exchange_id.to_owned(),
                     data: prices,
                 };
@@ -102,8 +103,8 @@ pub async fn fetch_all_prices(resources: &ResourceData) -> Result<TradingPairToR
 
 fn fill_results(
     resources: &[ResourcePairData],
-    prices_per_exchange: ExchangePriceData,
-    results: &mut TradingPairToResults,
+    prices_per_exchange: ProviderPriceData,
+    results: &mut PairsToResults,
 ) {
     for resource in resources {
         let quote = [resource.pair.quote.as_str()];
@@ -122,14 +123,14 @@ fn fill_results(
                 quote.to_uppercase()
             );
             if let Some(price_point) = prices_per_exchange.data.get(&symbol) {
-                res.exchanges_data.insert(
+                res.providers_data.insert(
                     format!("{} {} price", prices_per_exchange.name, quote),
                     price_point.clone(),
                 );
             }
         }
 
-        if res.exchanges_data.is_empty() {
+        if res.providers_data.is_empty() {
             results.remove(&resource.id);
         }
     }
