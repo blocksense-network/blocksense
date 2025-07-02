@@ -39,12 +39,11 @@ To consume price data from [`CLAggregatorAdapter`](https://github.com/blocksense
 
 ```solidity showLineNumbers copy filename="CLAggregatorAdapterConsumer.sol"
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.28;
 
 import {IChainlinkAggregator} from 'interfaces/chainlink/IChainlinkAggregator.sol';
 
 /**
- * THIS IS AN EXAMPLE CONTRACT THAT USES HARDCODED VALUES FOR CLARITY.
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
  * DO NOT USE THIS CODE IN PRODUCTION.
  */
@@ -126,7 +125,7 @@ const [roundID, answer, startedAt, updatedAt, answeredInRound] =
   await aggregator.getRoundData(roundId);
 ```
 
-To get the feed key the CL Aggregator Adapter is responsible for:
+To get the feed id the CL Aggregator Adapter is responsible for:
 
 ```js copy filename="javascript"
 const aggregator = new ethers.Contract(contractAddress, abiJson, provider);
