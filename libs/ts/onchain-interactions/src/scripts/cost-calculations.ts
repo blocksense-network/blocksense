@@ -4,6 +4,8 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
 import chalkTemplate from 'chalk-template';
+import client from 'prom-client';
+import express from 'express';
 
 import {
   getOptionalApiKey,
@@ -20,6 +22,49 @@ import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 import { throwError } from '@blocksense/base-utils/errors';
 
 import { Transaction, deployedNetworks } from '../types';
+
+const gasCostGauge = new client.Gauge({
+  name: 'eth_account_gas_cost',
+  help: 'Daily cost in gas to run using last x transactions',
+  labelNames: ['networkName', 'address'],
+});
+
+const costGauge = new client.Gauge({
+  name: 'eth_account_cost',
+  help: 'Daily cost to run using last x transactions',
+  labelNames: ['networkName', 'address'],
+});
+
+const balanceGauge = new client.Gauge({
+  name: 'eth_account_balance',
+  help: 'Ethereum account balance in native token',
+  labelNames: ['networkName', 'address'],
+});
+
+const daysLeftGauge = new client.Gauge({
+  name: 'eth_account_days_left',
+  help: 'Days until funds run out',
+  labelNames: ['networkName', 'address'],
+});
+
+function filterSmallBalance(balance: string, threshold = 1e-6): number {
+  return Number(balance) < threshold ? 0 : Number(balance);
+}
+
+const startPrometheusServer = (host: string, port: number): void => {
+  const app = express();
+  app.get('/metrics', async (_req, res) => {
+    res.set('Content-Type', client.register.contentType);
+    res.end(await client.register.metrics());
+  });
+  app.listen(port, host, () => {
+    console.log(
+      chalk.blue(
+        `Prometheus metrics exposed at http://${host}:${port}/metrics`,
+      ),
+    );
+  });
+};
 
 function getHourDifference(transactions: Transaction[]): number {
   const txsLen = transactions.length;
@@ -86,11 +131,12 @@ const logGasCosts = async (
   firstTransactionTime: string,
   lastTransactionTime: string,
   hoursBetweenFirstLast: number,
+  prometheus: boolean,
 ): Promise<void> => {
   const { currency } = networkMetadata[network];
 
   try {
-    await console.log(chalkTemplate`
+    console.log(chalkTemplate`
     {white ${network}: Processed ${transactionsCount} transactions sent by ${address} over ${hoursBetweenFirstLast} hours}
     {blue First transaction timestamp: ${firstTransactionTime}}
     {blue Last transaction timestamp: ${lastTransactionTime}}
@@ -112,6 +158,14 @@ const logGasCosts = async (
         console.log(chalk.bold.yellow(balanceMsg));
       } else {
         console.log(chalk.bold.green(balanceMsg));
+      }
+
+      const networkName = network;
+      if (prometheus) {
+        gasCostGauge.set({ networkName, address }, gasCosts.gasUsed1h * 24);
+        costGauge.set({ networkName, address }, gasCosts.cost1h * 24);
+        balanceGauge.set({ networkName, address }, filterSmallBalance(balance));
+        daysLeftGauge.set({ networkName, address }, daysBalanceWillLast);
       }
     }
   } catch (error) {
@@ -364,11 +418,31 @@ const main = async (): Promise<void> => {
       type: 'string',
       default: DEFAULT_LAST_TX_TIME,
     })
+    .option('prometheus', {
+      alias: 'p',
+      describe: 'Enable Prometheus metrics recording',
+      type: 'boolean',
+      default: false,
+    })
+    .option('host', {
+      describe: 'Host to bind Prometheus metrics server',
+      type: 'string',
+      default: '0.0.0.0',
+    })
+    .option('port', {
+      describe: 'Port to expose Prometheus metrics server',
+      type: 'number',
+      default: 9100,
+    })
     .help()
     .alias('help', 'h')
     .parse();
 
   const address = parseEthereumAddress(argv.address);
+
+  if (argv.prometheus) {
+    startPrometheusServer(argv.host, argv.port);
+  }
 
   console.log(
     chalk.cyan(
@@ -438,6 +512,7 @@ const main = async (): Promise<void> => {
           firstTxTime,
           lastTxTime,
           hoursBetweenFirstLastTx,
+          argv.prometheus,
         );
       }
     } else {
