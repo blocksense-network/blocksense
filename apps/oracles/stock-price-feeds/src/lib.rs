@@ -9,6 +9,7 @@ use anyhow::{Context, Error, Result};
 use itertools::Itertools;
 use prettytable::{format, Cell, Row, Table};
 
+use blocksense_data_providers_sdk::price_data::types::{PairsToResults, ProvidersSymbols};
 use blocksense_data_providers_sdk::price_data::wap::vwap::compute_vwap;
 use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
@@ -18,9 +19,7 @@ use chrono::Utc;
 use chrono_tz::US::Eastern;
 
 use fetch_prices::fetch_all_prices;
-use types::{
-    Capabilities, FeedConfigData, PairToResults, ProvidersSymbols, ResourceData, ResourcePairData,
-};
+use types::{Capabilities, FeedConfigData, ResourceData, ResourcePairData};
 
 use crate::utils::markets_are_closed;
 
@@ -45,7 +44,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     Ok(payload)
 }
 
-fn process_results(results: &PairToResults) -> Result<Payload> {
+fn process_results(results: &PairsToResults) -> Result<Payload> {
     let mut payload = Payload::new();
     for (feed_id, results) in results.iter() {
         let price_points = results.providers_data.values();
@@ -116,7 +115,7 @@ struct ResultInfo {
     The `print_results` function is very similar to the one we use in `cex-price-feeds` oracle.
     It should be moved to blocksense-sdk
 */
-fn print_results(resources: &[ResourcePairData], results: &PairToResults, payload: &Payload) {
+fn print_results(resources: &[ResourcePairData], results: &PairsToResults, payload: &Payload) {
     let mut results_info: Vec<ResultInfo> = Vec::new();
     let mut pairs_with_missing_provider_data: String = String::new();
     let mut pairs_with_missing_provider_data_count = 0;

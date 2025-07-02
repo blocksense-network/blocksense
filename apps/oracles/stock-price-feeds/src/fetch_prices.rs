@@ -1,21 +1,20 @@
-use anyhow::Result;
-use serde::{Deserialize, Serialize};
-
 use std::time::Instant;
 
+use anyhow::Result;
 use futures::stream::{FuturesUnordered, StreamExt};
+use serde::{Deserialize, Serialize};
 
 use blocksense_data_providers_sdk::price_data::traits::prices_fetcher::{fetch, TradingPairSymbol};
+use blocksense_data_providers_sdk::price_data::types::{
+    PairsToResults, ProviderPriceData, ProvidersSymbols,
+};
 
 use crate::{
     providers::{
         alpha_vantage::AlphaVantagePriceFetcher, fmp::FMPPriceFetcher,
         twelvedata::TwelveDataPriceFetcher, yahoo_finance::YFPriceFetcher,
     },
-    types::{
-        Capabilities, PairToResults, ProviderPriceData, ProvidersSymbols, ResourceData,
-        ResourcePairData,
-    },
+    types::{Capabilities, ResourceData, ResourcePairData},
     utils::get_api_key,
 };
 
@@ -55,7 +54,7 @@ impl SymbolsData {
 pub async fn fetch_all_prices(
     resources: &ResourceData,
     capabilities: &Capabilities,
-) -> Result<PairToResults> {
+) -> Result<PairsToResults> {
     let symbols = SymbolsData::from_resources(&resources.symbols)?;
 
     let mut futures_set = FuturesUnordered::from_iter([
@@ -75,7 +74,7 @@ pub async fn fetch_all_prices(
     ]);
 
     let before_fetch = Instant::now();
-    let mut results = PairToResults::new();
+    let mut results = PairsToResults::new();
 
     // Process results as they complete
     while let Some((provider_id, result)) = futures_set.next().await {
@@ -101,7 +100,7 @@ pub async fn fetch_all_prices(
 fn fill_results(
     resources: &[ResourcePairData],
     prices_per_provider: ProviderPriceData,
-    results: &mut PairToResults,
+    results: &mut PairsToResults,
 ) {
     let provider_name = &prices_per_provider.name.clone();
     for resource in resources {
