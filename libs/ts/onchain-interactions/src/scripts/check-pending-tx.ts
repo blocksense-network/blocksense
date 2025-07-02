@@ -9,6 +9,30 @@ import { hideBin } from 'yargs/helpers';
 import { deployedNetworks } from '../types';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 
+import client from 'prom-client';
+import express from 'express';
+
+const pendingGauge = new client.Gauge({
+  name: 'eth_account_pending',
+  help: 'How many pending transactions this account has',
+  labelNames: ['networkName', 'address'],
+});
+
+const startPrometheusServer = (host: string, port: number): void => {
+  const app = express();
+  app.get('/metrics', async (_req, res) => {
+    res.set('Content-Type', client.register.contentType);
+    res.end(await client.register.metrics());
+  });
+  app.listen(port, host, () => {
+    console.log(
+      chalk.blue(
+        `Prometheus metrics exposed at http://${host}:${port}/metrics`,
+      ),
+    );
+  });
+};
+
 const main = async (): Promise<void> => {
   const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
   const argv = await yargs(hideBin(process.argv))
@@ -19,11 +43,32 @@ const main = async (): Promise<void> => {
       type: 'string',
       default: sequencerAddress,
     })
+    .option('prometheus', {
+      alias: 'p',
+      describe: 'Enable Prometheus metrics recording',
+      type: 'boolean',
+      default: false,
+    })
+    .option('host', {
+      describe: 'Host to bind Prometheus metrics server',
+      type: 'string',
+      default: '0.0.0.0',
+    })
+    .option('port', {
+      describe: 'Port to expose Prometheus metrics server',
+      type: 'number',
+      default: 9100,
+    })
     .help()
     .alias('help', 'h')
     .parse();
 
   const address = parseEthereumAddress(argv.address);
+
+  if (argv.prometheus) {
+    startPrometheusServer(argv.host, argv.port);
+  }
+
   console.log(
     chalk.cyan(
       `Using Ethereum address: ${address} (sequencer: ${
@@ -48,8 +93,13 @@ const main = async (): Promise<void> => {
         address,
         'pending',
       );
+      const nonceDifference = Number(pendingNonce - latestNonce);
 
-      if (latestNonce !== pendingNonce) {
+      if (argv.prometheus) {
+        pendingGauge.set({ networkName, address }, nonceDifference);
+      }
+
+      if (nonceDifference) {
         console.log(chalk.red(`Nonce difference found on ${networkName}:`));
         console.log(
           chalk.red(`  Latest: ${latestNonce}, Pending: ${pendingNonce}`),
