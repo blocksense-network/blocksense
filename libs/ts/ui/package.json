@@ -16,7 +16,7 @@
     "@eslint/eslintrc": "^3",
     "@storybook/addon-a11y": "8.6.12",
     "@storybook/addon-docs": "^9.0.14",
-    "@storybook/nextjs": "^9.0.14",
+    "@storybook/nextjs-vite": "^9.0.15",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24",
     "@types/react": "^19",
@@ -29,7 +29,7 @@
     "react-dom": "^19.0.0",
     "storybook": "^9.0.14",
     "tailwindcss": "^4",
-    "typescript": "^5",
-    "webpack": "5"
+    "typescript": "5.8.3",
+    "vite": "^7.0.0"
   }
 }
