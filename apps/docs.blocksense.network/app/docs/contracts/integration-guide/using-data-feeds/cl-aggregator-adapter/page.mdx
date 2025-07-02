@@ -8,14 +8,6 @@ import { Callout } from "@blocksense/docs-ui/Callout";
 
 The CL Aggregator Adapter is a smart contract that acts as a proxy for a Blocksense feed. It provides easy access to the latest round data and historical round data for a given feed. The CL Aggregator Adapter is responsible for a single feed associated with a specific token pair on a given network. It exposes a part of Chainlink's aggregator interface, hence the name.
 
-<Callout type="info" emoji="💡">
-  Feeds without a corresponding token address, such as those for stock indices,
-  do not have a dedicated CL Aggregator Adapter due to the lack of a canonical token
-  representation.
-</Callout>
-
-For a complete list of functions and parameters for the CLAggregatorAdapter contract, see the [CL Aggregator Adapter Reference Documentation](../../reference-documentation/contract/CLAggregatorAdapter.mdx).
-
 ```mermaid
 ---
 config:
@@ -37,11 +29,13 @@ flowchart TD
   class DFS dataNode
 ```
 
+For a complete list of functions and parameters for the CLAggregatorAdapter contract, see the [CL Aggregator Adapter Reference Documentation](../../reference-documentation/contract/CLAggregatorAdapter.mdx).
+
 ## Code Examples
 
 ### Solidity
 
-To consume price data from the CL Aggregator Adapter, your smart contract should reference [`ICLAggregatorAdapter`](/coming-soon), which defines the external functions implemented by the CL Aggregator Adapter.
+To consume price data from [`CLAggregatorAdapter`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/cl-adapters/CLAggregatorAdapter.sol), your smart contract should reference [`ICLAggregatorAdapter`](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/interfaces/ICLAggregatorAdapter.sol), which defines the external functions implemented by the CL Aggregator Adapter.
 
 ```solidity showLineNumbers copy filename="CLAggregatorAdapterConsumer.sol"
 // SPDX-License-Identifier: MIT
@@ -112,8 +106,7 @@ contract CLAggregatorAdapterConsumer {
 ### Solidity Hardhat Example
 
 <Callout type="info" emoji="💡">
-You can find a working Hardhat project [here](/coming-soon). Clone the repo
-and follow the setup instructions to run the example locally.
+  You can find a working Hardhat project in the Blocksense repository. Clone the repo and follow the setup instructions to run the example locally. The example contract for the CL Aggregator Adapter can be found in [CLAggregatorAdapterConsumer.sol](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/test/examples/CLAggregatorAdapterConsumer.sol) and a file with ethers utils can be found in [clAggregatorAdapterConsumer.ts](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/test/examples/utils/clAggregatorAdapterConsumer.ts).
 </Callout>
 
 ### Ethers.js v6.x

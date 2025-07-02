@@ -17,15 +17,15 @@ Aggregated Data Feed Store contract is where all data is stored and where all co
   contract which underneath calls the `fallback` function of the **AggregatedDataFeedStore** contract.
 </Callout>
 
-The examples below show how to call the contract to fetch data. All read calls must start with the first bit set to 1, where the whole selector is 1 byte (0x80 in binary is 0b10000000, i.e. first bit set to 1). To simplify the calls, we have the following types of calls:
-- selector **0x86**: getFeedAtRound(uint8 stride, uint120 feedId, uint16 round, uint32 startSlot?, uint32 slots?) returns (bytes)
-- selector **0x81**: getLatestRound(uint8 stride, uint120 feedId) returns (uint16)
-- selector **0x82**: getLatestSingleData(uint8 stride, uint120 feedId) returns (bytes)
-- selector **0x84**: getLatestData(uint8 stride, uint120 feedId, uint32 startSlot?, uint32 slots?) returns (bytes)
+The examples below show how to call the contract to fetch data. We have the following types of calls:
+- selector **0x86**: getDataAtIndex(uint128 feedId, uint16 index, uint32 startSlot?, uint32 slots?) returns (bytes)
+- selector **0x81**: getLatestIndex(uint128 feedId) returns (uint16)
+- selector **0x82**: getLatestSingleData(uint128 feedId) returns (bytes)
+- selector **0x84**: getLatestData(uint128 feedId, uint32 startSlot?, uint32 slots?) returns (bytes)
 
 <Callout type="info" emoji="ℹ️">
-  - Selector **0x83** will call both getLatestRound and getLatestSingleData.
-  - Selector **0x85** will call both getLatestRound and getLatestData.
+  - Selector **0x83** will call both getLatestIndex and getLatestSingleData.
+  - Selector **0x85** will call both getLatestIndex and getLatestData.
 </Callout>
 
 ## Code Examples
@@ -33,8 +33,7 @@ The examples below show how to call the contract to fetch data. All read calls m
 ### Solidity
 
 <Callout type="info" emoji="💡">
-  Use [Blocksense library](/coming-soon) for easy and gas optimised interaction
-  with the contract.
+  Use the [ADFS library](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/libraries/ADFS.sol) for easy and gas optimised interaction with the contract.
 </Callout>
 
 Here is a complete working example. After that, there are more details on how to perform a raw call.
@@ -615,8 +614,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
 ### Solidity Hardhat Example
 
 <Callout type="info" emoji="💡">
-  You can find a working Hardhat project [here](/coming-soon). Clone the repo
-  and follow the setup instructions to run the example locally.
+  You can find a working Hardhat project in the Blocksense repository. Clone the repo and follow the setup instructions to run the example locally. The example contract for using ADFS with the ADFS library can be found in [ADFSConsumer.sol](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/test/examples/ADFSConsumer.sol) and for using ADFS via a raw call - in [RawCallADFSConsumer.sol](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/test/examples/RawCallADFSConsumer.sol). A file with ethers utils can be found in [feedStoreConsumer.ts](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/test/examples/utils/feedStoreConsumer.ts).
 </Callout>
 
 ### Ethers.js v6.x
