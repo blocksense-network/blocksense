@@ -25,22 +25,6 @@ To enhance interoperability and provide a wider range of data access, Blocksense
 - **CL Aggregator Adapters:** Implements Chainlink AggregatorV3Interface interface to provide access to historical data for a given data feed.
 - **CL Feed Registry Adapter:** Implements ChainlinkCLFeedRegistryAdapterInterface interface to provide access to Chainlink proxies through a given pair of tokens (‘base’, ‘quote’).
 
-## Delegate Calls and Static Calls
-
-Blocksense employs advanced functionalities to enhance contract interactions and security.
-
-- **Delegate Calls:**
-  - **Function:** Enable the execution of functions from one contract in the context of another contract.
-  - **Features:** Allow for modular contract design and the dynamic upgrading of contract logic while maintaining state consistency.
-- **Static Calls:**
-  - **Function:** Enable read-only calls to smart contracts, ensuring no state changes will occur.
-  - **Features:** Enhance security by allowing functions to be executed without the risk of altering contract state, useful for retrieving data and performing checks.
-- **Upgradeable Proxy:**
-  - **Function:** Supports the deployment of upgradeable smart contracts, allowing for protocol updates and improvements without disruption of ongoing services by maintaining the address of the contract.
-  - **Features:** Ensures backwards compatibility and future-proofing of the Blocksense protocol by allowing the underlying logic of smart contracts to be upgraded.
-
 ## Summary
 
-The Blocksense blockchain integration leverages smart contracts, implementing Chainlink interfaces, and robust data management techniques to provide reliable and accurate oracle data feeds.
-
-With the use of delegate calls, static calls, and core EVM data feed contracts, Blocksense ensures a highly efficient, secure, and modular oracle solution for the decentralized ecosystem.
+The Blocksense blockchain integration leverages smart contracts, implementing Chainlink interfaces, and robust data management techniques to provide reliable and accurate data on-chain.
