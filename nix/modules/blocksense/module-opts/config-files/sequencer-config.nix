@@ -1,4 +1,8 @@
-{ self, cfg, ... }:
+{
+  self,
+  cfg,
+  ...
+}:
 let
   inherit (self.lib) dashToUnderscoreRecursive;
 in
@@ -7,6 +11,7 @@ dashToUnderscoreRecursive {
     block-config
     providers
     http-input-buffer-size
+    pyroscope-config
     ;
 
   sequencer-id = cfg.sequencer.id;

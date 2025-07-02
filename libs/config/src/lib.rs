@@ -261,8 +261,8 @@ pub struct KafkaReportEndpoint {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct PyroscopeConfig {
-    pub user: String,
-    pub password_file_path: String,
+    pub user: Option<String>,
+    pub password_file_path: Option<String>,
     pub url: String,
     pub sample_rate: u32,
 }
