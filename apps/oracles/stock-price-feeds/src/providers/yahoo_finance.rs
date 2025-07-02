@@ -4,10 +4,10 @@ use futures::{future::LocalBoxFuture, FutureExt};
 use serde::Deserialize;
 use serde_json::Value;
 
-use blocksense_sdk::{
-    http::http_get_json,
-    traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
+use blocksense_data_providers_sdk::price_data::traits::prices_fetcher::{
+    PairPriceData, PricePoint, PricesFetcher,
 };
+use blocksense_sdk::http::http_get_json;
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]

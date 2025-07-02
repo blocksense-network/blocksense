@@ -9,10 +9,10 @@ use std::ops::Deref;
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
-use blocksense_sdk::{
-    http::http_get_json,
-    traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
+use blocksense_data_providers_sdk::price_data::traits::prices_fetcher::{
+    PairPriceData, PricePoint, PricesFetcher,
 };
+use blocksense_sdk::http::http_get_json;
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct CoinbasePriceResponse {

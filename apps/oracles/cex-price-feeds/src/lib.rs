@@ -3,10 +3,10 @@ mod exchanges;
 mod fetch_prices;
 
 use anyhow::{Context, Result};
+use blocksense_data_providers_sdk::price_data::wap::vwap::compute_vwap;
 use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
-    wap::vwap::compute_vwap,
 };
 use common::{ExchangeName, ExchangesSymbols, ResourcePairData};
 use itertools::Itertools;

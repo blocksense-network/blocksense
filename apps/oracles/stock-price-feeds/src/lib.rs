@@ -9,10 +9,10 @@ use anyhow::{Context, Error, Result};
 use itertools::Itertools;
 use prettytable::{format, Cell, Row, Table};
 
+use blocksense_data_providers_sdk::price_data::wap::vwap::compute_vwap;
 use blocksense_sdk::{
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
-    wap::vwap::compute_vwap,
 };
 use chrono::Utc;
 use chrono_tz::US::Eastern;

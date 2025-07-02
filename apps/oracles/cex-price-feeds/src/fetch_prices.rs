@@ -1,11 +1,10 @@
 use anyhow::Result;
+use futures::stream::{FuturesUnordered, StreamExt};
 use serde::{Deserialize, Serialize};
 
 use std::time::Instant;
 
-use futures::stream::{FuturesUnordered, StreamExt};
-
-use blocksense_sdk::{traits::prices_fetcher::fetch, traits::prices_fetcher::TradingPairSymbol};
+use blocksense_data_providers_sdk::price_data::traits::prices_fetcher::{fetch, TradingPairSymbol};
 
 use crate::{
     common::{

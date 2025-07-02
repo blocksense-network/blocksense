@@ -2,7 +2,9 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use blocksense_sdk::traits::prices_fetcher::{PairPriceData, PricePoint, TradingPairSymbol};
+use blocksense_data_providers_sdk::price_data::traits::prices_fetcher::{
+    PairPriceData, PricePoint, TradingPairSymbol,
+};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Pair {
