@@ -29,6 +29,8 @@ port_scanner = { workspace = true }
 curl = { workspace = true }
 serde_json = { workspace = true }
 json-patch = { workspace = true }
+rdkafka = { workspace = true, features = ["dynamic-linking"] }
+futures-util = { workspace = true }
 
 [[bin]]
 name = "eth_relayer"
