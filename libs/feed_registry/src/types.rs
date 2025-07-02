@@ -230,8 +230,7 @@ impl FeedType {
                         truncate(val_split[1].to_string(), digits_in_fraction).len();
 
                     fraction = truncate(val_split[1].to_string(), digits_in_fraction)
-                        .parse::<BigUint>()
-                        .unwrap();
+                        .parse::<BigUint>()?;
                 } else {
                     actual_digits_in_fraction = 0;
                     fraction = BigUint::from(0u32);
