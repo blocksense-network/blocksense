@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
-use blocksense_sdk::traits::prices_fetcher::{PairPriceData, PricePoint, TradingPairSymbol};
+use blocksense_data_providers_sdk::price_data::traits::prices_fetcher::{
+    PairPriceData, PricePoint, TradingPairSymbol,
+};
 use serde::{Deserialize, Serialize};
 
 pub type ExchangeName = String;
