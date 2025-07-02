@@ -12,6 +12,7 @@ members = [
   "libs/alpaca_core",
   "libs/anomaly_detection",
   "libs/data_feeds",
+  "libs/data_providers_sdk",
   "libs/metrics",
   "libs/registry",
   "libs/sdk",
@@ -41,6 +42,7 @@ blocksense-sdk = { path = "libs/sdk" }
 blocksense-config = { path = "libs/config" }
 blocksense-crypto = { path = "libs/crypto" }
 blocksense-data-feeds = { path = "libs/data_feeds" }
+blocksense-data-providers-sdk = { path = "libs/data_providers_sdk" }
 blocksense-feed-registry = { path = "libs/feed_registry" }
 blocksense-feeds-processing = { path = "libs/feeds_processing" }
 blocksense-gnosis-safe = { path = "libs/gnosis_safe" }
