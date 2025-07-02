@@ -2,6 +2,9 @@ import Web3 from 'web3';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
+import client from 'prom-client';
+import express from 'express';
+
 import {
   getNetworkNameByChainId,
   getOptionalRpcUrl,
@@ -10,10 +13,9 @@ import {
   isChainId,
   parseNetworkName,
 } from '@blocksense/base-utils/evm';
-import { deployedNetworks } from '../types';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
-import client from 'prom-client';
-import express from 'express';
+
+import { deployedNetworks } from '../types';
 
 const balanceGauge = new client.Gauge({
   name: 'eth_account_balance',

@@ -1,16 +1,17 @@
-import {
-  getOptionalRpcUrl,
-  parseEthereumAddress,
-} from '@blocksense/base-utils/evm';
 import chalk from 'chalk';
 import Web3 from 'web3';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { deployedNetworks } from '../types';
-import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
-
 import client from 'prom-client';
 import express from 'express';
+
+import {
+  getOptionalRpcUrl,
+  parseEthereumAddress,
+} from '@blocksense/base-utils/evm';
+import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
+
+import { deployedNetworks } from '../types';
 
 const pendingGauge = new client.Gauge({
   name: 'eth_account_pending',
