@@ -10,7 +10,7 @@ export enum ReadOp {
   GetLatestData = 0x04,
   GetLatestIndex = 0x01,
   GetLatestDataAndIndex = 0x05,
-  GetLatestSingleFeed = 0x02,
+  GetLatestSingleData = 0x02,
   GetLatestSingleDataAndIndex = 0x03,
 }
 
