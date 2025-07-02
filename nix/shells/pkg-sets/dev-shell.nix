@@ -15,6 +15,7 @@
     oras
     just
     findutils
+    process-compose
   ];
 
   enterShell =

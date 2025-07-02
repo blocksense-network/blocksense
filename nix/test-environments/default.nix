@@ -19,7 +19,16 @@
       allEnvironments = lib.pipe allEnvironmentNames [
         (builtins.map (name: {
           inherit name;
-          value = config.devenv.shells.${name}.process.managers.process-compose.configFile;
+          value = {
+            process-compose-file = {
+              drv = config.devenv.shells.${name}.process.managers.process-compose.configFile.drvPath;
+              out = config.devenv.shells.${name}.process.managers.process-compose.configFile.outPath;
+            };
+            config-dir = {
+              drv = config.devenv.shells.${name}.services.blocksense.config-dir.drvPath;
+              out = config.devenv.shells.${name}.services.blocksense.config-dir.outPath;
+            };
+          };
         }))
       ];
 

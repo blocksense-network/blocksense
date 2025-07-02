@@ -43,9 +43,13 @@ build-environment environment="all":
 
 [group('Working with process-compose environments')]
 [doc('Start a process-compose environment')]
-start-environment environment:
+start-environment environment="example-setup-01":
   #!/usr/bin/env bash
+  set -euo pipefail
   PC_FILE="{{process-compose-artifacts-dir}}/process-compose-{{environment}}.yaml"
+
+  just build-blocksense
+
   if ! test -f "$PC_FILE"; then
     just build-environment {{environment}}
   fi
@@ -63,7 +67,6 @@ build-ts package="all":
     yarn build-single @blocksense/sol-reflector
     yarn build-single @blocksense/contracts
     yarn build-single @blocksense/data-feeds-config-generator
-    yarn build-single @blocksense/changelog-generator
   else
     yarn build:recursive {{package}}
   fi
@@ -100,21 +103,13 @@ start-oracle oracle-name:
 build-blocksense:
   @{{root-dir}}/scripts/build-blocksense.sh
 
-[group('blocksense')]
-[doc('Build Blocksense and start the default process-compose environment')]
-start-blocksense:
-  #!/usr/bin/env bash
-  set -euo pipefail
-
-  just build-blocksense
-  process-compose up
-
 [group('General')]
 [doc('Run a command to clean the repository of untracked files')]
 clean:
   git clean -fdx \
     -e .env \
     -e .direnv \
+    -e .yarn \
     -e .vscode \
     -e .pre-commit-config.yaml \
     -- {{root-dir}}

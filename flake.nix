@@ -37,6 +37,7 @@
         # Local flake-parts modules
         ./nix
       ];
+      debug = true;
       systems = [
         "x86_64-linux"
         "aarch64-darwin"
