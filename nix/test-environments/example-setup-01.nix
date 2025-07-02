@@ -128,6 +128,10 @@ in
         }
       ];
 
+      pyroscope-config = {
+        url = "http://localhost:4040";
+      };
+
       log-level = "info";
     };
 
