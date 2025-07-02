@@ -64,12 +64,11 @@ To consume price data from the CL Feed Registry Adapter, your smart contract sho
 
 ```solidity showLineNumbers copy filename="CLFeedRegistryAdapterConsumer.sol"
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.28;
 
 import 'interfaces/ICLFeedRegistryAdapter.sol';
 
 /**
- * THIS IS AN EXAMPLE CONTRACT THAT USES HARDCODED VALUES FOR CLARITY.
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
  * DO NOT USE THIS CODE IN PRODUCTION.
  */
@@ -179,5 +178,5 @@ To get the CLAggregatorAdapter address responsible for a given feed:
 
 ```js copy filename="javascript"
 const registry = new ethers.Contract(contractAddress, abiJson, provider);
-const chainlinkProxyAddress = await registry.getFeed(base, quote);
+const clAggregatorAdapterAddress = await registry.getFeed(base, quote);
 ```
