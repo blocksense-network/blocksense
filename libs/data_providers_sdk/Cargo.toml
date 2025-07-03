@@ -9,8 +9,11 @@ edition.workspace = true
 name = "blocksense_data_providers_sdk"
 
 [dependencies]
+blocksense-sdk = { workspace = true }
 anyhow = { workspace = true }
 serde_json = { workspace = true }
+serde-this-or-that = { workspace = true }
+itertools = { workspace = true }
 serde = { workspace = true }
 futures = { workspace = true }
 url = { workspace = true }
