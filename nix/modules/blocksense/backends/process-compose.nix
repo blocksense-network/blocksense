@@ -17,13 +17,8 @@ let
     blama
     ;
 
-  mkCargoTargetExePath = executable-name: "${config.devenv.root}/target/release/${executable-name}";
-
-  feedsConfigDir =
-    if builtins.getEnv "FEEDS_CONFIG_DIR" != "" then
-      builtins.getEnv "FEEDS_CONFIG_DIR"
-    else
-      "${config.devenv.root}/config";
+  # NOTE: runtime evaluated value, we can use `$GIT_ROOT` instead of `devenv.root`
+  mkCargoTargetExePath = executable-name: "$GIT_ROOT/target/release/${executable-name}";
 
   logsConfig = {
     fields_order = [
@@ -57,7 +52,7 @@ let
           timeout_seconds = 30;
         };
         log_configuration = logsConfig;
-        log_location = cfg.logsDir + "/anvil-${name}.log";
+        log_location = "${cfg.logsDir}/anvil-${name}.log";
       };
     }
   ) cfg.anvil;
@@ -92,20 +87,21 @@ let
           '';
           environment = [
             "RUST_LOG=${log-level}"
-            "SPIN_DATA_DIR=${config.devenv.root}/target/spin-artifacts"
+            # FIXME: mazalo
+            "SPIN_DATA_DIR=$GIT_ROOT/target/spin-artifacts"
           ];
           depends_on = {
             blocksense-sequencer.condition = "process_healthy";
           };
           log_configuration = logsConfig;
-          log_location = cfg.logsDir + "/reporter-${name}.log";
+          log_location = "${cfg.logsDir}/reporter-${name}.log";
         };
     }
   ) cfg.reporters;
 
   sequencerInstance = {
     blocksense-sequencer.process-compose = {
-      command = mkCargoTargetExePath "sequencer";
+      command = "FEEDS_CONFIG_DIR=\${FEEDS_CONFIG_DIR:-${../../../../config}}" + mkCargoTargetExePath "sequencer";
       readiness_probe = {
         exec.command = ''
           curl -fsSL http://127.0.0.1:${toString cfg.sequencer.ports.admin}/health \
@@ -116,7 +112,6 @@ let
         timeout_seconds = 30;
       };
       environment = [
-        "FEEDS_CONFIG_DIR=${feedsConfigDir}"
         "SEQUENCER_CONFIG_DIR=${cfg.config-dir}"
         "SEQUENCER_LOG_LEVEL=${lib.toUpper cfg.sequencer.log-level}"
       ];
@@ -128,7 +123,7 @@ let
         };
       }) cfg.sequencer.providers;
       log_configuration = logsConfig;
-      log_location = cfg.logsDir + "/sequencer.log";
+      log_location = "${cfg.logsDir}/sequencer.log";
     };
   };
 
@@ -138,7 +133,7 @@ let
       shutdown.signal = 9;
       depends_on.kafka.condition = "process_started";
       log_configuration = logsConfig;
-      log_location = cfg.logsDir + "/blockchain-reader.log";
+      log_location = "${cfg.logsDir}/blockchain-reader.log";
     };
   };
 
@@ -148,7 +143,7 @@ let
       shutdown.signal = 9;
       depends_on.kafka.condition = "process_started";
       log_configuration = logsConfig;
-      log_location = cfg.logsDir + "/aggregate-consensus-reader.log";
+      log_location = "${cfg.logsDir}/aggregate-consensus-reader.log";
     };
   };
 
@@ -158,7 +153,7 @@ let
       environment = lib.mapAttrsToList (k: v: "${k}=${v}") cfg.blama.environment;
       shutdown.signal = 9;
       log_configuration = logsConfig;
-      log_location = cfg.logsDir + "/blama.log";
+      log_location = "${cfg.logsDir}/blama.log";
       # TODO: Adequate `readiness_probe`
       # readiness_probe = {};
     };
