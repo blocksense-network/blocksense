@@ -148,7 +148,7 @@ pub async fn set_log_level(
     req: HttpRequest,
     sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
-    if tokio_console_active("SEQUENCER") {
+    if tokio_console_active("SEQUENCER", true) {
         return Ok(HttpResponse::NotAcceptable().into());
     } else {
         let bad_input = error::ErrorBadRequest("Incorrect input.");

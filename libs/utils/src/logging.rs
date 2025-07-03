@@ -53,10 +53,10 @@ pub fn get_shared_logging_handle() -> SharedLoggingHandle {
     shared_logging_handle_get_or_init("INFO", true).clone() // The parameters won't matter if init was previously called.
 }
 
-pub fn tokio_console_active(app_name: &str) -> bool {
+pub fn tokio_console_active(app_name: &str, default_val: bool) -> bool {
     match env::var(app_name.to_string() + "_TOKIO_CONSOLE") {
         Ok(val) => val == "true",
-        Err(_) => true,
+        Err(_) => default_val,
     }
 }
 
