@@ -1,5 +1,4 @@
 mod common;
-mod exchanges;
 mod fetch_prices;
 
 use std::{

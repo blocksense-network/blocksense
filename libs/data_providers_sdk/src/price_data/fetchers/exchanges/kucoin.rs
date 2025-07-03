@@ -5,10 +5,9 @@ use futures::{future::LocalBoxFuture, FutureExt};
 
 use serde::{Deserialize, Deserializer};
 
-use blocksense_data_providers_sdk::price_data::traits::prices_fetcher::{
-    PairPriceData, PricePoint, PricesFetcher,
-};
 use blocksense_sdk::http::http_get_json;
+
+use crate::price_data::traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher};
 
 fn as_f64_option<'de, D>(deserializer: D) -> Result<Option<f64>, D::Error>
 where
