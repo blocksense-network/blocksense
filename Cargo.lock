@@ -2194,8 +2194,11 @@ name = "blocksense-data-providers-sdk"
 version = "0.1.1"
 dependencies = [
  "anyhow",
+ "blocksense-sdk",
  "futures",
+ "itertools 0.14.0",
  "serde 1.0.217",
+ "serde-this-or-that",
  "serde_json",
  "url",
 ]
