@@ -210,7 +210,7 @@ async fn main() -> std::io::Result<()> {
     }
     init_shared_logging_handle(
         get_log_level("SEQUENCER").as_str(),
-        tokio_console_active("SEQUENCER"),
+        tokio_console_active("SEQUENCER", true),
     );
 
     let (sequencer_config, feeds_config) = get_sequencer_and_feed_configs();
