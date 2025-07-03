@@ -1,20 +1,21 @@
-use std::time::Instant;
-
 use anyhow::Result;
-use futures::stream::{FuturesUnordered, StreamExt};
+use futures::stream::FuturesUnordered;
 use serde::{Deserialize, Serialize};
 
-use blocksense_data_providers_sdk::price_data::fetchers::exchanges::{
-    binance::BinancePriceFetcher, binance_us::BinanceUsPriceFetcher,
-    bitfinex::BitfinexPriceFetcher, bitget::BitgetPriceFetcher, bybit::BybitPriceFetcher,
-    coinbase::CoinbasePriceFetcher, crypto_com_exchange::CryptoComPriceFetcher,
-    gate_io::GateIoPriceFetcher, gemini::GeminiPriceFetcher, kraken::KrakenPriceFetcher,
-    kucoin::KuCoinPriceFetcher, mexc::MEXCPriceFetcher, okx::OKXPriceFetcher,
-    upbit::UpBitPriceFetcher,
-};
-use blocksense_data_providers_sdk::price_data::traits::prices_fetcher::{fetch, TradingPairSymbol};
-use blocksense_data_providers_sdk::price_data::types::{
-    PairsToResults, ProviderPriceData, ProvidersSymbols,
+use blocksense_data_providers_sdk::price_data::{
+    fetchers::{
+        exchanges::{
+            binance::BinancePriceFetcher, binance_us::BinanceUsPriceFetcher,
+            bitfinex::BitfinexPriceFetcher, bitget::BitgetPriceFetcher, bybit::BybitPriceFetcher,
+            coinbase::CoinbasePriceFetcher, crypto_com_exchange::CryptoComPriceFetcher,
+            gate_io::GateIoPriceFetcher, gemini::GeminiPriceFetcher, kraken::KrakenPriceFetcher,
+            kucoin::KuCoinPriceFetcher, mexc::MEXCPriceFetcher, okx::OKXPriceFetcher,
+            upbit::UpBitPriceFetcher,
+        },
+        fetch::fetch_all_prices,
+    },
+    traits::prices_fetcher::{fetch, TradingPairSymbol},
+    types::{PairsToResults, ProviderPriceData, ProvidersSymbols},
 };
 
 use crate::common::{ResourceData, ResourcePairData};
@@ -55,10 +56,10 @@ impl SymbolsData {
     }
 }
 
-pub async fn fetch_all_prices(resources: &ResourceData) -> Result<PairsToResults> {
+pub async fn get_prices(resources: &ResourceData) -> Result<PairsToResults> {
     let symbols = SymbolsData::from_resources(&resources.symbols)?;
 
-    let mut futures_set = FuturesUnordered::from_iter([
+    let futures_set = FuturesUnordered::from_iter([
         fetch::<BinancePriceFetcher>(&symbols.binance, None),
         fetch::<BinanceUsPriceFetcher>(&symbols.binance_us, None),
         fetch::<BitfinexPriceFetcher>(&symbols.bitfinex, None),
@@ -75,28 +76,17 @@ pub async fn fetch_all_prices(resources: &ResourceData) -> Result<PairsToResults
         fetch::<UpBitPriceFetcher>(&symbols.upbit, None),
     ]);
 
-    let before_fetch = Instant::now();
-    let mut results = PairsToResults::new();
+    let fetched_provider_prices = fetch_all_prices(futures_set).await;
 
-    // Process results as they complete
-    while let Some((exchange_id, result)) = futures_set.next().await {
-        match result {
-            Ok(prices) => {
-                let time_taken = before_fetch.elapsed();
-                println!("ℹ️  Successfully fetched prices from {exchange_id} in {time_taken:?}",);
-                let prices_per_exchange = ProviderPriceData {
-                    name: exchange_id.to_owned(),
-                    data: prices,
-                };
-                fill_results(&resources.pairs, prices_per_exchange, &mut results);
-            }
-            Err(err) => println!("❌ Error fetching prices from {exchange_id}: {err:?}"),
-        }
+    let mut final_results = PairsToResults::new();
+    for price_data_for_exchange in fetched_provider_prices {
+        fill_results(
+            &resources.pairs,
+            price_data_for_exchange,
+            &mut final_results,
+        );
     }
-
-    println!("🕛 All prices fetched in {:?}", before_fetch.elapsed());
-
-    Ok(results)
+    Ok(final_results)
 }
 
 fn fill_results(

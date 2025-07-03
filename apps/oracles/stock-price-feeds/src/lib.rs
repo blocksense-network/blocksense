@@ -17,9 +17,9 @@ use blocksense_sdk::{
 use chrono::Utc;
 use chrono_tz::US::Eastern;
 
-use fetch_prices::fetch_all_prices;
 use types::{Capabilities, FeedConfigData, ResourceData, ResourcePairData};
 
+use crate::fetch_prices::get_prices;
 use crate::utils::markets_are_closed;
 
 #[oracle_component]
@@ -35,7 +35,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     let capabilities = get_capabilities_from_settings(&settings);
     let resources = get_resources_from_settings(&settings)?;
 
-    let results = fetch_all_prices(&resources, &capabilities).await?;
+    let results = get_prices(&resources, &capabilities).await?;
     let payload = process_results(&results)?;
 
     print_results(&resources.pairs, &results, &payload);
