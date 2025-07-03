@@ -13,7 +13,7 @@ import * as utils from './utils/feedStoreConsumer';
 import { ADFSWrapper } from '../utils/wrappers';
 import { encodeDataAndTimestamp } from '../utils/helpers/common';
 import { Feed } from '../utils/wrappers/types';
-import { AggregatedDataFeedStore as AggregatedDataFeedStoreViem } from '../../src/clients/aggregated-data-feed-store';
+import { AggregatedDataFeedStore as AggregatedDataFeedStoreViem } from '../../lib/viem/AggregatedDataFeedStore';
 
 const feeds: Feed[] = [
   {

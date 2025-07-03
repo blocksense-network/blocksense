@@ -13,7 +13,7 @@ import {
   UpgradeableProxyADFSWrapper,
 } from '../utils/wrappers';
 import { encodeDataAndTimestamp } from '../utils/helpers/common';
-import { CLAggregatorAdapter as CLAggregatorAdapterViem } from '../../src/clients/cl-aggregator-adapter';
+import { CLAggregatorAdapter as CLAggregatorAdapterViem } from '../../lib/viem/CLAggregatorAdapter';
 
 describe('Example: CLAggregatorAdapterConsumer', function () {
   let clAggregatorAdapter: CLAdapterWrapper;

@@ -21,16 +21,16 @@
       "require": "./artifacts/docs/contractsFileStructure.json",
       "import": "./artifacts/docs/contractsFileStructure.json"
     },
-    "./clients": {
-      "require": "./dist/cjs/clients/index.cjs",
-      "import": "./dist/esm/clients/index.mjs",
-      "types": "./src/clients/index.ts"
+    "./viem": {
+      "require": "./dist/cjs/viem/index.cjs",
+      "import": "./dist/esm/viem/index.mjs",
+      "types": "./lib/viem/index.ts"
     }
   },
   "scripts": {
     "clean": "git clean -fdx -e .env",
-    "build": "hardhat compile && yarn build:src",
-    "build:src": "TS_CONFIG_NAME=tsconfig.src.json yarn run rollup:build-workspace",
+    "build": "hardhat compile && yarn build:lib",
+    "build:lib": "TS_CONFIG_NAME=tsconfig.lib.json yarn run rollup:build-workspace",
     "sol-reflect": "hardhat reflect",
     "test": "hardhat test",
     "test:fork": "FORKING=true hardhat test --grep '@fork'",

@@ -1,9 +1,9 @@
 import { getContract, PublicClient, Address } from 'viem';
 
-import { ContractConsumer } from './contract-consumer';
-import { abi as clAdapterAbi } from '../abi/cl-adapter';
+import { ContractConsumerBase } from './ContractConsumerBase';
+import { abi as clAdapterAbi } from '../abi/CLAggregatorAdapter';
 
-export class CLAggregatorAdapter extends ContractConsumer {
+export class CLAggregatorAdapter extends ContractConsumerBase {
   public contract;
 
   /**

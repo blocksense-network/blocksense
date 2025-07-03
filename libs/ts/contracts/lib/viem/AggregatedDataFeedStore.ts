@@ -1,7 +1,7 @@
 import { PublicClient, Hex, encodePacked, Address } from 'viem';
-import { ContractConsumer } from './contract-consumer';
+import { ContractConsumerBase } from './ContractConsumerBase';
 
-export class AggregatedDataFeedStore extends ContractConsumer {
+export class AggregatedDataFeedStore extends ContractConsumerBase {
   private selectors = {
     getLatestIndex: '0x81',
     getLatestSingleData: '0x82',
