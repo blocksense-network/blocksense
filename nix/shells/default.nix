@@ -1,7 +1,11 @@
 { ... }:
 {
   perSystem =
-    { inputs', self', ... }:
+    {
+      inputs',
+      self',
+      ...
+    }:
     let
       createShell =
         {
