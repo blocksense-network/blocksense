@@ -1,7 +1,7 @@
-{ ... }:
+{ inputs, ... }:
 {
   perSystem =
-    { inputs', self', ... }:
+    { config, inputs', self', ... }:
     let
       createShell =
         {
@@ -15,6 +15,10 @@
               _module.args = {
                 inherit inputs' self' shellName;
               };
+            }
+            # inputs.devenv.flakeModules.readDevenvRoot
+            {
+              devenv.root = "/home/reo101/Projects/Metacraft/blocksense";
             }
             module
           ] ++ extraImports;

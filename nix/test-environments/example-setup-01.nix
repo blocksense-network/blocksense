@@ -7,9 +7,11 @@ let
   # Function to read and parse the JSON file
   readJson = path: builtins.fromJSON (builtins.readFile path);
 
-  testKeysDir = config.devenv.root + "/nix/test-environments/test-keys";
-  deploymentV1FilePath = config.devenv.root + "/config/evm_contracts_deployment_v1.json";
-  deploymentV2FilePath = config.devenv.root + "/config/evm_contracts_deployment_v2/ink-sepolia.json";
+  root = ../..;
+
+  testKeysDir = lib.path.append root "nix/test-environments/test-keys";
+  deploymentV1FilePath = lib.path.append root "config/evm_contracts_deployment_v1.json";
+  deploymentV2FilePath = lib.path.append root "config/evm_contracts_deployment_v2/ink-sepolia.json";
 
   upgradeableProxyContractAddressSepolia =
     (readJson deploymentV1FilePath)."ethereum-sepolia".contracts.coreContracts.UpgradeableProxy.address;
@@ -25,7 +27,9 @@ in
   services.blocksense = {
     enable = true;
 
-    logsDir = config.devenv.root + "/logs/blocksense";
+    # logsDir = lib.path.append config.devenv.root "logs/blocksense";
+    logsDir = "${config.devenv.root}/logs/blocksense";
+    # logsDir = "$PWD/logs/blocksense";
 
     anvil = {
       ethereum-sepolia = {

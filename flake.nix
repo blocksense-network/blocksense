@@ -23,23 +23,30 @@
     flake-parts.follows = "mcl-blockchain/flake-parts";
     fenix.follows = "mcl-blockchain/fenix";
     devenv.follows = "mcl-blockchain/devenv";
+    # HACK: <https://github.com/cachix/devenv/issues/1764>
+    devenv-root = {
+      url = "file+file:///dev/null";
+      flake = false;
+    };
     nix2container.follows = "mcl-blockchain/nix2container";
     mk-shell-bin.url = "github:rrbutani/nix-mk-shell-bin";
   };
 
   outputs =
     inputs@{ flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
+    flake-parts.lib.mkFlake { inherit inputs; } ({ lib, ...}: {
       imports = [
         # Third-party flake-parts modules
-        inputs.devenv.flakeModule
+        inputs.devenv.flakeModules.default
 
         # Local flake-parts modules
-        ./nix
+        (lib.path.append ./. "nix")
+        # ./nix
       ];
       systems = [
         "x86_64-linux"
         "aarch64-darwin"
       ];
-    };
+      debug = true;
+    });
 }
