@@ -8,13 +8,15 @@
       ...
     }:
     let
-      allEnvironmentNames = lib.pipe (builtins.readDir ./.) [
-        (lib.filterAttrs (
-          name: value: (lib.hasSuffix ".nix" name) && name != "default.nix" && value == "regular"
-        ))
-        builtins.attrNames
-        (builtins.map (name: lib.removeSuffix ".nix" name))
-      ];
+      allEnvironmentNames =
+        lib.pipe (builtins.readDir (lib.path.append ./../.. "nix/test-environments"))
+          [
+            (lib.filterAttrs (
+              name: value: (lib.hasSuffix ".nix" name) && name != "default.nix" && value == "regular"
+            ))
+            builtins.attrNames
+            (builtins.map (name: lib.removeSuffix ".nix" name))
+          ];
 
       getShellName =
         name: use-local-cargo-result:
