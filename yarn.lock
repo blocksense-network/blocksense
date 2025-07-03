@@ -2385,6 +2385,7 @@ __metadata:
     "@effect/sql": "npm:^0.37.10"
     "@effect/typeclass": "npm:^0.35.5"
     "@effect/vitest": "npm:0.23.5"
+    "@octokit/rest": "npm:21.1.1"
     "@types/node": "npm:^22.5.2"
     "@vitest/coverage-v8": "npm:^3.2.3"
     effect: "npm:^3.15.1"
@@ -7338,7 +7339,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/rest@npm:^21.1.1":
+"@octokit/rest@npm:21.1.1, @octokit/rest@npm:^21.1.1":
   version: 21.1.1
   resolution: "@octokit/rest@npm:21.1.1"
   dependencies:
