@@ -1,5 +1,4 @@
 mod fetch_prices;
-mod providers;
 mod types;
 mod utils;
 
