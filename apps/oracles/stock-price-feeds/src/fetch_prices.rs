@@ -1,16 +1,17 @@
-use std::time::Instant;
-
 use anyhow::Result;
-use futures::stream::{FuturesUnordered, StreamExt};
+use futures::stream::FuturesUnordered;
 use serde::{Deserialize, Serialize};
 
-use blocksense_data_providers_sdk::price_data::fetchers::stock_markets::{
-    alpha_vantage::AlphaVantagePriceFetcher, fmp::FMPPriceFetcher,
-    twelvedata::TwelveDataPriceFetcher, yahoo_finance::YFPriceFetcher,
-};
-use blocksense_data_providers_sdk::price_data::traits::prices_fetcher::{fetch, TradingPairSymbol};
-use blocksense_data_providers_sdk::price_data::types::{
-    PairsToResults, ProviderPriceData, ProvidersSymbols,
+use blocksense_data_providers_sdk::price_data::{
+    fetchers::{
+        fetch::fetch_all_prices,
+        stock_markets::{
+            alpha_vantage::AlphaVantagePriceFetcher, fmp::FMPPriceFetcher,
+            twelvedata::TwelveDataPriceFetcher, yahoo_finance::YFPriceFetcher,
+        },
+    },
+    traits::prices_fetcher::{fetch, TradingPairSymbol},
+    types::{PairsToResults, ProviderPriceData, ProvidersSymbols},
 };
 
 use crate::{
@@ -47,17 +48,13 @@ impl SymbolsData {
     }
 }
 
-/*TODO:(EmilIvanichkovv):
-    The `fetch_all_prices` function is very similar to the one we use in `cex-price-feeds` oracle.
-    It should be moved to blocksense-sdk
-*/
-pub async fn fetch_all_prices(
+pub async fn get_prices(
     resources: &ResourceData,
     capabilities: &Capabilities,
 ) -> Result<PairsToResults> {
     let symbols = SymbolsData::from_resources(&resources.symbols)?;
 
-    let mut futures_set = FuturesUnordered::from_iter([
+    let futures_set = FuturesUnordered::from_iter([
         fetch::<AlphaVantagePriceFetcher>(
             &symbols.alpha_vantage,
             get_api_key(capabilities, "ALPHAVANTAGE_API_KEY"),
@@ -73,28 +70,17 @@ pub async fn fetch_all_prices(
         fetch::<FMPPriceFetcher>(&symbols.fmp, get_api_key(capabilities, "FMP_API_KEY")),
     ]);
 
-    let before_fetch = Instant::now();
-    let mut results = PairsToResults::new();
+    let fetched_provider_prices = fetch_all_prices(futures_set).await;
 
-    // Process results as they complete
-    while let Some((provider_id, result)) = futures_set.next().await {
-        match result {
-            Ok(prices) => {
-                let time_taken = before_fetch.elapsed();
-                println!("ℹ️  Successfully fetched prices from {provider_id} in {time_taken:?}",);
-                let prices_per_provider = ProviderPriceData {
-                    name: provider_id.to_owned(),
-                    data: prices,
-                };
-                fill_results(&resources.pairs, prices_per_provider, &mut results);
-            }
-            Err(err) => println!("❌ Error fetching prices from {provider_id}: {err:?}"),
-        }
+    let mut final_results = PairsToResults::new();
+    for price_data_for_exchange in fetched_provider_prices {
+        fill_results(
+            &resources.pairs,
+            price_data_for_exchange,
+            &mut final_results,
+        );
     }
-
-    println!("🕛 All prices fetched in {:?}", before_fetch.elapsed());
-
-    Ok(results)
+    Ok(final_results)
 }
 
 fn fill_results(

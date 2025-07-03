@@ -21,8 +21,10 @@ use blocksense_sdk::{
     oracle_component,
 };
 
-use crate::common::{ResourceData, ResourcePairData};
-use fetch_prices::fetch_all_prices;
+use crate::{
+    common::{ResourceData, ResourcePairData},
+    fetch_prices::get_prices,
+};
 
 type ExchangeData = HashMap<ProviderName, HashMap<String, Vec<String>>>;
 
@@ -43,7 +45,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
 
     let resources = get_resources_from_settings(&settings)?;
 
-    let results = fetch_all_prices(&resources).await?;
+    let results = get_prices(&resources).await?;
     let payload = process_results(&results)?;
 
     print_results(&resources.pairs, &results, &payload);
