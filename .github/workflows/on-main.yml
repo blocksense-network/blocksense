@@ -21,6 +21,10 @@ jobs:
             path: libs/ts/docs-ui/storybook-static
             project_name: blocksense-docs-ui
             build_command: yarn workspace @blocksense/docs-ui build-storybook
+          - project: ui.blocksense.network
+            path: libs/ts/ui/storybook-static
+            project_name: blocksense-ui
+            build_command: yarn workspace @blocksense/ui build-storybook
     steps:
       - uses: actions/checkout@v4
 
