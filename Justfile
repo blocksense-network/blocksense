@@ -32,6 +32,7 @@ build-environment environment="all":
   set -euo pipefail
   # Collect free ports that process-compose will use
   scripts/utils/collect-available-ports.sh {{process-compose-artifacts-dir}}/available-ports
+  git add --intent-to-add --force {{process-compose-artifacts-dir}}/available-ports
 
   if [[ {{environment}} == "all" ]]; then
     srcDir=$(nix build --impure --json -L .#allProcessComposeFiles | jq -r '.[0].outputs.out')
