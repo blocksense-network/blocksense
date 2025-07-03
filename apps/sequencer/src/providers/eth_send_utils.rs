@@ -655,6 +655,7 @@ pub async fn eth_batch_send_to_contract(
             let tx_hash = *tx_hash_result.tx_hash();
 
             let tx_receipt = match tx_hash_result
+                .with_required_confirmations(1)
                 .with_timeout(Some(std::time::Duration::from_secs(
                     transaction_retry_timeout_secs,
                 )))
