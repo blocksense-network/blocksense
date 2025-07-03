@@ -1,13 +1,13 @@
 import { getContract, PublicClient, Address } from 'viem';
 
-import { ContractConsumer } from './contract-consumer';
-import { abi as clAdapterAbi } from '../abi/cl-adapter';
+import { ContractConsumerBase } from './ContractConsumerBase';
+import { abi as clAdapterAbi } from '../abis/CLAggregatorAdapter';
 
-export class CLAggregatorAdapterConsumer extends ContractConsumer {
+export class CLAggregatorAdapterConsumer extends ContractConsumerBase {
   public contract;
 
   /**
-   * Constructs a CLAggregatorAdapter.
+   * Constructs a CLAggregatorAdapterConsumer.
    *
    * @param contractAddress The address of the CLAggregatorAdapter contract.
    * @param client The Viem PublicClient instance to use.

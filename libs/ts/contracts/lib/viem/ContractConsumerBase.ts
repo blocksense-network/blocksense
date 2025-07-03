@@ -15,7 +15,7 @@ import {
 
 import { valuesOf } from '@blocksense/base-utils';
 
-export abstract class ContractConsumer {
+export abstract class ContractConsumerBase {
   public client: PublicClient;
   public contractAddress: Address;
 
@@ -39,7 +39,7 @@ export abstract class ContractConsumer {
    * @param networkName - The name of the network to connect to.
    * @returns A new instance of the consumer configured for the specified network.
    */
-  public static createConsumerByNetworkName<T extends ContractConsumer>(
+  public static createConsumerByNetworkName<T extends ContractConsumerBase>(
     this: new (contractAddress: Address, client: PublicClient) => T,
     contractAddress: Address,
     networkName: NetworkName,
@@ -59,7 +59,7 @@ export abstract class ContractConsumer {
    * @param rpcUrl - The RPC URL to connect to.
    * @returns A new instance of the consumer configured for the specified RPC URL.
    */
-  public static createConsumerByRpcUrl<T extends ContractConsumer>(
+  public static createConsumerByRpcUrl<T extends ContractConsumerBase>(
     this: new (contractAddress: Address, client: PublicClient) => T,
     contractAddress: Address,
     rpcUrl: string,
