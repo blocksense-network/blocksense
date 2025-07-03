@@ -13,7 +13,7 @@ import * as utils from './utils/feedStoreConsumer';
 import { ADFSWrapper } from '../utils/wrappers';
 import { encodeDataAndTimestamp } from '../utils/helpers/common';
 import { Feed } from '../utils/wrappers/types';
-import { AggregatedDataFeedStore as AggregatedDataFeedStoreViem } from '../../src/clients/aggregated-data-feed-store';
+import { AggregatedDataFeedStoreConsumer as AggregatedDataFeedStoreViemConsumer } from '../../lib/viem/AggregatedDataFeedStore';
 
 const feeds: Feed[] = [
   {
@@ -40,7 +40,7 @@ describe('Example: ADFSConsumer', function () {
   let dataFeedStore: ADFSWrapper;
   let adfsConsumer: ADFSConsumer;
   let rawCallADFSConsumer: RawCallADFSConsumer;
-  let aggregatedDataFeedStoreViem: AggregatedDataFeedStoreViem;
+  let aggregatedDataFeedStoreViem: AggregatedDataFeedStoreViemConsumer;
   let sequencer: HardhatEthersSigner;
 
   const id = 1n;
@@ -70,7 +70,7 @@ describe('Example: ADFSConsumer', function () {
     );
 
     const viemPublicClient = await viem.getPublicClient();
-    aggregatedDataFeedStoreViem = new AggregatedDataFeedStoreViem(
+    aggregatedDataFeedStoreViem = new AggregatedDataFeedStoreViemConsumer(
       dataFeedStore.contract.target as `0x${string}`,
       viemPublicClient,
     );
@@ -208,7 +208,7 @@ describe('Example: ADFSConsumer', function () {
     const rawCallData = await rawCallADFSConsumer.getFunction(functionName)(
       ...filteredData,
     );
-    const viemAdfsData = await (
+    const viemADFSData = await (
       aggregatedDataFeedStoreViem[functionName] as (...args: any[]) => any
     )(...filteredData);
 
@@ -220,7 +220,7 @@ describe('Example: ADFSConsumer', function () {
     expect(adfsData).to.deep.equal(utilData);
     expect(rawCallData).to.deep.equal(utilData);
     expect(
-      isObject(viemAdfsData) ? Object.values(viemAdfsData) : viemAdfsData,
+      isObject(viemADFSData) ? Object.values(viemADFSData) : viemADFSData,
     ).to.deep.equal(utilData);
   };
 });

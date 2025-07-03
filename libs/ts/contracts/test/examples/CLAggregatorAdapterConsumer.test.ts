@@ -13,12 +13,12 @@ import {
   UpgradeableProxyADFSWrapper,
 } from '../utils/wrappers';
 import { encodeDataAndTimestamp } from '../utils/helpers/common';
-import { CLAggregatorAdapter as CLAggregatorAdapterViem } from '../../src/clients/cl-aggregator-adapter';
+import { CLAggregatorAdapterConsumer as CLAggregatorAdapterConsumerViem } from '../../lib/viem/CLAggregatorAdapter';
 
 describe('Example: CLAggregatorAdapterConsumer', function () {
   let clAggregatorAdapter: CLAdapterWrapper;
   let clAggregatorAdapterConsumer: CLAggregatorAdapterConsumer;
-  let clAggregatorAdapterViem: CLAggregatorAdapterViem;
+  let clAggregatorAdapterViem: CLAggregatorAdapterConsumerViem;
 
   beforeEach(async function () {
     const admin = (await ethers.getSigners())[9];
@@ -47,7 +47,7 @@ describe('Example: CLAggregatorAdapterConsumer', function () {
       );
 
     const viemPublicClient = await viem.getPublicClient();
-    clAggregatorAdapterViem = new CLAggregatorAdapterViem(
+    clAggregatorAdapterViem = new CLAggregatorAdapterConsumerViem(
       clAggregatorAdapter.contract.target as `0x${string}`,
       viemPublicClient,
     );

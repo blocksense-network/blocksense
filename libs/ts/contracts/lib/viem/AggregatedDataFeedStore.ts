@@ -1,9 +1,9 @@
 import { PublicClient, Hex, encodePacked, Address } from 'viem';
-import { ContractConsumer } from './contract-consumer';
+import { ContractConsumerBase } from './ContractConsumerBase';
 
 type DataAndIndex = { data: Hex | Hex[]; index: number };
 
-export class AggregatedDataFeedStoreConsumer extends ContractConsumer {
+export class AggregatedDataFeedStoreConsumer extends ContractConsumerBase {
   private selectors = {
     getLatestIndex: '0x81',
     getLatestSingleData: '0x82',
@@ -13,6 +13,12 @@ export class AggregatedDataFeedStoreConsumer extends ContractConsumer {
     getFeedAtIndex: '0x86',
   } as const;
 
+  /**
+   * Constructs a AggregatedDataFeedStoreConsumer.
+   *
+   * @param contractAddress The address of the UpgradeableProxyADFS contract.
+   * @param client The Viem PublicClient instance to use.
+   */
   constructor(contractAddress: Address, client: PublicClient) {
     super(contractAddress, client);
   }
