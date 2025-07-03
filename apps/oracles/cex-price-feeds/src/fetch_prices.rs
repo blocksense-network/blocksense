@@ -4,22 +4,20 @@ use anyhow::Result;
 use futures::stream::{FuturesUnordered, StreamExt};
 use serde::{Deserialize, Serialize};
 
+use blocksense_data_providers_sdk::price_data::fetchers::exchanges::{
+    binance::BinancePriceFetcher, binance_us::BinanceUsPriceFetcher,
+    bitfinex::BitfinexPriceFetcher, bitget::BitgetPriceFetcher, bybit::BybitPriceFetcher,
+    coinbase::CoinbasePriceFetcher, crypto_com_exchange::CryptoComPriceFetcher,
+    gate_io::GateIoPriceFetcher, gemini::GeminiPriceFetcher, kraken::KrakenPriceFetcher,
+    kucoin::KuCoinPriceFetcher, mexc::MEXCPriceFetcher, okx::OKXPriceFetcher,
+    upbit::UpBitPriceFetcher,
+};
 use blocksense_data_providers_sdk::price_data::traits::prices_fetcher::{fetch, TradingPairSymbol};
 use blocksense_data_providers_sdk::price_data::types::{
     PairsToResults, ProviderPriceData, ProvidersSymbols,
 };
 
-use crate::{
-    common::{ResourceData, ResourcePairData},
-    exchanges::{
-        binance::BinancePriceFetcher, binance_us::BinanceUsPriceFetcher,
-        bitfinex::BitfinexPriceFetcher, bitget::BitgetPriceFetcher, bybit::BybitPriceFetcher,
-        coinbase::CoinbasePriceFetcher, crypto_com_exchange::CryptoComPriceFetcher,
-        gate_io::GateIoPriceFetcher, gemini::GeminiPriceFetcher, kraken::KrakenPriceFetcher,
-        kucoin::KuCoinPriceFetcher, mexc::MEXCPriceFetcher, okx::OKXPriceFetcher,
-        upbit::UpBitPriceFetcher,
-    },
-};
+use crate::common::{ResourceData, ResourcePairData};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

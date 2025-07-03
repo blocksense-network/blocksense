@@ -4,31 +4,34 @@ use futures::{future::LocalBoxFuture, FutureExt};
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
-use blocksense_data_providers_sdk::price_data::traits::prices_fetcher::{
-    PairPriceData, PricePoint, PricesFetcher,
-};
 use blocksense_sdk::http::http_get_json;
 
+use crate::price_data::traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher};
+
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct OKXTickerData {
-    #[serde(rename = "instId")]
-    pub inst_id: String,
+pub struct CryptoComPriceData {
+    pub i: String,
     #[serde(deserialize_with = "as_f64")]
-    pub last: f64,
+    pub a: f64,
     #[serde(deserialize_with = "as_f64")]
-    pub vol24h: f64,
+    pub v: f64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct OKXTickerResponse {
-    pub code: String,
-    pub data: Vec<OKXTickerData>,
+pub struct CryptoComResult {
+    pub data: Vec<CryptoComPriceData>,
 }
 
-pub struct OKXPriceFetcher;
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+pub struct CryptoComPriceResponse {
+    pub code: i8,
+    pub result: CryptoComResult,
+}
 
-impl PricesFetcher<'_> for OKXPriceFetcher {
-    const NAME: &'static str = "OKX";
+pub struct CryptoComPriceFetcher;
+
+impl PricesFetcher<'_> for CryptoComPriceFetcher {
+    const NAME: &'static str = "Crypto.com";
 
     fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
         Self
@@ -36,22 +39,23 @@ impl PricesFetcher<'_> for OKXPriceFetcher {
 
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
-            let response = http_get_json::<OKXTickerResponse>(
-                "https://www.okx.com/api/v5/market/tickers",
-                Some(&[("instType", "SPOT")]),
+            let response = http_get_json::<CryptoComPriceResponse>(
+                "https://api.crypto.com/exchange/v1/public/get-tickers",
+                None,
                 None,
             )
             .await?;
 
             Ok(response
+                .result
                 .data
                 .into_iter()
                 .map(|value| {
                     (
-                        value.inst_id.replace("-", ""),
+                        value.i.replace("_", ""),
                         PricePoint {
-                            price: value.last,
-                            volume: value.vol24h,
+                            price: value.a,
+                            volume: value.v,
                         },
                     )
                 })
