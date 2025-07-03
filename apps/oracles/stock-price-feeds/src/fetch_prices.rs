@@ -4,16 +4,16 @@ use anyhow::Result;
 use futures::stream::{FuturesUnordered, StreamExt};
 use serde::{Deserialize, Serialize};
 
+use blocksense_data_providers_sdk::price_data::fetchers::stock_markets::{
+    alpha_vantage::AlphaVantagePriceFetcher, fmp::FMPPriceFetcher,
+    twelvedata::TwelveDataPriceFetcher, yahoo_finance::YFPriceFetcher,
+};
 use blocksense_data_providers_sdk::price_data::traits::prices_fetcher::{fetch, TradingPairSymbol};
 use blocksense_data_providers_sdk::price_data::types::{
     PairsToResults, ProviderPriceData, ProvidersSymbols,
 };
 
 use crate::{
-    providers::{
-        alpha_vantage::AlphaVantagePriceFetcher, fmp::FMPPriceFetcher,
-        twelvedata::TwelveDataPriceFetcher, yahoo_finance::YFPriceFetcher,
-    },
     types::{Capabilities, ResourceData, ResourcePairData},
     utils::get_api_key,
 };

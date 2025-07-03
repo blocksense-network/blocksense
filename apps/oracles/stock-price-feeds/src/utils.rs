@@ -8,25 +8,6 @@ pub fn get_api_key<'a>(capabilities: &'a Capabilities, key: &str) -> Option<&'a 
     capabilities.get(key).map(|s| s.as_str())
 }
 
-pub fn print_missing_network_price_data<T>(
-    network: &str,
-    symbol: String,
-    price: Option<T>,
-    volume: Option<T>,
-) {
-    eprintln!(
-        "[{network}] Skipping symbol {}: missing {}{}{}",
-        symbol,
-        if price.is_none() { "price" } else { "" },
-        if price.is_none() && volume.is_none() {
-            " and "
-        } else {
-            ""
-        },
-        if volume.is_none() { "volume" } else { "" },
-    );
-}
-
 pub fn markets_are_closed(now_et: chrono::DateTime<chrono_tz::Tz>) -> bool {
     let weekday = now_et.weekday();
     let current_time = now_et.time();
