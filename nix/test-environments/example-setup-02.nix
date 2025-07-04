@@ -5,7 +5,8 @@
 }:
 
 let
-  testKeysDir = config.devenv.root + "/nix/test-environments/test-keys";
+  root = ../..;
+  testKeysDir = lib.path.append root "nix/test-environments/test-keys";
 in
 
 {
