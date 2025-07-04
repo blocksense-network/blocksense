@@ -10,6 +10,7 @@ import {
 import { adjustVInSignature } from '@safe-global/protocol-kit/dist/src/utils';
 import { readEvmDeployment } from '@blocksense/config-types';
 import { initChain } from './deployment-utils/init-chain';
+import { solidityPacked, toBeArray } from 'ethers';
 
 task('change-sequencer', 'Change sequencer role in Access Control contract')
   .addParam('networks', 'Network to deploy to')
@@ -30,14 +31,18 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
       const { networkName } = config;
       const {
         contracts: {
-          AdminMultisig,
+          safe: { AdminMultisig },
           coreContracts: { AccessControl },
         },
       } = await readEvmDeployment(networkName, true);
 
+      const signer = config.deployerIsLedger
+        ? undefined
+        : config.deployer.privateKey;
+
       const adminMultisig = await Safe.init({
         provider: config.rpc,
-        signer: config.adminMultisig.signer?.privateKey,
+        signer,
         safeAddress: AdminMultisig,
         contractNetworks: {
           [config.network.chainId.toString()]: config.safeAddresses,
@@ -52,7 +57,7 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
       const safeTxSetAccessControl: SafeTransactionDataPartial = {
         to: AccessControl.address,
         value: '0',
-        data: ethers.solidityPacked(
+        data: solidityPacked(
           ['address', 'bool'],
           [args.sequencerAddress, Boolean(JSON.parse(args.setRole))],
         ),
@@ -65,15 +70,13 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
 
       const safeTxHash = await adminMultisig.getTransactionHash(tx);
 
-      const signer = config.adminMultisig.signer || config.ledgerAccount!;
-
-      const typedDataHash = ethers.toBeArray(safeTxHash);
-      const signedData = await signer.signMessage(typedDataHash);
+      const typedDataHash = toBeArray(safeTxHash);
+      const signedData = await config.deployer.signMessage(typedDataHash);
       const signature = await adjustVInSignature(
         SigningMethod.ETH_SIGN,
         signedData,
         safeTxHash,
-        await signer.getAddress(),
+        config.deployerAddress,
       );
 
       // Send the transaction to the Transaction Service with the signature from Owner A
@@ -81,7 +84,7 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
         safeAddress: AdminMultisig,
         safeTransactionData: tx.data,
         safeTxHash,
-        senderAddress: await signer.getAddress(),
+        senderAddress: config.deployerAddress,
         senderSignature: signature,
       });
     }

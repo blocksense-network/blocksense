@@ -1,32 +1,28 @@
 import { task } from 'hardhat/config';
-import { NetworkConfig } from './types';
+import { initChain } from './deployment-utils/init-chain';
+import { parseEther } from 'ethers';
 
 task('fund-ledger', '[UTILS] Fund the ledger account with ETH').setAction(
-  async (args, { ethers }) => {
-    const {
-      config,
-    }: {
-      config: NetworkConfig;
-    } = args;
+  async (_, { ethers }) => {
+    const config = await initChain(ethers, 'local');
 
-    const ledgerAccountAddress = await config.ledgerAccount!.getAddress();
-    console.log('ledgerAccount', ledgerAccountAddress);
+    console.log('ledgerAccount', config.deployerAddress);
     console.log(
       '[BEFORE] ledger balance',
-      await config.provider.getBalance(ledgerAccountAddress),
+      await config.provider.getBalance(config.deployerAddress),
     );
 
     const tx = await (await ethers.getSigners())[0]
       .connect(config.provider)
       .sendTransaction({
-        to: ledgerAccountAddress,
-        value: ethers.parseEther('10'),
+        to: config.deployerAddress,
+        value: parseEther('10'),
       });
     await tx.wait();
 
     console.log(
       '[AFTER] ledger balance',
-      await config.provider.getBalance(ledgerAccountAddress),
+      await config.provider.getBalance(config.deployerAddress),
     );
   },
 );

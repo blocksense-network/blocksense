@@ -1,6 +1,6 @@
 import DEPLOYMENT_INFO from '@/artifacts/deployment_data.json';
 
-import { parseNetworkName } from '@blocksense/base-utils/evm';
+import { valuesOf } from '@blocksense/base-utils/array-iter';
 import { DeploymentConfigV2 } from '@blocksense/config-types';
 import {
   CoreContract,
@@ -12,8 +12,8 @@ const getCoreContractsData = (networksData: DeploymentConfigV2[]) => {
 
   networksData.map(data => {
     if (!data) return;
-    if (data.name === 'local') return;
-    const networkName = parseNetworkName(data.name);
+    const networkName = data.network;
+    if (networkName === 'local') return;
     const coreContracts = data.contracts.coreContracts;
     const skipContracts = ['AccessControl', 'OnlySequencerGuard'];
 
@@ -42,11 +42,11 @@ const getProxyContractsContent = (networksData: DeploymentConfigV2[]) => {
   const supportedNetworks = networksData
     .map(data => {
       if (!data) return [];
-      if (data.name === 'local') return [];
-      const networkName = parseNetworkName(data.name);
+      const networkName = data.network;
+      if (networkName === 'local') return [];
       const { CLAggregatorAdapter } = data.contracts;
 
-      return CLAggregatorAdapter.map(proxy => {
+      return valuesOf(CLAggregatorAdapter).map(proxy => {
         let id = proxy.constructorArgs[2].toString();
         return {
           ...proxy,
