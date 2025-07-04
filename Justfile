@@ -19,7 +19,7 @@ list-devshells:
 [doc('List available process-compose environments')]
 list-environments:
   #!/usr/bin/env bash
-  nix eval --impure -L --json --apply builtins.attrNames \
+  nix eval -L --json --apply builtins.attrNames \
     .#legacyPackages.${system}.process-compose-environments \
     2>/dev/null \
     | jq -r '.[]'
@@ -50,7 +50,7 @@ build-environment environment="all" use-local-cargo-result="0":
   git add --intent-to-add --force "$DEST_DIR/available-ports"
 
   SRC_DIR=$(
-    nix build --no-warn-dirty --impure -L --print-out-paths \
+    nix build --no-warn-dirty -L --print-out-paths \
       .#${FLAKE_ATTR_PATH} \
       2> >(grep -v '^Using saved setting for' >&2)
   )
