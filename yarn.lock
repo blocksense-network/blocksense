@@ -2756,7 +2756,7 @@ __metadata:
   dependencies:
     "@chromatic-com/storybook": "npm:^4.0.1"
     "@eslint/eslintrc": "npm:^3"
-    "@storybook/addon-a11y": "npm:8.6.12"
+    "@storybook/addon-a11y": "npm:^9.0.14"
     "@storybook/addon-docs": "npm:^9.0.14"
     "@storybook/nextjs-vite": "npm:^9.0.15"
     "@tailwindcss/postcss": "npm:^4"
@@ -10334,17 +10334,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@storybook/addon-a11y@npm:8.6.12":
-  version: 8.6.12
-  resolution: "@storybook/addon-a11y@npm:8.6.12"
+"@storybook/addon-a11y@npm:^9.0.14":
+  version: 9.0.15
+  resolution: "@storybook/addon-a11y@npm:9.0.15"
   dependencies:
-    "@storybook/addon-highlight": "npm:8.6.12"
     "@storybook/global": "npm:^5.0.0"
-    "@storybook/test": "npm:8.6.12"
     axe-core: "npm:^4.2.0"
   peerDependencies:
-    storybook: ^8.6.12
-  checksum: 10c0/a45b43cce50523f595e33de9b3530c4365777cabd592d2d0631e876c98cbf065f587fa639f36751b91184727803158a611fc702a65bec1f2f153ac904d47c8e4
+    storybook: ^9.0.15
+  checksum: 10c0/015dcc8d36cfe10b5431169efdca9d71dd52f8c9478d616f3d2cbb84b663aca1f966727c89d4f702670ed87e73e9485f1081a3b385f0f37e512791dcd37395a7
   languageName: node
   linkType: hard
 
