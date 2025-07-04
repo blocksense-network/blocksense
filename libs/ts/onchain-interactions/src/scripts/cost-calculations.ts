@@ -4,6 +4,7 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
 import chalkTemplate from 'chalk-template';
+import client from 'prom-client';
 
 import {
   getOptionalApiKey,
@@ -11,15 +12,24 @@ import {
   networkMetadata,
   NetworkName,
   parseNetworkName,
-} from '@blocksense/base-utils/evm';
-import {
   EthereumAddress,
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 import { throwError } from '@blocksense/base-utils/errors';
 
-import { Transaction, deployedNetworks } from '../types';
+import { Transaction, deployedNetworks, startPrometheusServer } from '../types';
+
+type Gauges = {
+  gasCost: client.Gauge;
+  cost: client.Gauge;
+  balance: client.Gauge;
+  daysLeft: client.Gauge;
+};
+
+function filterSmallBalance(balance: string, threshold = 1e-6): number {
+  return Number(balance) < threshold ? 0 : Number(balance);
+}
 
 function getHourDifference(transactions: Transaction[]): number {
   const txsLen = transactions.length;
@@ -86,11 +96,13 @@ const logGasCosts = async (
   firstTransactionTime: string,
   lastTransactionTime: string,
   hoursBetweenFirstLast: number,
+  prometheus: boolean,
+  gauges: Gauges | null,
 ): Promise<void> => {
   const { currency } = networkMetadata[network];
 
   try {
-    await console.log(chalkTemplate`
+    console.log(chalkTemplate`
     {white ${network}: Processed ${transactionsCount} transactions sent by ${address} over ${hoursBetweenFirstLast} hours}
     {blue First transaction timestamp: ${firstTransactionTime}}
     {blue Last transaction timestamp: ${lastTransactionTime}}
@@ -112,6 +124,17 @@ const logGasCosts = async (
         console.log(chalk.bold.yellow(balanceMsg));
       } else {
         console.log(chalk.bold.green(balanceMsg));
+      }
+
+      const networkName = network;
+      if (prometheus && gauges) {
+        gauges.gasCost.set({ networkName, address }, gasCosts.gasUsed1h * 24);
+        gauges.cost.set({ networkName, address }, gasCosts.cost1h * 24);
+        gauges.balance.set(
+          { networkName, address },
+          filterSmallBalance(balance),
+        );
+        gauges.daysLeft.set({ networkName, address }, daysBalanceWillLast);
       }
     }
   } catch (error) {
@@ -364,11 +387,56 @@ const main = async (): Promise<void> => {
       type: 'string',
       default: DEFAULT_LAST_TX_TIME,
     })
+    .option('prometheus', {
+      alias: 'p',
+      describe: 'Enable Prometheus metrics recording',
+      type: 'boolean',
+      default: false,
+    })
+    .option('host', {
+      describe: 'Host to bind Prometheus metrics server',
+      type: 'string',
+      default: '0.0.0.0',
+    })
+    .option('port', {
+      describe: 'Port to expose Prometheus metrics server',
+      type: 'number',
+      default: 9100,
+    })
     .help()
     .alias('help', 'h')
     .parse();
 
   const address = parseEthereumAddress(argv.address);
+
+  let gauges: Gauges | null = null;
+
+  if (argv.prometheus) {
+    startPrometheusServer(argv.host, argv.port);
+
+    gauges = {
+      gasCost: new client.Gauge({
+        name: 'eth_account_gas_cost',
+        help: 'Daily cost in gas to run using last x transactions',
+        labelNames: ['networkName', 'address'],
+      }),
+      cost: new client.Gauge({
+        name: 'eth_account_cost',
+        help: 'Daily cost to run using last x transactions',
+        labelNames: ['networkName', 'address'],
+      }),
+      balance: new client.Gauge({
+        name: 'eth_account_balance',
+        help: 'Ethereum account balance in native token',
+        labelNames: ['networkName', 'address'],
+      }),
+      daysLeft: new client.Gauge({
+        name: 'eth_account_days_left',
+        help: 'Days until funds run out',
+        labelNames: ['networkName', 'address'],
+      }),
+    };
+  }
 
   console.log(
     chalk.cyan(
@@ -438,6 +506,8 @@ const main = async (): Promise<void> => {
           firstTxTime,
           lastTxTime,
           hoursBetweenFirstLastTx,
+          argv.prometheus,
+          gauges,
         );
       }
     } else {

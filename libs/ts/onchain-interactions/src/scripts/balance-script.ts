@@ -2,6 +2,8 @@ import Web3 from 'web3';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
+import client from 'prom-client';
+
 import {
   getNetworkNameByChainId,
   getOptionalRpcUrl,
@@ -10,34 +12,13 @@ import {
   isChainId,
   parseNetworkName,
 } from '@blocksense/base-utils/evm';
-import { deployedNetworks } from '../types';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
-import client from 'prom-client';
-import express from 'express';
 
-const balanceGauge = new client.Gauge({
-  name: 'eth_account_balance',
-  help: 'Ethereum account balance in Ether',
-  labelNames: ['networkName', 'address', 'rpcUrl'],
-});
+import { deployedNetworks, startPrometheusServer } from '../types';
 
 function filterSmallBalance(balance: string, threshold = 1e-6): number {
   return Number(balance) < threshold ? 0 : Number(balance);
 }
-const startPrometheusServer = (host: string, port: number): void => {
-  const app = express();
-  app.get('/metrics', async (_req, res) => {
-    res.set('Content-Type', client.register.contentType);
-    res.end(await client.register.metrics());
-  });
-  app.listen(port, host, () => {
-    console.log(
-      chalk.blue(
-        `Prometheus metrics exposed at http://${host}:${port}/metrics`,
-      ),
-    );
-  });
-};
 
 const main = async (): Promise<void> => {
   const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
@@ -85,8 +66,15 @@ const main = async (): Promise<void> => {
 
   const address = parseEthereumAddress(argv.address);
 
+  let balanceGauge: client.Gauge | null = null;
+
   if (argv.prometheus) {
     startPrometheusServer(argv.host, argv.port);
+    balanceGauge = new client.Gauge({
+      name: 'eth_account_balance',
+      help: 'Ethereum account balance in Ether',
+      labelNames: ['networkName', 'address', 'rpcUrl'],
+    });
   }
 
   console.log(
@@ -120,7 +108,7 @@ const main = async (): Promise<void> => {
           networkName === 'unknown' ? chalk.red(message) : chalk.green(message),
         );
 
-        if (argv.prometheus) {
+        if (argv.prometheus && balanceGauge) {
           balanceGauge.set(
             { networkName, address, rpcUrl },
             filterSmallBalance(balance),
@@ -152,7 +140,7 @@ const main = async (): Promise<void> => {
       const balance = web3.utils.fromWei(balanceWei, 'ether');
       const { currency } = networkMetadata[networkName];
       console.log(chalk.green(`${networkName}: ${balance} ${currency}`));
-      if (argv.prometheus) {
+      if (argv.prometheus && balanceGauge) {
         balanceGauge.set(
           { networkName, address, rpcUrl },
           filterSmallBalance(balance),

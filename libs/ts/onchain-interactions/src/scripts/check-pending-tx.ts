@@ -1,13 +1,16 @@
-import {
-  getOptionalRpcUrl,
-  parseEthereumAddress,
-} from '@blocksense/base-utils/evm';
 import chalk from 'chalk';
 import Web3 from 'web3';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { deployedNetworks } from '../types';
+import client from 'prom-client';
+
+import {
+  getOptionalRpcUrl,
+  parseEthereumAddress,
+} from '@blocksense/base-utils/evm';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
+
+import { deployedNetworks, startPrometheusServer } from '../types';
 
 const main = async (): Promise<void> => {
   const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
@@ -19,11 +22,38 @@ const main = async (): Promise<void> => {
       type: 'string',
       default: sequencerAddress,
     })
+    .option('prometheus', {
+      alias: 'p',
+      describe: 'Enable Prometheus metrics recording',
+      type: 'boolean',
+      default: false,
+    })
+    .option('host', {
+      describe: 'Host to bind Prometheus metrics server',
+      type: 'string',
+      default: '0.0.0.0',
+    })
+    .option('port', {
+      describe: 'Port to expose Prometheus metrics server',
+      type: 'number',
+      default: 9100,
+    })
     .help()
     .alias('help', 'h')
     .parse();
 
   const address = parseEthereumAddress(argv.address);
+
+  let pendingGauge: client.Gauge | null = null;
+  if (argv.prometheus) {
+    startPrometheusServer(argv.host, argv.port);
+    pendingGauge = new client.Gauge({
+      name: 'eth_account_pending',
+      help: 'How many pending transactions this account has',
+      labelNames: ['networkName', 'address'],
+    });
+  }
+
   console.log(
     chalk.cyan(
       `Using Ethereum address: ${address} (sequencer: ${
@@ -48,8 +78,13 @@ const main = async (): Promise<void> => {
         address,
         'pending',
       );
+      const nonceDifference = Number(pendingNonce - latestNonce);
 
-      if (latestNonce !== pendingNonce) {
+      if (argv.prometheus && pendingGauge) {
+        pendingGauge.set({ networkName, address }, nonceDifference);
+      }
+
+      if (nonceDifference) {
         console.log(chalk.red(`Nonce difference found on ${networkName}:`));
         console.log(
           chalk.red(`  Latest: ${latestNonce}, Pending: ${pendingNonce}`),
