@@ -18,6 +18,7 @@
     "@chromatic-com/storybook": "^4.0.1",
     "@eslint/eslintrc": "^3",
     "@storybook/addon-a11y": "^9.0.14",
+    "@storybook/addon-designs": "^10.0.1",
     "@storybook/addon-docs": "^9.0.14",
     "@storybook/nextjs-vite": "^9.0.15",
     "@tailwindcss/postcss": "^4",
