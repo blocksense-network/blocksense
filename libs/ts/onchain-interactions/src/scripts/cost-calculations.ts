@@ -21,29 +21,12 @@ import { throwError } from '@blocksense/base-utils/errors';
 import { Transaction, deployedNetworks } from '../types';
 import { startPrometheusServer } from '../utils';
 
-const gasCostGauge = new client.Gauge({
-  name: 'eth_account_gas_cost',
-  help: 'Daily cost in gas to run using last x transactions',
-  labelNames: ['networkName', 'address'],
-});
-
-const costGauge = new client.Gauge({
-  name: 'eth_account_cost',
-  help: 'Daily cost to run using last x transactions',
-  labelNames: ['networkName', 'address'],
-});
-
-const balanceGauge = new client.Gauge({
-  name: 'eth_account_balance',
-  help: 'Ethereum account balance in native token',
-  labelNames: ['networkName', 'address'],
-});
-
-const daysLeftGauge = new client.Gauge({
-  name: 'eth_account_days_left',
-  help: 'Days until funds run out',
-  labelNames: ['networkName', 'address'],
-});
+type Gauges = {
+  gasCost: client.Gauge;
+  cost: client.Gauge;
+  balance: client.Gauge;
+  daysLeft: client.Gauge;
+};
 
 function filterSmallBalance(balance: string, threshold = 1e-6): number {
   return Number(balance) < threshold ? 0 : Number(balance);
@@ -115,6 +98,7 @@ const logGasCosts = async (
   lastTransactionTime: string,
   hoursBetweenFirstLast: number,
   prometheus: boolean,
+  gauges: Gauges | null,
 ): Promise<void> => {
   const { currency } = networkMetadata[networkName];
 
@@ -143,11 +127,14 @@ const logGasCosts = async (
         console.log(chalk.bold.green(balanceMsg));
       }
 
-      if (prometheus) {
-        gasCostGauge.set({ networkName, address }, gasCosts.gasUsed1h * 24);
-        costGauge.set({ networkName, address }, gasCosts.cost1h * 24);
-        balanceGauge.set({ networkName, address }, filterSmallBalance(balance));
-        daysLeftGauge.set({ networkName, address }, daysBalanceWillLast);
+      if (gauges) {
+        gauges.gasCost.set({ networkName, address }, gasCosts.gasUsed1h * 24);
+        gauges.cost.set({ networkName, address }, gasCosts.cost1h * 24);
+        gauges.balance.set(
+          { networkName, address },
+          filterSmallBalance(balance),
+        );
+        gauges.daysLeft.set({ networkName, address }, daysBalanceWillLast);
       }
     }
   } catch (error) {
@@ -421,9 +408,33 @@ const main = async (): Promise<void> => {
     .parse();
 
   const address = parseEthereumAddress(argv.address);
+  let gauges: Gauges | null = null;
 
   if (argv.prometheus) {
     startPrometheusServer(argv.host, argv.port);
+
+    gauges = {
+      gasCost: new client.Gauge({
+        name: 'eth_account_gas_cost',
+        help: 'Daily cost in gas to run using last x transactions',
+        labelNames: ['networkName', 'address'],
+      }),
+      cost: new client.Gauge({
+        name: 'eth_account_cost',
+        help: 'Daily cost to run using last x transactions',
+        labelNames: ['networkName', 'address'],
+      }),
+      balance: new client.Gauge({
+        name: 'eth_account_balance',
+        help: 'Ethereum account balance in native token',
+        labelNames: ['networkName', 'address'],
+      }),
+      daysLeft: new client.Gauge({
+        name: 'eth_account_days_left',
+        help: 'Days until funds run out',
+        labelNames: ['networkName', 'address'],
+      }),
+    };
   }
 
   console.log(
@@ -495,6 +506,7 @@ const main = async (): Promise<void> => {
           lastTxTime,
           hoursBetweenFirstLastTx,
           argv.prometheus,
+          gauges,
         );
       }
     } else {
