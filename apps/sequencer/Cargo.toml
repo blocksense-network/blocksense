@@ -42,7 +42,7 @@ alloy = { workspace = true, features = [
     "pubsub",
 ] }
 
-pprof = { version = "0.11", features = ["flamegraph"] }
+pprof = { version = "0.15", features = ["flamegraph"] }
 
 alloy-primitives = { workspace = true }
 
