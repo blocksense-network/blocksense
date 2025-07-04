@@ -20,7 +20,7 @@ list-devshells:
 [doc('List available process-compose environments')]
 list-environments:
   #!/usr/bin/env bash
-  nix eval --impure -L --json --apply builtins.attrNames \
+  nix eval -L --json --apply builtins.attrNames \
     .#legacyPackages.{{system}}.process-compose-environments \
     2>/dev/null \
     | jq -r '.[]'
@@ -35,11 +35,11 @@ build-environment environment="all":
   git add --intent-to-add --force {{process-compose-artifacts-dir}}/available-ports
 
   if [[ {{environment}} == "all" ]]; then
-    srcDir=$(nix build --impure --json -L .#allProcessComposeFiles | jq -r '.[0].outputs.out')
+    srcDir=$(nix build --json -L .#allProcessComposeFiles | jq -r '.[0].outputs.out')
     cp -rf --no-preserve=mode,ownership "$srcDir"/. {{process-compose-artifacts-dir}}
   else
     destDir="{{process-compose-artifacts-dir}}/{{environment}}"
-    srcDir=$(nix build --impure -L --json .#legacyPackages.{{system}}.process-compose-environments.{{environment}} | jq -r '.[0].outputs.out')
+    srcDir=$(nix build -L --json .#legacyPackages.{{system}}.process-compose-environments.{{environment}} | jq -r '.[0].outputs.out')
     cp -rf --no-preserve=mode,ownership "$srcDir"/. "$destDir"
   fi
   echo "Process Compose artifacts copied to {{process-compose-artifacts-dir}}"
