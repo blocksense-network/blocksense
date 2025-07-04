@@ -13,12 +13,6 @@ import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 import { deployedNetworks } from '../types';
 import { startPrometheusServer } from '../utils';
 
-const pendingGauge = new client.Gauge({
-  name: 'eth_account_pending',
-  help: 'How many pending transactions this account has',
-  labelNames: ['networkName', 'address'],
-});
-
 const main = async (): Promise<void> => {
   const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
   const argv = await yargs(hideBin(process.argv))
@@ -50,9 +44,15 @@ const main = async (): Promise<void> => {
     .parse();
 
   const address = parseEthereumAddress(argv.address);
+  let pendingGauge: client.Gauge | null = null;
 
   if (argv.prometheus) {
     startPrometheusServer(argv.host, argv.port);
+    pendingGauge = new client.Gauge({
+      name: 'eth_account_pending',
+      help: 'How many pending transactions this account has',
+      labelNames: ['networkName', 'address'],
+    });
   }
 
   console.log(
@@ -81,7 +81,7 @@ const main = async (): Promise<void> => {
       );
       const nonceDifference = Number(pendingNonce - latestNonce);
 
-      if (argv.prometheus) {
+      if (pendingGauge) {
         pendingGauge.set({ networkName, address }, nonceDifference);
       }
 
