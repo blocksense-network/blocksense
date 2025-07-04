@@ -21,6 +21,12 @@ export const Default: Story = {
   args: {
     text: 'Tailwind is working!',
   },
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/design/yvE4RWIUfOzb8Y2P2JUbtv/Blocksense-Website?node-id=4235-1171&m=dev',
+    },
+  },
 };
 
 export const CustomText: Story = {
