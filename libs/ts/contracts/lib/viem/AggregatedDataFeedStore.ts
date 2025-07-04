@@ -1,18 +1,7 @@
-import {
-  createPublicClient,
-  http,
-  type PublicClient,
-  Hex,
-  encodePacked,
-  Address,
-} from 'viem';
+import { PublicClient, Hex, encodePacked, Address } from 'viem';
+import { ContractConsumerBase } from './ContractConsumerBase';
 
-import { getRpcUrl, NetworkName } from '@blocksense/base-utils/evm';
-
-import { getViemChain } from '../common';
-
-export class AggregatedDataFeedStore {
-  public client: PublicClient;
+export class AggregatedDataFeedStore extends ContractConsumerBase {
   private selectors = {
     getLatestIndex: '0x81',
     getLatestSingleData: '0x82',
@@ -22,14 +11,8 @@ export class AggregatedDataFeedStore {
     getFeedAtIndex: '0x86',
   } as const;
 
-  constructor(
-    public contractAddress: Address,
-    networkName: NetworkName,
-  ) {
-    this.client = createPublicClient({
-      chain: getViemChain(networkName),
-      transport: http(getRpcUrl(networkName)),
-    });
+  constructor(contractAddress: Address, client: PublicClient) {
+    super(contractAddress, client);
   }
 
   private async call(encodedParams: Hex): Promise<Hex> {
@@ -115,7 +98,7 @@ export class AggregatedDataFeedStore {
     return Number(await this.call(encoded));
   }
 
-  async getLatestSingleDataAndIndex(feedId: bigint): Promise<IndexAndData> {
+  async getLatestSingleDataAndIndex(feedId: bigint): Promise<DataAndIndex> {
     const encoded = encodePacked(
       ['bytes1', 'uint128'],
       [this.selectors.getLatestSingleDataAndIndex, feedId],
@@ -124,10 +107,10 @@ export class AggregatedDataFeedStore {
     const index = Number(res.slice(0, 66));
     const data = `0x${res.slice(66)}` as Hex;
 
-    return { index, data };
+    return { data, index };
   }
 
-  async getLatestDataAndIndex(feedId: bigint): Promise<IndexAndData> {
+  async getLatestDataAndIndex(feedId: bigint): Promise<DataAndIndex> {
     const encoded = encodePacked(
       ['bytes1', 'uint128'],
       [this.selectors.getLatestDataAndIndex, feedId],
@@ -136,14 +119,14 @@ export class AggregatedDataFeedStore {
     const index = Number(res.slice(0, 66));
     const data = this.splitInto32bChunks(`0x${res.slice(66)}`);
 
-    return { index, data };
+    return { data, index };
   }
 
   async getLatestDataSliceAndIndex(
     feedId: bigint,
     startSlot: number,
     slots: number = 0,
-  ): Promise<IndexAndData> {
+  ): Promise<DataAndIndex> {
     const encoded = encodePacked(
       ['bytes1', 'uint128', 'uint32', 'uint32'],
       [this.selectors.getLatestDataAndIndex, feedId, startSlot, slots],
@@ -152,7 +135,7 @@ export class AggregatedDataFeedStore {
     const index = Number(res.slice(0, 66));
     const data = this.splitInto32bChunks(`0x${res.slice(66)}`);
 
-    return { index, data };
+    return { data, index };
   }
 
   private splitInto32bChunks(value: Hex): Hex[] {
@@ -165,4 +148,4 @@ export class AggregatedDataFeedStore {
   }
 }
 
-type IndexAndData = { index: number; data: Hex | Hex[] };
+type DataAndIndex = { data: Hex | Hex[]; index: number };
