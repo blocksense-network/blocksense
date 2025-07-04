@@ -7,15 +7,6 @@ import { Callout } from "@blocksense/docs-ui/Callout";
 
 The CL Feed Registry Adapter serves as a blockchain-based directory that links assets to their corresponding data feeds. This system allows for direct querying of Blocksense data feeds using asset addresses, eliminating the need-to-know specific feed contract addresses. As a result, smart contracts can efficiently retrieve up-to-date asset prices through a single function call to a unified contract interface.
 
-<Callout type="info" emoji="💡">
-  The CL Feed Registry Adapter exclusively includes feeds associated with canonical token
-  addresses on a given network. Feeds without a corresponding token address,
-  such as those for stock indices, are not included in the registry due to the
-  lack of a canonical token representation.
-</Callout>
-
-For a complete list of functions and parameters for the CLFeedRegistryAdapter contract, see the [CL Feed Registry Adapter Reference Documentation](../../reference-documentation/contract/CLFeedRegistryAdapter.mdx).
-
 ```mermaid
 ---
 config:
@@ -24,7 +15,7 @@ config:
 flowchart TD
   classDef clientNode display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace;
   classDef feedNode,dataNode display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace;
-  classDef feedNode:hover,dataNode:hover fill:#fafafa,color:#0000EE,stroke:#e4e4e7,stroke-width:1px,shadow:2px 2px 5px #888888, display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace, text-decoration: underline, text-underline-offset: 4px;
+  classDef feedNode:hover,dataNode:hover fill:#fafafa,color:#0000EE,stroke:#e4e4e7,stroke-width:1px,shadow #888888, display:block, padding:0rem 3rem, font-size: 0.875rem, font-family:'Fira Code', monospace, text-decoration: underline, text-underline-offset: 4px;
 
   linkStyle default fill:none,stroke-width:1px,stroke:#1c1917
 
@@ -46,7 +37,7 @@ flowchart TD
   lack of a canonical token representation.
 </Callout>
 
-For a complete list of functions and parameters for the CLFeedRegistryAdapter contract, see the [CL Feed Registry Adapter Reference Documentation](../../reference-documentation/CLFeedRegistryAdapter.mdx).
+For a complete list of functions and parameters for the CLFeedRegistryAdapter contract, see the [CL Feed Registry Adapter Reference Documentation](../../reference-documentation/contract/CLFeedRegistryAdapter.mdx).
 
 ## Base and Quote
 
@@ -69,16 +60,15 @@ latestRoundData(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2, 0xA0b86991c6218b36c1
 
 ### Solidity
 
-To consume price data from the CL Feed Registry Adapter, your smart contract should reference [`ICLFeedRegistryAdapter`](/coming-soon), which defines the external functions implemented by the CL Feed Registry Adapter.
+To consume price data from the CL Feed Registry Adapter, your smart contract should reference [`ICLFeedRegistryAdapter`](../../reference-documentation/contract/ICLFeedRegistryAdapter.mdx), which defines the external functions implemented by the CL Feed Registry Adapter.
 
 ```solidity showLineNumbers copy filename="CLFeedRegistryAdapterConsumer.sol"
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.28;
 
 import 'interfaces/ICLFeedRegistryAdapter.sol';
 
 /**
- * THIS IS AN EXAMPLE CONTRACT THAT USES HARDCODED VALUES FOR CLARITY.
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
  * DO NOT USE THIS CODE IN PRODUCTION.
  */
@@ -164,8 +154,7 @@ contract CLFeedRegistryAdapterConsumer {
 ### Solidity Hardhat Example
 
 <Callout type="info" emoji="💡">
-  You can find a working Hardhat project [here](/coming-soon). Clone the repo
-  and follow the setup instructions to run the example locally.
+  You can find a working Hardhat project in the Blocksense repository. Clone the repo and follow the setup instructions to run the example locally. The example contract for the CL Feed Registry Adapter can be found in [CLFeedRegistryAdapterConsumer.sol](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/test/examples/CLFeedRegistryAdapterConsumer.sol) and a file with ethers utils can be found in [clFeedRegistryAdapterConsumer.ts](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/test/examples/utils/clFeedRegistryAdapterConsumer.ts).
 </Callout>
 
 ### Ethers.js v6.x
@@ -189,5 +178,5 @@ To get the CLAggregatorAdapter address responsible for a given feed:
 
 ```js copy filename="javascript"
 const registry = new ethers.Contract(contractAddress, abiJson, provider);
-const chainlinkProxyAddress = await registry.getFeed(base, quote);
+const clAggregatorAdapterAddress = await registry.getFeed(base, quote);
 ```

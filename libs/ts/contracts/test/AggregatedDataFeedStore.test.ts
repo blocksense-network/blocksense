@@ -86,7 +86,7 @@ describe('AggregatedDataFeedStore', () => {
     const stride0Feeds = feeds.filter(feed => feed.stride === 0n);
     await contract.setFeeds(sequencer, stride0Feeds);
     const res = await contract.getValues(sequencer, stride0Feeds, {
-      operations: stride0Feeds.map(() => ReadOp.GetLatestSingleFeed),
+      operations: stride0Feeds.map(() => ReadOp.GetLatestSingleData),
     });
 
     for (const [i, feed] of stride0Feeds.entries()) {
