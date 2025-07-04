@@ -16,12 +16,6 @@ import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 
 import { deployedNetworks, startPrometheusServer } from '../types';
 
-const balanceGauge = new client.Gauge({
-  name: 'eth_account_balance',
-  help: 'Ethereum account balance in Ether',
-  labelNames: ['networkName', 'address', 'rpcUrl'],
-});
-
 function filterSmallBalance(balance: string, threshold = 1e-6): number {
   return Number(balance) < threshold ? 0 : Number(balance);
 }
@@ -72,8 +66,15 @@ const main = async (): Promise<void> => {
 
   const address = parseEthereumAddress(argv.address);
 
+  let balanceGauge: client.Gauge | null = null;
+
   if (argv.prometheus) {
     startPrometheusServer(argv.host, argv.port);
+    balanceGauge = new client.Gauge({
+      name: 'eth_account_balance',
+      help: 'Ethereum account balance in Ether',
+      labelNames: ['networkName', 'address', 'rpcUrl'],
+    });
   }
 
   console.log(
@@ -107,7 +108,7 @@ const main = async (): Promise<void> => {
           networkName === 'unknown' ? chalk.red(message) : chalk.green(message),
         );
 
-        if (argv.prometheus) {
+        if (argv.prometheus && balanceGauge) {
           balanceGauge.set(
             { networkName, address, rpcUrl },
             filterSmallBalance(balance),
@@ -139,7 +140,7 @@ const main = async (): Promise<void> => {
       const balance = web3.utils.fromWei(balanceWei, 'ether');
       const { currency } = networkMetadata[networkName];
       console.log(chalk.green(`${networkName}: ${balance} ${currency}`));
-      if (argv.prometheus) {
+      if (argv.prometheus && balanceGauge) {
         balanceGauge.set(
           { networkName, address, rpcUrl },
           filterSmallBalance(balance),
