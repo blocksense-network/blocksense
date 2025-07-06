@@ -60,7 +60,7 @@ export default async function DataFeed({ params }: DataFeedProps) {
         <ConsensusConfigCard feed={feed} />
         <NetworkAccessCard feedsDeploymentInfo={feedDeploymentInfo} />
       </div>
-      <div className="flex justify-start 2xl:justify-center">
+      <div className="grid grid-cols-1 2xl:grid-cols-1 gap-4">
         <OracleConfigCard feed={feed} />
       </div>
     </div>
