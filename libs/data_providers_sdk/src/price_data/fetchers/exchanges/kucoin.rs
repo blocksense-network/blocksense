@@ -1,5 +1,7 @@
 use std::str::FromStr;
 
+use std::collections::HashMap;
+
 use anyhow::Result;
 use futures::{future::LocalBoxFuture, FutureExt};
 
@@ -47,7 +49,7 @@ pub struct KuCoinPriceFetcher;
 impl PricesFetcher<'_> for KuCoinPriceFetcher {
     const NAME: &'static str = "KuCoin";
 
-    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
+    fn new(_symbols: &[String], _api_keys: Option<HashMap<String, String>>) -> Self {
         Self
     }
 

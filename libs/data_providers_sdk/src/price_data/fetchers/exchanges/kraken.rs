@@ -40,7 +40,7 @@ pub struct KrakenPriceFetcher;
 impl PricesFetcher<'_> for KrakenPriceFetcher {
     const NAME: &'static str = "Kraken";
 
-    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
+    fn new(_symbols: &[String], _api_keys: Option<HashMap<String, String>>) -> Self {
         Self
     }
 

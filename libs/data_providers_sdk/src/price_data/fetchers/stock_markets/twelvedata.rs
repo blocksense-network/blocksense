@@ -22,24 +22,23 @@ type TwelveDataResponse = HashMap<String, PriceData>;
 
 pub struct TwelveDataPriceFetcher<'a> {
     pub symbols: &'a [String],
-    api_key: Option<&'a str>,
+    api_keys: Option<HashMap<String, String>>,
 }
 
 impl<'a> PricesFetcher<'a> for TwelveDataPriceFetcher<'a> {
     const NAME: &'static str = "twelvedata";
 
-    fn new(symbols: &'a [String], api_key: Option<&'a str>) -> Self {
-        Self { symbols, api_key }
+    fn new(symbols: &'a [String], api_keys: Option<HashMap<String, String>>) -> Self {
+        Self { symbols, api_keys }
     }
 
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
-            let api_key = match self.api_key {
-                Some(key) => key,
-                None => {
-                    return Err(Error::msg("API key is required for TwelveData"));
-                }
-            };
+            let api_key = self
+                .api_keys
+                .as_ref()
+                .and_then(|map| map.get("TWELVEDATA_API_KEY"))
+                .ok_or_else(|| Error::msg("Missing TWELVEDATA_API_KEY"))?;
 
             let all_symbols = self.symbols.join(",");
 

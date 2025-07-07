@@ -1,10 +1,11 @@
+use std::{collections::HashMap, ops::Deref};
+
 use anyhow::Result;
 use futures::{
     future::LocalBoxFuture,
     stream::{FuturesUnordered, StreamExt},
     FutureExt,
 };
-use std::{collections::HashMap, ops::Deref};
 
 use serde::Deserialize;
 use serde_json::Value;
@@ -28,7 +29,7 @@ pub struct GeminiPriceFetcher<'a> {
 impl<'a> PricesFetcher<'a> for GeminiPriceFetcher<'a> {
     const NAME: &'static str = "Gemini";
 
-    fn new(symbols: &'a [String], _api_key: Option<&'a str>) -> Self {
+    fn new(symbols: &'a [String], _api_keys: Option<HashMap<String, String>>) -> Self {
         Self { symbols }
     }
 

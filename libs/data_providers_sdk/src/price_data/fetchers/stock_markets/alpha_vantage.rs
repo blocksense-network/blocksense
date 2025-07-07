@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use anyhow::{Error, Result};
 use futures::{future::LocalBoxFuture, FutureExt};
 
@@ -24,24 +26,26 @@ pub struct AlphaVantageResponse {
 
 pub struct AlphaVantagePriceFetcher<'a> {
     pub symbols: &'a [String],
-    api_key: Option<&'a str>,
+    api_keys: Option<HashMap<String, String>>,
 }
 
 impl<'a> PricesFetcher<'a> for AlphaVantagePriceFetcher<'a> {
     const NAME: &'static str = "AlphaVantage";
 
-    fn new(symbols: &'a [String], api_key: Option<&'a str>) -> Self {
-        Self { symbols, api_key }
+    fn new(symbols: &'a [String], api_key: Option<HashMap<String, String>>) -> Self {
+        Self {
+            symbols,
+            api_keys: api_key,
+        }
     }
 
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
-            let api_key = match self.api_key {
-                Some(key) => key,
-                None => {
-                    return Err(Error::msg("API key is required for AlphaVantage"));
-                }
-            };
+            let api_key = self
+                .api_keys
+                .as_ref()
+                .and_then(|map| map.get("ALPHAVANTAGE_API_KEY"))
+                .ok_or_else(|| Error::msg("Missing ALPHAVANTAGE_API_KEY"))?;
 
             let all_symbols = self.symbols.join(",");
 
