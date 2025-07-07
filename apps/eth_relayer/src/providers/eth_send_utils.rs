@@ -1200,7 +1200,6 @@ mod tests {
     use super::*;
 
     use crate::providers::provider::{init_shared_rpc_providers, MULTICALL_CONTRACT_NAME};
-    use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
     use alloy::rpc::types::eth::TransactionInput;
     use alloy::{
         hex::FromHex,
@@ -1482,7 +1481,10 @@ mod tests {
         let collected_futures: FuturesUnordered<JoinHandle<Result<(), Error>>> =
             FuturesUnordered::new();
 
-        let feeds_metrics = sequencer_state.feeds_metrics.clone();
+        let feeds_metrics = Arc::new(RwLock::new(
+            FeedsMetrics::new(metrics_prefix.unwrap_or(""))
+                .expect("Failed to allocate feed_metrics"),
+        ));
         let provider_status = sequencer_state.provider_status.clone();
 
         create_and_collect_relayers_futures(

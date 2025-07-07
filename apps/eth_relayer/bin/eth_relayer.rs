@@ -1,8 +1,11 @@
 use anyhow::Result;
+use blocksense_config::{get_eth_relayer_config, get_feeds_config};
 use blocksense_utils::logging::{
     get_log_level, init_shared_logging_handle, tokio_console_active, SharedLoggingHandle,
 };
-use eth_relayer::updates_reader::updates_reader_loop;
+use eth_relayer::{
+    providers::provider::init_shared_rpc_providers, updates_reader::updates_reader_loop,
+};
 use futures::stream::FuturesUnordered;
 use std::io::Error;
 use tokio::task::JoinHandle;
@@ -13,6 +16,12 @@ async fn main() -> Result<()> {
         get_log_level("ETH_RELAYER").as_str(),
         tokio_console_active("ETH_RELAYER", false),
     );
+
+    let eth_relayer_config = get_eth_relayer_config();
+
+    let feeds_config = get_feeds_config();
+
+    let providers = init_shared_rpc_providers(&eth_relayer_config, None, &feeds_config).await;
 
     let collected_futures: FuturesUnordered<JoinHandle<Result<(), Error>>> =
         FuturesUnordered::new();

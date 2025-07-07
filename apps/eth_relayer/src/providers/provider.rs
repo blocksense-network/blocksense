@@ -21,7 +21,7 @@ use futures::future::join_all;
 use reqwest::Url;
 
 use anyhow::{anyhow, Result};
-use blocksense_config::{AllFeedsConfig, PublishCriteria, SequencerConfig};
+use blocksense_config::{AllFeedsConfig, EthRelayerConfig, PublishCriteria};
 use blocksense_data_feeds::feeds_processing::{
     BatchedAggegratesToSend, PublishedFeedUpdate, PublishedFeedUpdateError, VotedFeedUpdate,
 };
@@ -104,7 +104,7 @@ pub enum ProviderStatus {
 pub type SharedRpcProviders = Arc<RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
 
 pub async fn init_shared_rpc_providers(
-    conf: &SequencerConfig,
+    conf: &EthRelayerConfig,
     prefix: Option<&str>,
     feeds_config: &AllFeedsConfig,
 ) -> SharedRpcProviders {
@@ -115,7 +115,7 @@ pub async fn init_shared_rpc_providers(
 }
 
 async fn get_rpc_providers(
-    conf: &SequencerConfig,
+    conf: &EthRelayerConfig,
     prefix: &str,
     feeds_config: &AllFeedsConfig,
 ) -> HashMap<String, Arc<Mutex<RpcProvider>>> {
