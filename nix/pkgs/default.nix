@@ -24,17 +24,20 @@
         inherit (self.lib) filesets;
       };
 
+      allOracleScripts = pkgs.callPackage ./oracle-script {
+        inherit craneLib version;
+        inherit (self.lib) filesets;
+      };
       mkOracleScript =
-        oracle-path: standalone:
-        pkgs.callPackage ./oracle-script {
-          inherit
-            craneLib
-            version
-            oracle-path
-            standalone
-            ;
-          inherit (self.lib) filesets;
-        };
+        name:
+        let
+          inherit (self.lib) dashToUnderscore;
+          oracleName = dashToUnderscore name;
+        in
+        pkgs.runCommandLocal "blocksense-oracle-${name}" { } ''
+          mkdir -p $out/lib
+          ln -s ${allOracleScripts}/lib/${oracleName}.wasm $out/lib/${oracleName}.wasm
+        '';
 
       mkApp = package: exeName: {
         type = "app";
@@ -63,15 +66,11 @@
       };
       legacyPackages = {
         oracle-scripts = {
-          cex-price-feeds = mkOracleScript /apps/oracles/cex-price-feeds false;
-          exsat-holdings = mkOracleScript /apps/oracles/exsat-holdings false;
-          gecko-terminal = mkOracleScript /apps/oracles/gecko-terminal false;
-          eth-rpc = mkOracleScript /apps/oracles/eth-rpc false;
-          stock-price-feeds = mkOracleScript /apps/oracles/stock-price-feeds false;
-
-          # Legacy oracle scripts
-          cmc = mkOracleScript /libs/sdk/examples/cmc true;
-          yahoo = mkOracleScript /libs/sdk/examples/yahoo true;
+          cex-price-feeds = mkOracleScript "cex-price-feeds";
+          exsat-holdings = mkOracleScript "exsat-holdings";
+          gecko-terminal = mkOracleScript "gecko-terminal";
+          eth-rpc = mkOracleScript "eth-rpc";
+          stock-price-feeds = mkOracleScript "stock-price-feeds";
         };
 
         spinPlugins = {

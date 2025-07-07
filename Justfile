@@ -81,7 +81,7 @@ build-oracle oracle-name:
   set -euo pipefail
 
   cd "{{root-dir}}/apps/oracles/{{oracle-name}}"
-  RUST_LOG=trigger=trace "${SPIN:-spin}" build
+  RUST_LOG=trigger=trace cargo build
 
 [group('Working with oracles')]
 [doc('Start a specific oracle')]

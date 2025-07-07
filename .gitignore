@@ -141,6 +141,7 @@ result
 
 # Rust cargo artifacts
 libs/*/target/
+apps/oracles/target/
 /target/
 
 # Solidity remappings
