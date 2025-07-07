@@ -31,13 +31,12 @@ build-environment environment="all":
   #!/usr/bin/env bash
   set -euo pipefail
   if [[ {{environment}} == "all" ]]; then
-    nix build --impure -L --json .#allProcessComposeFiles \
-      | jq -r '.[0].outputs.out' \
-      | xargs -I{} cp -rfs {}/. {{process-compose-artifacts-dir}}
+    srcDir=$(nix build --impure --json -L .#allProcessComposeFiles | jq -r '.[0].outputs.out')
+    cp -rf --no-preserve=mode,ownership "$srcDir"/. {{process-compose-artifacts-dir}}
   else
-    nix build --impure -L --json .#legacyPackages.{{system}}.process-compose-environments.{{environment}} \
-      | jq -r '.[0].outputs.out' \
-      | xargs -I{} cp -rfs {} {{process-compose-artifacts-dir}}/process-compose-{{environment}}.yaml
+    destDir="{{process-compose-artifacts-dir}}/{{environment}}"
+    srcDir=$(nix build --impure -L --json .#legacyPackages.{{system}}.process-compose-environments.{{environment}} | jq -r '.[0].outputs.out')
+    cp -rf --no-preserve=mode,ownership "$srcDir" "$destDir"
   fi
   echo "Process Compose artifacts copied to {{process-compose-artifacts-dir}}"
 
