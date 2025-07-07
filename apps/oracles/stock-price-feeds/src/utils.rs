@@ -1,11 +1,19 @@
 #![allow(unused_imports)]
+use std::collections::HashMap;
+
 use chrono::{Datelike, NaiveTime, TimeZone};
 use chrono_tz::US::Eastern;
 
 use crate::types::Capabilities;
 
-pub fn get_api_key<'a>(capabilities: &'a Capabilities, key: &str) -> Option<&'a str> {
-    capabilities.get(key).map(|s| s.as_str())
+pub fn get_api_keys(capabilities: &Capabilities, keys: &[&str]) -> Option<HashMap<String, String>> {
+    keys.iter()
+        .map(|&key| {
+            capabilities
+                .get(key)
+                .map(|value| (key.to_string(), value.clone()))
+        })
+        .collect()
 }
 
 pub fn markets_are_closed(now_et: chrono::DateTime<chrono_tz::Tz>) -> bool {
@@ -22,18 +30,24 @@ pub fn markets_are_closed(now_et: chrono::DateTime<chrono_tz::Tz>) -> bool {
 }
 
 #[test]
-fn test_get_api_key() {
+fn test_get_api_keys() {
     let mut capabilities = Capabilities::new();
     capabilities.insert("API_KEY".to_string(), "test_key".to_string());
 
-    let result = get_api_key(&capabilities, "API_KEY");
-    assert_eq!(result, Some("test_key"));
+    let result = get_api_keys(&capabilities, &["API_KEY"]);
+    assert_eq!(
+        result,
+        Some(HashMap::from([(
+            "API_KEY".to_string(),
+            "test_key".to_string()
+        )]))
+    );
 
-    let result = get_api_key(&capabilities, "NON_EXISTENT_KEY");
+    let result = get_api_keys(&capabilities, &["NON_EXISTENT_KEY"]);
     assert_eq!(result, None);
 
     let empty_capabilities = Capabilities::new();
-    let result = get_api_key(&empty_capabilities, "API_KEY");
+    let result = get_api_keys(&empty_capabilities, &["API_KEY"]);
     assert_eq!(result, None);
 }
 

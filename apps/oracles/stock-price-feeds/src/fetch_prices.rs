@@ -16,7 +16,7 @@ use blocksense_data_providers_sdk::price_data::{
 
 use crate::{
     types::{Capabilities, ResourceData, ResourcePairData},
-    utils::get_api_key,
+    utils::get_api_keys,
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -57,17 +57,17 @@ pub async fn get_prices(
     let futures_set = FuturesUnordered::from_iter([
         fetch::<AlphaVantagePriceFetcher>(
             &symbols.alpha_vantage,
-            get_api_key(capabilities, "ALPHAVANTAGE_API_KEY"),
+            get_api_keys(capabilities, &["ALPHAVANTAGE_API_KEY"]),
         ),
         fetch::<YFPriceFetcher>(
             &symbols.yahoo_finance,
-            get_api_key(capabilities, "YAHOO_FINANCE_API_KEY"),
+            get_api_keys(capabilities, &["YAHOO_FINANCE_API_KEY"]),
         ),
         fetch::<TwelveDataPriceFetcher>(
             &symbols.twelvedata,
-            get_api_key(capabilities, "TWELVEDATA_API_KEY"),
+            get_api_keys(capabilities, &["TWELVEDATA_API_KEY"]),
         ),
-        fetch::<FMPPriceFetcher>(&symbols.fmp, get_api_key(capabilities, "FMP_API_KEY")),
+        fetch::<FMPPriceFetcher>(&symbols.fmp, get_api_keys(capabilities, &["FMP_API_KEY"])),
     ]);
 
     let fetched_provider_prices = fetch_all_prices(futures_set).await;

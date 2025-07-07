@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use anyhow::{Error, Result};
 use futures::{future::LocalBoxFuture, FutureExt};
 
@@ -32,24 +34,23 @@ pub struct YFResponse {
 
 pub struct YFPriceFetcher<'a> {
     pub symbols: &'a [String],
-    api_key: Option<&'a str>,
+    api_keys: Option<HashMap<String, String>>,
 }
 
 impl<'a> PricesFetcher<'a> for YFPriceFetcher<'a> {
     const NAME: &'static str = "YahooFinance";
 
-    fn new(symbols: &'a [String], api_key: Option<&'a str>) -> Self {
-        Self { symbols, api_key }
+    fn new(symbols: &'a [String], api_keys: Option<HashMap<String, String>>) -> Self {
+        Self { symbols, api_keys }
     }
 
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
-            let api_key = match self.api_key {
-                Some(key) => key,
-                None => {
-                    return Err(Error::msg("API key is required for YahooFinance"));
-                }
-            };
+            let api_key = self
+                .api_keys
+                .as_ref()
+                .and_then(|map| map.get("YAHOO_FINANCE_API_KEY"))
+                .ok_or_else(|| Error::msg("Missing YAHOO_FINANCE_API_KEY"))?;
 
             let all_symbols = self.symbols.join(",");
 
