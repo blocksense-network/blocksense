@@ -14,7 +14,7 @@ use blocksense_utils::{to_hex_string, FeedId};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
 use tokio::{
     sync::{
-        mpsc::{UnboundedReceiver, UnboundedSender},
+        mpsc::{self, UnboundedReceiver, UnboundedSender},
         Mutex, RwLock,
     },
     task::JoinHandle,
@@ -222,6 +222,25 @@ pub struct BatchOfUpdatesToProcess {
     pub transaction_retry_timeout_secs: u64,
     pub transaction_retries_count_limit: u64,
     pub retry_fee_increment_fraction: f64,
+}
+
+pub async fn create_relayers_channels(
+    providers: &SharedRpcProviders,
+) -> (
+    HashMap<String, UnboundedSender<BatchOfUpdatesToProcess>>,
+    HashMap<String, UnboundedReceiver<BatchOfUpdatesToProcess>>,
+) {
+    let mut relayers_send_channels = HashMap::new();
+    let mut relayers_recv_channels = HashMap::new();
+    {
+        let providers = providers.read().await;
+        for (net_name, _provider) in providers.iter() {
+            let (s, r) = mpsc::unbounded_channel();
+            relayers_send_channels.insert(net_name.clone(), s);
+            relayers_recv_channels.insert(net_name.clone(), r);
+        }
+    }
+    (relayers_send_channels, relayers_recv_channels)
 }
 
 pub async fn create_and_collect_relayers_futures(
