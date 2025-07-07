@@ -19,17 +19,24 @@
       allEnvironments = lib.pipe allEnvironmentNames [
         (builtins.map (name: {
           inherit name;
-          value = config.devenv.shells.${name}.process.managers.process-compose.configFile;
+          value = pkgs.runCommand "process-compose-${name}" { } ''
+            mkdir -p "$out"
+            ln -s ${
+              config.devenv.shells.${name}.process.managers.process-compose.configFile
+            } "$out/process-compose.yaml"
+
+            for file in ${config.devenv.shells.${name}.services.blocksense.config-dir}/*; do
+              ln -s "$file" "$out/$(basename $file)"
+            done
+          '';
         }))
       ];
 
       allProcessComposeFiles = pkgs.runCommand "allProcessComposeFiles" { } ''
-        mkdir $out
+        mkdir "$out"
         (
           set -x
-          ${lib.concatMapStringsSep "\n" (
-            x: "cp ${x.value} $out/process-compose-${x.name}.yaml"
-          ) allEnvironments}
+          ${lib.concatMapStringsSep "\n" (x: "cp -r ${x.value} \"$out/${x.name}\"") allEnvironments}
         )
       '';
     in
