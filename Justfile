@@ -41,14 +41,10 @@ build-environment environment="all":
   echo "Process Compose artifacts copied to {{process-compose-artifacts-dir}}"
 
 [group('Working with process-compose environments')]
-[doc('Start a process-compose environment')]
-start-environment environment:
+[doc('Start a process-compose environment. This command depends on building blocksense and the environment first')]
+start-environment environment="example-setup-01": build-blocksense (build-environment environment)
   #!/usr/bin/env bash
-  PC_FILE="{{process-compose-artifacts-dir}}/process-compose-{{environment}}.yaml"
-  if ! test -f "$PC_FILE"; then
-    just build-environment {{environment}}
-  fi
-
+  PC_FILE="{{process-compose-artifacts-dir}}/{{environment}}/process-compose.yaml"
   process-compose -f "$PC_FILE"
 
 [group('Working with typescript')]
@@ -98,15 +94,6 @@ start-oracle oracle-name:
 [doc('Build Blocksense')]
 build-blocksense:
   @{{root-dir}}/scripts/build-blocksense.sh
-
-[group('blocksense')]
-[doc('Build Blocksense and start the default process-compose environment')]
-start-blocksense:
-  #!/usr/bin/env bash
-  set -euo pipefail
-
-  just build-blocksense
-  process-compose up
 
 [group('General')]
 [doc('Run a command to clean the repository of untracked files')]
