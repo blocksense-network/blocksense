@@ -2,7 +2,8 @@ use blocksense_registry::config::{
     CompatibilityInfo, FeedConfig, FeedQuorum, FeedSchedule, PriceFeedInfo,
 };
 use blocksense_utils::constants::{
-    FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE, SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE,
+    ETH_RELAYER_CONFIG_DIR, ETH_RELAYER_CONFIG_FILE, FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE,
+    SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE,
 };
 use blocksense_utils::{get_config_file_path, read_file, FeedId};
 use hex::decode;
@@ -304,6 +305,24 @@ impl Validated for SequencerConfig {
     }
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct EthRelayerConfig {
+    pub prometheus_port: u16,
+    pub providers: HashMap<String, Provider>,
+    pub kafka_input_stream_endpoint: String,
+    pub pyroscope_config: Option<PyroscopeConfig>,
+}
+
+impl Validated for EthRelayerConfig {
+    fn validate(&self, context: &str) -> anyhow::Result<()> {
+        for (key, provider) in &self.providers {
+            provider.validate(&[context, " ", key.as_str()].concat())?
+        }
+
+        Ok(())
+    }
+}
+
 pub fn init_config<T: for<'a> Deserialize<'a>>(config_file: &Path) -> anyhow::Result<T> {
     let config_file = match config_file.to_str() {
         Some(v) => v,
@@ -337,6 +356,13 @@ pub fn get_sequencer_config() -> SequencerConfig {
     let sequencer_config_file = get_config_file_path(SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE);
     get_validated_config::<SequencerConfig>(&sequencer_config_file, "SequencerConfig")
         .expect("Could not get validated sequencer config")
+}
+
+pub fn get_eth_relayer_config() -> EthRelayerConfig {
+    let eth_relayer_config_file =
+        get_config_file_path(ETH_RELAYER_CONFIG_DIR, ETH_RELAYER_CONFIG_FILE);
+    get_validated_config::<EthRelayerConfig>(&eth_relayer_config_file, "EthRelayer")
+        .expect("Could not get validated eth_relayer config")
 }
 
 pub fn get_feeds_config() -> AllFeedsConfig {
