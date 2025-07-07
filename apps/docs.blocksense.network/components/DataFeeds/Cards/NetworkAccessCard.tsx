@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { DeploymentConfigV2, NewFeed } from '@blocksense/config-types';
+import { DeploymentConfigV2 } from '@blocksense/config-types';
 import { NetworkName } from '@blocksense/base-utils/evm';
 
 import { useHash } from '@/hooks/useHash';
@@ -11,15 +11,15 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from '@blocksense/ui/DropdownMenu';
-import { Button } from '@blocksense/ui/Button';
-import { Card, CardHeader, CardTitle } from '@blocksense/ui/Card';
+} from '@blocksense/docs-ui/DropdownMenu';
+import { Button } from '@blocksense/docs-ui/Button';
+import { Card, CardHeader, CardTitle } from '@blocksense/docs-ui/Card';
 import { DataFeedCardContentItem } from '../DataFeedCardContentItem';
 import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
 import { capitalizeWords } from '@/src/utils';
 import { DataFeedCardContent } from '../DataFeedCardContent';
-import { Icon } from '@blocksense/ui/Icon';
-import { Separator } from '@blocksense/ui/Separator';
+import { Icon } from '@blocksense/docs-ui/Icon';
+import { Separator } from '@blocksense/docs-ui/Separator';
 
 type NetworkDropdownProps = {
   networks: NetworkName[];

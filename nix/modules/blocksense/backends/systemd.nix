@@ -54,10 +54,26 @@ let
       };
     }
   ) cfg.reporters;
+
+  blamaInstance = {
+    name = "blocksense-blama";
+    value = {
+      description = "Blocksense Blama";
+      # TODO: who needs this to be started?
+      wantedBy = [ "multi-user.target" ];
+      # TODO: what do we need to be started?
+      # requires = [ "blocksense-sequencer.service" ];
+      inherit (cfg.blama) environment;
+      serviceConfig = {
+        ExecStart = cfg.blama.command;
+        Restart = "always";
+      };
+    };
+  };
 in
 {
   config = lib.mkIf cfg.enable {
-    systemd.services =
+    systemd.services = lib.mkMerge [
       {
         blocksense-sequencer = {
           description = "Blocksense Sequencer";
@@ -78,7 +94,9 @@ in
           };
         };
       }
-      // anvilInstances
-      // reporterInstances;
+      anvilInstances
+      reporterInstances
+      (lib.mkIf cfg.blama.enable blamaInstance)
+    ];
   };
 }

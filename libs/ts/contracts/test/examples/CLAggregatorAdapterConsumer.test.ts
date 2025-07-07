@@ -1,9 +1,11 @@
 import { artifacts, ethers } from 'hardhat';
+import { Contract } from 'ethers';
+type EthersContractParams = ConstructorParameters<typeof Contract>;
 
 import * as utils from './utils/clAggregatorAdapterConsumer';
 import { expect } from 'chai';
 import { deployContract } from '../experiments/utils/helpers/common';
-import { CLAggregatorAdapterConsumer } from '../../typechain';
+import { CLAggregatorAdapterConsumer } from '@blocksense/contracts/typechain';
 import {
   CLAdapterWrapper,
   UpgradeableProxyADFSWrapper,
@@ -41,36 +43,55 @@ describe('Example: CLAggregatorAdapterConsumer', function () {
       );
   });
 
-  [
-    { title: 'get decimals', fnName: 'getDecimals' },
-    { title: 'get description', fnName: 'getDescription' },
-    { title: 'get latest answer', fnName: 'getLatestAnswer' },
-    { title: 'get latest round', fnName: 'getLatestRound' },
-    { title: 'get latest round data', fnName: 'getLatestRoundData' },
-  ].forEach(data => {
-    it('Should ' + data.title, async function () {
-      await getAndCompareData([], data.fnName as keyof typeof utils);
+  type Functions = typeof utils;
+  type FunctionName = keyof Functions;
+  type FunctionParameters<F extends FunctionName> =
+    Parameters<Functions[F]> extends [EthersContractParams, ...infer Rest]
+      ? Rest
+      : never;
+
+  (
+    [
+      { title: 'get decimals', fnName: 'getDecimals' },
+      { title: 'get description', fnName: 'getDescription' },
+      { title: 'get latest answer', fnName: 'getLatestAnswer' },
+      { title: 'get latest round', fnName: 'getLatestRound' },
+      { title: 'get latest round data', fnName: 'getLatestRoundData' },
+    ] satisfies { title: string; fnName: FunctionName }[]
+  ).forEach(({ title, fnName }) => {
+    it('Should ' + title, async function () {
+      await getAndCompareData(fnName, []);
     });
   });
 
   it('Should get round data', async function () {
-    await getAndCompareData([1], 'getRoundData');
+    await getAndCompareData('getRoundData', [1]);
   });
 
-  const getAndCompareData = async (
-    data: any[],
-    functionName: keyof typeof utils,
+  const getAndCompareData = async <F extends FunctionName>(
+    functionName: F,
+    data: FunctionParameters<F>,
   ) => {
     const contractData = await clAggregatorAdapterConsumer.getFunction(
       functionName,
     )(...data);
 
-    const config = {
-      address: clAggregatorAdapter.contract.target,
-      abiJson: (await artifacts.readArtifact('CLAggregatorAdapter')).abi,
-      provider: clAggregatorAdapter.contract.runner!,
-    };
-    const utilData = await utils[functionName](config, ...data);
+    const config: EthersContractParams = [
+      clAggregatorAdapter.contract.target,
+      (await artifacts.readArtifact('CLAggregatorAdapter')).abi,
+      clAggregatorAdapter.contract.runner!,
+    ];
+
+    const func = utils[functionName] as FunctionParameters<F> extends []
+      ? (config: EthersContractParams) => Promise<any>
+      : FunctionParameters<F> extends [unknown, ...unknown[]]
+        ? (
+            config: EthersContractParams,
+            ...args: FunctionParameters<F>
+          ) => Promise<any>
+        : never;
+
+    const utilData = await func(config, ...data);
 
     expect(contractData).to.deep.equal(utilData);
   };

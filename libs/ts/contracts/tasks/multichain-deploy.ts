@@ -18,6 +18,12 @@ import { readConfig, writeEvmDeployment } from '@blocksense/config-types';
 
 import { NetworkConfig, ContractNames, DeployContract } from './types';
 import { predictAddress } from './utils';
+import { initChain } from './deployment-utils/init-chain';
+import { setUpAccessControl } from './deployment-utils/access-control';
+import { deployContracts } from './deployment-utils/deploy-contracts';
+import { deployMultisig } from './deployment-utils/deploy-multisig';
+import { registerCLAdapters } from './deployment-utils/register-cl-adapters';
+import { upgradeProxyImplementation } from './deployment-utils/upgrade-proxy-implementation';
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
@@ -28,7 +34,7 @@ task('deploy', 'Deploy contracts')
       if (!isNetworkName(network)) {
         throw new Error(`Invalid network: ${network}`);
       }
-      configs.push(await run('init-chain', { networkName: network }));
+      configs.push(await initChain(ethers, network));
     }
 
     const { feeds } = await readConfig('feeds_config_v2');
@@ -83,7 +89,9 @@ task('deploy', 'Deploy contracts')
       console.log(`// Signer: ${await signer.getAddress()}`);
       console.log(`// Balance: ${fmtEth(signerBalance)}`);
       console.log(`// `);
-      console.log(`// Admin MultiSig:`);
+      console.log(
+        `// Admin MultiSig: ${config.adminMultisig.threshold > 0 ? '✅' : '❌'}`,
+      );
       console.log(`//   threshold: ${config.adminMultisig.threshold}`);
       console.log(`//      owners: ${config.adminMultisig.owners}`);
       console.log(`// `);
@@ -128,7 +136,7 @@ task('deploy', 'Deploy contracts')
 
       console.log('---------------------------\n');
 
-      const adminMultisig = await run('deploy-multisig', {
+      const adminMultisig = await deployMultisig({
         config,
         type: 'adminMultisig',
       });
@@ -205,7 +213,7 @@ task('deploy', 'Deploy contracts')
       let sequencerMultisigAddress = parseEthereumAddress(ethers.ZeroAddress);
 
       if (config.deployWithSequencerMultisig) {
-        sequencerMultisig = await run('deploy-multisig', {
+        sequencerMultisig = await deployMultisig({
           config,
           type: 'sequencerMultisig',
         });
@@ -233,10 +241,12 @@ task('deploy', 'Deploy contracts')
         });
       }
 
-      const deployData = await run('deploy-contracts', {
+      const deployData = await deployContracts({
         config,
         adminMultisig,
         contracts,
+        run,
+        artifacts,
       });
 
       deployData.coreContracts.OnlySequencerGuard ??= {
@@ -263,19 +273,25 @@ task('deploy', 'Deploy contracts')
       console.log(`// balance: ${fmtEth(signerBalancePost)}`);
       console.log(`//    diff: ${fmtEth(signerBalance - signerBalancePost)}`);
 
-      await run('upgrade-proxy-implementation', {
+      await upgradeProxyImplementation({
         config,
         safe: adminMultisig,
         deployData,
+        run,
+        artifacts,
       });
 
-      await run('register-cl-adapters', {
+      await registerCLAdapters({
         config,
         safe: adminMultisig,
         deployData,
+        run,
+        artifacts,
       });
 
-      await run('access-control', {
+      await setUpAccessControl({
+        run,
+        artifacts,
         config,
         deployData,
         adminMultisig,

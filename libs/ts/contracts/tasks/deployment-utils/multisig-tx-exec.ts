@@ -1,5 +1,5 @@
-import { task } from 'hardhat/config';
-import { parseTxHash } from '@blocksense/base-utils';
+import { toBeArray, TransactionResponse } from 'ethers';
+
 import Safe, {
   SigningMethod,
   EthSafeSignature,
@@ -13,78 +13,78 @@ import {
   SafeTransactionDataPartial,
   TransactionOptions,
 } from '@safe-global/safe-core-sdk-types';
+
+import { parseTxHash } from '@blocksense/base-utils';
+
 import { NetworkConfig } from '../types';
-import { TransactionResponse } from 'ethers';
 
-task('multisig-tx-exec', '[UTILS] Execute multisig transactions').setAction(
-  async (args, { ethers }) => {
-    const {
+type Params = {
+  transactions: SafeTransactionDataPartial[] | SafeTransaction;
+  safe: Safe;
+  config: NetworkConfig;
+};
+
+export async function executeMultisigTransaction({
+  transactions,
+  safe,
+  config,
+}: Params): Promise<string | undefined> {
+  let tx: SafeTransaction;
+
+  if (Array.isArray(transactions)) {
+    if (transactions.length === 0) {
+      console.log('No transactions to execute');
+      return;
+    }
+    tx = await safe.createTransaction({
       transactions,
-      safe,
-      config,
-    }: {
-      transactions: SafeTransactionDataPartial[] | SafeTransaction;
-      safe: Safe;
-      config: NetworkConfig;
-    } = args;
+    });
+  } else {
+    tx = transactions;
+  }
 
-    let tx: SafeTransaction;
-
-    if (Array.isArray(transactions)) {
-      if (transactions.length === 0) {
-        console.log('No transactions to execute');
-        return;
-      }
-      tx = await safe.createTransaction({
-        transactions,
-      });
-    } else {
-      tx = transactions;
-    }
-
-    if (config.adminMultisig.signer) {
-      console.log('\nProposing transaction...');
-
-      const txResponse = await safe.executeTransaction(tx);
-      const transaction = await config.provider.getTransaction(txResponse.hash);
-      await transaction?.wait();
-
-      console.log('-> tx hash', txResponse.hash);
-      return parseTxHash(txResponse.hash);
-    }
-
-    const message = calculateSafeTransactionHash(
-      await safe.getAddress(),
-      tx.data,
-      safe.getContractVersion(),
-      await safe.getChainId(),
-    );
-    const ledgerAddress = await config.ledgerAccount!.getAddress();
-    const signedMessage = await config.ledgerAccount!.signMessage!(
-      ethers.toBeArray(message),
-    );
-    const signature = await adjustVInSignature(
-      SigningMethod.ETH_SIGN,
-      signedMessage,
-      message,
-      ledgerAddress,
-    );
-    tx.addSignature(new EthSafeSignature(ledgerAddress, signature));
-
+  if (config.adminMultisig.signer) {
     console.log('\nProposing transaction...');
 
-    const txResponse = await executeTransaction(tx, safe, config, {
-      nonce: await config.provider.getTransactionCount(
-        await config.ledgerAccount!.getAddress(),
-      ),
-    });
-
+    const txResponse = await safe.executeTransaction(tx);
     const transaction = await config.provider.getTransaction(txResponse.hash);
     await transaction?.wait();
+
     console.log('-> tx hash', txResponse.hash);
     return parseTxHash(txResponse.hash);
-  },
-);
+  }
+
+  const message = calculateSafeTransactionHash(
+    await safe.getAddress(),
+    tx.data,
+    safe.getContractVersion(),
+    await safe.getChainId(),
+  );
+  const ledgerAddress = await config.ledgerAccount!.getAddress();
+  const signedMessage = await config.ledgerAccount!.signMessage!(
+    toBeArray(message),
+  );
+  const signature = await adjustVInSignature(
+    SigningMethod.ETH_SIGN,
+    signedMessage,
+    message,
+    ledgerAddress,
+  );
+  tx.addSignature(new EthSafeSignature(ledgerAddress, signature));
+
+  console.log('\nProposing transaction...');
+
+  const txResponse = await executeTransaction(tx, safe, config, {
+    nonce: await config.provider.getTransactionCount(
+      await config.ledgerAccount!.getAddress(),
+    ),
+  });
+
+  const transaction = await config.provider.getTransaction(txResponse.hash);
+  await transaction?.wait();
+  console.log('-> tx hash', txResponse.hash);
+  return parseTxHash(txResponse.hash);
+}
 
 const executeTransaction = async (
   safeTransaction: SafeTransaction,

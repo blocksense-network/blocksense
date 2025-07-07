@@ -40,6 +40,11 @@ in
       };
     };
 
+    blama = {
+      enable = true;
+      port = 4312;
+    };
+
     sequencer = {
       id = 1;
 
@@ -127,6 +132,10 @@ in
           address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
         }
       ];
+
+      pyroscope-config = {
+        url = "http://localhost:4040";
+      };
 
       log-level = "info";
     };

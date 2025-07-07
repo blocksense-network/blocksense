@@ -46,6 +46,7 @@ jspm_packages/
 web_modules/
 
 # TypeScript cache
+.tsbuildinfo/
 *.tsbuildinfo
 
 # Optional npm cache directory
@@ -166,8 +167,11 @@ apps/docs.blocksense.network/artifacts
 
 # Storybook
 *storybook.log
-libs/ts/ui/storybook-static
+libs/ts/docs-ui/storybook-static
 
 # wasm artifacts
 .spin/
 *.wasm
+
+# Local EVM contracts deployment artifacts
+config/evm_contracts_deployment_v2/local.json

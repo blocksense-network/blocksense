@@ -17,9 +17,6 @@ pub mod wit {
 pub mod http;
 pub mod oracle;
 
-/// Export the traits for the Spin SDK.
-pub mod traits;
-
 pub use spin_sdk as spin;
 
 #[doc(hidden)]

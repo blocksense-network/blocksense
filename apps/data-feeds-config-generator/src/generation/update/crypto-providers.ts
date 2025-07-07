@@ -13,7 +13,6 @@ import {
 } from '../../data-services/processors/crypto-providers/data-transformers';
 import { detectPriceOutliers } from '../../data-services/processors/crypto-providers/outliers-detector';
 import { CryptoProviderData } from '../../data-services/processors/crypto-providers/types';
-import { SimplifiedFeed } from '../initial/types';
 import { getCryptoProvidersData } from '../../data-services/processors/crypto-providers/data-collection';
 
 /**

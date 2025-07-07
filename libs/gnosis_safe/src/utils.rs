@@ -14,7 +14,7 @@ use alloy::{
 };
 
 use alloy_primitives::{
-    address, keccak256, Address, Bytes, FixedBytes, PrimitiveSignature, Uint, B256, U256,
+    address, keccak256, Address, Bytes, FixedBytes, Signature, Uint, B256, U256,
 };
 
 pub type SafeMultisigInst = SafeMultisigInstance<
@@ -61,7 +61,7 @@ sol! {
 
 #[derive(Clone, Debug)]
 pub struct SignatureWithAddress {
-    pub signature: PrimitiveSignature,
+    pub signature: Signature,
     pub signer_address: Address,
 }
 
@@ -127,7 +127,7 @@ pub async fn sign_hash(
 
 // to be called by sequencer on receiving a signature from the reporter in order to verify it is valid
 pub fn verify_message_recovery(
-    signature: PrimitiveSignature,
+    signature: Signature,
     tx_hash: &FixedBytes<32>,
     signer_address: Address,
 ) {
@@ -150,7 +150,7 @@ pub fn create_safe_tx(contract_address: Address, calldata: Bytes, nonce: Uint<25
     }
 }
 
-pub fn signature_to_bytes(signature: PrimitiveSignature) -> Vec<u8> {
+pub fn signature_to_bytes(signature: Signature) -> Vec<u8> {
     let v = if signature.v() { 28 } else { 27 };
     let r_bytes: [u8; 32] = signature.r().to_be_bytes();
     let s_bytes: [u8; 32] = signature.s().to_be_bytes();
@@ -162,7 +162,7 @@ pub fn signature_to_bytes(signature: PrimitiveSignature) -> Vec<u8> {
     signature_bytes
 }
 
-pub fn bytes_to_hex_string(signature: PrimitiveSignature) -> String {
+pub fn bytes_to_hex_string(signature: Signature) -> String {
     hex::encode(signature.as_bytes())
 }
 

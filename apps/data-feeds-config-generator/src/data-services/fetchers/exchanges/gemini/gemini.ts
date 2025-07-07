@@ -6,7 +6,6 @@ import {
   GeminiSymbolDetailsInfoRespSchema,
   GeminiSymbolsInfoResp,
   GeminiSymbolsInfoRespSchema,
-  GeminiPrice,
   GeminiPriceSchema,
 } from './types';
 

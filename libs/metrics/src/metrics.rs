@@ -108,6 +108,18 @@ macro_rules! inc_metric (
 );
 
 #[macro_export]
+macro_rules! dec_metric (
+($_component: ident, $_comp_index: ident, $_metric: ident) => (
+    $_component
+    .read() // Holding a read lock here suffice, since the counters are atomic.
+    .await
+    .$_metric
+    .with_label_values(&[&$_comp_index.to_string()])
+    .dec();
+);
+);
+
+#[macro_export]
 macro_rules! set_metric (
 ($_component: ident, $_comp_index: ident, $_metric: ident, $_set_val: ident) => (
     debug!(
@@ -158,6 +170,7 @@ pub struct ProviderMetrics {
     pub total_timed_out_tx: IntCounterVec,
     pub total_transaction_retries: IntCounterVec,
     pub total_mismatched_gnosis_safe_nonce: IntCounterVec,
+    pub num_transactions_in_queue: IntGaugeVec,
     pub is_enabled: IntGaugeVec,
 }
 
@@ -255,6 +268,11 @@ impl ProviderMetrics {
                 "Total number of times we got a mismatching safe nonce prior to tx send for network",
                 &["Network"]
             )?,
+            num_transactions_in_queue: register_int_gauge_vec!(
+                format!("{}num_transactions_in_queue", prefix),
+                "Current number of transactions in queue for sending",
+                &["Network"]
+            )?,
             is_enabled: register_int_gauge_vec!(
                 format!("{}is_enabled", prefix),
                 "Whether the network is currently enabled or not",
@@ -302,22 +320,22 @@ impl ReporterMetrics {
             timely_reports_per_feed: register_int_counter_vec!(
                 format!("{}reporter_timely_reports_per_feed", prefix),
                 "Per feed accepted (valid) feed reports from reporter",
-                &["ReporterId", "FeedId", "HeartbeatMs"]
+                &["ReporterId", "FeedId", "FeedName", "HeartbeatMs"]
             )?,
             late_reports_per_feed: register_int_counter_vec!(
                 format!("{}reporter_late_reports_per_feed", prefix),
                 "Per feed recvd reports for a past slot from reporter",
-                &["ReporterId", "FeedId", "HeartbeatMs"]
+                &["ReporterId", "FeedId", "FeedName", "HeartbeatMs"]
             )?,
             in_future_reports_per_feed: register_int_counter_vec!(
                 format!("{}reporter_in_future_reports_per_feed", prefix),
                 "Per feed recvd reports for a future slot from reporter",
-                &["ReporterId", "FeedId", "HeartbeatMs"]
+                &["ReporterId", "FeedId", "FeedName", "HeartbeatMs"]
             )?,
             total_revotes_for_same_slot_per_feed: register_int_counter_vec!(
                 format!("{}reporter_total_revotes_for_same_slot_per_feed", prefix),
                 "Total recvd revotes for the same slot from reporter",
-                &["ReporterId", "FeedId", "HeartbeatMs"]
+                &["ReporterId", "FeedId", "FeedName", "HeartbeatMs"]
             )?,
         })
     }

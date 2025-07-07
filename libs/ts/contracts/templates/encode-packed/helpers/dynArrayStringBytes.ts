@@ -1,4 +1,4 @@
-import { DecoderData, ExpandedField, GenerateDecoderConfig } from '../utils';
+import { DecoderData } from '../utils';
 import { generateMemoryAssignment } from './memoryAssignment';
 import { generateDecoderStringBytes } from './stringBytes';
 

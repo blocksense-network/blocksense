@@ -1,3 +1,4 @@
+use blocksense_utils::FeedId;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
@@ -58,7 +59,7 @@ pub struct CompatibilityInfo {
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct FeedConfig {
     #[serde(with = "crate::custom_serde::serde_string")]
-    pub id: u32,
+    pub id: FeedId,
     pub full_name: String,
     pub description: String,
     #[serde(rename = "type")] // rename because of reserved keyword
@@ -86,6 +87,9 @@ pub struct ReporterInfo {
     /// Sequencer URL
     #[serde(default)]
     pub sequencer: String,
+    /// Metrics URL
+    #[serde(default)]
+    pub metrics_url: String,
     /// Kafka endpoint
     pub kafka_endpoint: Option<String>,
     /// Registry URL

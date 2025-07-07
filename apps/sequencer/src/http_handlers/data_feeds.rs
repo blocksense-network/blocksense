@@ -1,7 +1,8 @@
 use actix_web::http::StatusCode;
-use alloy_primitives::{FixedBytes, PrimitiveSignature};
+use alloy_primitives::{FixedBytes, Signature};
 use blocksense_gnosis_safe::utils::SignatureWithAddress;
 use blocksense_utils::time::current_unix_time;
+use blocksense_utils::FeedId;
 use chrono::{TimeZone, Utc};
 use eyre::Result;
 use std::str::FromStr;
@@ -51,7 +52,7 @@ async fn process_report(
     let signature = &data_feed.payload_metadata.signature;
     let msg_timestamp = data_feed.payload_metadata.timestamp;
 
-    let feed_id: u32;
+    let feed_id: FeedId;
     let reporter = {
         let reporters = sequencer_state.reporters.read().await;
         let reporter = reporters.get_key_value(&reporter_id);
@@ -59,7 +60,7 @@ async fn process_report(
             Some(x) => {
                 let reporter = x.1;
                 let reporter_metrics = reporter.read().await.reporter_metrics.clone();
-                feed_id = match data_feed.payload_metadata.feed_id.parse::<u32>() {
+                feed_id = match data_feed.payload_metadata.feed_id.parse::<FeedId>() {
                     Ok(val) => val,
                     Err(e) => {
                         inc_metric!(reporter_metrics, reporter_id, non_valid_feed_id_reports);
@@ -132,11 +133,12 @@ async fn process_report(
 
     // check if the time stamp in the msg is <= current_time_as_ms
     // and check if it is inside the current active slot frame.
-    let (report_relevance, always_publish_heartbeat_ms) = {
+    let (report_relevance, always_publish_heartbeat_ms, feed_name) = {
         let feed = feed.read().await;
         let report_relevance = feed.check_report_relevance(current_time_as_ms, msg_timestamp);
         let always_publish_heartbeat_ms = feed.always_publish_heartbeat_ms.unwrap_or(0);
-        (report_relevance, always_publish_heartbeat_ms)
+        let feed_name = feed.get_name().clone();
+        (report_relevance, always_publish_heartbeat_ms, feed_name)
     };
 
     match report_relevance {
@@ -145,7 +147,7 @@ async fn process_report(
             match reports.push(feed_id, reporter_id, data_feed).await {
                 VoteStatus::FirstVoteForSlot => {
                     debug!(
-                        "Recvd timely vote (result/error) from reporter_id = {} for feed_id = {}",
+                        "Recvd timely vote (result/error) from reporter_id = {} for feed_id = {}, feed_name = {feed_name}",
                         reporter_id, feed_id
                     );
                     inc_vec_metric!(
@@ -153,12 +155,13 @@ async fn process_report(
                         timely_reports_per_feed,
                         reporter_id,
                         feed_id,
+                        feed_name,
                         always_publish_heartbeat_ms
                     );
                 }
                 VoteStatus::RevoteForSlot(prev_vote) => {
                     debug!(
-                        "Recvd revote from reporter_id = {} for feed_id = {} prev_vote = {:?}",
+                        "Recvd revote from reporter_id = {} for feed_id = {}, feed_name = {feed_name}, prev_vote = {:?}",
                         reporter_id, feed_id, prev_vote
                     );
                     inc_vec_metric!(
@@ -166,6 +169,7 @@ async fn process_report(
                         total_revotes_for_same_slot_per_feed,
                         reporter_id,
                         feed_id,
+                        feed_name,
                         always_publish_heartbeat_ms
                     );
                 }
@@ -174,7 +178,7 @@ async fn process_report(
         }
         ReportRelevance::NonRelevantOld => {
             debug!(
-                "Recvd late vote from reporter_id = {} for feed_id = {}",
+                "Recvd late vote from reporter_id = {} for feed_id = {}, feed_name = {feed_name}",
                 reporter_id, feed_id
             );
             inc_vec_metric!(
@@ -182,12 +186,13 @@ async fn process_report(
                 late_reports_per_feed,
                 reporter_id,
                 feed_id,
+                feed_name,
                 always_publish_heartbeat_ms
             );
         }
         ReportRelevance::NonRelevantInFuture => {
             debug!(
-                "Recvd vote for future slot from reporter_id = {} for feed_id = {}",
+                "Recvd vote for future slot from reporter_id = {} for feed_id = {}, feed_name = {feed_name}",
                 reporter_id, feed_id
             );
             inc_vec_metric!(
@@ -195,6 +200,7 @@ async fn process_report(
                 in_future_reports_per_feed,
                 reporter_id,
                 feed_id,
+                feed_name,
                 always_publish_heartbeat_ms
             );
         }
@@ -243,7 +249,7 @@ pub async fn get_last_published_value_and_time(
     let history = sequencer_state.feed_aggregate_history.read().await;
     let mut results: Vec<LastPublishedValue> = vec![];
     for r in requested_data_feeds {
-        let v = match r.feed_id.parse::<u32>() {
+        let v = match r.feed_id.parse::<FeedId>() {
             Ok(feed_id) => {
                 if history.is_registered_feed(feed_id) {
                     if let Some(last) = history.last(feed_id) {
@@ -374,7 +380,7 @@ pub async fn post_aggregated_consensus_vote(
             warn!("Unknown Reporter sending aggregation batch signature {body:?}!");
             return Ok(HttpResponse::BadRequest().body("Unknown Reporter".to_string()));
         };
-        let signature = match PrimitiveSignature::from_str(reporter_response.signature.as_str()) {
+        let signature = match Signature::from_str(reporter_response.signature.as_str()) {
             Ok(r) => r,
             Err(e) => {
                 return Ok(HttpResponse::BadRequest()
@@ -565,7 +571,7 @@ pub async fn register_feed(
         Some(x) => x,
         None => {
             return Err(ErrorInternalServerError(format!(
-                "Error when reading from feed registry for feed_id={feed_id}"
+                "Error when reading from feed registry for feed_id = {feed_id}"
             )));
         }
     };
@@ -579,7 +585,7 @@ pub async fn register_feed(
 
     if let Err(err) = tokio::task::Builder::new()
         .name(format!("manual_feed_processor_{feed_id}").as_str())
-        .spawn_local(async move {
+        .spawn(async move {
             feed_slots_processor
                 .start_loop(
                     &sequencer_state,
@@ -665,6 +671,7 @@ pub mod tests {
             feeds_management_cmd_to_block_creator_send,
             feeds_slots_manager_cmd_send,
             aggregate_batch_sig_send,
+            Arc::new(RwLock::new(HashMap::new())),
         ));
 
         let app = test::init_service(
@@ -739,6 +746,7 @@ pub mod tests {
             feeds_management_cmd_to_block_creator_recv,
             feeds_slots_manager_cmd_recv,
             aggregate_batch_sig_recv,
+            _,
         ) = create_sequencer_state_from_sequencer_config(
             cfg.clone(),
             "test_register_feed_success",
@@ -754,6 +762,7 @@ pub mod tests {
             feeds_management_cmd_to_block_creator_recv,
             feeds_slots_manager_cmd_recv,
             aggregate_batch_sig_recv,
+            HashMap::new(),
         )
         .await;
 
@@ -928,7 +937,7 @@ pub mod tests {
         let sequencer_config = get_test_config_with_no_providers();
         let feed_config = AllFeedsConfig { feeds: vec![] };
 
-        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_empty_success",
             feed_config,
@@ -961,7 +970,7 @@ pub mod tests {
     async fn test_get_last_published_value_and_timestamp_wrong_feed_id() {
         let sequencer_config = get_test_config_with_no_providers();
         let feed_config = AllFeedsConfig { feeds: vec![] };
-        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_wrong_feed_id",
             feed_config,
@@ -1008,7 +1017,7 @@ pub mod tests {
     async fn test_get_last_published_value_and_timestamp_unregistered_feed_id() {
         let sequencer_config = get_test_config_with_no_providers();
         let feed_config = AllFeedsConfig { feeds: vec![] };
-        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_unregistered_feed_id",
             feed_config,
@@ -1063,7 +1072,7 @@ pub mod tests {
             feeds: vec![test_feed_config(1, 0)],
         };
 
-        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_registered_feed_id_no_data",
             all_feeds_config,
@@ -1119,7 +1128,7 @@ pub mod tests {
             feeds: vec![test_feed_config(1, 0)],
         };
 
-        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_registered_feed_id_with_data",
             all_feeds_config,
@@ -1127,7 +1136,7 @@ pub mod tests {
         .await;
         {
             let mut history = sequencer_state.feed_aggregate_history.write().await;
-            let feed_id = 1_u32;
+            let feed_id = 1 as FeedId;
             history.register_feed(feed_id, 100);
             let feed_value = FeedType::Numerical(102754.0f64);
             let end_slot_timestamp = first_report_start_time
@@ -1184,7 +1193,7 @@ pub mod tests {
             feeds: vec![test_feed_config(1, 0)],
         };
 
-        let (sequencer_state, _, _, _, _) = create_sequencer_state_from_sequencer_config(
+        let (sequencer_state, _, _, _, _, _) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             "test_get_last_published_value_and_timestamp_registered_feed_id_with_more_data",
             all_feeds_config,
@@ -1197,7 +1206,7 @@ pub mod tests {
             + 300_u128 * 10_u128;
         {
             let mut history = sequencer_state.feed_aggregate_history.write().await;
-            let feed_id = 1_u32;
+            let feed_id = 1 as FeedId;
             history.register_feed(feed_id, 3);
 
             history.push_next(

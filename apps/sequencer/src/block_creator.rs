@@ -13,10 +13,11 @@ use blocksense_feed_registry::registry::SlotTimeTracker;
 use blocksense_feed_registry::types::Repeatability;
 use blocksense_registry::config::FeedConfig;
 use blocksense_utils::time::current_unix_time;
+use blocksense_utils::FeedId;
 use rdkafka::producer::FutureRecord;
 use rdkafka::util::Timeout;
 use serde_json::json;
-use std::collections::{HashMap, VecDeque};
+use std::collections::{BTreeSet, HashMap, VecDeque};
 use std::io::Error;
 use std::mem;
 use std::sync::Arc;
@@ -38,7 +39,7 @@ pub async fn block_creator_loop(
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
         .name("block_creator")
-        .spawn_local(async move {
+        .spawn(async move {
             let span = info_span!("BlockCreator");
             let _guard = span.enter();
             let mut max_feed_updates_to_batch = block_config.max_feed_updates_to_batch;
@@ -62,7 +63,7 @@ pub async fn block_creator_loop(
 
             // Updates that overflowed the capacity of a block
             let mut backlog_updates: VecDeque<VotedFeedUpdateWithProof> = Default::default();
-            let mut updates: Vec<VotedFeedUpdateWithProof> = Default::default();
+            let mut updates: BTreeSet<VotedFeedUpdateWithProof> = Default::default();
 
             let mut new_feeds_to_register = Vec::new();
             let mut feeds_ids_to_delete = Vec::new();
@@ -81,9 +82,11 @@ pub async fn block_creator_loop(
                     .await_end_of_current_slot(&Repeatability::Periodic) => {
                          // Only emit a block if data is present
                         if !updates.is_empty() || !new_feeds_to_register.is_empty() || !feeds_ids_to_delete.is_empty() {
+                            let mut updates_vec = std::mem::take(updates).into_iter().collect::<Vec<_>>();
+
                             debug!("Emitting block, since there is data present...");
                             if let Err(e) = generate_block(
-                                updates,
+                                &mut updates_vec,
                                 new_feeds_to_register,
                                 feeds_ids_to_delete,
                                 &batched_votes_send,
@@ -102,7 +105,7 @@ pub async fn block_creator_loop(
                                 if updates.len() == max_feed_updates_to_batch {
                                     break;
                                 }
-                                updates.push(v);
+                                updates.insert(v);
                             }
                         }
                     }
@@ -124,10 +127,10 @@ pub async fn block_creator_loop(
 // When we recv feed updates that have passed aggregation, we prepare them to be placed in the next generated block
 async fn recvd_feed_update_to_block(
     recvd_feed_update: Option<VotedFeedUpdateWithProof>,
-    updates_to_block: &mut Vec<VotedFeedUpdateWithProof>,
+    updates_to_block: &mut BTreeSet<VotedFeedUpdateWithProof>,
     backlog_updates: &mut VecDeque<VotedFeedUpdateWithProof>,
     max_feed_updates_to_batch: usize,
-    feeds_config: &Arc<RwLock<HashMap<u32, FeedConfig>>>,
+    feeds_config: &Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
 ) {
     match recvd_feed_update {
         Some(voted_update) => {
@@ -145,6 +148,7 @@ async fn recvd_feed_update_to_block(
             let (key, val) = match voted_update.update.encode(
                 digits_in_fraction,
                 voted_update.update.end_slot_timestamp as u64,
+                false,
             ) {
                 Ok((k, v)) => (k, v),
                 Err(e) => {
@@ -154,7 +158,7 @@ async fn recvd_feed_update_to_block(
             };
             info!("adding {:?} => {:?} to updates", key, val);
             if updates_to_block.len() < max_feed_updates_to_batch {
-                updates_to_block.push(voted_update);
+                updates_to_block.insert(voted_update);
             } else {
                 warn!(
                     "updates.keys().len() >= max_feed_updates_to_batch ({} >= {})",
@@ -369,6 +373,7 @@ mod tests {
             feeds_management_cmd_to_block_creator_recv,
             _feeds_slots_manager_cmd_recv,
             _aggregate_batch_sig_recv,
+            _,
         ) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             metrics_prefix,
@@ -391,7 +396,7 @@ mod tests {
         let end_of_timeslot: Timestamp = 0;
 
         // Send test votes
-        let k1 = "ab000001";
+        let k1 = "ab000000000000000000000000000001";
         let v1 = "000000000000000000000000000010f0da2079987e1000000000000000000000";
         let vote_1 = VotedFeedUpdateWithProof {
             update: VotedFeedUpdate::new_decode(
@@ -404,7 +409,7 @@ mod tests {
             .unwrap(),
             proof: Vec::new(),
         };
-        let k2 = "ac000002";
+        let k2 = "ac000000000000000000000000000002";
         let v2 = "000000000000000000000000000010f0da2079987e2000000000000000000000";
         let vote_2 = VotedFeedUpdateWithProof {
             update: VotedFeedUpdate::new_decode(
@@ -417,7 +422,7 @@ mod tests {
             .unwrap(),
             proof: Vec::new(),
         };
-        let k3 = "ad000003";
+        let k3 = "ad000000000000000000000000000003";
         let v3 = "000000000000000000000000000010f0da2079987e3000000000000000000000";
         let vote_3 = VotedFeedUpdateWithProof {
             update: VotedFeedUpdate::new_decode(
@@ -430,7 +435,7 @@ mod tests {
             .unwrap(),
             proof: Vec::new(),
         };
-        let k4 = "af000004";
+        let k4 = "af000000000000000000000000000004";
         let v4 = "000000000000000000000000000010f0da2079987e4000000000000000000000";
         let vote_4 = VotedFeedUpdateWithProof {
             update: VotedFeedUpdate::new_decode(

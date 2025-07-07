@@ -2,7 +2,7 @@ import { IBaseWrapper } from '../../../experiments/utils/wrappers';
 import {
   AggregatedDataFeedStore,
   UpgradeableProxyADFS,
-} from '../../../../typechain';
+} from '@blocksense/contracts/typechain';
 import { ADFSWrapper } from '../adfs/ADFS';
 import { Feed, UpgradeableProxyCallMethods } from '../types';
 import { TransactionResponse } from 'ethers';

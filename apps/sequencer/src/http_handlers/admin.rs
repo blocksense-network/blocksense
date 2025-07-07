@@ -17,6 +17,7 @@ use blocksense_feed_registry::feed_registration_cmds::{
 };
 use blocksense_registry::config::{FeedConfig, OracleScript, OraclesResponse};
 use blocksense_utils::logging::tokio_console_active;
+use blocksense_utils::FeedId;
 use eyre::eyre;
 use eyre::Result;
 use futures::StreamExt;
@@ -63,7 +64,7 @@ pub async fn get_key_from_contract(
         .with_chain_id(provider.get_chain_id().await?)
         .input(Some(input).into());
 
-    let result = provider.call(&tx).await?;
+    let result = provider.call(tx).await?;
     info!("Call result: {:?}", result);
     // TODO: get from metadata the type of the value.
     // TODO: Refector to not use dummy argument
@@ -113,7 +114,7 @@ pub async fn get_key(
     let network: String = req.match_info().get("network").ok_or(bad_input)?.parse()?;
     let key: String = req.match_info().query("key").parse()?;
 
-    let feed_id: u32 = match key.parse() {
+    let feed_id: FeedId = match key.parse() {
         Ok(v) => v,
         Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
     };
@@ -180,7 +181,7 @@ pub async fn get_feed_report_interval(
     let bad_input = error::ErrorBadRequest("Incorrect input.");
     let feed_id: String = req.match_info().get("feed_id").ok_or(bad_input)?.parse()?;
 
-    let feed_id: u32 = match feed_id.parse() {
+    let feed_id: FeedId = match feed_id.parse() {
         Ok(r) => r,
         Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
     };
@@ -226,7 +227,7 @@ pub async fn get_feed_config(
     let bad_input = error::ErrorBadRequest("Incorrect input.");
     let feed_id: String = req.match_info().get("feed_id").ok_or(bad_input)?.parse()?;
 
-    let feed_id: u32 = match feed_id.parse() {
+    let feed_id: FeedId = match feed_id.parse() {
         Ok(r) => r,
         Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
     };
@@ -455,7 +456,7 @@ pub async fn delete_asset_feed(
     let bad_input = error::ErrorBadRequest("Incorrect input.");
     let feed_id: String = req.match_info().get("feed_id").ok_or(bad_input)?.parse()?;
 
-    let feed_id: u32 = match feed_id.parse() {
+    let feed_id: FeedId = match feed_id.parse() {
         Ok(r) => r,
         Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
     };
@@ -632,8 +633,10 @@ mod tests {
 
     use blocksense_utils::logging::init_shared_logging_handle;
     use blocksense_utils::test_env::get_test_private_key_path;
+    use std::collections::HashMap;
     use std::path::PathBuf;
-    use tokio::sync::mpsc;
+    use std::sync::Arc;
+    use tokio::sync::{mpsc, RwLock};
 
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
 
@@ -672,6 +675,7 @@ mod tests {
             feeds_management_cmd_to_block_creator_send,
             feeds_slots_manager_cmd_send,
             aggregate_batch_sig_send,
+            Arc::new(RwLock::new(HashMap::new())),
         ));
 
         let app = test::init_service(
@@ -764,6 +768,7 @@ mod tests {
             _feeds_management_cmd_to_block_creator_recv,
             _feeds_slots_manager_cmd_recv,
             _aggregate_batch_sig_recv,
+            _,
         ) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             metrics_prefix,
@@ -914,6 +919,7 @@ mod tests {
             _feeds_management_cmd_to_block_creator_recv,
             _feeds_slots_manager_cmd_recv,
             _aggregate_batch_sig_recv,
+            _,
         ) = create_sequencer_state_from_sequencer_config(
             sequencer_config,
             metrics_prefix,

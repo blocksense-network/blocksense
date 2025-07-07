@@ -37,10 +37,20 @@
       "import": "./dist/esm/fs.mjs",
       "types": "./src/fs.ts"
     },
+    "./errors": {
+      "require": "./dist/cjs/errors.cjs",
+      "import": "./dist/esm/errors.mjs",
+      "types": "./src/errors.ts"
+    },
     "./evm": {
       "require": "./dist/cjs/evm/index.cjs",
       "import": "./dist/esm/evm/index.mjs",
       "types": "./src/evm/index.ts"
+    },
+    "./evm/functions": {
+      "require": "./dist/cjs/evm/functions.cjs",
+      "import": "./dist/esm/evm/functions.mjs",
+      "types": "./src/evm/functions.ts"
     },
     "./evm/networks": {
       "require": "./dist/cjs/evm/networks.cjs",

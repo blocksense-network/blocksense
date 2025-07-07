@@ -8,7 +8,6 @@ import {
   appendNatspecDetailsToParams,
 } from './utils/natspec';
 import { appendAbiToSolReflection, collectAbi } from './abiCollector';
-import { formatSignatures } from './utils/signature';
 import { enableFileTree } from './contractsFileStructure';
 
 if ('extendConfig' in global && 'task' in global) {

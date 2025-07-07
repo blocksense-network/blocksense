@@ -1,85 +1,82 @@
-import { task } from 'hardhat/config';
 import Safe, {
   SafeAccountConfig,
   PredictedSafeProps,
 } from '@safe-global/protocol-kit';
+import { hexlify, toUtf8Bytes } from 'ethers';
+
 import { NetworkConfig } from '../types';
 import { checkAddressExists } from '../utils';
 
-task('deploy-multisig', '[UTILS] Deploy multisig contract').setAction(
-  async (args, { ethers }) => {
-    const {
-      config,
-      type,
-    }: {
-      config: NetworkConfig;
-      type: keyof Pick<NetworkConfig, 'adminMultisig' | 'sequencerMultisig'>;
-    } = args;
-    const safeVersion = '1.4.1';
+type Params = {
+  config: NetworkConfig;
+  type: keyof Pick<NetworkConfig, 'adminMultisig' | 'sequencerMultisig'>;
+};
 
-    const signer = config[type].signer;
+export async function deployMultisig({ config, type }: Params): Promise<Safe> {
+  const safeVersion = '1.4.1';
 
-    const safeAccountConfig: SafeAccountConfig = {
-      owners: [
-        signer ? signer.address : await config.ledgerAccount!.getAddress(),
-      ],
-      threshold: 1,
-    };
+  const signer = config[type].signer;
 
-    const saltNonce = ethers.hexlify(ethers.toUtf8Bytes(type));
+  const safeAccountConfig: SafeAccountConfig = {
+    owners: [
+      signer ? signer.address : await config.ledgerAccount!.getAddress(),
+    ],
+    threshold: 1,
+  };
 
-    const predictedSafe: PredictedSafeProps = {
-      safeAccountConfig,
-      safeDeploymentConfig: {
-        saltNonce,
-        safeVersion,
-      },
-    };
+  const saltNonce = hexlify(toUtf8Bytes(type));
 
-    const protocolKit = await Safe.init({
+  const predictedSafe: PredictedSafeProps = {
+    safeAccountConfig,
+    safeDeploymentConfig: {
+      saltNonce,
+      safeVersion,
+    },
+  };
+
+  const protocolKit = await Safe.init({
+    provider: config.rpc,
+    signer: signer?.privateKey,
+    predictedSafe,
+    contractNetworks: {
+      [config.network.chainId.toString()]: config.safeAddresses,
+    },
+  });
+
+  const safeAddress = await protocolKit.getAddress();
+
+  console.log(`Predicted ${type} address: ${safeAddress}`);
+
+  if (await checkAddressExists(config, safeAddress)) {
+    console.log(`  -> ✅ ${type} already deployed!`);
+    return protocolKit.connect({
       provider: config.rpc,
       signer: signer?.privateKey,
-      predictedSafe,
+      safeAddress,
       contractNetworks: {
         [config.network.chainId.toString()]: config.safeAddresses,
       },
     });
+  } else {
+    console.log(`  -> ⏳ ${type} not found, deploying...`);
+  }
 
-    const safeAddress = await protocolKit.getAddress();
+  const deploymentTransaction =
+    await protocolKit.createSafeDeploymentTransaction();
 
-    console.log(`Predicted ${type} address: ${safeAddress}`);
+  const transactionHash = await (
+    signer ?? config.ledgerAccount!
+  ).sendTransaction({
+    to: deploymentTransaction.to,
+    value: BigInt(deploymentTransaction.value),
+    data: deploymentTransaction.data as `0x${string}`,
+  });
 
-    if (await checkAddressExists(config, safeAddress)) {
-      console.log(`  -> ✅ ${type} already deployed!`);
-      return protocolKit.connect({
-        provider: config.rpc,
-        signer: signer?.privateKey,
-        safeAddress,
-        contractNetworks: {
-          [config.network.chainId.toString()]: config.safeAddresses,
-        },
-      });
-    } else {
-      console.log(`  -> ⏳ ${type} not found, deploying...`);
-    }
+  const transactionReceipt = await config.provider.waitForTransaction(
+    transactionHash.hash,
+  );
 
-    const deploymentTransaction =
-      await protocolKit.createSafeDeploymentTransaction();
+  console.log('     ✅ Safe deployment tx hash:', transactionReceipt?.hash);
 
-    const transactionHash = await (
-      signer ?? config.ledgerAccount!
-    ).sendTransaction({
-      to: deploymentTransaction.to,
-      value: BigInt(deploymentTransaction.value),
-      data: deploymentTransaction.data as `0x${string}`,
-    });
-
-    const transactionReceipt = await config.provider.waitForTransaction(
-      transactionHash.hash,
-    );
-
-    console.log('    ✅ Safe deployment tx hash:', transactionReceipt?.hash);
-
-    return protocolKit.connect({ safeAddress });
-  },
-);
+  return protocolKit.connect({ safeAddress });
+}

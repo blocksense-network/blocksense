@@ -1,0 +1,49 @@
+{
+  "name": "@blocksense/avm-relayer",
+  "version": "0.0.0",
+  "type": "module",
+  "license": "MIT",
+  "description": "AVM Relayer",
+  "bin": "./dist/bin.cjs",
+  "scripts": {
+    "build": "tsup --dts && yarn copy-package-json",
+    "start": "yarn node --import tsx ./src/bin.ts",
+    "build:ts": "tsup",
+    "lint": "yarn run -T eslint \"**/{src,test,examples,scripts,dtslint}/**/*.{ts,mjs}\"",
+    "lint-fix": "yarn lint --fix",
+    "test": "vitest run",
+    "coverage": "vitest run --coverage",
+    "copy-package-json": "tsx scripts/copy-package-json.ts",
+    "changeset-version": "changeset version && node scripts/version.mjs",
+    "changeset-publish": "yarn build && TEST_DIST= yarn vitest && changeset publish"
+  },
+  "dependencies": {
+    "@aztec/accounts": "0.87.9",
+    "@aztec/aztec.js": "0.87.9",
+    "@aztec/stdlib": "0.87.9",
+    "@effect/cli": "0.63.9",
+    "@effect/cluster": "^0.38.14",
+    "@effect/experimental": "^0.48.10",
+    "@effect/platform": "0.84.9",
+    "@effect/platform-node": "0.85.14",
+    "@effect/printer": "^0.44.5",
+    "@effect/printer-ansi": "^0.44.5",
+    "@effect/rpc": "^0.61.13",
+    "@effect/sql": "^0.37.10",
+    "@effect/typeclass": "^0.35.5",
+    "effect": "^3.15.1"
+  },
+  "devDependencies": {
+    "@changesets/changelog-github": "^0.5.1",
+    "@changesets/cli": "^2.29.4",
+    "@effect/language-service": "^0.20.1",
+    "@effect/vitest": "0.23.5",
+    "@types/node": "^24.0.4",
+    "@vitest/coverage-v8": "^3.2.3",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.5.0",
+    "tsx": "^4.19.1",
+    "typescript": "5.8.3",
+    "vitest": "^3.2.4"
+  }
+}

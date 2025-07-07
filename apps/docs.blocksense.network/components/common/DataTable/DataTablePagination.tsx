@@ -2,14 +2,14 @@
 
 import { useContext } from 'react';
 
-import { Button } from '@blocksense/ui/Button';
+import { Button } from '@blocksense/docs-ui/Button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@blocksense/ui/Select';
+} from '@blocksense/docs-ui/Select';
 import { DataTableContext } from './DataTableContext';
 
 export function DataTablePagination() {

@@ -1,6 +1,6 @@
 import { Feed, ReadFeed, ReadOp } from '../types';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
-import { AggregatedDataFeedStore } from '../../../../typechain';
+import { AggregatedDataFeedStore } from '@blocksense/contracts/typechain';
 import { AccessControlWrapper } from '../adfs/AccessControl';
 import { IBaseWrapper } from '../../../experiments/utils/wrappers';
 import { EventFragment, TransactionReceipt, TransactionResponse } from 'ethers';

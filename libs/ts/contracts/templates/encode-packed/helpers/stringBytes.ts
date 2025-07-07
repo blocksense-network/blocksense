@@ -1,4 +1,4 @@
-import { DecoderData, ExpandedField, GenerateDecoderConfig } from '../utils';
+import { DecoderData } from '../utils';
 
 export const generateDecoderStringBytes = (
   data: DecoderData,

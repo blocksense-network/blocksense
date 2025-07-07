@@ -34,7 +34,7 @@ import {
   NodeType,
   DocItemConstructor,
 } from '../types';
-import { extractFields, formatVariable } from './common';
+import { extractFields } from './common';
 import { parseNatspec } from './natspec';
 import { getSignature } from './signature';
 

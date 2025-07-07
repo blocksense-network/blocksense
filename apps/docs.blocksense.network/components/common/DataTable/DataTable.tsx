@@ -11,15 +11,14 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from '@blocksense/ui/Table';
-import { cn } from '@blocksense/ui/utils';
+} from '@blocksense/docs-ui/Table';
+import { cn } from '@blocksense/docs-ui/utils';
 
 import { DataTableContext, DataTableProvider } from './DataTableContext';
 import { DataTablePagination } from './DataTablePagination';
 import { DataTableToolbar } from './DataTableToolbar';
 import { DataTableColumnHeader } from './DataTableColumnHeader';
 import {
-  DataRowType,
   DataTableProps,
   getSortingState,
   cellHaveContent,

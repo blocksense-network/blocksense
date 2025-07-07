@@ -1,36 +1,41 @@
-import {
-  CLAggregatorAdapterData,
-  ContractsConfigV2,
-} from '@blocksense/config-types/evm-contracts-deployment';
-import { task } from 'hardhat/config';
-import { ContractNames, NetworkConfig } from '../types';
-import Safe from '@safe-global/protocol-kit';
+import { Contract, ZeroAddress } from 'ethers';
+import { Artifacts, RunTaskFunction } from 'hardhat/types';
 import {
   OperationType,
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
+import Safe from '@safe-global/protocol-kit';
 
-task(
-  'register-cl-adapters',
-  '[UTILS] Register CLAggregatorAdapters in CLFeedRegistryAdapter',
-).setAction(async (args, { ethers, artifacts, run }) => {
-  const {
-    deployData,
-    config,
-    safe,
-  }: {
-    deployData: ContractsConfigV2;
-    config: NetworkConfig;
-    safe: Safe;
-  } = args;
+import {
+  CLAggregatorAdapterData,
+  ContractsConfigV2,
+} from '@blocksense/config-types/evm-contracts-deployment';
 
+import { ContractNames, NetworkConfig } from '../types';
+import { executeMultisigTransaction } from './multisig-tx-exec';
+
+type Params = {
+  deployData: ContractsConfigV2;
+  config: NetworkConfig;
+  safe: Safe;
+  run: RunTaskFunction;
+  artifacts: Artifacts;
+};
+
+export async function registerCLAdapters({
+  deployData,
+  config,
+  safe,
+  artifacts,
+  run,
+}: Params): Promise<void> {
   // The difference between setting n and n+1 feeds via CLFeedRegistryAdapter::setFeeds is slightly above 55k gas.
   console.log('\nRegistering CLAggregatorAdapters in CLFeedRegistryAdapter...');
   console.log('------------------------------------------------------------');
 
   const signer = config.adminMultisig.signer || config.ledgerAccount!;
 
-  const registry = new ethers.Contract(
+  const registry = new Contract(
     deployData.coreContracts.CLFeedRegistryAdapter.address,
     artifacts.readArtifactSync(ContractNames.CLFeedRegistryAdapter).abi,
     signer,
@@ -53,7 +58,7 @@ task(
       data.quote,
     );
 
-    if (feed === ethers.ZeroAddress) {
+    if (feed === ZeroAddress) {
       filteredData.push(data);
     } else {
       console.log(
@@ -90,10 +95,10 @@ task(
       `Registering ${batch.length} CLAggregatorAdapters in CLFeedRegistryAdapter`,
     );
 
-    await run('multisig-tx-exec', {
+    await executeMultisigTransaction({
       transactions: [safeTransactionData],
       safe,
       config,
     });
   }
-});
+}

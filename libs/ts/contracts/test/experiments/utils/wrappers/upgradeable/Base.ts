@@ -4,7 +4,7 @@ import { network } from 'hardhat';
 import {
   ITransparentUpgradeableProxy__factory,
   UpgradeableProxy,
-} from '../../../../../typechain';
+} from '@blocksense/contracts/typechain';
 import { IWrapper } from '../../../utils/wrappers/interfaces/IWrapper';
 import { IUpgradeableWrapper } from '../../../utils/wrappers/interfaces/IUpgradeableWrapper';
 

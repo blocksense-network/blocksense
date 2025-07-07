@@ -4,8 +4,8 @@ import * as React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { Tooltip } from '@blocksense/ui/Tooltip';
-import { CopyButton } from '@blocksense/ui/CopyButton';
+import { Tooltip } from '@blocksense/docs-ui/Tooltip';
+import { CopyButton } from '@blocksense/docs-ui/CopyButton';
 import { onLinkClick, previewHexStringOrDefault } from '@/src/utils';
 import {
   getAddressExplorerUrl,

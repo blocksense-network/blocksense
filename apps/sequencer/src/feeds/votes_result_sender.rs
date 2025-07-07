@@ -9,11 +9,14 @@ use alloy::hex::{self, ToHexExt};
 use alloy::providers::Provider;
 use alloy_primitives::map::HashMap;
 use alloy_primitives::{Address, Bytes, Uint, U256};
-use blocksense_data_feeds::feeds_processing::BatchedAggegratesToSend;
+use blocksense_data_feeds::feeds_processing::{
+    BatchedAggegratesToSend, EncodedBatchedAggegratesToSend, EncodedVotedFeedUpdate,
+};
 use blocksense_feed_registry::types::Repeatability::Periodic;
 use blocksense_gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use blocksense_gnosis_safe::utils::{create_safe_tx, generate_transaction_hash, SafeMultisig};
-use rdkafka::producer::FutureRecord;
+use eyre::Result;
+use rdkafka::producer::{FutureProducer, FutureRecord};
 use rdkafka::util::Timeout;
 use std::io::Error;
 use std::time::Duration;
@@ -26,7 +29,7 @@ pub async fn votes_result_sender_loop(
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
         .name("votes_result_sender")
-        .spawn_local(async move {
+        .spawn(async move {
             let mut batch_count = 0;
             loop {
                 debug!("Awaiting batched votes over `batched_votes_recv`...");
@@ -43,9 +46,16 @@ pub async fn votes_result_sender_loop(
                         )
                         .await;
 
-                        info!("sending updates to contract:");
+                        aggregated_updates_to_publishers(&sequencer_state, &updates).await;
+
+                        info!("sending updates to contracts:");
                         let sequencer_state = sequencer_state.clone();
-                        async_send_to_all_networks(sequencer_state, updates, batch_count);
+                        let blocksense_block_height = updates.block_height;
+                        debug!("Processing eth_batch_send_to_all_contracts{blocksense_block_height}_{batch_count}");
+                        match eth_batch_send_to_all_contracts(sequencer_state, updates, Periodic).await {
+                            Ok(_) => info!("Sending updates to relayers complete."),
+                            Err(err) => error!("ERROR Sending updates to relayers: {err}"),
+                        };
                     }
                     None => {
                         panic!("Sender got RecvError"); // This error indicates a severe internal error.
@@ -60,26 +70,81 @@ pub async fn votes_result_sender_loop(
         .expect("Failed to spawn votes result sender!")
 }
 
-fn async_send_to_all_networks(
-    sequencer_state: Data<SequencerState>,
-    updates: BatchedAggegratesToSend,
-    batch_count: usize,
+async fn aggregated_updates_to_publishers(
+    sequencer_state: &Data<SequencerState>,
+    updates: &BatchedAggegratesToSend,
 ) {
-    let blocksense_block_height = updates.block_height;
-    let sender = tokio::task::Builder::new()
-        .name(
-            format!("async_send_to_all_networks_{blocksense_block_height}_{batch_count}").as_str(),
-        )
-        .spawn_local(async move {
-            debug!("Spawned async_send_to_all_networks_{blocksense_block_height}_{batch_count}");
-            match eth_batch_send_to_all_contracts(sequencer_state, updates, Periodic).await {
-                Ok(res) => info!("Sending updates complete {res}."),
-                Err(err) => error!("ERROR Sending updates {err}"),
-            };
-        });
-    if let Err(err) = sender {
-        error!("Failed to spawn batch sender {batch_count} due to {err}!");
-    }
+    let Some(kafka_endpoint) = &sequencer_state.kafka_endpoint else {
+        warn!("No Kafka endpoint set to stream aggregated updates to publishers.");
+        return;
+    };
+
+    let block_height = updates.block_height;
+
+    let encoded_updates = EncodedBatchedAggegratesToSend {
+        block_height,
+        updates: {
+            let mut encoded_voted_feed_updates = Vec::new();
+            for v in &updates.updates {
+                let feed_id = &v.feed_id;
+                debug!("Acquiring a read lock on feeds_config; feed_id={feed_id}");
+                let Some(feed_config) = sequencer_state
+                    .active_feeds
+                    .read()
+                    .await
+                    .get(feed_id)
+                    .cloned()
+                else {
+                    error!("Acquired and released a read lock on feeds_config; feed_id={feed_id} but feed_id not in registry!");
+                    continue;
+                };
+                debug!("Acquired and released a read lock on feeds_config; feed_id={feed_id}");
+
+                encoded_voted_feed_updates.push(EncodedVotedFeedUpdate {
+                    feed_id: *feed_id,
+                    value: match v.value.as_bytes(
+                        feed_config.additional_feed_info.decimals as usize,
+                        v.end_slot_timestamp as u64,
+                    ) {
+                        Ok(bytes) => bytes,
+                        Err(e) => {
+                            error!("Could not serialize {v:?}' value to bytes: {e}");
+                            continue;
+                        }
+                    },
+                    end_slot_timestamp: v.end_slot_timestamp,
+                });
+            }
+            encoded_voted_feed_updates
+        },
+    };
+
+    match serde_json::to_string(&encoded_updates) {
+        Ok(json) => {
+            match send_to_msg_stream(
+                kafka_endpoint,
+                &json,
+                "aggregated_updates",
+                3 * 60,
+                "blocksense",
+                block_height,
+            )
+            .await
+            {
+                Ok(_) => {
+                    info!(
+                        "sent aggregated updates to publishers for block_height: {block_height}."
+                    );
+                }
+                Err(e) => {
+                    error!("send_to_msg_stream: {e}");
+                }
+            }
+        }
+        Err(e) => {
+            error!("Could not serialize updates: {updates:?} due to Error: {e}")
+        }
+    };
 }
 
 async fn try_send_aggregation_consensus_trigger_to_reporters(
@@ -198,9 +263,9 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
 
             let calldata = Bytes::from(serialized_updates);
 
-            nonce._0 += Uint::from(num_tx_in_progress);
+            nonce += Uint::from(num_tx_in_progress);
 
-            let safe_transaction = create_safe_tx(contract_address, calldata, nonce._0);
+            let safe_transaction = create_safe_tx(contract_address, calldata, nonce);
 
             let chain_id = match provider.provider.get_chain_id().await {
                 Ok(c) => c,
@@ -231,7 +296,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             block_height,
             contract_address: contract_address.encode_hex(),
             safe_address: safe_address.encode_hex(),
-            nonce: nonce._0.to_string(),
+            nonce: nonce.to_string(),
             chain_id: chain_id.to_string(),
             tx_hash: tx_hash.to_string(),
             network: net.to_string(),
@@ -248,25 +313,25 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             }
         };
 
-        info!("About to send feed values to kafka; network={net}, serialized_updates={serialized_updates}");
-        match kafka_endpoint
-            .send(
-                FutureRecord::<(), _>::to("aggregation_consensus").payload(&serialized_updates),
-                Timeout::After(Duration::from_secs(3 * 60)),
-            )
-            .await
+        info!("About to send feed values to kafka, serialized_updates={serialized_updates}");
+        match send_to_msg_stream(
+            kafka_endpoint,
+            &serialized_updates,
+            "aggregation_consensus",
+            3 * 60,
+            net,
+            block_height,
+        )
+        .await
         {
-            Ok(res) => {
-                debug!(
-                    "Successfully sent batch of aggregated feed values to kafka endpoint: {res:?}; network={net}"
-                );
+            Ok(_) => {
                 let mut batches_awaiting_consensus =
                     sequencer_state.batches_awaiting_consensus.write().await;
                 batches_awaiting_consensus
                     .insert_new_in_process_batch(&updates_to_kafka, safe_transaction);
             }
             Err(e) => {
-                error!("Failed to send batch of aggregated feed values for network: {net}, block height: {block_height} to kafka endpoint! {e:?}")
+                error!("send_to_msg_stream: {e}");
             }
         }
 
@@ -274,6 +339,33 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             let mut provider = provider.lock().await;
             increment_feeds_round_indexes(&updated_feeds_ids, net, &mut provider).await;
             provider.inc_num_tx_in_progress();
+        }
+    }
+}
+
+async fn send_to_msg_stream(
+    endpoint: &FutureProducer,
+    serialized_updates: &String,
+    topic: &str,
+    tomeout_secs: u64,
+    net: &str,
+    block_height: u64,
+) -> eyre::Result<()> {
+    match endpoint
+        .send(
+            FutureRecord::<(), _>::to(topic).payload(serialized_updates),
+            Timeout::After(Duration::from_secs(tomeout_secs)),
+        )
+        .await
+    {
+        Ok(res) => {
+            debug!(
+                "Successfully sent batch of aggregated feed values to kafka endpoint: {res:?}; network: {net} topic: {topic}"
+            );
+            Ok(())
+        }
+        Err(e) => {
+            eyre::bail!("Failed to send batch of aggregated feed values for network: {net}, topic: {topic}, block height: {block_height} to kafka endpoint! Error: {e:?}");
         }
     }
 }

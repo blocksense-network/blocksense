@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import * as utils from '../templates/encode-packed/utils';
 import { generateDecoder } from '../templates/encode-packed';
+import { BaseContract } from 'ethers';
 
 const { ethers, run } = hre;
 
@@ -26,7 +27,11 @@ describe('EncodePackedDecoder @skip-coverage', function () {
     await run('compile');
 
     const DecoderFactory = await ethers.getContractFactory(contractName);
-    return DecoderFactory.deploy();
+    return DecoderFactory.deploy() as Promise<
+      BaseContract & {
+        decode(data: string): Promise<unknown>;
+      }
+    >;
   }
 
   async function testDecoder(fields: utils.TupleField, values: any[]) {
