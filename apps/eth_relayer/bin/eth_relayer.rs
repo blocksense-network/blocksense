@@ -4,7 +4,8 @@ use blocksense_utils::logging::{
     get_log_level, init_shared_logging_handle, tokio_console_active, SharedLoggingHandle,
 };
 use eth_relayer::{
-    providers::provider::init_shared_rpc_providers, updates_reader::updates_reader_loop,
+    providers::{eth_send_utils::create_relayers_channels, provider::init_shared_rpc_providers},
+    updates_reader::updates_reader_loop,
 };
 use futures::stream::FuturesUnordered;
 use std::io::Error;
@@ -22,6 +23,9 @@ async fn main() -> Result<()> {
     let feeds_config = get_feeds_config();
 
     let providers = init_shared_rpc_providers(&eth_relayer_config, None, &feeds_config).await;
+
+    let (relayers_send_channels, relayers_recv_channels) =
+        create_relayers_channels(&providers).await;
 
     let collected_futures: FuturesUnordered<JoinHandle<Result<(), Error>>> =
         FuturesUnordered::new();

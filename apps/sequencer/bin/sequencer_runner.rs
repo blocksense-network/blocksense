@@ -4,10 +4,11 @@ use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_gnosis_safe::utils::SignatureWithAddress;
 #[cfg(feature = "profile")]
 use pprof::ProfilerGuard;
+use sequencer::providers::eth_send_utils::create_relayers_channels;
 use sequencer::providers::eth_send_utils::BatchOfUpdatesToProcess;
 use sequencer::providers::provider::init_shared_rpc_providers;
 use sequencer::pyroscope_profiler::setup_pyroscope;
-use sequencer::sequencer_state::{create_relayers_channels, SequencerState};
+use sequencer::sequencer_state::SequencerState;
 use tokio::sync::{mpsc, RwLock};
 
 use blocksense_utils::logging::{
