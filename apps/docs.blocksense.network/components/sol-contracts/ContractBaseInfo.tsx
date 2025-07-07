@@ -6,7 +6,7 @@ import { ABIModal } from '@/sol-contracts-components/ABIModal/ABIModal';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { ContractOverview } from './ContractOverview';
-import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
+import { ImageWrapper } from '@blocksense/docs-ui/ImageWrapper';
 import { ContractAnchorLink } from '@/components/sol-contracts/ContractAnchorLink';
 
 export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {

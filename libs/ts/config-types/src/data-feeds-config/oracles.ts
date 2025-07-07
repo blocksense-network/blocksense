@@ -51,6 +51,19 @@ const UrlSchema = S.String.pipe(
   }),
 );
 
-export const ethRpcArgsSchema = S.mutable(S.Array(UrlSchema)).annotations({
+export const ethRpcArgsSchema = S.mutable(
+  S.Struct({
+    divisor: S.NullishOr(S.Number),
+    contracts: S.Array(
+      S.Struct({
+        rpc_urls: S.Array(UrlSchema),
+        address: S.String,
+        label: S.String,
+        method_name: S.String,
+        param1: S.NullishOr(S.String),
+      }),
+    ),
+  }),
+).annotations({
   identifier: 'EthRpcOracleArgs',
 });

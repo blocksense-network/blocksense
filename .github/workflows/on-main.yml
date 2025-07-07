@@ -17,6 +17,10 @@ jobs:
             path: apps/docs.blocksense.network/dist
             project_name: blocksense-docs
             build_command: yarn workspace @blocksense/docs.blocksense.network build:with-deps
+          - project: docs-ui.blocksense.network
+            path: libs/ts/docs-ui/storybook-static
+            project_name: blocksense-docs-ui
+            build_command: yarn workspace @blocksense/docs-ui build-storybook
           - project: ui.blocksense.network
             path: libs/ts/ui/storybook-static
             project_name: blocksense-ui

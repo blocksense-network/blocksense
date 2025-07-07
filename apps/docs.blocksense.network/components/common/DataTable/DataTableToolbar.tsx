@@ -2,9 +2,9 @@
 
 import { useContext } from 'react';
 
-import { Input } from '@blocksense/ui/Input';
-import { Button } from '@blocksense/ui/Button';
-import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
+import { Input } from '@blocksense/docs-ui/Input';
+import { Button } from '@blocksense/docs-ui/Button';
+import { ImageWrapper } from '@blocksense/docs-ui/ImageWrapper';
 
 import { DataTableContext } from './DataTableContext';
 import { DataTableFacetedFilter } from './DataTableFacetedFilter';

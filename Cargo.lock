@@ -2190,6 +2190,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "blocksense-data-providers-sdk"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "blocksense-sdk",
+ "futures",
+ "itertools 0.14.0",
+ "serde 1.0.217",
+ "serde-this-or-that",
+ "serde_json",
+ "url",
+]
+
+[[package]]
 name = "blocksense-feed-registry"
 version = "0.1.1"
 dependencies = [
@@ -2245,6 +2259,7 @@ dependencies = [
  "anyhow",
  "blocksense-data-feeds",
  "blocksense-feed-registry",
+ "blocksense-utils",
  "hex",
  "serde 1.0.217",
  "serde_json",
@@ -2276,6 +2291,7 @@ name = "blocksense-registry"
 version = "0.1.1"
 dependencies = [
  "anyhow",
+ "blocksense-utils",
  "serde 1.0.217",
  "serde_json",
 ]
@@ -2610,6 +2626,7 @@ name = "cex-price-feeds"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "blocksense-data-providers-sdk",
  "blocksense-sdk",
  "futures",
  "itertools 0.14.0",
@@ -3964,6 +3981,7 @@ dependencies = [
  "alloy",
  "anyhow",
  "blocksense-sdk",
+ "itertools 0.8.2",
  "prettytable-rs",
  "serde 1.0.217",
  "serde_json",
@@ -10203,6 +10221,7 @@ name = "stock-price-feeds"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "blocksense-data-providers-sdk",
  "blocksense-sdk",
  "chrono",
  "chrono-tz",

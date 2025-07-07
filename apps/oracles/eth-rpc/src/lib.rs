@@ -1,29 +1,23 @@
 use alloy::{
     hex::ToHexExt,
-    primitives::{address, Address, Bytes, U256},
+    primitives::{Address, Bytes, U256},
     providers::ProviderBuilder,
     sol,
 };
-use anyhow::{Context, Result};
+use anyhow::Result;
 use blocksense_sdk::{
     http::http_post_json,
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
 };
+use itertools::zip;
 use prettytable::{format, Cell, Row, Table};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::str::FromStr;
 use url::Url;
 
-// Codegen from ABI file to interact with the contract.
-sol!(
-    #[allow(missing_docs)]
-    #[allow(clippy::too_many_arguments)]
-    #[sol(rpc)]
-    YnETHx,
-    "src/abi/YnETHx.json"
-);
+pub type FeedId = u128;
 
 sol!(
     #[allow(missing_docs)]
@@ -31,6 +25,14 @@ sol!(
     #[sol(rpc)]
     YieldFiyUSD,
     "src/abi/YieldFiyUSD.json"
+);
+
+sol!(
+    #[allow(missing_docs)]
+    #[allow(clippy::too_many_arguments)]
+    #[sol(rpc)]
+    VaultABI,
+    "src/abi/VaultABI.json"
 );
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -44,7 +46,7 @@ pub struct RequestEthCallParams {
 pub struct RequestEthCall {
     pub jsonrpc: String,
     pub method: String,
-    pub id: u64,
+    pub id: FeedId,
     pub params: (RequestEthCallParams, String),
 }
 
@@ -57,17 +59,11 @@ pub struct ResponseEthCallError {
 #[derive(Deserialize, Debug, Clone)]
 pub struct ResponseEthCall {
     pub jsonrpc: String,
-    pub id: Option<u64>,
+    pub id: Option<FeedId>,
     pub error: Option<ResponseEthCallError>,
     pub result: Option<String>,
     #[serde(default)]
     pub rpc_url: Option<String>,
-}
-
-#[derive(Deserialize, Debug, Clone)]
-pub struct ResponsePerFeed {
-    pub feed_id: u128,
-    pub res: ResponseEthCall,
 }
 
 fn convert(x: [u8; 32]) -> ([u8; 16], [u8; 16]) {
@@ -93,7 +89,7 @@ impl ResponseEthCall {
     pub fn result_as_f64(&self) -> Result<f64> {
         let x = self.result_as_u256()?;
         let non_zero_bits = x.bit_len();
-        println!("Number of bits = {non_zero_bits}");
+        // println!("Number of bits = {non_zero_bits}");
         if non_zero_bits > f64::MANTISSA_DIGITS as usize {
             println!("f64 is not big enough to accuratly represent integer with {non_zero_bits} non zero bits");
         }
@@ -110,7 +106,7 @@ impl ResponseEthCall {
 }
 
 impl RequestEthCall {
-    pub fn latest(calldata: &Bytes, contract_address: &Address, id: u64) -> RequestEthCall {
+    pub fn latest(calldata: &Bytes, contract_address: &Address, id: FeedId) -> RequestEthCall {
         let params = RequestEthCallParams {
             data: calldata.0.encode_hex_upper_with_prefix(),
             from: "0x0000000000000000000000000000000000000000".to_string(),
@@ -126,7 +122,13 @@ impl RequestEthCall {
     }
 }
 
-type FetchedDataForFeed = HashMap<u64, ResponseEthCall>;
+#[derive(Debug)]
+struct FetchedDataForFeed {
+    pub contacts: Vec<Contract>,
+    pub responses: Vec<ResponseEthCall>,
+}
+
+type FetchedDataHashMap = HashMap<FeedId, FetchedDataForFeed>;
 type MyProvider = alloy::providers::fillers::FillProvider<
     alloy::providers::fillers::JoinFill<
         alloy::providers::Identity,
@@ -144,128 +146,198 @@ type MyProvider = alloy::providers::fillers::FillProvider<
     alloy::providers::RootProvider,
 >;
 
-fn yn_ethx_call(provider: MyProvider, id: u64) -> RequestEthCall {
-    let address = address!("0x657d9ABA1DBb59e53f9F3eCAA878447dCfC96dCb");
-    let contact = YnETHx::new(address, provider.clone());
-    let shares = U256::from(1_000_000_000_000_000_000_u64);
-    let x = contact.convertToAssets(shares);
-    let calldata = x.calldata().clone();
-    RequestEthCall::latest(&calldata, &address, id)
-}
-
-fn yn_bnbx_call(provider: MyProvider, id: u64) -> RequestEthCall {
-    let address = address!("0x32c830f5c34122c6afb8ae87aba541b7900a2c5f");
-    let contact = YnETHx::new(address, provider.clone());
-    let shares = U256::from(1_000_000_000_000_000_000_u64);
-    let x = contact.convertToAssets(shares);
-    let calldata = x.calldata().clone();
-    RequestEthCall::latest(&calldata, &address, id)
-}
-
-fn yield_fi_yusd_call(provider: MyProvider, id: u64) -> RequestEthCall {
-    let address = address!("0x19Ebd191f7A24ECE672ba13A302212b5eF7F35cb");
-    let contact = YieldFiyUSD::new(address, provider.clone());
-    let x = contact.exchangeRate();
-    let calldata = x.calldata().clone();
-    RequestEthCall::latest(&calldata, &address, id)
-}
-
-async fn fetch_all(resourses: &[FeedConfig]) -> Result<FetchedDataForFeed> {
-    let mut res = FetchedDataForFeed::new();
+async fn fetch_all(resourses: &[FeedConfig]) -> Result<FetchedDataHashMap> {
+    let mut res = FetchedDataHashMap::new();
     for feed_config in resourses {
-        if let Some(value) = fetch_value_for_feed(feed_config).await? {
-            res.insert(feed_config.feed_id, value);
+        let mut responses = vec![];
+        for contract in &feed_config.arguments.contracts {
+            if let Some(value) = contract.fetch(feed_config.feed_id).await {
+                responses.push(value);
+            }
         }
+        res.insert(
+            feed_config.feed_id,
+            FetchedDataForFeed {
+                contacts: feed_config.arguments.contracts.to_vec(),
+                responses,
+            },
+        );
     }
     Ok(res)
 }
 
-async fn fetch_value_for_feed(
-    feed_config: &FeedConfig,
-) -> Result<Option<ResponseEthCall>, anyhow::Error> {
-    let mut last_value = None;
-    for rpc_url_candidate in &feed_config.arguments {
-        let rpc_url: Url = rpc_url_candidate.as_str().parse()?;
-        let provider = ProviderBuilder::new().connect_http(rpc_url.clone());
-        let eth_call = match feed_config.feed_id {
-            100001 => yn_ethx_call(provider.clone(), 12345 + 998),
-            100002 => yield_fi_yusd_call(provider.clone(), 12345 + 128),
-            100003 => yn_bnbx_call(provider.clone(), 12345 + 129),
-            _ => {
-                break;
-            }
-        };
-        let mut value: ResponseEthCall = http_post_json(rpc_url.as_str(), eth_call).await?;
-        value.rpc_url = Some(rpc_url_candidate.to_string());
-        if value.error.is_none() {
-            return Ok(Some(value));
-        } else {
-            last_value = Some(value);
+impl Contract {
+    pub fn prepare_request(&self, provider: MyProvider, id: FeedId) -> Option<RequestEthCall> {
+        match self.method_name.as_str() {
+            "convertToAssets" => Some(self.convert_to_assets(provider.clone(), id)),
+            "exchangeRate" => Some(self.exchange_rate(provider.clone(), id)),
+            _ => None,
         }
     }
-    Ok(last_value)
+
+    pub fn convert_to_assets(&self, provider: MyProvider, id: FeedId) -> RequestEthCall {
+        let contact = VaultABI::new(self.address, provider.clone());
+        let shares = self.param1.unwrap();
+        let x = contact.convertToAssets(shares);
+        let calldata = x.calldata().clone();
+        RequestEthCall::latest(&calldata, &self.address, id)
+    }
+
+    pub fn exchange_rate(&self, provider: MyProvider, id: FeedId) -> RequestEthCall {
+        let contact = YieldFiyUSD::new(self.address, provider.clone());
+        let x = contact.exchangeRate();
+        let calldata = x.calldata().clone();
+        RequestEthCall::latest(&calldata, &self.address, id)
+    }
+
+    async fn fetch(&self, id: FeedId) -> Option<ResponseEthCall> {
+        let mut last_value = None;
+        for rpc_url_candidate in &self.rpc_urls {
+            if let Ok(rpc_url) = rpc_url_candidate.as_str().parse::<Url>() {
+                let provider = ProviderBuilder::new().connect_http(rpc_url.clone());
+                let eth_call = match self.prepare_request(provider, id) {
+                    Some(value) => value,
+                    None => break,
+                };
+                if let Ok(mut value) =
+                    http_post_json::<RequestEthCall, ResponseEthCall>(rpc_url.as_str(), eth_call)
+                        .await
+                {
+                    value.rpc_url = Some(rpc_url_candidate.clone());
+                    if value.error.is_none() {
+                        return Some(value);
+                    } else {
+                        last_value = Some(value);
+                    }
+                }
+            }
+        }
+        last_value
+    }
 }
 
-fn process_results(results: &FetchedDataForFeed) -> Result<Payload> {
+fn process_results(results: &FetchedDataHashMap, resourses: &[FeedConfig]) -> Result<Payload> {
     let mut payload: Payload = Payload::new();
     for (feed_id, r) in results {
-        let value = match r.result_as_f64() {
-            Ok(x) => DataFeedResultValue::Numerical(x),
-            Err(e) => DataFeedResultValue::Error(e.to_string()),
+        let mut sum = 0_f64;
+        let mut weight = 0.0;
+        let mut error = None;
+        for resp in &r.responses {
+            match resp.result_as_f64() {
+                Ok(x) => {
+                    sum += x;
+                    weight += 1.0_f64;
+                }
+                Err(e) => error = Some(DataFeedResultValue::Error(e.to_string())),
+            };
+        }
+        let value = if sum > 0.0_f64 {
+            let div = if let Some(div) = resourses
+                .iter()
+                .find(|x| x.feed_id == *feed_id)
+                .and_then(|x| x.arguments.divisor)
+            {
+                weight * div
+            } else {
+                weight
+            };
+            DataFeedResultValue::Numerical(sum / div)
+        } else {
+            match error {
+                Some(err) => err,
+                None => DataFeedResultValue::Error("No data".to_string()),
+            }
         };
-        payload.values.push(DataFeedResult {
+        let data_feed_result = DataFeedResult {
             id: feed_id.to_string(),
             value,
-        });
+        };
+        payload.values.push(data_feed_result);
     }
     Ok(payload)
 }
 
-fn print_results(results: &FetchedDataForFeed, payload: &Payload) {
-    let mut keys = results.keys().cloned().collect::<Vec<u64>>();
-    keys.sort();
+fn print_responses(results: &FetchedDataHashMap) {
+    let mut feed_ids = results.keys().cloned().collect::<Vec<FeedId>>();
+    feed_ids.sort();
 
     let mut table = Table::new();
     table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
 
     table.set_titles(Row::new(vec![
         Cell::new("Feed ID").style_spec("bc"),
+        Cell::new("Label").style_spec("bc"),
         Cell::new("Method").style_spec("bc"),
-        Cell::new("Value").style_spec("bc"),
+        Cell::new("Raw response").style_spec("bc"),
         Cell::new("RPC Url").style_spec("bc"),
+        Cell::new("Contract").style_spec("bc"),
     ]));
 
-    for key in keys {
-        let description = match key {
-            100001 => "YnETHx -> convertToAssets",
-            100002 => "YToken -> exchangeRate",
-            100003 => "YnBNBx -> convertToAssets",
-            _ => "unknown",
-        };
-        let rpc_url = format!("{:?}", results.get(&key).unwrap().rpc_url);
-        let value = payload
-            .values
-            .iter()
-            .find(|p| p.id == key.to_string())
-            .map_or("missing".to_string(), |x| format!("{:?}", x.value));
-        table.add_row(Row::new(vec![
-            Cell::new(&key.to_string()).style_spec("r"),
-            Cell::new(description).style_spec("l"),
-            Cell::new(&value).style_spec("r"),
-            Cell::new(&rpc_url).style_spec("r"),
-        ]));
+    for feed_id in feed_ids {
+        let res = results.get(&feed_id).unwrap();
+        for (resp, contact) in zip(&res.responses, &res.contacts) {
+            let rpc_url = format!("{:?}", resp.rpc_url.clone());
+            let value = format!("{:?}", resp.result_as_f64());
+            table.add_row(Row::new(vec![
+                Cell::new(&feed_id.to_string()).style_spec("r"),
+                Cell::new(&contact.label).style_spec("l"),
+                Cell::new(&contact.method_name).style_spec("r"),
+                Cell::new(&value).style_spec("r"),
+                Cell::new(&rpc_url).style_spec("r"),
+                Cell::new(&contact.address.to_string()).style_spec("r"),
+            ]));
+        }
     }
 
     table.printstd();
 }
 
+fn print_payload(payload: &Payload, resourses: &[FeedConfig]) {
+    let mut feed_ids = resourses.iter().map(|x| x.feed_id).collect::<Vec<FeedId>>();
+    feed_ids.sort();
+
+    let mut table = Table::new();
+    table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
+
+    table.set_titles(Row::new(vec![
+        Cell::new("Feed ID").style_spec("bc"),
+        Cell::new("Pair").style_spec("bc"),
+        Cell::new("Value").style_spec("bc"),
+    ]));
+
+    for feed_id in feed_ids {
+        let x = payload
+            .values
+            .iter()
+            .find(|x| x.id.parse::<FeedId>().unwrap() == feed_id)
+            .unwrap();
+        let pair = resourses
+            .iter()
+            .find(|r| r.feed_id == feed_id)
+            .map(|x| format!("{} / {}", x.pair.base, x.pair.quote))
+            .unwrap_or("unknown".to_string());
+        let value = format!("{:?}", &x.value);
+        table.add_row(Row::new(vec![
+            Cell::new(&feed_id.to_string()).style_spec("r"),
+            Cell::new(&pair).style_spec("r"),
+            Cell::new(&value).style_spec("l"),
+        ]));
+    }
+    table.printstd();
+}
+
+fn print_results(results: &FetchedDataHashMap, payload: &Payload, resourses: &[FeedConfig]) {
+    print_responses(results);
+    print_payload(payload, resourses);
+}
+
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
-    println!("Starting oracle component - YnETHx Terminal");
+    println!("Starting oracle component - Etherium RPC");
     let resources = get_resources_from_settings(&settings)?;
     let results = fetch_all(&resources).await?;
-    let payload = process_results(&results)?;
-    print_results(&results, &payload);
+    let payload = process_results(&results, &resources)?;
+    print_results(&results, &payload, &resources);
     Ok(payload)
 }
 
@@ -275,29 +347,76 @@ pub struct Pair {
     pub quote: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
+pub struct VaultFeedConfig {
+    #[serde(default)]
+    pub feed_id: String,
+    pub network: String,
+    pub pool: String,
+    pub reverse: bool,
+    #[serde(default)]
+    pub min_volume_usd: Option<f64>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct Contract {
+    pub rpc_urls: Vec<String>,
+    pub address: Address,
+    pub label: String,
+    pub method_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub param1: Option<U256>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct PairDescription {
+    base: String,
+    quote: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct OracleArgs {
+    pub contracts: Vec<Contract>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub divisor: Option<f64>,
+}
+#[derive(Serialize, Deserialize, Debug, Clone)]
 struct FeedConfig {
     #[serde(default)]
-    pub feed_id: u64,
-    pub arguments: Vec<String>,
+    pub feed_id: FeedId,
+    pub pair: PairDescription,
+    #[serde(default)]
+    pub decimals: u32,
+    #[serde(default)]
+    pub category: String,
+    #[serde(default)]
+    pub market_hours: String,
+    pub arguments: OracleArgs,
 }
 
 fn get_resources_from_settings(settings: &Settings) -> Result<Vec<FeedConfig>> {
     let mut config: Vec<FeedConfig> = Vec::new();
     for feed_setting in &settings.data_feeds {
-        let mut feed_config = serde_json::from_str::<FeedConfig>(&feed_setting.data)
-            .context("Couldn't parse data feed")?;
-        feed_config.feed_id = feed_setting.id.parse::<u64>()?;
-        config.push(feed_config);
+        match serde_json::from_str::<FeedConfig>(&feed_setting.data) {
+            Ok(mut feed_config) => {
+                feed_config.feed_id = feed_setting.id.parse::<FeedId>()?;
+                config.push(feed_config);
+            }
+            Err(err) => {
+                println!(
+                    "Error {err} when parsing feed settings data = '{}'",
+                    &feed_setting.data
+                );
+            }
+        }
     }
     Ok(config)
 }
 
 #[cfg(test)]
 mod tests {
-    use alloy::primitives::U256;
-
-    use crate::ResponseEthCall;
+    use crate::{Contract, FeedConfig, OracleArgs, PairDescription, ResponseEthCall};
+    use alloy::primitives::{address, U256};
 
     #[test]
     fn test_deserializion_of_error() {
@@ -331,5 +450,49 @@ mod tests {
         assert!(value.error.is_none());
         assert!(value.result.is_some());
         assert_eq!(value.result_as_u256().unwrap(), U256::ZERO);
+    }
+
+    #[test]
+    fn test_serialization_of_settings() {
+        let m = FeedConfig {
+            feed_id: 100,
+            pair: PairDescription {
+                base: "oLP".to_string(),
+                quote: "USDC".to_string(),
+            },
+            market_hours: "Crypto".to_string(),
+            category: "".to_string(),
+            decimals: 0,
+            arguments: OracleArgs {
+                divisor: 50_f64.into(),
+                contracts: vec![
+                    Contract {
+                        address: address!("0x657d9ABA1DBb59e53f9F3eCAA878447dCfC96dCb"),
+                        rpc_urls: vec![
+                            "https://eth.llamarpc.com".to_string(),
+                            "https://rpc.eth.gateway.fm".to_string(),
+                            "https://ethereum-rpc.publicnode.com".to_string(),
+                        ],
+                        label: "some_label".to_string(),
+                        method_name: "convertToAssets".to_string(),
+                        param1: None,
+                    },
+                    Contract {
+                        address: address!("0x20d419a8e12c45f88fda7c5760bb6923cee27f98"),
+                        rpc_urls: vec![
+                            "https://eth.llamarpc.com".to_string(),
+                            "https://rpc.eth.gateway.fm".to_string(),
+                            "https://ethereum-rpc.publicnode.com".to_string(),
+                        ],
+                        label: "other_label".to_string(),
+                        method_name: "method_1".to_string(),
+                        param1: Some(U256::from(1000000000000000000_u128)),
+                    },
+                ],
+            },
+        };
+        let expected = r#"{"feed_id":100,"pair":{"base":"oLP","quote":"USDC"},"decimals":0,"category":"","market_hours":"Crypto","arguments":{"contracts":[{"rpc_urls":["https://eth.llamarpc.com","https://rpc.eth.gateway.fm","https://ethereum-rpc.publicnode.com"],"address":"0x657d9aba1dbb59e53f9f3ecaa878447dcfc96dcb","label":"some_label","method_name":"convertToAssets"},{"rpc_urls":["https://eth.llamarpc.com","https://rpc.eth.gateway.fm","https://ethereum-rpc.publicnode.com"],"address":"0x20d419a8e12c45f88fda7c5760bb6923cee27f98","label":"other_label","method_name":"method_1","param1":"0xde0b6b3a7640000"}],"divisor":50.0}}"#;
+        let serialized = serde_json::ser::to_string(&m).unwrap();
+        assert_eq!(expected, serialized);
     }
 }

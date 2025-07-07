@@ -6,6 +6,7 @@ license.workspace = true
 edition.workspace = true
 
 [dependencies]
+blocksense-utils = { path = "../../libs/utils" }
 blocksense-feed-registry = { workspace = true }
 blocksense-data-feeds = { workspace = true }
 hex = { workspace = true }

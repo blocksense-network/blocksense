@@ -4,7 +4,7 @@ use blocksense_registry::config::{
 use blocksense_utils::constants::{
     FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE, SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE,
 };
-use blocksense_utils::{get_config_file_path, read_file};
+use blocksense_utils::{get_config_file_path, read_file, FeedId};
 use hex::decode;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -149,7 +149,7 @@ impl Validated for ReporterConfig {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct PublishCriteria {
-    pub feed_id: u32,
+    pub feed_id: FeedId,
     #[serde(default)]
     pub skip_publish_if_less_then_percentage: f64,
 
@@ -194,7 +194,7 @@ pub struct Provider {
     pub is_enabled: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub allow_feeds: Option<Vec<u32>>,
+    pub allow_feeds: Option<Vec<FeedId>>,
 
     #[serde(default)]
     pub publishing_criteria: Vec<PublishCriteria>,
@@ -261,8 +261,8 @@ pub struct KafkaReportEndpoint {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct PyroscopeConfig {
-    pub user: String,
-    pub password_file_path: String,
+    pub user: Option<String>,
+    pub password_file_path: Option<String>,
     pub url: String,
     pub sample_rate: u32,
 }
@@ -351,7 +351,7 @@ pub fn get_sequencer_and_feed_configs() -> (SequencerConfig, AllFeedsConfig) {
 
 // Utility functions for tests follow:
 
-pub fn test_feed_config(id: u32, stride: u16) -> FeedConfig {
+pub fn test_feed_config(id: FeedId, stride: u16) -> FeedConfig {
     FeedConfig {
         id,
         full_name: "FOXY".to_owned(),
@@ -404,7 +404,7 @@ pub fn test_feed_config(id: u32, stride: u16) -> FeedConfig {
     }
 }
 
-pub fn test_feeds_config(id: u32, stride: u16) -> HashMap<u32, FeedConfig> {
+pub fn test_feeds_config(id: FeedId, stride: u16) -> HashMap<FeedId, FeedConfig> {
     let mut feeds_config = HashMap::new();
     feeds_config.insert(id, test_feed_config(id, stride));
     feeds_config

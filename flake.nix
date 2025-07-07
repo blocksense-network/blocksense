@@ -25,6 +25,10 @@
     devenv.follows = "mcl-blockchain/devenv";
     nix2container.follows = "mcl-blockchain/nix2container";
     mk-shell-bin.url = "github:rrbutani/nix-mk-shell-bin";
+    blama = {
+      url = "github:blocksense-network/blama";
+      flake = false;
+    };
   };
 
   outputs =

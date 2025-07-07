@@ -19,6 +19,7 @@ use blocksense_gnosis_safe::utils::SignatureWithAddress;
 use blocksense_metrics::metrics::FeedsMetrics;
 use blocksense_registry::config::FeedConfig;
 use blocksense_utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
+use blocksense_utils::FeedId;
 use eyre::eyre;
 use rdkafka::producer::FutureProducer;
 use rdkafka::ClientConfig;
@@ -38,7 +39,7 @@ pub struct SequencerState {
     pub feed_id_allocator: Arc<RwLock<Option<ConcurrentAllocator>>>,
     pub aggregated_votes_to_block_creator_send: UnboundedSender<VotedFeedUpdateWithProof>,
     pub feeds_metrics: Arc<RwLock<FeedsMetrics>>,
-    pub active_feeds: Arc<RwLock<HashMap<u32, FeedConfig>>>,
+    pub active_feeds: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
     pub sequencer_config: Arc<RwLock<SequencerConfig>>,
     pub feed_aggregate_history: Arc<RwLock<FeedAggregateHistory>>,
     pub feeds_management_cmd_to_block_creator_send: UnboundedSender<FeedsManagementCmds>,

@@ -11,6 +11,7 @@ crate-type = ["cdylib"]
 [dependencies]
 wit-bindgen = { workspace = true }
 blocksense-sdk = { workspace = true }
+blocksense-data-providers-sdk = { workspace = true }
 anyhow = { workspace = true }
 serde_json = { workspace = true }
 url = { workspace = true }

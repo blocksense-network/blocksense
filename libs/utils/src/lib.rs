@@ -4,6 +4,8 @@ pub mod logging;
 pub mod test_env;
 pub mod time;
 
+pub type FeedId = u128;
+
 use std::{
     env,
     fmt::{Debug, Display},

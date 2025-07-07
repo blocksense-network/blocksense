@@ -359,6 +359,7 @@ mod tests {
     use crate::providers::provider::init_shared_rpc_providers;
     use blocksense_config::{test_feed_config, AllFeedsConfig, SequencerConfig};
     use blocksense_feed_registry::types::{test_payload_from_result, FeedType};
+    use blocksense_utils::FeedId;
     use std::{collections::HashMap, time::Duration};
 
     use blocksense_config::get_test_config_with_no_providers;
@@ -430,6 +431,6 @@ mod tests {
             vote_recv.recv(),
         )
         .await;
-        check_received(received, (1_u32, original_report_data));
+        check_received(received, (1 as FeedId, original_report_data));
     }
 }

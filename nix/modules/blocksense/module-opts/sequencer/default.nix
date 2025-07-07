@@ -112,4 +112,37 @@ lib: with lib; {
     default = "debug";
     description = mdDoc "The log level for the sequencer.";
   };
+
+  pyroscope-config = mkOption {
+    default = null;
+    description = "Optional Pyroscope configuration.";
+    type = types.nullOr (
+      types.submodule {
+        options = {
+          user = mkOption {
+            type = types.nullOr types.str;
+            default = null;
+            description = "Username for Pyroscope.";
+          };
+
+          password-file-path = mkOption {
+            type = types.nullOr types.path;
+            default = null;
+            description = "Path to file containing Pyroscope password.";
+          };
+
+          url = mkOption {
+            type = types.str;
+            description = "Pyroscope server URL.";
+          };
+
+          sample-rate = mkOption {
+            default = 1000;
+            type = types.int;
+            description = "Sample rate for profiling (Hz).";
+          };
+        };
+      }
+    );
+  };
 }

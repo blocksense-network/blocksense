@@ -10,7 +10,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@blocksense/ui/Table';
+} from '@blocksense/docs-ui/Table';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 
 type FunctionModifiersProps = {

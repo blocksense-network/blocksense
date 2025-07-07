@@ -1,31 +1,32 @@
 mod common;
-mod exchanges;
 mod fetch_prices;
 
-use anyhow::{Context, Result};
-use blocksense_sdk::{
-    oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
-    oracle_component,
-    wap::vwap::compute_vwap,
-};
-use common::{ExchangeName, ExchangesSymbols, ResourcePairData};
-use itertools::Itertools;
-use prettytable::{format, Cell, Row, Table};
-use serde::{Deserialize, Serialize};
 use std::{
     collections::{HashMap, HashSet},
     fmt::Write,
 };
 
-use crate::common::{ResourceData, TradingPair, TradingPairToResults};
-use fetch_prices::fetch_all_prices;
+use anyhow::{Context, Result};
+use itertools::Itertools;
+use prettytable::{format, Cell, Row, Table};
+use serde::{Deserialize, Serialize};
 
-//TODO(adikov): Refacotr:
-//1. Move all specific exchange logic to separate files.
-//2. Move URLS to constants
-//3. Try to minimize object cloning.
+use blocksense_data_providers_sdk::price_data::types::{
+    PairsToResults, PricePair, ProviderName, ProvidersSymbols,
+};
+use blocksense_data_providers_sdk::price_data::wap::vwap::compute_vwap;
 
-type ExchangeData = HashMap<ExchangeName, HashMap<String, Vec<String>>>;
+use blocksense_sdk::{
+    oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
+    oracle_component,
+};
+
+use crate::{
+    common::{ResourceData, ResourcePairData},
+    fetch_prices::get_prices,
+};
+
+type ExchangeData = HashMap<ProviderName, HashMap<String, Vec<String>>>;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct ExchangesData {
@@ -34,7 +35,7 @@ struct ExchangesData {
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Data {
-    pub pair: TradingPair,
+    pub pair: PricePair,
     pub arguments: ExchangesData,
 }
 
@@ -44,7 +45,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
 
     let resources = get_resources_from_settings(&settings)?;
 
-    let results = fetch_all_prices(&resources).await?;
+    let results = get_prices(&resources).await?;
     let payload = process_results(&results)?;
 
     print_results(&resources.pairs, &results, &payload);
@@ -52,10 +53,10 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     Ok(payload)
 }
 
-fn process_results(results: &TradingPairToResults) -> Result<Payload> {
+fn process_results(results: &PairsToResults) -> Result<Payload> {
     let mut payload = Payload::new();
     for (feed_id, results) in results.iter() {
-        let price_points = results.exchanges_data.values();
+        let price_points = results.providers_data.values();
 
         payload.values.push(match compute_vwap(price_points) {
             Ok(price) => DataFeedResult {
@@ -74,7 +75,7 @@ fn process_results(results: &TradingPairToResults) -> Result<Payload> {
 
 fn get_resources_from_settings(settings: &Settings) -> Result<ResourceData> {
     let mut price_feeds = Vec::new();
-    let mut exchanges_symbols: ExchangesSymbols = HashMap::new();
+    let mut exchanges_symbols: ProvidersSymbols = HashMap::new();
 
     for feed_setting in &settings.data_feeds {
         let feed_config =
@@ -113,11 +114,7 @@ struct ResultInfo {
     pub exchanges: Vec<String>,
 }
 
-fn print_results(
-    resources: &[ResourcePairData],
-    results: &TradingPairToResults,
-    payload: &Payload,
-) {
+fn print_results(resources: &[ResourcePairData], results: &PairsToResults, payload: &Payload) {
     let mut results_info: Vec<ResultInfo> = Vec::new();
     let mut pairs_with_missing_exchange_data: String = String::new();
     let mut pairs_with_missing_exchange_data_count = 0;
@@ -129,7 +126,7 @@ fn print_results(
             let exchanges = results
                 .get(&resurce.id)
                 .map(|res| {
-                    res.exchanges_data
+                    res.providers_data
                         .keys()
                         .map(|x| x.split(' ').next().unwrap().to_string())
                         .unique()

@@ -2,7 +2,7 @@
 
 import { ReactNode } from 'react';
 
-import { ImageWrapper } from '@blocksense/ui/ImageWrapper';
+import { ImageWrapper } from '@blocksense/docs-ui/ImageWrapper';
 
 interface DataTableColumnHeaderProps {
   title: ReactNode;

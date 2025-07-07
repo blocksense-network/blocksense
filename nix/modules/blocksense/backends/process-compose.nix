@@ -13,6 +13,9 @@ let
     blockchain_reader
     aggregate_consensus_reader
     ;
+  inherit (self'.packages)
+    blama
+    ;
 
   mkCargoTargetExePath = executable-name: "${config.devenv.root}/target/release/${executable-name}";
 
@@ -142,6 +145,18 @@ let
       log_location = cfg.logsDir + "/aggregate-consensus-reader.log";
     };
   };
+
+  blamaInstance = {
+    blama.process-compose = {
+      inherit (cfg.blama) command;
+      environment = lib.mapAttrsToList (k: v: "${k}=${v}") cfg.blama.environment;
+      shutdown.signal = 9;
+      log_configuration = logsConfig;
+      log_location = cfg.logsDir + "/blama.log";
+      # TODO: Adequate `readiness_probe`
+      # readiness_probe = {};
+    };
+  };
 in
 {
   config = lib.mkIf cfg.enable {
@@ -152,6 +167,7 @@ in
       anvilInstances
       (lib.mkIf config.services.kafka.enable blockchainReader)
       (lib.mkIf config.services.kafka.enable aggregateConsensusReader)
+      (lib.mkIf cfg.blama.enable blamaInstance)
     ];
   };
 }

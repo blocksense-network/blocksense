@@ -62,7 +62,7 @@ use blocksense_metrics::{
     },
     TextEncoder,
 };
-use blocksense_utils::time::current_unix_time;
+use blocksense_utils::{time::current_unix_time, FeedId};
 
 use blocksense_gnosis_safe::{
     data_types::{ConsensusSecondRoundBatch, ReporterResponse},
@@ -79,7 +79,7 @@ use blocksense::oracle::oracle_types as oracle;
 
 pub(crate) type RuntimeData = HttpRuntimeData;
 pub(crate) type _Store = spin_core::Store<RuntimeData>;
-type DataFeedResults = Arc<RwLock<HashMap<u32, VotedFeedUpdate>>>;
+type DataFeedResults = Arc<RwLock<HashMap<FeedId, VotedFeedUpdate>>>;
 
 const TIME_BEFORE_KAFKA_READ_RETRY_IN_MS: u64 = 500;
 const TOTAL_RETRIES_FOR_KAFKA_READ: u64 = 10;
@@ -302,7 +302,7 @@ impl TriggerExecutor for OracleTrigger {
         let (data_feed_sender, data_feed_receiver) = unbounded_channel();
         let (signal_data_feed_sender, _) = channel(64);
         let data_feed_results: DataFeedResults = Arc::new(RwLock::new(HashMap::new()));
-        let mut feeds_config = HashMap::new();
+        let mut feeds_config: HashMap<FeedId, FeedStrideAndDecimals> = HashMap::new();
         //TODO(adikov): Move all the logic to a different struct and handle
         //errors properly.
         // For each component, run its own timer loop
@@ -311,7 +311,7 @@ impl TriggerExecutor for OracleTrigger {
         for component in components.values() {
             for df in &component.oracle_settings {
                 feeds_config.insert(
-                    df.id.parse::<u32>()?,
+                    df.id.parse::<FeedId>()?,
                     FeedStrideAndDecimals {
                         stride: df.stride,
                         decimals: df.decimals,
@@ -792,7 +792,7 @@ impl OracleTrigger {
 
     async fn process_aggregated_consensus(
         mut ss_rx: UnboundedReceiver<ConsensusSecondRoundBatch>,
-        feeds_config: HashMap<u32, FeedStrideAndDecimals>,
+        feeds_config: HashMap<FeedId, FeedStrideAndDecimals>,
         latest_votes: DataFeedResults,
         sequencer: Url,
         second_consensus_secret_key: String,
@@ -1037,7 +1037,7 @@ impl OutboundWasiHttpHandler for HttpRuntimeData {
 }
 
 fn update_latest_votes(
-    latest_votes: &mut HashMap<u32, VotedFeedUpdate>,
+    latest_votes: &mut HashMap<FeedId, VotedFeedUpdate>,
     batch: Vec<DataFeedPayload>,
 ) {
     for vote in batch {

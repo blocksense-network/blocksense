@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { CopyButton } from '@blocksense/ui/CopyButton';
+import { CopyButton } from '@blocksense/docs-ui/CopyButton';
 
 type SelectorProps = {
   selector?: string;

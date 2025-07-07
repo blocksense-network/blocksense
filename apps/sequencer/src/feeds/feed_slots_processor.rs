@@ -13,6 +13,7 @@ use blocksense_feed_registry::{aggregate::FeedAggregate, registry::FeedReports};
 use blocksense_feeds_processing::utils::{consume_reports, ConsumedReports};
 use blocksense_metrics::{inc_metric, metrics::FeedsMetrics};
 use blocksense_utils::time::current_unix_time;
+use blocksense_utils::FeedId;
 use eyre::{eyre, ContextCompat, Result};
 use std::sync::Arc;
 use std::time::Duration;
@@ -23,11 +24,11 @@ use tracing::{debug, info};
 
 pub struct FeedSlotsProcessor {
     name: String,
-    key: u32,
+    key: FeedId,
 }
 
 impl FeedSlotsProcessor {
-    pub fn new(name: String, key: u32) -> FeedSlotsProcessor {
+    pub fn new(name: String, key: FeedId) -> FeedSlotsProcessor {
         FeedSlotsProcessor { name, key }
     }
 
@@ -44,7 +45,7 @@ impl FeedSlotsProcessor {
 
     async fn get_reports_for_feed(
         &self,
-        feed_id: u32,
+        feed_id: FeedId,
         reports: &Arc<RwLock<AllFeedsReports>>,
     ) -> Option<Arc<RwLock<FeedReports>>> {
         debug!("Get a read lock on all reports [feed {feed_id}]");
@@ -83,6 +84,7 @@ impl FeedSlotsProcessor {
         history: &Arc<RwLock<FeedAggregateHistory>>,
     ) -> Result<ConsumedReports> {
         let feed_id = self.key;
+        let feed_name = &self.name;
         let num_valid_reporters = {
             self.get_num_valid_reportes(&sequencer_state.reporters)
                 .await
@@ -105,11 +107,11 @@ impl FeedSlotsProcessor {
             .await
         {
             Some(reports) => {
-                debug!("found the following reports: [feed {feed_id}]");
-                debug!("reports = {reports:?} [feed {feed_id}]");
-                debug!("Get a write lock on reports [feed {feed_id}]");
+                debug!("found the following reports: [feed `{feed_name}` feed_id = {feed_id}]");
+                debug!("reports = {reports:?} [feed `{feed_name}` feed_id = {feed_id}]");
+                debug!("Get a write lock on reports [feed `{feed_name}` feed_id = {feed_id}]");
                 let mut reports = reports.write().await;
-                debug!("Acquired a write lock on reports [feed {feed_id}]");
+                debug!("Acquired a write lock on reports [feed `{feed_name}` feed_id = {feed_id}]");
                 consumed_reports = consume_reports(
                     self.name.as_str(),
                     &reports.report,
@@ -129,10 +131,12 @@ impl FeedSlotsProcessor {
 
                 reports.clear();
                 drop(reports);
-                debug!("Release the write lock on reports [feed {feed_id}]");
+                debug!(
+                    "Release the write lock on reports [feed `{feed_name}` feed_id = {feed_id}]"
+                );
             }
             None => {
-                info!("No reports found!");
+                info!("No reports found! [feed `{feed_name}` feed_id = {feed_id}]");
             }
         }
         Ok(consumed_reports)
@@ -147,11 +151,12 @@ impl FeedSlotsProcessor {
         sequencer_state: &Data<SequencerState>,
     ) -> Result<()> {
         let feed_id = self.key;
+        let feed_name = &self.name;
         self.increase_quorum_metric(&feed_metrics, consumed_reports.is_quorum_reached)
             .await;
 
         if !consumed_reports.is_quorum_reached {
-            debug!("Quorum not reached for feed_id = {feed_id}");
+            debug!("Quorum not reached for [feed `{feed_name}` feed_id = {feed_id}]");
             return Ok(());
         }
 
@@ -192,8 +197,7 @@ impl FeedSlotsProcessor {
 
         if skip_decision.should_skip() {
             info!(
-                "Skipping publishing for feed_id = {} change is lower then threshold of {} %",
-                feed_id, skip_publish_if_less_then_percentage
+                "Skipping publishing for [feed `{feed_name}` feed_id = {feed_id}] change is lower then threshold of {skip_publish_if_less_then_percentage} %"
             );
             return Ok(());
         }
@@ -202,11 +206,11 @@ impl FeedSlotsProcessor {
             "[post_consumed_reports]: Impossible, quorum reached but no value is reported",
         )?;
 
-        debug!("Awaiting post_to_block_creator... [feed {feed_id}]");
+        debug!("Awaiting post_to_block_creator... [feed `{feed_name}` feed_id = {feed_id}]");
         let result = self
             .post_to_block_creator(history, result_post_to_contract, sequencer_state)
             .await;
-        debug!("Continued after post_to_block_creator [feed {feed_id}]");
+        debug!("Continued after post_to_block_creator [feed `{feed_name}` feed_id = {feed_id}]");
         result
     }
 
@@ -218,15 +222,16 @@ impl FeedSlotsProcessor {
     ) -> Result<()> {
         {
             let feed_id = self.key;
-            debug!("Get a write lock on history [feed {feed_id}]");
+            let feed_name = &self.name;
+            debug!("Get a write lock on history [feed `{feed_name}` feed_id = {feed_id}]");
             let mut history_guard = history.write().await;
-            debug!("Push result that will be posted to contract to history [feed {feed_id}]");
+            debug!("Push result that will be posted to contract to history [feed `{feed_name}` feed_id = {feed_id}]");
             history_guard.push_next(
                 self.key,
                 message.update.value.clone(),
                 message.update.end_slot_timestamp,
             );
-            debug!("Release the write lock on history [feed {feed_id}]");
+            debug!("Release the write lock on history [feed `{feed_name}` feed_id = {feed_id}]");
         }
         let result_send = sequencer_state
             .aggregated_votes_to_block_creator_send
@@ -261,6 +266,7 @@ impl FeedSlotsProcessor {
         _cmd_sender: Option<mpsc::UnboundedSender<FeedsSlotProcessorCmds>>,
     ) -> Result<ProcessorResultValue> {
         let feed_id = self.key;
+        let feed_name = &self.name;
         let (
             is_oneshot,
             report_interval_ms,
@@ -271,7 +277,7 @@ impl FeedSlotsProcessor {
             aggregator,
             feed_type,
         ) = {
-            debug!("Get a read lock on feed meta [feed {feed_id}]");
+            debug!("Get a read lock on feed meta [feed `{feed_name}` feed_id = {feed_id}]");
             let datafeed = feed.read().await;
             (
                 datafeed.is_oneshot(),
@@ -288,7 +294,7 @@ impl FeedSlotsProcessor {
         let feed_type = FeedType::get_variant_from_string(feed_type.as_str())
             .map_err(|msg| eyre!("{msg} for feed: {}", self.name))?;
 
-        debug!("Release the read lock on feed meta [feed {feed_id}]");
+        debug!("Release the read lock on feed meta [feed `{feed_name}` feed_id = {feed_id}]");
         let feed_slots_time_tracker = SlotTimeTracker::new(
             format!("feed_processor_{}", self.key),
             Duration::from_millis(report_interval_ms),
@@ -325,7 +331,7 @@ impl FeedSlotsProcessor {
                 processor_cmd = FeedSlotsProcessor::read_cmd(&mut cmd_channel) => {
                     match processor_cmd {
                         FeedsSlotProcessorCmds::Terminate() => {
-                            let msg = format!("Terminating processor for feed {} with id {} ", self.name, self.key);
+                            let msg = format!("Terminating processor for [feed `{feed_name}` feed_id = {feed_id}]");
                             info!(msg);
                             return Ok(ProcessorResultValue::ProcessorExitStatus(msg));
                         },
@@ -337,7 +343,7 @@ impl FeedSlotsProcessor {
                     is_processed = true;
                     let end_slot_timestamp = first_report_start_time + (report_interval_ms as u128) * (slot as u128 + 1);
 
-                    debug!("Awaiting process_end_of_slot [feed {}]", self.key);
+                    debug!("Awaiting process_end_of_slot [feed `{feed_name}` feed_id = {feed_id}]");
                     match self.process_end_of_slot(
                         is_oneshot,
                         report_interval_ms,
@@ -352,7 +358,7 @@ impl FeedSlotsProcessor {
                         history,
                         ).await {
                             Ok(consumed_reports) => {
-                                debug!("Continued after process_end_of_slot [feed {}]", self.key);
+                                debug!("Continued after process_end_of_slot [feed `{feed_name}` feed_id = {feed_id}]");
                                 if let Err(e) = self.post_consumed_reports(consumed_reports, feed_metrics.clone(), skip_publish_if_less_then_percentage, history, sequencer_state).await {
                                     error!("post_consumed_reports failed with {e}")
                                 }
@@ -386,7 +392,7 @@ pub mod tests {
 
     pub fn check_received(
         received: Result<Option<VotedFeedUpdateWithProof>, Elapsed>,
-        expected: (u32, FeedType),
+        expected: (FeedId, FeedType),
     ) {
         let feed_id = expected.0;
         let original_report_data = expected.1;
@@ -1051,7 +1057,7 @@ pub mod tests {
             always_publish_heartbeat_ms,
         )
         .await;
-        check_received(received, (1_u32, FeedType::Numerical(102.0)));
+        check_received(received, (1 as FeedId, FeedType::Numerical(102.0)));
     }
 
     #[tokio::test]

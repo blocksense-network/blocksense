@@ -2,11 +2,11 @@ use actix_web::{web, App, HttpServer};
 use blocksense_feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_gnosis_safe::utils::SignatureWithAddress;
-use blocksense_utils::read_file;
 #[cfg(feature = "profile")]
 use pprof::ProfilerGuard;
 use sequencer::providers::eth_send_utils::BatchOfUpdatesToProcess;
 use sequencer::providers::provider::init_shared_rpc_providers;
+use sequencer::pyroscope_profiler::setup_pyroscope;
 use sequencer::sequencer_state::{create_relayers_channels, SequencerState};
 use tokio::sync::{mpsc, RwLock};
 
@@ -314,38 +314,4 @@ async fn main() -> std::io::Result<()> {
     }
 
     Ok(())
-}
-
-async fn setup_pyroscope(
-    sequencer_config: &SequencerConfig,
-) -> Option<pyroscope::PyroscopeAgent<pyroscope::pyroscope::PyroscopeAgentReady>> {
-    let Some(pyroscope_config) = &sequencer_config.pyroscope_config else {
-        info!("No pyroscope_config provided. Will not send diagnostic information to pyroscope server!");
-        return None;
-    };
-
-    let user = pyroscope_config.user.clone();
-    info!("Trying to read pyroscope server password ...");
-    let password = read_file(pyroscope_config.password_file_path.as_str());
-
-    let url = pyroscope_config.url.clone();
-    let samplerate = pyroscope_config.sample_rate;
-
-    let application_name = format!("sequencer id={}", sequencer_config.sequencer_id);
-
-    let agent = match pyroscope::PyroscopeAgent::builder(url, application_name.to_string())
-        .basic_auth(user, password)
-        .backend(pyroscope_pprofrs::pprof_backend(
-            pyroscope_pprofrs::PprofConfig::new().sample_rate(samplerate),
-        ))
-        .tags([("app", "sequencer")].to_vec())
-        .build()
-    {
-        Ok(a) => a,
-        Err(e) => {
-            panic!("Could not start PyroscopeAgent: {e}");
-        }
-    };
-
-    Some(agent)
 }
