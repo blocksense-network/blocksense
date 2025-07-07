@@ -41,7 +41,7 @@ decimals = 0
 data = '{"pair":{"base":"oLP","quote":"USDC"},"decimals":0,"category":"","market_hours":"Crypto","arguments":{"contracts":[{"address":"0x20d419a8e12c45f88fda7c5760bb6923cee27f98","label":"oLP","method_name":"convertToAssets","param1":"1000000000000000000","rpc_urls":["https://arbitrum-one-rpc.publicnode.com"]}]}}'
 
 [component.eth-rpc]
-source = "../../../target/wasm32-wasip1/release/eth_rpc.wasm"
+source = "../target/wasm32-wasip1/release/eth_rpc.wasm"
 allowed_outbound_hosts = [
   "https://eth.llamarpc.com",
   "https://rpc.eth.gateway.fm",

@@ -2622,24 +2622,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6d43a04d8753f35258c91f8ec639f792891f748a1edbd759cf1dcea3382ad83c"
 
 [[package]]
-name = "cex-price-feeds"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "blocksense-data-providers-sdk",
- "blocksense-sdk",
- "futures",
- "itertools 0.14.0",
- "prettytable-rs",
- "serde 1.0.217",
- "serde-this-or-that",
- "serde_derive",
- "serde_json",
- "url",
- "wit-bindgen",
-]
-
-[[package]]
 name = "cexpr"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2673,28 +2655,6 @@ dependencies = [
  "serde 1.0.217",
  "wasm-bindgen",
  "windows-targets 0.52.6",
-]
-
-[[package]]
-name = "chrono-tz"
-version = "0.8.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d59ae0466b83e838b81a54256c39d5d7c20b9d7daa10510a242d9b75abd5936e"
-dependencies = [
- "chrono",
- "chrono-tz-build",
- "phf",
-]
-
-[[package]]
-name = "chrono-tz-build"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "433e39f13c9a060046954e0592a8d0a4bcb1040125cbf91cb8ee58964cfb350f"
-dependencies = [
- "parse-zoneinfo",
- "phf",
- "phf_codegen",
 ]
 
 [[package]]
@@ -3713,16 +3673,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "dirs-next"
-version = "2.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b98cf8ebf19c3d1b223e151f99a4f9f0690dca41414773390fc824184ac833e1"
-dependencies = [
- "cfg-if",
- "dirs-sys-next",
-]
-
-[[package]]
 name = "dirs-sys"
 version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3975,21 +3925,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "eth-rpc"
-version = "0.1.0"
-dependencies = [
- "alloy",
- "anyhow",
- "blocksense-sdk",
- "itertools 0.8.2",
- "prettytable-rs",
- "serde 1.0.217",
- "serde_json",
- "url",
- "wit-bindgen",
-]
-
-[[package]]
 name = "event-listener"
 version = "2.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4025,19 +3960,6 @@ checksum = "3c3e4e0dd3673c1139bf041f3008816d9cf2946bbfac2945c09e523b8d7b05b2"
 dependencies = [
  "event-listener 5.4.0",
  "pin-project-lite",
-]
-
-[[package]]
-name = "exsat-holdings"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "blocksense-sdk",
- "prettytable-rs",
- "serde 1.0.217",
- "serde_json",
- "url",
- "wit-bindgen",
 ]
 
 [[package]]
@@ -4412,20 +4334,6 @@ dependencies = [
  "fxhash",
  "serde 1.0.217",
  "serde_json",
-]
-
-[[package]]
-name = "gecko-terminal"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "blocksense-sdk",
- "prettytable-rs",
- "serde 1.0.217",
- "serde-this-or-that",
- "serde_json",
- "url",
- "wit-bindgen",
 ]
 
 [[package]]
@@ -7148,15 +7056,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "parse-zoneinfo"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1f2a05b18d44e2957b88f96ba460715e295bc1d7510468a2f3d3b44535d26c24"
-dependencies = [
- "regex",
-]
-
-[[package]]
 name = "partial_sort"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7577,20 +7476,6 @@ checksum = "483f8c21f64f3ea09fe0f30f5d48c3e8eefe5dac9129f0075f76593b4c1da705"
 dependencies = [
  "proc-macro2",
  "syn 2.0.100",
-]
-
-[[package]]
-name = "prettytable-rs"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eea25e07510aa6ab6547308ebe3c036016d162b8da920dbb079e3ba8acf3d95a"
-dependencies = [
- "csv",
- "encode_unicode",
- "is-terminal",
- "lazy_static 1.5.0",
- "term",
- "unicode-width 0.1.14",
 ]
 
 [[package]]
@@ -10217,25 +10102,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 
 [[package]]
-name = "stock-price-feeds"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "blocksense-data-providers-sdk",
- "blocksense-sdk",
- "chrono",
- "chrono-tz",
- "futures",
- "itertools 0.14.0",
- "prettytable-rs",
- "serde 1.0.217",
- "serde-this-or-that",
- "serde_json",
- "url",
- "wit-bindgen",
-]
-
-[[package]]
 name = "str_stack"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -10553,17 +10419,6 @@ dependencies = [
  "once_cell",
  "rustix 1.0.7",
  "windows-sys 0.59.0",
-]
-
-[[package]]
-name = "term"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c59df8ac95d96ff9bede18eb7300b0fda5e5d8d90960e76f8e14ae765eedbf1f"
-dependencies = [
- "dirs-next",
- "rustversion",
- "winapi",
 ]
 
 [[package]]

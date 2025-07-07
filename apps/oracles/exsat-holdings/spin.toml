@@ -23,7 +23,7 @@ decimals = 0
 data = '{"pair":{"base":"Exsat","quote":"satoshi"},"decimals":0,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
 
 [component.exsat-holdings]
-source = "../../../target/wasm32-wasip1/release/exsat_holdings.wasm"
+source = "../target/wasm32-wasip1/release/exsat_holdings.wasm"
 allowed_outbound_hosts = [
   "https://raw.githubusercontent.com",
   "https://rpc-us.exsat.network",
