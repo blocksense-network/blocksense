@@ -23,7 +23,7 @@ use reqwest::Url;
 use anyhow::{anyhow, Result};
 use blocksense_config::{AllFeedsConfig, EthRelayerConfig, PublishCriteria};
 use blocksense_data_feeds::feeds_processing::{
-    BatchedAggegratesToSend, PublishedFeedUpdate, PublishedFeedUpdateError, VotedFeedUpdate,
+    BatchedAggregatesToSend, PublishedFeedUpdate, PublishedFeedUpdateError, VotedFeedUpdate,
 };
 use blocksense_feed_registry::registry::{FeedAggregateHistory, HistoryEntry};
 use blocksense_feed_registry::types::FeedType;
@@ -312,7 +312,7 @@ impl RpcProvider {
         }
     }
 
-    pub fn apply_publish_criteria(&self, updates: &mut BatchedAggegratesToSend) {
+    pub fn apply_publish_criteria(&self, updates: &mut BatchedAggregatesToSend) {
         let mut res = updates
             .updates
             .iter()
@@ -328,7 +328,7 @@ impl RpcProvider {
         updates.updates = mem::take(&mut res);
     }
 
-    pub fn peg_stable_coins_to_value(&self, updates: &mut BatchedAggegratesToSend) {
+    pub fn peg_stable_coins_to_value(&self, updates: &mut BatchedAggregatesToSend) {
         for u in updates.updates.iter_mut() {
             if let FeedType::Numerical(value) = u.value {
                 if let Some(criteria) = self

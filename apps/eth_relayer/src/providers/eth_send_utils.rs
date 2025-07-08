@@ -8,7 +8,7 @@ use alloy::{
 };
 use anyhow::{anyhow, bail, Result};
 use blocksense_config::{FeedStrideAndDecimals, SequencerConfig};
-use blocksense_data_feeds::feeds_processing::{BatchedAggegratesToSend, VotedFeedUpdate};
+use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
 use blocksense_utils::{to_hex_string, FeedId};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
@@ -59,7 +59,7 @@ pub async fn deploy_contract(
 /// Serializes the `updates` hash map into a string.
 fn legacy_serialize_updates(
     net: &str,
-    updates: &BatchedAggegratesToSend,
+    updates: &BatchedAggregatesToSend,
     feeds_config: HashMap<FeedId, FeedStrideAndDecimals>,
 ) -> Vec<u8> {
     let mut result: String = Default::default();
@@ -107,7 +107,7 @@ fn legacy_serialize_updates(
 /// will be added to the result. Otherwise, all feeds in `updates` will be added.
 pub fn filter_allowed_feeds(
     net: &str,
-    updates: &mut BatchedAggegratesToSend,
+    updates: &mut BatchedAggregatesToSend,
     allow_feeds: &Option<Vec<FeedId>>,
 ) {
     if let Some(allowed_feed_ids) = allow_feeds {
@@ -128,7 +128,7 @@ pub fn filter_allowed_feeds(
 pub async fn get_serialized_updates_for_network(
     net: &str,
     provider_mutex: &Arc<Mutex<RpcProvider>>,
-    updates: &mut BatchedAggegratesToSend,
+    updates: &mut BatchedAggregatesToSend,
     provider_settings: &blocksense_config::Provider,
     feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
     feeds_rounds: &mut HashMap<FeedId, u64>,
@@ -216,7 +216,7 @@ pub struct BatchOfUpdatesToProcess {
     pub net: String,
     pub provider: Arc<Mutex<RpcProvider>>,
     pub provider_settings: blocksense_config::Provider,
-    pub updates: BatchedAggegratesToSend,
+    pub updates: BatchedAggregatesToSend,
     pub feed_type: Repeatability,
     pub feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
     pub transaction_retry_timeout_secs: u64,
@@ -364,7 +364,7 @@ pub async fn eth_batch_send_to_contract(
     net: String,
     provider: Arc<Mutex<RpcProvider>>,
     provider_settings: blocksense_config::Provider,
-    mut updates: BatchedAggegratesToSend,
+    mut updates: BatchedAggregatesToSend,
     feed_type: Repeatability,
     feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
     transaction_retry_timeout_secs: u64,
@@ -826,7 +826,7 @@ pub async fn inc_retries_with_backoff(
 pub async fn get_gas_price(
     net: &str,
     provider: &RpcProvider,
-    updates: &BatchedAggegratesToSend,
+    updates: &BatchedAggregatesToSend,
     transaction_retry_timeout_secs: u64,
 ) -> Result<u128> {
     let block_height = updates.block_height;
@@ -865,7 +865,7 @@ pub async fn get_gas_price(
 pub async fn get_chain_id(
     net: &str,
     provider: &RpcProvider,
-    updates: &BatchedAggegratesToSend,
+    updates: &BatchedAggregatesToSend,
     transaction_retry_timeout_secs: u64,
 ) -> Result<u64> {
     let provider_metrics = &provider.provider_metrics;
@@ -1018,7 +1018,7 @@ pub async fn get_tx_retry_params(
 pub async fn eth_batch_send_to_all_contracts(
     providers: SharedRpcProviders,
     sequencer_config: Arc<RwLock<SequencerConfig>>,
-    updates: BatchedAggegratesToSend,
+    updates: BatchedAggregatesToSend,
     feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
     relayers_send_channels: Arc<RwLock<HashMap<String, UnboundedSender<BatchOfUpdatesToProcess>>>>,
     feed_type: Repeatability,
@@ -1397,7 +1397,7 @@ mod tests {
             18,
         )
         .unwrap();
-        let updates_oneshot = BatchedAggegratesToSend {
+        let updates_oneshot = BatchedAggregatesToSend {
             block_height: 0,
             updates: vec![voted_update],
         };
@@ -1549,7 +1549,7 @@ mod tests {
             String::from("0505050505050505050505050505050505050505050505050505050505050505");
         let value1 = format!("{:04x}{}{}", 0x0002, slot1, slot2);
         let end_of_timeslot = 0_u128;
-        let updates_oneshot = BatchedAggegratesToSend {
+        let updates_oneshot = BatchedAggregatesToSend {
             block_height: 0,
             updates: vec![VotedFeedUpdate::new_decode(
                 "00000000000000000000000000000003",
@@ -1666,15 +1666,15 @@ mod tests {
                 end_slot_timestamp: end_slot_timestamp + interval_ms * 3,
             };
 
-            let updates1 = BatchedAggegratesToSend {
+            let updates1 = BatchedAggregatesToSend {
                 block_height: 0,
                 updates: vec![v1],
             };
-            let updates2 = BatchedAggegratesToSend {
+            let updates2 = BatchedAggregatesToSend {
                 block_height: 1,
                 updates: vec![v2],
             };
-            let updates3 = BatchedAggegratesToSend {
+            let updates3 = BatchedAggregatesToSend {
                 block_height: 2,
                 updates: vec![v3],
             };
@@ -1869,7 +1869,7 @@ mod tests {
     async fn compute_keys_vals_ignores_networks_not_on_the_list() {
         let selector = "1a2d80ac";
         let network = "dont_filter_me";
-        let mut updates = BatchedAggegratesToSend {
+        let mut updates = BatchedAggregatesToSend {
             block_height: 0,
             updates: get_updates_test_data(),
         };
@@ -1908,7 +1908,7 @@ mod tests {
         // Citrea
         let network = "citrea-testnet";
 
-        let mut updates = BatchedAggegratesToSend {
+        let mut updates = BatchedAggregatesToSend {
             block_height: 0,
             updates: get_updates_test_data(),
         };
@@ -1983,7 +1983,7 @@ mod tests {
         );
     }
 
-    fn peg_stable_coin_updates_data() -> BatchedAggegratesToSend {
+    fn peg_stable_coin_updates_data() -> BatchedAggregatesToSend {
         let end_slot_timestamp = 0_u128;
         let v1 = VotedFeedUpdate {
             feed_id: 0x1F as FeedId,
@@ -2012,7 +2012,7 @@ mod tests {
             end_slot_timestamp,
         };
 
-        BatchedAggegratesToSend {
+        BatchedAggregatesToSend {
             block_height: 1,
             updates: vec![v1, v2, v3, v4, v5],
         }
