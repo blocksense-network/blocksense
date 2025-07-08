@@ -22,6 +22,8 @@
       envSecrets = [
         "CMC_API_KEY"
         "YF_FINANCE_API_KEY"
+        "APCA_API_KEY_ID"
+        "APCA_API_SECRET_KEY"
         "ALPHAVANTAGE_API_KEY"
         "YAHOO_FINANCE_API_KEY"
         "TWELVEDATA_API_KEY"
