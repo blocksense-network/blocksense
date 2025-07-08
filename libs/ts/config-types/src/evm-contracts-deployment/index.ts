@@ -12,6 +12,14 @@ const FunctionArgs = S.Array(ParameterType);
 const ContractDataSchemaV1 = S.Struct({
   address: ethereumAddress,
   constructorArgs: FunctionArgs,
+}).annotations({
+  identifier: 'ContractDataV1',
+});
+
+const ContractDataSchemaV2 = S.Struct({
+  ...ContractDataSchemaV1.fields,
+}).annotations({
+  identifier: 'ContractDataV2',
 });
 
 export const CLAggregatorAdapterDataSchemaV1 = S.Struct({
@@ -23,8 +31,17 @@ export const CLAggregatorAdapterDataSchemaV1 = S.Struct({
   identifier: 'CLAggregatorAdapterDataV1',
 });
 
-export type CLAggregatorAdapterDataV1 =
-  typeof CLAggregatorAdapterDataSchemaV1.Type;
+export const CLAggregatorAdapterDataSchemaV2 = S.Struct({
+  ...ContractDataSchemaV2.fields,
+  description: S.String,
+  base: S.NullOr(ethereumAddress),
+  quote: S.NullOr(ethereumAddress),
+}).annotations({
+  identifier: 'CLAggregatorAdapterDataV2',
+});
+
+export type CLAggregatorAdapterDataV2 =
+  typeof CLAggregatorAdapterDataSchemaV2.Type;
 
 const ContractsConfigSchemaV1 = S.mutable(
   S.Struct({
@@ -44,15 +61,15 @@ const ContractsConfigSchemaV2 = S.mutable(
   S.Struct({
     coreContracts: S.mutable(
       S.Struct({
-        AggregatedDataFeedStore: ContractDataSchemaV1,
-        UpgradeableProxyADFS: ContractDataSchemaV1,
-        CLFeedRegistryAdapter: ContractDataSchemaV1,
-        AccessControl: ContractDataSchemaV1,
-        OnlySequencerGuard: S.UndefinedOr(ContractDataSchemaV1),
-        AdminExecutorModule: S.UndefinedOr(ContractDataSchemaV1),
+        AggregatedDataFeedStore: ContractDataSchemaV2,
+        UpgradeableProxyADFS: ContractDataSchemaV2,
+        CLFeedRegistryAdapter: ContractDataSchemaV2,
+        AccessControl: ContractDataSchemaV2,
+        OnlySequencerGuard: S.UndefinedOr(ContractDataSchemaV2),
+        AdminExecutorModule: S.UndefinedOr(ContractDataSchemaV2),
       }),
     ),
-    CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchemaV1)),
+    CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchemaV2)),
     SequencerMultisig: ethereumAddress,
     AdminMultisig: ethereumAddress,
   }),
