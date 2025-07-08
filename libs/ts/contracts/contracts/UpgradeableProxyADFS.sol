@@ -25,14 +25,10 @@ pragma solidity ^0.8.28;
 ///
 /// Storage layout:
 ///   * Management space: [0 to 2**128-2**116)
-///              0x0000 - latest blocknumber (used by the implementation)
-///              0x0001 - implementation slot (used by this contract)
-///              0x0002 - admin slot (used by this contract)
-///                 ... - additional management space reserved for ADFS
-///   *  ADFS data space: [2**128-2**116 to 2**160)
+///   * ADFS data space:  [2**128-2**116 to 2**160)
 ///
 /// This contract intentionally deviates from the EIP-1967 slot scheme.
-/// It was co-designed with ADFS to accomodate its custom low-level
+/// It was co-designed with ADFS to accommodate its custom low-level
 /// storage management requirements.
 ///
 /// Note that this deviation has implications on storage isolation and
