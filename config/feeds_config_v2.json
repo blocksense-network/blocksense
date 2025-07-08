@@ -41823,7 +41823,13 @@
         "category": "Equities",
         "market_hours": "US_Equities",
         "arguments": {
-          "providers": ["AlphaVantage", "YahooFinance", "twelvedata", "FMP"]
+          "providers": [
+            "AlpacaMarkets",
+            "AlphaVantage",
+            "YahooFinance",
+            "twelvedata",
+            "FMP"
+          ]
         }
       }
     },
@@ -41854,7 +41860,13 @@
         "category": "Equities",
         "market_hours": "US_Equities",
         "arguments": {
-          "providers": ["AlphaVantage", "YahooFinance", "twelvedata", "FMP"]
+          "providers": [
+            "AlpacaMarkets",
+            "AlphaVantage",
+            "YahooFinance",
+            "twelvedata",
+            "FMP"
+          ]
         }
       }
     }
