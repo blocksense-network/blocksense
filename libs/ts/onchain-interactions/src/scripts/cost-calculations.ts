@@ -131,7 +131,7 @@ const logGasCosts = async (
         gauges.gasCost.set({ networkName, address }, gasCosts.gasUsed1h * 24);
         gauges.cost.set({ networkName, address }, gasCosts.cost1h * 24);
         gauges.balance.set(
-          { networkName, address },
+          { networkName, address, currency },
           filterSmallBalance(balance),
         );
         gauges.daysLeft.set({ networkName, address }, daysBalanceWillLast);
@@ -393,18 +393,18 @@ const main = async (): Promise<void> => {
     gauges = {
       gasCost: new client.Gauge({
         name: 'eth_account_gas_cost',
-        help: 'Daily cost in gas to run using last x transactions',
+        help: `Daily cost in gas to run using last ${argv.numberOfTransactions} transactions`,
         labelNames: ['networkName', 'address'],
       }),
       cost: new client.Gauge({
         name: 'eth_account_cost',
-        help: 'Daily cost to run using last x transactions',
+        help: `Daily cost to run using last ${argv.numberOfTransactions} transactions`,
         labelNames: ['networkName', 'address'],
       }),
       balance: new client.Gauge({
         name: 'eth_account_balance',
         help: 'Ethereum account balance in native token',
-        labelNames: ['networkName', 'address'],
+        labelNames: ['networkName', 'address', 'currency'],
       }),
       daysLeft: new client.Gauge({
         name: 'eth_account_days_left',
