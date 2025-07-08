@@ -6,7 +6,7 @@ use blocksense_anomaly_detection::ingest::anomaly_detector_aggregate;
 use blocksense_config::{FeedStrideAndDecimals, PublishCriteria};
 use blocksense_crypto::{verify_signature, PublicKey, Signature};
 use blocksense_data_feeds::feeds_processing::{
-    BatchedAggegratesToSend, DoSkipReason, DontSkipReason, SkipDecision, VotedFeedUpdate,
+    BatchedAggregatesToSend, DoSkipReason, DontSkipReason, SkipDecision, VotedFeedUpdate,
     VotedFeedUpdateWithProof,
 };
 use blocksense_feed_registry::{
@@ -324,7 +324,7 @@ pub async fn validate(
         &tolerated_deviations,
     )?;
 
-    let updates_to_serialize = BatchedAggegratesToSend {
+    let updates_to_serialize = BatchedAggregatesToSend {
         block_height: batch.block_height,
         updates: batch.updates,
     };
@@ -503,7 +503,7 @@ pub mod tests {
         let block_height = 100;
         let network = "ETH".to_string();
 
-        let updates_to_serialize = BatchedAggegratesToSend {
+        let updates_to_serialize = BatchedAggregatesToSend {
             block_height,
             updates: updates.clone(),
         };

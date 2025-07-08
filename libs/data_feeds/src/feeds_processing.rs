@@ -197,13 +197,13 @@ pub fn naive_packing(
 }
 
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct BatchedAggegratesToSend {
+pub struct BatchedAggregatesToSend {
     pub block_height: u64,
     pub updates: Vec<VotedFeedUpdate>,
 }
 
 #[derive(Debug, Clone, Default, Serialize)]
-pub struct EncodedBatchedAggegratesToSend {
+pub struct EncodedBatchedAggregatesToSend {
     pub block_height: u64,
     pub updates: Vec<EncodedVotedFeedUpdate>,
 }

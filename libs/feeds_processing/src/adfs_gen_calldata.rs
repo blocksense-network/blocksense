@@ -2,7 +2,7 @@ use alloy::hex;
 use alloy_primitives::U256;
 use anyhow::Result;
 use blocksense_config::FeedStrideAndDecimals;
-use blocksense_data_feeds::feeds_processing::BatchedAggegratesToSend;
+use blocksense_data_feeds::feeds_processing::BatchedAggregatesToSend;
 use blocksense_utils::{from_hex_string, to_hex_string, FeedId};
 use std::cmp::max;
 use std::collections::{BTreeMap, HashMap, HashSet};
@@ -61,7 +61,7 @@ fn encode_packed(items: &[&[u8]]) -> (Vec<u8>, String) {
 /// Serializes the `updates` hash map into a string.
 pub async fn adfs_serialize_updates(
     net: &str,
-    feed_updates: &BatchedAggegratesToSend,
+    feed_updates: &BatchedAggregatesToSend,
     round_counters: Option<&RoundCounters>,
     strides_and_decimals: HashMap<FeedId, FeedStrideAndDecimals>,
     feeds_rounds: &mut HashMap<FeedId, u64>, /* The rounds table for the relevant feeds. If the round_counters are provided,
@@ -274,11 +274,11 @@ pub mod tests {
     }
 
     fn setup_updates_rounds_and_config() -> (
-        BatchedAggegratesToSend,
+        BatchedAggregatesToSend,
         HashMap<FeedId, u64>,
         HashMap<FeedId, FeedStrideAndDecimals>,
     ) {
-        let updates = BatchedAggegratesToSend {
+        let updates = BatchedAggregatesToSend {
             block_height: 1234567890,
             updates: vec![
                 create_voted_feed_update(1, "12343267643573"),
