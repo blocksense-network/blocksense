@@ -28,13 +28,13 @@ use tracing::{debug, error, info, info_span, warn};
 
 use crate::feeds::feed_config_conversions::feed_config_to_block;
 use crate::sequencer_state::SequencerState;
-use blocksense_data_feeds::feeds_processing::BatchedAggegratesToSend;
+use blocksense_data_feeds::feeds_processing::BatchedAggregatesToSend;
 
 pub async fn block_creator_loop(
     sequencer_state: Data<SequencerState>,
     mut aggregated_votes_to_block_creator_recv: UnboundedReceiver<VotedFeedUpdateWithProof>,
     mut feed_management_cmds_recv: UnboundedReceiver<FeedsManagementCmds>,
-    batched_votes_send: UnboundedSender<BatchedAggegratesToSend>,
+    batched_votes_send: UnboundedSender<BatchedAggregatesToSend>,
     block_config: BlockConfig,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
@@ -213,7 +213,7 @@ async fn generate_block(
     updates: &mut Vec<VotedFeedUpdateWithProof>,
     new_feeds_to_register: &mut Vec<RegisterNewAssetFeed>,
     feeds_ids_to_delete: &mut Vec<DeleteAssetFeed>,
-    batched_votes_send: &UnboundedSender<BatchedAggegratesToSend>,
+    batched_votes_send: &UnboundedSender<BatchedAggregatesToSend>,
     sequencer_state: &Data<SequencerState>,
     block_height: u64,
 ) -> eyre::Result<()> {
@@ -283,7 +283,7 @@ async fn generate_block(
             proofs.insert(feed_id, v.proof);
         }
 
-        if let Err(e) = batched_votes_send.send(BatchedAggegratesToSend {
+        if let Err(e) = batched_votes_send.send(BatchedAggregatesToSend {
             block_height,
             updates: value_updates,
         }) {
