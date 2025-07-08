@@ -7,7 +7,7 @@ import {
 import Safe from '@safe-global/protocol-kit';
 
 import {
-  CLAggregatorAdapterData,
+  CLAggregatorAdapterDataV1,
   ContractsConfigV2,
 } from '@blocksense/config-types/evm-contracts-deployment';
 
@@ -41,7 +41,7 @@ export async function registerCLAdapters({
 
   // Split into batches of 100
   const BATCH_LENGTH = 100;
-  const batches: Array<Array<CLAggregatorAdapterData>> = [];
+  const batches: Array<Array<CLAggregatorAdapterDataV1>> = [];
   const aggregatorData = deployData.CLAggregatorAdapter.filter(d => d.base);
   const filteredData = [];
 
