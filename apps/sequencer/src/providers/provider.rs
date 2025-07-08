@@ -1209,10 +1209,10 @@ mod tests {
     }
 
     #[actix_web::test]
-    async fn fork_test_provider() -> Result<()> {
-        let metrics_prefix = "fork_test_provider";
+    async fn test_reading_adfs_counters_and_values() -> Result<()> {
+        let metrics_prefix = "test_reading_adfs_counters_and_values";
 
-        let span = info_span!("fork_test_provider");
+        let span = info_span!("test_reading_adfs_counters_and_values");
         let _guard = span.enter();
 
         let network = "ETH4378";
@@ -1411,7 +1411,7 @@ mod tests {
             });
         });
 
-        let metrics_prefix2 = "fork_test_provider2";
+        let metrics_prefix2 = "test_reading_adfs_counters_and_values2";
         let new_rpc_providers =
             init_shared_rpc_providers(&sequencer_config2, Some(metrics_prefix2), &feeds_config)
                 .await;
