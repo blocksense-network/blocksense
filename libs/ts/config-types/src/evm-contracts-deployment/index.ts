@@ -9,32 +9,33 @@ import {
 const ParameterType = S.Union(S.String, S.Number, S.BigIntFromSelf, S.Boolean);
 const FunctionArgs = S.Array(ParameterType);
 
-const ContractDataSchema = S.Struct({
+const ContractDataSchemaV1 = S.Struct({
   address: ethereumAddress,
   constructorArgs: FunctionArgs,
 });
 
-export const CLAggregatorAdapterDataSchema = S.Struct({
-  ...ContractDataSchema.fields,
+export const CLAggregatorAdapterDataSchemaV1 = S.Struct({
+  ...ContractDataSchemaV1.fields,
   description: S.String,
   base: S.NullOr(ethereumAddress),
   quote: S.NullOr(ethereumAddress),
 }).annotations({
-  identifier: 'CLAggregatorAdapterData',
+  identifier: 'CLAggregatorAdapterDataV1',
 });
 
-export type CLAggregatorAdapterData = typeof CLAggregatorAdapterDataSchema.Type;
+export type CLAggregatorAdapterDataV1 =
+  typeof CLAggregatorAdapterDataSchemaV1.Type;
 
 const ContractsConfigSchemaV1 = S.mutable(
   S.Struct({
     coreContracts: S.mutable(
       S.Struct({
-        HistoricalDataFeedStoreV2: ContractDataSchema,
-        UpgradeableProxy: ContractDataSchema,
-        CLFeedRegistryAdapter: ContractDataSchema,
+        HistoricalDataFeedStoreV2: ContractDataSchemaV1,
+        UpgradeableProxy: ContractDataSchemaV1,
+        CLFeedRegistryAdapter: ContractDataSchemaV1,
       }),
     ),
-    CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchema)),
+    CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchemaV1)),
     SafeMultisig: ethereumAddress,
   }),
 ).annotations({ identifier: 'ContractsConfigV1' });
@@ -43,15 +44,15 @@ const ContractsConfigSchemaV2 = S.mutable(
   S.Struct({
     coreContracts: S.mutable(
       S.Struct({
-        AggregatedDataFeedStore: ContractDataSchema,
-        UpgradeableProxyADFS: ContractDataSchema,
-        CLFeedRegistryAdapter: ContractDataSchema,
-        AccessControl: ContractDataSchema,
-        OnlySequencerGuard: S.UndefinedOr(ContractDataSchema),
-        AdminExecutorModule: S.UndefinedOr(ContractDataSchema),
+        AggregatedDataFeedStore: ContractDataSchemaV1,
+        UpgradeableProxyADFS: ContractDataSchemaV1,
+        CLFeedRegistryAdapter: ContractDataSchemaV1,
+        AccessControl: ContractDataSchemaV1,
+        OnlySequencerGuard: S.UndefinedOr(ContractDataSchemaV1),
+        AdminExecutorModule: S.UndefinedOr(ContractDataSchemaV1),
       }),
     ),
-    CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchema)),
+    CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchemaV1)),
     SequencerMultisig: ethereumAddress,
     AdminMultisig: ethereumAddress,
   }),
