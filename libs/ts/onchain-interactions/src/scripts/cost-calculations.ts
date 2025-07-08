@@ -26,6 +26,8 @@ type Gauges = {
   cost: client.Gauge;
   balance: client.Gauge;
   daysLeft: client.Gauge;
+  transactionsCount: client.Gauge;
+  transactionsPeriod: client.Gauge;
 };
 
 function filterSmallBalance(balance: string, threshold = 1e-6): number {
@@ -135,6 +137,14 @@ const logGasCosts = async (
           filterSmallBalance(balance),
         );
         gauges.daysLeft.set({ networkName, address }, daysBalanceWillLast);
+        gauges.transactionsCount.set(
+          { networkName, address },
+          transactionsCount,
+        );
+        gauges.transactionsPeriod.set(
+          { networkName, address },
+          hoursBetweenFirstLast,
+        );
       }
     }
   } catch (error) {
@@ -409,6 +419,16 @@ const main = async (): Promise<void> => {
       daysLeft: new client.Gauge({
         name: 'eth_account_days_left',
         help: 'Days until funds run out',
+        labelNames: ['networkName', 'address'],
+      }),
+      transactionsCount: new client.Gauge({
+        name: 'transactions_count',
+        help: 'Number of Transactions used to calculate cost',
+        labelNames: ['networkName', 'address'],
+      }),
+      transactionsPeriod: new client.Gauge({
+        name: 'transactions_period',
+        help: 'Hours between first and last of used transactions',
         labelNames: ['networkName', 'address'],
       }),
     };
