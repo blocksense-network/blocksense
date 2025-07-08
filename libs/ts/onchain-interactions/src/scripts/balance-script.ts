@@ -72,7 +72,7 @@ const main = async (): Promise<void> => {
     startPrometheusServer(argv.host, argv.port);
     balanceGauge = new client.Gauge({
       name: 'eth_account_balance',
-      help: 'Ethereum account balance in Ether',
+      help: 'Ethereum account balance in native token',
       labelNames: ['networkName', 'address', 'rpcUrl'],
     });
   }
