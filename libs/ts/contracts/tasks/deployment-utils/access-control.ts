@@ -8,7 +8,12 @@ import {
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
 
-import { getEnvString, getOptionalEnvString } from '@blocksense/base-utils';
+import {
+  assertNotNull,
+  getEnvString,
+  getOptionalEnvString,
+} from '@blocksense/base-utils';
+
 import { ContractNames, NetworkConfig } from '../types';
 import { executeMultisigTransaction } from './multisig-tx-exec';
 
@@ -36,9 +41,15 @@ export async function setUpAccessControl({
   const abiCoder = new AbiCoder();
   const transactions: SafeTransactionDataPartial[] = [];
 
-  const guard = new Contract(
-    deployData.coreContracts.OnlySequencerGuard!.address,
-    artifacts.readArtifactSync(ContractNames.OnlySequencerGuard).abi,
+  const { OnlySequencerGuard__factory } = await import(
+    '@blocksense/contracts/typechain'
+  );
+
+  const guard = OnlySequencerGuard__factory.connect(
+    assertNotNull(
+      deployData.coreContracts.OnlySequencerGuard,
+      'OnlySequencerGuard is not specified in the deployment data',
+    ).address,
     adminSigner,
   );
   if (sequencerMultisig) {
