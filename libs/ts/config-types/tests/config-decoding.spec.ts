@@ -49,7 +49,7 @@ describe('Configuration files decoding', async () => {
       expect(metadata).toBeDefined();
       const deployment = readEvmDeployment(net);
       await expect(deployment).resolves.toMatchObject({
-        name: net,
+        network: net,
         chainId: metadata.chainId,
         contracts: {
           coreContracts: expect.any(Object),

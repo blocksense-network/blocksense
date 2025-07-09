@@ -10,6 +10,10 @@ import { hexDataString } from '@blocksense/base-utils';
 const ParameterType = S.Union(S.String, S.Number, S.BigIntFromSelf, S.Boolean);
 const FunctionArgs = S.Array(ParameterType);
 
+const feedId = S.BigInt.annotations({
+  identifier: 'FeedId',
+});
+
 const ContractDataSchemaV1 = S.Struct({
   address: ethereumAddress,
   constructorArgs: FunctionArgs,
@@ -35,7 +39,7 @@ export const CLAggregatorAdapterDataSchemaV1 = S.Struct({
 
 export const CLAggregatorAdapterDataSchemaV2 = S.Struct({
   ...ContractDataSchemaV2.fields,
-  description: S.String,
+  feedId: feedId,
   base: S.NullOr(ethereumAddress),
   quote: S.NullOr(ethereumAddress),
 }).annotations({
@@ -71,7 +75,14 @@ const ContractsConfigSchemaV2 = S.mutable(
         AdminExecutorModule: S.NullOr(ContractDataSchemaV2),
       }),
     ),
-    CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchemaV2)),
+    CLAggregatorAdapter: S.mutable(
+      S.Record({
+        // The key is the feedId, but effect schema does not support
+        // `${bigint}` as a key type.
+        key: S.String,
+        value: CLAggregatorAdapterDataSchemaV2,
+      }),
+    ),
     SequencerMultisig: S.NullOr(ethereumAddress),
     AdminMultisig: ethereumAddress,
   }),
@@ -95,7 +106,7 @@ export const DeploymentConfigSchemaV1 = S.mutable(
 
 export const DeploymentConfigSchemaV2 = S.mutable(
   S.Struct({
-    name: networkName,
+    network: networkName,
     chainId: chainId,
     contracts: ContractsConfigSchemaV2,
   }),
