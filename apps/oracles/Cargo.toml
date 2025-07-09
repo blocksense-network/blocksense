@@ -5,6 +5,7 @@ members = [
   "gecko-terminal",
   "eth-rpc",
   "stock-price-feeds",
+  "spout-rwa",
 ]
 
 resolver = "2"

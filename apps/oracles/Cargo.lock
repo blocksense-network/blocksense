@@ -3583,6 +3583,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "spout-rwa"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "blocksense-data-providers-sdk",
+ "blocksense-sdk",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "itertools 0.14.0",
+ "prettytable-rs",
+ "serde",
+ "serde-this-or-that",
+ "serde_json",
+ "url",
+ "wit-bindgen",
+]
+
+[[package]]
 name = "stable_deref_trait"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
