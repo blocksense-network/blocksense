@@ -67,3 +67,12 @@ export const ethRpcArgsSchema = S.mutable(
 ).annotations({
   identifier: 'EthRpcOracleArgs',
 });
+
+// spout-rwa Oracle related Types
+export const spoutRwaArgsSchema = S.Struct({
+  api_url: S.String,
+  endpoint: S.String,
+}).annotations({
+  identifier: 'SpoutRwaOracleArgs',
+  description: 'Arguments for the Spout RWA Oracle',
+});
