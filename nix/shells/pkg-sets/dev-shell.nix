@@ -29,6 +29,7 @@
         "YAHOO_FINANCE_API_KEY"
         "TWELVEDATA_API_KEY"
         "FMP_API_KEY"
+        "SPOUT_RWA_API_KEY"
       ];
       template = secret: ''
         if [ "''${${secret}:-}" != "" ]; then

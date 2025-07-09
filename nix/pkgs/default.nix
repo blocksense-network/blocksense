@@ -71,6 +71,7 @@
           gecko-terminal = mkOracleScript "gecko-terminal";
           eth-rpc = mkOracleScript "eth-rpc";
           stock-price-feeds = mkOracleScript "stock-price-feeds";
+          spout-rwa = mkOracleScript "spout-rwa";
         };
 
         spinPlugins = {

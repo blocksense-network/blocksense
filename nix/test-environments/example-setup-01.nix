@@ -153,6 +153,7 @@ in
           YAHOO_FINANCE_API_KEY = "${testKeysDir}/YAHOO_FINANCE_API_KEY";
           TWELVEDATA_API_KEY = "${testKeysDir}/TWELVEDATA_API_KEY";
           FMP_API_KEY = "${testKeysDir}/FMP_API_KEY";
+          SPOUT_RWA_API_KEY = "${testKeysDir}/SPOUT_RWA_API_KEY";
         };
       };
     };
@@ -225,6 +226,15 @@ in
           "YAHOO_FINANCE_API_KEY"
           "TWELVEDATA_API_KEY"
           "FMP_API_KEY"
+        ];
+      };
+      spout-rwa = {
+        exec-interval = 60;
+        allowed-outbound-hosts = [
+          "https://rwa-deploy-backend.onrender.com/"
+        ];
+        api-keys = [
+          "SPOUT_RWA_API_KEY"
         ];
       };
     };
