@@ -69,6 +69,7 @@ export async function updateExchangesArgumentConfig(): Promise<NewFeedsConfig> {
       additional_feed_info: {
         ...feed.additional_feed_info,
         arguments: {
+          kind: 'cex-price-feeds' as const,
           exchanges: providers.exchanges,
           aggregators: feed.additional_feed_info.arguments.aggregators,
         },

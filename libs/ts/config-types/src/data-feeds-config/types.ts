@@ -3,6 +3,7 @@ import { Schema as S } from 'effect';
 import {
   cexPriceFeedsArgsSchema,
   ethRpcArgsSchema,
+  exsatHoldingsArgsSchema,
   geckoTerminalArgsSchema,
   stockPriceFeedsArgsSchema,
 } from './oracles';
@@ -199,6 +200,7 @@ export const NewFeedSchema = S.mutable(
           cexPriceFeedsArgsSchema,
           geckoTerminalArgsSchema,
           ethRpcArgsSchema,
+          exsatHoldingsArgsSchema,
         ).annotations({ identifier: 'OracleScriptArguments' }),
 
         compatibility_info: S.UndefinedOr(

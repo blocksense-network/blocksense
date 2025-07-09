@@ -50,7 +50,7 @@ export function feedFromChainLinkFeedInfo(
           ? categoryFixup[category as keyof typeof categoryFixup]
           : category,
       market_hours,
-      arguments: {},
+      arguments: { kind: 'cex-price-feeds' },
       compatibility_info: {
         chainlink: clName,
       },

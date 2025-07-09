@@ -20,7 +20,7 @@ component = "exsat-holdings"
 id = "100000"
 stride = 0
 decimals = 0
-data = '{"pair":{"base":"Exsat","quote":"satoshi"},"decimals":0,"category":"Crypto","market_hours":"Crypto","arguments":{}}'
+data = '{"pair":{"base":"exSat","quote":"satoshis"},"decimals":0,"category":"Crypto","market_hours":"Crypto","arguments":{"kind":"exsat-holdings"}}'
 
 [component.exsat-holdings]
 source = "../target/wasm32-wasip1/release/exsat_holdings.wasm"
