@@ -196,7 +196,7 @@ task('deploy', 'Deploy contracts')
             name: ContractNames.CLAggregatorAdapter as const,
             argsTypes: ['string', 'uint8', 'uint256', 'address'],
             argsValues: [
-              data.description,
+              data.full_name,
               data.additional_feed_info.decimals,
               data.id,
               upgradeableProxyAddress,
