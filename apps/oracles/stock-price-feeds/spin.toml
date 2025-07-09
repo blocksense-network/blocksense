@@ -20,19 +20,19 @@ component = "stock-price-feeds"
 id = "2000000"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"IBIT","quote":"USD"},"decimals":8,"category":"Equities","market_hours":"US_Equities","arguments":{"providers":["AlpacaMarkets","AlphaVantage","YahooFinance","twelvedata","FMP"]}}'
+data = '{"pair":{"base":"IBIT","quote":"USD"},"decimals":8,"category":"Equities","market_hours":"US_Equities","arguments":{"kind":"stock-price-feeds","providers":["AlphaVantage","YahooFinance","twelvedata","FMP"]}}'
 
 [[trigger.oracle.data_feeds]]
 id = "2000001"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"SPY","quote":"USD"},"decimals":8,"category":"Equities","market_hours":"US_Equities","arguments":{"providers":["AlpacaMarkets","AlphaVantage","YahooFinance","twelvedata","FMP"]}}'
+data = '{"pair":{"base":"SPY","quote":"USD"},"decimals":8,"category":"Equities","market_hours":"US_Equities","arguments":{"kind":"stock-price-feeds","providers":["AlphaVantage","YahooFinance","twelvedata","FMP"]}}'
 
 [[trigger.oracle.data_feeds]]
 id = "2000002"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"LQD","quote":"USD"},"decimals":8,"category":"Equities","market_hours":"US_Equities","arguments":{"providers":["AlpacaMarkets","AlphaVantage","YahooFinance","twelvedata","FMP"]}}'
+data = '{"pair":{"base":"LQD","quote":"USD"},"decimals":8,"category":"Equities","market_hours":"US_Equities","arguments":{"kind":"stock-price-feeds","providers":["AlpacaMarkets","AlphaVantage","YahooFinance","twelvedata","FMP"]}}'
 
 [component.stock-price-feeds]
 source = "../target/wasm32-wasip1/release/stock_price_feeds.wasm"
@@ -41,7 +41,7 @@ allowed_outbound_hosts = [
   "https://www.alphavantage.co",
   "https://yfapi.net",
   "https://api.twelvedata.com",
-  "https://financialmodelingprep.com"
+  "https://financialmodelingprep.com",
 ]
 
 [[trigger.oracle.capabilities]]

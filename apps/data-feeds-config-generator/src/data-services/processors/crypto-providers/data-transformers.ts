@@ -10,7 +10,7 @@ export function getAllProvidersForPair(
   pair: Pair,
   providersData: CryptoProviderData[],
 ): CexPriceFeedsArgs {
-  const providers: CexPriceFeedsArgs = {};
+  const providers: CexPriceFeedsArgs = { kind: 'cex-price-feeds' };
 
   for (const { name, type, data } of providersData) {
     const resources = getProviderResourcesForPair(pair, data);
