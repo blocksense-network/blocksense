@@ -198,7 +198,7 @@ task('deploy', 'Deploy contracts')
           const { base, quote } = getCLRegistryPair(data.id);
           return {
             name: ContractNames.CLAggregatorAdapter as const,
-            argsTypes: ['string', 'uint8', 'uint32', 'address'],
+            argsTypes: ['string', 'uint8', 'uint256', 'address'],
             argsValues: [
               data.description,
               data.additional_feed_info.decimals,
