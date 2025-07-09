@@ -199,6 +199,7 @@ in
       eth-rpc = {
         exec-interval = 10;
         allowed-outbound-hosts = [
+          "https://arbitrum-one-rpc.publicnode.com"
           "https://eth.llamarpc.com"
           "https://rpc.eth.gateway.fm"
           "https://ethereum-rpc.publicnode.com"
