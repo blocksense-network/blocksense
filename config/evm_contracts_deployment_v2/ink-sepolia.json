@@ -1,5 +1,5 @@
 {
-  "name": "ink-sepolia",
+  "network": "ink-sepolia",
   "chainId": 763373,
   "contracts": {
     "coreContracts": {

@@ -208,6 +208,7 @@ task('deploy', 'Deploy contracts')
             salt: create2ContractSalts.clAggregatorProxy,
             value: 0n,
             feedRegistryInfo: {
+              feedId: data.id,
               description: `${data.full_name} (${data.id})`,
               base,
               quote,
@@ -262,7 +263,7 @@ task('deploy', 'Deploy contracts')
       };
 
       chainsDeployment[networkName] = {
-        name: networkName,
+        network: networkName,
         chainId,
         contracts: {
           ...deployData,

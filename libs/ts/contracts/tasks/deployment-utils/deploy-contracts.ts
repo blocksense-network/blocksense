@@ -7,7 +7,7 @@ import { getCreateCallDeployment } from '@safe-global/safe-deployments';
 import { AbiCoder, Contract, solidityPacked } from 'ethers';
 import { Artifacts } from 'hardhat/types';
 
-import { parseEthereumAddress } from '@blocksense/base-utils';
+import { assertNotNull, parseEthereumAddress } from '@blocksense/base-utils';
 import { ContractsConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
 
 import { DeployContract, ContractNames, NetworkConfig } from '../types';
@@ -39,6 +39,7 @@ export async function deployContracts({
 
   const ContractsConfigV2 = {
     coreContracts: {},
+    CLAggregatorAdapter: {},
   } as ContractsConfigV2;
 
   const abiCoder = AbiCoder.defaultAbiCoder();
@@ -89,14 +90,18 @@ export async function deployContracts({
     }
 
     if (contract.name === ContractNames.CLAggregatorAdapter) {
-      (ContractsConfigV2[contract.name] ??= []).push({
-        description: contract.feedRegistryInfo?.description ?? '',
-        base: contract.feedRegistryInfo?.base ?? null,
-        quote: contract.feedRegistryInfo?.quote ?? null,
+      const registryInfo = assertNotNull(
+        contract.feedRegistryInfo,
+        `CLAggregatorAdapter without registry info: ${contract}`,
+      );
+      ContractsConfigV2.CLAggregatorAdapter[`${registryInfo.feedId}`] = {
+        feedId: registryInfo.feedId,
+        base: registryInfo.base,
+        quote: registryInfo.quote,
         address: parseEthereumAddress(contractAddress),
         constructorArgs: contract.argsValues,
         salt: contract.salt,
-      });
+      };
     } else {
       ContractsConfigV2.coreContracts[contract.name] = {
         address: parseEthereumAddress(contractAddress),

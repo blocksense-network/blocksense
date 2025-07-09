@@ -69,6 +69,7 @@ export type DeployContract = {
   salt: HexDataString;
   value: bigint;
   feedRegistryInfo?: {
+    feedId: bigint;
     description: string;
     base: EthereumAddress | null;
     quote: EthereumAddress | null;

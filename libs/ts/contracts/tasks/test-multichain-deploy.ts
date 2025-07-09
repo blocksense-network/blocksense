@@ -16,6 +16,7 @@ import { Feed, WriteOp } from '../test/utils/wrappers/types';
 import { expect } from 'chai';
 import { initChain } from './deployment-utils/init-chain';
 import { executeMultisigTransaction } from './deployment-utils/multisig-tx-exec';
+import { valuesOf } from '@blocksense/base-utils/array-iter';
 
 task(
   'test-deploy',
@@ -188,7 +189,7 @@ task(
     sequencerWallet,
   );
 
-  const registeredFeed = deployment.CLAggregatorAdapter.find(
+  const registeredFeed = valuesOf(deployment.CLAggregatorAdapter).find(
     feed => feed.base && feed.quote,
   );
 
