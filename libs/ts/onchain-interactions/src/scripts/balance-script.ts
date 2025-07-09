@@ -139,7 +139,11 @@ const main = async (): Promise<void> => {
       const balanceWei = await web3.eth.getBalance(address);
       const balance = web3.utils.fromWei(balanceWei, 'ether');
       const { currency } = networkMetadata[networkName];
-      console.log(chalk.green(`${networkName}: ${balance} ${currency}`));
+      console.log(
+        (balanceWei === 0n ? chalk.grey : chalk.green)(
+          `${networkName}: ${balance} ${currency}`,
+        ),
+      );
       if (balanceGauge) {
         balanceGauge.set(
           { networkName, address, rpcUrl },
