@@ -36,7 +36,7 @@ build-environment environment="all":
   else
     destDir="{{process-compose-artifacts-dir}}/{{environment}}"
     srcDir=$(nix build --impure -L --json .#legacyPackages.{{system}}.process-compose-environments.{{environment}} | jq -r '.[0].outputs.out')
-    cp -rf --no-preserve=mode,ownership "$srcDir" "$destDir"
+    cp -rf --no-preserve=mode,ownership "$srcDir"/. "$destDir"
   fi
   echo "Process Compose artifacts copied to {{process-compose-artifacts-dir}}"
 
