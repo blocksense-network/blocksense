@@ -17,10 +17,10 @@ reporter_id = 0
 component = "spout-rwa"
 
 [[trigger.oracle.data_feeds]]
-id = "0"
+id = "101001"
 stride = 0
-decimals = 8
-data = ''
+decimals = 6
+data = '{"pair":{"base":"LQD","quote":"amount"},"decimals":6,"category":"","market_hours":"","arguments":{"api_url":"https://rwa-deploy-backend.onrender.com/reserves/LQD","endpoint":"reserve"}}'
 
 [component.spout-rwa]
 source = "../target/wasm32-wasip1/release/spout_rwa.wasm"
