@@ -6,7 +6,7 @@ use alloy::{
     providers::{Provider, ProviderBuilder},
     rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
-use blocksense_config::FeedStrideAndDecimals;
+use blocksense_config::{FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
 use blocksense_utils::{to_hex_string, FeedId};
@@ -1041,7 +1041,10 @@ pub async fn eth_batch_send_to_all_contracts(
             let net = net.clone();
 
             if let Some(provider_settings) = providers_config.get(&net) {
-                if provider_settings.safe_address.is_some() {
+                if provider_settings
+                    .get_contract_config(GNOSIS_SAFE_CONTRACT_NAME)
+                    .is_some()
+                {
                     info!(
                         "Network `{net}` is configured for two phase consensus in sequencer; skipping direct update"
                     );

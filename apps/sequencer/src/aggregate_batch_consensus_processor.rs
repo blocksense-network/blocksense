@@ -113,9 +113,26 @@ pub async fn aggregation_batch_consensus_loop(
 
                         // Get quorum size from config before locking batches_awaiting_consensus!
                         let safe_min_quorum = {
-                            let sequencer_config = sequencer_state.sequencer_config.read().await;
-                            match sequencer_config.providers.get(net) {
-                                Some(v) => v.safe_min_quorum,
+                            let sequencer_providers = sequencer_state.providers.read().await;
+                            match sequencer_providers.get(net) {
+                                Some(p) => {
+                                    let contract_opt = p.lock().await.get_contract(GNOSIS_SAFE_CONTRACT_NAME);
+                                    let contract = match contract_opt {
+                                        Some(c) => c,
+                                        None => {
+                                            error!("No safe contract set for network {net}!");
+                                            continue;
+                                        }
+                                    };
+
+                                    match contract.min_quorum {
+                                        Some(q) => q,
+                                        None => {
+                                            error!("Variable safe_min_quorum not set for network {net}!");
+                                            continue;
+                                        }
+                                    }
+                                }
                                 None => {
                                     error!("Trying to get the quorum size of a non existent network!");
                                     continue
