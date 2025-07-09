@@ -179,11 +179,6 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                 continue;
             };
 
-            if provider_settings.safe_address.is_none() {
-                info!("Network `{net}` not configured for second round consensus - skipping");
-                continue;
-            }
-
             let is_enabled_value = provider_settings.is_enabled;
 
             log_provider_enabled(net.as_str(), provider, is_enabled_value).await;

@@ -72,6 +72,7 @@ pub struct Contract {
     pub creation_byte_code: Option<Vec<u8>>,
     pub deployed_byte_code: Option<Vec<u8>>,
     pub contract_version: u16,
+    pub min_quorum: Option<u32>,
 }
 impl Contract {
     pub fn new(config: &ContractConfig) -> Result<Contract> {
@@ -93,6 +94,7 @@ impl Contract {
             creation_byte_code,
             deployed_byte_code,
             contract_version: config.contract_version,
+            min_quorum: config.min_quorum,
         })
     }
 }
@@ -101,7 +103,6 @@ pub struct RpcProvider {
     pub network: String,
     pub provider: ProviderType,
     pub signer: PrivateKeySigner,
-    pub safe_min_quorum: u32,
     pub provider_metrics: Arc<RwLock<ProviderMetrics>>,
     pub transaction_retries_count_limit: u32,
     pub transaction_retry_timeout_secs: u32,
@@ -267,7 +268,6 @@ impl RpcProvider {
             network: network.to_string(),
             provider,
             signer: signer.clone(),
-            safe_min_quorum: p.safe_min_quorum,
             provider_metrics: provider_metrics.clone(),
             transaction_retries_count_limit: p.transaction_retries_count_before_give_up,
             transaction_retry_timeout_secs: p.transaction_retry_timeout_secs,
