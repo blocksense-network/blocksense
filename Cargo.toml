@@ -102,7 +102,7 @@ spin-trigger = { git = "https://github.com/blocksense-network/spin", branch = "b
 ssz_rs = "0.9.0"
 strum = "0.26.3"
 strum_macros = "0.26.4"
-syn = "1.0"
+syn = "2.0"
 tempfile = "3.13.0"
 terminal = { git = "https://github.com/blocksense-network/spin", branch = "blocksense" }
 thiserror = "2.0.11"
