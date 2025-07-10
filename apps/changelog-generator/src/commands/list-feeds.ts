@@ -32,15 +32,13 @@ export const listFeeds = Command.make(
       );
 
       const rows: Array<TableRow> = feedConfig.feeds.map(feed => {
-        const contract = deploymentData?.contracts?.CLAggregatorAdapter.find(
-          data => data.constructorArgs[2] == feed.id,
-        );
+        const cl = deploymentData?.contracts?.CLAggregatorAdapter[`${feed.id}`];
         return [
           feed.full_name,
-          `${contract?.address ?? ''}`,
-          `${contract?.constructorArgs[1] ?? ''}`,
-          `${contract?.base ?? ''}`,
-          `${contract?.quote ?? ''}`,
+          cl?.address ?? '',
+          `${cl?.constructorArgs[1] ?? ''}`,
+          cl?.base ?? '',
+          cl?.quote ?? '',
         ];
       });
 
