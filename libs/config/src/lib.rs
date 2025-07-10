@@ -817,4 +817,103 @@ mod tests {
             assert_eq!(c.peg_tolerance_percentage, 1.3f64);
         }
     }
+
+
+    #[test]
+    fn test_parsing_feed_config_v2() {
+        let json = r#"
+        {
+            "feeds": [
+                {
+                "id": "0",
+                "full_name": "BTC / USD",
+                "description": "Price of Bitcoin in USD",
+                "type": "price-feed",
+                "oracle_id": "cex-price-feeds",
+                "value_type": "numerical",
+                "stride": 0,
+                "quorum": {
+                    "percentage": 75,
+                    "aggregation": "median"
+                },
+                "schedule": {
+                    "interval_ms": 90000,
+                    "heartbeat_ms": 3600000,
+                    "deviation_percentage": 0.1,
+                    "first_report_start_unix_time_ms": 0
+                },
+                "additional_feed_info": {
+                    "pair": {
+                    "base": "BTC",
+                    "quote": "USD"
+                    },
+                    "decimals": 8,
+                    "category": "Crypto",
+                    "market_hours": "Crypto",
+                    "arguments": {
+                    "exchanges": {
+                        "Binance": {
+                        "symbol": ["BTCUSDC", "BTCUSDT"]
+                        },
+                        "BinanceUS": {
+                        "symbol": ["BTCUSD", "BTCUSDC", "BTCUSDT"]
+                        },
+                        "Bitfinex": {
+                        "symbol": ["tBTCUSD"]
+                        },
+                        "Bitget": {
+                        "symbol": ["BTCUSDC", "BTCUSDT"]
+                        },
+                        "Bybit": {
+                        "symbol": ["BTCUSDC", "BTCUSDT"]
+                        },
+                        "Coinbase": {
+                        "id": ["BTC-USD", "BTC-USDT"]
+                        },
+                        "CryptoCom": {
+                        "symbol": ["BTC_USD", "BTC_USDT"]
+                        },
+                        "GateIo": {
+                        "id": ["BTC_USDC", "BTC_USDT"]
+                        },
+                        "Gemini": {
+                        "symbol": ["BTCUSD", "BTCUSDT"]
+                        },
+                        "KuCoin": {
+                        "symbol": ["BTC-USDC", "BTC-USDT"]
+                        },
+                        "MEXC": {
+                        "symbol": ["BTCUSDC", "BTCUSDT"]
+                        },
+                        "OKX": {
+                        "instId": ["BTC-USD", "BTC-USDC", "BTC-USDT"]
+                        },
+                        "Upbit": {
+                        "market": ["USDT-BTC"]
+                        }
+                    },
+                    "aggregators": {
+                        "CoinMarketCap": {
+                        "symbol": ["BTC", "BTC", "BTC", "BTC", "BTC"],
+                        "id": [1, 31469, 31652, 32295, 34316]
+                        }
+                    }
+                    },
+                    "compatibility_info": {
+                    "chainlink": "BTC / USD"
+                    }
+                }
+                }
+            ]
+    }
+"#;
+
+        let config = serde_json::from_str::<AllFeedsConfig>(json)
+            .map_err(|e| anyhow::anyhow!("Config is not valid JSON! {e}"))
+            .unwrap();
+        assert_eq!(config.feeds.len(), 1);
+
+        assert_eq!(config.feeds[0].id, 0_u128);
+        assert_eq!(config.feeds[0].stride, 0);
+    }
 }
