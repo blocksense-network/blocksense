@@ -6,12 +6,6 @@ lib: with lib; {
       description = mdDoc "Is the provider enabled or not.";
     };
 
-    contract-version = mkOption {
-      type = types.int;
-      default = 1;
-      description = mdDoc "The version of the ETH contract deployed on the network and associated with the parameter contract-address";
-    };
-
     private-key-path = mkOption {
       type = types.path;
       description = mdDoc "The path to the private key.";
@@ -58,17 +52,6 @@ lib: with lib; {
       description = mdDoc "Transaction GAS limit for the provider.";
     };
 
-    contract-address = mkOption {
-      type = types.str;
-      description = mdDoc "The Historical Data Feed contract address.";
-    };
-
-    safe-address = mkOption {
-      type = types.nullOr types.str;
-      default = null;
-      description = mdDoc "Address of Gnosis Safe contract.";
-    };
-
     safe-min-quorum = mkOption {
       type = types.int;
       default = 1;
@@ -79,6 +62,12 @@ lib: with lib; {
       type = types.nullOr types.str;
       default = null;
       description = mdDoc "The account to impersonate for the provider.";
+    };
+
+    contracts = mkOption {
+      type = types.listOf (types.submodule (import ./contract.nix lib));
+      default = [ ];
+      description = mdDoc "List of contracts of various types";
     };
   };
 }

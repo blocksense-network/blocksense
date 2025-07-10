@@ -39,7 +39,6 @@ in
         ink-sepolia = {
           url = "http://127.0.0.1:8547";
           private-key-path = "${testKeysDir}/sequencer-private-key";
-          contract-address = upgradeableProxyADFSContractAddressInk;
           contract-version = 2;
           transaction-gas-limit = 20000000;
           impersonated-anvil-account = impersonationAddress;
