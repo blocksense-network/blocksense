@@ -1,116 +1,58 @@
-import React from 'react';
 import type { StoryObj } from '@storybook/nextjs-vite';
 
-import { Logo } from './Logo';
+import { Logo, LogoVariant } from './Logo';
 
 export default {
   title: 'Components/Logo',
   component: Logo,
-  decorators: [
-    (Story: React.ComponentType) => (
-      <div className="max-w-80">
-        <Story />
-      </div>
-    ),
-  ],
 };
 
 type Story = StoryObj<typeof Logo>;
 
-export const PrimaryWhite: Story = {
+export const Base: Story = {
   args: {
-    type: 'primary',
-    color: 'white',
+    variant: 'primary-neon',
   },
 };
 
-export const PrimaryBlack: Story = {
-  args: {
-    type: 'primary',
-    color: 'black',
-  },
+type LogoSectionProps = {
+  variants: LogoVariant[];
 };
 
-export const PrimaryNeon: Story = {
-  args: {
-    type: 'primary',
-    color: 'neon',
-  },
-};
+const LogoSection = ({ variants }: LogoSectionProps) => (
+  <section className="flex align-center justify-center gap-4">
+    {variants.map(variant => (
+      <article className="flex flex-col items-center" key={variant}>
+        <Logo variant={variant} />
+        <p>{variant}</p>
+      </article>
+    ))}
+  </section>
+);
 
-export const SecondaryWhite: Story = {
-  args: {
-    type: 'secondary',
-    color: 'white',
-  },
-};
+export const Primary = () => (
+  <LogoSection variants={['primary-neon', 'primary-white', 'primary-black']} />
+);
 
-export const SecondaryBlack: Story = {
-  args: {
-    type: 'secondary',
-    color: 'black',
-  },
-};
+export const Secondary = () => (
+  <LogoSection
+    variants={['secondary-neon', 'secondary-white', 'secondary-black']}
+  />
+);
 
-export const SecondaryNeon: Story = {
-  args: {
-    type: 'secondary',
-    color: 'neon',
-  },
-};
+export const LogoMark = () => (
+  <LogoSection
+    variants={[
+      'logo-mark-neon',
+      'logo-mark-white',
+      'logo-mark-black',
+      'logo-mark-black-white',
+    ]}
+  />
+);
 
-export const LogoMarkWhite: Story = {
-  args: {
-    type: 'logo-mark',
-    color: 'white',
-  },
-};
-
-export const LogoMarkBlack: Story = {
-  args: {
-    type: 'logo-mark',
-    color: 'black',
-  },
-};
-
-export const LogoMarkNeon: Story = {
-  args: {
-    type: 'logo-mark',
-    color: 'neon',
-  },
-};
-
-export const LogoMarkBlackWhite: Story = {
-  args: {
-    type: 'logo-mark',
-    color: 'black-white',
-  },
-};
-
-export const IconWhite: Story = {
-  args: {
-    type: 'icon',
-    color: 'white',
-  },
-};
-
-export const IconBlack: Story = {
-  args: {
-    type: 'icon',
-    color: 'black',
-  },
-};
-
-export const IconNeon: Story = {
-  args: {
-    type: 'icon',
-    color: 'neon',
-  },
-};
-
-export const IconBlackWhite: Story = {
-  args: {
-    type: 'icon',
-    color: 'black-white',
-  },
-};
+export const Icon = () => (
+  <LogoSection
+    variants={['icon-neon', 'icon-white', 'icon-black', 'icon-black-white']}
+  />
+);

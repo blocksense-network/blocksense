@@ -1,62 +1,50 @@
 import Image from 'next/image';
 
-import iconBlack from '../../assets/logos/icon-black.svg';
-import iconBlackWhite from '../../assets/logos/icon-black-white.svg';
-import iconNeon from '../../assets/logos/icon-neon.svg';
-import iconWhite from '../../assets/logos/icon-white.svg';
-import logoMarkBlack from '../../assets/logos/logo-mark-black.svg';
-import logoMarkBlackWhite from '../../assets/logos/logo-mark-black-white.svg';
-import logoMarkNeon from '../../assets/logos/logo-mark-neon.svg';
-import logoMarkWhite from '../../assets/logos/logo-mark-white.svg';
-import primaryBlack from '../../assets/logos/primary-black.svg';
-import primaryNeon from '../../assets/logos/primary-neon.svg';
-import primaryWhite from '../../assets/logos/primary-white.svg';
-import secondaryBlack from '../../assets/logos/secondary-black.svg';
-import secondaryNeon from '../../assets/logos/secondary-neon.svg';
-import secondaryWhite from '../../assets/logos/secondary-white.svg';
+import IconBlack from '../../assets/logos/icon-black.svg';
+import IconBlackWhite from '../../assets/logos/icon-black-white.svg';
+import IconNeon from '../../assets/logos/icon-neon.svg';
+import IconWhite from '../../assets/logos/icon-white.svg';
+import LogoMarkBlack from '../../assets/logos/logo-mark-black.svg';
+import LogoMarkBlackWhite from '../../assets/logos/logo-mark-black-white.svg';
+import LogoMarkNeon from '../../assets/logos/logo-mark-neon.svg';
+import LogoMarkWhite from '../../assets/logos/logo-mark-white.svg';
+import PrimaryBlack from '../../assets/logos/primary-black.svg';
+import PrimaryNeon from '../../assets/logos/primary-neon.svg';
+import PrimaryWhite from '../../assets/logos/primary-white.svg';
+import SecondaryBlack from '../../assets/logos/secondary-black.svg';
+import SecondaryNeon from '../../assets/logos/secondary-neon.svg';
+import SecondaryWhite from '../../assets/logos/secondary-white.svg';
 
-type LogoType = 'primary' | 'secondary' | 'logo-mark' | 'icon';
-type LogoColor = 'white' | 'black' | 'neon' | 'black-white';
+export const variants = {
+  'icon-neon': IconNeon,
+  'icon-white': IconWhite,
+  'icon-black': IconBlack,
+  'icon-black-white': IconBlackWhite,
+  'logo-mark-neon': LogoMarkNeon,
+  'logo-mark-white': LogoMarkWhite,
+  'logo-mark-black': LogoMarkBlack,
+  'logo-mark-black-white': LogoMarkBlackWhite,
+  'primary-neon': PrimaryNeon,
+  'primary-white': PrimaryWhite,
+  'primary-black': PrimaryBlack,
+  'secondary-neon': SecondaryNeon,
+  'secondary-white': SecondaryWhite,
+  'secondary-black': SecondaryBlack,
+};
 
-type LogoProps = {
+export type LogoVariant = keyof typeof variants;
+
+export type LogoProps = {
+  variant?: LogoVariant;
   className?: string;
-  type: LogoType;
-  color: LogoColor;
-  alt?: string;
 };
 
-const logoMap = {
-  icon: {
-    white: iconWhite,
-    black: iconBlack,
-    neon: iconNeon,
-    'black-white': iconBlackWhite,
-  },
-  'logo-mark': {
-    white: logoMarkWhite,
-    black: logoMarkBlack,
-    neon: logoMarkNeon,
-    'black-white': logoMarkBlackWhite,
-  },
-  primary: {
-    white: primaryWhite,
-    black: primaryBlack,
-    neon: primaryNeon,
-    'black-white': '',
-  },
-  secondary: {
-    white: secondaryWhite,
-    black: secondaryBlack,
-    neon: secondaryNeon,
-    'black-white': '',
-  },
-};
-
-export const Logo = ({ className, type, color }: LogoProps) => {
-  const src = logoMap[type][color];
-  if (!src) return null;
-
+export const Logo = ({ variant = 'primary-neon', className }: LogoProps) => {
   return (
-    <Image className={className} src={src} alt={'Blocksense Network Logo'} />
+    <Image
+      src={variants[variant]}
+      alt="Blocksense Network Logo"
+      className={className}
+    />
   );
 };
