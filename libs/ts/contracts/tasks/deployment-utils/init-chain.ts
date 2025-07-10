@@ -75,6 +75,13 @@ export async function initChain(
       ? '0xf8f3965692216a43513fd1ea951d2b3c9d48fac5a96a95a159ce854886f7c1bd'
       : id('upgradeableProxy'),
   );
+  // Allow the deployer private key to be empty if the deployer is a Ledger.
+  if (
+    parsedEnv.mergedConfig.deployerAddressIsLedger &&
+    !parsedEnv.mergedConfig.deployerPrivateKey
+  ) {
+    parsedEnv.mergedConfig.deployerPrivateKey = parseHexDataString('0x00');
+  }
   parsedEnv.mergedConfig.isSafeOriginalDeployment ??= true;
 
   const { mergedConfig: envCfg } =
