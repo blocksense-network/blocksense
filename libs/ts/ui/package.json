@@ -2,6 +2,9 @@
   "name": "@blocksense/ui",
   "version": "0.1.0",
   "private": true,
+  "exports": {
+    "./Logo": "./src/components/Logo/Logo.tsx"
+  },
   "scripts": {
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"

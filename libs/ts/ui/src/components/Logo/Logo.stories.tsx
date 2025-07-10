@@ -1,3 +1,4 @@
+import React from 'react';
 import type { StoryObj } from '@storybook/nextjs-vite';
 
 import { Logo } from './Logo';
@@ -5,6 +6,13 @@ import { Logo } from './Logo';
 export default {
   title: 'Components/Logo',
   component: Logo,
+  decorators: [
+    (Story: React.ComponentType) => (
+      <div className="max-w-80">
+        <Story />
+      </div>
+    ),
+  ],
 };
 
 type Story = StoryObj<typeof Logo>;
