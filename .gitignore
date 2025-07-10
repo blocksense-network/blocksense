@@ -176,3 +176,7 @@ libs/ts/docs-ui/storybook-static
 
 # Local EVM contracts deployment artifacts
 config/evm_contracts_deployment_v2/local.json
+
+# Nix example setups secret keys
+nix/test-environments/test-keys
+
