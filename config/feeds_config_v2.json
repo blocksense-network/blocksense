@@ -41869,6 +41869,43 @@
           ]
         }
       }
+    },
+    {
+      "id": "2000002",
+      "full_name": " LQD / USD",
+      "description": "Price of iShares iBoxx $ Inv Grade Corporate Bond ETF ($LQD) in USD",
+      "type": "price-feed",
+      "oracle_id": "stock-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "LQD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Equities",
+        "market_hours": "US_Equities",
+        "arguments": {
+          "providers": [
+            "AlpacaMarkets",
+            "AlphaVantage",
+            "YahooFinance",
+            "twelvedata",
+            "FMP"
+          ]
+        }
+      }
     }
   ]
 }
