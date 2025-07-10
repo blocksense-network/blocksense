@@ -8,10 +8,10 @@
 }:
 {
   env = {
-    SEQUENCER_CONFIG_DIR = config.devenv.root + "/apps/sequencer";
-    REPORTER_CONFIG_DIR = config.devenv.root + "/apps/reporter";
-    FEEDS_CONFIG_DIR = config.devenv.root + "/config";
-    REPORTER_SECRET_KEY_FILE_PATH = config.devenv.root + "/nix/test-environments/test-keys";
+    SEQUENCER_CONFIG_DIR = "${config.devenv.root}/apps/sequencer";
+    REPORTER_CONFIG_DIR = "${config.devenv.root}/apps/reporter";
+    FEEDS_CONFIG_DIR = "${config.devenv.root}/config";
+    REPORTER_SECRET_KEY_FILE_PATH = "${config.devenv.root}/nix/test-environments/test-keys";
     LD_LIBRARY_PATH = lib.makeLibraryPath self'.legacyPackages.commonLibDeps;
   };
 

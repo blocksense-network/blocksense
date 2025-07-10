@@ -7,8 +7,10 @@ let
   # Function to read and parse the JSON file
   # readJson = path: builtins.fromJSON (builtins.readFile path);
 
-  testKeysDir = config.devenv.root + "/nix/test-environments/test-keys";
-  # deploymentV2FilePath = config.devenv.root + "/config/evm_contracts_deployment_v2/ink-sepolia.json";
+  root = ../..;
+
+  testKeysDir = lib.path.append root "nix/test-environments/test-keys";
+  # deploymentV2FilePath = "${config.devenv.root}/config/evm_contracts_deployment_v2/ink-sepolia.json";
 
   upgradeableProxyADFSContractAddressInk = "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F";
   # TODO:(milagenova): once we merge latest deployment files we can use the line below
@@ -21,7 +23,7 @@ in
   ];
 
   services.blocksense = {
-    logsDir = lib.mkForce (config.devenv.root + "/logs/blocksense/example-setup-03");
+    logsDir = lib.mkForce (lib.path.append root "logs/blocksense/example-setup-03");
 
     anvil = lib.mkForce {
       ink-sepolia = {

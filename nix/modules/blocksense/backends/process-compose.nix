@@ -86,7 +86,8 @@ let
           '';
           environment = [
             "RUST_LOG=${log-level}"
-            "SPIN_DATA_DIR=${config.devenv.root}/target/spin-artifacts"
+            # FIXME: mazalo
+            "SPIN_DATA_DIR=$GIT_ROOT/target/spin-artifacts"
           ];
           depends_on = {
             blocksense-sequencer.condition = "process_healthy";
@@ -110,7 +111,8 @@ let
         timeout_seconds = 30;
       };
       environment = [
-        "FEEDS_CONFIG_DIR=${../../../../config}"
+        # FIXME: opa
+        # "FEEDS_CONFIG_DIR=${../../../../config}"
         "SEQUENCER_CONFIG_DIR=${cfg.config-dir}"
         "SEQUENCER_LOG_LEVEL=${lib.toUpper cfg.sequencer.log-level}"
       ];
