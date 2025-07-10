@@ -41872,7 +41872,7 @@
     },
     {
       "id": "2000002",
-      "full_name": " LQD / USD",
+      "full_name": "LQD / USD",
       "description": "Price of iShares iBoxx $ Inv Grade Corporate Bond ETF ($LQD) in USD",
       "type": "price-feed",
       "oracle_id": "stock-price-feeds",
