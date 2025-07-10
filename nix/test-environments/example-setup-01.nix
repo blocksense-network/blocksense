@@ -67,7 +67,6 @@ in
           # In a production environment, use a secret manager like Agenix, to
           # prevent secrets from being copyed to the Nix Store.
           private-key-path = "${testKeysDir}/sequencer-private-key";
-          contract-address = upgradeableProxyContractAddressSepolia;
           impersonated-anvil-account = impersonationAddress;
           allow-feeds = [
             0 # BTC / USD
@@ -113,11 +112,41 @@ in
               peg-tolerance-percentage = 0.2;
             }
           ];
+          contracts = [
+            {
+              name = "AggregatedDataFeedStore";
+              address = upgradeableProxyContractAddressSepolia;
+              creation-byte-code = null;
+              deployed-byte-code = null;
+              contract-version = 1;
+            }
+            {
+              name = "multicall";
+              address = "0xcA11bde05977b3631167028862bE2a173976CA11";
+              creation-byte-code = null;
+              deployed-byte-code = null;
+              contract-version = 1;
+            }
+          ];
         };
         ink-sepolia = {
           private-key-path = "${testKeysDir}/sequencer-private-key";
-          contract-address = upgradeableProxyADFSContractAddressInk;
-          contract-version = 2;
+          contracts = [
+            {
+              name = "AggregatedDataFeedStore";
+              address = upgradeableProxyADFSContractAddressInk;
+              creation-byte-code = null;
+              deployed-byte-code = null;
+              contract-version = 2;
+            }
+            {
+              name = "multicall";
+              address = "0xcA11bde05977b3631167028862bE2a173976CA11";
+              creation-byte-code = null;
+              deployed-byte-code = null;
+              contract-version = 2;
+            }
+          ];
           transaction-gas-limit = 20000000;
           impersonated-anvil-account = impersonationAddress;
         };

@@ -284,7 +284,7 @@ impl RpcProvider {
         };
 
         let res = r.load_history_from_chain().await;
-        info!("Loaded history from chaing = {res:?}");
+        info!("Loaded history from chain {network} = {res:?}");
         r
     }
 
