@@ -403,7 +403,6 @@ export const Sidebar: FC<{ toc: Heading[] }> = ({ toc }) => {
           'x:max-md:hidden x:flex x:flex-col',
           'x:h-[calc(100dvh-var(--nextra-menu-height))]',
           'x:top-(--nextra-navbar-height) x:shrink-0',
-          isExpanded ? 'x:w-68' : 'x:w-20',
           hideSidebar ? 'x:hidden' : 'x:sticky',
         )}
       >
