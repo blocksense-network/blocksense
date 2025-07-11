@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use anyhow::{Error, Result};
 use futures::{future::LocalBoxFuture, FutureExt};
 
@@ -21,24 +23,26 @@ type FMPResponse = Vec<PriceData>;
 
 pub struct FMPPriceFetcher<'a> {
     pub symbols: &'a [String],
-    api_key: Option<&'a str>,
+    api_keys: Option<HashMap<String, String>>,
 }
 
 impl<'a> PricesFetcher<'a> for FMPPriceFetcher<'a> {
     const NAME: &'static str = "FMP";
 
-    fn new(symbols: &'a [String], api_key: Option<&'a str>) -> Self {
-        Self { symbols, api_key }
+    fn new(symbols: &'a [String], api_key: Option<HashMap<String, String>>) -> Self {
+        Self {
+            symbols,
+            api_keys: api_key,
+        }
     }
 
     fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
         async {
-            let api_key = match self.api_key {
-                Some(key) => key,
-                None => {
-                    return Err(Error::msg("API key is required for FMP"));
-                }
-            };
+            let api_key = self
+                .api_keys
+                .as_ref()
+                .and_then(|map| map.get("FMP_API_KEY"))
+                .ok_or_else(|| Error::msg("Missing FMP_API_KEY"))?;
 
             let all_symbols = self.symbols.join(",");
 

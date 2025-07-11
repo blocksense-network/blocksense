@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use anyhow::Result;
 use futures::{future::LocalBoxFuture, FutureExt};
 
@@ -33,7 +35,7 @@ pub struct CryptoComPriceFetcher;
 impl PricesFetcher<'_> for CryptoComPriceFetcher {
     const NAME: &'static str = "Crypto.com";
 
-    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
+    fn new(_symbols: &[String], _api_keys: Option<HashMap<String, String>>) -> Self {
         Self
     }
 

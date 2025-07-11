@@ -5,14 +5,13 @@
 }:
 let
   # Function to read and parse the JSON file
-  # readJson = path: builtins.fromJSON (builtins.readFile path);
+  readJson = path: builtins.fromJSON (builtins.readFile path);
 
   testKeysDir = config.devenv.root + "/nix/test-environments/test-keys";
-  # deploymentV2FilePath = config.devenv.root + "/config/evm_contracts_deployment_v2/ink-sepolia.json";
+  deploymentV2FilePath = config.devenv.root + "/config/evm_contracts_deployment_v2/ink-sepolia.json";
 
-  upgradeableProxyADFSContractAddressInk = "0xADF5aacfA254FbC566d3b81e04b95db4bCF7b40F";
-  # TODO:(milagenova): once we merge latest deployment files we can use the line below
-  # (readJson deploymentV2FilePath).contracts.coreContracts.UpgradeableProxyADFS.address;
+  upgradeableProxyADFSContractAddressInk =
+    (readJson deploymentV2FilePath).contracts.coreContracts.UpgradeableProxyADFS.address;
   impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
 in
 {
@@ -20,8 +19,12 @@ in
     ./example-setup-01.nix
   ];
 
+  services.kafka.enable = lib.mkForce false;
+
   services.blocksense = {
     logsDir = lib.mkForce (config.devenv.root + "/logs/blocksense/example-setup-03");
+
+    blama.enable = lib.mkForce false;
 
     anvil = lib.mkForce {
       ink-sepolia = {

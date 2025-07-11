@@ -5,36 +5,60 @@ import {
   ethereumAddress,
   networkName,
 } from '@blocksense/base-utils/evm';
+import { hexDataString } from '@blocksense/base-utils';
 
 const ParameterType = S.Union(S.String, S.Number, S.BigIntFromSelf, S.Boolean);
 const FunctionArgs = S.Array(ParameterType);
 
-const ContractDataSchema = S.Struct({
-  address: ethereumAddress,
-  constructorArgs: FunctionArgs,
+const feedId = S.BigInt.annotations({
+  identifier: 'FeedId',
 });
 
-export const CLAggregatorAdapterDataSchema = S.Struct({
-  ...ContractDataSchema.fields,
+const ContractDataSchemaV1 = S.Struct({
+  address: ethereumAddress,
+  constructorArgs: FunctionArgs,
+}).annotations({
+  identifier: 'ContractDataV1',
+});
+
+const ContractDataSchemaV2 = S.Struct({
+  ...ContractDataSchemaV1.fields,
+  salt: hexDataString,
+}).annotations({
+  identifier: 'ContractDataV2',
+});
+
+export const CLAggregatorAdapterDataSchemaV1 = S.Struct({
+  ...ContractDataSchemaV1.fields,
   description: S.String,
   base: S.NullOr(ethereumAddress),
   quote: S.NullOr(ethereumAddress),
 }).annotations({
-  identifier: 'CLAggregatorAdapterData',
+  identifier: 'CLAggregatorAdapterDataV1',
 });
 
-export type CLAggregatorAdapterData = typeof CLAggregatorAdapterDataSchema.Type;
+export const CLAggregatorAdapterDataSchemaV2 = S.Struct({
+  ...ContractDataSchemaV2.fields,
+  feedId: feedId,
+  base: S.NullOr(ethereumAddress),
+  quote: S.NullOr(ethereumAddress),
+}).annotations({
+  identifier: 'CLAggregatorAdapterDataV2',
+});
+
+export type CLAggregatorAdapterDataV2 =
+  typeof CLAggregatorAdapterDataSchemaV2.Type;
 
 const ContractsConfigSchemaV1 = S.mutable(
   S.Struct({
     coreContracts: S.mutable(
       S.Struct({
-        HistoricalDataFeedStoreV2: ContractDataSchema,
-        UpgradeableProxy: ContractDataSchema,
-        CLFeedRegistryAdapter: ContractDataSchema,
+        HistoricalDataFeedStoreV2: ContractDataSchemaV1,
+        UpgradeableProxy: ContractDataSchemaV1,
+        CLFeedRegistryAdapter: ContractDataSchemaV1,
       }),
     ),
-    CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchema)),
+    CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchemaV1)),
     SafeMultisig: ethereumAddress,
   }),
 ).annotations({ identifier: 'ContractsConfigV1' });
@@ -43,17 +67,28 @@ const ContractsConfigSchemaV2 = S.mutable(
   S.Struct({
     coreContracts: S.mutable(
       S.Struct({
-        AggregatedDataFeedStore: ContractDataSchema,
-        UpgradeableProxyADFS: ContractDataSchema,
-        CLFeedRegistryAdapter: ContractDataSchema,
-        AccessControl: ContractDataSchema,
-        OnlySequencerGuard: S.UndefinedOr(ContractDataSchema),
-        AdminExecutorModule: S.UndefinedOr(ContractDataSchema),
+        UpgradeableProxyADFS: ContractDataSchemaV2,
+        AggregatedDataFeedStore: ContractDataSchemaV2,
+        AccessControl: ContractDataSchemaV2,
+        CLFeedRegistryAdapter: ContractDataSchemaV2,
       }),
     ),
-    CLAggregatorAdapter: S.mutable(S.Array(CLAggregatorAdapterDataSchema)),
-    SequencerMultisig: ethereumAddress,
-    AdminMultisig: ethereumAddress,
+    safe: S.mutable(
+      S.Struct({
+        AdminMultisig: ethereumAddress,
+        ReporterMultisig: S.NullOr(ethereumAddress),
+        OnlySequencerGuard: S.NullOr(ContractDataSchemaV2),
+        AdminExecutorModule: S.NullOr(ContractDataSchemaV2),
+      }),
+    ),
+    CLAggregatorAdapter: S.mutable(
+      S.Record({
+        // The key is the feedId, but effect schema does not support
+        // `${bigint}` as a key type.
+        key: S.String,
+        value: CLAggregatorAdapterDataSchemaV2,
+      }),
+    ),
   }),
 ).annotations({ identifier: 'ContractsConfigV2' });
 
@@ -75,7 +110,7 @@ export const DeploymentConfigSchemaV1 = S.mutable(
 
 export const DeploymentConfigSchemaV2 = S.mutable(
   S.Struct({
-    name: networkName,
+    network: networkName,
     chainId: chainId,
     contracts: ContractsConfigSchemaV2,
   }),

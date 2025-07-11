@@ -1,20 +1,24 @@
-import { artifacts, ethers } from 'hardhat';
+import { artifacts, ethers, viem } from 'hardhat';
 import { Contract } from 'ethers';
+import { expect } from 'chai';
 type EthersContractParams = ConstructorParameters<typeof Contract>;
 
-import * as utils from './utils/clAggregatorAdapterConsumer';
-import { expect } from 'chai';
-import { deployContract } from '../experiments/utils/helpers/common';
 import { CLAggregatorAdapterConsumer } from '@blocksense/contracts/typechain';
+import { isObject } from '@blocksense/base-utils/type-level';
+
+import * as utils from './utils/clAggregatorAdapterConsumer';
+import { deployContract } from '../experiments/utils/helpers/common';
 import {
   CLAdapterWrapper,
   UpgradeableProxyADFSWrapper,
 } from '../utils/wrappers';
 import { encodeDataAndTimestamp } from '../utils/helpers/common';
+import { CLAggregatorAdapterConsumer as CLAggregatorAdapterConsumerViem } from '../../lib/viem/CLAggregatorAdapter';
 
 describe('Example: CLAggregatorAdapterConsumer', function () {
   let clAggregatorAdapter: CLAdapterWrapper;
   let clAggregatorAdapterConsumer: CLAggregatorAdapterConsumer;
+  let clAggregatorAdapterViem: CLAggregatorAdapterConsumerViem;
 
   beforeEach(async function () {
     const admin = (await ethers.getSigners())[9];
@@ -41,6 +45,12 @@ describe('Example: CLAggregatorAdapterConsumer', function () {
         'CLAggregatorAdapterConsumer',
         clAggregatorAdapter.contract.target,
       );
+
+    const viemPublicClient = await viem.getPublicClient();
+    clAggregatorAdapterViem = new CLAggregatorAdapterConsumerViem(
+      clAggregatorAdapter.contract.target as `0x${string}`,
+      viemPublicClient,
+    );
   });
 
   type Functions = typeof utils;
@@ -75,6 +85,9 @@ describe('Example: CLAggregatorAdapterConsumer', function () {
     const contractData = await clAggregatorAdapterConsumer.getFunction(
       functionName,
     )(...data);
+    const viemContractData = await (
+      clAggregatorAdapterViem[functionName] as (...args: any[]) => any
+    )(...data);
 
     const config: EthersContractParams = [
       clAggregatorAdapter.contract.target,
@@ -94,5 +107,10 @@ describe('Example: CLAggregatorAdapterConsumer', function () {
     const utilData = await func(config, ...data);
 
     expect(contractData).to.deep.equal(utilData);
+    expect(
+      isObject(viemContractData)
+        ? Object.values(viemContractData)
+        : viemContractData,
+    ).to.deep.equal(utilData);
   };
 });

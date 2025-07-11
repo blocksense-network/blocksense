@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use anyhow::Result;
 use futures::{future::LocalBoxFuture, FutureExt};
 
@@ -48,7 +50,7 @@ pub struct BitfinexPriceFetcher<'a> {
 impl<'a> PricesFetcher<'a> for BitfinexPriceFetcher<'a> {
     const NAME: &'static str = "Bitfinex";
 
-    fn new(symbols: &'a [String], _api_key: Option<&'a str>) -> Self {
+    fn new(symbols: &'a [String], _api_keys: Option<HashMap<String, String>>) -> Self {
         Self { symbols }
     }
 

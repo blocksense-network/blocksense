@@ -1,28 +1,19 @@
-import {
-  Address,
-  createPublicClient,
-  getContract,
-  http,
-  type PublicClient,
-} from 'viem';
+import { getContract, PublicClient, Address } from 'viem';
 
-import { getRpcUrl, NetworkName } from '@blocksense/base-utils/evm';
+import { ContractConsumerBase } from './ContractConsumerBase';
+import { abi as clAdapterAbi } from '../abis/CLAggregatorAdapter';
 
-import { abi as clAdapterAbi } from './abi';
-import { getViemChain } from '../common';
-
-export class CLAggregatorAdapter {
+export class CLAggregatorAdapterConsumer extends ContractConsumerBase {
   public contract;
-  public client: PublicClient;
 
-  constructor(
-    public contractAddress: Address,
-    networkName: NetworkName,
-  ) {
-    this.client = createPublicClient({
-      chain: getViemChain(networkName),
-      transport: http(getRpcUrl(networkName)),
-    });
+  /**
+   * Constructs a CLAggregatorAdapterConsumer.
+   *
+   * @param contractAddress The address of the CLAggregatorAdapter contract.
+   * @param client The Viem PublicClient instance to use.
+   */
+  constructor(contractAddress: Address, client: PublicClient) {
+    super(contractAddress, client);
 
     this.contract = getContract({
       address: this.contractAddress,
@@ -31,31 +22,31 @@ export class CLAggregatorAdapter {
     });
   }
 
-  async decimals(): Promise<number> {
-    return await this.contract.read.decimals();
+  async getDecimals(): Promise<number> {
+    return this.contract.read.decimals();
   }
 
-  async dataFeedStore(): Promise<Address> {
-    return await this.contract.read.dataFeedStore();
+  async getDataFeedStore(): Promise<Address> {
+    return this.contract.read.dataFeedStore();
   }
 
-  async description(): Promise<string> {
-    return await this.contract.read.description();
+  async getDescription(): Promise<string> {
+    return this.contract.read.description();
   }
 
-  async id(): Promise<bigint> {
-    return await this.contract.read.id();
+  async getId(): Promise<bigint> {
+    return this.contract.read.id();
   }
 
-  async latestAnswer(): Promise<bigint> {
-    return await this.contract.read.latestAnswer();
+  async getLatestAnswer(): Promise<bigint> {
+    return this.contract.read.latestAnswer();
   }
 
-  async latestRound(): Promise<bigint> {
-    return await this.contract.read.latestRound();
+  async getLatestRound(): Promise<bigint> {
+    return this.contract.read.latestRound();
   }
 
-  async latestRoundData(): Promise<RoundData> {
+  async getLatestRoundData(): Promise<RoundData> {
     const roundDataResult = await this.contract.read.latestRoundData();
     return parseRoundData(roundDataResult);
   }

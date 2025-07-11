@@ -13,7 +13,7 @@ export const columns: ColumnDef[] = [
     facetedFilter: true,
   },
   {
-    id: 'name',
+    id: 'full_name',
     title: 'Data Feed Name',
     header: ({ column }) => <DataTableColumnHeader title={column.title} />,
     cell: ({ row }) => (

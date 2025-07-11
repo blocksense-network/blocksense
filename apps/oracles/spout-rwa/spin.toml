@@ -1,0 +1,34 @@
+spin_manifest_version = 2
+
+[application]
+authors = ["Mila Genova", "Emil Ivanichkov"]
+name = " Spout RWA Oracle"
+version = "0.1.0"
+
+[application.trigger.settings]
+interval_time_in_seconds = 10
+sequencer = "http://127.0.0.1:9856/post_reports_batch"
+secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
+second_consensus_secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
+kafka_endpoint = "http://127.0.0.1:9092"
+reporter_id = 0
+
+[[trigger.oracle]]
+component = "spout-rwa"
+
+[[trigger.oracle.data_feeds]]
+id = "101001"
+stride = 0
+decimals = 6
+data = '{"pair":{"base":"LQD","quote":"amount"},"decimals":6,"category":"","market_hours":"","arguments":{"api_url":"https://rwa-deploy-backend.onrender.com/reserves/LQD","endpoint":"reserve"}}'
+
+[component.spout-rwa]
+source = "../target/wasm32-wasip1/release/spout_rwa.wasm"
+allowed_outbound_hosts = ["https://rwa-deploy-backend.onrender.com"]
+
+[[trigger.oracle.capabilities]]
+data = "x"
+id = "SPOUT_RWA_API_KEY"
+
+[component.spout-rwa.build]
+command = "cargo build --target wasm32-wasip1 --release"

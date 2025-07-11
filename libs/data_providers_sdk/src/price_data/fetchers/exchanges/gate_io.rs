@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use anyhow::Result;
 use futures::{future::LocalBoxFuture, FutureExt};
 
@@ -24,7 +26,7 @@ pub struct GateIoPriceFetcher;
 impl PricesFetcher<'_> for GateIoPriceFetcher {
     const NAME: &'static str = "Gate.io";
 
-    fn new(_symbols: &[String], _api_key: Option<&str>) -> Self {
+    fn new(_symbols: &[String], _api_keys: Option<HashMap<String, String>>) -> Self {
         Self
     }
 

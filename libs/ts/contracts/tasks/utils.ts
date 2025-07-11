@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { getCreate2Address, keccak256, solidityPacked } from 'ethers';
 import { ContractNames, NetworkConfig } from './types';
 import { Artifacts } from 'hardhat/types';
 
@@ -26,14 +26,14 @@ export const predictAddress = async (
   args: string,
 ) => {
   const artifact = artifacts.readArtifactSync(contractName);
-  const bytecode = ethers.solidityPacked(
+  const bytecode = solidityPacked(
     ['bytes', 'bytes'],
     [artifact.bytecode, args],
   );
 
-  return ethers.getCreate2Address(
+  return getCreate2Address(
     config.safeAddresses.createCallAddress,
     salt,
-    ethers.keccak256(bytecode),
+    keccak256(bytecode),
   );
 };

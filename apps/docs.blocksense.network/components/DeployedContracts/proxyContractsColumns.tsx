@@ -12,10 +12,10 @@ export const columns: ColumnDef[] = [
     facetedFilter: true,
   },
   {
-    id: 'description',
+    id: 'name',
     title: 'Data Feed',
     header: ({ column }) => <DataTableColumnHeader title={column.title} />,
-    cell: ({ row }) => <DataTableBadge>{row.description}</DataTableBadge>,
+    cell: ({ row }) => <DataTableBadge>{row.name}</DataTableBadge>,
   },
   {
     id: 'address',

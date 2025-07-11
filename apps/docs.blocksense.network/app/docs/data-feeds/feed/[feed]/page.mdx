@@ -5,13 +5,14 @@ import DataFeed, { generateStaticParams } from '@/components/DataFeeds/[feed]';
 
 export { generateStaticParams };
 
+
 export async function generateMetadata({ params }) {
   const { feed: feedId } = await params;
   let metadata = { title: 'Data Feed' };
 
   if (feedId) {
     const feedsConfig = decodeNewFeedsConfig(DATA_FEEDS);
-    const feed = feedsConfig.feeds.find(feed => feed.id === Number(feedId));
+    const feed = feedsConfig.feeds.find(feed => feed.id.toString() === feedId);
 
     if (feed) {
       metadata = { title: `${feed.full_name} | ID: ${feed.id}` };

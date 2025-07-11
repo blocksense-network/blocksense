@@ -6,8 +6,9 @@ use blocksense_data_providers_sdk::price_data::{
     fetchers::{
         fetch::fetch_all_prices,
         stock_markets::{
-            alpha_vantage::AlphaVantagePriceFetcher, fmp::FMPPriceFetcher,
-            twelvedata::TwelveDataPriceFetcher, yahoo_finance::YFPriceFetcher,
+            alpaca_markets::AlpacaMarketsPriceFetcher, alpha_vantage::AlphaVantagePriceFetcher,
+            fmp::FMPPriceFetcher, twelvedata::TwelveDataPriceFetcher,
+            yahoo_finance::YFPriceFetcher,
         },
     },
     traits::prices_fetcher::{fetch, TradingPairSymbol},
@@ -16,12 +17,13 @@ use blocksense_data_providers_sdk::price_data::{
 
 use crate::{
     types::{Capabilities, ResourceData, ResourcePairData},
-    utils::get_api_key,
+    utils::get_api_keys,
 };
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SymbolsData {
+    pub alpaca_markets: Vec<TradingPairSymbol>,
     pub alpha_vantage: Vec<TradingPairSymbol>,
     pub yahoo_finance: Vec<TradingPairSymbol>,
     pub twelvedata: Vec<TradingPairSymbol>,
@@ -31,6 +33,10 @@ pub struct SymbolsData {
 impl SymbolsData {
     pub fn from_resources(providers_symbols: &ProvidersSymbols) -> Result<Self> {
         Ok(Self {
+            alpaca_markets: providers_symbols
+                .get("AlpacaMarkets")
+                .cloned()
+                .unwrap_or_default(),
             alpha_vantage: providers_symbols
                 .get("AlphaVantage")
                 .cloned()
@@ -55,19 +61,23 @@ pub async fn get_prices(
     let symbols = SymbolsData::from_resources(&resources.symbols)?;
 
     let futures_set = FuturesUnordered::from_iter([
+        fetch::<AlpacaMarketsPriceFetcher>(
+            &symbols.alpaca_markets,
+            get_api_keys(capabilities, &["APCA_API_KEY_ID", "APCA_API_SECRET_KEY"]),
+        ),
         fetch::<AlphaVantagePriceFetcher>(
             &symbols.alpha_vantage,
-            get_api_key(capabilities, "ALPHAVANTAGE_API_KEY"),
+            get_api_keys(capabilities, &["ALPHAVANTAGE_API_KEY"]),
         ),
         fetch::<YFPriceFetcher>(
             &symbols.yahoo_finance,
-            get_api_key(capabilities, "YAHOO_FINANCE_API_KEY"),
+            get_api_keys(capabilities, &["YAHOO_FINANCE_API_KEY"]),
         ),
         fetch::<TwelveDataPriceFetcher>(
             &symbols.twelvedata,
-            get_api_key(capabilities, "TWELVEDATA_API_KEY"),
+            get_api_keys(capabilities, &["TWELVEDATA_API_KEY"]),
         ),
-        fetch::<FMPPriceFetcher>(&symbols.fmp, get_api_key(capabilities, "FMP_API_KEY")),
+        fetch::<FMPPriceFetcher>(&symbols.fmp, get_api_keys(capabilities, &["FMP_API_KEY"])),
     ]);
 
     let fetched_provider_prices = fetch_all_prices(futures_set).await;

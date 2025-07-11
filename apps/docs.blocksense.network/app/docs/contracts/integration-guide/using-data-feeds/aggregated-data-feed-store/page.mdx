@@ -17,146 +17,124 @@ Aggregated Data Feed Store contract is where all data is stored and where all co
   contract which underneath calls the `fallback` function of the **AggregatedDataFeedStore** contract.
 </Callout>
 
-The examples below show how to call the contract to fetch data. All read calls must start with the first bit set to 1, where the whole selector is 1 byte (0x80 in binary is 0b10000000, i.e. first bit set to 1). To simplify the calls, we have the following types of calls:
-- selector **0x86**: getFeedAtRound(uint8 stride, uint120 feedId, uint16 round, uint32 startSlot?, uint32 slots?) returns (bytes)
-- selector **0x81**: getLatestRound(uint8 stride, uint120 feedId) returns (uint16)
-- selector **0x82**: getLatestSingleData(uint8 stride, uint120 feedId) returns (bytes)
-- selector **0x84**: getLatestData(uint8 stride, uint120 feedId, uint32 startSlot?, uint32 slots?) returns (bytes)
+The examples below show how to call the contract to fetch data. We have the following types of calls:
+- selector **0x86**: getDataAtIndex(uint128 feedId, uint16 index, uint32 startSlot?, uint32 slots?) returns (bytes)
+- selector **0x81**: getLatestIndex(uint128 feedId) returns (uint16)
+- selector **0x82**: getLatestSingleData(uint128 feedId) returns (bytes)
+- selector **0x84**: getLatestData(uint128 feedId, uint32 startSlot?, uint32 slots?) returns (bytes)
 
 <Callout type="info" emoji="ℹ️">
-  - Selector **0x83** will call both getLatestRound and getLatestSingleData.
-  - Selector **0x85** will call both getLatestRound and getLatestData.
+  - Selector **0x83** will call both getLatestIndex and getLatestSingleData.
+  - Selector **0x85** will call both getLatestIndex and getLatestData.
 </Callout>
+
+The Aggregated Data Feed Store (ADFS) maintains historical data for feeds of varying sizes. Each feed's size is determined by its slot count, where 1 slot equals 32 bytes. Supported sizes follow powers of 2, ranging from 0 to 31: [2^0; 2^31] (1 slot, 2 slots, 4 slots, 8 slots, 16 slots, 32 slots, etc.).
+
+Data is stored using a ring buffer architecture with a maximum capacity of 8,192 indices (2^13). When the buffer reaches capacity, new data overwrites the oldest entries beginning at index 0, ensuring continuous operation while maintaining the most recent historical data.
 
 ## Code Examples
 
 ### Solidity
 
 <Callout type="info" emoji="💡">
-  Use [Blocksense library](/coming-soon) for easy and gas optimised interaction
-  with the contract.
+  Use the [ADFS library](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/libraries/ADFS.sol) for easy and gas optimised interaction with the contract.
 </Callout>
 
 Here is a complete working example. After that, there are more details on how to perform a raw call.
 
-```solidity showLineNumbers copy filename="BlocksenseADFSConsumer.sol"
+```solidity showLineNumbers copy filename="ADFSConsumer.sol"
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.24;
+pragma solidity ^0.8.28;
 
-import {Blocksense} from 'lib/Blocksense.sol';
+import {ADFS} from `libraries/ADFS.sol';
 
 /**
  * THIS IS AN EXAMPLE CONTRACT THAT USES UN-AUDITED CODE.
  * DO NOT USE THIS CODE IN PRODUCTION.
  */
-contract BlocksenseADFSConsumer {
+contract ADFSConsumer {
   address public immutable adfs;
 
   constructor(address _adfs) {
     adfs = _adfs;
   }
 
-  function getLatestSingleFeedData(uint256 id) external view returns (bytes32) {
-    return Blocksense._getLatestSingleFeedData(adfs, id);
+  function getLatestSingleData(uint256 id) external view returns (bytes32) {
+    return ADFS.getLatestSingleData(adfs, id);
   }
 
-  function getLatestFeedData(
-    uint256 stride,
-    uint256 id
-  ) external view returns (bytes32[] memory) {
-    return Blocksense._getLatestFeedData(adfs, stride, id);
+  function getLatestData(uint256 id) external view returns (bytes32[] memory) {
+    return ADFS.getLatestData(adfs, id);
   }
 
-  function getLatestSlicedFeedData(
-    uint256 stride,
+  function getLatestDataSlice(
     uint256 id,
     uint256 startSlot,
     uint256 slotsCount
   ) external view returns (bytes32[] memory) {
-    return
-      Blocksense._getLatestSlicedFeedData(
-        adfs,
-        stride,
-        id,
-        startSlot,
-        slotsCount
-      );
+    return ADFS.getLatestDataSlice(adfs, id, startSlot, slotsCount);
   }
 
-  function getLatestRound(
-    uint256 stride,
-    uint256 id
-  ) external view returns (uint256 round) {
-    return Blocksense._getLatestRound(adfs, stride, id);
+  function getLatestIndex(uint256 id) external view returns (uint256 index) {
+    return ADFS.getLatestIndex(adfs, id);
   }
 
-  function getSingleFeedDataAtRound(
+  function getSingleDataAtIndex(
     uint256 id,
-    uint256 round
+    uint256 index
   ) external view returns (bytes32) {
-    return Blocksense._getSingleFeedDataAtRound(adfs, id, round);
+    return ADFS.getSingleDataAtIndex(adfs, id, index);
   }
 
-  function getFeedDataAtRound(
-    uint256 stride,
+  function getDataAtIndex(
     uint256 id,
-    uint256 round
+    uint256 index
   ) external view returns (bytes32[] memory) {
-    return Blocksense._getFeedDataAtRound(adfs, stride, id, round);
+    return ADFS.getDataAtIndex(adfs, id, index);
   }
 
-  function getSlicedFeedDataAtRound(
-    uint256 stride,
+  function getDataSliceAtIndex(
     uint256 id,
-    uint256 round,
+    uint256 index,
     uint256 startSlot,
     uint256 slotsCount
   ) external view returns (bytes32[] memory) {
-    return
-      Blocksense._getSlicedFeedDataAtRound(
-        adfs,
-        stride,
-        id,
-        round,
-        startSlot,
-        slotsCount
-      );
+    return ADFS.getDataSliceAtIndex(adfs, id, index, startSlot, slotsCount);
   }
 
-  function getLatestSingleFeedDataAndRound(
+  function getLatestSingleDataAndIndex(
     uint256 id
-  ) external view returns (bytes32 data, uint256 round) {
-    return Blocksense._getLatestSingleFeedDataAndRound(adfs, id);
+  ) external view returns (bytes32 data, uint256 index) {
+    return ADFS.getLatestSingleDataAndIndex(adfs, id);
   }
 
-  function getLatestFeedDataAndRound(
-    uint256 stride,
+  function getLatestDataAndIndex(
     uint256 id
-  ) external view returns (bytes32[] memory data, uint256 round) {
-    return Blocksense._getLatestFeedDataAndRound(adfs, stride, id);
+  ) external view returns (bytes32[] memory data, uint256 index) {
+    return ADFS.getLatestDataAndIndex(adfs, id);
   }
 
-  function getLatestSlicedFeedDataAndRound(
-    uint256 stride,
+  function getLatestDataSliceAndIndex(
     uint256 id,
     uint256 startSlot,
     uint256 slotsCount
-  ) external view returns (bytes32[] memory data, uint256 round) {
-    return
-      Blocksense._getLatestSlicedFeedDataAndRound(
-        adfs,
-        stride,
-        id,
-        startSlot,
-        slotsCount
-      );
+  ) external view returns (bytes32[] memory data, uint256 index) {
+    return ADFS.getLatestDataSliceAndIndex(adfs, id, startSlot, slotsCount);
+  }
+
+  function getEpochSeconds(uint256 id) external view returns (uint64) {
+    return ADFS.getEpochSeconds(ADFS.getLatestSingleData(adfs, id));
+  }
+
+  function getEpochMilliseconds(uint256 id) external view returns (uint64) {
+    return ADFS.getEpochMilliseconds(ADFS.getLatestSingleData(adfs, id));
   }
 }
 ```
 
 In order to retrieve data from the contract, the client must call the `fallback` function as follows:
 
-- To read the latest data stored in a single feed (stride = 0):
+- To read the latest data stored in a feed stored in up to 32 bytes:
 
 <Tabs defaultValue="lib-call" className="mt-4">
   <TabsList>
@@ -165,20 +143,19 @@ In order to retrieve data from the contract, the client must call the `fallback`
   </TabsList>
     <TabsContent value="lib-call">
       ```solidity copy filename="solidity"
-      function getLatestSingleFeedData(uint256 id) external view returns (bytes32) {
-        return
-          Blocksense._callSingleDataFeed(adfs, (uint256(0x82) << 248) | (id << 120));
+      function getLatestSingleData(uint256 id) external view returns (bytes32) {
+        return ADFS.getLatestSingleData(adfs, id);
       }
       ```
     </TabsContent>
 
       <TabsContent value="raw-call">
       ```solidity copy filename="solidity"
-      function getLatestSingleFeedData(
+      function getLatestSingleData(
         uint256 id
       ) external view returns (bytes32 data) {
         (bool success, bytes memory returnData) = adfs.staticcall(
-          abi.encodePacked(bytes1(0x82), uint8(0), uint120(id))
+          abi.encodePacked(bytes1(0x82), uint128(id))
         );
         require(success, 'ADFS: call failed');
 
@@ -189,7 +166,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
 
 </Tabs>
 
-- To read the latest data stored in a feed of a greater stride (stride > 0):
+- To read the latest data stored in a feed stored in more than 32 bytes:
 
 <Tabs defaultValue="lib-call" className="mt-4">
   <TabsList>
@@ -198,29 +175,19 @@ In order to retrieve data from the contract, the client must call the `fallback`
   </TabsList>
     <TabsContent value="lib-call">
       ```solidity copy filename="solidity"
-      function getLatestFeedData(
-        uint256 stride,
-        uint256 id
-      ) external view returns (bytes32[] memory) {
-        return
-          Blocksense._callDataFeed(
-            adfs,
-            (uint256(0x84) << 248) | (stride << 240) | (id << 120),
-            17,
-            1 << stride
-          );
+      function getLatestData(uint256 id) external view returns (bytes32[] memory) {
+        return ADFS.getLatestData(adfs, id);
       }
       ```
     </TabsContent>
 
       <TabsContent value="raw-call">
       ```solidity copy filename="solidity"
-      function getLatestFeedData(
-        uint8 stride,
+      function getLatestData(
         uint256 id
       ) external view returns (bytes32[] memory data) {
         (bool success, bytes memory returnData) = adfs.staticcall(
-          abi.encodePacked(bytes1(0x84), stride, uint120(id))
+          abi.encodePacked(bytes1(0x84), uint128(id))
         );
         require(success, 'ADFS: call failed');
 
@@ -231,7 +198,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
 
 </Tabs>
 
-- To read a slice of the latest data stored in a feed of a greater stride (stride > 0):
+- To read a slice of the latest data stored in a feed stored in more than 32 bytes:
 
 <Tabs defaultValue="lib-call" className="mt-4">
   <TabsList>
@@ -240,48 +207,31 @@ In order to retrieve data from the contract, the client must call the `fallback`
   </TabsList>
     <TabsContent value="lib-call">
       ```solidity copy filename="solidity"
-      function getLatestSlicedFeedData(
-        uint256 stride,
+      function getLatestDataSlice(
         uint256 id,
         uint256 startSlot,
         uint256 slotsCount
       ) external view returns (bytes32[] memory) {
-        return
-          Blocksense._callDataFeed(
-            adfs,
-            (uint256(0x84) << 248) |
-              (stride << 240) |
-              (id << 120) |
-              (startSlot << 88) |
-              (slotsCount << 56),
-            slotsCount == 0 ? 21 : 25,
-            slotsCount > 0 ? slotsCount : (1 << (stride - startSlot))
-          );
+        return ADFS.getLatestDataSlice(adfs, id, startSlot, slotsCount);
       }
       ```
     </TabsContent>
 
       <TabsContent value="raw-call">
       ```solidity copy filename="solidity"
-      function getLatestSlicedFeedData(
-        uint8 stride,
+      function getLatestDataSlice(
         uint256 id,
-        uint32 startSlot,
-        uint32 slotsCount
-      ) external view returns (bytes32[] memory data) {
-        (bool success, bytes memory returnData) = adfs.staticcall(
-          abi.encodePacked(bytes1(0x84), stride, uint120(id), startSlot, slotsCount)
-        );
-        require(success, 'ADFS: call failed');
-
-        return parseBytesToBytes32Array(returnData);
+        uint256 startSlot,
+        uint256 slotsCount
+      ) external view returns (bytes32[] memory) {
+        return ADFS.getLatestDataSlice(adfs, id, startSlot, slotsCount);
       }
       ```
     </TabsContent>
 
 </Tabs>
 
-- To get the latest round:
+- To get the latest ring buffer index:
 
 <Tabs defaultValue="lib-call" className="mt-4">
   <TabsList>
@@ -290,29 +240,17 @@ In order to retrieve data from the contract, the client must call the `fallback`
   </TabsList>
     <TabsContent value="lib-call">
       ```solidity copy filename="solidity"
-      function getLatestRound(
-        uint256 stride,
-        uint256 id
-      ) external view returns (uint256 round) {
-        return
-          uint256(
-            Blocksense._callSingleDataFeed(
-              adfs,
-              (uint256(0x81) << 248) | (stride << 240) | (id << 120)
-            )
-          );
+      function getLatestIndex(uint256 id) external view returns (uint256 index) {
+        return ADFS.getLatestIndex(adfs, id);
       }
       ```
     </TabsContent>
 
       <TabsContent value="raw-call">
       ```solidity copy filename="solidity"
-      function getLatestRound(
-        uint8 stride,
-        uint256 id
-      ) external view returns (uint256 round) {
+      function getLatestIndex(uint256 id) external view returns (uint256 index) {
         (bool success, bytes memory returnData) = adfs.staticcall(
-          abi.encodePacked(bytes1(0x81), stride, uint120(id))
+          abi.encodePacked(bytes1(0x81), uint128(id))
         );
         require(success, 'ADFS: call failed');
 
@@ -323,7 +261,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
 
 </Tabs>
 
-- To read historical data stored in a single feed (stride = 0):
+- To read historical data stored in a feed stored in up to 32 bytes:
 
 <Tabs defaultValue="lib-call" className="mt-4">
   <TabsList>
@@ -332,27 +270,23 @@ In order to retrieve data from the contract, the client must call the `fallback`
   </TabsList>
     <TabsContent value="lib-call">
       ```solidity copy filename="solidity"
-      function getSingleFeedDataAtRound(
+      function getSingleDataAtIndex(
         uint256 id,
-        uint256 round
+        uint256 index
       ) external view returns (bytes32) {
-        return
-          Blocksense._callSingleDataFeed(
-            adfs,
-            (uint256(0x86) << 248) | (id << 120) | (_round << 104)
-          );
+        return ADFS.getSingleDataAtIndex(adfs, id, index);
       }
       ```
     </TabsContent>
 
       <TabsContent value="raw-call">
       ```solidity copy filename="solidity"
-      function getSingleFeedDataAtRound(
+      function getSingleDataAtIndex(
         uint256 id,
-        uint256 round
+        uint256 index
       ) external view returns (bytes32 data) {
         (bool success, bytes memory returnData) = adfs.staticcall(
-          abi.encodePacked(bytes1(0x86), uint8(0), uint120(id), uint16(round))
+          abi.encodePacked(bytes1(0x86), uint128(id), uint16(index))
         );
         require(success, 'ADFS: call failed');
 
@@ -363,7 +297,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
 
 </Tabs>
 
-- To read historical data stored in a feed of a greater stride (stride > 0):
+- To read historical data stored in a feed stored in more than 32 bytes:
 
 <Tabs defaultValue="lib-call" className="mt-4">
   <TabsList>
@@ -372,34 +306,23 @@ In order to retrieve data from the contract, the client must call the `fallback`
   </TabsList>
     <TabsContent value="lib-call">
       ```solidity copy filename="solidity"
-      function getFeedDataAtRound(
-        uint256 stride,
+      function getDataAtIndex(
         uint256 id,
-        uint256 round
+        uint256 index
       ) external view returns (bytes32[] memory) {
-        return
-          Blocksense._callDataFeed(
-            adfs,
-            (uint256(0x86) << 248) |
-              (stride << 240) |
-              (id << 120) |
-              (_round << 104),
-            19,
-            1 << stride
-          );
+        return ADFS.getDataAtIndex(adfs, id, index);
       }
       ```
     </TabsContent>
 
       <TabsContent value="raw-call">
       ```solidity copy filename="solidity"
-      function getFeedDataAtRound(
-        uint8 stride,
+      function getDataAtIndex(
         uint256 id,
-        uint256 round
+        uint256 index
       ) external view returns (bytes32[] memory data) {
         (bool success, bytes memory returnData) = adfs.staticcall(
-          abi.encodePacked(bytes1(0x86), stride, uint120(id), uint16(round))
+          abi.encodePacked(bytes1(0x86), uint128(id), uint16(index))
         );
         require(success, 'ADFS: call failed');
 
@@ -410,7 +333,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
 
 </Tabs>
 
-- To read a slice of the historical data stored in a feed of a greater stride (stride > 0):
+- To read a slice of the historical data stored in a feed stored in more than 32 bytes:
 
 <Tabs defaultValue="lib-call" className="mt-4">
   <TabsList>
@@ -419,44 +342,30 @@ In order to retrieve data from the contract, the client must call the `fallback`
   </TabsList>
     <TabsContent value="lib-call">
       ```solidity copy filename="solidity"
-      function getSlicedFeedDataAtRound(
-        uint256 stride,
+      function getDataSliceAtIndex(
         uint256 id,
-        uint256 round,
+        uint256 index,
         uint256 startSlot,
         uint256 slotsCount
       ) external view returns (bytes32[] memory) {
-        return
-          Blocksense._callDataFeed(
-            adfs,
-            (uint256(0x86) << 248) |
-              (stride << 240) |
-              (id << 120) |
-              (_round << 104) |
-              (startSlot << 72) |
-              (slotsCount << 40),
-            slotsCount == 0 ? 23 : 27,
-            slotsCount > 0 ? slotsCount : (1 << (stride - startSlot))
-          );
+        return ADFS.getDataSliceAtIndex(adfs, id, index, startSlot, slotsCount);
       }
       ```
     </TabsContent>
 
       <TabsContent value="raw-call">
       ```solidity copy filename="solidity"
-      function getSlicedFeedDataAtRound(
-        uint8 stride,
+      function getDataSliceAtIndex(
         uint256 id,
-        uint256 round,
+        uint256 index,
         uint32 startSlot,
         uint32 slotsCount
       ) external view returns (bytes32[] memory data) {
         (bool success, bytes memory returnData) = adfs.staticcall(
           abi.encodePacked(
             bytes1(0x86),
-            stride,
-            uint120(id),
-            uint16(round),
+            uint128(id),
+            uint16(index),
             startSlot,
             slotsCount
           )
@@ -470,7 +379,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
 
 </Tabs>
 
-- To read the latest data stored in a single feed (stride = 0) with its round:
+- To read the latest data stored in a feed stored in up to 32 bytes with its ring buffer index:
 
 <Tabs defaultValue="lib-call" className="mt-4">
   <TabsList>
@@ -479,32 +388,32 @@ In order to retrieve data from the contract, the client must call the `fallback`
   </TabsList>
     <TabsContent value="lib-call">
       ```solidity copy filename="solidity"
-      function getLatestSingleFeedDataAndRound(
+      function getLatestSingleDataAndIndex(
         uint256 id
-      ) external view returns (bytes32 data, uint256 round) {
-        return Blocksense._getLatestSingleFeedDataAndRound(adfs, id);
+      ) external view returns (bytes32 data, uint256 index) {
+        return ADFS.getLatestSingleDataAndIndex(adfs, id);
       }
       ```
     </TabsContent>
 
       <TabsContent value="raw-call">
       ```solidity copy filename="solidity"
-      function getLatestSingleFeedDataAndRound(
+      function getLatestSingleDataAndIndex(
         uint256 id
-      ) external view returns (bytes32 data, uint256 round) {
+      ) external view returns (bytes32 data, uint256 index) {
         (bool success, bytes memory returnData) = adfs.staticcall(
-          abi.encodePacked(bytes1(0x83), uint8(0), uint120(id))
+          abi.encodePacked(bytes1(0x83), uint128(id))
         );
         require(success, 'ADFS: call failed');
 
-        (round, data) = abi.decode(returnData, (uint256, bytes32));
+        (index, data) = abi.decode(returnData, (uint256, bytes32));
       }
       ```
     </TabsContent>
 
 </Tabs>
 
-- To read the latest data stored in a feed of a greater stride (stride > 0) with its round:
+- To read the latest data stored in a feed stored in more than 32 bytes with its ring buffer index:
 
 <Tabs defaultValue="lib-call" className="mt-4">
   <TabsList>
@@ -513,33 +422,25 @@ In order to retrieve data from the contract, the client must call the `fallback`
   </TabsList>
     <TabsContent value="lib-call">
       ```solidity copy filename="solidity"
-      function getLatestFeedDataAndRound(
-        uint256 stride,
+      function getLatestDataAndIndex(
         uint256 id
-      ) external view returns (bytes32[] memory data, uint256 round) {
-        return
-          Blocksense._callDataFeedAndRound(
-            adfs,
-            (uint256(0x85) << 248) | (stride << 240) | (id << 120),
-            17,
-            1 << stride
-          );
+      ) external view returns (bytes32[] memory data, uint256 index) {
+        return ADFS.getLatestDataAndIndex(adfs, id);
       }
       ```
     </TabsContent>
 
       <TabsContent value="raw-call">
       ```solidity copy filename="solidity"
-      function getLatestFeedDataAndRound(
-        uint8 stride,
+      function getLatestDataAndIndex(
         uint256 id
-      ) external view returns (bytes32[] memory data, uint256 round) {
+      ) external view returns (bytes32[] memory data, uint256 index) {
         (bool success, bytes memory returnData) = adfs.staticcall(
-          abi.encodePacked(bytes1(0x85), stride, uint120(id))
+          abi.encodePacked(bytes1(0x85), uint128(id))
         );
         require(success, 'ADFS: call failed');
 
-        round = uint256(bytes32(returnData));
+        index = uint256(bytes32(returnData));
 
         assembly {
           let len := mload(returnData)
@@ -554,7 +455,7 @@ In order to retrieve data from the contract, the client must call the `fallback`
 
 </Tabs>
 
-- To read a slice of the latest data stored in a feed of a greater stride (stride > 0) with its round:
+- To read a slice of the latest data of a feed stored in more than 32 bytes with its ring buffer index:
 
 <Tabs defaultValue="lib-call" className="mt-4">
   <TabsList>
@@ -563,41 +464,29 @@ In order to retrieve data from the contract, the client must call the `fallback`
   </TabsList>
     <TabsContent value="lib-call">
       ```solidity copy filename="solidity"
-      function getLatestSlicedFeedDataAndRound(
-        uint256 stride,
+      function getLatestDataSliceAndIndex(
         uint256 id,
         uint256 startSlot,
         uint256 slotsCount
-      ) external view returns (bytes32[] memory data, uint256 round) {
-        return
-          Blocksense._callDataFeedAndRound(
-            adfs,
-            (uint256(0x85) << 248) |
-              (stride << 240) |
-              (id << 120) |
-              (startSlot << 88) |
-              (slotsCount << 56),
-            slotsCount == 0 ? 23 : 27,
-            slotsCount > 0 ? slotsCount : (1 << (stride - startSlot))
-          );
+      ) external view returns (bytes32[] memory data, uint256 index) {
+        return ADFS.getLatestDataSliceAndIndex(adfs, id, startSlot, slotsCount);
       }
       ```
     </TabsContent>
 
       <TabsContent value="raw-call">
       ```solidity copy filename="solidity"
-      function getLatestSlicedFeedDataAndRound(
-        uint8 stride,
+      function getLatestDataSliceAndIndex(
         uint256 id,
         uint32 startSlot,
         uint32 slotsCount
-      ) external view returns (bytes32[] memory data, uint256 round) {
+      ) external view returns (bytes32[] memory data, uint256 index) {
         (bool success, bytes memory returnData) = adfs.staticcall(
-          abi.encodePacked(bytes1(0x85), stride, uint120(id), startSlot, slotsCount)
+          abi.encodePacked(bytes1(0x85), uint128(id), startSlot, slotsCount)
         );
         require(success, 'ADFS: call failed');
 
-        round = uint256(bytes32(returnData));
+        index = uint256(bytes32(returnData));
 
         assembly {
           let len := mload(returnData)
@@ -615,25 +504,124 @@ In order to retrieve data from the contract, the client must call the `fallback`
 ### Solidity Hardhat Example
 
 <Callout type="info" emoji="💡">
-  You can find a working Hardhat project [here](/coming-soon). Clone the repo
-  and follow the setup instructions to run the example locally.
+  You can find a working Hardhat project in the Blocksense repository. Clone the repo and follow the setup instructions to run the example locally. The example contract for using ADFS with the ADFS library can be found in [ADFSConsumer.sol](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/test/examples/ADFSConsumer.sol) and for using ADFS via a raw call - in [RawCallADFSConsumer.sol](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/contracts/test/examples/RawCallADFSConsumer.sol). A file with ethers utils can be found in [feedStoreConsumer.ts](https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/test/examples/utils/feedStoreConsumer.ts).
 </Callout>
 
 ### Ethers.js v6.x
 
-To read the latest data stored in a single feed (stride = 0):
+To read the latest data stored in a feed stored in up to 32 bytes:
 
 ```js copy filename="javascript"
-// inputs: key
+// inputs: id
 
 const adfs = new ethers.Contract(
   contractAddress,
   abiJson,
   provider,
 );
+const data = ethers.solidityPacked(['bytes1', 'uint128'], ['0x82', id]);
+
+const res = await network.provider.send('eth_call', [
+  {
+    to: adfs.target,
+    data,
+  },
+  'latest',
+]);
+
+const value = Number(res.slice(0, 50));
+const timestamp = Number('0x' + res.slice(50, 66));
+```
+
+To read the latest data stored in a feed stored in more than 32 bytes:
+
+```js copy filename="javascript"
+// inputs: id
+
+const adfs = new ethers.Contract(
+  contractAddress,
+  abiJson,
+  provider,
+);
+
+const data = ethers.solidityPacked(['bytes1', 'uint128'], ['0x82', id]);
+
+const res = await network.provider.send('eth_call', [
+  {
+    to: adfs.target,
+    data,
+  },
+  'latest',
+]);
+
+const value = splitInto32bChunks(res);
+```
+
+To read a slice of the latest data stored in a feed stored in more than 32 bytes:
+
+```js copy filename="javascript"
+// inputs: id, startSlot, slots
+
+const adfs = new ethers.Contract(
+  contractAddress,
+  abiJson,
+  provider,
+);
+
 const data = ethers.solidityPacked(
-  ['bytes1', 'uint8', 'uint120'],
-  ['0x82', 0, key],
+  ['bytes1', 'uint128', 'uint32', 'uint32'],
+  ['0x84', id, startSlot, slots],
+);
+
+const res = await network.provider.send('eth_call', [
+  {
+    to: adfs.target,
+    data,
+  },
+  'latest',
+]);
+
+const value = splitInto32bChunks(res);
+```
+
+To get the latest ring buffer index:
+
+```js copy filename="javascript"
+// inputs: id
+
+const adfs = new ethers.Contract(
+  contractAddress,
+  abiJson,
+  provider,
+);
+
+const data = ethers.solidityPacked(['bytes1', 'uint128'], ['0x81', id]);
+
+const res = await network.provider.send('eth_call', [
+  {
+    to: adfs.target,
+    data,
+  },
+  'latest',
+]);
+
+const index = Number(res)
+```
+
+To read historical data stored in a feed stored in up to 32 bytes:
+
+```js copy filename="javascript"
+// inputs: id, indexId
+
+const adfs = new ethers.Contract(
+  contractAddress,
+  abiJson,
+  provider,
+);
+
+const data = ethers.solidityPacked(
+  ['bytes1', 'uint128', 'uint16'],
+  ['0x86', id, indexId],
 );
 
 const res = await network.provider.send('eth_call', [
@@ -648,10 +636,10 @@ const value = Number(res.slice(0, 50));
 const timestamp = Number('0x' + res.slice(50, 66));
 ```
 
-To read the latest data stored in a feed of a greater stride (stride > 0):
+To read historical data stored in a feed stored in more than 32 bytes:
 
 ```js copy filename="javascript"
-// inputs: key, stride
+// inputs: id, indexId
 
 const adfs = new ethers.Contract(
   contractAddress,
@@ -660,8 +648,8 @@ const adfs = new ethers.Contract(
 );
 
 const data = ethers.solidityPacked(
-  ['bytes1', 'uint8', 'uint120'],
-  ['0x82', stride, key],
+  ['bytes1', 'uint128', 'uint16'],
+  ['0x86', id, indexId],
 );
 
 const res = await network.provider.send('eth_call', [
@@ -675,10 +663,10 @@ const res = await network.provider.send('eth_call', [
 const value = splitInto32bChunks(res);
 ```
 
-To read a slice of the latest data stored in a feed of a greater stride (stride > 0):
+To read a slice of the historical data stored in a feed stored in more than 32 bytes:
 
 ```js copy filename="javascript"
-// inputs: key, stride, startSlot, slots
+// inputs: id, indexId, startSlot, slots
 
 const adfs = new ethers.Contract(
   contractAddress,
@@ -687,8 +675,8 @@ const adfs = new ethers.Contract(
 );
 
 const data = ethers.solidityPacked(
-  ['bytes1', 'uint8', 'uint120', 'uint32', 'uint32'],
-  ['0x84', stride, key, startSlot, slots],
+  ['bytes1', 'uint128', 'uint16', 'uint32', 'uint32'],
+  ['0x86', id, indexId, startSlot, slots],
 );
 
 const res = await network.provider.send('eth_call', [
@@ -702,10 +690,10 @@ const res = await network.provider.send('eth_call', [
 const value = splitInto32bChunks(res);
 ```
 
-To get the latest round:
+To read the latest data stored in a feed stored in up to 32 bytes with its ring buffer index:
 
 ```js copy filename="javascript"
-// inputs: key, stride?
+// inputs: id
 
 const adfs = new ethers.Contract(
   contractAddress,
@@ -713,119 +701,7 @@ const adfs = new ethers.Contract(
   provider,
 );
 
-const data = ethers.solidityPacked(
-  ['bytes1', 'uint8', 'uint120'],
-  ['0x81', stride ?? 0n, key],
-);
-
-const res = await network.provider.send('eth_call', [
-  {
-    to: adfs.target,
-    data,
-  },
-  'latest',
-]);
-
-const round = Number(res)
-```
-
-To read historical data stored in a single feed (stride = 0):
-
-```js copy filename="javascript"
-// inputs: key, roundId
-
-const adfs = new ethers.Contract(
-  contractAddress,
-  abiJson,
-  provider,
-);
-
-const data = ethers.solidityPacked(
-  ['bytes1', 'uint8', 'uint120', 'uint16'],
-  ['0x86', 0, key, roundId],
-);
-
-const res = await network.provider.send('eth_call', [
-  {
-    to: adfs.target,
-    data,
-  },
-  'latest',
-]);
-
-const value = Number(res.slice(0, 50));
-const timestamp = Number('0x' + res.slice(50, 66));
-```
-
-To read historical data stored in a feed of a greater stride (stride > 0):
-
-```js copy filename="javascript"
-// inputs: key, stride, roundId
-
-const adfs = new ethers.Contract(
-  contractAddress,
-  abiJson,
-  provider,
-);
-
-const data = ethers.solidityPacked(
-  ['bytes1', 'uint8', 'uint120', 'uint16'],
-  ['0x86', stride, key, roundId],
-);
-
-const res = await network.provider.send('eth_call', [
-  {
-    to: adfs.target,
-    data,
-  },
-  'latest',
-]);
-
-const value = splitInto32bChunks(res);
-```
-
-To read a slice of the historical data stored in a feed of a greater stride (stride > 0):
-
-```js copy filename="javascript"
-// inputs: key, stride, roundId, startSlot, slots
-
-const adfs = new ethers.Contract(
-  contractAddress,
-  abiJson,
-  provider,
-);
-
-const data = ethers.solidityPacked(
-  ['bytes1', 'uint8', 'uint120', 'uint16', 'uint32', 'uint32'],
-  ['0x86', stride, key, roundId, startSlot, slots],
-);
-
-const res = await network.provider.send('eth_call', [
-  {
-    to: adfs.target,
-    data,
-  },
-  'latest',
-]);
-
-const value = splitInto32bChunks(res);
-```
-
-To read the latest data stored in a single feed (stride = 0) with its round:
-
-```js copy filename="javascript"
-// inputs: key
-
-const adfs = new ethers.Contract(
-  contractAddress,
-  abiJson,
-  provider,
-);
-
-const data = ethers.solidityPacked(
-  ['bytes1', 'uint8', 'uint120'],
-  ['0x83', 0, key],
-);
+const data = ethers.solidityPacked(['bytes1', 'uint128'], ['0x83', id]);
 
 const res = await network.provider.send('eth_call', [
   {
@@ -836,15 +712,15 @@ const res = await network.provider.send('eth_call', [
 ]);
 
 const feedData = '0x' + res.slice(66);
-const round = Number(res.slice(0, 66));
+const index = Number(res.slice(0, 66));
 const value = Number(feedData.slice(0, 50));
 const timestamp = Number('0x' + feedData.slice(50, 66));
 ```
 
-To read the latest data stored in a feed of a greater stride (stride > 0) with its round:
+To read the latest data stored in a feed stored in more than 32 bytes with its ring buffer index:
 
 ```js copy filename="javascript"
-// inputs: key, stride
+// inputs: id
 
 const adfs = new ethers.Contract(
   contractAddress,
@@ -852,10 +728,7 @@ const adfs = new ethers.Contract(
   provider,
 );
 
-const data = ethers.solidityPacked(
-  ['bytes1', 'uint8', 'uint120'],
-  ['0x85', stride, key],
-);
+const data = ethers.solidityPacked(['bytes1', 'uint128'], ['0x85', id]);
 
 const res = await network.provider.send('eth_call', [
   {
@@ -868,10 +741,10 @@ const res = await network.provider.send('eth_call', [
 const value = splitInto32bChunks(res);
 ```
 
-To read a slice of the latest data stored in a feed of a greater stride (stride > 0) with its round:
+To read a slice of the latest data stored in a feed stored in more than 32 bytes with its ring buffer index:
 
 ```js copy filename="javascript"
-// inputs: key, stride, startSlot, slots
+// inputs: id, startSlot, slots
 
 const adfs = new ethers.Contract(
   contractAddress,
@@ -880,8 +753,8 @@ const adfs = new ethers.Contract(
 );
 
 const data = ethers.solidityPacked(
-  ['bytes1', 'uint8', 'uint120', 'uint32', 'uint32'],
-  ['0x85', stride, key, startSlot, slots],
+  ['bytes1', 'uint128', 'uint32', 'uint32'],
+  ['0x85', id, startSlot, slots],
 );
 
 const res = await network.provider.send('eth_call', [

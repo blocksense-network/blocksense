@@ -4423,7 +4423,7 @@ decimals = 8
 data = '{"pair":{"base":"USDC","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["USDCUSDT"]},"BinanceUS":{"symbol":["USDCUSD","USDCUSDT"]},"Bitget":{"symbol":["USDCUSDT"]},"Bybit":{"symbol":["USDCUSDT"]},"GateIo":{"id":["USDC_USDT"]},"Gemini":{"symbol":["USDCUSD"]},"Kraken":{"pair":["USDCUSD","USDCUSDT"],"wsname":["USDC/USD","USDC/USDT"]},"KuCoin":{"symbol":["USDC-USDT"]},"MEXC":{"symbol":["USDCUSDT"]},"OKX":{"instId":["USDC-USDT"]},"Upbit":{"market":["USDT-USDC"]}}}}'
 
 [component.cex-price-feeds]
-source = "../../../target/wasm32-wasip1/release/cex_price_feeds.wasm"
+source = "../target/wasm32-wasip1/release/cex_price_feeds.wasm"
 allowed_outbound_hosts = [
   "https://api.kraken.com",
   "https://api.bybit.com",

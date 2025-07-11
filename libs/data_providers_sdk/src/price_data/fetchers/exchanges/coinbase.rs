@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use anyhow::Result;
 use futures::{
     future::LocalBoxFuture,
@@ -28,7 +30,7 @@ pub struct CoinbasePriceFetcher<'a> {
 impl<'a> PricesFetcher<'a> for CoinbasePriceFetcher<'a> {
     const NAME: &'static str = "Coinbase";
 
-    fn new(symbols: &'a [String], _api_key: Option<&'a str>) -> Self {
+    fn new(symbols: &'a [String], _api_keys: Option<HashMap<String, String>>) -> Self {
         Self { symbols }
     }
 

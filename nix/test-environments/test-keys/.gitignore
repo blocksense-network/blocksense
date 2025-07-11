@@ -1,6 +1,6 @@
-CMC_API_KEY
-YH_FINANCE_API_KEY
-ALPHAVANTAGE_API_KEY
-YAHOO_FINANCE_API_KEY
-TWELVEDATA_API_KEY
-FMP_API_KEY
+!impersonation_address
+!sequencer-address
+!reporter_second_consensus_secret_key
+!sequencer-private-key
+!reporter_secret_key
+!signer-private-key
