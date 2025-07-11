@@ -1,4 +1,5 @@
 import { Octokit } from '@octokit/rest';
+import { RequestError } from '@octokit/request-error';
 import type { Schema as S } from 'effect';
 import { ParseResult } from 'effect';
 

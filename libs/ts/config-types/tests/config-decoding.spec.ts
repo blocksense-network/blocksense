@@ -11,19 +11,35 @@ import {
 } from '@blocksense/base-utils/evm';
 
 import {
-  configFiles,
   configDirs,
   readConfig,
   readEvmDeployment,
   readAllEvmDeployments,
+  configTypes,
+  legacyConfigTypes,
+  getConfigFilePath,
 } from '../src/read-write-config';
 import { DeploymentConfigV2 } from '../src/evm-contracts-deployment';
+import {
+  downloadAndDecodeFile,
+  isTokenValid,
+} from '../src/dfcg/artifacts/legacy-dfcg-artifacts-downloader';
 
 describe('Configuration files decoding', async () => {
-  for (const configName of keysOf(configFiles)) {
-    test(`should decode '${configName}' config file successfully`, async () => {
-      const config = await readConfig(configName);
-      expect(config).toBeTypeOf('object');
+  const LEGACY_CONFIGS_DIR = 'configs';
+
+  for (const configType of keysOf(configTypes)) {
+    test(`should decode '${configType}' config file successfully`, async () => {
+      if ((await isTokenValid()) && configType in legacyConfigTypes) {
+        const config = await downloadAndDecodeFile(
+          getConfigFilePath(configType, LEGACY_CONFIGS_DIR),
+          legacyConfigTypes[configType],
+        );
+        expect(config).toBeTypeOf('object');
+      } else {
+        const config = await readConfig(configType);
+        expect(config).toBeTypeOf('object');
+      }
     });
   }
 
