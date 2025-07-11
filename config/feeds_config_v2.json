@@ -41883,9 +41883,9 @@
         "aggregation": "median"
       },
       "schedule": {
-        "interval_ms": 90000,
-        "heartbeat_ms": 3600000,
-        "deviation_percentage": 0.1,
+        "interval_ms": 1000,
+        "heartbeat_ms": 600000,
+        "deviation_percentage": 0.01,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
