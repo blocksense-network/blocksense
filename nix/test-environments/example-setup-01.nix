@@ -114,7 +114,7 @@ in
           ];
           contracts = [
             {
-              name = "AggregatedDataFeedStore";
+              name = "HistoricalDataFeedStoreV2";
               address = upgradeableProxyContractAddressSepolia;
               creation-byte-code = null;
               deployed-byte-code = null;
@@ -125,7 +125,7 @@ in
               address = "0xcA11bde05977b3631167028862bE2a173976CA11";
               creation-byte-code = null;
               deployed-byte-code = null;
-              contract-version = 1;
+              contract-version = 3;
             }
           ];
         };
@@ -144,7 +144,7 @@ in
               address = "0xcA11bde05977b3631167028862bE2a173976CA11";
               creation-byte-code = null;
               deployed-byte-code = null;
-              contract-version = 2;
+              contract-version = 3;
             }
           ];
           transaction-gas-limit = 20000000;
