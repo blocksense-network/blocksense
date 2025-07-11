@@ -134,9 +134,21 @@ pub async fn init_shared_rpc_providers(
     feeds_config: &AllFeedsConfig,
 ) -> SharedRpcProviders {
     let prefix = prefix.unwrap_or("");
-    Arc::new(RwLock::new(
+    let providers = Arc::new(RwLock::new(
         get_rpc_providers(conf, prefix, feeds_config).await,
-    ))
+    ));
+    check_contracts_in_networks(&providers).await;
+    for (network, rpc_provider) in providers.read().await.iter() {
+        let mut provider = rpc_provider.lock().await;
+        let res = provider.load_history_from_chain().await;
+        info!("Loaded history from chain {network} = {res:?}");
+        let res = provider.load_round_counters_from_chain(feeds_config).await;
+        if let Ok(round_counters) = res {
+            info!("Loaded round counters from chain {network} = {round_counters:?}");
+            provider.round_counters = round_counters;
+        }
+    }
+    providers
 }
 
 async fn get_rpc_providers(
@@ -149,8 +161,6 @@ async fn get_rpc_providers(
     let provider_metrics = Arc::new(RwLock::new(
         ProviderMetrics::new(prefix).expect("Failed to allocate ProviderMetrics"),
     ));
-
-    let mut check_contracts_in_networks_tasks = Vec::new();
 
     for (net, p) in &conf.providers {
         let rpc_url: Url = p
@@ -176,11 +186,8 @@ async fn get_rpc_providers(
         )
         .await;
         let rpc_provider = Arc::new(Mutex::new(rpc_provider));
-        check_contracts_in_networks_tasks.push(log_if_contracts_exist(rpc_provider.clone()));
-        providers.insert(net.clone(), rpc_provider.clone());
+        providers.insert(net.clone(), rpc_provider);
     }
-
-    join_all(check_contracts_in_networks_tasks).await;
 
     debug!("List of providers:");
     for (key, value) in &providers {
@@ -189,6 +196,27 @@ async fn get_rpc_providers(
     }
 
     providers
+}
+
+async fn check_contracts_in_networks(providers: &SharedRpcProviders) {
+    let p = providers.read().await;
+    let mut check_contracts_in_networks_tasks = Vec::new();
+    for (_, rpc_provider) in p.iter() {
+        let contracts = rpc_provider.clone().lock().await.contracts.clone();
+        for c in &contracts {
+            check_contracts_in_networks_tasks
+                .push(log_if_contract_exists(rpc_provider.clone(), c.name.clone()));
+        }
+    }
+    join_all(check_contracts_in_networks_tasks).await;
+}
+
+async fn log_if_contract_exists(rpc_provider: Arc<Mutex<RpcProvider>>, contract_name: String) {
+    rpc_provider
+        .lock()
+        .await
+        .log_if_contract_exists(&contract_name)
+        .await
 }
 
 #[derive(Debug)]
@@ -215,17 +243,6 @@ impl LatestRound {
         let b: [u8; 32] = x.to_be_bytes();
         Bytes::copy_from_slice(&b)
     }
-}
-
-async fn log_if_contracts_exist(provider_mutex: Arc<Mutex<RpcProvider>>) {
-    let rpc_provider = provider_mutex.lock().await;
-    let _ = join_all(
-        rpc_provider
-            .contracts
-            .iter()
-            .map(|c| rpc_provider.log_if_contract_exists(&c.name)),
-    )
-    .await;
 }
 
 impl RpcProvider {
@@ -260,11 +277,7 @@ impl RpcProvider {
                 }
             }
         }
-        let round_counters =
-            RpcProvider::load_round_counters_from_chain(&provider, feeds_config, &contracts)
-                .await
-                .unwrap();
-        let mut r = RpcProvider {
+        RpcProvider {
             network: network.to_string(),
             provider,
             signer: signer.clone(),
@@ -279,22 +292,18 @@ impl RpcProvider {
             feeds_variants,
             contracts,
             rpc_url,
-            round_counters,
+            round_counters: HashMap::new(),
             num_tx_in_progress: 0,
-        };
-
-        let res = r.load_history_from_chain().await;
-        info!("Loaded history from chain {network} = {res:?}");
-        r
+        }
     }
 
     pub async fn load_round_counters_from_chain(
-        provider: &ProviderType,
+        &mut self,
         feeds_config: &AllFeedsConfig,
-        contracts: &[Contract],
     ) -> Result<HashMap<FeedId, u64>> {
         let mut res: HashMap<FeedId, u64> = HashMap::new();
-        let adfs_address_opt = contracts.iter().find_map(|x| {
+
+        let adfs_address_opt = self.contracts.iter().find_map(|x| {
             if x.name == ADFS_CONTRACT_NAME {
                 x.address
             } else {
@@ -302,7 +311,8 @@ impl RpcProvider {
             }
         });
         if let Some(adfs_address) = adfs_address_opt {
-            let multicall = contracts
+            let multicall = self
+                .contracts
                 .iter()
                 .find_map(|x| {
                     if x.name == MULTICALL_CONTRACT_NAME {
@@ -320,7 +330,7 @@ impl RpcProvider {
                 let r = Self::get_latest_round_v2(
                     multicall,
                     adfs_address,
-                    provider,
+                    &self.provider,
                     &feed_id,
                     stride.into(),
                 )
