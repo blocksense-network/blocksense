@@ -39,7 +39,7 @@ export const OracleConfigCard = ({ feed }: DataFeedCardProps) => {
 
         <div className="w-full md:w-1/2">
           <span className="text-sm text-gray-500">Arguments:</span>
-          <ScrollArea className="border border-neutral-200 dark:border-neutral-600 rounded-lg max-h-[30vh] overflow-auto mt-2">
+          <ScrollArea className="border border-neutral-200 dark:border-neutral-600 rounded-lg max-h-[50vh] overflow-auto mt-2">
             <CodeBlock
               code={JSON.stringify(
                 feed.additional_feed_info.arguments,

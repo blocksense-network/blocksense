@@ -50,8 +50,8 @@ export default async function DataFeed({ params }: DataFeedProps) {
   }
 
   return (
-    <div className="data-feed-details max-w-4xl px-4">
-      <h1 className="flex justify-center text-2xl font-bold text-gray-900 mt-10 dark:text-white">
+    <>
+      <h1 className="flex justify-center text-2xl font-bold text-gray-900 mb-4 dark:text-white">
         {feed.full_name} | ID: {feed.id}
       </h1>
       <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
@@ -59,10 +59,10 @@ export default async function DataFeed({ params }: DataFeedProps) {
         {feed.type === 'price-feed' && <PriceFeedConfigCard feed={feed} />}
         <ConsensusConfigCard feed={feed} />
         <NetworkAccessCard feedsDeploymentInfo={feedDeploymentInfo} />
+        <section className="col-span-full">
+          <OracleConfigCard feed={feed} />
+        </section>
       </div>
-      <div className="flex justify-start 2xl:justify-center">
-        <OracleConfigCard feed={feed} />
-      </div>
-    </div>
+    </>
   );
 }
