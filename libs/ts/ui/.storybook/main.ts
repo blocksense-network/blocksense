@@ -11,7 +11,7 @@ function getAbsolutePath(value: string): any {
   return dirname(require.resolve(join(value, 'package.json')));
 }
 const config: StorybookConfig = {
-  stories: ['../src/**/*.mdx', '../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
+  stories: ['../src/components/**/*.stories.@(ts|tsx)'],
   addons: [
     getAbsolutePath('@chromatic-com/storybook'),
     getAbsolutePath('@storybook/addon-docs'),
@@ -20,6 +20,6 @@ const config: StorybookConfig = {
     name: getAbsolutePath('@storybook/nextjs-vite'),
     options: {},
   },
-  staticDirs: ['../public'],
+  staticDirs: ['../src/assets'],
 };
 export default config;
