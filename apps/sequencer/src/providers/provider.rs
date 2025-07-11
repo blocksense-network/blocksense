@@ -14,7 +14,7 @@ use alloy::{
     },
     signers::local::PrivateKeySigner,
 };
-use alloy_primitives::Bytes;
+use alloy_primitives::{keccak256, Bytes, B256};
 use blocksense_feeds_processing::adfs_gen_calldata::RoundCounters;
 use blocksense_utils::FeedId;
 use futures::future::join_all;
@@ -74,6 +74,7 @@ pub const MULTICALL_CONTRACT_NAME: &str = "multicall";
 pub const GNOSIS_SAFE_CONTRACT_NAME: &str = "gnosis_safe";
 
 pub struct RpcProvider {
+    pub latest_state_hash: B256,
     pub network: String,
     pub provider: ProviderType,
     pub signer: PrivateKeySigner,
@@ -209,6 +210,7 @@ impl RpcProvider {
             }
         }
         RpcProvider {
+            latest_state_hash: keccak256(b"blocksense"), // TODO: Read the value from the contract on init
             network: network.to_string(),
             provider,
             signer: signer.clone(),

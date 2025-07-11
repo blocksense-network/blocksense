@@ -6,6 +6,7 @@ use alloy::{
     providers::{Provider, ProviderBuilder},
     rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
+use alloy_primitives::keccak256;
 use blocksense_config::FeedStrideAndDecimals;
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
@@ -407,6 +408,9 @@ pub async fn eth_batch_send_to_contract(
 
     let input = Bytes::from(serialized_updates);
 
+    let latest_state_hash =
+        keccak256([provider.latest_state_hash.as_ref(), input.as_ref()].concat());
+
     let receipt;
     let tx_time = Instant::now();
 
@@ -748,10 +752,15 @@ pub async fn eth_batch_send_to_contract(
     log_gas_used(&net, &receipt, transaction_time, provider_metrics).await;
 
     provider.update_history(&updates.updates);
+    let result = receipt.status().to_string();
+    if result == "true" {
+        //Transaction was successfully confirmed therefore we update the latest state hash
+        provider.latest_state_hash = latest_state_hash;
+    } // TODO: Reread round counters + latest state hash from contract
     drop(provider);
     debug!("Released a read/write lock on provider state in network `{net}` block height {block_height}");
 
-    Ok((receipt.status().to_string(), feeds_to_update_ids))
+    Ok((result, feeds_to_update_ids))
 }
 
 pub async fn get_nonce(
