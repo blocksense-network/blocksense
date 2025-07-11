@@ -2402,6 +2402,7 @@ __metadata:
   resolution: "@blocksense/config-types@workspace:libs/ts/config-types"
   dependencies:
     "@blocksense/base-utils": "workspace:*"
+    "@octokit/rest": "npm:21.1.1"
     "@types/node": "npm:^22.10.2"
     effect: "npm:^3.15.1"
     glob: "npm:^11.0.0"
@@ -7656,7 +7657,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@octokit/rest@npm:^21.1.1":
+"@octokit/rest@npm:21.1.1, @octokit/rest@npm:^21.1.1":
   version: 21.1.1
   resolution: "@octokit/rest@npm:21.1.1"
   dependencies:
