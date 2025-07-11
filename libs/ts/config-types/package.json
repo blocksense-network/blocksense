@@ -22,6 +22,11 @@
       "require": "./dist/cjs/evm-contracts-deployment/index.cjs",
       "import": "./dist/esm/evm-contracts-deployment/index.mjs",
       "types": "./src/evm-contracts-deployment/index.ts"
+    },
+    "./node-config": {
+      "require": "./dist/cjs/node-config/index.cjs",
+      "import": "./dist/esm/node-config/index.mjs",
+      "types": "./src/node-config/index.ts"
     }
   },
   "scripts": {
