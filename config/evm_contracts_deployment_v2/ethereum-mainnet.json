@@ -1,0 +1,156 @@
+{
+  "network": "ethereum-mainnet",
+  "chainId": "1",
+  "contracts": {
+    "coreContracts": {
+      "UpgradeableProxyADFS": {
+        "address": "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249",
+        "constructorArgs": ["0xe029f9EE758c61Ec8613c8a4F1122239d96473eb"],
+        "salt": "0x63825ccf72de9605025ad334e6c7dfb5be7f746ed772c17a317aafeca601097e"
+      },
+      "AggregatedDataFeedStore": {
+        "address": "0x4A01d6BefF95ADc721630C2913992E0438e6B796",
+        "constructorArgs": ["0x5985F6247985e0cB7750893093214A77F0F9D3cE"],
+        "salt": "0x71b411ccc58b0bf522c76bab9a977992a03cfbc078d3852ee8ee8b6d5311a477"
+      },
+      "AccessControl": {
+        "address": "0x5985F6247985e0cB7750893093214A77F0F9D3cE",
+        "constructorArgs": ["0xe029f9EE758c61Ec8613c8a4F1122239d96473eb"],
+        "salt": "0x26186f5256760fb01ab0053f874a1674c76a40b87c3031918056ef3ace009aac"
+      },
+      "CLFeedRegistryAdapter": {
+        "address": "0x43662b6eD1EDEA444Ed2bA4e1e008403C5F32bAc",
+        "constructorArgs": [
+          "0xe029f9EE758c61Ec8613c8a4F1122239d96473eb",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xd1adaede68d344519025e2ff574650cd99d3830fe6d274c7a7843cdc00e17938"
+      }
+    },
+    "safe": {
+      "AdminMultisig": "0xe029f9EE758c61Ec8613c8a4F1122239d96473eb",
+      "ReporterMultisig": null,
+      "OnlySequencerGuard": null,
+      "AdminExecutorModule": null
+    },
+    "CLAggregatorAdapter": {
+      "0": {
+        "address": "0x9be4cd2D5D0E9B793cE3b35d2b3Be1A4D34c7c8d",
+        "constructorArgs": [
+          "BTC / USD",
+          8,
+          "0",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "0",
+        "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "3": {
+        "address": "0x614005eC98b689C6fC282dB651fEEB61F8f26401",
+        "constructorArgs": [
+          "ETH / USD",
+          8,
+          "3",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "3",
+        "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "13": {
+        "address": "0xE15dA00EabFd5df43611e4C221F47e578609D2bC",
+        "constructorArgs": [
+          "BNB / USD",
+          8,
+          "13",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "13",
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "16": {
+        "address": "0xbE63723C3c501E95c420a0917BFfaDe377E5eFFB",
+        "constructorArgs": [
+          "SOL / USD",
+          8,
+          "16",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "16",
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "35": {
+        "address": "0x851C890Ecad3167bF3f458A1D71d8353Dc30E03E",
+        "constructorArgs": [
+          "LINK / USD",
+          8,
+          "35",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "35",
+        "base": "0x514910771AF9Ca656af840dff83E8264EcF986CA",
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "91": {
+        "address": "0xd48A5aD9F08040483Fb37c6d6194a2A4Eed54Ee8",
+        "constructorArgs": [
+          "UNI / USD",
+          8,
+          "91",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "91",
+        "base": "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984",
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "114": {
+        "address": "0x9cfa9f40443c6434C60f5936B1fD10eD5999Bf9C",
+        "constructorArgs": [
+          "AAVE / USD",
+          8,
+          "114",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "114",
+        "base": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "121": {
+        "address": "0x21571475234C2BE2ABab7df9a0c5c09A6dE2e166",
+        "constructorArgs": [
+          "TAO / USD",
+          18,
+          "121",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "121",
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "347": {
+        "address": "0xaB830B1d3DBD9C6A2dFA21101F6c54dBddbcd2Ae",
+        "constructorArgs": [
+          "1INCH / USD",
+          8,
+          "347",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "347",
+        "base": "0x111111111117dC0aa78b770fA6A738034120C302",
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    }
+  }
+}
