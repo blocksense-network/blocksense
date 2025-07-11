@@ -5,9 +5,9 @@ import {
 import Safe from '@safe-global/protocol-kit';
 import { getCreateCallDeployment } from '@safe-global/safe-deployments';
 import { AbiCoder, Contract, solidityPacked } from 'ethers';
-import { Artifacts, RunTaskFunction } from 'hardhat/types';
+import { Artifacts } from 'hardhat/types';
 
-import { parseEthereumAddress } from '@blocksense/base-utils';
+import { assertNotNull, parseEthereumAddress } from '@blocksense/base-utils';
 import { ContractsConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
 
 import { DeployContract, ContractNames, NetworkConfig } from '../types';
@@ -18,7 +18,6 @@ type Params = {
   config: NetworkConfig;
   adminMultisig: Safe;
   contracts: DeployContract[];
-  run: RunTaskFunction;
   artifacts: Artifacts;
 };
 
@@ -26,21 +25,20 @@ export async function deployContracts({
   config,
   adminMultisig,
   contracts,
-  run,
   artifacts,
 }: Params) {
-  const signer = config.adminMultisig.signer || config.ledgerAccount;
-
   const createCallAddress = config.safeAddresses.createCallAddress;
 
   const createCall = new Contract(
     createCallAddress,
     getCreateCallDeployment()?.abi!,
-    signer,
+    config.deployer,
   );
 
   const ContractsConfigV2 = {
     coreContracts: {},
+    safe: {},
+    CLAggregatorAdapter: {},
   } as ContractsConfigV2;
 
   const abiCoder = AbiCoder.defaultAbiCoder();
@@ -91,17 +89,32 @@ export async function deployContracts({
     }
 
     if (contract.name === ContractNames.CLAggregatorAdapter) {
-      (ContractsConfigV2[contract.name] ??= []).push({
-        description: contract.feedRegistryInfo?.description ?? '',
-        base: contract.feedRegistryInfo?.base ?? null,
-        quote: contract.feedRegistryInfo?.quote ?? null,
+      const registryInfo = assertNotNull(
+        contract.feedRegistryInfo,
+        `CLAggregatorAdapter without registry info: ${contract}`,
+      );
+      ContractsConfigV2.CLAggregatorAdapter[`${registryInfo.feedId}`] = {
+        feedId: registryInfo.feedId,
+        base: registryInfo.base,
+        quote: registryInfo.quote,
         address: parseEthereumAddress(contractAddress),
         constructorArgs: contract.argsValues,
-      });
+        salt: contract.salt,
+      };
+    } else if (
+      contract.name === ContractNames.OnlySequencerGuard ||
+      contract.name === ContractNames.AdminExecutorModule
+    ) {
+      ContractsConfigV2.safe[contract.name] = {
+        address: parseEthereumAddress(contractAddress),
+        constructorArgs: contract.argsValues,
+        salt: contract.salt,
+      };
     } else {
       ContractsConfigV2.coreContracts[contract.name] = {
         address: parseEthereumAddress(contractAddress),
         constructorArgs: contract.argsValues,
+        salt: contract.salt,
       };
     }
 

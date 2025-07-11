@@ -1,13 +1,14 @@
 import { Contract, ZeroAddress } from 'ethers';
-import { Artifacts, RunTaskFunction } from 'hardhat/types';
+import { Artifacts } from 'hardhat/types';
 import {
   OperationType,
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
 import Safe from '@safe-global/protocol-kit';
+import { entriesOf } from '@blocksense/base-utils/array-iter';
 
 import {
-  CLAggregatorAdapterData,
+  CLAggregatorAdapterDataV2,
   ContractsConfigV2,
 } from '@blocksense/config-types/evm-contracts-deployment';
 
@@ -18,7 +19,6 @@ type Params = {
   deployData: ContractsConfigV2;
   config: NetworkConfig;
   safe: Safe;
-  run: RunTaskFunction;
   artifacts: Artifacts;
 };
 
@@ -27,13 +27,12 @@ export async function registerCLAdapters({
   config,
   safe,
   artifacts,
-  run,
 }: Params): Promise<void> {
   // The difference between setting n and n+1 feeds via CLFeedRegistryAdapter::setFeeds is slightly above 55k gas.
   console.log('\nRegistering CLAggregatorAdapters in CLFeedRegistryAdapter...');
   console.log('------------------------------------------------------------');
 
-  const signer = config.adminMultisig.signer || config.ledgerAccount!;
+  const signer = config.deployer;
 
   const registry = new Contract(
     deployData.coreContracts.CLFeedRegistryAdapter.address,
@@ -43,13 +42,12 @@ export async function registerCLAdapters({
 
   // Split into batches of 100
   const BATCH_LENGTH = 100;
-  const batches: Array<Array<CLAggregatorAdapterData>> = [];
-  const aggregatorData = deployData.CLAggregatorAdapter.filter(d => d.base);
-  const filteredData = [];
+  const batches: CLAggregatorAdapterDataV2[][] = [];
+  const filteredData: CLAggregatorAdapterDataV2[] = [];
 
-  for (const data of aggregatorData) {
+  for (const [description, data] of entriesOf(deployData.CLAggregatorAdapter)) {
     if (!data.base || !data.quote) {
-      console.log(` -> Feed '${data.description}' has no base or quote`, '\n');
+      console.log(` -> Feed '${description}' has no base or quote`, '\n');
       continue;
     }
 
@@ -62,7 +60,7 @@ export async function registerCLAdapters({
       filteredData.push(data);
     } else {
       console.log(
-        ` -> Feed '${data.description}' already registered`,
+        ` -> Feed '${description}' already registered`,
         {
           base: data.base,
           quote: data.quote,

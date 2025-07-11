@@ -21,7 +21,7 @@ export const DataFeedsTable = ({ feeds }: { feeds: FeedsConfig['feeds'] }) => {
     <DataTable
       columns={columns}
       data={feeds}
-      filterCell="description"
+      filterCell="full_name"
       getRowLink={getRowLink}
       hasToolbar
     />

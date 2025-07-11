@@ -20,10 +20,22 @@ import { capitalizeWords } from '@/src/utils';
 import { DataFeedCardContent } from '../DataFeedCardContent';
 import { Icon } from '@blocksense/docs-ui/Icon';
 import { Separator } from '@blocksense/docs-ui/Separator';
+import { ImageWrapper } from '@blocksense/docs-ui';
+import { valuesOf } from '@blocksense/base-utils/array-iter';
+
+const NetworkIcon = ({ network }: { network: NetworkName }) => {
+  const path = `/images/network-icons/${network.split('-')[0]}.png`;
+  return (
+    <div className="flex items-center gap-2">
+      <ImageWrapper src={path} alt={network} className="relative w-5 h-5" />
+      {capitalizeWords(network)}
+    </div>
+  );
+};
 
 type NetworkDropdownProps = {
   networks: NetworkName[];
-  selectedNetwork: string;
+  selectedNetwork: string | null;
   onSelect: (network: NetworkName) => void;
 };
 
@@ -51,14 +63,21 @@ const NetworkDropdown = ({
           }
           className="mt-0 bg-white flex justify-center h-8 border-solid border-neutral-200 dark:bg-neutral-600"
         >
-          {capitalizeWords(selectedNetwork) || 'Select Network'}
+          {selectedNetwork ? (
+            <NetworkIcon network={selectedNetwork as NetworkName} />
+          ) : (
+            'Select Network'
+          )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[12rem]">
+      <DropdownMenuContent
+        align="end"
+        className="w-[12rem] max-h-[20rem] overflow-y-auto"
+      >
         <Separator />
         {networks.map(network => (
           <DropdownMenuItem key={network} onClick={() => onSelect(network)}>
-            {capitalizeWords(network)}
+            <NetworkIcon network={network} />
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
@@ -96,7 +115,9 @@ const FeedStoreContent = ({ deploymentInfo }: DataFeedCardContentProps) => {
 };
 
 const CLAdapterContent = ({ deploymentInfo }: DataFeedCardContentProps) => {
-  const clAdapterInfo = deploymentInfo.contracts.CLAggregatorAdapter[0];
+  const clAdapterInfo = valuesOf(
+    deploymentInfo.contracts.CLAggregatorAdapter,
+  )[0];
 
   if (!clAdapterInfo) {
     return null;
@@ -126,7 +147,9 @@ const CLAdapterContent = ({ deploymentInfo }: DataFeedCardContentProps) => {
 const CLRegistryContentItem = ({
   deploymentInfo,
 }: DataFeedCardContentProps) => {
-  const clAdapterInfo = deploymentInfo.contracts.CLAggregatorAdapter[0];
+  const clAdapterInfo = valuesOf(
+    deploymentInfo.contracts.CLAggregatorAdapter,
+  )[0];
 
   if (!clAdapterInfo?.base || !clAdapterInfo?.quote) {
     return null;
@@ -184,11 +207,13 @@ type DataFeedCardProps = {
 export const NetworkAccessCard = ({
   feedsDeploymentInfo,
 }: DataFeedCardProps) => {
-  const networks = feedsDeploymentInfo.map(networkData => networkData.name);
-  const [selectedNetwork, setSelectedNetwork] = useState(networks[0]);
-  const [deploymentInfo, setDeploymentInfo] = useState<DeploymentConfigV2>(
-    feedsDeploymentInfo.find(networkData => networkData.name === networks[0])!,
+  const networks = feedsDeploymentInfo.map(networkData => networkData.network);
+  const [selectedNetwork, setSelectedNetwork] = useState<NetworkName | null>(
+    null,
   );
+
+  const [deploymentInfo, setDeploymentInfo] =
+    useState<DeploymentConfigV2 | null>(null);
   const { hash, setNewHash } = useHash();
   const networkFromHash = hash.replace('#', '');
 
@@ -211,7 +236,9 @@ export const NetworkAccessCard = ({
 
   const changeNetwork = (network: NetworkName) => {
     setSelectedNetwork(network);
-    setDeploymentInfo(feedsDeploymentInfo.find(data => data.name === network)!);
+    setDeploymentInfo(
+      feedsDeploymentInfo.find(data => data.network === network)!,
+    );
   };
 
   return (
@@ -229,11 +256,13 @@ export const NetworkAccessCard = ({
           />
         </div>
       </CardHeader>
-      <DataFeedCardContent>
-        <FeedStoreContent deploymentInfo={deploymentInfo} />
-        <CLAdapterContent deploymentInfo={deploymentInfo} />
-        <CLRegistryContentItem deploymentInfo={deploymentInfo} />
-      </DataFeedCardContent>
+      {deploymentInfo && (
+        <DataFeedCardContent>
+          <FeedStoreContent deploymentInfo={deploymentInfo} />
+          <CLAdapterContent deploymentInfo={deploymentInfo} />
+          <CLRegistryContentItem deploymentInfo={deploymentInfo} />
+        </DataFeedCardContent>
+      )}
     </Card>
   );
 };

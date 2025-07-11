@@ -2,7 +2,6 @@ import DATA_FEEDS from '@blocksense/data-feeds-config-generator/feeds_config';
 import DEPLOYMENT_INFO from '@/artifacts/deployment_data.json';
 
 import { decodeNewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
-import { DeploymentConfigV2 } from '@blocksense/config-types';
 
 import { Error404 } from '@/components/common/Error404';
 import { CoreConfigCard } from '@/components/DataFeeds/Cards/CoreConfigCard';
@@ -14,7 +13,7 @@ import { OracleConfigCard } from '@/components/DataFeeds/Cards/OracleConfigCard'
 import { prepareDeploymentData } from '@/src/deployed-contracts/utils';
 import { decodeDeploymentConfigArray } from '@/src/deployed-contracts/types';
 
-export function generateStaticParams() {
+export function generateStaticParams(): { feed: string }[] {
   const feedsConfig = decodeNewFeedsConfig(DATA_FEEDS);
   return feedsConfig.feeds.map(feed => ({
     feed: String(feed.id),
@@ -24,7 +23,6 @@ export function generateStaticParams() {
 type DataFeedProps = {
   params: {
     feed: string;
-    feedDeploymentInfo: DeploymentConfigV2[];
   };
 };
 
@@ -44,7 +42,7 @@ export default async function DataFeed({ params }: DataFeedProps) {
 
   const feedDeploymentInfo = prepareDeploymentData(
     decodeDeploymentConfigArray(DEPLOYMENT_INFO),
-    feed.full_name,
+    String(feed.id),
   );
 
   if (!feedDeploymentInfo) {

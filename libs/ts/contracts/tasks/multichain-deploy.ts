@@ -1,9 +1,12 @@
-import { formatEther } from 'ethers';
+import { AbiCoder, formatEther, id, ZeroAddress } from 'ethers';
 import { task } from 'hardhat/config';
 
 import type Safe from '@safe-global/protocol-kit';
 
-import { getOptionalEnvString } from '@blocksense/base-utils/env';
+import {
+  HexDataString,
+  parseHexDataString,
+} from '@blocksense/base-utils/buffer-and-hex';
 import {
   isNetworkName,
   NetworkName,
@@ -42,7 +45,7 @@ task('deploy', 'Deploy contracts')
       'chainlink_compatibility_v2',
     );
 
-    const getCLRegistryPair = (feedId: number | bigint) => {
+    const getCLRegistryPair = (feedId: bigint) => {
       const { base, quote } = chainlinkCompatibility
         .blocksenseFeedsCompatibility[feedId.toString()]
         ?.chainlink_compatibility ?? {
@@ -52,9 +55,9 @@ task('deploy', 'Deploy contracts')
       return { base, quote };
     };
 
-    const chainsDeployment: Record<NetworkName, DeploymentConfigV2> = {} as any;
+    const chainsDeployment = {} as Record<NetworkName, DeploymentConfigV2>;
 
-    const abiCoder = ethers.AbiCoder.defaultAbiCoder();
+    const abiCoder = AbiCoder.defaultAbiCoder();
 
     for (const config of configs) {
       const feedsToDeploy = config.feedIds;
@@ -63,30 +66,30 @@ task('deploy', 'Deploy contracts')
           ? feeds.filter(feed => feedsToDeploy.includes(feed.id) ?? false)
           : feeds;
 
-      const signer = config.adminMultisig.signer ?? config.ledgerAccount!;
       const chainId = parseChainId(config.network.chainId);
       const { networkName } = config;
 
-      const signerBalance = await config.provider.getBalance(signer);
+      const signerBalance = await config.provider.getBalance(
+        config.deployerAddress,
+      );
+
+      const keccak256 = (str: string) => parseHexDataString(id(str));
 
       const create2ContractSalts = {
-        upgradeableProxy: getOptionalEnvString(
-          'ADFS_UPGRADEABLE_PROXY_SALT',
-          ethers.id('upgradeableProxy'),
-        ),
-        accessControl: ethers.id('accessControl'),
-        adfs: ethers.id('aggregatedDataFeedStore'),
-        safeGuard: ethers.id('onlySafeGuard'),
-        safeModule: ethers.id('adminExecutorModule'),
-        clFeedRegistry: ethers.id('registry'),
-        clAggregatorProxy: ethers.id('aggregator'),
-      };
+        upgradeableProxy: config.adfsUpgradeableProxySalt,
+        accessControl: keccak256('accessControl'),
+        adfs: keccak256('aggregatedDataFeedStore'),
+        safeGuard: keccak256('onlySafeGuard'),
+        safeModule: keccak256('adminExecutorModule'),
+        clFeedRegistry: keccak256('registry'),
+        clAggregatorProxy: keccak256('aggregator'),
+      } satisfies Record<string, HexDataString>;
 
       console.log(`Blocksense EVM contracts deployment`);
       console.log(`===================================\n`);
       console.log(`// RPC: ${config.rpc}`);
       console.log(`// Network: ${networkName} (chainId: ${chainId})`);
-      console.log(`// Signer: ${await signer.getAddress()}`);
+      console.log(`// Deployer: ${config.deployerAddress}`);
       console.log(`// Balance: ${fmtEth(signerBalance)}`);
       console.log(`// `);
       console.log(
@@ -96,10 +99,10 @@ task('deploy', 'Deploy contracts')
       console.log(`//      owners: ${config.adminMultisig.owners}`);
       console.log(`// `);
       console.log(
-        `// Reporter MultiSig: ${config.deployWithSequencerMultisig ? '✅' : '❌'}`,
+        `// Reporter MultiSig: ${config.deployWithReporterMultisig ? '✅' : '❌'}`,
       );
-      console.log(`//   threshold: ${config.sequencerMultisig.threshold}`);
-      console.log(`//      owners: ${config.sequencerMultisig.owners}`);
+      console.log(`//   threshold: ${config.reporterMultisig.threshold}`);
+      console.log(`//      owners: ${config.reporterMultisig.owners}`);
       console.log(`// `);
       console.log(`// Feeds: `);
 
@@ -189,11 +192,12 @@ task('deploy', 'Deploy contracts')
           value: 0n,
         },
         ...dataFeedConfig.map(data => {
+          const { base, quote } = getCLRegistryPair(data.id);
           return {
             name: ContractNames.CLAggregatorAdapter as const,
-            argsTypes: ['string', 'uint8', 'uint32', 'address'],
+            argsTypes: ['string', 'uint8', 'uint256', 'address'],
             argsValues: [
-              data.description,
+              data.full_name,
               data.additional_feed_info.decimals,
               data.id,
               upgradeableProxyAddress,
@@ -201,38 +205,39 @@ task('deploy', 'Deploy contracts')
             salt: create2ContractSalts.clAggregatorProxy,
             value: 0n,
             feedRegistryInfo: {
+              feedId: data.id,
               description: `${data.full_name} (${data.id})`,
-              base: data.base,
-              quote: data.quote,
+              base,
+              quote,
             },
-          };
+          } satisfies DeployContract;
         }),
       ];
 
-      let sequencerMultisig: Safe | undefined;
-      let sequencerMultisigAddress = parseEthereumAddress(ethers.ZeroAddress);
+      let reporterMultisig: Safe | undefined;
+      let reporterMultisigAddress = parseEthereumAddress(ZeroAddress);
 
-      if (config.deployWithSequencerMultisig) {
-        sequencerMultisig = await deployMultisig({
+      if (config.deployWithReporterMultisig) {
+        reporterMultisig = await deployMultisig({
           config,
-          type: 'sequencerMultisig',
+          type: 'reporterMultisig',
         });
-        sequencerMultisigAddress = parseEthereumAddress(
-          await sequencerMultisig!.getAddress(),
+        reporterMultisigAddress = parseEthereumAddress(
+          await reporterMultisig!.getAddress(),
         );
 
         contracts.unshift({
           name: ContractNames.AdminExecutorModule,
           argsTypes: ['address', 'address'],
-          argsValues: [sequencerMultisigAddress, adminMultisigAddress],
-          salt: create2ContractSalts.safeModule,
+          argsValues: [reporterMultisigAddress, adminMultisigAddress],
+          salt: parseHexDataString(create2ContractSalts.safeModule),
           value: 0n,
         });
         contracts.unshift({
           name: ContractNames.OnlySequencerGuard,
           argsTypes: ['address', 'address', 'address'],
           argsValues: [
-            sequencerMultisigAddress,
+            reporterMultisigAddress,
             adminMultisigAddress,
             upgradeableProxyAddress,
           ],
@@ -245,29 +250,27 @@ task('deploy', 'Deploy contracts')
         config,
         adminMultisig,
         contracts,
-        run,
         artifacts,
       });
 
-      deployData.coreContracts.OnlySequencerGuard ??= {
-        address: parseEthereumAddress(ethers.ZeroAddress),
-        constructorArgs: [],
-      };
-
       chainsDeployment[networkName] = {
-        name: networkName,
+        network: networkName,
         chainId,
         contracts: {
           ...deployData,
-          AdminMultisig: adminMultisigAddress,
-          SequencerMultisig:
-            sequencerMultisigAddress === ethers.ZeroAddress
-              ? undefined
-              : sequencerMultisigAddress,
+          safe: {
+            AdminMultisig: adminMultisigAddress,
+            ReporterMultisig:
+              reporterMultisigAddress === ZeroAddress
+                ? null
+                : reporterMultisigAddress,
+            AdminExecutorModule: deployData.safe.AdminExecutorModule,
+            OnlySequencerGuard: deployData.safe.OnlySequencerGuard,
+          },
         },
       };
       const signerBalancePost = await config.provider.getBalance(
-        await signer.getAddress(),
+        config.deployerAddress,
       );
 
       console.log(`// balance: ${fmtEth(signerBalancePost)}`);
@@ -277,7 +280,6 @@ task('deploy', 'Deploy contracts')
         config,
         safe: adminMultisig,
         deployData,
-        run,
         artifacts,
       });
 
@@ -285,23 +287,20 @@ task('deploy', 'Deploy contracts')
         config,
         safe: adminMultisig,
         deployData,
-        run,
         artifacts,
       });
 
       await setUpAccessControl({
-        run,
         artifacts,
         config,
         deployData,
         adminMultisig,
-        sequencerMultisig,
+        reporterMultisig,
       });
 
-      if (!config.deployWithSequencerMultisig) {
-        chainsDeployment[
-          networkName
-        ].contracts.coreContracts.OnlySequencerGuard = undefined;
+      if (!config.deployWithReporterMultisig) {
+        chainsDeployment[networkName].contracts.safe.AdminExecutorModule = null;
+        chainsDeployment[networkName].contracts.safe.OnlySequencerGuard = null;
       }
     }
 
@@ -312,11 +311,11 @@ function fmtEth(balance: bigint) {
   return `${formatEther(balance)} ETH (${balance} wei)`;
 }
 
-const saveDeployment = async (
+async function saveDeployment(
   configs: NetworkConfig[],
   chainsDeployment: Record<NetworkName, DeploymentConfigV2>,
-) => {
+) {
   for (const { networkName } of configs) {
     await writeEvmDeployment(networkName, chainsDeployment[networkName]);
   }
-};
+}

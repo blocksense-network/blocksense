@@ -148,9 +148,12 @@ in
         second-consensus-secret-key-path = "${testKeysDir}/reporter_second_consensus_secret_key";
         api-keys = {
           ALPHAVANTAGE_API_KEY = "${testKeysDir}/ALPHAVANTAGE_API_KEY";
+          APCA_API_KEY_ID = "${testKeysDir}/APCA_API_KEY_ID";
+          APCA_API_SECRET_KEY = "${testKeysDir}/APCA_API_SECRET_KEY";
           YAHOO_FINANCE_API_KEY = "${testKeysDir}/YAHOO_FINANCE_API_KEY";
           TWELVEDATA_API_KEY = "${testKeysDir}/TWELVEDATA_API_KEY";
           FMP_API_KEY = "${testKeysDir}/FMP_API_KEY";
+          SPOUT_RWA_API_KEY = "${testKeysDir}/SPOUT_RWA_API_KEY";
         };
       };
     };
@@ -197,6 +200,7 @@ in
       eth-rpc = {
         exec-interval = 10;
         allowed-outbound-hosts = [
+          "https://arbitrum-one-rpc.publicnode.com"
           "https://eth.llamarpc.com"
           "https://rpc.eth.gateway.fm"
           "https://ethereum-rpc.publicnode.com"
@@ -209,16 +213,28 @@ in
       stock-price-feeds = {
         exec-interval = 60;
         allowed-outbound-hosts = [
+          "https://data.alpaca.markets"
           "https://www.alphavantage.co"
           "https://yfapi.net"
           "https://api.twelvedata.com"
           "https://financialmodelingprep.com"
         ];
         api-keys = [
+          "APCA_API_KEY_ID"
+          "APCA_API_SECRET_KEY"
           "ALPHAVANTAGE_API_KEY"
           "YAHOO_FINANCE_API_KEY"
           "TWELVEDATA_API_KEY"
           "FMP_API_KEY"
+        ];
+      };
+      spout-rwa = {
+        exec-interval = 60;
+        allowed-outbound-hosts = [
+          "https://rwa-deploy-backend.onrender.com/"
+        ];
+        api-keys = [
+          "SPOUT_RWA_API_KEY"
         ];
       };
     };

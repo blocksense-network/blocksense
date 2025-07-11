@@ -1,0 +1,33 @@
+[workspace]
+members = [
+  "cex-price-feeds",
+  "exsat-holdings",
+  "gecko-terminal",
+  "eth-rpc",
+  "stock-price-feeds",
+  "spout-rwa",
+]
+
+resolver = "2"
+
+[workspace.package]
+version = "0.0.1"
+authors = ["The Blocksense team"]
+license = "to be decided"
+edition = "2021"
+
+[workspace.dependencies]
+blocksense-sdk = { path = "../../libs/sdk" }
+blocksense-data-providers-sdk = { path = "../../libs/data_providers_sdk" }
+
+anyhow = "1"
+futures = "0.3"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = { version = "1.0", features = ["float_roundtrip"] }
+url = "2.5"
+itertools = "0.14.0"
+prettytable-rs = "0.10"
+serde-this-or-that = "0.5.0"
+serde_derive = "1.0.210"
+wit-bindgen = "0.16.0"
+alloy = "1.0.9"

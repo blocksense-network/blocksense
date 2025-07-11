@@ -10,7 +10,7 @@ use alloy::providers::Provider;
 use alloy_primitives::map::HashMap;
 use alloy_primitives::{Address, Bytes, Uint, U256};
 use blocksense_data_feeds::feeds_processing::{
-    BatchedAggegratesToSend, EncodedBatchedAggegratesToSend, EncodedVotedFeedUpdate,
+    BatchedAggregatesToSend, EncodedBatchedAggregatesToSend, EncodedVotedFeedUpdate,
 };
 use blocksense_feed_registry::types::Repeatability::Periodic;
 use blocksense_gnosis_safe::data_types::ConsensusSecondRoundBatch;
@@ -24,7 +24,7 @@ use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, warn};
 
 pub async fn votes_result_sender_loop(
-    mut batched_votes_recv: UnboundedReceiver<BatchedAggegratesToSend>,
+    mut batched_votes_recv: UnboundedReceiver<BatchedAggregatesToSend>,
     sequencer_state: Data<SequencerState>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
@@ -72,7 +72,7 @@ pub async fn votes_result_sender_loop(
 
 async fn aggregated_updates_to_publishers(
     sequencer_state: &Data<SequencerState>,
-    updates: &BatchedAggegratesToSend,
+    updates: &BatchedAggregatesToSend,
 ) {
     let Some(kafka_endpoint) = &sequencer_state.kafka_endpoint else {
         warn!("No Kafka endpoint set to stream aggregated updates to publishers.");
@@ -81,7 +81,7 @@ async fn aggregated_updates_to_publishers(
 
     let block_height = updates.block_height;
 
-    let encoded_updates = EncodedBatchedAggegratesToSend {
+    let encoded_updates = EncodedBatchedAggregatesToSend {
         block_height,
         updates: {
             let mut encoded_voted_feed_updates = Vec::new();
@@ -149,7 +149,7 @@ async fn aggregated_updates_to_publishers(
 
 async fn try_send_aggregation_consensus_trigger_to_reporters(
     sequencer_state: &Data<SequencerState>,
-    updates: &BatchedAggegratesToSend,
+    updates: &BatchedAggregatesToSend,
 ) {
     let Some(kafka_endpoint) = &sequencer_state.kafka_endpoint else {
         warn!("No Kafka endpoint set to stream consensus second round data.");
@@ -308,7 +308,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
         let serialized_updates = match serde_json::to_string(&updates_to_kafka) {
             Ok(res) => res,
             Err(e) => {
-                error!("Failed to serialize data for second round conseneus trigger! {e}");
+                error!("Failed to serialize data for second round consensus trigger! {e}");
                 continue;
             }
         };
@@ -347,14 +347,14 @@ async fn send_to_msg_stream(
     endpoint: &FutureProducer,
     serialized_updates: &String,
     topic: &str,
-    tomeout_secs: u64,
+    timeout_secs: u64,
     net: &str,
     block_height: u64,
 ) -> eyre::Result<()> {
     match endpoint
         .send(
             FutureRecord::<(), _>::to(topic).payload(serialized_updates),
-            Timeout::After(Duration::from_secs(tomeout_secs)),
+            Timeout::After(Duration::from_secs(timeout_secs)),
         )
         .await
     {

@@ -41209,6 +41209,38 @@
       }
     },
     {
+      "id": "101001",
+      "full_name": "Spout LQD PoR",
+      "description": "Spout LQD Proof of Reserve, based on RWA backend",
+      "type": "price-feed",
+      "oracle_id": "spout-rwa",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 1000,
+        "heartbeat_ms": 600000,
+        "deviation_percentage": 0.01,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "LQD",
+          "quote": "amount"
+        },
+        "decimals": 6,
+        "category": "",
+        "market_hours": "",
+        "arguments": {
+          "api_url": "https://rwa-deploy-backend.onrender.com/reserves/LQD",
+          "endpoint": "reserve"
+        }
+      }
+    },
+    {
       "id": "1000000",
       "full_name": "WMON / USD",
       "description": "Price of Wrapped Monad in USD on Monad Testnet",
@@ -41855,6 +41887,43 @@
         "market_hours": "US_Equities",
         "arguments": {
           "providers": ["AlphaVantage", "YahooFinance", "twelvedata", "FMP"]
+        }
+      }
+    },
+    {
+      "id": "2000002",
+      "full_name": "LQD / USD",
+      "description": "Price of iShares iBoxx $ Inv Grade Corporate Bond ETF ($LQD) in USD",
+      "type": "price-feed",
+      "oracle_id": "stock-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 1000,
+        "heartbeat_ms": 600000,
+        "deviation_percentage": 0.01,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "LQD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Equities",
+        "market_hours": "US_Equities",
+        "arguments": {
+          "providers": [
+            "AlpacaMarkets",
+            "AlphaVantage",
+            "YahooFinance",
+            "twelvedata",
+            "FMP"
+          ]
         }
       }
     }

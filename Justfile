@@ -31,25 +31,20 @@ build-environment environment="all":
   #!/usr/bin/env bash
   set -euo pipefail
   if [[ {{environment}} == "all" ]]; then
-    nix build --impure -L --json .#allProcessComposeFiles \
-      | jq -r '.[0].outputs.out' \
-      | xargs -I{} cp -rfs {}/. {{process-compose-artifacts-dir}}
+    srcDir=$(nix build --impure --json -L .#allProcessComposeFiles | jq -r '.[0].outputs.out')
+    cp -rf --no-preserve=mode,ownership "$srcDir"/. {{process-compose-artifacts-dir}}
   else
-    nix build --impure -L --json .#legacyPackages.{{system}}.process-compose-environments.{{environment}} \
-      | jq -r '.[0].outputs.out' \
-      | xargs -I{} cp -rfs {} {{process-compose-artifacts-dir}}/process-compose-{{environment}}.yaml
+    destDir="{{process-compose-artifacts-dir}}/{{environment}}"
+    srcDir=$(nix build --impure -L --json .#legacyPackages.{{system}}.process-compose-environments.{{environment}} | jq -r '.[0].outputs.out')
+    cp -rf --no-preserve=mode,ownership "$srcDir"/. "$destDir"
   fi
   echo "Process Compose artifacts copied to {{process-compose-artifacts-dir}}"
 
 [group('Working with process-compose environments')]
-[doc('Start a process-compose environment')]
-start-environment environment:
+[doc('Start a process-compose environment. This command depends on building blocksense and the environment first')]
+start-environment environment="example-setup-01": build-blocksense (build-environment environment)
   #!/usr/bin/env bash
-  PC_FILE="{{process-compose-artifacts-dir}}/process-compose-{{environment}}.yaml"
-  if ! test -f "$PC_FILE"; then
-    just build-environment {{environment}}
-  fi
-
+  PC_FILE="{{process-compose-artifacts-dir}}/{{environment}}/process-compose.yaml"
   process-compose -f "$PC_FILE"
 
 [group('Working with typescript')]
@@ -82,7 +77,7 @@ build-oracle oracle-name:
   set -euo pipefail
 
   cd "{{root-dir}}/apps/oracles/{{oracle-name}}"
-  RUST_LOG=trigger=trace "${SPIN:-spin}" build
+  RUST_LOG=trigger=trace cargo build
 
 [group('Working with oracles')]
 [doc('Start a specific oracle')]
@@ -99,15 +94,6 @@ start-oracle oracle-name:
 [doc('Build Blocksense')]
 build-blocksense:
   @{{root-dir}}/scripts/build-blocksense.sh
-
-[group('blocksense')]
-[doc('Build Blocksense and start the default process-compose environment')]
-start-blocksense:
-  #!/usr/bin/env bash
-  set -euo pipefail
-
-  just build-blocksense
-  process-compose up
 
 [group('General')]
 [doc('Run a command to clean the repository of untracked files')]

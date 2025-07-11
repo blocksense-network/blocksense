@@ -146,7 +146,7 @@ export const DeployedContracts = ({
                   element =>
                     element.network === parseNetworkName(selectedNetwork),
                 )}
-                filterCell="description"
+                filterCell="name"
                 getRowLink={getRowLink}
                 hasToolbar
               />
