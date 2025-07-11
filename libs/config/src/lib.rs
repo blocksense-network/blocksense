@@ -818,7 +818,6 @@ mod tests {
         }
     }
 
-
     #[test]
     fn test_parsing_feed_config_v2() {
         let json = r#"
