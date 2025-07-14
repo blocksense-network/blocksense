@@ -23,7 +23,7 @@ in
   services.kafka.enable = lib.mkForce false;
 
   services.blocksense = {
-    logsDir = lib.mkForce (config.devenv.root + "/logs/blocksense/example-setup-03");
+    logsDir = lib.mkForce (config.devenv.root + "/logs/process-compose/example-setup-03");
 
     blama.enable = lib.mkForce false;
 

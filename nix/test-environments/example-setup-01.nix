@@ -25,7 +25,7 @@ in
   services.blocksense = {
     enable = true;
 
-    logsDir = config.devenv.root + "/logs/blocksense";
+    logsDir = config.devenv.root + "/logs/process-compose/example-setup-01";
 
     anvil = {
       ethereum-sepolia = {
