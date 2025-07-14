@@ -111,10 +111,11 @@ pub struct RpcProvider {
     pub impersonated_anvil_account: Option<Address>,
     pub history: FeedAggregateHistory,
     pub publishing_criteria: HashMap<FeedId, PublishCriteria>,
-    pub feeds_variants: HashMap<FeedId, (FeedType, usize)>,
+    pub feeds_variants: HashMap<FeedId, FeedVariant>,
     pub contracts: Vec<Contract>,
     pub rpc_url: Url,
     pub round_counters: RoundCounters,
+    pub limit_multicall_data_calls: usize,
     num_tx_in_progress: u32,
 }
 
@@ -236,13 +237,20 @@ impl LatestRound {
         LatestRound { feed_id, round }
     }
 
-    pub fn calldata(feed_id: u128, stride: u32) -> Bytes {
+    pub fn calldata(feed_id: u128, stride: u8) -> Bytes {
         let x: U256 = (U256::from(0x81_u8) << 248)
             | (U256::from(stride) << 240)
             | (U256::from(feed_id) << 120);
         let b: [u8; 32] = x.to_be_bytes();
         Bytes::copy_from_slice(&b)
     }
+}
+
+#[derive(Clone)]
+pub struct FeedVariant {
+    pub variant: FeedType,
+    pub decimals: usize,
+    pub stride: u8,
 }
 
 impl RpcProvider {
@@ -264,13 +272,19 @@ impl RpcProvider {
             .and_then(|x| parse_eth_address(x.as_str()));
         let (history, publishing_criteria) = RpcProvider::prepare_history(p);
         let contracts = RpcProvider::prepare_contracts(p).expect("Error in prepare_contracts");
-        let mut feeds_variants: HashMap<FeedId, (FeedType, usize)> = HashMap::new();
+        let mut feeds_variants: HashMap<FeedId, FeedVariant> = HashMap::new();
         for f in feeds_config.feeds.iter() {
             debug!("Registering feed for network; feed={f:?}; network={network}");
             match FeedType::get_variant_from_string(f.value_type.as_str()) {
                 Ok(variant) => {
-                    feeds_variants
-                        .insert(f.id, (variant, f.additional_feed_info.decimals as usize));
+                    feeds_variants.insert(
+                        f.id,
+                        FeedVariant {
+                            variant,
+                            decimals: f.additional_feed_info.decimals as usize,
+                            stride: f.stride as u8,
+                        },
+                    );
                 }
                 _ => {
                     error!("Unknown feed value variant = {}", f.value_type);
@@ -293,6 +307,7 @@ impl RpcProvider {
             contracts,
             rpc_url,
             round_counters: HashMap::new(),
+            limit_multicall_data_calls: 16,
             num_tx_in_progress: 0,
         }
     }
@@ -326,13 +341,13 @@ impl RpcProvider {
                 )?;
             for feed in feeds_config.feeds.iter() {
                 let feed_id = feed.id;
-                let stride = feed.stride;
+                let stride = feed.stride as u8;
                 let r = Self::get_latest_round_v2(
                     multicall,
                     adfs_address,
                     &self.provider,
                     &feed_id,
-                    stride.into(),
+                    stride,
                 )
                 .await?;
                 if let Some(r) = r.first() {
@@ -513,9 +528,10 @@ impl RpcProvider {
         adfs_address: Address,
         provider: &ProviderType,
         feed_id: &u128,
-        stride: u32,
+        stride: u8,
     ) -> Result<Vec<LatestRound>, eyre::Error> {
         let contract = MulticallInstance::new(multicall, provider.clone());
+
         let calldata: Vec<Multicall::Call> = vec![Multicall::Call {
             target: adfs_address,
             callData: LatestRound::calldata(*feed_id, stride),
@@ -529,135 +545,83 @@ impl RpcProvider {
         Ok(latest_rounds)
     }
 
-    pub async fn get_latest_round(
-        &self,
-        feed_id: &u128,
-        stride: u32,
-    ) -> Result<Vec<LatestRound>, eyre::Error> {
+    pub async fn get_latest_round(&self, feed_id: &u128) -> Result<Vec<LatestRound>, eyre::Error> {
         let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
         let adfs_address = self.get_contract_address(ADFS_CONTRACT_NAME)?;
-        Self::get_latest_round_v2(multicall, adfs_address, &self.provider, feed_id, stride).await
-    }
-
-    pub async fn get_latest_values_from_v1(
-        &self,
-        feed_ids: &[FeedId],
-    ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>, eyre::Error> {
-        let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
-        let data_feed = self.get_contract_address(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)?;
-        //let data_feed = self.get_contract_address(ADFS_CONTRACT_NAME)?;
-        let contract = MulticallInstance::new(multicall, self.provider.clone());
-        let calldata: Vec<Multicall::Call> = feed_ids
-            .iter()
-            .map(|feed_id| Multicall::Call {
-                target: data_feed,
-                callData: Self::calldata_for_values_feed_v1(*feed_id),
-            })
-            .collect();
-        let mut digits: Vec<usize> = vec![];
-        let mut variants: Vec<FeedType> = vec![];
-        for feed_id in feed_ids.iter() {
-            let Some((variant, digits_in_fraction)) = self.feeds_variants.get(feed_id) else {
-                return Err(eyre!(
-                    "Unknown variant and number of digits for feed with id = {feed_id}"
-                ));
-            };
-            digits.push(*digits_in_fraction);
-            variants.push(variant.clone());
-        }
-
-        let aggregate_return = contract.aggregate(calldata).call().await?;
-
-        let res = aggregate_return
-            .returnData
-            .into_iter()
-            .enumerate()
-            .map(|(count, data)| {
-                PublishedFeedUpdate::latest(
-                    1,
-                    feed_ids[count],
-                    variants[count].clone(),
-                    digits[count],
-                    &data.0,
-                )
-            })
-            .collect();
-        Ok(res)
-    }
-
-    pub fn calldata_for_values_feed_v2(feed_id: FeedId) -> Bytes {
-        //let method_code = U256::from(0x83_u8);
-        let method_code = U256::from(0x83_u8);
-        let x = (method_code << 248) | (U256::from(feed_id) << 120);
-        Bytes::copy_from_slice(&DynSolValue::Uint(x, 256).abi_encode())
-    }
-
-    pub fn calldata_for_values_feed_v1(feed_id: FeedId) -> Bytes {
-        Bytes::copy_from_slice(&[
-            (((feed_id >> 24) & 0xFF) | 0xC0) as u8,
-            ((feed_id >> 16) & 0xFF) as u8,
-            ((feed_id >> 8) & 0xFF) as u8,
-            (feed_id & 0xFF) as u8,
-        ])
-    }
-
-    pub async fn get_latest_values_from_v2(
-        &self,
-        feed_ids: &[FeedId],
-    ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>, eyre::Error> {
-        let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
-        let data_feed = self.get_contract_address(ADFS_CONTRACT_NAME)?;
-        let contract = MulticallInstance::new(multicall, self.provider.clone());
-        let calldata: Vec<Multicall::Call> = feed_ids
-            .iter()
-            .map(|feed_id| Multicall::Call {
-                target: data_feed,
-                callData: Self::calldata_for_values_feed_v2(*feed_id),
-            })
-            .collect();
-        info!("Calldata = {calldata:?}");
-        let mut digits: Vec<usize> = vec![];
-        let mut variants: Vec<FeedType> = vec![];
-        for feed_id in feed_ids.iter() {
-            let Some((variant, digits_in_fraction)) = self.feeds_variants.get(feed_id) else {
-                return Err(eyre!(
-                    "Unknown variant and number of digits for feed with id = {feed_id}"
-                ));
-            };
-            digits.push(*digits_in_fraction);
-            variants.push(variant.clone());
-        }
-
-        let aggregate_return = contract.aggregate(calldata).call().await?;
-
-        let res = aggregate_return
-            .returnData
-            .into_iter()
-            .enumerate()
-            .map(|(count, data)| {
-                PublishedFeedUpdate::latest(
-                    2,
-                    feed_ids[count],
-                    variants[count].clone(),
-                    digits[count],
-                    &data.0,
-                )
-            })
-            .collect();
-        Ok(res)
+        let Some(variant) = self.feeds_variants.get(feed_id) else {
+            return Err(eyre!(
+                "Unknown variant and number of digits for feed with id = {feed_id}"
+            ));
+        };
+        Self::get_latest_round_v2(
+            multicall,
+            adfs_address,
+            &self.provider,
+            feed_id,
+            variant.stride,
+        )
+        .await
     }
 
     pub async fn get_latest_values(
         &self,
         feed_ids: &[FeedId],
     ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>, eyre::Error> {
-        match self.get_latest_contract_version(Repeatability::Periodic) {
-            1 => self.get_latest_values_from_v1(feed_ids).await,
-            2 => self.get_latest_values_from_v2(feed_ids).await,
-            _ => Err(eyre!(
-                "Unknown contract version when trying to fetch latest values!"
-            )),
+        let mut variants: Vec<FeedVariant> = vec![];
+        for feed_id in feed_ids.iter() {
+            let Some(variant) = self.feeds_variants.get(feed_id) else {
+                return Err(eyre!(
+                    "Unknown variant and number of digits for feed with id = {feed_id}"
+                ));
+            };
+            variants.push(variant.clone());
         }
+        type CallDataForValueFnType = fn(u128) -> Bytes;
+        type LatestFn = fn(
+            u128,
+            FeedVariant,
+            &[u8],
+        )
+            -> std::result::Result<PublishedFeedUpdate, PublishedFeedUpdateError>;
+        let (data_feed, calldata_for_values, latest) =
+            match self.get_latest_contract_version(Repeatability::Periodic) {
+                1 => {
+                    let data_feed =
+                        self.get_contract_address(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)?;
+                    let calldata_for_value: CallDataForValueFnType = calldata_for_latest_value_v1;
+                    let latest: LatestFn = latest_v1;
+                    (data_feed, calldata_for_value, latest)
+                }
+
+                2 => {
+                    let data_feed = self.get_contract_address(ADFS_CONTRACT_NAME)?;
+                    let calldata_for_value: CallDataForValueFnType = calldata_for_latest_value_v2;
+                    let latest: LatestFn = latest_v2;
+                    (data_feed, calldata_for_value, latest)
+                }
+                _ => {
+                    return Err(eyre!(
+                        "Unknown contract version when trying to fetch latest values!"
+                    ))
+                }
+            };
+        let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
+        let contract = MulticallInstance::new(multicall, self.provider.clone());
+        let calldata: Vec<Multicall::Call> = feed_ids
+            .iter()
+            .map(|feed_id| Multicall::Call {
+                target: data_feed,
+                callData: calldata_for_values(*feed_id),
+            })
+            .collect();
+        let aggregate_return = contract.aggregate(calldata).call().await?;
+        let res = aggregate_return
+            .returnData
+            .into_iter()
+            .enumerate()
+            .map(|(count, data)| latest(feed_ids[count], variants[count].clone(), &data.0))
+            .collect();
+        Ok(res)
     }
 
     pub async fn get_historical_values_for_feed(
@@ -665,122 +629,91 @@ impl RpcProvider {
         feed_id: FeedId,
         updates: &[u128],
     ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>> {
-        match self.get_latest_contract_version(Repeatability::Periodic) {
-            1 => self.get_historical_values_for_feed_v1(feed_id, updates).await,
-            2 => self.get_historical_values_for_feed_v2(feed_id, updates).await,
-            _ => Err(eyre!(
-                "Unknown contract version when trying to fetch get_historical_values_for_feed {feed_id}!"
-            )),
+        let Some(variant) = self.feeds_variants.get(&feed_id) else {
+            return Err(eyre!(
+                "Unknown variant and number of digits for feed with id = {feed_id}"
+            ));
+        };
+        type NthCalldataFn = fn(u128, u8, u128) -> Bytes;
+        type NthResultFn = fn(
+            u128,
+            u128,
+            FeedVariant,
+            &[u8],
+        )
+            -> std::result::Result<PublishedFeedUpdate, PublishedFeedUpdateError>;
+        let (data_feed, nth_calldata, nth_result) = match self
+            .get_latest_contract_version(Repeatability::Periodic)
+        {
+            1 => {
+                let data_feed: Address =
+                    self.get_contract_address(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)?;
+                let nth_calldata: NthCalldataFn = calldata_nth_v1;
+                let nth_result: NthResultFn = nth_v1;
+                (data_feed, nth_calldata, nth_result)
+            }
+            2 => {
+                let data_feed: Address = self.get_contract_address(ADFS_CONTRACT_NAME)?;
+                let nth_calldata: NthCalldataFn = calldata_nth_v2;
+                let nth_result: NthResultFn = nth_v2;
+                (data_feed, nth_calldata, nth_result)
+            }
+            _ => {
+                return Err(eyre!("Unknown contract version when trying to fetch get_historical_values_for_feed {feed_id}!" ));
+            }
+        };
+        let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
+        let contract = MulticallInstance::new(multicall, self.provider.clone());
+        let chunk_size = self.limit_multicall_data_calls;
+        let chunks: Vec<Vec<u128>> = updates.chunks(chunk_size).map(|x| x.to_vec()).collect();
+        let mut res = vec![];
+        for chunk in chunks {
+            let calldata: Vec<Multicall::Call> = chunk
+                .iter()
+                .map(|update| Multicall::Call {
+                    target: data_feed,
+                    callData: Bytes::copy_from_slice(&nth_calldata(
+                        feed_id,
+                        variant.stride,
+                        *update,
+                    )),
+                })
+                .collect();
+            let call_result = contract.aggregate(calldata).call().await;
+            let mut chunk_results = match call_result {
+                Ok(aggregate_return) => {
+                    let chunk_results: Vec<_> = aggregate_return
+                        .returnData
+                        .into_iter()
+                        .enumerate()
+                        .map(|(count, data)| {
+                            nth_result(feed_id, updates[count], variant.clone(), &data.0)
+                        })
+                        .collect();
+                    chunk_results
+                }
+                Err(err) => {
+                    let message = err.to_string();
+                    let chunk_errors = chunk
+                        .iter()
+                        .map(|update| {
+                            Err(PublishedFeedUpdate::error_num_update(
+                                feed_id, &message, *update,
+                            ))
+                        })
+                        .collect();
+                    chunk_errors
+                }
+            };
+            res.append(&mut chunk_results);
         }
-    }
-
-    pub fn nth_calldata_v1(feed_id: FeedId, update: u128) -> Bytes {
-        let mut a = [
-            (((feed_id >> 24) & 0xFF) | 0x20) as u8,
-            ((feed_id >> 16) & 0xFF) as u8,
-            ((feed_id >> 8) & 0xFF) as u8,
-            (feed_id & 0xFF) as u8,
-        ]
-        .to_vec();
-        a.append(&mut 0_u128.to_be_bytes().to_vec());
-        a.append(&mut update.to_be_bytes().to_vec());
-        Bytes::copy_from_slice(&a)
-    }
-
-    pub fn nth_calldata_v2(feed_id: FeedId, update: u128) -> Bytes {
-        //  ['0x86', stride, feed_id, roundId],
-        // abi.encodePacked(bytes1(0x86), stride, uint120(id), uint16(round))
-        let stride = 0_u8;
-        let call = DynSolValue::Tuple(vec![
-            DynSolValue::Uint(U256::from(0x86_u8), 8),
-            DynSolValue::Uint(U256::from(stride), 8),
-            DynSolValue::Uint(U256::from(feed_id), 120),
-            DynSolValue::Uint(U256::from(update), 16),
-        ]);
-        // PACKED is very important :) !!!
-        Bytes::copy_from_slice(&call.abi_encode_packed())
-    }
-
-    pub async fn get_historical_values_for_feed_v1(
-        &self,
-        feed_id: FeedId,
-        updates: &[u128],
-    ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>> {
-        let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
-        let data_feed = self.get_contract_address(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)?;
-        let contract = MulticallInstance::new(multicall, self.provider.clone());
-        let calldata: Vec<Multicall::Call> = updates
-            .iter()
-            .map(|update| Multicall::Call {
-                target: data_feed,
-                callData: Self::nth_calldata_v1(feed_id, *update),
-            })
-            .collect();
-        let Some((variant, digits_in_fraction)) = self.feeds_variants.get(&feed_id) else {
-            return Err(eyre!(
-                "Unknown variant and number of digits for feed with id = {feed_id}"
-            ));
-        };
-        let aggregate_return = contract.aggregate(calldata).call().await?;
-        let res = aggregate_return
-            .returnData
-            .into_iter()
-            .enumerate()
-            .map(|(count, data)| {
-                PublishedFeedUpdate::nth_v1(
-                    feed_id,
-                    updates[count],
-                    variant.clone(),
-                    *digits_in_fraction,
-                    &data.0,
-                )
-            })
-            .collect();
-        Ok(res)
-    }
-
-    pub async fn get_historical_values_for_feed_v2(
-        &self,
-        feed_id: FeedId,
-        updates: &[u128],
-    ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>> {
-        info!("get_historical_values_for_feed {feed_id} {updates:?}");
-        let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
-        let data_feed = self.get_contract_address(ADFS_CONTRACT_NAME)?;
-        let contract = MulticallInstance::new(multicall, self.provider.clone());
-        let calldata: Vec<Multicall::Call> = updates
-            .iter()
-            .map(|update| Multicall::Call {
-                target: data_feed,
-                callData: Bytes::copy_from_slice(&Self::nth_calldata_v2(feed_id, *update)),
-            })
-            .collect();
-        let Some((variant, digits_in_fraction)) = self.feeds_variants.get(&feed_id) else {
-            return Err(eyre!(
-                "Unknown variant and number of digits for feed with id = {feed_id}"
-            ));
-        };
-        let aggregate_return = contract.aggregate(calldata).call().await?;
-        let res = aggregate_return
-            .returnData
-            .into_iter()
-            .enumerate()
-            .map(|(count, data)| {
-                PublishedFeedUpdate::nth_v2(
-                    feed_id,
-                    updates[count],
-                    variant.clone(),
-                    *digits_in_fraction,
-                    &data.0,
-                )
-            })
-            .collect();
         Ok(res)
     }
 
     pub fn get_history_capacity(&self, feed_id: FeedId) -> Option<usize> {
         self.history.get(feed_id).map(|x| x.capacity().get())
     }
+
     pub fn get_last_update_num_from_history(&self, feed_id: FeedId) -> u128 {
         let default = 0;
         self.history
@@ -1086,6 +1019,188 @@ fn extend_byte_code_with_address(address: Address, bytecode: &mut Vec<u8>) {
 //     println!("{:?}", std::any::type_name::<T>());
 // }
 
+pub fn calldata_nth_v1(feed_id: FeedId, _stride: u8, update: u128) -> Bytes {
+    let mut a = [
+        (((feed_id >> 24) & 0xFF) | 0x20) as u8,
+        ((feed_id >> 16) & 0xFF) as u8,
+        ((feed_id >> 8) & 0xFF) as u8,
+        (feed_id & 0xFF) as u8,
+    ]
+    .to_vec();
+    a.append(&mut 0_u128.to_be_bytes().to_vec());
+    a.append(&mut update.to_be_bytes().to_vec());
+    Bytes::copy_from_slice(&a)
+}
+
+pub fn calldata_nth_v2(feed_id: FeedId, stride: u8, update: u128) -> Bytes {
+    //  ['0x86', stride, feed_id, roundId],
+    // abi.encodePacked(bytes1(0x86), stride, uint120(id), uint16(round))
+    let call = DynSolValue::Tuple(vec![
+        DynSolValue::Uint(U256::from(0x86_u8), 8),
+        DynSolValue::Uint(U256::from(stride), 8),
+        DynSolValue::Uint(U256::from(feed_id), 120),
+        DynSolValue::Uint(U256::from(update), 16),
+    ]);
+    // PACKED is very important :) !!!
+    Bytes::copy_from_slice(&call.abi_encode_packed())
+}
+
+pub fn calldata_for_latest_value_v2(feed_id: FeedId) -> Bytes {
+    let method_code = U256::from(0x83_u8);
+    let x = (method_code << 248) | (U256::from(feed_id) << 120);
+    Bytes::copy_from_slice(&DynSolValue::Uint(x, 256).abi_encode())
+}
+
+pub fn calldata_for_latest_value_v1(feed_id: FeedId) -> Bytes {
+    Bytes::copy_from_slice(&[
+        (((feed_id >> 24) & 0xFF) | 0xC0) as u8,
+        ((feed_id >> 16) & 0xFF) as u8,
+        ((feed_id >> 8) & 0xFF) as u8,
+        (feed_id & 0xFF) as u8,
+    ])
+}
+
+pub fn latest_v1(
+    feed_id: FeedId,
+    variant: FeedVariant,
+    data: &[u8],
+) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
+    if data.is_empty() {
+        return Err(PublishedFeedUpdate::error(
+            feed_id,
+            "Data shows no published updates on chain",
+        ));
+    }
+    if data.len() != 64 {
+        return Err(PublishedFeedUpdate::error(
+            feed_id,
+            "Data size is not exactly 64 bytes",
+        ));
+    }
+    let j1: [u8; 32] = data[0..32].try_into().expect("Impossible");
+    let j2: [u8; 16] = data[48..64].try_into().expect("Impossible");
+    let j3: [u8; 8] = data[24..32].try_into().expect("Impossible");
+    let timestamp_u64 = u64::from_be_bytes(j3);
+    match FeedType::from_bytes(j1.to_vec(), variant.variant, variant.decimals) {
+        Ok(latest) => Ok(PublishedFeedUpdate {
+            feed_id,
+            num_updates: u128::from_be_bytes(j2),
+            value: latest,
+            published: timestamp_u64 as u128,
+        }),
+        Err(msg) => Err(PublishedFeedUpdate::error(feed_id, &msg)),
+    }
+}
+
+pub fn latest_v2(
+    feed_id: FeedId,
+    variant: FeedVariant,
+    data: &[u8],
+) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
+    if data.is_empty() {
+        return Err(PublishedFeedUpdate::error(
+            feed_id,
+            "Data shows no published updates on chain",
+        ));
+    }
+    if data.len() != 64 {
+        return Err(PublishedFeedUpdate::error(
+            feed_id,
+            "Data size is not exactly 64 bytes",
+        ));
+    }
+    let value_bytes: [u8; 32] = data[32..64].try_into().expect("Impossible");
+    let update_bytes: [u8; 16] = data[16..32].try_into().expect("Impossible");
+    let timestamp_bytes: [u8; 16] = data[0..16].try_into().expect("Impossible");
+    let timestamp = u128::from_be_bytes(timestamp_bytes);
+    match FeedType::from_bytes(value_bytes.to_vec(), variant.variant, variant.decimals) {
+        Ok(latest) => Ok(PublishedFeedUpdate {
+            feed_id,
+            num_updates: u128::from_be_bytes(update_bytes),
+            value: latest,
+            published: timestamp,
+        }),
+        Err(msg) => Err(PublishedFeedUpdate::error(feed_id, &msg)),
+    }
+}
+
+fn nth_v1(
+    feed_id: FeedId,
+    num_updates: u128,
+    variant: FeedVariant,
+    data: &[u8],
+) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
+    if data.len() != 32 {
+        return Err(PublishedFeedUpdate::error_num_update(
+            feed_id,
+            "Data size is not exactly 32 bytes",
+            num_updates,
+        ));
+    }
+    let j3: [u8; 8] = data[24..32].try_into().expect("Impossible");
+    let timestamp_u64 = u64::from_be_bytes(j3);
+    if timestamp_u64 == 0 {
+        return Err(PublishedFeedUpdate::error_num_update(
+            feed_id,
+            "Timestamp is zero",
+            num_updates,
+        ));
+    }
+    let j1: [u8; 32] = data[0..32].try_into().expect("Impossible");
+    match FeedType::from_bytes(j1.to_vec(), variant.variant, variant.decimals) {
+        Ok(value) => Ok(PublishedFeedUpdate {
+            feed_id,
+            num_updates,
+            value,
+            published: timestamp_u64 as u128,
+        }),
+        Err(msg) => Err(PublishedFeedUpdate::error_num_update(
+            feed_id,
+            &msg,
+            num_updates,
+        )),
+    }
+}
+
+fn nth_v2(
+    feed_id: FeedId,
+    num_updates: u128,
+    variant: FeedVariant,
+    data: &[u8],
+) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
+    if data.len() != 32 {
+        return Err(PublishedFeedUpdate::error_num_update(
+            feed_id,
+            "Data size is not exactly 32 bytes",
+            num_updates,
+        ));
+    }
+    info!("nth_v2 {num_updates} {data:?}");
+    let j3: [u8; 8] = data[0..8].try_into().expect("Impossible");
+    let timestamp_u64 = u64::from_be_bytes(j3);
+    // if timestamp_u64 == 0 {
+    //     return Err(PublishedFeedUpdate::error_num_update(
+    //         feed_id,
+    //         "Timestamp is zero",
+    //         num_updates,
+    //     ));
+    // }
+    let j1: [u8; 32] = data[0..32].try_into().expect("Impossible");
+    match FeedType::from_bytes(j1.to_vec(), variant.variant, variant.decimals) {
+        Ok(value) => Ok(PublishedFeedUpdate {
+            feed_id,
+            num_updates,
+            value,
+            published: timestamp_u64 as u128,
+        }),
+        Err(msg) => Err(PublishedFeedUpdate::error_num_update(
+            feed_id,
+            &msg,
+            num_updates,
+        )),
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1218,7 +1333,7 @@ mod tests {
         assert_eq!(result.len(), 1);
     }
 
-    #[actix_web::test]
+    #[tokio::test]
     async fn test_reading_adfs_counters_and_values() -> Result<()> {
         let metrics_prefix = "test_reading_adfs_counters_and_values";
 
@@ -1287,10 +1402,7 @@ mod tests {
             //let block_num_at_time_of_writing_this_test = 16500374_u64;
             let block_num_at_time_of_writing_this_test = 0_u64;
             assert!(block_number > block_num_at_time_of_writing_this_test);
-            let last_round = rpc_provider
-                .get_latest_round(&feed_id, stride.into())
-                .await
-                .unwrap();
+            let last_round = rpc_provider.get_latest_round(&feed_id).await.unwrap();
             let r = last_round.first().expect("One round is expected");
             assert_eq!(r.feed_id, feed_id);
             assert_eq!(r.round, 0);
@@ -1379,10 +1491,7 @@ mod tests {
             let last_values = rpc_provider.get_latest_values(&[feed_id]).await;
             info!("last_values = {last_values:?}");
 
-            let last_round = rpc_provider
-                .get_latest_round(&feed_id, stride.into())
-                .await
-                .unwrap();
+            let last_round = rpc_provider.get_latest_round(&feed_id).await.unwrap();
             let r = last_round.first().expect("One round is expected");
             assert_eq!(r.feed_id, feed_id);
             assert_eq!(r.round, 2)

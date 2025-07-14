@@ -6,7 +6,6 @@ use blocksense_feed_registry::{
 };
 use blocksense_utils::{from_hex_string, FeedId};
 use log::error;
-use log::info;
 use serde::Deserialize;
 use serde::Serialize;
 use std::cmp::Ordering;
@@ -225,77 +224,6 @@ pub struct PublishedFeedUpdateError {
 }
 
 impl PublishedFeedUpdate {
-    pub fn latest(
-        contract_version: u32,
-        feed_id: FeedId,
-        variant: FeedType,
-        digits_in_fraction: usize,
-        data: &[u8],
-    ) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
-        if data.is_empty() {
-            return Err(PublishedFeedUpdate::error(
-                feed_id,
-                "Data shows no published updates on chain",
-            ));
-        }
-        if data.len() != 64 {
-            return Err(PublishedFeedUpdate::error(
-                feed_id,
-                "Data size is not exactly 64 bytes",
-            ));
-        }
-        match contract_version {
-            1 => Self::latest_v1(feed_id, variant, digits_in_fraction, data),
-            2 => Self::latest_v2(feed_id, variant, digits_in_fraction, data),
-            _ => Err(PublishedFeedUpdate::error(
-                feed_id,
-                &format!("Unsupported contract version {contract_version}"),
-            )),
-        }
-    }
-
-    pub fn latest_v1(
-        feed_id: FeedId,
-        variant: FeedType,
-        digits_in_fraction: usize,
-        data: &[u8],
-    ) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
-        let j1: [u8; 32] = data[0..32].try_into().expect("Impossible");
-        let j2: [u8; 16] = data[48..64].try_into().expect("Impossible");
-        let j3: [u8; 8] = data[24..32].try_into().expect("Impossible");
-        let timestamp_u64 = u64::from_be_bytes(j3);
-        match FeedType::from_bytes(j1.to_vec(), variant, digits_in_fraction) {
-            Ok(latest) => Ok(PublishedFeedUpdate {
-                feed_id,
-                num_updates: u128::from_be_bytes(j2),
-                value: latest,
-                published: timestamp_u64 as u128,
-            }),
-            Err(msg) => Err(PublishedFeedUpdate::error(feed_id, &msg)),
-        }
-    }
-
-    pub fn latest_v2(
-        feed_id: FeedId,
-        variant: FeedType,
-        digits_in_fraction: usize,
-        data: &[u8],
-    ) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
-        let value_bytes: [u8; 32] = data[32..64].try_into().expect("Impossible");
-        let update_bytes: [u8; 16] = data[16..32].try_into().expect("Impossible");
-        let timestamp_bytes: [u8; 16] = data[0..16].try_into().expect("Impossible");
-        let timestamp = u128::from_be_bytes(timestamp_bytes);
-        match FeedType::from_bytes(value_bytes.to_vec(), variant, digits_in_fraction) {
-            Ok(latest) => Ok(PublishedFeedUpdate {
-                feed_id,
-                num_updates: u128::from_be_bytes(update_bytes),
-                value: latest,
-                published: timestamp,
-            }),
-            Err(msg) => Err(PublishedFeedUpdate::error(feed_id, &msg)),
-        }
-    }
-
     pub fn error(feed_id: FeedId, message: &str) -> PublishedFeedUpdateError {
         PublishedFeedUpdateError {
             feed_id,
@@ -312,85 +240,6 @@ impl PublishedFeedUpdate {
         let mut r = PublishedFeedUpdate::error(feed_id, message);
         r.num_updates = num_updates;
         r
-    }
-
-    pub fn nth_v1(
-        feed_id: FeedId,
-        num_updates: u128,
-        variant: FeedType,
-        digits_in_fraction: usize,
-        data: &[u8],
-    ) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
-        if data.len() != 32 {
-            return Err(PublishedFeedUpdate::error_num_update(
-                feed_id,
-                "Data size is not exactly 32 bytes",
-                num_updates,
-            ));
-        }
-        let j3: [u8; 8] = data[24..32].try_into().expect("Impossible");
-        let timestamp_u64 = u64::from_be_bytes(j3);
-        if timestamp_u64 == 0 {
-            return Err(PublishedFeedUpdate::error_num_update(
-                feed_id,
-                "Timestamp is zero",
-                num_updates,
-            ));
-        }
-        let j1: [u8; 32] = data[0..32].try_into().expect("Impossible");
-        match FeedType::from_bytes(j1.to_vec(), variant, digits_in_fraction) {
-            Ok(value) => Ok(PublishedFeedUpdate {
-                feed_id,
-                num_updates,
-                value,
-                published: timestamp_u64 as u128,
-            }),
-            Err(msg) => Err(PublishedFeedUpdate::error_num_update(
-                feed_id,
-                &msg,
-                num_updates,
-            )),
-        }
-    }
-
-    pub fn nth_v2(
-        feed_id: FeedId,
-        num_updates: u128,
-        variant: FeedType,
-        digits_in_fraction: usize,
-        data: &[u8],
-    ) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
-        if data.len() != 32 {
-            return Err(PublishedFeedUpdate::error_num_update(
-                feed_id,
-                "Data size is not exactly 32 bytes",
-                num_updates,
-            ));
-        }
-        info!("nth_v2 {num_updates} {data:?}");
-        let j3: [u8; 8] = data[0..8].try_into().expect("Impossible");
-        let timestamp_u64 = u64::from_be_bytes(j3);
-        // if timestamp_u64 == 0 {
-        //     return Err(PublishedFeedUpdate::error_num_update(
-        //         feed_id,
-        //         "Timestamp is zero",
-        //         num_updates,
-        //     ));
-        // }
-        let j1: [u8; 32] = data[0..32].try_into().expect("Impossible");
-        match FeedType::from_bytes(j1.to_vec(), variant, digits_in_fraction) {
-            Ok(value) => Ok(PublishedFeedUpdate {
-                feed_id,
-                num_updates,
-                value,
-                published: timestamp_u64 as u128,
-            }),
-            Err(msg) => Err(PublishedFeedUpdate::error_num_update(
-                feed_id,
-                &msg,
-                num_updates,
-            )),
-        }
     }
 }
 

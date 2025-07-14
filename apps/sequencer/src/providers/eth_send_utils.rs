@@ -1311,7 +1311,7 @@ mod tests {
         }
     }
 
-    #[actix_web::test]
+    #[tokio::test]
     async fn test_eth_batch_send_to_oneshot_contract() {
         /////////////////////////////////////////////////////////////////////
         // BIG STEP ONE - Setup Anvil and deploy SportsDataFeedStoreV2 to it
@@ -1457,7 +1457,7 @@ mod tests {
         assert_eq!(output.len(), 64, "Invalid output length");
     }
 
-    #[actix_web::test]
+    #[tokio::test]
     async fn test_eth_batch_send_to_all_oneshot_contracts() {
         let metrics_prefix = "test_eth_batch_send_to_all_oneshot_contracts";
 
@@ -1559,7 +1559,7 @@ mod tests {
         assert!(result.is_ok());
     }
 
-    #[actix_web::test]
+    #[tokio::test]
     async fn test_eth_batch_send_to_multidata_contracts_and_read_value() {
         let metrics_prefix = "test_eth_batch_send_to_multidata_contracts_and_read_value";
 
@@ -2055,7 +2055,7 @@ mod tests {
         }
     }
 
-    #[actix_web::test]
+    #[tokio::test]
     async fn peg_stable_coin_updates() {
         let network = "ETH";
         let url = "http://localhost:8545";
@@ -2110,7 +2110,7 @@ mod tests {
         assert_eq!(updates.updates[2].value, FeedType::Numerical(1.101f64));
     }
 
-    #[actix_web::test]
+    #[tokio::test]
     async fn peg_stable_coin_updates_disabled() {
         let network = "ETH";
         let url = "http://localhost:8545";
