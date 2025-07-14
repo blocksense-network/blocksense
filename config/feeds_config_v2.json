@@ -41860,6 +41860,72 @@
       }
     },
     {
+      "id": "1000008",
+      "full_name": "cbBTC / USD",
+      "description": "Price of Coinbase Wrapped BTC (cbBTC) in USD",
+      "type": "price-feed",
+      "oracle_id": "gecko-terminal",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "cbBTC",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": [
+          {
+            "network": "base",
+            "pool": "0x70acdf2ad0bf2402c957154f944c19ef4e1cbae1",
+            "reverse": false,
+            "min_volume_usd": 1000000
+          },
+          {
+            "network": "base",
+            "pool": "0x4e962bb3889bf030368f56810a9c96b83cb3e778",
+            "reverse": false,
+            "min_volume_usd": 1000000
+          },
+          {
+            "network": "base",
+            "pool": "0xc211e1f853a898bd1302385ccde55f33a8c4b3f3",
+            "reverse": false,
+            "min_volume_usd": 1000000
+          },
+          {
+            "network": "base",
+            "pool": "0xfbb6eed8e7aa03b138556eedaf5d271a5e1e43ef",
+            "reverse": false,
+            "min_volume_usd": 1000000
+          },
+          {
+            "network": "base",
+            "pool": "0xb94b22332abf5f89877a14cc88f2abc48c34b3df",
+            "reverse": false,
+            "min_volume_usd": 1000000
+          },
+          {
+            "network": "base",
+            "pool": "0x8c7080564b5a792a33ef2fd473fba6364d5495e5",
+            "reverse": false,
+            "min_volume_usd": 1000000
+          }
+        ]
+      }
+    },
+    {
       "id": "2000001",
       "full_name": "SPY / USD",
       "description": "Price of the SPDR S&P 500 ETF Trust ($SPY) in USD",

@@ -64,6 +64,12 @@ stride = 0
 decimals = 8
 data = '{"pair":{"base":"oLP","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":[{"network":"arbitrum","pool":"0x09e6a7adfb8c06f22adfefd872de73059d955be3","reverse":false}]}'
 
+[[trigger.oracle.data_feeds]]
+id = "1000008"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"cbBTC","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":[{"min_volume_usd":1000000,"network":"base","pool":"0x70acdf2ad0bf2402c957154f944c19ef4e1cbae1","reverse":false},{"min_volume_usd":1000000,"network":"base","pool":"0x4e962bb3889bf030368f56810a9c96b83cb3e778","reverse":false},{"min_volume_usd":1000000,"network":"base","pool":"0xc211e1f853a898bd1302385ccde55f33a8c4b3f3","reverse":false},{"min_volume_usd":1000000,"network":"base","pool":"0xfbb6eed8e7aa03b138556eedaf5d271a5e1e43ef","reverse":false},{"min_volume_usd":1000000,"network":"base","pool":"0xb94b22332abf5f89877a14cc88f2abc48c34b3df","reverse":false},{"min_volume_usd":1000000,"network":"base","pool":"0x8c7080564b5a792a33ef2fd473fba6364d5495e5","reverse":false}]}'
+
 [component.gecko-terminal]
 source = "../target/wasm32-wasip1/release/gecko_terminal.wasm"
 allowed_outbound_hosts = ["https://api.geckoterminal.com"]
