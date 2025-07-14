@@ -202,7 +202,7 @@ pub struct BatchedAggregatesToSend {
     pub updates: Vec<VotedFeedUpdate>,
 }
 
-#[derive(Debug, Clone, Default, Serialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct EncodedBatchedAggregatesToSend {
     pub block_height: u64,
     pub updates: Vec<EncodedVotedFeedUpdate>,

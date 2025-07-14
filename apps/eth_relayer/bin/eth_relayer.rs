@@ -41,7 +41,7 @@ async fn main() -> Result<()> {
     let collected_futures: FuturesUnordered<JoinHandle<Result<(), Error>>> =
         FuturesUnordered::new();
 
-    let updates_reader = updates_reader_loop().await;
+    let updates_reader = updates_reader_loop(feeds_config).await;
 
     let provider_status: HashMap<String, ProviderStatus> = eth_relayer_config
         .providers
