@@ -8,6 +8,7 @@ let
   readJson = path: builtins.fromJSON (builtins.readFile path);
 
   testKeysDir = config.devenv.root + "/nix/test-environments/test-keys";
+  e2eTestKeysDir = config.devenv.root + "/apps/e2e-tests/test-keys";
   deploymentV2FilePath = config.devenv.root + "/config/evm_contracts_deployment_v2/ink-sepolia.json";
 
   upgradeableProxyADFSContractAddressInk =
@@ -203,6 +204,15 @@ in
     };
 
     reporters.a.default-exec-interval = lib.mkForce 10;
+    reporters.a.api-keys = lib.mkForce {
+      ALPHAVANTAGE_API_KEY = "${e2eTestKeysDir}/ALPHAVANTAGE_API_KEY";
+      APCA_API_KEY_ID = "${e2eTestKeysDir}/APCA_API_KEY_ID";
+      APCA_API_SECRET_KEY = "${e2eTestKeysDir}/APCA_API_SECRET_KEY";
+      YAHOO_FINANCE_API_KEY = "${e2eTestKeysDir}/YAHOO_FINANCE_API_KEY";
+      TWELVEDATA_API_KEY = "${e2eTestKeysDir}/TWELVEDATA_API_KEY";
+      FMP_API_KEY = "${e2eTestKeysDir}/FMP_API_KEY";
+      SPOUT_RWA_API_KEY = "${e2eTestKeysDir}/SPOUT_RWA_API_KEY";
+    };
 
     oracles = {
       cex-price-feeds.exec-interval = lib.mkForce 10;
