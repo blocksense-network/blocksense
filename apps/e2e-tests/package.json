@@ -5,7 +5,7 @@
   "scripts": {
     "ts": "yarn node --import tsx",
     "test": "yarn vitest -w false",
-    "test:e2e": "yarn test src/e2e.spec.ts"
+    "test:process-compose-e2e": "yarn test src/process-compose/e2e.spec.ts"
   },
   "dependencies": {
     "@blocksense/base-utils": "workspace:*",
