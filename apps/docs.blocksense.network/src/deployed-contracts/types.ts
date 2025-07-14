@@ -1,23 +1,34 @@
 import { Schema as S } from 'effect';
 
-import { ethereumAddress, networkName } from '@blocksense/base-utils/evm';
+import {
+  ethereumAddress,
+  NetworkName,
+  networkName,
+} from '@blocksense/base-utils/evm';
 import { DeploymentConfigSchemaV2 } from '@blocksense/config-types';
 
 const CoreContractSchema = S.mutable(
   S.Struct({
     contract: S.String,
     address: ethereumAddress,
-    networks: S.mutable(S.Array(networkName)),
   }),
 );
 
 export type CoreContract = typeof CoreContractSchema.Type;
 
-export const decodeCoreContract = S.decodeUnknownSync(CoreContractSchema);
-
-export const decodeCoreContracts = S.decodeUnknownSync(
-  S.mutable(S.Array(CoreContractSchema)),
+const CoreContractsPerNetworkSchema = S.mutable(
+  S.Struct({
+    contracts: S.mutable(S.Array(CoreContractSchema)),
+    network: networkName,
+  }),
 );
+
+export type CoreContractsPerNetwork = typeof CoreContractsPerNetworkSchema.Type;
+
+export type CoreContractsDataAndNetworks = {
+  contracts: (CoreContractsPerNetwork | undefined)[];
+  networks: NetworkName[];
+};
 
 const ProxyContractDataSchema = S.mutable(
   S.Struct({
