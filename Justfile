@@ -42,10 +42,13 @@ build-environment environment="all":
 
 [group('Working with process-compose environments')]
 [doc('Start a process-compose environment. This command depends on building blocksense and the environment first')]
-start-environment environment="example-setup-01": build-blocksense (build-environment environment)
+start-environment environment *pc-flags: build-blocksense (build-environment environment)
   #!/usr/bin/env bash
   PC_FILE="{{process-compose-artifacts-dir}}/{{environment}}/process-compose.yaml"
-  process-compose -f "$PC_FILE"
+  process-compose up {{pc-flags}} -f "$PC_FILE"
+
+stop-environment:
+  process-compose down
 
 [group('Working with typescript')]
 [doc('Build single TypeScript package or all packages')]
@@ -69,6 +72,9 @@ test-ts:
   yarn test-single @blocksense/base-utils
   yarn test-single @blocksense/config-types
   yarn test-single @blocksense/data-feeds-config-generator
+
+test-e2e:
+  yarn workspace @blocksense/e2e-tests run test:e2e
 
 [group('Working with oracles')]
 [doc('Build a specific oracle')]
