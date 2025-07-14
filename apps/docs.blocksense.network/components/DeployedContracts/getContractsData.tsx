@@ -4,39 +4,43 @@ import { entriesOf } from '@blocksense/base-utils/array-iter';
 import { DeploymentConfigV2 } from '@blocksense/config-types';
 import {
   CoreContract,
+  CoreContractsDataAndNetworks,
+  CoreContractsPerNetwork,
   decodeDeploymentConfigArray,
   ProxyContractData,
 } from '@/src/deployed-contracts/types';
+import { NetworkName } from '@blocksense/base-utils/evm/networks';
 
-const getCoreContractsData = (networksData: DeploymentConfigV2[]) => {
-  const parsedCoreContracts: CoreContract[] = [];
+const getCoreContractsData = (
+  networksData: DeploymentConfigV2[],
+): CoreContractsDataAndNetworks => {
+  const contractsData: (CoreContractsPerNetwork | undefined)[] =
+    networksData.map(data => {
+      if (!data) return;
+      const networkName = data.network;
+      if (networkName === 'local') return;
 
-  networksData.map(data => {
-    if (!data) return;
-    const networkName = data.network;
-    if (networkName === 'local') return;
-    const coreContracts = data.contracts.coreContracts;
-    const skipContracts = ['AccessControl', 'OnlySequencerGuard'];
+      const skipContracts = ['AccessControl', 'OnlySequencerGuard'];
+      const coreContracts = entriesOf(data.contracts.coreContracts)
+        .filter(([name, _contract]) => {
+          // Filter out contracts that are not relevant for the docs
+          return !skipContracts.includes(name);
+        })
+        .map(([name, contract]): CoreContract => {
+          return {
+            contract: name,
+            address: contract.address,
+          };
+        });
 
-    Object.entries(coreContracts).forEach(([contractName, contractsData]) => {
-      const existingContract = parsedCoreContracts.find(
-        contract => contract.contract === contractName,
-      );
-
-      if (existingContract) {
-        existingContract.networks.push(networkName);
-      } else {
-        if (contractsData && !skipContracts.includes(contractName)) {
-          parsedCoreContracts.push({
-            contract: contractName,
-            address: contractsData.address,
-            networks: [networkName],
-          });
-        }
-      }
+      return {
+        contracts: coreContracts,
+        network: networkName as NetworkName,
+      };
     });
-  });
-  return parsedCoreContracts;
+
+  const networks = contractsData.map(data => data!.network);
+  return { contracts: contractsData, networks };
 };
 
 const getProxyContractsContent = (networksData: DeploymentConfigV2[]) => {
@@ -66,7 +70,7 @@ const getProxyContractsContent = (networksData: DeploymentConfigV2[]) => {
 };
 
 export function getContractsData(): {
-  parsedCoreContracts: CoreContract[];
+  parsedCoreContracts: CoreContractsDataAndNetworks;
   parsedProxyContracts: ProxyContractData[];
 } {
   const networksData = decodeDeploymentConfigArray(DEPLOYMENT_INFO);

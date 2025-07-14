@@ -7,7 +7,7 @@ import { parseNetworkName } from '@blocksense/base-utils/evm/networks';
 
 import { capitalizeWords } from '@/src/utils';
 import {
-  CoreContract,
+  CoreContractsDataAndNetworks,
   ProxyContractData,
 } from '@/src/deployed-contracts/types';
 import { DataTable } from '@/components/common/DataTable/DataTable';
@@ -23,7 +23,7 @@ import {
 } from '../common/DataTable/dataTableUtils';
 
 type DeployedContractsProps = {
-  parsedCoreContracts: CoreContract[];
+  parsedCoreContracts: CoreContractsDataAndNetworks;
   parsedProxyContracts: ProxyContractData[];
 };
 
@@ -42,9 +42,7 @@ export const DeployedContracts = ({
       return;
     }
 
-    const network =
-      networkFromHash &&
-      deployedCoreContracts[0].networks.find(n => n === networkFromHash);
+    const network = networkFromHash;
 
     if (network) {
       setSelectedNetwork(network);
@@ -74,7 +72,7 @@ export const DeployedContracts = ({
           network to view detailed information about the deployed contracts.
         </Callout>
         <div className="flex flex-wrap justify-center gap-4 pt-4">
-          {deployedCoreContracts[0].networks.map(network => (
+          {deployedCoreContracts.networks.map(network => (
             <NetworkIcon
               key={network}
               network={network}
@@ -91,7 +89,7 @@ export const DeployedContracts = ({
           <ContractItemWrapper
             title="Core Contracts"
             titleLevel={2}
-            itemsLength={deployedCoreContracts.length}
+            itemsLength={deployedCoreContracts.contracts.length}
           >
             <Callout type="info" emoji="💡">
               <span>
@@ -110,18 +108,19 @@ export const DeployedContracts = ({
               </span>
             </Callout>
             <div className="container px-0">
-              {deployedCoreContracts.map(contract => (
-                <CoreContractCard
-                  key={contract.address}
-                  contract={{
-                    name: contract.contract,
-                    address: contract.address,
-                    networks: contract.networks.filter(
-                      network => network === parseNetworkName(selectedNetwork),
-                    ),
-                  }}
-                />
-              ))}
+              {deployedCoreContracts.contracts
+                .filter(c => c !== undefined)
+                .filter(c => c.network === parseNetworkName(selectedNetwork))[0]
+                .contracts.map(contract => (
+                  <CoreContractCard
+                    key={contract.address}
+                    contract={{
+                      name: contract.contract,
+                      address: contract.address,
+                      network: parseNetworkName(selectedNetwork),
+                    }}
+                  />
+                ))}
             </div>
           </ContractItemWrapper>
           <div className="mt-6">
