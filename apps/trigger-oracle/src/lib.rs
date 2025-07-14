@@ -319,10 +319,6 @@ impl TriggerExecutor for OracleTrigger {
                 );
             }
         }
-        tracing::debug!(
-            "Components: {}",
-            &serde_json::to_string_pretty(&components).unwrap(),
-        );
         tracing::trace!("Starting oracle scripts");
         let mut loops: Vec<_> = self
             .queue_components
