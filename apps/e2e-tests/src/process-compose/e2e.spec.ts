@@ -1,17 +1,16 @@
 import { deepStrictEqual } from 'assert';
+import { execa } from 'execa';
 import { afterAll, beforeAll, describe, expect, test } from 'vitest';
 
 import { loopWhile, sleep } from '@blocksense/base-utils/async';
+import { getProcessComposeLogsFiles } from '@blocksense/base-utils/env';
 
 import {
   parseProcessesStatus,
   startEnvironment,
   stopEnvironment,
-} from './utils/process-compose';
-
+} from './helpers';
 import { expectedPCStatuses03 } from './expected';
-import { execa } from 'execa';
-import { getProcessComposeLogsFiles } from '@blocksense/base-utils/env';
 
 describe.sequential('E2E Tests with process-compose', async () => {
   beforeAll(async () => {

@@ -74,7 +74,7 @@ test-ts:
   yarn test-single @blocksense/data-feeds-config-generator
 
 test-e2e:
-  yarn workspace @blocksense/e2e-tests run test:e2e
+  yarn workspace @blocksense/e2e-tests run test
 
 [group('Working with oracles')]
 [doc('Build a specific oracle')]

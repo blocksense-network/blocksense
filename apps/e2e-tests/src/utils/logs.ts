@@ -34,12 +34,3 @@ export function logMessage(
   )({ maxWidth: width || 80 });
   logLevelConfig[level].logFunction(rendered.join('\n'));
 }
-
-export function logTestEnvironmentInfo(status: 'Starting' | 'Stopping'): void {
-  const time = new Date();
-  logMessage(
-    'info',
-    `${status} test environment`,
-    `${status} time: ${time.toDateString()} ${time.toTimeString()}`,
-  );
-}

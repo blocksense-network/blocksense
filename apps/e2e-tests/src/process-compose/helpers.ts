@@ -1,6 +1,8 @@
 import { ParseResult, Schema as S } from 'effect';
 import { $ } from 'execa';
-import { logTestEnvironmentInfo } from './logs';
+
+import { logMessage } from '../utils/logs';
+
 import { arrayToObject } from '@blocksense/base-utils/array-iter';
 
 const ProcessComposeStatusSchema = S.mutable(
@@ -37,11 +39,23 @@ export async function parseProcessesStatus() {
 }
 
 export async function startEnvironment(testEnvironment: string): Promise<void> {
-  logTestEnvironmentInfo('Starting');
+  logTestEnvironmentInfo('Starting', testEnvironment);
   await $`just start-environment ${testEnvironment} --detached`;
 }
 
 export async function stopEnvironment(): Promise<void> {
   logTestEnvironmentInfo('Stopping');
   await $`just stop-environment`;
+}
+
+export function logTestEnvironmentInfo(
+  status: 'Starting' | 'Stopping',
+  name?: string,
+): void {
+  const time = new Date();
+  logMessage(
+    'info',
+    `${status} test environment ${name}`,
+    `${status} time: ${time.toDateString()} ${time.toTimeString()}`,
+  );
 }
