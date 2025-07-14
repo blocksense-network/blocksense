@@ -1,6 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "rootDir": ".", // instead of "./src"
+    "outDir": "./dist",
     // consider enabling it globally
     "downlevelIteration": true,
     "exactOptionalPropertyTypes": true,
@@ -10,6 +12,7 @@
       "@template/cli/*": ["./src/*.js"]
     }
   },
+  "include": ["src", "utils"],
   "exclude": ["dist"],
   "references": [
     { "path": "tsconfig.src.json" },

@@ -1,15 +1,13 @@
 import { beforeAll, describe, expect, test } from '@effect/vitest';
 import type { AccountWallet, PXE } from '@aztec/aztec.js';
-import { getInitialTestAccountsWallets } from '@aztec/accounts/testing';
-import { setupSandbox } from '../src/utils';
 
 let pxe: PXE;
 let _wallets: Array<AccountWallet> = [];
 
 beforeAll(async () => {
-  pxe = await setupSandbox();
 
-  _wallets = await getInitialTestAccountsWallets(pxe);
+  pxe = setupSandbox()
+
 });
 
 describe('AVM Relayer', () => {
