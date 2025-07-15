@@ -15,7 +15,7 @@ export const Enums = ({ enums = [], isFromSourceUnit }: EnumsProps) => {
     <ContractItemWrapper
       title="Enums"
       titleLevel={isFromSourceUnit ? 2 : 3}
-      itemsLength={enums.length}
+      nonEmpty={!!enums.length}
     >
       <ContractAccordion elementsNames={getContractElementsNames(enums)}>
         {enums.map(_enum => (

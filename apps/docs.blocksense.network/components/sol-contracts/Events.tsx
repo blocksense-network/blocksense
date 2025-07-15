@@ -17,7 +17,7 @@ export const Events = ({ events = [] }: EventsProps) => {
     <ContractItemWrapper
       title="Events"
       titleLevel={3}
-      itemsLength={events.length}
+      nonEmpty={!!events.length}
     >
       <ContractAccordion elementsNames={getContractElementsNames(events)}>
         {events.map(event => (

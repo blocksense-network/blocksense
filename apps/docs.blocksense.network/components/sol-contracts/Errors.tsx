@@ -19,7 +19,7 @@ export const Errors = ({ errors = [], isFromSourceUnit }: ErrorsProps) => {
     <ContractItemWrapper
       title="Errors"
       titleLevel={isFromSourceUnit ? 2 : 3}
-      itemsLength={errors.length}
+      nonEmpty={!!errors.length}
     >
       <ContractAccordion elementsNames={getContractElementsNames(errors)}>
         {errors?.map(error => (

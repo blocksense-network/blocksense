@@ -6,7 +6,7 @@ import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrap
 export const DataFeedsOverview = () => {
   return (
     <section className="mt-4">
-      <ContractItemWrapper title="Data Feeds" titleLevel={2} itemsLength={1}>
+      <ContractItemWrapper title="Data Feeds" titleLevel={2} nonEmpty>
         <article className="mt-4 mb-6">
           <p className="mt-4">
             Blocksense offers a platform to securely collect and integrate

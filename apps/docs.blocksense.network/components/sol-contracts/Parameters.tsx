@@ -72,7 +72,7 @@ export const Parameters = ({
 }: ParametersProps) => {
   return (
     <ContractItemWrapper
-      itemsLength={parameters?.length}
+      nonEmpty={!!parameters?.length}
       title={title}
       parentTitle={parentTitle}
       titleLevel={titleLevel}
