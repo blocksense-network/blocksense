@@ -28,7 +28,7 @@ const networks = [
   'avalanche-fuji',
   'base-mainnet',
   'base-sepolia',
-  'basecamp',
+  'basecamp-testnet',
   'berachain-mainnet',
   'berachain-bepolia',
   'bitlayer-mainnet',
@@ -426,7 +426,7 @@ export const networkMetadata = {
     ],
     currency: Currency.ETH,
   },
-  basecamp: {
+  'basecamp-testnet': {
     chainId: 123420001114,
     isTestnet: true,
     explorers: [
