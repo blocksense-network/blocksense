@@ -24,7 +24,7 @@ export const FunctionModifiers = ({
     <ContractItemWrapper
       title="Function Modifiers"
       titleLevel={4}
-      itemsLength={functionModifiers?.length}
+      nonEmpty={!!functionModifiers?.length}
     >
       <Table className="contract-item-wrapper__table-component">
         <TableCaption className="contract-item-wrapper__table-caption">

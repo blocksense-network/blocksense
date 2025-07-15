@@ -62,11 +62,7 @@ export const DeployedContracts = ({
 
   return (
     <section className="mt-4">
-      <ContractItemWrapper
-        title="Supported Networks"
-        titleLevel={2}
-        itemsLength={1}
-      >
+      <ContractItemWrapper title="Supported Networks" titleLevel={2} nonEmpty>
         <Callout type="info" emoji="💡">
           We have deployed our contracts on the following networks. Select a
           network to view detailed information about the deployed contracts.
@@ -89,7 +85,7 @@ export const DeployedContracts = ({
           <ContractItemWrapper
             title="Core Contracts"
             titleLevel={2}
-            itemsLength={deployedCoreContracts.contracts.length}
+            nonEmpty={!!deployedCoreContracts.contracts.length}
           >
             <Callout type="info" emoji="💡">
               <span>
@@ -127,7 +123,7 @@ export const DeployedContracts = ({
             <ContractItemWrapper
               title="Chainlink Aggregator Adapter Contracts"
               titleLevel={2}
-              itemsLength={deployedProxyContracts.length}
+              nonEmpty={!!deployedProxyContracts.length}
             >
               <Callout type="info" emoji="💡">
                 Blocksense aggregator proxy contracts table allows users to

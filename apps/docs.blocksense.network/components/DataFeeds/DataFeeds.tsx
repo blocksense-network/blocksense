@@ -18,7 +18,7 @@ export const DataFeeds = ({
       <ContractItemWrapper
         title={feedsType}
         titleLevel={2}
-        itemsLength={feeds.length}
+        nonEmpty={!!feeds.length}
       >
         <DataFeedsTable feeds={feeds} />
       </ContractItemWrapper>

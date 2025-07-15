@@ -16,7 +16,7 @@ export const Modifiers = ({ modifiers = [] }: ModifiersProps) => {
     <ContractItemWrapper
       title="Modifiers"
       titleLevel={3}
-      itemsLength={modifiers.length}
+      nonEmpty={!!modifiers.length}
     >
       <ContractAccordion elementsNames={getContractElementsNames(modifiers)}>
         {modifiers.map(modifier => (
