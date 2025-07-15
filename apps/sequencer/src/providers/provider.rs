@@ -517,7 +517,7 @@ impl RpcProvider {
     pub fn is_deployed(&self, name: &str) -> bool {
         for c in &self.contracts {
             if c.name == name {
-                return c.deployed_byte_code.is_some();
+                return c.address.is_some();
             }
         }
         false
