@@ -6,7 +6,7 @@ export const deployedNetworks = [
   'aurora-testnet',
   'avalanche-fuji',
   'base-sepolia',
-  'basecamp',
+  'basecamp-testnet',
   'berachain-bepolia',
   'bitlayer-testnet',
   'blast-sepolia',
