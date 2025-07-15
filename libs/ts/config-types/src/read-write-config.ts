@@ -58,20 +58,32 @@ export function readEvmDeployment(
   );
 }
 
+export function listEvmNetworks(
+  excludedNetworks: NetworkName[] = [],
+): Promise<NetworkName[]> {
+  const { readDir } = selectDirectory(configDirs.evm_contracts_deployment_v2);
+  return readDir().then(files =>
+    files
+      .map(file => parseNetworkName(file.replace(/\.json$/, '')))
+      .filter(network => !excludedNetworks.includes(network)),
+  );
+}
+
 export async function readAllEvmDeployments(
   excludedNetworks: NetworkName[],
 ): Promise<Record<NetworkName, DeploymentConfigV2>> {
-  const { readAllJSONFiles } = selectDirectory(
+  const networks = await listEvmNetworks(excludedNetworks);
+
+  const { decodeJSON } = selectDirectory(
     configDirs.evm_contracts_deployment_v2,
   );
+
   const result = {} as Record<NetworkName, DeploymentConfigV2>;
-  for (const { base, content } of await readAllJSONFiles()) {
-    const network = parseNetworkName(base.replace(/\.json$/, ''));
-    if (excludedNetworks.includes(network)) {
-      continue;
-    }
-    const data = S.decodeUnknownSync(DeploymentConfigSchemaV2)(content);
-    result[network] = data;
+  for (const network of networks) {
+    result[network] = await decodeJSON(
+      { name: network },
+      DeploymentConfigSchemaV2,
+    );
   }
   return result;
 }
