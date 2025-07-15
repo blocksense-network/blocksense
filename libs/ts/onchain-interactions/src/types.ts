@@ -31,7 +31,6 @@ export const deployedNetworks = [
   'inevm-testnet',
   'ink-sepolia',
   'kava-testnet',
-  'kroma-sepolia',
   'kusama-moonbase-alpha',
   'linea-sepolia',
   'lisk-sepolia',
