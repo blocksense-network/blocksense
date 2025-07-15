@@ -76,7 +76,7 @@ const networks = [
   'linea-sepolia',
   'lisk-sepolia',
   'lumia-mainnet',
-  'lumia-testnet',
+  'lumia-beam-testnet',
   'manta-mainnet',
   'manta-sepolia',
   'mantle-mainnet',
@@ -144,7 +144,7 @@ const chainIds = [
   81457, 168587773, 56288, 9728, 288, 28882, 56, 97, 325000, 42220, 44787, 5115,
   66665, 338, 111557560, 18880, 839999, 250, 4002, 114, 252, 2522, 10888, 100,
   10200, 1666700000, 743111, 560048, 1663, 998, 2424, 57073, 763373, 2221, 2358,
-  1284, 1287, 1285, 59144, 59141, 4202, 994873017, 1952959480, 169, 3441006,
+  1284, 1287, 1285, 59144, 59141, 4202, 994873017, 2030232745, 169, 3441006,
   5000, 5003, 1740, 59902, 6342, 31611, 10143, 2818, 2810, 72080, 8801, 5851,
   10, 11155420, 5611, 7849306, 50002, 688688, 9746, 98866, 98867, 137, 80002,
   1101, 2442, 11155931, 57000, 200018, 31, 534352, 534351, 11011, 5031, 50312,
@@ -1019,14 +1019,14 @@ export const networkMetadata = {
     ],
     currency: Currency.LUMIA,
   },
-  'lumia-testnet': {
-    chainId: 1952959480,
+  'lumia-beam-testnet': {
+    chainId: 2030232745,
     isTestnet: true,
     explorers: [
       {
         type: 'blockscout',
-        webUrl: 'https://testnet-explorer.lumia.org',
-        apiUrl: 'https://testnet-explorer.lumia.org/api',
+        webUrl: 'https://beam-explorer.lumia.org',
+        apiUrl: 'https://beam-explorer.lumia.org/api',
       },
     ],
     currency: Currency.LUMIA,

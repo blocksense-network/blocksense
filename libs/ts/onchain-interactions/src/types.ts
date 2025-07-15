@@ -35,7 +35,6 @@ export const deployedNetworks = [
   'kusama-moonbase-alpha',
   'linea-sepolia',
   'lisk-sepolia',
-  'lumia-testnet',
   'manta-sepolia',
   'mantle-sepolia',
   'megaeth-testnet',
