@@ -1,17 +1,15 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { Callout } from '@blocksense/docs-ui/Callout';
-import { parseNetworkName } from '@blocksense/base-utils/evm/networks';
+import {
+  NetworkName,
+  isNetworkName,
+} from '@blocksense/base-utils/evm/networks';
 
 import { capitalizeWords } from '@/src/utils';
-import {
-  CoreContractsDataAndNetworks,
-  ProxyContractData,
-} from '@/src/deployed-contracts/types';
 import { DataTable } from '@/components/common/DataTable/DataTable';
-import { columns as proxyContractsColumns } from '@/components/DeployedContracts/proxyContractsColumns';
 import { ContractItemWrapper } from '@/components/sol-contracts/ContractItemWrapper';
 import { CoreContractCard } from '@/components/DeployedContracts/CoreContractCard';
 import { NetworkIcon } from '@/components/DeployedContracts/NetworkIcon';
@@ -21,42 +19,54 @@ import {
   cellHaveContent,
   DataRowType,
 } from '../common/DataTable/dataTableUtils';
+import { DeploymentConfigV2 } from '@blocksense/config-types';
+import { entriesOf, keysOf } from '@blocksense/base-utils/array-iter';
+import { DataTableBadge } from '../common/DataTable/DataTableBadge';
+import { DataTableColumnHeader } from '../common/DataTable/DataTableColumnHeader';
+import { ContractAddress } from '../sol-contracts/ContractAddress';
 
 type DeployedContractsProps = {
-  parsedCoreContracts: CoreContractsDataAndNetworks;
-  parsedProxyContracts: ProxyContractData[];
+  networks: NetworkName[];
+  deploymentInfo: Record<NetworkName, DeploymentConfigV2>;
 };
 
 export const DeployedContracts = ({
-  parsedCoreContracts: deployedCoreContracts,
-  parsedProxyContracts: deployedProxyContracts,
+  networks,
+  deploymentInfo,
 }: DeployedContractsProps) => {
-  const [selectedNetwork, setSelectedNetwork] = useState('');
+  const [selectedNetwork, setSelectedNet] = useState<NetworkName | null>(null);
   const contractsRef = useRef<HTMLDivElement | null>(null);
   const { hash, setNewHash } = useHash();
 
   useEffect(() => {
-    const networkFromHash = hash.replace('#', '');
-    if (!networkFromHash) {
-      setSelectedNetwork('');
+    const network = hash.replace('#', '');
+    if (!isNetworkName(network)) {
+      setSelectedNet(null);
       return;
     }
 
-    const network = networkFromHash;
+    setSelectedNet(network);
+    setTimeout(() => {
+      contractsRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 500);
+  }, [hash]);
 
-    if (network) {
-      setSelectedNetwork(network);
-      setTimeout(() => {
-        contractsRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }, 500);
-    } else {
-      setSelectedNetwork('');
-    }
-  }, [deployedCoreContracts, hash]);
+  const networkInfo = selectedNetwork ? deploymentInfo[selectedNetwork] : null;
+
+  const proxyContracts = useMemo(() => {
+    if (!networkInfo) return [];
+    return Object.entries(networkInfo.contracts.CLAggregatorAdapter).map(
+      ([feedId, { address, constructorArgs }]) => ({
+        feedId,
+        name: constructorArgs[0],
+        address,
+      }),
+    );
+  }, [networkInfo]);
 
   function getRowLink(row: DataRowType) {
-    return dataFeedUrl && cellHaveContent(row.id)
-      ? `${dataFeedUrl}${row.id}${hash}`
+    return dataFeedUrl && cellHaveContent(row.feedId)
+      ? `${dataFeedUrl}${row.feedId}${hash}`
       : '';
   }
 
@@ -68,7 +78,7 @@ export const DeployedContracts = ({
           network to view detailed information about the deployed contracts.
         </Callout>
         <div className="flex flex-wrap justify-center gap-4 pt-4">
-          {deployedCoreContracts.networks.map(network => (
+          {networks.map(network => (
             <NetworkIcon
               key={network}
               network={network}
@@ -80,12 +90,12 @@ export const DeployedContracts = ({
           ))}
         </div>
       </ContractItemWrapper>
-      {selectedNetwork && (
+      {selectedNetwork && networkInfo && (
         <div ref={contractsRef}>
           <ContractItemWrapper
             title="Core Contracts"
             titleLevel={2}
-            nonEmpty={!!deployedCoreContracts.contracts.length}
+            nonEmpty={true}
           >
             <Callout type="info" emoji="💡">
               <span>
@@ -104,26 +114,27 @@ export const DeployedContracts = ({
               </span>
             </Callout>
             <div className="container px-0">
-              {deployedCoreContracts.contracts
-                .filter(c => c !== undefined)
-                .filter(c => c.network === parseNetworkName(selectedNetwork))[0]
-                .contracts.map(contract => (
+              {entriesOf(networkInfo.contracts.coreContracts).map(
+                ([name, { address }]) => (
                   <CoreContractCard
-                    key={contract.address}
+                    key={address}
                     contract={{
-                      name: contract.contract,
-                      address: contract.address,
-                      network: parseNetworkName(selectedNetwork),
+                      name,
+                      address,
+                      network: selectedNetwork,
                     }}
                   />
-                ))}
+                ),
+              )}
             </div>
           </ContractItemWrapper>
           <div className="mt-6">
             <ContractItemWrapper
               title="Chainlink Aggregator Adapter Contracts"
               titleLevel={2}
-              nonEmpty={!!deployedProxyContracts.length}
+              nonEmpty={
+                !!keysOf(networkInfo.contracts.CLAggregatorAdapter).length
+              }
             >
               <Callout type="info" emoji="💡">
                 Blocksense aggregator proxy contracts table allows users to
@@ -136,11 +147,44 @@ export const DeployedContracts = ({
                 {`${capitalizeWords(selectedNetwork)}`}
               </div>
               <DataTable
-                columns={proxyContractsColumns}
-                data={deployedProxyContracts.filter(
-                  element =>
-                    element.network === parseNetworkName(selectedNetwork),
-                )}
+                columns={[
+                  {
+                    id: 'id',
+                    title: 'Id',
+                    header: ({ column }) => (
+                      <DataTableColumnHeader title={column.title} />
+                    ),
+                    cell: ({ row }) => (
+                      <DataTableBadge>{row.feedId}</DataTableBadge>
+                    ),
+                  },
+                  {
+                    id: 'name',
+                    title: 'Data Feed',
+                    header: ({ column }) => (
+                      <DataTableColumnHeader title={column.title} />
+                    ),
+                    cell: ({ row }) => (
+                      <DataTableBadge>{row.name}</DataTableBadge>
+                    ),
+                  },
+                  {
+                    id: 'address',
+                    title: 'CL Aggregator Adapter',
+                    header: ({ column }) => (
+                      <DataTableColumnHeader title={column.title} />
+                    ),
+                    cell: ({ row }) => (
+                      <ContractAddress
+                        network={selectedNetwork}
+                        address={row.address}
+                        copyButton={{ enableCopy: true, background: false }}
+                        abbreviation={{ hasAbbreviation: false }}
+                      />
+                    ),
+                  },
+                ]}
+                data={proxyContracts}
                 filterCell="name"
                 getRowLink={getRowLink}
                 hasToolbar
