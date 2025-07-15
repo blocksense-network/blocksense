@@ -98,6 +98,7 @@ const networks = [
   'ozean-poseidon-testnet',
   'pharos-devnet',
   'pharos-testnet',
+  'plasma-testnet',
   'plume-mainnet',
   'plume-testnet',
   'polygon-mainnet',
@@ -145,9 +146,9 @@ const chainIds = [
   10200, 1666700000, 743111, 560048, 1663, 998, 2424, 57073, 763373, 2221, 2358,
   1284, 1287, 1285, 59144, 59141, 4202, 994873017, 1952959480, 169, 3441006,
   5000, 5003, 1740, 59902, 6342, 31611, 10143, 2818, 2810, 72080, 8801, 5851,
-  10, 11155420, 5611, 7849306, 50002, 688688, 98866, 98867, 137, 80002, 1101,
-  2442, 11155931, 57000, 200018, 31, 534352, 534351, 11011, 5031, 50312, 1868,
-  1946, 16, 146, 57054, 1660990954, 5330, 53302, 1924, 2391, 2390, 167000,
+  10, 11155420, 5611, 7849306, 50002, 688688, 9746, 98866, 98867, 137, 80002,
+  1101, 2442, 11155931, 57000, 200018, 31, 534352, 534351, 11011, 5031, 50312,
+  1868, 1946, 16, 146, 57054, 1660990954, 5330, 53302, 1924, 2391, 2390, 167000,
   167009, 5678, 842, 41, 130, 1301, 4801, 1417429182, 324, 300,
 ] as const;
 
@@ -242,6 +243,7 @@ export enum Currency {
   tZKJ = 'tZKJ',
   USDX = 'USDX',
   xDAI = 'xDAI',
+  XPL = 'XPL',
   Z = 'Z',
 }
 
@@ -1290,6 +1292,19 @@ export const networkMetadata = {
       },
     ],
     currency: Currency.PHRS,
+  },
+  'plasma-testnet': {
+    chainId: 9746,
+    isTestnet: true,
+    explorers: [
+      {
+        type: 'routescan',
+        webUrl: 'https://testnet.plasmascan.to',
+        apiUrl:
+          'https://api.routescan.io/v2/network/testnet/evm/9746/etherscan',
+      },
+    ],
+    currency: Currency.XPL,
   },
   'plume-mainnet': {
     chainId: 98866,
