@@ -326,30 +326,12 @@ impl RpcProvider {
             }
         });
         if let Some(adfs_address) = adfs_address_opt {
-            let multicall = self
-                .contracts
-                .iter()
-                .find_map(|x| {
-                    if x.name == MULTICALL_CONTRACT_NAME {
-                        x.address
-                    } else {
-                        None
-                    }
-                })
-                .ok_or_eyre(
-                    "Can't find MULTICALL contract address. Skipping loading or round counters",
-                )?;
             for feed in feeds_config.feeds.iter() {
                 let feed_id = feed.id;
                 let stride = feed.stride as u8;
-                let r = Self::get_latest_round_v2(
-                    multicall,
-                    adfs_address,
-                    &self.provider,
-                    &feed_id,
-                    stride,
-                )
-                .await?;
+                let r = self
+                    .get_latest_round_v2(adfs_address, &feed_id, stride)
+                    .await?;
                 if let Some(r) = r.first() {
                     let _v = res.insert(feed_id, r.round.into());
                 }
@@ -524,21 +506,17 @@ impl RpcProvider {
     }
 
     async fn get_latest_round_v2(
-        multicall: Address,
+        &self,
         adfs_address: Address,
-        provider: &ProviderType,
         feed_id: &u128,
         stride: u8,
     ) -> Result<Vec<LatestRound>, eyre::Error> {
-        let contract = MulticallInstance::new(multicall, provider.clone());
-
         let calldata: Vec<Multicall::Call> = vec![Multicall::Call {
             target: adfs_address,
             callData: LatestRound::calldata(*feed_id, stride),
         }];
-        let aggregate_return = contract.aggregate(calldata).call().await?;
-        let latest_rounds: Vec<LatestRound> = aggregate_return
-            .returnData
+        let return_data = self.invoke_multicall(&calldata).await?;
+        let latest_rounds: Vec<LatestRound> = return_data
             .into_iter()
             .map(|data| LatestRound::new(*feed_id, &data.0))
             .collect();
@@ -546,21 +524,28 @@ impl RpcProvider {
     }
 
     pub async fn get_latest_round(&self, feed_id: &u128) -> Result<Vec<LatestRound>, eyre::Error> {
-        let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
         let adfs_address = self.get_contract_address(ADFS_CONTRACT_NAME)?;
         let Some(variant) = self.feeds_variants.get(feed_id) else {
             return Err(eyre!(
                 "Unknown variant and number of digits for feed with id = {feed_id}"
             ));
         };
-        Self::get_latest_round_v2(
-            multicall,
-            adfs_address,
-            &self.provider,
-            feed_id,
-            variant.stride,
-        )
-        .await
+        self.get_latest_round_v2(adfs_address, feed_id, variant.stride)
+            .await
+    }
+
+    pub async fn invoke_multicall(&self, calls: &[Multicall::Call]) -> Result<Vec<Bytes>> {
+        let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
+        let contract = MulticallInstance::new(multicall, self.provider.clone());
+        let chunk_size = self.limit_multicall_data_calls;
+        let chunks: Vec<Vec<Multicall::Call>> =
+            calls.chunks(chunk_size).map(|x| x.to_vec()).collect();
+        let mut res = vec![];
+        for calldata in chunks {
+            let mut aggregate_return = contract.aggregate(calldata).call().await?;
+            res.append(&mut aggregate_return.returnData);
+        }
+        Ok(res)
     }
 
     pub async fn get_latest_values(
@@ -605,8 +590,6 @@ impl RpcProvider {
                     ))
                 }
             };
-        let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
-        let contract = MulticallInstance::new(multicall, self.provider.clone());
         let calldata: Vec<Multicall::Call> = feed_ids
             .iter()
             .map(|feed_id| Multicall::Call {
@@ -614,9 +597,9 @@ impl RpcProvider {
                 callData: calldata_for_values(*feed_id),
             })
             .collect();
-        let aggregate_return = contract.aggregate(calldata).call().await?;
-        let res = aggregate_return
-            .returnData
+
+        let mutlicall_return_data = self.invoke_multicall(&calldata).await?;
+        let res = mutlicall_return_data
             .into_iter()
             .enumerate()
             .map(|(count, data)| latest(feed_ids[count], variants[count].clone(), &data.0))
@@ -662,51 +645,20 @@ impl RpcProvider {
                 return Err(eyre!("Unknown contract version when trying to fetch get_historical_values_for_feed {feed_id}!" ));
             }
         };
-        let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
-        let contract = MulticallInstance::new(multicall, self.provider.clone());
-        let chunk_size = self.limit_multicall_data_calls;
-        let chunks: Vec<Vec<u128>> = updates.chunks(chunk_size).map(|x| x.to_vec()).collect();
-        let mut res = vec![];
-        for chunk in chunks {
-            let calldata: Vec<Multicall::Call> = chunk
-                .iter()
-                .map(|update| Multicall::Call {
-                    target: data_feed,
-                    callData: Bytes::copy_from_slice(&nth_calldata(
-                        feed_id,
-                        variant.stride,
-                        *update,
-                    )),
-                })
-                .collect();
-            let call_result = contract.aggregate(calldata).call().await;
-            let mut chunk_results = match call_result {
-                Ok(aggregate_return) => {
-                    let chunk_results: Vec<_> = aggregate_return
-                        .returnData
-                        .into_iter()
-                        .enumerate()
-                        .map(|(count, data)| {
-                            nth_result(feed_id, updates[count], variant.clone(), &data.0)
-                        })
-                        .collect();
-                    chunk_results
-                }
-                Err(err) => {
-                    let message = err.to_string();
-                    let chunk_errors = chunk
-                        .iter()
-                        .map(|update| {
-                            Err(PublishedFeedUpdate::error_num_update(
-                                feed_id, &message, *update,
-                            ))
-                        })
-                        .collect();
-                    chunk_errors
-                }
-            };
-            res.append(&mut chunk_results);
-        }
+        let calldata: Vec<Multicall::Call> = updates
+            .iter()
+            .map(|update| Multicall::Call {
+                target: data_feed,
+                callData: Bytes::copy_from_slice(&nth_calldata(feed_id, variant.stride, *update)),
+            })
+            .collect();
+
+        let mutlicall_return_data = self.invoke_multicall(&calldata).await?;
+        let res = mutlicall_return_data
+            .into_iter()
+            .enumerate()
+            .map(|(count, data)| nth_result(feed_id, updates[count], variant.clone(), &data.0))
+            .collect();
         Ok(res)
     }
 
