@@ -1,5 +1,5 @@
 {
-  "network": "basecamp",
+  "network": "basecamp-testnet",
   "chainId": "123420001114",
   "contracts": {
     "coreContracts": {
