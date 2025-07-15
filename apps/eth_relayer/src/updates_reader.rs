@@ -1,33 +1,36 @@
 use std::io::Error;
+use std::sync::Arc;
 
-use alloy_primitives::map::HashMap;
-use blocksense_config::AllFeedsConfig;
+use blocksense_config::EthRelayerConfig;
 use blocksense_data_feeds::feeds_processing::{
     BatchedAggregatesToSend, EncodedBatchedAggregatesToSend, VotedFeedUpdate,
 };
-use blocksense_feed_registry::types::FeedType;
+use blocksense_feed_registry::types::{FeedType, Repeatability};
 use blocksense_registry::config::FeedConfig;
 use blocksense_utils::FeedId;
 use futures::StreamExt;
 use rdkafka::consumer::Consumer;
 use rdkafka::Message;
+use std::collections::HashMap;
 
 use rdkafka::{consumer::StreamConsumer, message::BorrowedMessage, ClientConfig};
+use tokio::sync::mpsc::UnboundedSender;
+use tokio::sync::RwLock;
 use tracing::{debug, error, info, warn};
 
+use crate::providers::eth_send_utils::{eth_batch_send_to_all_contracts, BatchOfUpdatesToProcess};
+use crate::providers::provider::SharedRpcProviders;
+
 pub async fn updates_reader_loop(
-    feeds_config: AllFeedsConfig,
+    providers: SharedRpcProviders,
+    eth_relayer_config: Arc<RwLock<EthRelayerConfig>>,
+    active_feeds: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
+    relayers_send_channels: Arc<RwLock<HashMap<String, UnboundedSender<BatchOfUpdatesToProcess>>>>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
         .name("updates_reader_loop")
         .spawn(async move {
             let kafka_report_endpoint = "127.0.0.1:9092";
-
-            let active_feeds: HashMap<FeedId, FeedConfig> = feeds_config
-                .feeds
-                .into_iter()
-                .map(|feed| (feed.id, feed))
-                .collect();
 
             // Configure the Kafka consumer
             let consumer: StreamConsumer = ClientConfig::new()
@@ -51,7 +54,14 @@ pub async fn updates_reader_loop(
                 if let Some(message_result) = message_stream.next().await {
                     match message_result {
                         Ok(message) => {
-                            process_msg_from_stream(&active_feeds, message).await;
+                            process_msg_from_stream(
+                                &active_feeds,
+                                &providers,
+                                &eth_relayer_config,
+                                &relayers_send_channels,
+                                message,
+                            )
+                            .await;
                         }
                         Err(err) => {
                             // Handle message errors
@@ -65,7 +75,10 @@ pub async fn updates_reader_loop(
 }
 
 async fn process_msg_from_stream(
-    active_feeds: &HashMap<FeedId, FeedConfig>,
+    active_feeds: &Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
+    providers: &SharedRpcProviders,
+    eth_relayer_config: &Arc<RwLock<EthRelayerConfig>>,
+    relayers_send_channels: &Arc<RwLock<HashMap<String, UnboundedSender<BatchOfUpdatesToProcess>>>>,
     message: BorrowedMessage<'_>,
 ) {
     // Process the message
@@ -91,7 +104,9 @@ async fn process_msg_from_stream(
                             let feed_id = v.feed_id;
                             let end_slot_timestamp = v.end_slot_timestamp;
                             debug!("Acquiring a read lock on feeds_config; feed_id={feed_id}");
-                            let Some(feed_config) = active_feeds.get(&feed_id).cloned() else {
+                            let Some(feed_config) =
+                                active_feeds.read().await.get(&feed_id).cloned()
+                            else {
                                 continue;
                             };
                             voted_feed_updates.push(VotedFeedUpdate {
@@ -121,6 +136,17 @@ async fn process_msg_from_stream(
                     },
                 };
                 info!("updates = {updates:?}");
+
+                eth_batch_send_to_all_contracts(
+                    &providers,
+                    &eth_relayer_config,
+                    updates,
+                    active_feeds,
+                    relayers_send_channels,
+                    Repeatability::Periodic,
+                )
+                .await
+                .unwrap();
             }
             Err(e) => {
                 warn!("Error parsing updates: {e}");

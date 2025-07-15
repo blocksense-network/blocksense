@@ -1,8 +1,12 @@
 use anyhow::Result;
 use blocksense_config::{get_eth_relayer_config, get_feeds_config};
 use blocksense_metrics::metrics::FeedsMetrics;
-use blocksense_utils::logging::{
-    get_log_level, init_shared_logging_handle, tokio_console_active, SharedLoggingHandle,
+use blocksense_registry::config::FeedConfig;
+use blocksense_utils::{
+    logging::{
+        get_log_level, init_shared_logging_handle, tokio_console_active, SharedLoggingHandle,
+    },
+    FeedId,
 };
 use eth_relayer::{
     providers::{
@@ -29,10 +33,21 @@ async fn main() -> Result<()> {
 
     let feeds_config = get_feeds_config();
 
+    let active_feeds: HashMap<FeedId, FeedConfig> = feeds_config
+        .clone()
+        .feeds
+        .into_iter()
+        .map(|feed| (feed.id, feed))
+        .collect();
+
+    let active_feeds = Arc::new(RwLock::new(active_feeds));
+
     let providers = init_shared_rpc_providers(&eth_relayer_config, None, &feeds_config).await;
 
     let (relayers_send_channels, relayers_recv_channels) =
         create_relayers_channels(&providers).await;
+
+    let relayers_send_channels = Arc::new(RwLock::new(relayers_send_channels));
 
     let feeds_metrics = Arc::new(RwLock::new(
         FeedsMetrics::new("").expect("Failed to allocate feed_metrics"),
@@ -41,7 +56,13 @@ async fn main() -> Result<()> {
     let collected_futures: FuturesUnordered<JoinHandle<Result<(), Error>>> =
         FuturesUnordered::new();
 
-    let updates_reader = updates_reader_loop(feeds_config).await;
+    let updates_reader = updates_reader_loop(
+        providers,
+        Arc::new(RwLock::new(eth_relayer_config.clone())),
+        active_feeds,
+        relayers_send_channels,
+    )
+    .await;
 
     let provider_status: HashMap<String, ProviderStatus> = eth_relayer_config
         .providers

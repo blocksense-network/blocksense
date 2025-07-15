@@ -1,3 +1,7 @@
+use crate::providers::provider::{
+    parse_eth_address, ProviderStatus, ProviderType, RpcProvider, SharedRpcProviders,
+    EVENT_FEED_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME,
+};
 use actix_web::rt::time::interval;
 use alloy::{
     hex,
@@ -7,24 +11,9 @@ use alloy::{
     rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
 use anyhow::{anyhow, bail, Result};
-use blocksense_config::{FeedStrideAndDecimals, SequencerConfig};
+use blocksense_config::EthRelayerConfig;
+use blocksense_config::FeedStrideAndDecimals;
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
-use blocksense_registry::config::FeedConfig;
-use blocksense_utils::{to_hex_string, FeedId};
-use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
-use tokio::{
-    sync::{
-        mpsc::{self, UnboundedReceiver, UnboundedSender},
-        Mutex, RwLock,
-    },
-    task::JoinHandle,
-    time::Duration,
-};
-
-use crate::providers::provider::{
-    parse_eth_address, ProviderStatus, ProviderType, RpcProvider, SharedRpcProviders,
-    EVENT_FEED_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME,
-};
 use blocksense_feed_registry::types::{Repeatability, Repeatability::Periodic};
 use blocksense_feeds_processing::adfs_gen_calldata::{
     adfs_serialize_updates, get_neighbour_feed_ids, RoundCounters,
@@ -34,8 +23,19 @@ use blocksense_metrics::{
     metrics::{FeedsMetrics, ProviderMetrics},
     process_provider_getter, set_metric,
 };
+use blocksense_registry::config::FeedConfig;
+use blocksense_utils::{to_hex_string, FeedId};
 use paste::paste;
 use std::time::Instant;
+use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
+use tokio::{
+    sync::{
+        mpsc::{self, UnboundedReceiver, UnboundedSender},
+        Mutex, RwLock,
+    },
+    task::JoinHandle,
+    time::Duration,
+};
 use tracing::{debug, error, info, info_span, warn};
 
 use futures_util::stream::FuturesUnordered;
@@ -1016,11 +1016,11 @@ pub async fn get_tx_retry_params(
 }
 
 pub async fn eth_batch_send_to_all_contracts(
-    providers: SharedRpcProviders,
-    sequencer_config: Arc<RwLock<SequencerConfig>>,
+    providers: &SharedRpcProviders,
+    eth_relayer_config: &Arc<RwLock<EthRelayerConfig>>,
     updates: BatchedAggregatesToSend,
-    feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
-    relayers_send_channels: Arc<RwLock<HashMap<String, UnboundedSender<BatchOfUpdatesToProcess>>>>,
+    feeds_config: &Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
+    relayers_send_channels: &Arc<RwLock<HashMap<String, UnboundedSender<BatchOfUpdatesToProcess>>>>,
     feed_type: Repeatability,
 ) -> Result<()> {
     let span = info_span!("eth_batch_send_to_all_contracts");
@@ -1036,9 +1036,9 @@ pub async fn eth_batch_send_to_all_contracts(
         let providers = providers.read().await;
         debug!("Acquired a read lock on providers");
 
-        debug!("Acquiring a read lock on sequencer_config");
-        let providers_config_guard = sequencer_config.read().await;
-        debug!("Acquired a read lock on sequencer_config");
+        debug!("Acquiring a read lock on eth_relayer_config");
+        let providers_config_guard = eth_relayer_config.read().await;
+        debug!("Acquired a read lock on eth_relayer_config");
         let providers_config = &providers_config_guard.providers;
 
         for (net, provider) in providers.iter() {
