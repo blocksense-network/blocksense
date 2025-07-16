@@ -1121,9 +1121,9 @@ export const networkMetadata = {
     isTestnet: true,
     explorers: [
       {
-        type: 'blockvision',
-        webUrl: 'https://testnet.monadexplorer.com',
-        apiUrl: 'https://api.socialscan.io/monad-testnet/v1/developer/api?', //
+        type: 'etherscan',
+        webUrl: 'https://testnet.monadscan.com',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=10143',
       },
     ],
     currency: Currency.MON,
@@ -1738,7 +1738,6 @@ export const networkMetadata = {
     explorers: {
       type:
         | 'blockscout'
-        | 'blockvision'
         | 'etherscan'
         | 'routescan'
         | 'lorescan'
@@ -1821,5 +1820,8 @@ export function getApiKeyEnvVar<Net extends NetworkName>(
 
 export function getOptionalApiKey(network: NetworkName): string {
   const envVar = getApiKeyEnvVar(network);
-  return getOptionalEnvString(envVar, '');
+  return getOptionalEnvString(
+    envVar,
+    getOptionalEnvString('ETHERSCAN_API_KEY', '0x123'),
+  );
 }
