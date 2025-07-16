@@ -92,6 +92,9 @@ jobs:
       - name: Build @blocksense/e2e-tests
         run: yarn build:recursive @blocksense/e2e-tests
 
+      - name: Build blocksense
+        run: process-compose version && just start-environment example-setup-03 --detached && just stop-environment
+
       - name: Start e2e tests
         run: just test-e2e
 
