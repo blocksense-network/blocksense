@@ -97,3 +97,11 @@ export const fromCommaSeparatedString = <T, S extends string>(
       },
     },
   );
+
+export const PortSchema = S.Int.pipe(
+  S.between(1, 65535, { message: () => 'Port must be between 1 and 65535' }),
+).annotations({
+  identifier: 'Port',
+});
+
+export type Port = typeof PortSchema.Type;

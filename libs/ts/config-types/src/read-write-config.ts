@@ -5,7 +5,10 @@ import { Schema as S, Either } from 'effect';
 import { configDir } from '@blocksense/base-utils/env';
 import { selectDirectory } from '@blocksense/base-utils/fs';
 import { NetworkName, parseNetworkName } from '@blocksense/base-utils/evm';
-import { SequencerConfigV1Schema } from './node-config/types';
+import {
+  SequencerConfigV1Schema,
+  SequencerConfigV2Schema,
+} from './node-config/types';
 
 import { FeedsConfigSchema, NewFeedsConfigSchema } from './data-feeds-config';
 import { ChainlinkCompatibilityConfigSchema } from './chainlink-compatibility';
@@ -133,6 +136,7 @@ export const legacyConfigTypes = {
 
 export const configTypes = {
   ...legacyConfigTypes,
+  ['sequencer_config_v2']: SequencerConfigV2Schema,
   ['feeds_config_v2']: NewFeedsConfigSchema,
   ['chainlink_compatibility_v2']: ChainlinkCompatibilityConfigSchema,
 } satisfies Record<string, S.Schema<any>>;
