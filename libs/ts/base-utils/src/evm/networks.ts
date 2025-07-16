@@ -375,6 +375,11 @@ export const networkMetadata = {
         apiUrl:
           'https://api.routescan.io/v2/network/mainnet/evm/43114/etherscan',
       },
+      {
+        type: 'etherscan',
+        webUrl: 'https://snowscan.xyz',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=43114',
+      },
     ],
     currency: Currency.AVAX,
   },
@@ -387,6 +392,11 @@ export const networkMetadata = {
         webUrl: 'https://subnets-test.avax.network/c-chain',
         apiUrl:
           'https://api.routescan.io/v2/network/testnet/evm/43113/etherscan',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://testnet.snowscan.xyz',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=43113',
       },
     ],
     currency: Currency.AVAX,
