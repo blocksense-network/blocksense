@@ -495,6 +495,11 @@ export const networkMetadata = {
         webUrl: 'https://explorer-testnet.unit0.dev',
         apiUrl: 'https://explorer-testnet.unit0.dev/api',
       },
+      {
+        type: 'etherscan',
+        webUrl: 'https://blastscan.io',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=81457',
+      },
     ],
     currency: Currency.ETH,
   },
