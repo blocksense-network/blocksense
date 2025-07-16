@@ -1691,6 +1691,11 @@ export const networkMetadata = {
         webUrl: 'https://worldchain-sepolia.explorer.alchemy.com/',
         apiUrl: 'https://worldchain-sepolia.explorer.alchemy.com/api',
       },
+      {
+        type: 'etherscan',
+        webUrl: 'https://sepolia.worldscan.org',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=4801',
+      },
     ],
     currency: Currency.ETH,
   },
