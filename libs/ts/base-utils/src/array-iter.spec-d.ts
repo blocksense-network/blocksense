@@ -2,7 +2,7 @@ import { describe, expectTypeOf, it } from 'vitest';
 
 import { tuple } from './array-iter';
 
-describe('`base-utils/array-iter` tests', () => {
+describe('`base-utils/array-iter` type level tests', () => {
   describe('`tuple`', () => {
     it('should preserve literal types', () => {
       const x = tuple('a', 'b', 'c');
