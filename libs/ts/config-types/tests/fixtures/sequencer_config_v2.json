@@ -1,0 +1,147 @@
+{
+  "sequencer_id": 1,
+  "main_port": 8877,
+  "admin_port": 5556,
+  "prometheus_port": 5555,
+  "block_config": {
+    "max_feed_updates_to_batch": 300,
+    "block_generation_period": 500,
+    "genesis_block_timestamp_ms": 0,
+    "aggregation_consensus_discard_period_blocks": 1000
+  },
+  "providers": {
+    "monad_testnet": {
+      "private_key_path": "test-key",
+      "url": "https://testnet-rpc.monad.xyz",
+      "contract_address": "0xADF5555555555555555555555555555555555555",
+      "safe_address": null,
+      "safe_min_quorum": 1,
+      "event_contract_address": null,
+      "multicall_contract_address": null,
+      "transaction_retries_count_limit": 5,
+      "transaction_retry_timeout_secs": 60,
+      "retry_fee_increment_fraction": 0.1,
+      "transaction_gas_limit": 7500000,
+      "data_feed_store_byte_code": null,
+      "data_feed_sports_byte_code": null,
+      "impersonated_anvil_account": null,
+      "is_enabled": true,
+      "allow_feeds": [
+        1000007, 7, 19, 32, 82, 1000000, 1000001, 1000002, 1000003, 1000004,
+        1000005, 1000006
+      ],
+      "publishing_criteria": [
+        {
+          "feed_id": "7",
+          "skip_publish_if_less_then_percentage": 0,
+          "always_publish_heartbeat_ms": 3600000,
+          "peg_to_value": null,
+          "peg_tolerance_percentage": 0
+        },
+        {
+          "feed_id": "340282366920938463463374607431768211455",
+          "skip_publish_if_less_then_percentage": 0,
+          "always_publish_heartbeat_ms": 3600000,
+          "peg_to_value": null,
+          "peg_tolerance_percentage": 0
+        },
+        {
+          "feed_id": "32",
+          "skip_publish_if_less_then_percentage": 0,
+          "always_publish_heartbeat_ms": 3600000,
+          "peg_to_value": null,
+          "peg_tolerance_percentage": 0
+        },
+        {
+          "feed_id": "82",
+          "skip_publish_if_less_then_percentage": 0,
+          "always_publish_heartbeat_ms": 3600000,
+          "peg_to_value": null,
+          "peg_tolerance_percentage": 0
+        },
+        {
+          "feed_id": "1000000",
+          "skip_publish_if_less_then_percentage": 0,
+          "always_publish_heartbeat_ms": 3600000,
+          "peg_to_value": null,
+          "peg_tolerance_percentage": 0
+        },
+        {
+          "feed_id": "1000006",
+          "skip_publish_if_less_then_percentage": 1,
+          "always_publish_heartbeat_ms": 86400000,
+          "peg_to_value": 1,
+          "peg_tolerance_percentage": 1
+        }
+      ],
+      "contract_version": 2
+    },
+    "harmony_testnet_shard0": {
+      "private_key_path": "test-key",
+      "url": "https://endpoints.omniatech.io/v1/harmony/testnet-0/public",
+      "contract_address": "0xADF5555555555555555555555555555555555555",
+      "safe_address": null,
+      "safe_min_quorum": 1,
+      "event_contract_address": null,
+      "multicall_contract_address": null,
+      "transaction_retries_count_limit": 5,
+      "transaction_retry_timeout_secs": 60,
+      "retry_fee_increment_fraction": 0.1,
+      "transaction_gas_limit": 7500000,
+      "data_feed_store_byte_code": null,
+      "data_feed_sports_byte_code": null,
+      "impersonated_anvil_account": null,
+      "is_enabled": true,
+      "allow_feeds": [
+        "0",
+        "1",
+        "3",
+        "9",
+        "340282366920938463463374607431768211455",
+        "16",
+        "22",
+        "26",
+        "29"
+      ],
+      "publishing_criteria": [],
+      "contract_version": 2
+    },
+    "cronos_testnet": {
+      "private_key_path": "test-key",
+      "url": "https://cronos-testnet.drpc.org",
+      "contract_address": "0xADF5555555555555555555555555555555555555",
+      "safe_address": null,
+      "safe_min_quorum": 1,
+      "event_contract_address": null,
+      "multicall_contract_address": null,
+      "transaction_retries_count_limit": 5,
+      "transaction_retry_timeout_secs": 60,
+      "retry_fee_increment_fraction": 0.1,
+      "transaction_gas_limit": 7500000,
+      "data_feed_store_byte_code": null,
+      "data_feed_sports_byte_code": null,
+      "impersonated_anvil_account": null,
+      "is_enabled": true,
+      "allow_feeds": [0, 1, 3, 9, 13, "16", "22", "26", "29"],
+      "publishing_criteria": [],
+      "contract_version": 2
+    }
+  },
+  "reporters": [
+    {
+      "id": 0,
+      "pub_key": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "address": "0xDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF"
+    }
+  ],
+  "kafka_report_endpoint": {
+    "url": null
+  },
+  "http_input_buffer_size": null,
+  "pyroscope_config": {
+    "user": null,
+    "password_file_path": null,
+    "url": "http://observatory:4040",
+    "sample_rate": 1000
+  }
+}
