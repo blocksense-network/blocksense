@@ -952,6 +952,11 @@ export const networkMetadata = {
         webUrl: 'https://explorer.linea.build/',
         apiUrl: 'https://api-explorer.linea.build/api',
       },
+      {
+        type: 'etherscan',
+        webUrl: 'https://lineascan.build',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=59144',
+      },
     ],
     currency: Currency.ETH,
   },
@@ -963,6 +968,11 @@ export const networkMetadata = {
         type: 'blockscout',
         webUrl: 'https://explorer.sepolia.linea.build',
         apiUrl: 'https://api-explorer.sepolia.linea.build/api',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://sepolia.lineascan.build',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=59141',
       },
     ],
     currency: Currency.ETH,
