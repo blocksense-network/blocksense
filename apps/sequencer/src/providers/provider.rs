@@ -33,7 +33,7 @@ use blocksense_feed_registry::registry::{FeedAggregateHistory, HistoryEntry};
 use blocksense_feed_registry::types::FeedType;
 use blocksense_feed_registry::types::Repeatability;
 use blocksense_metrics::{metrics::ProviderMetrics, process_provider_getter};
-use eyre::{eyre, OptionExt, Result};
+use eyre::{eyre, Result};
 use paste::paste;
 use ringbuf::traits::{Consumer, Observer, RingBuffer};
 use serde::{Deserialize, Serialize};
@@ -721,7 +721,7 @@ impl RpcProvider {
                     .iter()
                     .find(|con| con.name == ADFS_ACCESS_CONTROL_CONTRACT_NAME)
                     .and_then(|v| v.address)
-                    .unwrap();
+                    .unwrap_or_else(|| panic!("{ADFS_ACCESS_CONTROL_CONTRACT_NAME} contract should be deployed before {ADFS_CONTRACT_NAME}"));
                 extend_byte_code_with_address(access_control_address, &mut bytecode);
             }
             ADFS_ACCESS_CONTROL_CONTRACT_NAME => {
@@ -905,7 +905,12 @@ impl RpcProvider {
         let mut f: Vec<(FeedId, u32)> = vec![];
         for (feed_id, buff) in &self.history.aggregate_history {
             if buff.occupied_len() == 0 {
-                let len = buff.vacant_len().try_into().unwrap();
+                let limit = 128_u32;
+                let len = if buff.vacant_len() < limit as usize {
+                    buff.vacant_len() as u32
+                } else {
+                    limit
+                };
                 f.push((*feed_id, len));
             }
         }
