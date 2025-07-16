@@ -1561,6 +1561,11 @@ export const networkMetadata = {
         webUrl: 'https://swell-testnet-explorer.alt.technology',
         apiUrl: 'https://swell-testnet-explorer.alt.technology/api',
       },
+      {
+        type: 'etherscan',
+        webUrl: 'https://sepolia.swellchainscan.io',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=1924',
+      },
     ],
     currency: Currency.ETH,
   },
