@@ -1212,6 +1212,11 @@ export const networkMetadata = {
         webUrl: 'https://optimism.blockscout.com/',
         apiUrl: 'https://optimism.blockscout.com/api',
       },
+      {
+        type: 'etherscan',
+        webUrl: 'https://optimistic.etherscan.io',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=10',
+      },
     ],
     currency: Currency.ETH,
   },
