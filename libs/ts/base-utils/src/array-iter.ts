@@ -24,3 +24,38 @@ export function tuple<Args extends NonEmptyTuple<T>, T extends Literal>(
 export function tuple<Args extends LiteralTuple>(...args: Args): Args {
   return args;
 }
+
+/**
+ * Converts an array of objects into a record, using a specified field as the key.
+ *
+ * @template T - The shape of each object in the input array.
+ * @template K - The key of each object to use as the record key.
+ * @template R - The shape of the resulting values in the record (defaults to T without the key field).
+ *
+ * @param {T[]} arr - The input array of objects.
+ * @param {K} keyField - The key within each object to use as the output record's key.
+ *
+ * @returns {Record<string, R>} A record object with keys from `keyField` and values as the rest of the object.
+ *
+ * @example
+ * const input = [
+ *   { id: 1, name: 'Alice' },
+ *   { id: 2, name: 'Bob' },
+ * ];
+ * const result = arrayToObject(input, 'id');
+ * // result = {
+ * //   '1': { name: 'Alice' },
+ * //   '2': { name: 'Bob' },
+ * // }
+ */
+export function arrayToObject<T, K extends keyof T, R = Omit<T, K>>(
+  arr: T[],
+  keyField: K,
+): Record<string, R> {
+  return fromEntries(
+    arr.map(item => {
+      const { [keyField]: key, ...rest } = item;
+      return [String(key), rest] as [string, R];
+    }),
+  );
+}
