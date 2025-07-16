@@ -200,27 +200,6 @@ const fetchTransactionsForNetwork = async (
         totalPages = page.data.pagination.totalPage;
         currentPage += 1;
       } while (currentPage <= totalPages);
-    } else if (network === 'monad-testnet') {
-      let currentPage = 1;
-      let totalPages = 10;
-
-      do {
-        const page = await axios.get(apiUrl, {
-          params: {
-            module: 'account',
-            action: 'txlist',
-            address,
-            startblock: latestBlock - 30000n,
-            endblock: latestBlock,
-            apikey: apiKey,
-            offset: 100,
-            currentPage,
-          },
-        });
-        const txFromPage = page.data.result;
-        rawTransactions = rawTransactions.concat(txFromPage);
-        currentPage += 1;
-      } while (currentPage <= totalPages);
     } else {
       response = await axios.get(apiUrl, {
         params: {
@@ -260,12 +239,6 @@ const fetchTransactionsForNetwork = async (
           tx.from.hash.toLowerCase() === address.toLowerCase() &&
           tx.to.hash.toLowerCase() !== address.toLowerCase(),
       ); //morph has a different call
-    } else if (network === 'monad-testnet') {
-      notSelfSent = rawTransactions.filter(
-        (tx: any) =>
-          tx.fromAddress.toLowerCase() === address.toLowerCase() &&
-          tx.toAddress.toLowerCase() !== address.toLowerCase(),
-      );
     } else {
       notSelfSent = rawTransactions.filter(
         (tx: any) =>
