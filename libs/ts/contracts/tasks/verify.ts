@@ -9,13 +9,24 @@ import {
 import { readEvmDeployment } from '@blocksense/config-types';
 import { ZeroAddress } from 'ethers';
 
+import { getApiKeys, getCustomChainConfig } from './utils';
+
 type VerifyTaskArgs = {
   address: EthereumAddress;
   constructorArgs: readonly any[];
 };
 
-task('etherscan-verify', 'Verify contracts on Etherscan').setAction(
-  async (_, { run, network }) => {
+task('etherscan-verify', 'Verify contracts on Etherscan')
+  .addOptionalParam('explorerIndex', 'Index of the block explorer to use', '0')
+  .setAction(async ({ explorerIndex }, { run, network, config }) => {
+    const explorerIdx = Number(explorerIndex);
+
+    config.etherscan = {
+      ...config.etherscan,
+      customChains: getCustomChainConfig(explorerIdx),
+      apiKey: getApiKeys(),
+    };
+
     const deploymentData = await readEvmDeployment(
       parseNetworkName(network.name),
       true,
@@ -44,5 +55,4 @@ task('etherscan-verify', 'Verify contracts on Etherscan').setAction(
       console.log('-> Verifying contract:', contractName, data.address);
       await verify(data);
     }
-  },
-);
+  });
