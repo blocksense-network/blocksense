@@ -469,6 +469,11 @@ export const networkMetadata = {
         apiUrl:
           'https://api.routescan.io/v2/network/testnet/evm/80069/etherscan',
       },
+      {
+        type: 'etherscan',
+        webUrl: 'https://testnet.berascan.com',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=80069',
+      },
     ],
     currency: Currency.BERA,
   },
