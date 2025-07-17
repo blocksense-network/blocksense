@@ -1064,7 +1064,7 @@ export const networkMetadata = {
       {
         type: 'etherscan',
         webUrl: 'https://mantlescan.xyz',
-        apiUrl: 'https://api.mantlescan.xyz',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=5000',
       },
     ],
     currency: Currency.MNT,
