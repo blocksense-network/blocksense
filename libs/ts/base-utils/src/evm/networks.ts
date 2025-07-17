@@ -1707,6 +1707,11 @@ export const networkMetadata = {
         webUrl: 'https://unichain.blockscout.com',
         apiUrl: 'https://unichain.blockscout.com/api',
       },
+      {
+        type: 'etherscan',
+        webUrl: 'https://uniscan.xyz',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=130',
+      },
     ],
     currency: Currency.ETH,
   },
@@ -1718,6 +1723,11 @@ export const networkMetadata = {
         type: 'blockscout',
         webUrl: 'https://unichain-sepolia.blockscout.com',
         apiUrl: 'https://unichain-sepolia.blockscout.com/api',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://sepolia.uniscan.xyz',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=1301',
       },
     ],
     currency: Currency.ETH,
