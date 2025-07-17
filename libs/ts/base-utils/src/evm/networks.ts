@@ -638,6 +638,11 @@ export const networkMetadata = {
         webUrl: 'https://celo-alfajores.blockscout.com',
         apiUrl: 'https://celo-alfajores.blockscout.com/api',
       },
+      {
+        type: 'etherscan',
+        webUrl: 'https://alfajores.celoscan.io',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=44787',
+      },
     ],
     currency: Currency.CELO,
   },
