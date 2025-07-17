@@ -147,7 +147,11 @@ const fetchTransactionsForNetwork = async (
   firstTxTime: string;
   lastTxTime: string;
 }> => {
-  const apiUrl = networkMetadata[network].explorers[0]?.apiUrl;
+  const apiUrl =
+    network === 'berachain-bepolia'
+      ? networkMetadata[network].explorers[1]?.apiUrl
+      : networkMetadata[network].explorers[0]?.apiUrl;
+
   const apiKey = getOptionalApiKey(network);
   if (!apiUrl) {
     console.log(chalk.red(`Skipping ${network}: Missing API configuration`));
