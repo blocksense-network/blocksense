@@ -176,7 +176,3 @@ main > h1 {
     white-space: pre-wrap;
   }
 }
-
-.nextra-toc a {
-  display: none;
-}
