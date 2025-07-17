@@ -3,11 +3,12 @@ import yargs from 'yargs';
 import Web3 from 'web3';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
+import fs from 'fs/promises';
+
 import {
   EthereumAddress,
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
-import fs from 'fs/promises';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 
 async function getWeb3(
