@@ -19,6 +19,7 @@ import {
   networkMetadata,
   ethereumAddress,
   NetworkName,
+  getOptionalApiKey,
 } from '@blocksense/base-utils/evm';
 
 import './tasks';
@@ -47,6 +48,29 @@ const deployerConfig = (network: NetworkName) =>
   parseDeploymentEnvConfig(deployerSchema, network);
 
 const localDeployerConfig = deployerConfig('local').mergedConfig;
+
+const explorerIndex = 0;
+
+const customChains = Object.entries(networkMetadata)
+  .filter(([_, meta]) => meta.explorers[explorerIndex]?.apiUrl)
+  .map(([name, meta]) => {
+    const explorer = meta.explorers[explorerIndex];
+    return {
+      network: name,
+      chainId: meta.chainId,
+      urls: {
+        apiURL: explorer.apiUrl!,
+        browserURL: explorer.webUrl,
+      },
+    };
+  });
+
+const apiKey = Object.fromEntries(
+  Object.keys(networkMetadata).map(name => [
+    name,
+    getOptionalApiKey(name as NetworkName),
+  ]),
+);
 
 const config: HardhatUserConfig = {
   reflect: {
@@ -113,7 +137,8 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     enabled: true,
-    apiKey: process.env['ETHERSCAN_API_KEY'] || '',
+    apiKey,
+    customChains,
   },
 };
 
