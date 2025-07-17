@@ -2568,7 +2568,7 @@ __metadata:
     "@blocksense/contracts": "workspace:*"
     "@types/node": "npm:^22.3.0"
     "@vitest/coverage-v8": "npm:^3.2.4"
-    effect: "npm:^3.7.0"
+    effect: "npm:^3.15.1"
     execa: "npm:^9.5.2"
     tsx: "npm:^4.17.0"
     typescript: "npm:^5.5.4"
@@ -18278,16 +18278,6 @@ __metadata:
     "@standard-schema/spec": "npm:^1.0.0"
     fast-check: "npm:^3.23.1"
   checksum: 10c0/45947604b1e070fadea0bdb68f710b737a44c1ee0e39ad900ce9f65c5265ca79d3018a76c9475dce5d70425430990416772416b92cb167f2a1aff854aa4c75a4
-  languageName: node
-  linkType: hard
-
-"effect@npm:^3.7.0":
-  version: 3.14.8
-  resolution: "effect@npm:3.14.8"
-  dependencies:
-    "@standard-schema/spec": "npm:^1.0.0"
-    fast-check: "npm:^3.23.1"
-  checksum: 10c0/00583e632a1b432af0d80825d591714e3ed4f6a76c0d8abbc2dfc88d6e9fb5ee7e0c9ef4fa9dd1d139ebbfa9ce54ed5eabe1c302f7bf4a310a771f286f9b18c6
   languageName: node
   linkType: hard
 
