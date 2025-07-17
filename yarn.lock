@@ -2572,6 +2572,7 @@ __metadata:
     "@vitest/coverage-v8": "npm:^3.2.4"
     effect: "npm:^3.15.1"
     execa: "npm:^9.5.2"
+    parse-prometheus-text-format: "npm:^1.1.1"
     tsx: "npm:^4.17.0"
     typescript: "npm:^5.5.4"
     vitest: "npm:^3.2.4"
@@ -27761,6 +27762,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"parse-prometheus-text-format@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "parse-prometheus-text-format@npm:1.1.1"
+  dependencies:
+    shallow-equal: "npm:^1.2.0"
+  checksum: 10c0/394e5939efc8b36fa9299c158b057750313a098cd38164fbd46bb6f25fabbb4ab270916fc06d0d3c7fa1402cf90fedfa81ee5fa3bf2b8d9e09ba6d9364a6a6ed
+  languageName: node
+  linkType: hard
+
 "parse5@npm:^7.0.0":
   version: 7.1.2
   resolution: "parse5@npm:7.1.2"
@@ -30840,6 +30850,13 @@ __metadata:
   dependencies:
     buffer: "npm:6.0.3"
   checksum: 10c0/d3c1542e30977c421957e87ceca699931dfca3f61e9f25d407efb3fd0dfdfa3eb274342bd905b46d4d862eeb741dd168c9a43a36b068436d63b818471be33e94
+  languageName: node
+  linkType: hard
+
+"shallow-equal@npm:^1.2.0":
+  version: 1.2.1
+  resolution: "shallow-equal@npm:1.2.1"
+  checksum: 10c0/51e03abadd97c9ebe590547d92db9148446962a3f23a3a0fb1ba2fccab80af881eef0ff1f8ccefd3f066c0bc5a4c8ca53706194813b95c8835fa66448a843a26
   languageName: node
   linkType: hard
 
