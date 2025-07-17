@@ -454,7 +454,7 @@ export const networkMetadata = {
       {
         type: 'etherscan',
         webUrl: 'https://berascan.com',
-        apiUrl: 'https://api.berascan.com/api',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=80094',
       },
     ],
     currency: Currency.BERA,
