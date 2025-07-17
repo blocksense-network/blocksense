@@ -5,6 +5,7 @@
   "scripts": {
     "ts": "yarn node --import tsx",
     "test": "vitest run --typecheck --coverage",
+    "test:unit": "yarn vitest -w false src/utils",
     "test:process-compose-e2e": "yarn test src/process-compose/e2e.spec.ts"
   },
   "dependencies": {
