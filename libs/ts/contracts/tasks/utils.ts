@@ -1,6 +1,11 @@
 import { getCreate2Address, keccak256, solidityPacked } from 'ethers';
 import { ContractNames, NetworkConfig } from './types';
 import { Artifacts } from 'hardhat/types';
+import {
+  getOptionalApiKey,
+  networkMetadata,
+  NetworkName,
+} from '@blocksense/base-utils';
 
 export async function checkAddressExists(
   config: NetworkConfig,
@@ -55,3 +60,26 @@ export const adjustVInSignature = async (
   signature = signature.slice(0, -2) + signatureV.toString(16);
   return signature;
 };
+
+export const getCustomChainConfig = (explorerIndex: number) =>
+  Object.entries(networkMetadata)
+    .filter(([_, meta]) => meta.explorers[explorerIndex]?.apiUrl)
+    .map(([name, meta]) => {
+      const explorer = meta.explorers[explorerIndex];
+      return {
+        network: name,
+        chainId: meta.chainId,
+        urls: {
+          apiURL: explorer.apiUrl!,
+          browserURL: explorer.webUrl,
+        },
+      };
+    });
+
+export const getApiKeys = () =>
+  Object.fromEntries(
+    Object.keys(networkMetadata).map(name => [
+      name,
+      getOptionalApiKey(name as NetworkName),
+    ]),
+  );
