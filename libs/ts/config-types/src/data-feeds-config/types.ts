@@ -233,3 +233,7 @@ export type NewFeedsConfig = typeof NewFeedsConfigSchema.Type;
  * Function to decode Data Feeds configuration.
  */
 export const decodeNewFeedsConfig = S.decodeUnknownSync(NewFeedsConfigSchema);
+
+export const feedId = S.BigInt.annotations({
+  identifier: 'FeedId',
+});

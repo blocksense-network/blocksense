@@ -6,13 +6,10 @@ import {
   networkName,
 } from '@blocksense/base-utils/evm';
 import { hexDataString } from '@blocksense/base-utils';
+import { feedId } from '../data-feeds-config/types';
 
 const ParameterType = S.Union(S.String, S.Number, S.BigIntFromSelf, S.Boolean);
 const FunctionArgs = S.Array(ParameterType);
-
-const feedId = S.BigInt.annotations({
-  identifier: 'FeedId',
-});
 
 const ContractDataSchemaV1 = S.Struct({
   address: ethereumAddress,
