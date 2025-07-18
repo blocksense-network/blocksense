@@ -62,8 +62,12 @@ fn encode_packed(items: &[&[u8]]) -> (Vec<u8>, String) {
 pub async fn adfs_serialize_updates(
     net: &str,
     feed_updates: &BatchedAggregatesToSend,
-    round_counters: &RoundCounters,
+    round_counters: Option<&RoundCounters>,
     strides_and_decimals: HashMap<FeedId, FeedStrideAndDecimals>,
+    feeds_rounds: &mut HashMap<FeedId, u64>, /* The rounds table for the relevant feeds. If the round_counters are provided,
+                                             this map will be filled with the update count for each feed from it. If the
+                                             round_counters is None, feeds_rounds will be used as the source of the updates
+                                             count. */
 ) -> Result<Vec<u8>> {
     let mut result = Vec::<u8>::new();
     let updates = &feed_updates.updates;
@@ -89,29 +93,34 @@ pub async fn adfs_serialize_updates(
             }
         };
 
-        let mut round = {
-            let mut updated_feed_id_round: u64 = 0;
-            // Add the feed id-s that are part of each record that will be updated
-            for additional_feed_id in get_neighbour_feed_ids(update.feed_id) {
-                let round = round_counters
-                    .get(&additional_feed_id)
-                    .cloned()
-                    .unwrap_or(0);
-                let (stride, _digits_in_fraction) = match &strides_and_decimals
-                    .get(&additional_feed_id)
-                {
-                    Some(f) => (f.stride, f.decimals),
-                    None => {
-                        error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimal default to 18");
-                        (0, 18)
+        let mut round = match &round_counters {
+            Some(rc) => {
+                let mut updated_feed_id_round: u64 = 0;
+                // Add the feed id-s that are part of each record that will be updated
+                for additional_feed_id in get_neighbour_feed_ids(update.feed_id) {
+                    let round = rc.get(&additional_feed_id).cloned().unwrap_or(0);
+
+
+                    let (stride, _digits_in_fraction) = match &strides_and_decimals
+                        .get(&additional_feed_id)
+                    {
+                        Some(f) => (f.stride, f.decimals),
+                        None => {
+                            error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimal default to 18");
+                            (0, 18)
+                        }
+                    };
+                    feeds_info.insert(additional_feed_id, (stride, round));
+                    if additional_feed_id == update.feed_id {
+                        updated_feed_id_round = round;
                     }
-                };
-                feeds_info.insert(additional_feed_id, (stride, round));
-                if additional_feed_id == update.feed_id {
-                    updated_feed_id_round = round;
                 }
+                updated_feed_id_round
             }
-            updated_feed_id_round
+            None => *feeds_rounds.get(&feed_id).unwrap_or_else(|| {
+                error!("feeds_rounds does not contain updates count for feed_id {feed_id}. Rolling back to 0!");
+                &0
+            }),
         };
 
         round %= MAX_HISTORY_ELEMENTS_PER_FEED;
@@ -167,10 +176,23 @@ pub async fn adfs_serialize_updates(
         result.append(&mut result_bytes);
     }
 
+    // In case feed_metrics is none, the feeds_rounds contains all the round indexes needed for serialization.
+    // We use them to populate feeds_info map based on which the round indexes will be serialized
+    if round_counters.is_none() {
+        for (feed_id, round) in feeds_rounds.iter() {
+            if let Some(strides_and_decimals) = strides_and_decimals.get(feed_id) {
+                feeds_info.insert(*feed_id, (strides_and_decimals.stride, *round));
+            } else {
+                feeds_info.insert(*feed_id, (0, 0));
+            };
+        }
+    };
+
     // Fill the round tables:
     let mut batch_feeds = BTreeMap::new();
 
     for (feed_id, (stride, mut round)) in feeds_info.iter() {
+        feeds_rounds.insert(*feed_id, round);
         if !feeds_ids_with_value_updates.contains(feed_id) && round > 0 {
             round -= 1; // Get the index of the last updated value
         }
@@ -303,11 +325,29 @@ pub mod tests {
 
         let expected_result = "0100000000499602d2000000050102400c0107123432676435730002400501022456000260040102367800028003010248900002a00201025abc010000000000000500040003000200000000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
 
+        let mut feeds_rounds = HashMap::new();
+
         // Call as it will be in the sequencer
         assert_eq!(
             expected_result,
             hex::encode(
-                adfs_serialize_updates(net, &updates, &round_counters, config.clone(),)
+                adfs_serialize_updates(
+                    net,
+                    &updates,
+                    Some(&round_counters),
+                    config.clone(),
+                    &mut feeds_rounds,
+                )
+                .await
+                .unwrap()
+            )
+        );
+
+        // Call as it will be in the reporter (feeds_rounds provided by the sequencer)
+        assert_eq!(
+            expected_result,
+            hex::encode(
+                adfs_serialize_updates(net, &updates, None, config, &mut feeds_rounds,)
                     .await
                     .unwrap()
             )
@@ -323,11 +363,29 @@ pub mod tests {
 
         let expected_result = "0100000000499602d2000000050102400c0107123432676435730002400501022456000260040102367800028003010248900002a00201025abc010000000000000500040003000200040000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
 
+        let mut feeds_rounds = HashMap::new();
+
         // Call as it will be in the sequencer
         assert_eq!(
             expected_result,
             hex::encode(
-                adfs_serialize_updates(net, &updates, &round_counters, config.clone(),)
+                adfs_serialize_updates(
+                    net,
+                    &updates,
+                    Some(&round_counters),
+                    config.clone(),
+                    &mut feeds_rounds,
+                )
+                .await
+                .unwrap()
+            )
+        );
+
+        // Call as it will be in the reporter (feeds_rounds provided by the sequencer)
+        assert_eq!(
+            expected_result,
+            hex::encode(
+                adfs_serialize_updates(net, &updates, None, config, &mut feeds_rounds,)
                     .await
                     .unwrap()
             )

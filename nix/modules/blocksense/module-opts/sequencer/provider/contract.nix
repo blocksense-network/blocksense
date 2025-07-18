@@ -29,5 +29,11 @@ lib: with lib; {
       default = 1;
       description = mdDoc "";
     };
+
+    min-quorum = mkOption {
+      type = types.nullOr types.int;
+      default = null;
+      description = mdDoc "Minimum quorum of signatures before posting to Gnosis Safe contract";
+    };
   };
 }

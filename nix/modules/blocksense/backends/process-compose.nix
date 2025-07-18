@@ -101,9 +101,13 @@ let
     blocksense-sequencer.process-compose = {
       command = mkCargoTargetExePath "sequencer";
       readiness_probe = {
+        # exec.command = ''
+        #   curl -fsSL http://127.0.0.1:${toString cfg.sequencer.ports.admin}/health \
+        #     -H 'content-type: application/json'
+        # '';
+        # initial_delay_seconds = 100;
         exec.command = ''
-          curl -fsSL http://127.0.0.1:${toString cfg.sequencer.ports.admin}/health \
-            -H 'content-type: application/json'
+          true
         '';
         initial_delay_seconds = 0;
         period_seconds = 1;

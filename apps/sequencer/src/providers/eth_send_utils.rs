@@ -130,6 +130,7 @@ pub async fn get_serialized_updates_for_network(
     updates: &mut BatchedAggregatesToSend,
     provider_settings: &blocksense_config::Provider,
     feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
+    feeds_rounds: &mut HashMap<FeedId, u64>,
     feeds_repeatability: Repeatability,
 ) -> Result<Vec<u8>> {
     debug!("Acquiring a read lock on provider config for `{net}`");
@@ -185,8 +186,9 @@ pub async fn get_serialized_updates_for_network(
             match adfs_serialize_updates(
                 net,
                 updates,
-                &provider.round_counters,
+                Some(&provider.round_counters),
                 strides_and_decimals,
+                feeds_rounds,
             )
             .await
             {
@@ -348,12 +350,14 @@ pub async fn eth_batch_send_to_contract(
     transaction_retries_count_limit: u64,
     retry_fee_increment_fraction: f64,
 ) -> Result<(String, Vec<FeedId>)> {
+    let mut feeds_rounds = HashMap::new();
     let serialized_updates = get_serialized_updates_for_network(
         net.as_str(),
         &provider,
         &mut updates,
         &provider_settings,
         feeds_config,
+        &mut feeds_rounds,
         feed_type,
     )
     .await?;

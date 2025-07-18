@@ -5,13 +5,12 @@
 }:
 let
   # Function to read and parse the JSON file
-  readJson = path: builtins.fromJSON (builtins.readFile path);
-
+  # readJson = path: builtins.fromJSON (builtins.readFile path);
   testKeysDir = config.devenv.root + "/nix/test-environments/test-keys";
-  deploymentV2FilePath = config.devenv.root + "/config/evm_contracts_deployment_v2/ink-sepolia.json";
+  # deploymentV2FilePath = config.devenv.root + "/config/evm_contracts_deployment_v2/ink-sepolia.json";
 
-  upgradeableProxyADFSContractAddressInk =
-    (readJson deploymentV2FilePath).contracts.coreContracts.UpgradeableProxyADFS.address;
+  # upgradeableProxyADFSContractAddressInk =
+  #   (readJson deploymentV2FilePath).contracts.coreContracts.UpgradeableProxyADFS.address;
   impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
 in
 {

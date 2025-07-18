@@ -22,6 +22,7 @@ in
             name = "gnosis_safe";
             address = "0x23BC561ea93063B0cD12b6E3c690D40c93e29692";
             contract-version = 2;
+            min-quorum = 1;
           }
         ];
       };

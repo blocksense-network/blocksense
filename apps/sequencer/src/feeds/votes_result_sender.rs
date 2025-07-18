@@ -216,12 +216,15 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
 
         let feeds_config = sequencer_state.active_feeds.clone();
 
+        let mut feeds_rounds = HashMap::new();
+
         let serialized_updates = match get_serialized_updates_for_network(
             net,
             provider,
             &mut updates,
             &provider_settings,
             feeds_config,
+            &mut feeds_rounds,
             Repeatability::Periodic,
         )
         .await
@@ -311,7 +314,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             network: net.to_string(),
             calldata: serialized_updates_hex,
             updates: updates.updates,
-            feeds_rounds: HashMap::new(),
+            feeds_rounds,
         };
 
         let serialized_updates = match serde_json::to_string(&updates_to_kafka) {
