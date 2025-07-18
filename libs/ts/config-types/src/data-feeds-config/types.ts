@@ -234,6 +234,7 @@ export type NewFeedsConfig = typeof NewFeedsConfigSchema.Type;
  */
 export const decodeNewFeedsConfig = S.decodeUnknownSync(NewFeedsConfigSchema);
 
-export const FeedIdSchema = S.BigInt.annotations({
+// TODO: (dianielstoyanov) Remove this when rust code treat feedId as string
+export const FeedIdSchema = S.Union(S.BigInt, S.BigIntFromNumber).annotations({
   identifier: 'FeedId',
 });
