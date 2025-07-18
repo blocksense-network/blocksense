@@ -79,21 +79,22 @@ in
             50001 # USDC / USD Pegged
 
             # exsat-holdings oracle feeds
-            100000 # ExSat BTC
+            # Very slow oracle, not suitable for fast setup
+            # 100000 # ExSat BTC
 
             # eth-rpc oracle feeds
-            100001 # ynETH MAX (ynETHx) - YieldNest convertToAssets on ETH
             100002 # YieldFi yUSD (yUSD) exchangeRate on ETH mainnet
             100003 # ynBNB MAX (ynBNBx) - YieldNest convertToAssets on BNB
 
             # gecko-terminal oracle feeds
             1000000 # WMON / USD
-            1000001 # USDZ / USD
             1000003 # CHOG / USD
+            1000008 # cbBTC/ USD
 
             # stock-price-feeds oracle feeds
-            2000000 # IBIT / USD
-            2000001 # SPY / USD
+            # At this point we don't have API keys in the e2e test set
+            # 2000000 # IBIT / USD
+            # 2000001 # SPY / USD
           ];
           publishing-criteria = [
             {
@@ -171,16 +172,6 @@ in
               peg-tolerance-percentage = 0.1;
             }
             {
-              feed-id = 100000; # ExSat BTC
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
-              feed-id = 100001; # ynETH MAX (ynETHx) - YieldNest convertToAssets on ETH
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
               feed-id = 100002; # YieldFi yUSD (yUSD) exchangeRate on ETH mainnet
               skip-publish-if-less-then-percentage = 0.001;
               always-publish-heartbeat-ms = 20000;
@@ -196,22 +187,12 @@ in
               always-publish-heartbeat-ms = 20000;
             }
             {
-              feed-id = 1000001; # USDZ / USD
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
               feed-id = 1000003; # CHOG / USD
               skip-publish-if-less-then-percentage = 0.001;
               always-publish-heartbeat-ms = 20000;
             }
             {
-              feed-id = 2000000; # IBIT / USD
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
-              feed-id = 2000001; # SPY / USD
+              feed-id = 1000008; # cbBTC / USD
               skip-publish-if-less-then-percentage = 0.001;
               always-publish-heartbeat-ms = 20000;
             }
