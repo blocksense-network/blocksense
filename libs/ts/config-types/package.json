@@ -22,6 +22,16 @@
       "require": "./dist/cjs/evm-contracts-deployment/index.cjs",
       "import": "./dist/esm/evm-contracts-deployment/index.mjs",
       "types": "./src/evm-contracts-deployment/index.ts"
+    },
+    "./node-config": {
+      "require": "./dist/cjs/node-config/index.cjs",
+      "import": "./dist/esm/node-config/index.mjs",
+      "types": "./src/node-config/index.ts"
+    },
+    "./dfcg/artifacts": {
+      "require": "./dist/cjs/dfcg/artifacts/index.cjs",
+      "import": "./dist/esm/dfcg/artifacts/index.mjs",
+      "types": "./src/dfcg/artifacts/index.ts"
     }
   },
   "scripts": {
@@ -38,6 +48,8 @@
   },
   "dependencies": {
     "@blocksense/base-utils": "workspace:*",
+    "@octokit/request-error": "^7.0.0",
+    "@octokit/rest": "21.1.1",
     "effect": "^3.15.1",
     "tslib": "^2.8.1"
   }

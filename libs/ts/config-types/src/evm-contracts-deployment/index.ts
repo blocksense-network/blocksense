@@ -6,13 +6,10 @@ import {
   networkName,
 } from '@blocksense/base-utils/evm';
 import { hexDataString } from '@blocksense/base-utils';
+import { FeedIdSchema } from '../data-feeds-config/types';
 
 const ParameterType = S.Union(S.String, S.Number, S.BigIntFromSelf, S.Boolean);
 const FunctionArgs = S.Array(ParameterType);
-
-const feedId = S.BigInt.annotations({
-  identifier: 'FeedId',
-});
 
 const ContractDataSchemaV1 = S.Struct({
   address: ethereumAddress,
@@ -39,7 +36,7 @@ export const CLAggregatorAdapterDataSchemaV1 = S.Struct({
 
 export const CLAggregatorAdapterDataSchemaV2 = S.Struct({
   ...ContractDataSchemaV2.fields,
-  feedId: feedId,
+  feedId: FeedIdSchema,
   base: S.NullOr(ethereumAddress),
   quote: S.NullOr(ethereumAddress),
 }).annotations({
@@ -107,6 +104,8 @@ export const DeploymentConfigSchemaV1 = S.mutable(
 ).annotations({
   identifier: 'DeploymentConfigV1',
 });
+
+export type DeploymentConfigV1 = typeof DeploymentConfigSchemaV1.Type;
 
 export const DeploymentConfigSchemaV2 = S.mutable(
   S.Struct({
