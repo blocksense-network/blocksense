@@ -41106,7 +41106,7 @@
           "base": "YUSD",
           "quote": "USDC"
         },
-        "decimals": 0,
+        "decimals": 6,
         "category": "",
         "market_hours": "Crypto",
         "arguments": {
