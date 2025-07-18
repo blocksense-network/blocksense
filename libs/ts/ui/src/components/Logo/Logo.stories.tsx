@@ -14,6 +14,12 @@ export const Base: Story = {
     variant: 'primary-neon',
     className: '',
   },
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/design/mLzd40iFjBBPTPBhGIfa3z/Brand-Assets?node-id=1-51&p=f&m=dev',
+    },
+  },
 };
 
 type LogoSectionProps = {
