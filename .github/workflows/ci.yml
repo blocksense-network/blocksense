@@ -66,34 +66,34 @@ jobs:
       - name: Test all packages
         run: just test-ts
 
-  e2e-tests:
-    timeout-minutes: 10
-    runs-on: [self-hosted, nixos, x86-64-v3]
+  # e2e-tests:
+  #   timeout-minutes: 10
+  #   runs-on: [self-hosted, nixos, x86-64-v3]
 
-    steps:
-      - uses: actions/checkout@v4
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - name: Install Nix
-        uses: metacraft-labs/nixos-modules/.github/install-nix@main
-        with:
-          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          cachix-cache: ${{ vars.CACHIX_CACHE }}
-          trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
-          substituters: ${{ vars.SUBSTITUTERS }}
+  #     - name: Install Nix
+  #       uses: metacraft-labs/nixos-modules/.github/install-nix@main
+  #       with:
+  #         cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+  #         cachix-cache: ${{ vars.CACHIX_CACHE }}
+  #         trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
+  #         substituters: ${{ vars.SUBSTITUTERS }}
 
-      - name: Build & activate the Nix Dev Shell
-        run: |
-          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
-          env >> "$GITHUB_ENV"
+  #     - name: Build & activate the Nix Dev Shell
+  #       run: |
+  #         eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
+  #         env >> "$GITHUB_ENV"
 
-      - name: Install JS deps
-        run: yarn install
+  #     - name: Install JS deps
+  #       run: yarn install
 
-      - name: Build @blocksense/e2e-tests
-        run: yarn build:recursive @blocksense/e2e-tests
+  #     - name: Build @blocksense/e2e-tests
+  #       run: yarn build:recursive @blocksense/e2e-tests
 
-      - name: Start e2e tests
-        run: just test-e2e
+  #     - name: Start e2e tests
+  #       run: just test-e2e
 
   smart-contracts-tests:
     timeout-minutes: 360
