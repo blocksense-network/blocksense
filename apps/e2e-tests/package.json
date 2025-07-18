@@ -5,6 +5,7 @@
   "scripts": {
     "ts": "yarn node --import tsx",
     "test": "yarn vitest -w false",
+    "test:unit": "yarn vitest -w false src/utils",
     "test:process-compose-e2e": "yarn test src/process-compose/e2e.spec.ts"
   },
   "dependencies": {
@@ -12,6 +13,7 @@
     "@types/node": "^22.3.0",
     "effect": "^3.7.0",
     "execa": "^9.5.2",
+    "parse-prometheus-text-format": "^1.1.1",
     "tsx": "^4.17.0",
     "typescript": "^5.5.4",
     "vitest": "^3.2.4"
