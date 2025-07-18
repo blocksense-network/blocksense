@@ -8,13 +8,13 @@ lib: with lib; {
     skip-publish-if-less-then-percentage = mkOption {
       type = types.float;
       default = 0.0;
-      description = mdDoc "Publish updates only if they are greater then given threshould as percentage";
+      description = mdDoc "Publish updates only if they are greater then given threshold as percentage";
     };
 
     always-publish-heartbeat-ms = mkOption {
       type = types.int;
       default = 3600000;
-      description = mdDoc "Interval to always publuish updates if there is not enough change";
+      description = mdDoc "Interval to always publish updates if there is not enough change";
     };
 
     peg-to-value = mkOption {
