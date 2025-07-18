@@ -234,6 +234,6 @@ export type NewFeedsConfig = typeof NewFeedsConfigSchema.Type;
  */
 export const decodeNewFeedsConfig = S.decodeUnknownSync(NewFeedsConfigSchema);
 
-export const feedId = S.BigInt.annotations({
+export const FeedIdSchema = S.BigInt.annotations({
   identifier: 'FeedId',
 });
