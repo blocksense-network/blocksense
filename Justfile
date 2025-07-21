@@ -30,6 +30,9 @@ list-environments:
 build-environment environment="all":
   #!/usr/bin/env bash
   set -euo pipefail
+  # Collect free ports that process-compose will use
+  scripts/utils/collect-available-ports.sh {{process-compose-artifacts-dir}}/available-ports
+
   if [[ {{environment}} == "all" ]]; then
     srcDir=$(nix build --impure --json -L .#allProcessComposeFiles | jq -r '.[0].outputs.out')
     cp -rf --no-preserve=mode,ownership "$srcDir"/. {{process-compose-artifacts-dir}}
