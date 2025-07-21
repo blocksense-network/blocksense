@@ -2565,6 +2565,7 @@ __metadata:
   resolution: "@blocksense/e2e-tests@workspace:apps/e2e-tests"
   dependencies:
     "@blocksense/base-utils": "workspace:*"
+    "@blocksense/config-types": "workspace:*"
     "@blocksense/contracts": "workspace:*"
     "@types/node": "npm:^22.3.0"
     "@vitest/coverage-v8": "npm:^3.2.4"
