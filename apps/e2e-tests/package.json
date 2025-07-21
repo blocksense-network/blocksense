@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@blocksense/base-utils": "workspace:*",
+    "@blocksense/config-types": "workspace:*",
     "@blocksense/contracts": "workspace:*",
     "@types/node": "^22.3.0",
     "effect": "^3.15.1",
