@@ -9641,6 +9641,19 @@
         "base": null,
         "quote": null
       },
+      "101001": {
+        "address": "0x93Cf2f28790BEA26479DDF23543AA9bA7Ae6cb47",
+        "constructorArgs": [
+          "Spout LQD PoR",
+          6,
+          "101001",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "101001",
+        "base": null,
+        "quote": null
+      },
       "1000000": {
         "address": "0x7038Ad59f21cEd8Ea5cE69e3fCeA1206b31d434e",
         "constructorArgs": [
@@ -9745,6 +9758,19 @@
         "base": null,
         "quote": null
       },
+      "1000008": {
+        "address": "0x0E720A96E69E97795EF1DA8437fdbf18c469A1df",
+        "constructorArgs": [
+          "cbBTC / USD",
+          8,
+          "1000008",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "1000008",
+        "base": null,
+        "quote": null
+      },
       "2000000": {
         "address": "0x5A78d63A7BD8740D71450d74aCBDea47fa5dfD58",
         "constructorArgs": [
@@ -9768,6 +9794,19 @@
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "2000001",
+        "base": null,
+        "quote": null
+      },
+      "2000002": {
+        "address": "0x55dbC2e2BD9a3165DAe60d586C2701C0B1C61D48",
+        "constructorArgs": [
+          "LQD / USD",
+          8,
+          "2000002",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "2000002",
         "base": null,
         "quote": null
       }
