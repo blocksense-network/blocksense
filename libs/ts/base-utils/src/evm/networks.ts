@@ -120,6 +120,7 @@ const networks = [
   'superseed-mainnet',
   'superseed-sepolia',
   'swellchain-testnet',
+  'tac-mainnet',
   'tac-spb',
   'tac-turin',
   'taiko-mainnet',
@@ -145,8 +146,8 @@ const chainIds = [
   1740, 59902, 6342, 31611, 10143, 2818, 2810, 72080, 8801, 5851, 10, 11155420,
   5611, 7849306, 688688, 9746, 98866, 98867, 137, 80002, 1101, 2442, 11155931,
   57000, 200018, 31, 534352, 534351, 11011, 5031, 50312, 1868, 1946, 16, 146,
-  57054, 1660990954, 5330, 53302, 1924, 2391, 2390, 167000, 167009, 5678, 842,
-  41, 130, 1301, 4801, 1417429182, 324, 300,
+  57054, 1660990954, 5330, 53302, 1924, 239, 2391, 2390, 167000, 167009, 5678,
+  842, 41, 130, 1301, 4801, 1417429182, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks).annotations({
@@ -1608,6 +1609,18 @@ export const networkMetadata = {
       },
     ],
     currency: Currency.ETH,
+  },
+  'tac-mainnet': {
+    chainId: 239,
+    isTestnet: false,
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.tac.build',
+        apiUrl: 'https://explorer.tac.build/api',
+      },
+    ],
+    currency: Currency.TAC,
   },
   'tac-spb': {
     chainId: 2391,
