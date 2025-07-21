@@ -1,8 +1,7 @@
 import { DeploymentConfigV2 } from '@blocksense/config-types';
-import { DeploymentConfigArray } from './types';
 
 export function prepareDeploymentData(
-  deploymentConfig: DeploymentConfigArray,
+  deploymentConfig: DeploymentConfigV2[],
   feedId: string,
 ): DeploymentConfigV2[] {
   return deploymentConfig.map(data => {

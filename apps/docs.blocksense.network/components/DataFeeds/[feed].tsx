@@ -1,7 +1,7 @@
 import DATA_FEEDS from '@blocksense/data-feeds-config-generator/feeds_config';
-import DEPLOYMENT_INFO from '@/artifacts/deployment_data.json';
 
 import { decodeNewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
+import { valuesOf } from '@blocksense/base-utils/array-iter';
 
 import { Error404 } from '@/components/common/Error404';
 import { CoreConfigCard } from '@/components/DataFeeds/Cards/CoreConfigCard';
@@ -11,7 +11,7 @@ import { NetworkAccessCard } from '@/components/DataFeeds/Cards/NetworkAccessCar
 import { OracleConfigCard } from '@/components/DataFeeds/Cards/OracleConfigCard';
 
 import { prepareDeploymentData } from '@/src/deployed-contracts/utils';
-import { decodeDeploymentConfigArray } from '@/src/deployed-contracts/types';
+import { readAllEvmDeployments } from '@blocksense/config-types';
 
 export function generateStaticParams(): { feed: string }[] {
   const feedsConfig = decodeNewFeedsConfig(DATA_FEEDS);
@@ -40,8 +40,10 @@ export default async function DataFeed({ params }: DataFeedProps) {
     return <Error404 />;
   }
 
+  const deploymentInfo = await readAllEvmDeployments(['local']);
+
   const feedDeploymentInfo = prepareDeploymentData(
-    decodeDeploymentConfigArray(DEPLOYMENT_INFO),
+    valuesOf(deploymentInfo),
     String(feed.id),
   );
 

@@ -22,11 +22,6 @@ export const pagesDataFeedsFolder = path.join(
   'pages/docs/data-feeds/',
 );
 
-export const artifactsFolder = path.join(
-  docsBlocksenseNetworkRoot,
-  'artifacts/',
-);
-
 export const ghContractFolder =
   'https://github.com/blocksense-network/blocksense/blob/main/libs/ts/contracts/';
 

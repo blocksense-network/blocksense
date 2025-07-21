@@ -5,7 +5,6 @@ import {
   NetworkName,
   networkName,
 } from '@blocksense/base-utils/evm';
-import { DeploymentConfigSchemaV2 } from '@blocksense/config-types';
 
 const CoreContractSchema = S.mutable(
   S.Struct({
@@ -42,13 +41,3 @@ const ProxyContractDataSchema = S.mutable(
 );
 
 export type ProxyContractData = typeof ProxyContractDataSchema.Type;
-
-export const DeploymentConfigArraySchema = S.mutable(
-  S.Array(DeploymentConfigSchemaV2),
-);
-
-export type DeploymentConfigArray = typeof DeploymentConfigArraySchema.Type;
-
-export const decodeDeploymentConfigArray = S.decodeUnknownSync(
-  DeploymentConfigArraySchema,
-);
