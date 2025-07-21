@@ -1,8 +1,24 @@
-import { describe, expectTypeOf, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 
-import { tuple } from './array-iter';
+import { filterEntries, tuple } from './array-iter';
 
 describe('`base-utils/array-iter` type level tests', () => {
+  describe('filterEntries', () => {
+    it('should filter entries based on key and value predicates', () => {
+      const obj = { a: 1, b: '2', c: 3, d: '4' };
+      const result = filterEntries(
+        obj,
+        key => key === 'a' || key === 'c',
+        value => typeof value === 'number',
+      );
+      expectTypeOf(result).toEqualTypeOf<{
+        a: number;
+        c: number;
+      }>();
+      expect(result).toEqual({ a: 1, c: 3 });
+    });
+  });
+
   describe('`tuple`', () => {
     it('should preserve literal types', () => {
       const x = tuple('a', 'b', 'c');

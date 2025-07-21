@@ -51,6 +51,126 @@ export function fromEntries<K extends string, V>(
 }
 
 /**
+ * Creates a new object with the same keys as the original object, but with
+ * values transformed by a given function.
+ * @template K - The type of the keys in the object.
+ * @template V1 - The type of the values in the input object.
+ * @template V2 - The type of the values in the output object.
+ * @param {Record<K, V1>} obj - The object to iterate over.
+ * @param {(key: K, value: V1) => V2} fn - The function to apply to each
+ * key-value pair. It receives the key and value, and should return the new
+ * value.
+ * @returns {Record<K, V2>} A new object with the same keys and transformed
+ * values.
+ */
+export function mapValues<K extends string, V1, V2>(
+  obj: Record<K, V1>,
+  fn: (key: K, value: V1) => V2,
+): Record<K, V2> {
+  const result = {} as Record<K, V2>;
+
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      result[key] = fn(key as K, obj[key]);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Creates a new object by applying a function to each key-value pair of the
+ * original object.  The function can transform both the key and the value.
+ * @template K1 - The type of the keys in the input object.
+ * @template K2 - The type of the keys in the output object.
+ * @template V1 - The type of the values in the input object.
+ * @template V2 - The type of the values in the output object.
+ * @param {Record<K1, V1>} obj - The object to iterate over.
+ * @param {(key: K1, value: V1) => [K2, V2]} fn - The function to apply to each
+ * key-value pair. It should return a new [key, value] pair.
+ * @returns {Record<K2, V2>} A new object with transformed keys and values.
+ */
+export function mapEntries<K1 extends string, K2 extends string, V1, V2>(
+  obj: Record<K1, V1>,
+  fn: (key: K1, value: V1) => [K2, V2],
+): Record<K2, V2> {
+  const result = {} as Record<K2, V2>;
+
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const [newKey, newValue] = fn(key as K1, obj[key]);
+      result[newKey] = newValue;
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Filters the entries of an object based on a predicate function.
+ * This is useful for type-safe filtering of object entries.
+ * @template K1 - The original key type.
+ * @template K2 - The filtered key type.
+ * @template V1 - The original value type.
+ * @template V2 - The filtered value type.
+ * @param {Record<K1, V1>} obj - The object to filter.
+ * @param {(pair: [K1, V1]) => pair is [K2, V2]} predicate - A type guard
+ * function that returns true for entries to keep.
+ * @returns {Record<K2, V2>} A new object with the filtered entries.
+ */
+export function filterEntries<
+  K1 extends string,
+  K2 extends K1,
+  V1,
+  V2 extends V1,
+>(
+  obj: Record<K1, V1>,
+  keyPredicate: (key: K1) => key is K2,
+  valuePredicate: (value: V1) => value is V2,
+): Record<K2, V2> {
+  const result = {} as Record<K2, V2>;
+
+  for (const key in obj) {
+    if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
+    if (!keyPredicate(key)) continue;
+    const v = obj[key];
+    if (valuePredicate(v)) {
+      result[key] = v;
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Maps the values of an object to promises and returns a promise that resolves
+ * to a new object with the resolved values.
+ * @template K - The type of the keys.
+ * @template V1 - The type of the original values.
+ * @template V2 - The type of the resolved values.
+ * @param {Record<K, V1>} obj - The object to map.
+ * @param {(key: K, value: V1) => Promise<V2>} fn - The function that returns a
+ * promise for the new value.
+ * @returns {Promise<Record<K, V2>>} A promise that resolves to a new object
+ * with the same keys and resolved values.
+ */
+export async function mapValuePromises<K extends string, V1, V2>(
+  obj: Record<K, V1>,
+  fn: (key: K, value: V1) => Promise<V2>,
+): Promise<Record<K, V2>> {
+  const entries = entriesOf(obj);
+  const newEntries = await Promise.all(entries.map(([k, v]) => fn(k, v)));
+
+  const res = {} as Record<K, V2>;
+
+  for (let i = 0; i < entries.length; i++) {
+    res[entries[i][0]] = newEntries[i];
+  }
+
+  return res;
+}
+
+/**
  * Creates a tuple from a list of arguments, ensuring literal types are
  * preserved.
  */
