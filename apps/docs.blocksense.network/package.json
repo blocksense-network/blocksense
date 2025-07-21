@@ -11,7 +11,7 @@
     "dev-watch": "yarn watch:docs-theme & next",
     "ready-dev-go": "yarn build:with-deps && yarn dev",
     "start": "next start",
-    "test": "yarn vitest -w false",
+    "test": "vitest run --typecheck --coverage",
     "ts": "yarn node --import tsx",
     "watch:docs-theme": "nodemon -w ../../libs/docs-theme -e js,jsx,ts,tsx,css --exec 'yarn workspace @blocksense/docs-theme build'"
   },

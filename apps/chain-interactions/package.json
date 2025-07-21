@@ -11,11 +11,10 @@
     "build:ts": "tsup",
     "lint": "yarn run -T eslint \"**/{src,test,examples,scripts,dtslint}/**/*.{ts,mjs}\"",
     "lint-fix": "yarn lint --fix",
-    "test": "vitest run",
-    "coverage": "vitest run --coverage",
+    "test": "vitest run --typecheck --coverage",
     "copy-package-json": "tsx scripts/copy-package-json.ts",
     "changeset-version": "changeset version && node scripts/version.mjs",
-    "changeset-publish": "yarn build && TEST_DIST= yarn vitest && changeset publish"
+    "changeset-publish": "yarn build && TEST_DIST= yarn test && changeset publish"
   },
   "dependencies": {
     "@effect/cli": "0.63.9",

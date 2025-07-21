@@ -65,6 +65,8 @@ build-ts package="all":
     yarn build-single @blocksense/contracts
     yarn build-single @blocksense/data-feeds-config-generator
     yarn build-single @blocksense/changelog-generator
+    yarn build-single @blocksense/chain-interactions
+    yarn build-single @blocksense/avm-relayer
   else
     yarn build:recursive {{package}}
   fi
@@ -75,6 +77,9 @@ test-ts:
   yarn test-single @blocksense/base-utils
   yarn test-single @blocksense/config-types
   yarn test-single @blocksense/data-feeds-config-generator
+  yarn test-single @blocksense/changelog-generator
+  yarn test-single @blocksense/chain-interactions
+  yarn test-single @blocksense/avm-relayer
 
 test-e2e:
   yarn workspace @blocksense/e2e-tests run test

@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "ts": "yarn node --import tsx",
-    "test": "yarn vitest -w false",
+    "test": "vitest run --typecheck --coverage",
     "test:process-compose-e2e": "yarn test src/process-compose/e2e.spec.ts"
   },
   "dependencies": {
