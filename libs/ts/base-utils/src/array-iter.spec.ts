@@ -2,8 +2,12 @@ import { describe, expect, test } from 'vitest';
 import {
   arrayToObject,
   entriesOf,
+  filterEntries,
   fromEntries,
   keysOf,
+  mapEntries,
+  mapValuePromises,
+  mapValues,
   tuple,
   valuesOf,
 } from './array-iter';
@@ -105,6 +109,66 @@ describe('`base-utils/array-iter` tests', () => {
 
     test('should return an empty object for an empty array', () => {
       expect(fromEntries([])).toEqual({});
+    });
+  });
+
+  describe('mapValues', () => {
+    test('should create a new object with transformed values', () => {
+      const obj = { a: 1, b: 2 };
+      const result = mapValues(obj, (key, value) => `${key}-${value * 2}`);
+      expect(result).toEqual({ a: 'a-2', b: 'b-4' });
+    });
+
+    test('should return an empty object for an empty object', () => {
+      expect(mapValues({}, () => 'whatever')).toEqual({});
+    });
+  });
+
+  describe('mapEntries', () => {
+    test('should create a new object with transformed keys and values', () => {
+      const obj = { a: 1, b: 2 };
+      const result = mapEntries(obj, (key, value) => [`key_${key}`, value * 2]);
+      expect(result).toEqual({ key_a: 2, key_b: 4 });
+    });
+
+    test('should return an empty object for an empty object', () => {
+      expect(mapEntries({}, () => ['a', 1])).toEqual({});
+    });
+  });
+
+  describe('filterEntries', () => {
+    test('should filter entries of an object based on a predicate', () => {
+      const obj = { a: 1, b: '2', c: 3, d: '4' };
+      const result = filterEntries(
+        obj,
+        key => key === 'a' || key === 'c',
+        value => typeof value === 'number',
+      );
+      expect(result).toEqual({ a: 1, c: 3 });
+    });
+
+    test('should return an empty object if no entries match', () => {
+      const obj = { a: '1', b: '2' };
+      const result = filterEntries(
+        obj,
+        (pair): pair is [string, number] => typeof pair[1] === 'number',
+      );
+      expect(result).toEqual({});
+    });
+  });
+
+  describe('mapValuePromises', () => {
+    test('should map values to promises and resolve to a new object', async () => {
+      const obj = { a: 1, b: 2 };
+      const result = await mapValuePromises(obj, async (key, value) => {
+        return Promise.resolve(`${key}-${value * 2}`);
+      });
+      expect(result).toEqual({ a: 'a-2', b: 'b-4' });
+    });
+
+    test('should handle empty object', async () => {
+      const result = await mapValuePromises({}, async () => Promise.resolve(1));
+      expect(result).toEqual({});
     });
   });
 
