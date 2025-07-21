@@ -96,7 +96,7 @@
   "scripts": {
     "build": "yarn run rollup:build-workspace",
     "ts": "yarn node --import tsx",
-    "test": "yarn vitest --typecheck -w false"
+    "test": "vitest run --typecheck --coverage"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
