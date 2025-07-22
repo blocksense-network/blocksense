@@ -1,6 +1,7 @@
 import Safe, {
   SafeAccountConfig,
   PredictedSafeProps,
+  predictSafeAddress,
 } from '@safe-global/protocol-kit';
 import { hexlify, toUtf8Bytes } from 'ethers';
 
@@ -43,7 +44,15 @@ export async function deployMultisig({ config, type }: Params): Promise<Safe> {
     },
   });
 
-  const safeAddress = await protocolKit.getAddress();
+  // `protocolKit.getAddress()` calculates incorrect address on zksync chains due to an `if statement` with the chainId
+  const safeAddress = await predictSafeAddress({
+    safeProvider: protocolKit.getSafeProvider(),
+    chainId: config.networkName.toLowerCase().includes('zksync')
+      ? 1n
+      : config.network.chainId,
+    ...predictedSafe,
+    customContracts: config.safeAddresses,
+  });
 
   console.log(`Predicted ${type} address: ${safeAddress}`);
 
