@@ -18,41 +18,51 @@ type VerifyTaskArgs = {
 
 task('etherscan-verify', 'Verify contracts on Etherscan')
   .addOptionalParam('explorerIndex', 'Index of the block explorer to use', '0')
-  .setAction(async ({ explorerIndex }, { run, network, config }) => {
-    const explorerIdx = Number(explorerIndex);
+  .addOptionalParam(
+    'startingContract',
+    'How many CLAggregatorAdapter contracts to skip',
+    '0',
+  )
+  .setAction(
+    async ({ explorerIndex, startingContract }, { run, network, config }) => {
+      const explorerIdx = Number(explorerIndex);
+      const skipCount = Number(startingContract);
 
-    config.etherscan = {
-      ...config.etherscan,
-      customChains: getCustomChainConfig(explorerIdx),
-      apiKey: getApiKeys(),
-    };
+      config.etherscan = {
+        ...config.etherscan,
+        customChains: getCustomChainConfig(explorerIdx),
+        apiKey: getApiKeys(),
+      };
 
-    const deploymentData = await readEvmDeployment(
-      parseNetworkName(network.name),
-      true,
-    );
+      const deploymentData = await readEvmDeployment(
+        parseNetworkName(network.name),
+        true,
+      );
 
-    const verify = ({ address, constructorArgs }: VerifyTaskArgs) =>
-      run('verify:verify', {
-        address,
-        constructorArguments: constructorArgs,
-      }).catch(e => {
-        if (e.message.toLowerCase().includes('already verified')) {
-          console.log('Already verified!');
-        } else {
-          throw e;
-        }
-      });
+      const verify = ({ address, constructorArgs }: VerifyTaskArgs) =>
+        run('verify:verify', {
+          address,
+          constructorArguments: constructorArgs,
+        }).catch(e => {
+          if (e.message.toLowerCase().includes('already verified')) {
+            console.log('Already verified!');
+          } else {
+            throw e;
+          }
+        });
 
-    const contracts = [
-      ...entriesOf(deploymentData.contracts.coreContracts),
-      ...entriesOf(deploymentData.contracts.CLAggregatorAdapter),
-    ];
+      const coreContracts = entriesOf(deploymentData.contracts.coreContracts);
+      const adapterContracts = entriesOf(
+        deploymentData.contracts.CLAggregatorAdapter,
+      ).slice(skipCount);
 
-    for (const [contractName, data] of contracts) {
-      if (!data || data.address === ZeroAddress) continue;
+      const contracts = [...coreContracts, ...adapterContracts];
 
-      console.log('-> Verifying contract:', contractName, data.address);
-      await verify(data);
-    }
-  });
+      for (const [contractName, data] of contracts) {
+        if (!data || data.address === ZeroAddress) continue;
+
+        console.log('-> Verifying contract:', contractName, data.address);
+        await verify(data);
+      }
+    },
+  );
