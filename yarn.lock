@@ -2430,11 +2430,12 @@ __metadata:
     "@nomicfoundation/hardhat-viem": "npm:^2.0.6"
     "@nomiclabs/hardhat-ethers": "npm:^2.2.3"
     "@openzeppelin/contracts": "npm:^5.1.0"
-    "@safe-global/api-kit": "npm:^3.0.0"
-    "@safe-global/protocol-kit": "npm:^5.2.4"
+    "@safe-global/api-kit": "npm:^4.0.0"
+    "@safe-global/protocol-kit": "npm:^6.1.0"
     "@safe-global/safe-contracts": "npm:1.4.1-2"
     "@safe-global/safe-core-sdk-types": "npm:^5.1.0"
-    "@safe-global/safe-deployments": "npm:^1.37.22"
+    "@safe-global/safe-deployments": "npm:^1.37.40"
+    "@safe-global/types-kit": "npm:^3.0.0"
     "@typechain/ethers-v6": "npm:^0.5.1"
     "@typechain/hardhat": "npm:^9.1.0"
     "@types/chai": "npm:4"
@@ -9835,48 +9836,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@safe-global/api-kit@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "@safe-global/api-kit@npm:3.0.0"
+"@safe-global/api-kit@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "@safe-global/api-kit@npm:4.0.0"
   dependencies:
-    "@safe-global/protocol-kit": "npm:^6.0.0"
-    "@safe-global/types-kit": "npm:^2.0.0"
+    "@safe-global/protocol-kit": "npm:^6.1.0"
+    "@safe-global/types-kit": "npm:^3.0.0"
     node-fetch: "npm:^2.7.0"
     viem: "npm:^2.21.8"
-  checksum: 10c0/a4b4f563437989296e3294547f1fa6eb03da0bce51e94b9fc71c1b24c408c29b2cb1c47ee677b555de96c9eed9a676adc160f83938f16c52b521af36817d0b8a
+  checksum: 10c0/67cea959842bcd15029d622cd603321c7ad9015faae781a06339bd8b8835d20e575d4a78609968e63b83fadafd514190ea4e2daf2c0b596cde15df087790c884
   languageName: node
   linkType: hard
 
-"@safe-global/protocol-kit@npm:^5.2.4":
-  version: 5.2.4
-  resolution: "@safe-global/protocol-kit@npm:5.2.4"
+"@safe-global/protocol-kit@npm:^6.1.0":
+  version: 6.1.0
+  resolution: "@safe-global/protocol-kit@npm:6.1.0"
   dependencies:
     "@noble/curves": "npm:^1.6.0"
     "@peculiar/asn1-schema": "npm:^2.3.13"
-    "@safe-global/safe-deployments": "npm:^1.37.28"
-    "@safe-global/safe-modules-deployments": "npm:^2.2.5"
-    "@safe-global/types-kit": "npm:^1.0.4"
-    abitype: "npm:^1.0.2"
-    semver: "npm:^7.6.3"
-    viem: "npm:^2.21.8"
-  dependenciesMeta:
-    "@noble/curves":
-      optional: true
-    "@peculiar/asn1-schema":
-      optional: true
-  checksum: 10c0/d59a0d7ab4bb87d44109d1e10696b7ceeec39e3ef4d34c35651b0ffe9532c825501cb941de3d686cd615b8883cb9921e319c13b8903cfc84a03af006b4b177ce
-  languageName: node
-  linkType: hard
-
-"@safe-global/protocol-kit@npm:^6.0.0":
-  version: 6.0.0
-  resolution: "@safe-global/protocol-kit@npm:6.0.0"
-  dependencies:
-    "@noble/curves": "npm:^1.6.0"
-    "@peculiar/asn1-schema": "npm:^2.3.13"
-    "@safe-global/safe-deployments": "npm:^1.37.30"
-    "@safe-global/safe-modules-deployments": "npm:^2.2.7"
-    "@safe-global/types-kit": "npm:^2.0.0"
+    "@safe-global/safe-deployments": "npm:^1.37.35"
+    "@safe-global/safe-modules-deployments": "npm:^2.2.10"
+    "@safe-global/types-kit": "npm:^3.0.0"
     abitype: "npm:^1.0.2"
     semver: "npm:^7.7.1"
     viem: "npm:^2.21.8"
@@ -9885,7 +9865,7 @@ __metadata:
       optional: true
     "@peculiar/asn1-schema":
       optional: true
-  checksum: 10c0/07fcb51e5c22cdb3d1d18b9cda72ac0b8929bd81266b662658c0230badc7eeb2740947781a757a8b5e34267ed412dd56c404f9719d523462e4e4f8eeb9ebd000
+  checksum: 10c0/62b822059a6162249a2136c08258addc082e75438e58480de00decf356cfdb1b4303f8f964ce818810e03f2acece5d830139ad4ebb4c5917590cbc449f69a6ec
   languageName: node
   linkType: hard
 
@@ -9907,46 +9887,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@safe-global/safe-deployments@npm:^1.37.22":
-  version: 1.37.22
-  resolution: "@safe-global/safe-deployments@npm:1.37.22"
+"@safe-global/safe-deployments@npm:^1.37.35, @safe-global/safe-deployments@npm:^1.37.40":
+  version: 1.37.40
+  resolution: "@safe-global/safe-deployments@npm:1.37.40"
   dependencies:
     semver: "npm:^7.6.2"
-  checksum: 10c0/7b25cbfedc180bc74f3e5c3ee0ab6b63a64ab77d9c35f0b9657aec9d62ea5b651b381354a28708752c126ca8af5a30df827d825dced5c784d8ed44b43ed13355
+  checksum: 10c0/1616da870febf8265fdd99bb641b277538c6d8c4c6bd96a46ecfbda8ba4fb2b576170c14b3031f1e9c4d5cc353f83aa5945167270318bf7e09a6519426a7d9d9
   languageName: node
   linkType: hard
 
-"@safe-global/safe-deployments@npm:^1.37.28, @safe-global/safe-deployments@npm:^1.37.30":
-  version: 1.37.30
-  resolution: "@safe-global/safe-deployments@npm:1.37.30"
-  dependencies:
-    semver: "npm:^7.6.2"
-  checksum: 10c0/1ee93fc7287b28e6e2485892c6f25b6e94eeeba7b97ee68572459c5aec394cf7922ac15ebd2896a592a30d9f7cd035e873b411260e0dc5ca4ef46b56b6848fb7
+"@safe-global/safe-modules-deployments@npm:^2.2.10":
+  version: 2.2.12
+  resolution: "@safe-global/safe-modules-deployments@npm:2.2.12"
+  checksum: 10c0/f60f8eac991fd827546f7169d0a451885721fda6ab225619f411b273b25b144843d372f97b97447866f3eecd5c265e68c632c45cd38f961486eeb415c832c8b2
   languageName: node
   linkType: hard
 
-"@safe-global/safe-modules-deployments@npm:^2.2.5, @safe-global/safe-modules-deployments@npm:^2.2.7":
-  version: 2.2.7
-  resolution: "@safe-global/safe-modules-deployments@npm:2.2.7"
-  checksum: 10c0/aee05d6e2ac2d1289a7d1435760526f25efbd83c200d66402618e22bcd34bf5a3d31723d6fbe121a8ff09d5de7600cac96c09750326bb2c33b489a89dd36ed7d
-  languageName: node
-  linkType: hard
-
-"@safe-global/types-kit@npm:^1.0.4":
-  version: 1.0.4
-  resolution: "@safe-global/types-kit@npm:1.0.4"
+"@safe-global/types-kit@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@safe-global/types-kit@npm:3.0.0"
   dependencies:
     abitype: "npm:^1.0.2"
-  checksum: 10c0/1ac8b2933f0fe9d550818228fc1c637be96ee9a5ee84d8fd432c9d81511158a2a0ec15bedfa5843fe90bf84ad328b8148232b91a638f401b7a9a48553503546a
-  languageName: node
-  linkType: hard
-
-"@safe-global/types-kit@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "@safe-global/types-kit@npm:2.0.0"
-  dependencies:
-    abitype: "npm:^1.0.2"
-  checksum: 10c0/93ab36e0fc7c98b85f285396245c752757c52a0471e4b45d0a44cb4b4da50b8f46026ac9900d0736fd73119f33233e29ca69b1226cb5eb706a146354f4e2ffbb
+  checksum: 10c0/98a36a95ff7a5dcf857937d7c26faa28f5d9fb14c22254429ed150db726d4fa0e5cf6451702933545187796ce53cd4bc16682cd019a781bb0e01bd9a8cbb60b8
   languageName: node
   linkType: hard
 
