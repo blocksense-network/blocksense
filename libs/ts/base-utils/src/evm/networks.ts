@@ -102,6 +102,7 @@ const networks = [
   'polygon-amoy',
   'polygon-zkevm-mainnet',
   'polygon-zkevm-cardona',
+  'pyrope-testnet',
   'rise-testnet',
   'rollux-testnet',
   'rome-testnet',
@@ -144,10 +145,10 @@ const chainIds = [
   1666700000, 743111, 560048, 1663, 998, 2424, 57073, 763373, 2221, 1284, 1287,
   1285, 59144, 59141, 4202, 994873017, 2030232745, 169, 3441006, 5000, 5003,
   1740, 59902, 6342, 31611, 10143, 2818, 2810, 72080, 8801, 5851, 10, 11155420,
-  5611, 7849306, 688688, 9746, 98866, 98867, 137, 80002, 1101, 2442, 11155931,
-  57000, 200018, 31, 534352, 534351, 11011, 5031, 50312, 1868, 1946, 16, 146,
-  57054, 1660990954, 5330, 53302, 1924, 239, 2391, 2390, 167000, 167009, 5678,
-  842, 41, 130, 1301, 4801, 1417429182, 324, 300,
+  5611, 7849306, 688688, 9746, 98866, 98867, 137, 80002, 1101, 2442, 695569,
+  11155931, 57000, 200018, 31, 534352, 534351, 11011, 5031, 50312, 1868, 1946,
+  16, 146, 57054, 1660990954, 5330, 53302, 1924, 239, 2391, 2390, 167000,
+  167009, 5678, 842, 41, 130, 1301, 4801, 1417429182, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks).annotations({
@@ -1375,6 +1376,18 @@ export const networkMetadata = {
         type: 'etherscan',
         webUrl: 'https://cardona-zkevm.polygonscan.com',
         apiUrl: 'https://api-cardona-zkevm.polygonscan.com/api',
+      },
+    ],
+    currency: Currency.ETH,
+  },
+  'pyrope-testnet': {
+    chainId: 695569,
+    isTestnet: true,
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.pyropechain.com',
+        apiUrl: 'https://explorer.pyropechain.com/api',
       },
     ],
     currency: Currency.ETH,
