@@ -83,3 +83,22 @@ export const getApiKeys = () =>
       getOptionalApiKey(name as NetworkName),
     ]),
   );
+
+export const binarySearch = <T>(
+  array: T[],
+  left: number,
+  right: number,
+  condition: (mid: T, index: number) => boolean,
+): number => {
+  while (left < right) {
+    const midIndex = Math.floor((left + right) / 2);
+    const midValue = array[midIndex];
+
+    if (condition(midValue, midIndex)) {
+      left = midIndex + 1;
+    } else {
+      right = midIndex;
+    }
+  }
+  return left;
+};
