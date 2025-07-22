@@ -49,6 +49,7 @@ export const deployedNetworks = [
   'plume-testnet',
   'polygon-amoy',
   'polygon-zkevm-cardona',
+  'pyrope-testnet',
   'rise-testnet',
   'rootstock-testnet',
   'scroll-sepolia',
