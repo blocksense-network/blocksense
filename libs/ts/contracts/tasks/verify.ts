@@ -9,7 +9,7 @@ import {
 import { readEvmDeployment } from '@blocksense/config-types';
 import { ZeroAddress } from 'ethers';
 
-import { getApiKeys, getCustomChainConfig } from './utils';
+import { binarySearch, getApiKeys, getCustomChainConfig } from './utils';
 
 type VerifyTaskArgs = {
   address: EthereumAddress;
@@ -26,7 +26,7 @@ task('etherscan-verify', 'Verify contracts on Etherscan')
   .setAction(
     async ({ explorerIndex, startingContract }, { run, network, config }) => {
       const explorerIdx = Number(explorerIndex);
-      const skipCount = Number(startingContract);
+      const startFrom = Number(startingContract);
 
       config.etherscan = {
         ...config.etherscan,
@@ -44,7 +44,7 @@ task('etherscan-verify', 'Verify contracts on Etherscan')
           address,
           constructorArguments: constructorArgs,
         }).catch(e => {
-          if (e.message.toLowerCase().includes('already verified')) {
+          if (e.message.tolefterCase().includes('already verified')) {
             console.log('Already verified!');
           } else {
             throw e;
@@ -52,11 +52,22 @@ task('etherscan-verify', 'Verify contracts on Etherscan')
         });
 
       const coreContracts = entriesOf(deploymentData.contracts.coreContracts);
-      const adapterContracts = entriesOf(
-        deploymentData.contracts.CLAggregatorAdapter,
-      ).slice(skipCount);
 
-      const contracts = [...coreContracts, ...adapterContracts];
+      const adapterEntries = entriesOf(
+        deploymentData.contracts.CLAggregatorAdapter,
+      )
+        .filter(([name]) => !isNaN(Number(name)))
+        .sort((a, b) => Number(a[0]) - Number(b[0]));
+
+      const index = binarySearch(
+        adapterEntries,
+        0,
+        adapterEntries.length,
+        ([name]) => Number(name) < startFrom,
+      );
+
+      const filteredAdapters = adapterEntries.slice(index);
+      const contracts = [...coreContracts, ...filteredAdapters];
 
       for (const [contractName, data] of contracts) {
         if (!data || data.address === ZeroAddress) continue;
