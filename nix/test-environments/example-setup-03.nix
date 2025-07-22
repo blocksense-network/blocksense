@@ -65,37 +65,12 @@ in
             {
               feed-id = 50000; # USDT / USD Pegged
               peg-to-value = 1.00;
-              peg-tolerance-percentage = 0.1;
+              peg-tolerance-percentage = 10.0; # 10% tolerance assures that the price will be pegged
             }
             {
               feed-id = 50001; # USDC / USD Pegged
               peg-to-value = 1.00;
-              peg-tolerance-percentage = 0.1;
-            }
-            {
-              feed-id = 100002; # YieldFi yUSD (yUSD) exchangeRate on ETH mainnet
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
-              feed-id = 100003; # ynBNB MAX (ynBNBx) - YieldNest convertToAssets on BNB
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
-              feed-id = 1000000; # WMON / USD
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
-              feed-id = 1000003; # CHOG / USD
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
-              feed-id = 1000008; # cbBTC / USD
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
+              peg-tolerance-percentage = 0.000001; # 0.000001% tolerance assures that the price will not be pegged
             }
           ];
         };
