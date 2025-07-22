@@ -19,6 +19,12 @@ let
 
   mkCargoTargetExePath = executable-name: "${config.devenv.root}/target/release/${executable-name}";
 
+  feedsConfigDir =
+    if builtins.getEnv "FEEDS_CONFIG_DIR" != "" then
+      builtins.getEnv "FEEDS_CONFIG_DIR"
+    else
+      "${config.devenv.root}/config";
+
   logsConfig = {
     fields_order = [
       "message"
@@ -110,7 +116,7 @@ let
         timeout_seconds = 30;
       };
       environment = [
-        "FEEDS_CONFIG_DIR=${../../../../config}"
+        "FEEDS_CONFIG_DIR=${feedsConfigDir}"
         "SEQUENCER_CONFIG_DIR=${cfg.config-dir}"
         "SEQUENCER_LOG_LEVEL=${lib.toUpper cfg.sequencer.log-level}"
       ];
