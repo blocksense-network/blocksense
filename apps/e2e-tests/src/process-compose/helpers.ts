@@ -1,9 +1,10 @@
 import { ParseResult, Schema as S } from 'effect';
-import { $ } from 'execa';
+import { $, execa } from 'execa';
 
 import { logMessage } from '../utils/logs';
 
 import { arrayToObject } from '@blocksense/base-utils/array-iter';
+import { rootDir } from '@blocksense/base-utils/env';
 
 const ProcessComposeStatusSchema = S.mutable(
   S.Array(
@@ -39,8 +40,11 @@ export async function parseProcessesStatus() {
 }
 
 export async function startEnvironment(testEnvironment: string): Promise<void> {
-  logTestEnvironmentInfo('Starting', testEnvironment);
-  await $`just start-environment ${testEnvironment} --detached`;
+  await execa('just', ['start-environment', testEnvironment, '--detached'], {
+    env: {
+      FEEDS_CONFIG_DIR: `${rootDir}/apps/e2e-tests/src/process-compose/config`,
+    },
+  });
 }
 
 export async function stopEnvironment(): Promise<void> {
