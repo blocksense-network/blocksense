@@ -61,113 +61,14 @@ in
           contract-version = 2;
           transaction-gas-limit = 20000000;
           impersonated-anvil-account = impersonationAddress;
-          allow-feeds = [
-            # cex-price-feeds oracle feeds
-            0 # BTC / USD
-            3 # ETH / USD
-            7 # USDT / USD
-            13 # BNB / USD
-            16 # SOL / USD
-            19 # USDC / USD
-            32 # wBTC / USD
-            35 # LINK / USD
-            91 # UNI / USD
-            114 # AAVE / USD
-            121 # TAO / USD
-            347 # 1INCH / USD
-            50000 # USDT / USD Pegged
-            50001 # USDC / USD Pegged
-
-            # exsat-holdings oracle feeds
-            # Very slow oracle, not suitable for fast setup
-            # 100000 # ExSat BTC
-
-            # eth-rpc oracle feeds
-            100002 # YieldFi yUSD (yUSD) exchangeRate on ETH mainnet
-            100003 # ynBNB MAX (ynBNBx) - YieldNest convertToAssets on BNB
-
-            # gecko-terminal oracle feeds
-            1000000 # WMON / USD
-            1000003 # CHOG / USD
-            1000008 # cbBTC/ USD
-
-            # stock-price-feeds oracle feeds
-            # At this point we don't have API keys in the e2e test set
-            # 2000000 # IBIT / USD
-            # 2000001 # SPY / USD
-          ];
           publishing-criteria = [
             {
-              feed-id = 0; # BTC / USD
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
-              feed-id = 3; # ETH / USD
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
-              feed-id = 7; # USDT / USD
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
-              feed-id = 13; # BNB / USD
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
-              feed-id = 16; # SOL / USD
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
-              feed-id = 19; # USDC / USD
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
-              feed-id = 32; # wBTC / USD
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
-              feed-id = 35; # LINK / USD
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
-              feed-id = 91; # UNI / USD
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
-              feed-id = 114; # AAVE / USD
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
-              feed-id = 121; # TAO / USD
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
-              feed-id = 347; # 1INCH / USD
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
-            }
-            {
               feed-id = 50000; # USDT / USD Pegged
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
               peg-to-value = 1.00;
               peg-tolerance-percentage = 0.1;
             }
             {
               feed-id = 50001; # USDC / USD Pegged
-              skip-publish-if-less-then-percentage = 0.001;
-              always-publish-heartbeat-ms = 20000;
               peg-to-value = 1.00;
               peg-tolerance-percentage = 0.1;
             }
