@@ -125,6 +125,12 @@ describe.sequential('E2E Tests with process-compose', async () => {
     );
 
     for (const [id, price] of entriesOf(currentPrices)) {
+      // Pegged asset with 10% tolerance should be pegged
+      // Pegged asset with 0.000001% tolerance should not be pegged
+      if (id === '50000') {
+        expect(price).toEqual(1 * 10 ** 8);
+        continue;
+      }
       expect(price).not.toEqual(initialPrices[id]);
     }
   });
