@@ -9550,6 +9550,19 @@
         "base": null,
         "quote": null
       },
+      "732": {
+        "address": "0xc2469b83ed778BB7dffA969AB90152da7e964653",
+        "constructorArgs": [
+          "TARA / USD",
+          18,
+          "732",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "732",
+        "base": null,
+        "quote": null
+      },
       "50000": {
         "address": "0xF09ed8aA3bEfb227bE06d133FCE8b650f3708130",
         "constructorArgs": [
@@ -9603,10 +9616,10 @@
         "quote": null
       },
       "100002": {
-        "address": "0xf1819A81cA59e8E9D195Ee62876bea55422bE493",
+        "address": "0x7CDA9b3CfC7dE7A95Ef7C8dDEc16F96dD46acc24",
         "constructorArgs": [
           "YUSD / USDC",
-          0,
+          6,
           "100002",
           "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
