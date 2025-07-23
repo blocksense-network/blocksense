@@ -1,16 +1,12 @@
-import { isNetworkName } from '@blocksense/base-utils';
 import { task } from 'hardhat/config';
-import { NetworkConfig } from './types';
+import { solidityPacked } from 'ethers';
 import Safe from '@safe-global/protocol-kit';
-import SafeApiKit from '@safe-global/api-kit';
 import {
   OperationType,
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
-import { readEvmDeployment } from '@blocksense/config-types/read-write-config';
-import { initChain } from './deployment-utils/init-chain';
-import { solidityPacked, toBeArray } from 'ethers';
-import { adjustVInSignature } from './utils';
+
+import { isNetworkName } from '@blocksense/base-utils/evm';
 import {
   color as c,
   drawBox,
@@ -18,6 +14,11 @@ import {
   renderTui,
   vlist,
 } from '@blocksense/base-utils/tty';
+import { readEvmDeployment } from '@blocksense/config-types/read-write-config';
+
+import { NetworkConfig } from './types';
+import { initChain } from './deployment-utils/init-chain';
+import { executeMultisigTransaction } from './deployment-utils/multisig-tx-exec';
 
 task('change-sequencer', 'Change sequencer role in Access Control contract')
   .addParam('networks', 'Network to deploy to')
@@ -81,11 +82,6 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
         return;
       }
 
-      // Initialize the API Kit
-      const apiKit = new SafeApiKit({
-        chainId: config.network.chainId,
-      });
-
       const safeTxSetAccessControl: SafeTransactionDataPartial = {
         to: AccessControl.address,
         value: '0',
@@ -96,23 +92,10 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
         operation: OperationType.Call,
       };
 
-      const tx = await adminMultisig.createTransaction({
+      await executeMultisigTransaction({
         transactions: [safeTxSetAccessControl],
-      });
-
-      const safeTxHash = await adminMultisig.getTransactionHash(tx);
-
-      const typedDataHash = toBeArray(safeTxHash);
-      const signedData = await config.deployer.signMessage(typedDataHash);
-      const signature = await adjustVInSignature(signedData);
-
-      // Send the transaction to the Transaction Service with the signature from Owner A
-      await apiKit.proposeTransaction({
-        safeAddress: AdminMultisig,
-        safeTransactionData: tx.data,
-        safeTxHash,
-        senderAddress: config.deployerAddress,
-        senderSignature: signature,
+        safe: adminMultisig,
+        config,
       });
     }
   });
