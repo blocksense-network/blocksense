@@ -17,15 +17,17 @@ let
     in
     asInts;
 
+  root = ../..;
+
   availablePorts =
     let
-      filePath = "${config.devenv.root}/config/generated/process-compose/available-ports";
+      filePath = lib.path.append root "config/generated/process-compose/available-ports";
     in
     if builtins.pathExists filePath then readPortsFromFile filePath else [ 8547 ];
 
-  testKeysDir = config.devenv.root + "/nix/test-environments/test-keys";
-  e2eTestKeysDir = config.devenv.root + "/apps/e2e-tests/test-keys";
-  deploymentV2FilePath = config.devenv.root + "/config/evm_contracts_deployment_v2/ink-sepolia.json";
+  testKeysDir = lib.path.append root "nix/test-environments/test-keys";
+  e2eTestKeysDir = lib.path.append root "apps/e2e-tests/test-keys";
+  deploymentV2FilePath = lib.path.append root "config/evm_contracts_deployment_v2/ink-sepolia.json";
 
   upgradeableProxyADFSContractAddressInk =
     (readJson deploymentV2FilePath).contracts.coreContracts.UpgradeableProxyADFS.address;
@@ -40,7 +42,7 @@ in
   services.kafka.enable = lib.mkForce false;
 
   services.blocksense = {
-    logsDir = lib.mkForce (config.devenv.root + "/logs/process-compose/example-setup-03");
+    logsDir = lib.mkForce "$GIT_ROOT/logs/blocksense/example-setup-03";
 
     blama.enable = lib.mkForce false;
 
