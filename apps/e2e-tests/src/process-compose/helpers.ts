@@ -40,6 +40,7 @@ export async function parseProcessesStatus() {
 }
 
 export async function startEnvironment(testEnvironment: string): Promise<void> {
+  logTestEnvironmentInfo('Starting', testEnvironment);
   await execa('just', ['start-environment', testEnvironment, '--detached'], {
     env: {
       FEEDS_CONFIG_DIR: `${rootDir}/apps/e2e-tests/src/process-compose/config`,
