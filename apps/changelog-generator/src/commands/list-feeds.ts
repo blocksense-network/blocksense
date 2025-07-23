@@ -1,19 +1,15 @@
-import { readdirSync } from 'fs';
-
-import { configDir, parseNetworkName } from '@blocksense/base-utils';
 import type { TableRow } from '@blocksense/base-utils/tty';
 import { renderTui, drawTable } from '@blocksense/base-utils/tty';
 import {
-  configDirs,
+  configDir,
   readConfig,
+  listEvmNetworks,
   readEvmDeployment,
 } from '@blocksense/config-types';
 import { Command, Options } from '@effect/cli';
 import { Effect } from 'effect';
 
-const availableNetworks = readdirSync(
-  configDirs.evm_contracts_deployment_v2,
-).map(filename => parseNetworkName(filename.replace(/\.json$/, '')));
+const availableNetworks = await listEvmNetworks();
 
 export const listFeeds = Command.make(
   'list-feeds',
