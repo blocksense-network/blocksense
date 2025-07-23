@@ -40889,6 +40889,47 @@
       }
     },
     {
+      "id": "732",
+      "full_name": "TARA / USD",
+      "description": "Price of Taraxa (TARA) in USD",
+      "type": "price-feed",
+      "oracle_id": "cex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "TARA",
+          "quote": "USD"
+        },
+        "decimals": 18,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "exchanges": {
+            "GateIo": {
+              "id": ["TARA_USDT"]
+            },
+            "KuCoin": {
+              "symbol": ["TARA-USDT"]
+            },
+            "MEXC": {
+              "symbol": ["TARAUSDT"]
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "50000",
       "full_name": "USDT / USD Peg-aware",
       "description": "Peg-aware price of USDT in USD",
