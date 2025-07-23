@@ -11,13 +11,19 @@ import { readEvmDeployment } from '@blocksense/config-types/read-write-config';
 import { initChain } from './deployment-utils/init-chain';
 import { solidityPacked, toBeArray } from 'ethers';
 import { adjustVInSignature } from './utils';
+import {
+  color as c,
+  drawBox,
+  readline,
+  renderTui,
+  vlist,
+} from '@blocksense/base-utils/tty';
 
 task('change-sequencer', 'Change sequencer role in Access Control contract')
   .addParam('networks', 'Network to deploy to')
   .addParam('sequencerAddress', 'Sequencer address')
   .addParam('setRole', 'Enable/Disable sequencer address role in AC')
   .setAction(async (args, { ethers }) => {
-    console.log('args', args);
     const networks = args.networks.split(',');
     const configs: NetworkConfig[] = [];
     for (const network of networks) {
@@ -48,6 +54,32 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
           [config.network.chainId.toString()]: config.safeAddresses,
         },
       });
+
+      const signers = await adminMultisig.getOwners();
+      const threshold = await adminMultisig.getThreshold();
+
+      renderTui(
+        drawBox(
+          'Change sequencer role in Access Control',
+          drawBox(
+            `ADMIN Multisig config`,
+            c`Address: {bold ${AdminMultisig}}`,
+            c`Threshold: {bold ${threshold} / ${signers.length}}`,
+            `Signers: `,
+            ...vlist(signers),
+          ),
+          drawBox(
+            'Sequencer',
+            `address: ${args.sequencerAddress}`,
+            `is allowed: ${args.setRole ? '✅' : '❌'}`,
+          ),
+        ),
+      );
+
+      if ((await readline().question('\nConfirm deployment? (y/n) ')) !== 'y') {
+        console.log('Aborting deployment...');
+        return;
+      }
 
       // Initialize the API Kit
       const apiKit = new SafeApiKit({
