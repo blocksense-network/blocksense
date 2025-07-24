@@ -86,6 +86,44 @@
             packages = [ self'.apps.trigger-oracle.program ];
           };
         };
+
+        # Docker Images
+        sequencer-image = pkgs.dockerTools.buildImage {
+          name = "sequencer";
+          config = {
+            Cmd = [ "${self'.apps.sequencer.program}" ];
+          };
+        };
+
+        # reporter-image = nix2container.buildImage {
+        #   name = "reporter";
+        #   tag = "latest";
+
+        #   config = {
+        #     cmd = [
+        #       self'.apps.blocksense.program
+        #       "node"
+        #       "build"
+        #       "--up"
+        #       "--from"
+        #       "$REPORTER_CONFIG_JSON_FILE"
+        #     ];
+        #   };
+        # };
+
+        reporter-image = pkgs.dockerTools.buildImage {
+          name = "reporter";
+          config = {
+            Cmd = [
+              "${self'.apps.blocksense.program}"
+              "node"
+              "build"
+              "--up"
+              "--from"
+              "$REPORTER_CONFIG_JSON_FILE"
+            ];
+          };
+        };
       };
     };
 }
