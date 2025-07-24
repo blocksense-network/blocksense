@@ -11,7 +11,7 @@ import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
 type CoreContractProps = {
   name: string;
   address: EthereumAddress;
-  networks: NetworkName[];
+  network: NetworkName;
 };
 
 export const CoreContractCard = ({
@@ -33,7 +33,7 @@ export const CoreContractCard = ({
             <div className="flex items-center space-x-2">
               <ContractAddress
                 address={contract.address}
-                network={contract.networks[0]}
+                network={contract.network}
                 copyButton={{ enableCopy: true, background: false }}
               />
             </div>

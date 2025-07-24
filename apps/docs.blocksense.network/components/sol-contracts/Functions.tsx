@@ -23,7 +23,7 @@ export const Functions = ({
     <ContractItemWrapper
       title="Functions"
       titleLevel={isFromSourceUnit ? 2 : 3}
-      itemsLength={functions.length}
+      nonEmpty={!!functions.length}
     >
       <ContractAccordion elementsNames={getContractElementsNames(functions)}>
         {functions.map(_function => {

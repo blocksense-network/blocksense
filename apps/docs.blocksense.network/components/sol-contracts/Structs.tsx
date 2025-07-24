@@ -16,7 +16,7 @@ export const Structs = ({ structs = [], isFromSourceUnit }: StructsProps) => {
     <ContractItemWrapper
       title="Structs"
       titleLevel={isFromSourceUnit ? 2 : 3}
-      itemsLength={structs.length}
+      nonEmpty={!!structs.length}
     >
       <ContractAccordion elementsNames={getContractElementsNames(structs)}>
         {structs.map(struct => (

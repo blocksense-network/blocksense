@@ -1,8 +1,9 @@
 import { readdir } from 'fs/promises';
+import { Schema as S } from 'effect';
 
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it, test } from 'vitest';
 
-import { keysOf } from '@blocksense/base-utils/array-iter';
+import { entriesOf, keysOf } from '@blocksense/base-utils/array-iter';
 import { assertNotNull } from '@blocksense/base-utils/assert';
 import {
   parseNetworkName,
@@ -11,18 +12,59 @@ import {
 } from '@blocksense/base-utils/evm';
 
 import {
-  configFiles,
   configDirs,
   readConfig,
   readEvmDeployment,
   readAllEvmDeployments,
+  configTypes,
+  legacyConfigTypes,
+  getConfigFilePath,
+  ConfigFileName,
 } from '../src/read-write-config';
 import { DeploymentConfigV2 } from '../src/evm-contracts-deployment';
+import {
+  downloadAndDecodeFile,
+  isTokenValid,
+} from '../src/dfcg/artifacts/downloader';
+import { join } from 'path';
+import { rootDir } from '../../base-utils/src/env/constants';
+
+const LEGACY_CONFIGS_DIR = 'configs';
+
+const tokenValid = await isTokenValid();
+if (!tokenValid) {
+  console.warn(
+    `Skipping tests for legacy configs. Renew GitHub token for /blocksense/dfcg-artifacts repo`,
+  );
+}
+
+describe.skipIf(!tokenValid)(
+  'Legacy configuration files decoding',
+  async () => {
+    for (const configType of keysOf(legacyConfigTypes)) {
+      it(`should decode '${configType}' config file successfully`, async () => {
+        const config = await downloadAndDecodeFile(
+          getConfigFilePath(configType, LEGACY_CONFIGS_DIR),
+          legacyConfigTypes[configType as ConfigFileName],
+        );
+        expect(config).toBeTypeOf('object');
+      });
+    }
+  },
+);
 
 describe('Configuration files decoding', async () => {
-  for (const configName of keysOf(configFiles)) {
-    test(`should decode '${configName}' config file successfully`, async () => {
-      const config = await readConfig(configName);
+  const configTypesWithoutLegacy = Object.fromEntries(
+    entriesOf(configTypes).filter(([key]) => !(key in legacyConfigTypes)),
+  ) satisfies Record<string, S.Schema<any>>;
+
+  for (const configType of keysOf(configTypesWithoutLegacy)) {
+    it(`should decode '${configType}' config file successfully`, async () => {
+      const dir =
+        configType === 'sequencer_config_v2'
+          ? join(rootDir, '/libs/ts/config-types/tests/fixtures')
+          : configDirs[configType];
+      const config = await readConfig(configType as ConfigFileName, dir);
       expect(config).toBeTypeOf('object');
     });
   }

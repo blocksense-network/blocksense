@@ -28,9 +28,8 @@ const networks = [
   'avalanche-fuji',
   'base-mainnet',
   'base-sepolia',
-  'basecamp',
+  'basecamp-testnet',
   'berachain-mainnet',
-  'berachain-bartio',
   'berachain-bepolia',
   'bitlayer-mainnet',
   'bitlayer-testnet',
@@ -68,7 +67,6 @@ const networks = [
   'ink-mainnet',
   'ink-sepolia',
   'kava-testnet',
-  'kroma-sepolia',
   'kusama-moonbeam',
   'kusama-moonbase-alpha',
   'kusama-moonriver',
@@ -76,7 +74,7 @@ const networks = [
   'linea-sepolia',
   'lisk-sepolia',
   'lumia-mainnet',
-  'lumia-testnet',
+  'lumia-beam-testnet',
   'manta-mainnet',
   'manta-sepolia',
   'mantle-mainnet',
@@ -96,14 +94,15 @@ const networks = [
   'optimism-sepolia',
   'opbnb-testnet',
   'ozean-poseidon-testnet',
-  'pharos-devnet',
   'pharos-testnet',
+  'plasma-testnet',
   'plume-mainnet',
   'plume-testnet',
   'polygon-mainnet',
   'polygon-amoy',
   'polygon-zkevm-mainnet',
   'polygon-zkevm-cardona',
+  'pyrope-testnet',
   'rise-testnet',
   'rollux-testnet',
   'rome-testnet',
@@ -111,6 +110,7 @@ const networks = [
   'scroll-mainnet',
   'scroll-sepolia',
   'shape-sepolia',
+  'somnia-mainnet',
   'somnia-testnet',
   'soneium-mainnet',
   'soneium-minato',
@@ -121,6 +121,7 @@ const networks = [
   'superseed-mainnet',
   'superseed-sepolia',
   'swellchain-testnet',
+  'tac-mainnet',
   'tac-spb',
   'tac-turin',
   'taiko-mainnet',
@@ -138,16 +139,16 @@ const networks = [
 
 const chainIds = [
   99999999999, 1, 11155111, 17000, 11124, 1088, 42161, 421614, 1313161555,
-  43114, 43113, 123420001114, 8453, 84532, 80094, 80084, 80069, 200901, 200810,
-  81457, 168587773, 56288, 9728, 288, 28882, 56, 97, 325000, 42220, 44787, 5115,
-  66665, 338, 111557560, 18880, 839999, 250, 4002, 114, 252, 2522, 10888, 100,
-  10200, 1666700000, 743111, 560048, 1663, 998, 2424, 57073, 763373, 2221, 2358,
-  1284, 1287, 1285, 59144, 59141, 4202, 994873017, 1952959480, 169, 3441006,
-  5000, 5003, 1740, 59902, 6342, 31611, 10143, 2818, 2810, 72080, 8801, 5851,
-  10, 11155420, 5611, 7849306, 50002, 688688, 98866, 98867, 137, 80002, 1101,
-  2442, 11155931, 57000, 200018, 31, 534352, 534351, 11011, 50312, 1868, 1946,
-  16, 146, 57054, 1660990954, 5330, 53302, 1924, 2391, 2390, 167000, 167009,
-  5678, 842, 41, 130, 1301, 4801, 1417429182, 324, 300,
+  43114, 43113, 123420001114, 8453, 84532, 80094, 80069, 200901, 200810, 81457,
+  168587773, 56288, 9728, 288, 28882, 56, 97, 325000, 42220, 44787, 5115, 66665,
+  338, 111557560, 18880, 839999, 250, 4002, 114, 252, 2522, 10888, 100, 10200,
+  1666700000, 743111, 560048, 1663, 998, 2424, 57073, 763373, 2221, 1284, 1287,
+  1285, 59144, 59141, 4202, 994873017, 2030232745, 169, 3441006, 5000, 5003,
+  1740, 59902, 6342, 31611, 10143, 2818, 2810, 72080, 8801, 5851, 10, 11155420,
+  5611, 7849306, 688688, 9746, 98866, 98867, 137, 80002, 1101, 2442, 695569,
+  11155931, 57000, 200018, 31, 534352, 534351, 11011, 5031, 50312, 1868, 1946,
+  16, 146, 57054, 1660990954, 5330, 53302, 1924, 239, 2391, 2390, 167000,
+  167009, 5678, 842, 41, 130, 1301, 4801, 1417429182, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks).annotations({
@@ -241,6 +242,7 @@ export enum Currency {
   tZKJ = 'tZKJ',
   USDX = 'USDX',
   xDAI = 'xDAI',
+  XPL = 'XPL',
   Z = 'Z',
 }
 
@@ -375,6 +377,11 @@ export const networkMetadata = {
         apiUrl:
           'https://api.routescan.io/v2/network/mainnet/evm/43114/etherscan',
       },
+      {
+        type: 'etherscan',
+        webUrl: 'https://snowscan.xyz',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=43114',
+      },
     ],
     currency: Currency.AVAX,
   },
@@ -387,6 +394,11 @@ export const networkMetadata = {
         webUrl: 'https://subnets-test.avax.network/c-chain',
         apiUrl:
           'https://api.routescan.io/v2/network/testnet/evm/43113/etherscan',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://testnet.snowscan.xyz',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=43113',
       },
     ],
     currency: Currency.AVAX,
@@ -425,7 +437,7 @@ export const networkMetadata = {
     ],
     currency: Currency.ETH,
   },
-  basecamp: {
+  'basecamp-testnet': {
     chainId: 123420001114,
     isTestnet: true,
     explorers: [
@@ -444,20 +456,7 @@ export const networkMetadata = {
       {
         type: 'etherscan',
         webUrl: 'https://berascan.com',
-        apiUrl: 'https://api.berascan.com/api',
-      },
-    ],
-    currency: Currency.BERA,
-  },
-  'berachain-bartio': {
-    chainId: 80084,
-    isTestnet: true,
-    explorers: [
-      {
-        type: 'routescan',
-        webUrl: 'https://bartio.beratrail.io',
-        apiUrl:
-          'https://api.routescan.io/v2/network/testnet/evm/80084/etherscan',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=80094',
       },
     ],
     currency: Currency.BERA,
@@ -471,6 +470,11 @@ export const networkMetadata = {
         webUrl: 'https://bepolia.beratrail.io',
         apiUrl:
           'https://api.routescan.io/v2/network/testnet/evm/80069/etherscan',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://testnet.berascan.com',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=80069',
       },
     ],
     currency: Currency.BERA,
@@ -507,6 +511,11 @@ export const networkMetadata = {
         type: 'blockscout',
         webUrl: 'https://explorer-testnet.unit0.dev',
         apiUrl: 'https://explorer-testnet.unit0.dev/api',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://blastscan.io',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=81457',
       },
     ],
     currency: Currency.ETH,
@@ -635,6 +644,11 @@ export const networkMetadata = {
         type: 'blockscout',
         webUrl: 'https://celo-alfajores.blockscout.com',
         apiUrl: 'https://celo-alfajores.blockscout.com/api',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://alfajores.celoscan.io',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=44787',
       },
     ],
     currency: Currency.CELO,
@@ -920,18 +934,6 @@ export const networkMetadata = {
     ],
     currency: Currency.KAVA,
   },
-  'kroma-sepolia': {
-    chainId: 2358,
-    isTestnet: true,
-    explorers: [
-      {
-        type: 'blockscout',
-        webUrl: 'https://blockscout.sepolia.kroma.network',
-        apiUrl: 'https://blockscout.sepolia.kroma.network/api',
-      },
-    ],
-    currency: Currency.ETH,
-  },
   'kusama-moonbeam': {
     chainId: 1284,
     isTestnet: false,
@@ -977,6 +979,11 @@ export const networkMetadata = {
         webUrl: 'https://explorer.linea.build/',
         apiUrl: 'https://api-explorer.linea.build/api',
       },
+      {
+        type: 'etherscan',
+        webUrl: 'https://lineascan.build',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=59144',
+      },
     ],
     currency: Currency.ETH,
   },
@@ -988,6 +995,11 @@ export const networkMetadata = {
         type: 'blockscout',
         webUrl: 'https://explorer.sepolia.linea.build',
         apiUrl: 'https://api-explorer.sepolia.linea.build/api',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://sepolia.lineascan.build',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=59141',
       },
     ],
     currency: Currency.ETH,
@@ -1016,14 +1028,14 @@ export const networkMetadata = {
     ],
     currency: Currency.LUMIA,
   },
-  'lumia-testnet': {
-    chainId: 1952959480,
+  'lumia-beam-testnet': {
+    chainId: 2030232745,
     isTestnet: true,
     explorers: [
       {
         type: 'blockscout',
-        webUrl: 'https://testnet-explorer.lumia.org',
-        apiUrl: 'https://testnet-explorer.lumia.org/api',
+        webUrl: 'https://beam-explorer.lumia.org',
+        apiUrl: 'https://beam-explorer.lumia.org/api',
       },
     ],
     currency: Currency.LUMIA,
@@ -1059,7 +1071,7 @@ export const networkMetadata = {
       {
         type: 'etherscan',
         webUrl: 'https://mantlescan.xyz',
-        apiUrl: 'https://api.mantlescan.xyz',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=5000',
       },
     ],
     currency: Currency.MNT,
@@ -1146,9 +1158,9 @@ export const networkMetadata = {
     isTestnet: true,
     explorers: [
       {
-        type: 'blockvision',
-        webUrl: 'https://testnet.monadexplorer.com',
-        apiUrl: 'https://api.socialscan.io/monad-testnet/v1/developer/api?', //
+        type: 'etherscan',
+        webUrl: 'https://testnet.monadscan.com',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=10143',
       },
     ],
     currency: Currency.MON,
@@ -1222,6 +1234,11 @@ export const networkMetadata = {
         webUrl: 'https://optimism.blockscout.com/',
         apiUrl: 'https://optimism.blockscout.com/api',
       },
+      {
+        type: 'etherscan',
+        webUrl: 'https://optimistic.etherscan.io',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=10',
+      },
     ],
     currency: Currency.ETH,
   },
@@ -1266,18 +1283,6 @@ export const networkMetadata = {
     ],
     currency: Currency.USDX,
   },
-  'pharos-devnet': {
-    chainId: 50002,
-    isTestnet: true,
-    explorers: [
-      {
-        type: 'blockscout',
-        webUrl: 'https://pharosscan.xyz',
-        apiUrl: 'https://pharosscan.xyz/api',
-      },
-    ],
-    currency: Currency.ETH,
-  },
   'pharos-testnet': {
     chainId: 688688,
     isTestnet: true,
@@ -1289,6 +1294,19 @@ export const networkMetadata = {
       },
     ],
     currency: Currency.PHRS,
+  },
+  'plasma-testnet': {
+    chainId: 9746,
+    isTestnet: true,
+    explorers: [
+      {
+        type: 'routescan',
+        webUrl: 'https://testnet.plasmascan.to',
+        apiUrl:
+          'https://api.routescan.io/v2/network/testnet/evm/9746/etherscan',
+      },
+    ],
+    currency: Currency.XPL,
   },
   'plume-mainnet': {
     chainId: 98866,
@@ -1358,6 +1376,18 @@ export const networkMetadata = {
         type: 'etherscan',
         webUrl: 'https://cardona-zkevm.polygonscan.com',
         apiUrl: 'https://api-cardona-zkevm.polygonscan.com/api',
+      },
+    ],
+    currency: Currency.ETH,
+  },
+  'pyrope-testnet': {
+    chainId: 695569,
+    isTestnet: true,
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.pyropechain.com',
+        apiUrl: 'https://explorer.pyropechain.com/api',
       },
     ],
     currency: Currency.ETH,
@@ -1455,6 +1485,18 @@ export const networkMetadata = {
       },
     ],
     currency: Currency.ETH,
+  },
+  'somnia-mainnet': {
+    chainId: 5031,
+    isTestnet: false,
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://mainnet.somnia.w3us.site',
+        apiUrl: 'https://mainnet.somnia.w3us.site/api',
+      },
+    ],
+    currency: Currency.STT,
   },
   'somnia-testnet': {
     chainId: 50312,
@@ -1573,8 +1615,25 @@ export const networkMetadata = {
         webUrl: 'https://swell-testnet-explorer.alt.technology',
         apiUrl: 'https://swell-testnet-explorer.alt.technology/api',
       },
+      {
+        type: 'etherscan',
+        webUrl: 'https://sepolia.swellchainscan.io',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=1924',
+      },
     ],
     currency: Currency.ETH,
+  },
+  'tac-mainnet': {
+    chainId: 239,
+    isTestnet: false,
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.tac.build',
+        apiUrl: 'https://explorer.tac.build/api',
+      },
+    ],
+    currency: Currency.TAC,
   },
   'tac-spb': {
     chainId: 2391,
@@ -1679,6 +1738,11 @@ export const networkMetadata = {
         webUrl: 'https://unichain.blockscout.com',
         apiUrl: 'https://unichain.blockscout.com/api',
       },
+      {
+        type: 'etherscan',
+        webUrl: 'https://uniscan.xyz',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=130',
+      },
     ],
     currency: Currency.ETH,
   },
@@ -1691,6 +1755,11 @@ export const networkMetadata = {
         webUrl: 'https://unichain-sepolia.blockscout.com',
         apiUrl: 'https://unichain-sepolia.blockscout.com/api',
       },
+      {
+        type: 'etherscan',
+        webUrl: 'https://sepolia.uniscan.xyz',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=1301',
+      },
     ],
     currency: Currency.ETH,
   },
@@ -1702,6 +1771,11 @@ export const networkMetadata = {
         type: 'blockscout',
         webUrl: 'https://worldchain-sepolia.explorer.alchemy.com/',
         apiUrl: 'https://worldchain-sepolia.explorer.alchemy.com/api',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://sepolia.worldscan.org',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=4801',
       },
     ],
     currency: Currency.ETH,
@@ -1750,7 +1824,6 @@ export const networkMetadata = {
     explorers: {
       type:
         | 'blockscout'
-        | 'blockvision'
         | 'etherscan'
         | 'routescan'
         | 'lorescan'
@@ -1833,5 +1906,8 @@ export function getApiKeyEnvVar<Net extends NetworkName>(
 
 export function getOptionalApiKey(network: NetworkName): string {
   const envVar = getApiKeyEnvVar(network);
-  return getOptionalEnvString(envVar, '');
+  return getOptionalEnvString(
+    envVar,
+    getOptionalEnvString('ETHERSCAN_API_KEY', '0x123'),
+  );
 }

@@ -2,16 +2,18 @@
 title: Deployed Contracts
 ---
 
-import { DeployedContracts } from '@/components/DeployedContracts/DeployedContracts';
-import { getContractsData } from '@/components/DeployedContracts/getContractsData';
+import { listEvmNetworks, readAllEvmDeployments } from '@blocksense/config-types';
 
-export default function DeployedContractsPage() {
-  const { parsedCoreContracts, parsedProxyContracts } = getContractsData();
+import { DeployedContracts } from '@/components/DeployedContracts/DeployedContracts';
+
+export default async function DeployedContractsPage() {
+  const networks = await listEvmNetworks(['local']);
+  const deploymentInfo = await readAllEvmDeployments(['local']);
 
   return (
     <DeployedContracts
-      parsedCoreContracts={parsedCoreContracts}
-      parsedProxyContracts={parsedProxyContracts}
+      networks={networks}
+      deploymentInfo={deploymentInfo}
     />
   );
 }

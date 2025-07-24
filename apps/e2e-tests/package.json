@@ -1,0 +1,24 @@
+{
+  "name": "@blocksense/e2e-tests",
+  "type": "module",
+  "version": "0.0.0",
+  "scripts": {
+    "ts": "yarn node --import tsx",
+    "test": "vitest run --typecheck --coverage",
+    "test:process-compose-e2e": "yarn test src/process-compose/e2e.spec.ts"
+  },
+  "dependencies": {
+    "@blocksense/base-utils": "workspace:*",
+    "@blocksense/config-types": "workspace:*",
+    "@blocksense/contracts": "workspace:*",
+    "@types/node": "^22.3.0",
+    "effect": "^3.15.1",
+    "execa": "^9.5.2",
+    "tsx": "^4.17.0",
+    "typescript": "^5.5.4",
+    "vitest": "^3.2.4"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^3.2.4"
+  }
+}

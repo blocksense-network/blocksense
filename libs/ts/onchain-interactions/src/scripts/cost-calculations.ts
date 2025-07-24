@@ -4,6 +4,7 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import chalk from 'chalk';
 import chalkTemplate from 'chalk-template';
+import client from 'prom-client';
 
 import {
   getOptionalApiKey,
@@ -11,8 +12,6 @@ import {
   networkMetadata,
   NetworkName,
   parseNetworkName,
-} from '@blocksense/base-utils/evm';
-import {
   EthereumAddress,
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
@@ -20,6 +19,20 @@ import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 import { throwError } from '@blocksense/base-utils/errors';
 
 import { Transaction, deployedNetworks } from '../types';
+import { startPrometheusServer } from '../utils';
+
+type Gauges = {
+  gasCost: client.Gauge;
+  cost: client.Gauge;
+  balance: client.Gauge;
+  daysLeft: client.Gauge;
+  transactionsCount: client.Gauge;
+  transactionsPeriod: client.Gauge;
+};
+
+function filterSmallBalance(balance: string, threshold = 1e-6): number {
+  return Number(balance) < threshold ? 0 : Number(balance);
+}
 
 function getHourDifference(transactions: Transaction[]): number {
   const txsLen = transactions.length;
@@ -74,7 +87,7 @@ const calculateGasCosts = (
 };
 
 const logGasCosts = async (
-  network: NetworkName,
+  networkName: NetworkName,
   address: EthereumAddress,
   transactionsCount: number,
   gasCosts: {
@@ -86,12 +99,14 @@ const logGasCosts = async (
   firstTransactionTime: string,
   lastTransactionTime: string,
   hoursBetweenFirstLast: number,
+  prometheus: boolean,
+  gauges: Gauges | null,
 ): Promise<void> => {
-  const { currency } = networkMetadata[network];
+  const { currency } = networkMetadata[networkName];
 
   try {
-    await console.log(chalkTemplate`
-    {white ${network}: Processed ${transactionsCount} transactions sent by ${address} over ${hoursBetweenFirstLast} hours}
+    console.log(chalkTemplate`
+    {white ${networkName}: Processed ${transactionsCount} transactions sent by ${address} over ${hoursBetweenFirstLast} hours}
     {blue First transaction timestamp: ${firstTransactionTime}}
     {blue Last transaction timestamp: ${lastTransactionTime}}
     {yellow Average Gas Price: ${gasCosts.avgGasPriceGwei} Gwei}
@@ -102,7 +117,7 @@ const logGasCosts = async (
     `);
 
     if (balance == null) {
-      console.error(chalk.red(`Can't calculate balance for ${network}`));
+      console.error(chalk.red(`Can't calculate balance for ${networkName}`));
     } else {
       const daysBalanceWillLast = Number(balance) / (gasCosts.cost1h * 24);
       const balanceMsg = `  Balance of ${balance} ${currency} will last approximately ${daysBalanceWillLast.toFixed(2)} days based on 24-hour costs.`;
@@ -112,6 +127,24 @@ const logGasCosts = async (
         console.log(chalk.bold.yellow(balanceMsg));
       } else {
         console.log(chalk.bold.green(balanceMsg));
+      }
+
+      if (gauges) {
+        gauges.gasCost.set({ networkName, address }, gasCosts.gasUsed1h * 24);
+        gauges.cost.set({ networkName, address }, gasCosts.cost1h * 24);
+        gauges.balance.set(
+          { networkName, address, currency },
+          filterSmallBalance(balance),
+        );
+        gauges.daysLeft.set({ networkName, address }, daysBalanceWillLast);
+        gauges.transactionsCount.set(
+          { networkName, address },
+          transactionsCount,
+        );
+        gauges.transactionsPeriod.set(
+          { networkName, address },
+          hoursBetweenFirstLast,
+        );
       }
     }
   } catch (error) {
@@ -147,7 +180,11 @@ const fetchTransactionsForNetwork = async (
   firstTxTime: string;
   lastTxTime: string;
 }> => {
-  const apiUrl = networkMetadata[network].explorers[0]?.apiUrl;
+  const apiUrl =
+    network === 'berachain-bepolia'
+      ? networkMetadata[network].explorers[1]?.apiUrl
+      : networkMetadata[network].explorers[0]?.apiUrl;
+
   const apiKey = getOptionalApiKey(network);
   if (!apiUrl) {
     console.log(chalk.red(`Skipping ${network}: Missing API configuration`));
@@ -200,27 +237,6 @@ const fetchTransactionsForNetwork = async (
         totalPages = page.data.pagination.totalPage;
         currentPage += 1;
       } while (currentPage <= totalPages);
-    } else if (network === 'monad-testnet') {
-      let currentPage = 1;
-      let totalPages = 10;
-
-      do {
-        const page = await axios.get(apiUrl, {
-          params: {
-            module: 'account',
-            action: 'txlist',
-            address,
-            startblock: latestBlock - 30000n,
-            endblock: latestBlock,
-            apikey: apiKey,
-            offset: 100,
-            currentPage,
-          },
-        });
-        const txFromPage = page.data.result;
-        rawTransactions = rawTransactions.concat(txFromPage);
-        currentPage += 1;
-      } while (currentPage <= totalPages);
     } else {
       response = await axios.get(apiUrl, {
         params: {
@@ -260,12 +276,6 @@ const fetchTransactionsForNetwork = async (
           tx.from.hash.toLowerCase() === address.toLowerCase() &&
           tx.to.hash.toLowerCase() !== address.toLowerCase(),
       ); //morph has a different call
-    } else if (network === 'monad-testnet') {
-      notSelfSent = rawTransactions.filter(
-        (tx: any) =>
-          tx.fromAddress.toLowerCase() === address.toLowerCase() &&
-          tx.toAddress.toLowerCase() !== address.toLowerCase(),
-      );
     } else {
       notSelfSent = rawTransactions.filter(
         (tx: any) =>
@@ -364,11 +374,65 @@ const main = async (): Promise<void> => {
       type: 'string',
       default: DEFAULT_LAST_TX_TIME,
     })
+    .option('prometheus', {
+      alias: 'p',
+      describe: 'Enable Prometheus metrics recording',
+      type: 'boolean',
+      default: false,
+    })
+    .option('host', {
+      describe: 'Host to bind Prometheus metrics server',
+      type: 'string',
+      default: '0.0.0.0',
+    })
+    .option('port', {
+      describe: 'Port to expose Prometheus metrics server',
+      type: 'number',
+      default: 9100,
+    })
     .help()
     .alias('help', 'h')
     .parse();
 
   const address = parseEthereumAddress(argv.address);
+  let gauges: Gauges | null = null;
+
+  if (argv.prometheus) {
+    startPrometheusServer(argv.host, argv.port);
+
+    gauges = {
+      gasCost: new client.Gauge({
+        name: 'eth_account_gas_cost',
+        help: `Daily cost in gas to run using last ${argv.numberOfTransactions} transactions`,
+        labelNames: ['networkName', 'address'],
+      }),
+      cost: new client.Gauge({
+        name: 'eth_account_cost',
+        help: `Daily cost to run using last ${argv.numberOfTransactions} transactions`,
+        labelNames: ['networkName', 'address'],
+      }),
+      balance: new client.Gauge({
+        name: 'eth_account_balance',
+        help: 'Ethereum account balance in native token',
+        labelNames: ['networkName', 'address', 'currency'],
+      }),
+      daysLeft: new client.Gauge({
+        name: 'eth_account_days_left',
+        help: 'Days until funds run out',
+        labelNames: ['networkName', 'address'],
+      }),
+      transactionsCount: new client.Gauge({
+        name: 'transactions_count',
+        help: 'Number of Transactions used to calculate cost',
+        labelNames: ['networkName', 'address'],
+      }),
+      transactionsPeriod: new client.Gauge({
+        name: 'transactions_period',
+        help: 'Hours between first and last of used transactions',
+        labelNames: ['networkName', 'address'],
+      }),
+    };
+  }
 
   console.log(
     chalk.cyan(
@@ -438,6 +502,8 @@ const main = async (): Promise<void> => {
           firstTxTime,
           lastTxTime,
           hoursBetweenFirstLastTx,
+          argv.prometheus,
+          gauges,
         );
       }
     } else {
