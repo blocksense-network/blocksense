@@ -25,11 +25,22 @@ export async function upgradeProxyImplementation({
   safe,
   artifacts,
 }: Params) {
+  const upAddress = deployData.coreContracts.UpgradeableProxyADFS.address;
+  const adfsAddress = deployData.coreContracts.AggregatedDataFeedStore.address
+    .slice(2)
+    .toLowerCase();
+
   const proxy = new Contract(
-    deployData.coreContracts.UpgradeableProxyADFS.address,
+    upAddress,
     artifacts.readArtifactSync(ContractNames.UpgradeableProxyADFS).abi,
     config.deployer,
   );
+
+  const implementation = await config.provider.getStorage(upAddress, 1n);
+  if (implementation.slice(26) === adfsAddress) {
+    console.log('Proxy implementation already upgraded');
+    return;
+  }
 
   // if new implementation needs initialization data, change the line below
   const calldata = '0x';
@@ -37,9 +48,7 @@ export async function upgradeProxyImplementation({
   const safeTransactionData: SafeTransactionDataPartial = {
     to: proxy.target.toString(),
     value: '0',
-    data: ProxyOp.UpgradeTo.concat(
-      deployData.coreContracts.AggregatedDataFeedStore.address.slice(2),
-    ).concat(calldata.slice(2)),
+    data: ProxyOp.UpgradeTo.concat(adfsAddress).concat(calldata.slice(2)),
     operation: OperationType.Call,
   };
 
