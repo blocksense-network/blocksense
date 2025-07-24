@@ -15,18 +15,32 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
     opts: {
-      blockNumber?: number;
+      sourceAccumulator?: string;
+      destinationAccumulator?: string;
       txData?: any;
     } = {},
   ) {
-    return sequencer.sendTransaction({
-      to: this.contract.target,
-      data: this.encodeDataWrite(feeds, opts.blockNumber),
-      ...opts.txData,
-    });
+    const { data, sourceAccumulator, destinationAccumulator } =
+      this.encodeDataWrite(
+        feeds,
+        opts.sourceAccumulator,
+        opts.destinationAccumulator,
+      );
+    return {
+      tx: await sequencer.sendTransaction({
+        to: this.contract.target,
+        data,
+        ...opts.txData,
+      }),
+      sourceAccumulator,
+      destinationAccumulator,
+    };
   }
 
-  public checkEvent(receipt: TransactionReceipt, newBlockNumber: number): void {
+  public checkEvent(
+    receipt: TransactionReceipt,
+    destinationAccumulator: string,
+  ): void {
     const fragment = this.getEventFragment();
 
     let log: Log = Object.assign({});
@@ -46,7 +60,7 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
       log.data,
     );
 
-    expect(parsedEvent[0]).to.be.eq(newBlockNumber);
+    expect(parsedEvent[0]).to.be.eq(destinationAccumulator);
   }
 
   public getEventFragment(): EventFragment {
@@ -54,8 +68,8 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
       name: 'DataFeedsUpdated',
       inputs: [
         {
-          type: 'uint256',
-          name: 'newBlockNumber',
+          type: 'bytes32',
+          name: 'newHistoryAccumulator',
         },
       ],
     });
@@ -160,11 +174,25 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
     return results;
   }
 
-  public encodeDataWrite = (feeds: Feed[], blockNumber?: number) => {
-    blockNumber ??= Date.now() + 100;
+  public encodeDataWrite = (
+    feeds: Feed[],
+    sourceAccumulator?: string,
+    destinationAccumulator?: string,
+  ) => {
+    sourceAccumulator ??= ethers.toBeHex(0, 32);
+    destinationAccumulator ??= ethers.toBeHex(
+      (Math.random() * 10000).toFixed(0),
+      32,
+    );
+
     const prefix = ethers.solidityPacked(
-      ['bytes1', 'uint64', 'uint32'],
-      [ethers.toBeHex(WriteOp.SetFeeds), blockNumber, feeds.length],
+      ['bytes1', 'bytes32', 'bytes32', 'uint32'],
+      [
+        ethers.toBeHex(WriteOp.SetFeeds),
+        sourceAccumulator,
+        destinationAccumulator,
+        feeds.length,
+      ],
     );
 
     const data = feeds.map(feed => {
@@ -234,7 +262,11 @@ export abstract class ADFSBaseWrapper implements IADFSWrapper {
       })
       .join('');
 
-    return prefix.concat(data.join('')).concat(roundData);
+    return {
+      data: prefix.concat(data.join('')).concat(roundData),
+      sourceAccumulator,
+      destinationAccumulator,
+    };
   };
 
   public encodeDataRead = (operation: ReadOp, feed: ReadFeed) => {
