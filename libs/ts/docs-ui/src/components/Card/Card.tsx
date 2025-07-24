@@ -36,7 +36,7 @@ export const Card = ({
   return (
     <div
       className={cn(
-        'card border shadow-sm border-neutral-200 dark:border-neutral-600 dark:bg-neutral-900 dark:text-white rounded-sm max-w-96 mt-10 transition-all',
+        'card border shadow-sm border-neutral-200 dark:border-neutral-600 dark:bg-neutral-900 dark:text-white rounded-sm transition-all',
         variants[variant],
         sizes[size],
         className,

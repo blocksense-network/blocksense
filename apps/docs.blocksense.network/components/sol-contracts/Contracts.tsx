@@ -19,7 +19,7 @@ type ContractsProps = {
 
 export const Contracts = ({ contracts }: ContractsProps) => {
   return (
-    <ContractItemWrapper itemsLength={contracts?.length}>
+    <ContractItemWrapper nonEmpty={!!contracts?.length}>
       {contracts?.map((contract, index) => {
         return (
           <div className="contract-item-wrapper__item" key={index}>

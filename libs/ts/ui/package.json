@@ -2,6 +2,9 @@
   "name": "@blocksense/ui",
   "version": "0.1.0",
   "private": true,
+  "exports": {
+    "./Logo": "./src/components/Logo/Logo.tsx"
+  },
   "scripts": {
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
@@ -14,13 +17,15 @@
   "devDependencies": {
     "@chromatic-com/storybook": "^4.0.1",
     "@eslint/eslintrc": "^3",
-    "@storybook/addon-a11y": "8.6.12",
+    "@storybook/addon-a11y": "^9.0.14",
+    "@storybook/addon-designs": "^10.0.1",
     "@storybook/addon-docs": "^9.0.14",
     "@storybook/nextjs-vite": "^9.0.15",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
     "eslint-plugin-storybook": "^9.0.14",

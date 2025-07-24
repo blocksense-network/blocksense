@@ -20,7 +20,7 @@ export const Variables = ({
 }: VariablesProps) => {
   return (
     <ContractItemWrapper
-      itemsLength={variables.length}
+      nonEmpty={!!variables.length}
       title={title}
       titleLevel={titleLevel}
     >

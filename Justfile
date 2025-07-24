@@ -30,6 +30,9 @@ list-environments:
 build-environment environment="all":
   #!/usr/bin/env bash
   set -euo pipefail
+  # Collect free ports that process-compose will use
+  scripts/utils/collect-available-ports.sh {{process-compose-artifacts-dir}}/available-ports
+
   if [[ {{environment}} == "all" ]]; then
     srcDir=$(nix build --impure --json -L .#allProcessComposeFiles | jq -r '.[0].outputs.out')
     cp -rf --no-preserve=mode,ownership "$srcDir"/. {{process-compose-artifacts-dir}}
@@ -42,10 +45,13 @@ build-environment environment="all":
 
 [group('Working with process-compose environments')]
 [doc('Start a process-compose environment. This command depends on building blocksense and the environment first')]
-start-environment environment="example-setup-01": build-blocksense (build-environment environment)
+start-environment environment *pc-flags: build-blocksense (build-environment environment)
   #!/usr/bin/env bash
   PC_FILE="{{process-compose-artifacts-dir}}/{{environment}}/process-compose.yaml"
-  process-compose -f "$PC_FILE"
+  process-compose up {{pc-flags}} -f "$PC_FILE"
+
+stop-environment:
+  process-compose down
 
 [group('Working with typescript')]
 [doc('Build single TypeScript package or all packages')]
@@ -59,6 +65,8 @@ build-ts package="all":
     yarn build-single @blocksense/contracts
     yarn build-single @blocksense/data-feeds-config-generator
     yarn build-single @blocksense/changelog-generator
+    yarn build-single @blocksense/chain-interactions
+    yarn build-single @blocksense/avm-relayer
   else
     yarn build:recursive {{package}}
   fi
@@ -69,6 +77,12 @@ test-ts:
   yarn test-single @blocksense/base-utils
   yarn test-single @blocksense/config-types
   yarn test-single @blocksense/data-feeds-config-generator
+  yarn test-single @blocksense/changelog-generator
+  yarn test-single @blocksense/chain-interactions
+  yarn test-single @blocksense/avm-relayer
+
+test-e2e:
+  yarn workspace @blocksense/e2e-tests run test
 
 [group('Working with oracles')]
 [doc('Build a specific oracle')]

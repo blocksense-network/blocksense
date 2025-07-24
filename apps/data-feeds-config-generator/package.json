@@ -25,7 +25,7 @@
     "get-providers-data": "yarn ts scripts/get-providers-data.ts",
     "fetch-symbols": "yarn ts src/data-services/fetchers/scripts/fetch-symbols.ts",
     "update-exchanges-argument-config": "yarn ts scripts/update-exchanges-argument-config.ts",
-    "test": "yarn vitest --typecheck -w false"
+    "test": "vitest run --typecheck --coverage"
   },
   "devDependencies": {
     "@blocksense/base-utils": "workspace:*",
@@ -33,6 +33,7 @@
     "@octokit/rest": "^21.1.1",
     "@types/keccak": "^3",
     "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^3.2.4",
     "effect": "^3.15.1",
     "glob": "^11.0.0",
     "keccak": "^3.0.4",

@@ -15,11 +15,13 @@ const config: StorybookConfig = {
   addons: [
     getAbsolutePath('@chromatic-com/storybook'),
     getAbsolutePath('@storybook/addon-docs'),
+    getAbsolutePath('@storybook/addon-a11y'),
+    getAbsolutePath('@storybook/addon-designs'),
   ],
   framework: {
     name: getAbsolutePath('@storybook/nextjs-vite'),
     options: {},
   },
-  staticDirs: ['../public'],
+  staticDirs: ['../src/assets'],
 };
 export default config;

@@ -127,6 +127,8 @@ class SelectedDirectory {
   read = (args: FileArgs) =>
     fs.readFile(path.format({ dir: this.dir, ...args }), 'utf8');
 
+  readDir = (recursive = false) => fs.readdir(this.dir, { recursive });
+
   /**
    * Reads a JSON object from a file at the specified directory.
    *

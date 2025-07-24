@@ -16,6 +16,7 @@
     just
     findutils
     process-compose
+    ripgrep
   ];
 
   enterShell =
