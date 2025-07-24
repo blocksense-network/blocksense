@@ -8,9 +8,9 @@ contract AggregatedDataFeedStoreGeneric {
     0x0000000000000000000000000000000000001000;
   address internal immutable ACCESS_CONTROL;
 
-  event DataFeedsUpdated(uint256 blocknumber);
+  event DataFeedsUpdated(bytes32 destinationAccumulator);
 
-  uint256 internal blocknumber;
+  bytes32 internal historyAccumulator;
 
   constructor(address accessControl) {
     ACCESS_CONTROL = accessControl;
@@ -106,7 +106,8 @@ contract AggregatedDataFeedStoreGeneric {
   }
 
   function write(
-    uint256 blocknumber_,
+    bytes32 sourceAccumulator,
+    bytes32 destinationAccumulator,
     uint256[] calldata strides,
     uint256[] calldata indices,
     bytes[] calldata data,
@@ -119,8 +120,8 @@ contract AggregatedDataFeedStoreGeneric {
     bool isAdmin = abi.decode(res, (bool));
     require(success && isAdmin);
 
-    require(blocknumber < blocknumber_);
-    blocknumber = blocknumber_;
+    require(historyAccumulator == sourceAccumulator);
+    historyAccumulator = destinationAccumulator;
 
     for (uint256 i = 0; i < indices.length; i++) {
       uint256 index = indices[i];
@@ -149,7 +150,7 @@ contract AggregatedDataFeedStoreGeneric {
       }
     }
 
-    emit DataFeedsUpdated(blocknumber_);
+    emit DataFeedsUpdated(destinationAccumulator);
   }
 
   function _bytesToBytes32Array(
