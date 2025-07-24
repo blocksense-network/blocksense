@@ -20,6 +20,8 @@ export const compareGasUsed = async <
   adfsContractWrappers: IADFSWrapper[] | IUpgradeableProxyADFSWrapper[],
   adfsGenericContractWrappers: IADFSWrapper[] | IUpgradeableProxyADFSWrapper[],
   valuesCount: number,
+  sourceAccumulator: string,
+  destinationAccumulator: string,
   adfsData?: {
     skip?: number; // used to skip feeds so to make testing ring buffer index table write
     index?: bigint;
@@ -38,6 +40,8 @@ export const compareGasUsed = async <
     adfsGenericContractWrappers,
     adfsContractWrappers,
     valuesCount,
+    sourceAccumulator,
+    destinationAccumulator,
     adfsData,
     start,
   );
@@ -60,9 +64,9 @@ export const compareGasUsed = async <
   for (const receipt of data.receipts) {
     for (const wrapper of adfsContractWrappers) {
       const tx = await ethers.provider.getTransaction(receipt?.hash!);
-      const blockNumberInReceipt = parseInt('0x' + tx!.data.slice(4, 20), 16);
+      const destinationAccumulatorInReceipt = '0x' + tx!.data.slice(68, 132);
       if (!isUpgradeableProxy(wrapper)) {
-        wrapper.checkEvent(receipt!, blockNumberInReceipt);
+        wrapper.checkEvent(receipt!, destinationAccumulatorInReceipt);
       }
     }
   }

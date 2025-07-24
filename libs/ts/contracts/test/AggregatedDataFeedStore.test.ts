@@ -73,12 +73,12 @@ describe('AggregatedDataFeedStore', () => {
   });
 
   it('Should emit event when data feeds updated', async () => {
-    const blockNumber = 1234;
-    const tx = await contract.setFeeds(sequencer, feeds, {
-      blockNumber,
+    const destinationAccumulator = ethers.toBeHex(1, 32);
+    const res = await contract.setFeeds(sequencer, feeds, {
+      destinationAccumulator,
     });
-    const receipt = await tx.wait();
-    contract.checkEvent(receipt!, blockNumber);
+    const receipt = await res.tx.wait();
+    contract.checkEvent(receipt!, destinationAccumulator);
   });
 
   it('Should get latest index', async () => {
@@ -104,7 +104,7 @@ describe('AggregatedDataFeedStore', () => {
   });
 
   it('Should get historical feed at index', async () => {
-    await contract.setFeeds(sequencer, feeds);
+    const res = await contract.setFeeds(sequencer, feeds);
 
     const updatedFeeds = feeds.map(feed => {
       return {
@@ -114,7 +114,10 @@ describe('AggregatedDataFeedStore', () => {
       };
     });
 
-    await contract.setFeeds(sequencer, updatedFeeds);
+    await contract.setFeeds(sequencer, updatedFeeds, {
+      sourceAccumulator: res.destinationAccumulator,
+      destinationAccumulator: ethers.toBeHex(101, 32),
+    });
 
     await contract.checkDataAtIndex(sequencer, feeds);
     await contract.checkDataAtIndex(sequencer, updatedFeeds);
@@ -122,7 +125,7 @@ describe('AggregatedDataFeedStore', () => {
 
   it('Should get latest single feed and index after update', async () => {
     const stride0Feeds = feeds.filter(feed => feed.stride === 0n);
-    await contract.setFeeds(sequencer, stride0Feeds);
+    const res = await contract.setFeeds(sequencer, stride0Feeds);
 
     const updatedFeeds = stride0Feeds.map(feed => {
       return {
@@ -132,13 +135,16 @@ describe('AggregatedDataFeedStore', () => {
       };
     });
 
-    await contract.setFeeds(sequencer, updatedFeeds);
-    const res = await contract.getValues(sequencer, stride0Feeds, {
+    await contract.setFeeds(sequencer, updatedFeeds, {
+      sourceAccumulator: res.destinationAccumulator,
+      destinationAccumulator: ethers.toBeHex(101, 32),
+    });
+    const values = await contract.getValues(sequencer, stride0Feeds, {
       operations: stride0Feeds.map(() => ReadOp.GetLatestSingleDataAndIndex),
     });
 
     for (const [i, feed] of updatedFeeds.entries()) {
-      expect(res[i]).to.equal(
+      expect(values[i]).to.equal(
         ethers
           .toBeHex(feed.index, 32)
           .concat(contract.formatData(feed).slice(2)),
@@ -147,7 +153,7 @@ describe('AggregatedDataFeedStore', () => {
   });
 
   it('Should get latest feed and index after update', async () => {
-    await contract.setFeeds(sequencer, feeds);
+    const res = await contract.setFeeds(sequencer, feeds);
 
     const updatedFeeds = feeds.map(feed => {
       return {
@@ -157,7 +163,10 @@ describe('AggregatedDataFeedStore', () => {
       };
     });
 
-    await contract.setFeeds(sequencer, updatedFeeds);
+    await contract.setFeeds(sequencer, updatedFeeds, {
+      sourceAccumulator: res.destinationAccumulator,
+      destinationAccumulator: ethers.toBeHex(101, 32),
+    });
     await contract.checkLatestDataAndIndex(sequencer, updatedFeeds);
   });
 
@@ -165,20 +174,17 @@ describe('AggregatedDataFeedStore', () => {
     await expect(contract.setFeeds(signers[2], feeds)).to.be.reverted;
   });
 
-  it('Should revert if blockNumber same as previous block', async () => {
-    const blockNumber = 1;
-    await contract.setFeeds(sequencer, feeds, { blockNumber });
-
-    await expect(contract.setFeeds(sequencer, feeds, { blockNumber })).to.be
-      .reverted;
-  });
-
-  it('Should revert if blockNumber lower than previous block', async () => {
-    const blockNumber = 1;
-    await contract.setFeeds(sequencer, feeds, { blockNumber });
+  it('Should revert if source history accumulator is different from the stored', async () => {
+    const sourceAccumulator = ethers.toBeHex(100, 32);
+    // set history accumulator for the first time (0 -> 100)
+    await contract.setFeeds(sequencer, feeds, {
+      destinationAccumulator: sourceAccumulator,
+    });
 
     await expect(
-      contract.setFeeds(sequencer, feeds, { blockNumber: blockNumber - 1 }),
+      contract.setFeeds(sequencer, feeds, {
+        sourceAccumulator: ethers.toBeHex(101, 32),
+      }),
     ).to.be.reverted;
   });
 
@@ -402,13 +408,14 @@ describe('AggregatedDataFeedStore', () => {
       data: '0x12343267643573',
     };
 
-    let data = contract.encodeDataWrite([feed]);
+    let res = contract.encodeDataWrite([feed]);
+    let data = res.data;
 
     const indexTableIndex = ethers.toBeHex(
       (2n ** 115n * feed.stride + feed.id) / 16n,
     );
-    const maxindexTableIndex = ethers.toBeHex(2n ** 116n - 1n);
-    data = data.replace(indexTableIndex.slice(2), maxindexTableIndex.slice(2));
+    const maxIndexTableIndex = ethers.toBeHex(2n ** 116n - 1n);
+    data = data.replace(indexTableIndex.slice(2), maxIndexTableIndex.slice(2));
     await expect(
       sequencer.sendTransaction({
         to: contract.contract.target,
@@ -416,15 +423,21 @@ describe('AggregatedDataFeedStore', () => {
       }),
     ).to.not.be.reverted;
 
-    const overflowindexTableIndex = ethers.toBeHex(2n ** 116n);
+    const overflowIndexTableIndex = ethers.toBeHex(2n ** 116n);
     data = data.replace(
-      maxindexTableIndex.slice(2),
-      overflowindexTableIndex.slice(2),
+      maxIndexTableIndex.slice(2),
+      overflowIndexTableIndex.slice(2),
     );
 
-    // change blocknumber
-    const newPrefix = contract.encodeDataWrite([]);
-    data = data.replace(data.slice(2, 20), newPrefix.slice(2, 20));
+    // change history accumulator
+    data = data.replace(
+      res.destinationAccumulator.slice(2),
+      ethers.toBeHex(0, 32).slice(2),
+    );
+    data = data.replace(
+      res.sourceAccumulator.slice(2),
+      res.destinationAccumulator.slice(2),
+    );
 
     await expect(
       sequencer.sendTransaction({
@@ -447,6 +460,9 @@ describe('AggregatedDataFeedStore', () => {
       [];
 
     let genericContract: ADFSGenericWrapper;
+
+    const historyAccumulator = ethers.toBeHex(1234, 32);
+    const newHistoryAccumulator = ethers.toBeHex(12345, 32);
 
     beforeEach(async function () {
       contractWrappers = [];
@@ -477,9 +493,13 @@ describe('AggregatedDataFeedStore', () => {
         [true],
       );
 
-      // store no data first time in ADFS to avoid first sstore of blocknumber
-      await contract.setFeeds(sequencer, []);
-      await genericContract.setFeeds(sequencer, []);
+      // store no data first time in ADFS to avoid first sstore of history accumulator
+      await contract.setFeeds(sequencer, [], {
+        destinationAccumulator: historyAccumulator,
+      });
+      await genericContract.setFeeds(sequencer, [], {
+        destinationAccumulator: historyAccumulator,
+      });
     });
 
     for (let i = 1; i <= 100; i *= 10) {
@@ -491,6 +511,8 @@ describe('AggregatedDataFeedStore', () => {
           [contract],
           [genericContract],
           i,
+          historyAccumulator,
+          newHistoryAccumulator,
           {
             index: 1n,
           },
@@ -503,6 +525,8 @@ describe('AggregatedDataFeedStore', () => {
           [contract],
           [genericContract],
           i,
+          newHistoryAccumulator,
+          ethers.toBeHex(123456, 32),
           {
             index: 2n,
           },
@@ -517,6 +541,8 @@ describe('AggregatedDataFeedStore', () => {
           [contract],
           [genericContract],
           i,
+          historyAccumulator,
+          newHistoryAccumulator,
           {
             skip: 16,
             index: 1n,
@@ -530,6 +556,8 @@ describe('AggregatedDataFeedStore', () => {
           [contract],
           [genericContract],
           i,
+          newHistoryAccumulator,
+          ethers.toBeHex(123456, 32),
           {
             skip: 16,
             index: 2n,
