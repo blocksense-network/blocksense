@@ -14,7 +14,8 @@ export abstract class CLBaseWrapper {
     sequencer: HardhatEthersSigner,
     data: string,
     index: bigint,
-    blockNumber?: number,
+    sourceAccumulator?: string,
+    destinationAccumulator?: string,
   ): Promise<any> {
     return this.proxy.proxyCall(
       'setFeeds',
@@ -28,7 +29,8 @@ export abstract class CLBaseWrapper {
         },
       ],
       {
-        blockNumber,
+        sourceAccumulator,
+        destinationAccumulator,
       },
     );
   }
