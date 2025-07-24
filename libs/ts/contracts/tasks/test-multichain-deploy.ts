@@ -39,7 +39,7 @@ task(
 
   const networkName = 'local';
 
-  const config = await initChain(ethers, networkName);
+  const config = await initChain(networkName);
 
   const { contracts: deployment } = await readEvmDeployment(networkName, true);
 

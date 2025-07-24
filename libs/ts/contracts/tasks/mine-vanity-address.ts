@@ -24,7 +24,7 @@ task(
   .addOptionalParam('prefix', 'Vanity address prefix', 'ADF5aa')
   .setAction(async (args, { ethers, artifacts }) => {
     await mineVanityAddress({
-      config: await initChain(ethers, parseNetworkName(args.networkName)),
+      config: await initChain(parseNetworkName(args.networkName)),
       adminMultisigAddr: args.adminMultisig
         ? parseEthereumAddress(args.adminMultisig)
         : undefined,
