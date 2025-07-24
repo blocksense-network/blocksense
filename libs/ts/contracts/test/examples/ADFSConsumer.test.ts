@@ -45,6 +45,7 @@ describe('Example: ADFSConsumer', function () {
 
   const id = 1n;
   const index = 1n;
+  const destinationAccumulator = ethers.toBeHex(1, 32);
 
   beforeEach(async function () {
     sequencer = (await ethers.getSigners())[0];
@@ -58,7 +59,9 @@ describe('Example: ADFSConsumer', function () {
       [true],
     );
 
-    await dataFeedStore.setFeeds(sequencer, feeds);
+    await dataFeedStore.setFeeds(sequencer, feeds, {
+      destinationAccumulator,
+    });
 
     adfsConsumer = await deployContract<ADFSConsumer>(
       'ADFSConsumer',
@@ -167,7 +170,10 @@ describe('Example: ADFSConsumer', function () {
       stride: 0n,
       data: feedData,
     };
-    await dataFeedStore.setFeeds(sequencer, [feed]);
+    await dataFeedStore.setFeeds(sequencer, [feed], {
+      sourceAccumulator: destinationAccumulator,
+      destinationAccumulator: ethers.toBeHex(2, 32),
+    });
 
     const timestamp = await adfsConsumer.getEpochSeconds(feed.id);
     expect(timestamp).to.be.equal(Math.floor(timestampNow / 1000));
@@ -182,7 +188,10 @@ describe('Example: ADFSConsumer', function () {
       stride: 0n,
       data: feedData,
     };
-    await dataFeedStore.setFeeds(sequencer, [feed]);
+    await dataFeedStore.setFeeds(sequencer, [feed], {
+      sourceAccumulator: destinationAccumulator,
+      destinationAccumulator: ethers.toBeHex(2, 32),
+    });
 
     const timestamp = await adfsConsumer.getEpochMilliseconds(feed.id);
     expect(timestamp).to.be.equal(timestampNow);

@@ -37,12 +37,17 @@ describe('CLFeedRegistryAdapter', async () => {
   let caller: HardhatEthersSigner;
   let registryOwner: HardhatEthersSigner;
 
+  let sourceAccumulator: string = ethers.toBeHex(0, 32);
+
   beforeEach(async function () {
     admin = (await ethers.getSigners())[9];
     sequencer = (await ethers.getSigners())[10];
     accessControlAdmin = (await ethers.getSigners())[5];
     caller = (await ethers.getSigners())[6];
     registryOwner = (await ethers.getSigners())[11];
+    clAdapters = [];
+
+    sourceAccumulator = ethers.toBeHex(0, 32);
 
     proxy = new UpgradeableProxyADFSWrapper();
     await proxy.init(admin, accessControlAdmin);
@@ -94,10 +99,18 @@ describe('CLFeedRegistryAdapter', async () => {
       await clRegistry.checkDecimals(d.base, d.quote, d.decimals);
     }
   });
+
   it('Should return the correct latest answer', async () => {
     const value = encodeDataAndTimestamp(3132);
     for (const clAdapter of clAdapters) {
-      await clAdapter.setFeed(sequencer, value, 1n);
+      const res = await clAdapter.setFeed(
+        sequencer,
+        value,
+        1n,
+        sourceAccumulator,
+      );
+      sourceAccumulator = res.destinationAccumulator;
+
       await clAdapter.checkLatestAnswer(caller, value);
     }
 
@@ -108,8 +121,16 @@ describe('CLFeedRegistryAdapter', async () => {
 
   it('Should return the correct latest round id', async () => {
     const value = encodeDataAndTimestamp(3132);
+
     for (const clAdapter of clAdapters) {
-      await clAdapter.setFeed(sequencer, value, 1n);
+      const res = await clAdapter.setFeed(
+        sequencer,
+        value,
+        1n,
+        sourceAccumulator,
+      );
+      sourceAccumulator = res.destinationAccumulator;
+
       await clAdapter.checkLatestRoundId(caller, 1n);
     }
 
@@ -120,8 +141,16 @@ describe('CLFeedRegistryAdapter', async () => {
 
   it('Should return the correct latest round data', async () => {
     const value = encodeDataAndTimestamp(3132);
+
     for (const clAdapter of clAdapters) {
-      await clAdapter.setFeed(sequencer, value, 1n);
+      const res = await clAdapter.setFeed(
+        sequencer,
+        value,
+        1n,
+        sourceAccumulator,
+      );
+      sourceAccumulator = res.destinationAccumulator;
+
       await clAdapter.checkLatestRoundData(caller, value, 1n);
     }
 
@@ -132,8 +161,16 @@ describe('CLFeedRegistryAdapter', async () => {
 
   it('Should return the correct round data', async () => {
     const value = encodeDataAndTimestamp(3132);
+
     for (const clAdapter of clAdapters) {
-      await clAdapter.setFeed(sequencer, value, 1n);
+      const res = await clAdapter.setFeed(
+        sequencer,
+        value,
+        1n,
+        sourceAccumulator,
+      );
+      sourceAccumulator = res.destinationAccumulator;
+
       await clAdapter.checkRoundData(caller, value, 1n);
     }
 
