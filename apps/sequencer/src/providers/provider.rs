@@ -6,10 +6,7 @@ use alloy::{
     network::{EthereumWallet, TransactionBuilder},
     primitives::Address,
     providers::{
-        fillers::{
-            BlobGasFiller, ChainIdFiller, FillProvider, GasFiller, JoinFill, NonceFiller,
-            WalletFiller,
-        },
+        fillers::{FillProvider, JoinFill, WalletFiller},
         Identity, ProviderBuilder, RootProvider,
     },
     signers::local::PrivateKeySigner,
@@ -44,16 +41,8 @@ use crate::providers::multicall::Multicall;
 use crate::providers::provider::Multicall::MulticallInstance;
 use std::time::Instant;
 
-pub type ProviderType = FillProvider<
-    JoinFill<
-        JoinFill<
-            Identity,
-            JoinFill<GasFiller, JoinFill<BlobGasFiller, JoinFill<NonceFiller, ChainIdFiller>>>,
-        >,
-        WalletFiller<EthereumWallet>,
-    >,
-    RootProvider,
->;
+pub type ProviderType =
+    FillProvider<JoinFill<Identity, WalletFiller<EthereumWallet>>, RootProvider>;
 
 pub fn parse_eth_address(addr: &str) -> Option<Address> {
     let contract_address: Option<Address> = addr.parse().ok();
@@ -186,6 +175,7 @@ impl RpcProvider {
         feeds_config: &AllFeedsConfig,
     ) -> RpcProvider {
         let provider = ProviderBuilder::new()
+            .disable_recommended_fillers()
             .wallet(EthereumWallet::from(signer.clone()))
             .connect_http(rpc_url.clone());
 

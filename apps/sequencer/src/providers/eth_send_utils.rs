@@ -551,54 +551,54 @@ pub async fn eth_batch_send_to_contract(
             }
         };
 
-        let tx;
+        let gas_fees = match get_tx_retry_params(
+            net.as_str(),
+            rpc_handle,
+            provider_metrics,
+            &sender_address,
+            transaction_retry_timeout_secs,
+            transaction_retries_count,
+            retry_fee_increment_fraction,
+        )
+        .await
+        {
+            Ok(res) => res,
+            Err(e) => {
+                let block_height = updates.block_height;
+                warn!("Timed out on get_tx_retry_params for {transaction_retries_count}-th time in network `{net}` block height {block_height}: {e}!");
+                inc_retries_with_backoff(
+                    net.as_str(),
+                    &mut transaction_retries_count,
+                    provider_metrics,
+                    BACKOFF_SECS,
+                )
+                .await;
+                continue;
+            }
+        };
+
+        let mut tx = TransactionRequest::default()
+            .to(contract_address)
+            .with_nonce(nonce)
+            .with_from(sender_address)
+            .with_chain_id(chain_id)
+            .with_gas_limit(10_000_000) // Set a high gas limit to avoid out of gas errors
+            .input(Some(input.clone()).into());
+
+        match gas_fees {
+            GasFees::Legacy(gas_price) => {
+                tx = tx.with_gas_price(gas_price.gas_price).transaction_type(0);
+            }
+            GasFees::Eip1559(eip1559_gas_fees) => {
+                tx = tx
+                    .with_max_priority_fee_per_gas(eip1559_gas_fees.priority_fee)
+                    .with_max_fee_per_gas(eip1559_gas_fees.max_fee_per_gas);
+            }
+        }
+
         if transaction_retries_count == 0 {
-            tx = TransactionRequest::default()
-                .to(contract_address)
-                .with_nonce(nonce)
-                .with_from(sender_address)
-                .with_chain_id(chain_id)
-                .input(Some(input.clone()).into());
             debug!("Sending initial tx: {tx:?} in network `{net}` block height {block_height}");
         } else {
-            debug!(
-                "Retrying to send updates in network `{net}` block height {block_height} for {transaction_retries_count}-th time"
-            );
-
-            let (max_fee_per_gas, priority_fee) = match get_tx_retry_params(
-                net.as_str(),
-                rpc_handle,
-                provider_metrics,
-                &sender_address,
-                transaction_retry_timeout_secs,
-                transaction_retries_count,
-                retry_fee_increment_fraction,
-            )
-            .await
-            {
-                Ok(res) => res,
-                Err(e) => {
-                    let block_height = updates.block_height;
-                    warn!("Timed out on get_tx_retry_params for {transaction_retries_count}-th time in network `{net}` block height {block_height}: {e}!");
-                    inc_retries_with_backoff(
-                        net.as_str(),
-                        &mut transaction_retries_count,
-                        provider_metrics,
-                        BACKOFF_SECS,
-                    )
-                    .await;
-                    continue;
-                }
-            };
-
-            tx = TransactionRequest::default()
-                .to(contract_address)
-                .with_nonce(nonce)
-                .with_from(sender_address)
-                .with_max_fee_per_gas(max_fee_per_gas)
-                .with_max_priority_fee_per_gas(priority_fee)
-                .with_chain_id(chain_id)
-                .input(Some(input.clone()).into());
             debug!("Retrying for {transaction_retries_count}-th time in network `{net}` block height {block_height} tx: {tx:?}");
         }
 
@@ -926,6 +926,20 @@ pub async fn log_provider_enabled(
     debug!("Released a read lock on provider for network {net}");
 }
 
+pub struct Eip1559GasFees {
+    pub max_fee_per_gas: u128,
+    pub priority_fee: u128,
+}
+
+pub struct GasPrice {
+    pub gas_price: u128,
+}
+
+pub enum GasFees {
+    Legacy(GasPrice),
+    Eip1559(Eip1559GasFees),
+}
+
 pub async fn get_tx_retry_params(
     net: &str,
     rpc_handle: &ProviderType,
@@ -934,7 +948,7 @@ pub async fn get_tx_retry_params(
     transaction_retry_timeout_secs: u64,
     transaction_retries_count: u64,
     retry_fee_increment_fraction: f64,
-) -> Result<(u128, u128)> {
+) -> Result<GasFees> {
     let price_increment = 1.0 + (transaction_retries_count as f64 * retry_fee_increment_fraction);
 
     debug!("Getting gas_price for network {net}...");
@@ -978,8 +992,8 @@ pub async fn get_tx_retry_params(
             }
             Err(err) => {
                 inc_metric!(provider_metrics, net, failed_get_max_priority_fee_per_gas);
-                debug!("Failed to get priority_fee for network {net} due to {err}");
-                return Err(err.into());
+                warn!("Failed to get priority_fee for network {net} due to {err}");
+                return Ok(GasFees::Legacy(GasPrice { gas_price }));
             }
         },
         Err(err) => {
@@ -993,7 +1007,10 @@ pub async fn get_tx_retry_params(
     let mut max_fee_per_gas = gas_price + gas_price + priority_fee;
     max_fee_per_gas = (max_fee_per_gas as f64 * price_increment) as u128;
 
-    Ok((max_fee_per_gas, priority_fee))
+    Ok(GasFees::Eip1559(Eip1559GasFees {
+        max_fee_per_gas,
+        priority_fee,
+    }))
 }
 
 pub async fn eth_batch_send_to_all_contracts(
