@@ -154,23 +154,47 @@ describe('CLAggregatorAdapter', function () {
         const data1 = encodeDataAndTimestamp(3132);
         const data2 = encodeDataAndTimestamp(2345);
         const data3 = encodeDataAndTimestamp(12348747364);
+        const historyAccumulator1 = ethers.toBeHex(0, 32);
+        const historyAccumulator2 = ethers.toBeHex(1, 32);
+        const historyAccumulator3 = ethers.toBeHex(2, 32);
+        const historyAccumulator4 = ethers.toBeHex(3, 32);
 
-        await contractWrappers[i].setFeed(sequencer, data1, 1n, 1);
-        await contractWrappers[i].setFeed(sequencer, data2, 2n, 2);
+        await contractWrappers[i].setFeed(
+          sequencer,
+          data1,
+          1n,
+          historyAccumulator1,
+          historyAccumulator2,
+        );
+        await contractWrappers[i].setFeed(
+          sequencer,
+          data2,
+          2n,
+          historyAccumulator2,
+          historyAccumulator3,
+        );
 
         await contractWrappers[i].checkSetValue(caller, data2);
         await contractWrappers[i].checkRoundData(caller, data1, 1n);
 
         await contractWrappers[i].checkRoundData(caller, data2, 2n);
 
-        await contractWrappers[i].proxy.proxyCall('setFeeds', sequencer, [
+        await contractWrappers[i].proxy.proxyCall(
+          'setFeeds',
+          sequencer,
+          [
+            {
+              id: BigInt(data.id),
+              index: 3n,
+              data: data3,
+              stride: 0n,
+            },
+          ],
           {
-            id: BigInt(data.id),
-            index: 3n,
-            data: data3,
-            stride: 0n,
+            sourceAccumulator: historyAccumulator3,
+            destinationAccumulator: historyAccumulator4,
           },
-        ]);
+        );
 
         await contractWrappers[i].checkSetValue(caller, data3);
         await contractWrappers[i].checkRoundData(caller, data3, 3n);
