@@ -3,11 +3,10 @@ import Safe, {
   PredictedSafeProps,
   predictSafeAddress,
 } from '@safe-global/protocol-kit';
-import { hexlify, toUtf8Bytes } from 'ethers';
+import { hexlify, toUtf8Bytes, TransactionRequest } from 'ethers';
 
 import { NetworkConfig } from '../types';
 import { checkAddressExists } from '../utils';
-import { parseHexDataString } from '@blocksense/base-utils';
 
 type Params = {
   config: NetworkConfig;
@@ -65,15 +64,47 @@ export async function deployMultisig({ config, type }: Params): Promise<Safe> {
     const deploymentTransaction =
       await protocolKit.createSafeDeploymentTransaction();
 
-    const transactionHash = await config.deployer.sendTransaction({
-      to: deploymentTransaction.to,
-      value: BigInt(deploymentTransaction.value),
-      data: parseHexDataString(deploymentTransaction.data),
-    });
+    const feeData = await (async () => {
+      try {
+        console.log('Before getting fee data');
+        return await config.provider.getFeeData();
+      } catch {
+        console.log('Failed to get fee data, using gas price fallback');
+        return {
+          gasPrice: BigInt(await config.provider.send('eth_gasPrice', [])),
+          maxFeePerGas: null,
+          maxPriorityFeePerGas: null,
+        };
+      }
+    })();
 
-    const transactionReceipt = await config.provider.waitForTransaction(
-      transactionHash.hash,
-    );
+    const txRequest: TransactionRequest = {
+      chainId: config.network.chainId,
+      nonce: await config.provider.getTransactionCount(config.deployerAddress),
+      to: deploymentTransaction.to,
+      value: 0,
+      data: deploymentTransaction.data,
+      ...(typeof feeData.maxFeePerGas !== 'bigint'
+        ? {
+            type: 0,
+            gasPrice: feeData.gasPrice,
+          }
+        : {
+            maxFeePerGas: feeData.maxFeePerGas,
+            maxPriorityFeePerGas: feeData.maxPriorityFeePerGas,
+          }),
+    };
+
+    const gasLimit = await config.provider.estimateGas(txRequest);
+    txRequest.gasLimit = Number(gasLimit);
+
+    const signedTx = await config.deployer.signTransaction(txRequest);
+
+    const txHash = await config.provider.send('eth_sendRawTransaction', [
+      signedTx,
+    ]);
+
+    const transactionReceipt = await config.provider.waitForTransaction(txHash);
 
     console.log('     ✅ Safe deployment tx hash:', transactionReceipt?.hash);
   }

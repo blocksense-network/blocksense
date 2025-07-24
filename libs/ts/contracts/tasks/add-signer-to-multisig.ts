@@ -24,9 +24,9 @@ task('add-signer-to-multisig', 'Add signer to multisig')
   .addParam('adminMultisig', 'Custom admin multisig address')
   .addParam('newSigner', 'New signer address')
   .addParam('networkName', 'Network name')
-  .setAction(async (args, { ethers }) => {
+  .setAction(async args => {
     await addSignerToMultisig({
-      config: await initChain(ethers, parseNetworkName(args.networkName)),
+      config: await initChain(parseNetworkName(args.networkName)),
       adminMultisigAddr: parseEthereumAddress(args.adminMultisig),
       newAddress: args.newSigner,
     });

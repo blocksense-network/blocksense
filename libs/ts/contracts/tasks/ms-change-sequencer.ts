@@ -24,14 +24,14 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
   .addParam('networks', 'Network to deploy to')
   .addParam('sequencerAddress', 'Sequencer address')
   .addParam('setRole', 'Enable/Disable sequencer address role in AC')
-  .setAction(async (args, { ethers }) => {
+  .setAction(async args => {
     const networks = args.networks.split(',');
     const configs: NetworkConfig[] = [];
     for (const network of networks) {
       if (!isNetworkName(network)) {
         throw new Error(`Invalid network: ${network}`);
       }
-      configs.push(await initChain(ethers, network));
+      configs.push(await initChain(network));
     }
 
     for (const config of configs) {
