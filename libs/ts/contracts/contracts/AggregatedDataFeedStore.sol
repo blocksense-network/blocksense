@@ -25,14 +25,14 @@ contract AggregatedDataFeedStore {
   address internal immutable ACCESS_CONTROL;
 
   /// @notice Topic to be emitted on update
-  /// @dev keccak256("DataFeedsUpdated(uint256)")
+  /// @dev keccak256("DataFeedsUpdated(bytes32)")
   bytes32 internal constant DATA_FEEDS_UPDATE_EVENT_TOPIC =
-    0xe64378c8d8a289137204264780c7669f3860a703795c6f0574d925d473a4a2a7;
+    0x6f6892f1e8eab8687f7b5f3c3bc0d046cd783c6059310be0bef4e18eb0662789;
 
   /*
     Storage layout:
       Management space: [0 to 2**128-2**116)
-        0x0000 - latest blocknumber
+        0x0000 - latest history accumulator
         0x0001 - implementation slot (UpgradeableProxy)
         0x0002 - admin slot (UpgradeableProxy)
       Ring buffer index table: [2**128-2**116 to 2**128)
@@ -237,17 +237,17 @@ contract AggregatedDataFeedStore {
     address accessControl = ACCESS_CONTROL;
 
     /*
-                                                                                                                        ┌--------------------- index table data --------------------┐
-                                                                                                                        │                                                           │
-                                      ┌---------------------- feed 1 ----------------------------┬-- feed 2 .. feed N --┼-------------- row 1 --------------┬---- row 2 .. row N ---┤
-      ┌────────┬───────────┬──────────┬──────┬────────────┬──────────────┬────────────┬─────┬────┬──────────────────────┬────────────┬─────┬────────────────┬───────────────────────┐
-      │selector│blocknumber│# of feeds│stride│index length│feedId + index│bytes length│bytes│data│          ..          │index length│index│index table data│           ..          │
-      ├────────┼───────────┼──────────┼──────┼────────────┼──────────────┼────────────┼─────┼────┼──────────────────────┼────────────┼─────┼────────────────┼───────────────────────┤
-      │   1b   │    8b     │    4b    │  1b  │     1b     │      Xb      │     1b     │ Yb  │ Zb │          ..          │     1b     │ Xb  │      32b       │           ..          │
-      └────────┴───────────┴──────────┴──────┴────────────┴──────────────┴────────────┴─────┴────┴──────────────────────┴────────────┴─────┴────────────────┴───────────────────────┘
-                                                    │             ▲         │           ▲ │    ▲                              │         ▲
-                                                    └-------------┘         └-----------┘ └----┘                              └---------┘
-                                                    X=index length        Y=bytes length Z=bytes                             X=index length
+    /                                                                                                                                    ┌--------------------- round table data ---------------------┐
+    /                                                                                                                                    │                                                            │
+    /                                                 ┌---------------------- feed 1 ----------------------------┬-- feed 2 ... feed N --┼-------------- row 1 --------------┬---- row 2 ... row N ---┤
+    /  ┌────────┬──────────┬───────────────┬──────────┬──────┬────────────┬──────────────┬────────────┬─────┬────┬───────────────────────┬────────────┬─────┬────────────────┬────────────────────────┐
+    /  │selector│source acc│destination acc│# of feeds│stride│index length│feedId + round│bytes length│bytes│data│          ...          │index length│index│round table data│           ...          │
+    /  ├────────┼──────────┼───────────────┼──────────┼──────┼────────────┼──────────────┼────────────┼─────┼────┼───────────────────────┼────────────┼─────┼────────────────┼────────────────────────┤
+    /  │   1b   │   32b    │      32b      │    4b    │  1b  │     1b     │      Xb      │     1b     │ Yb  │ Zb │          ...          │     1b     │ Xb  │      32b       │           ...          │
+    /  └────────┴──────────┴───────────────┴──────────┴──────┴────────────┴──────────────┴────────────┴─────┴────┴───────────────────────┴────────────┴─────┴────────────────┴────────────────────────┘
+    /                                                              │             ▲         │           ▲ │    ▲                                │         ▲
+    /                                                              └-------------┘         └-----------┘ └----┘                                └---------┘
+    /                                                              X=index length         Y=bytes length Z=bytes                             X=index length
     */
     assembly {
       let ptr := mload(0x40)
@@ -267,27 +267,28 @@ contract AggregatedDataFeedStore {
 
       // setFeeds(bytes)
       if eq(byte(0, data), 0x01) {
-        ///////////////////////////////////
-        // Update Blocksense blocknumber //
-        ///////////////////////////////////
-        let newBlockNumber := shr(192, shl(8, data))
-        let prevBlockNumber := sload(0x00)
+        ///////////////////////////////////////////
+        // Update Blocksense history accumulator //
+        ///////////////////////////////////////////
+        let sourceAccumulator := calldataload(1)
+        let destinationAccumulator := calldataload(33)
+        let historyAccumulator := sload(0x00)
 
         // ensure it is strictly increasing
-        if eq(gt(newBlockNumber, prevBlockNumber), 0) {
+        if iszero(eq(sourceAccumulator, historyAccumulator)) {
           revert(0x00, 0x00)
         }
-        sstore(0x00, newBlockNumber)
+        sstore(0x00, destinationAccumulator)
 
         ///////////////////////////////////
         //         Update feeds          //
         ///////////////////////////////////
 
         let len := calldatasize()
-        let feedsCount := shr(224, shl(72, data))
-        // selector (1b) + blocknumber (8b) + feeds count (4b) = 13b
+        let feedsCount := shr(224, calldataload(65))
+        // selector (1b) + source acc (32b) + dest acc (32b) + feeds count (4b) = 69b
         // points to the start of the feeds data
-        let pointer := 13
+        let pointer := 69
 
         /*
                     ┌───────────────────────────────┐   .........  ┌───────────────────────────────┐
@@ -423,10 +424,10 @@ contract AggregatedDataFeedStore {
         //  Emit DataFeedsUpdated event  //
         ///////////////////////////////////
 
-        // store blocknumber at slot 0 in memory
-        mstore(0x00, newBlockNumber)
+        // store new history accumulator at slot 0 in memory
+        mstore(0x00, destinationAccumulator)
 
-        // Emit event with new block number
+        // Emit event with new history accumulator
         log1(0x00, 0x20, DATA_FEEDS_UPDATE_EVENT_TOPIC)
 
         return(0x00, 0x00)
