@@ -15,25 +15,36 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
     opts: {
-      blockNumber?: number;
+      sourceAccumulator?: string;
+      destinationAccumulator?: string;
       txData?: any;
     } = {},
   ) {
-    return sequencer.sendTransaction({
-      to: this.contract.target,
-      data: this.encodeDataWrite(feeds, opts.blockNumber),
-      ...opts.txData,
-    });
+    const { data, sourceAccumulator, destinationAccumulator } =
+      this.encodeDataWrite(
+        feeds,
+        opts.sourceAccumulator,
+        opts.destinationAccumulator,
+      );
+    return {
+      tx: await sequencer.sendTransaction({
+        to: this.contract.target,
+        data,
+        ...opts.txData,
+      }),
+      sourceAccumulator,
+      destinationAccumulator,
+    };
   }
 
-  public checkEvent(receipt: any, newBlockNumber: number): void {
+  public checkEvent(receipt: any, destinationAccumulator: string): void {
     const fragment = this.getEventFragment();
     const parsedEvent = this.contract.interface.decodeEventLog(
       fragment,
       receipt.logs[0].data,
     );
 
-    expect(parsedEvent[0]).to.be.eq(newBlockNumber);
+    expect(parsedEvent[0]).to.be.eq(destinationAccumulator);
   }
 
   public getEventFragment(): EventFragment {
@@ -147,8 +158,17 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
     return results;
   }
 
-  public encodeDataWrite = (feeds: Feed[], blockNumber?: number) => {
-    blockNumber ??= Date.now() + 100;
+  public encodeDataWrite = (
+    feeds: Feed[],
+    sourceAccumulator?: string,
+    destinationAccumulator?: string,
+  ) => {
+    sourceAccumulator ??= ethers.toBeHex(0, 32);
+    destinationAccumulator ??= ethers.toBeHex(
+      (Math.random() * 10000).toFixed(0),
+      32,
+    );
+
     const indices = feeds.map(
       feed => (feed.id * 2n ** 13n + feed.index) * 2n ** feed.stride,
     );
@@ -183,14 +203,19 @@ export abstract class ADFSBaseGenericWrapper implements IADFSWrapper {
 
     const indexTableData = indexTableIndices.map(key => batchFeeds[key]);
 
-    return this.contract.interface.encodeFunctionData('write', [
-      blockNumber,
-      feeds.map(feed => feed.stride),
-      indices,
-      feeds.map(feed => feed.data),
-      indexTableIndices,
-      indexTableData,
-    ]);
+    return {
+      data: this.contract.interface.encodeFunctionData('write', [
+        sourceAccumulator,
+        destinationAccumulator,
+        feeds.map(feed => feed.stride),
+        indices,
+        feeds.map(feed => feed.data),
+        indexTableIndices,
+        indexTableData,
+      ]),
+      sourceAccumulator,
+      destinationAccumulator,
+    };
   };
 
   public encodeDataRead = (operation: ReadOp, feed: ReadFeed) => {
