@@ -45,6 +45,8 @@ alloy = { workspace = true, features = [
 pprof = { version = "0.11", features = ["flamegraph"] }
 
 alloy-primitives = { workspace = true }
+alloy-u256-literal = { workspace = true }
+
 
 blocksense-metrics = { workspace = true }
 blocksense-gnosis-safe = { workspace = true }

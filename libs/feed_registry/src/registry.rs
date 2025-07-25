@@ -149,7 +149,7 @@ impl HistoryEntry {
 #[derive(Serialize)]
 pub struct FeedAggregateHistory {
     #[serde(serialize_with = "serialize_aggregate_history")]
-    aggregate_history: HashMap<FeedId, HeapRb<HistoryEntry>>,
+    pub aggregate_history: HashMap<FeedId, HeapRb<HistoryEntry>>,
 }
 
 fn serialize_aggregate_history<S>(
