@@ -1,10 +1,9 @@
 import type { Metadata } from 'next';
 import { ReactNode } from 'react';
-import { GoogleAnalytics, GoogleTagManager } from '@next/third-parties/google';
 import { ThirdwebProvider } from 'thirdweb/react';
 
 import { Navbar } from '../components/Navbar';
-import { CookieBanner } from '../components/CookieBanner';
+import { ConsentManager } from '../components/ConsentManager';
 import { Footer } from '../components/Footer';
 import { geist, geistMono } from '../src/geist';
 import './globals.css';
@@ -84,14 +83,12 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
       className={`${geist.variable} ${geistMono.variable}`}
       suppressHydrationWarning
     >
-      <GoogleTagManager gtmId="GTM-WB9ZRVTV" />
-      <GoogleAnalytics gaId="G-7E3PF0WSSM" />
       <body className="nft-drop-layout__body">
         <ThirdwebProvider>
           <Navbar />
           <main className="nft-drop-layout__main pt-[3.85rem]">{children}</main>
           <Footer />
-          <CookieBanner />
+          <ConsentManager />
         </ThirdwebProvider>
       </body>
     </html>
