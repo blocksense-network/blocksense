@@ -87,12 +87,13 @@ export const getApiKeys = () =>
     ]),
   );
 
+// the 'condition' could be used to make the binarySearch - lowerBound, upperBound or custom
 export const binarySearch = <T>(
   array: T[],
-  left: number,
-  right: number,
   condition: (mid: T, index: number) => boolean,
 ): number => {
+  let left = 0;
+  let right = array.length;
   while (left < right) {
     const midIndex = Math.floor((left + right) / 2);
     const midValue = array[midIndex];
