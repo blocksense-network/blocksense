@@ -1,4 +1,4 @@
-import { Context, Data, Effect, Layer } from 'effect';
+import { Context, Data, Effect, Layer, Schema as S } from 'effect';
 import { execa } from 'execa';
 
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
@@ -128,3 +128,20 @@ export const RGLogCheckerLive = Layer.succeed(
 // class ExampleError extends Data.TaggedError('@e2e-tests/ExampleError')<{
 //   readonly message: string;
 // }> {}
+
+// --- Schema Definition ---
+export const UpdatesToNetworkMetric = S.Struct({
+  name: S.Literal('updates_to_networks'),
+  type: S.Literal('COUNTER'),
+  metrics: S.Array(
+    S.Struct({
+      value: S.Number,
+      labels: S.Struct({
+        Network: S.String,
+        FeedId: S.String,
+      }),
+    }),
+  ),
+});
+
+export type UpdatesToNetwork = Record<string, Record<string, number>>;

@@ -2,14 +2,14 @@ import { Effect, pipe } from 'effect';
 import { afterAll, beforeAll, describe, expect, it } from '@effect/vitest';
 import { deepStrictEqual } from 'assert';
 
-import { loopWhile, sleep } from '@blocksense/base-utils/async';
+import { loopWhile } from '@blocksense/base-utils/async';
 import { getProcessComposeLogsFiles } from '@blocksense/base-utils/env';
-import { entriesOf, mapValuePromises } from '@blocksense/base-utils';
+import { entriesOf, mapValuePromises, valuesOf } from '@blocksense/base-utils';
 import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
 
-import { parseProcessesStatus } from './helpers';
+import { fetchUpdatesToNetworksMetric, parseProcessesStatus } from './helpers';
 import { expectedPCStatuses03 } from './expected';
-import type { ProcessComposeService } from './types';
+import type { ProcessComposeService, UpdatesToNetwork } from './types';
 import {
   RGLogChecker,
   RGLogCheckerLive,
@@ -115,16 +115,28 @@ describe.sequential('E2E Tests with process-compose', () => {
     ),
   );
 
-  it.effect('Test processes state after 2 mins', () =>
-    // TODO: (EmilIvanichkovv): Consider reading `the total_tx_sent` metrics from the sequencer instead of wait for something unspecified to happen.
-    Effect.gen(function* () {
-      // Effect.sleep() uses fake timers and we cannot test real time passage
-      yield* Effect.tryPromise(() => sleep(2 * 60 * 1000));
+  it.effect(
+    'Test processes state after at least 2 updates of each feeds have been made',
+    () =>
+      Effect.gen(function* () {
+        const _updates = yield* Effect.promise(() =>
+          loopWhile(
+            (updates: UpdatesToNetwork | null) =>
+              updates === null || !valuesOf(updates[network]).every(v => v > 2),
+            () => {
+              return Effect.runPromise(fetchUpdatesToNetworksMetric());
+            },
+            10000,
+            30,
+          ),
+        );
 
-      const processes = yield* Effect.tryPromise(() => parseProcessesStatus());
+        const processes = yield* Effect.tryPromise(() =>
+          parseProcessesStatus(),
+        );
 
-      expect(processes).toEqual(expectedPCStatuses03);
-    }),
+        expect(processes).toEqual(expectedPCStatuses03);
+      }),
   );
 
   it.effect('Test prices are updated', () =>
