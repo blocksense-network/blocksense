@@ -85,8 +85,6 @@ task('etherscan-verify', 'Verify contracts on Etherscan')
 
       const index = binarySearch(
         adapterEntries,
-        0,
-        adapterEntries.length,
         ([name]) => Number(name) < startFrom,
       );
 
