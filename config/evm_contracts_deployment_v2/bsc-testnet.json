@@ -165,10 +165,10 @@
         "quote": null
       },
       "100002": {
-        "address": "0xf1819A81cA59e8E9D195Ee62876bea55422bE493",
+        "address": "0x7CDA9b3CfC7dE7A95Ef7C8dDEc16F96dD46acc24",
         "constructorArgs": [
           "YUSD / USDC",
-          0,
+          6,
           "100002",
           "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],

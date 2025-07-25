@@ -9550,6 +9550,19 @@
         "base": null,
         "quote": null
       },
+      "732": {
+        "address": "0x4b12Bb6c86C53527Ff6c5F7B311155504531f4f3",
+        "constructorArgs": [
+          "TARA / USD",
+          18,
+          "732",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "732",
+        "base": null,
+        "quote": null
+      },
       "50000": {
         "address": "0xcDE309A9b3C5C6A23952089e1CEa71510EE3735D",
         "constructorArgs": [
@@ -9603,10 +9616,10 @@
         "quote": null
       },
       "100002": {
-        "address": "0x77C678D5599E1b6F80adf061b597f5b4cF3f99CC",
+        "address": "0xF6439c13DA7D9503091133916f334D022840249a",
         "constructorArgs": [
           "YUSD / USDC",
-          0,
+          6,
           "100002",
           "0x72F88509C53b939a0613c679a0F4768c0444d247"
         ],
@@ -9755,6 +9768,19 @@
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "1000007",
+        "base": null,
+        "quote": null
+      },
+      "1000008": {
+        "address": "0x2200e462f725BEC0360B7AE4fFFE473d2d0cb819",
+        "constructorArgs": [
+          "cbBTC / USD",
+          8,
+          "1000008",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "1000008",
         "base": null,
         "quote": null
       },
