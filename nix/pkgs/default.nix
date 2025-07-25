@@ -16,6 +16,7 @@
       rust = self'.legacyPackages.rustToolchain;
 
       craneLib = (inputs.mcl-blockchain.inputs.crane.mkLib pkgs).overrideToolchain rust;
+      inherit (inputs'.mcl-blockchain.legacyPackages) nix2container;
 
       version = "dev";
 
@@ -87,41 +88,30 @@
           };
         };
 
-        # Docker Images
-        sequencer-image = pkgs.dockerTools.buildImage {
-          name = "sequencer";
-          config = {
-            Cmd = [ "${self'.apps.sequencer.program}" ];
+        ociImages = {
+          sequencer = nix2container.buildImage {
+            name = "blocksense/sequencer";
+            tag = version;
+
+            config = {
+              cmd = [ "${self'.apps.sequencer.program}" ];
+            };
           };
-        };
 
-        # reporter-image = nix2container.buildImage {
-        #   name = "reporter";
-        #   tag = "latest";
+          reporter = nix2container.buildImage {
+            name = "blocksense/reporter";
+            tag = version;
 
-        #   config = {
-        #     cmd = [
-        #       self'.apps.blocksense.program
-        #       "node"
-        #       "build"
-        #       "--up"
-        #       "--from"
-        #       "$REPORTER_CONFIG_JSON_FILE"
-        #     ];
-        #   };
-        # };
-
-        reporter-image = pkgs.dockerTools.buildImage {
-          name = "reporter";
-          config = {
-            Cmd = [
-              "${self'.apps.blocksense.program}"
-              "node"
-              "build"
-              "--up"
-              "--from"
-              "$REPORTER_CONFIG_JSON_FILE"
-            ];
+            config = {
+              cmd = [
+                "${self'.apps.blocksense.program}"
+                "node"
+                "build"
+                "--up"
+                "--from"
+                "/etc/blocksense/reporter_config_a.json"
+              ];
+            };
           };
         };
       };
