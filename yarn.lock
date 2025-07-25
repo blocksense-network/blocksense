@@ -2325,6 +2325,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blocksense/base-utils@workspace:libs/ts/base-utils"
   dependencies:
+    "@effect/platform": "npm:^0.90.0"
     "@types/node": "npm:^22.10.2"
     "@vitest/coverage-v8": "npm:3.1.3"
     effect: "npm:^3.15.1"
@@ -3490,6 +3491,20 @@ __metadata:
   peerDependencies:
     effect: ^3.14.13
   checksum: 10c0/0865c0280d6f7b94580fba31f111b591f0702a2838ddd3615fa750154133bad6cdbfc26f1e958dbd8c1bfe61df05dd3e4e8c734bb7af900a362542f37128d133
+  languageName: node
+  linkType: hard
+
+"@effect/platform@npm:^0.90.0":
+  version: 0.90.0
+  resolution: "@effect/platform@npm:0.90.0"
+  dependencies:
+    "@opentelemetry/semantic-conventions": "npm:^1.33.0"
+    find-my-way-ts: "npm:^0.1.6"
+    msgpackr: "npm:^1.11.4"
+    multipasta: "npm:^0.2.7"
+  peerDependencies:
+    effect: ^3.17.0
+  checksum: 10c0/a3e611cdfa9fb82ee8df00d017f3df6323e057e2399af20f454b3b368ef7dbf6ca44deeb0d753bd16103cee845f6634b352397507d0a67ac64641f64f4b6b846
   languageName: node
   linkType: hard
 
@@ -20688,6 +20703,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"find-my-way-ts@npm:^0.1.6":
+  version: 0.1.6
+  resolution: "find-my-way-ts@npm:0.1.6"
+  checksum: 10c0/16ad4b15275b56ee0ec361d0c61afbdff4c75bd0ac04112f6910f188cb1058096ba63529c2363914da6bb60266aa4def1025af04af26368ff87eb0df52f2862f
+  languageName: node
+  linkType: hard
+
 "find-replace@npm:^3.0.0":
   version: 3.0.0
   resolution: "find-replace@npm:3.0.0"
@@ -26313,6 +26335,13 @@ __metadata:
   version: 0.2.5
   resolution: "multipasta@npm:0.2.5"
   checksum: 10c0/f0790b1bdfc6b84ae6139982ead353957b668fe54fec8a4d93c19e9d051b02c837c93fbdff10b26bff2dbfcf7792c6435c27786c14ad82a0fb33b939c1bf96c6
+  languageName: node
+  linkType: hard
+
+"multipasta@npm:^0.2.7":
+  version: 0.2.7
+  resolution: "multipasta@npm:0.2.7"
+  checksum: 10c0/15917ac88aeefa5b8afac44b90d1e9d0d0ec7148b51e0766f07a69a220ecebcb6404539a856c45aa85a3d7fe517bc58febe81437146705f17ecd2961dc0b9fa5
   languageName: node
   linkType: hard
 
