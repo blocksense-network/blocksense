@@ -37,6 +37,7 @@ use tokio::time::error::Elapsed;
 use tokio::time::Duration;
 use tracing::{debug, error, info, warn};
 
+use crate::providers::eth_send_utils::{get_gas_limit, get_tx_retry_params, GasFees};
 use crate::providers::multicall::Multicall;
 use crate::providers::provider::Multicall::MulticallInstance;
 use std::time::Instant;
@@ -495,12 +496,6 @@ impl RpcProvider {
 
         // Deploy the contract.
         let network = self.network.clone();
-        let _max_priority_fee_per_gas = process_provider_getter!(
-            provider.get_max_priority_fee_per_gas().await,
-            network,
-            provider_metrics,
-            get_max_priority_fee_per_gas
-        )?;
 
         let chain_id = process_provider_getter!(
             provider.get_chain_id().await,
@@ -519,11 +514,46 @@ impl RpcProvider {
         let mut encoded_arg = message_value.abi_encode();
         bytecode.append(&mut encoded_arg);
 
-        let tx = TransactionRequest::default()
-            .nonce(nonce)
-            .from(signer.address())
+        let gas_fees = match get_tx_retry_params(
+            network.as_str(),
+            provider,
+            provider_metrics,
+            &signer.address(),
+            30,
+            0,
+            0.0,
+        )
+        .await
+        {
+            Ok(res) => res,
+            Err(e) => {
+                warn!("Timed out on get_tx_retry_params while deploying contract {contract_name} in network `{network}`: {e}!");
+                return Err(eyre!(
+                    "failed to get_tx_retry_params for network `{network}"
+                ));
+            }
+        };
+
+        let mut tx = TransactionRequest::default()
+            .with_nonce(nonce)
+            .with_from(signer.address())
             .with_chain_id(chain_id)
             .with_deploy_code(bytecode);
+
+        let gas_limit = get_gas_limit(network.as_str(), provider, &tx, 30).await;
+
+        tx = tx.with_gas_limit(gas_limit);
+
+        match gas_fees {
+            GasFees::Legacy(gas_price) => {
+                tx = tx.with_gas_price(gas_price.gas_price).transaction_type(0);
+            }
+            GasFees::Eip1559(eip1559_gas_fees) => {
+                tx = tx
+                    .with_max_priority_fee_per_gas(eip1559_gas_fees.priority_fee)
+                    .with_max_fee_per_gas(eip1559_gas_fees.max_fee_per_gas);
+            }
+        }
 
         let deploy_time = Instant::now();
         let contract_address = provider
@@ -710,23 +740,22 @@ mod tests {
             .with_from(alice)
             .with_to(bob)
             .with_value(U256::from(100))
+            .with_gas_limit(10_000_000)
+            .with_max_fee_per_gas(30_000_000_000)
+            .with_max_priority_fee_per_gas(2_000_000_000)
+            .with_nonce(0)
             // It is required to set the chain_id for EIP-1559 transactions.
             .with_chain_id(anvil.chain_id());
 
         // Send the transaction, the nonce (0) is automatically managed by the provider.
-        let builder = provider.send_transaction(tx.clone()).await?;
+        let builder = provider.send_transaction(tx).await?;
         let node_hash = *builder.tx_hash();
         let pending_tx = provider.get_transaction_by_hash(node_hash).await?.unwrap();
         assert_eq!(pending_tx.nonce(), 0);
 
-        println!("Transaction sent with nonce: {}", pending_tx.nonce());
+        let receipt = builder.get_receipt().await.unwrap();
 
-        // Send the transaction, the nonce (1) is automatically managed by the provider.
-        let tx = provider.send_transaction(tx).await?;
-
-        let receipt = tx.get_receipt().await.unwrap();
-
-        assert_eq!(receipt.effective_gas_price, 875_175_001);
+        assert_eq!(receipt.effective_gas_price, 3000000000);
         assert_eq!(receipt.gas_used, 21000);
 
         Ok(())

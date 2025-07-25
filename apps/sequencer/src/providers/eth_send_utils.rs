@@ -582,8 +582,17 @@ pub async fn eth_batch_send_to_contract(
             .with_nonce(nonce)
             .with_from(sender_address)
             .with_chain_id(chain_id)
-            .with_gas_limit(10_000_000) // Set a high gas limit to avoid out of gas errors
             .input(Some(input.clone()).into());
+
+        let gas_limit = get_gas_limit(
+            net.as_str(),
+            rpc_handle,
+            &tx,
+            transaction_retry_timeout_secs,
+        )
+        .await;
+
+        tx = tx.with_gas_limit(gas_limit);
 
         match gas_fees {
             GasFees::Legacy(gas_price) => {
@@ -752,6 +761,36 @@ pub async fn eth_batch_send_to_contract(
     debug!("Released a read/write lock on provider state in network `{net}` block height {block_height}");
 
     Ok((receipt.status().to_string(), feeds_to_update_ids))
+}
+
+pub async fn get_gas_limit(
+    net: &str,
+    rpc_handle: &ProviderType,
+    tx: &TransactionRequest,
+    transaction_retry_timeout_secs: u64,
+) -> u64 {
+    let default_gas_limit = 10_000_000;
+    match actix_web::rt::time::timeout(
+        Duration::from_secs(transaction_retry_timeout_secs),
+        rpc_handle.estimate_gas(tx.clone()),
+    )
+    .await
+    {
+        Ok(gas_limit_result) => match gas_limit_result {
+            Ok(gas_limit) => {
+                debug!("Got gas_limit={gas_limit} for network {net}");
+                gas_limit * 2
+            }
+            Err(err) => {
+                debug!("Failed to get gas_limit for network {net} due to {err}");
+                default_gas_limit
+            }
+        },
+        Err(err) => {
+            warn!("Timed out while getting gas_limit for network {net} due to {err}");
+            default_gas_limit
+        }
+    }
 }
 
 pub async fn get_nonce(
