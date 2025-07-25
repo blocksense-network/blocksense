@@ -44,7 +44,7 @@ library ADFS {
         dataFeedStore,
         (uint256(0x84) << 248) | (id << 120),
         17,
-        1 << _decodeStride(id)
+        1 << decodeStride(id)
       );
   }
 
@@ -68,7 +68,7 @@ library ADFS {
           (startSlot << 88) |
           (slotsCount << 56),
         slotsCount == 0 ? 21 : 25,
-        slotsCount > 0 ? slotsCount : (1 << (_decodeStride(id) - startSlot))
+        slotsCount > 0 ? slotsCount : (1 << (decodeStride(id) - startSlot))
       );
   }
 
@@ -107,7 +107,7 @@ library ADFS {
         dataFeedStore,
         (uint256(0x86) << 248) | (id << 120) | (index << 104),
         19,
-        1 << _decodeStride(id)
+        1 << decodeStride(id)
       );
   }
 
@@ -134,7 +134,7 @@ library ADFS {
           (startSlot << 72) |
           (slotsCount << 40),
         slotsCount == 0 ? 23 : 27,
-        slotsCount > 0 ? slotsCount : (1 << (_decodeStride(id) - startSlot))
+        slotsCount > 0 ? slotsCount : (1 << (decodeStride(id) - startSlot))
       );
   }
 
@@ -211,7 +211,7 @@ library ADFS {
         dataFeedStore,
         (uint256(0x85) << 248) | (id << 120),
         17,
-        1 << _decodeStride(id)
+        1 << decodeStride(id)
       );
   }
 
@@ -236,7 +236,7 @@ library ADFS {
           (startSlot << 88) |
           (slotsCount << 56),
         slotsCount == 0 ? 23 : 27,
-        slotsCount > 0 ? slotsCount : (1 << (_decodeStride(id) - startSlot))
+        slotsCount > 0 ? slotsCount : (1 << (decodeStride(id) - startSlot))
       );
   }
 
@@ -369,7 +369,7 @@ library ADFS {
   /// @param data The data to decode
   /// @return answer The value stored for the feed at the given index
   /// @return timestamp The timestamp when the value was stored
-  function _decodeData(bytes32 data) internal pure returns (uint256, uint256) {
+  function decodeData(bytes32 data) internal pure returns (uint256, uint256) {
     return (uint256(uint192(bytes24(data))), uint64(uint256(data)));
   }
 
@@ -378,7 +378,7 @@ library ADFS {
   /// There are only 32 strides (from 0 to 31 incl.) so only the last 5 bits are used to determine the stride
   /// @param id The id of the feed
   /// @return stride The stride of the feed
-  function _decodeStride(uint256 id) internal pure returns (uint256) {
+  function decodeStride(uint256 id) internal pure returns (uint256) {
     return (id >> 120) & 0x1f;
   }
 }
