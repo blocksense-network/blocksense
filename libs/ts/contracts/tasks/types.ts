@@ -1,6 +1,7 @@
 import { HexDataString } from '@blocksense/base-utils/buffer-and-hex';
 import { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
-import { JsonRpcProvider, Network, Signer, Wallet } from 'ethers';
+import { type LedgerSigner } from '@ethers-ext/signer-ledger';
+import { JsonRpcProvider, Network, Wallet } from 'ethers';
 
 export interface MultisigConfig {
   owners: readonly EthereumAddress[];
@@ -10,7 +11,6 @@ export interface MultisigConfig {
 export interface NetworkConfigBase {
   rpc: string;
   provider: JsonRpcProvider;
-  deployer: Signer;
   deployerAddress: EthereumAddress;
   deployerIsLedger: boolean;
   network: Network;
@@ -39,7 +39,7 @@ export type NetworkConfig = NetworkConfigBase &
   (
     | {
         deployerIsLedger: true;
-        deployer: Signer;
+        deployer: LedgerSigner;
       }
     | {
         deployerIsLedger: false;
