@@ -152,6 +152,7 @@ macro_rules! inc_vec_metric {
 
 #[derive(Debug)]
 pub struct ProviderMetrics {
+    pub tx_sent: IntCounterVec,
     pub total_tx_sent: IntCounterVec,
     pub gas_used: IntGaugeVec,
     pub effective_gas_price: IntGaugeVec,
@@ -177,6 +178,11 @@ pub struct ProviderMetrics {
 impl ProviderMetrics {
     pub fn new(prefix: &str) -> Result<ProviderMetrics> {
         Ok(ProviderMetrics {
+            tx_sent: register_int_counter_vec!(
+                format!("{}total_tx_sent", prefix),
+                "Total number of tx sent",
+                &["Network", "Result", "BlockHeight", "Nonce"]
+            )?,
             total_tx_sent: register_int_counter_vec!(
                 format!("{}total_tx_sent", prefix),
                 "Total number of tx sent",

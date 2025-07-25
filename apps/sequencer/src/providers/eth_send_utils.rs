@@ -288,10 +288,20 @@ pub async fn loop_processing_batch_of_updates(
                 inc_metric!(provider_metrics, net, total_tx_sent);
 
                 match result {
-                    Ok((status, updated_feeds)) => {
+                    Ok((status, updated_feeds, nonce)) => {
+                        let nonce_str = nonce.map(|v| v.to_string()).unwrap_or("none".to_string());
                         let mut result_str = String::new();
                         result_str += &format!("result from network {net} and block height {block_height}: Ok -> status: {status}");
-                        if status == "true" {
+                        inc_vec_metric!(
+                            provider_metrics,
+                            tx_sent,
+                            net,
+                            status,
+                            block_height,
+                            nonce_str
+                        );
+
+                        if status == "success" {
                             result_str += &format!(", updated_feeds: {updated_feeds:?}");
                             increment_feeds_round_metrics(
                                 &updated_feeds,
@@ -321,7 +331,7 @@ pub async fn loop_processing_batch_of_updates(
                             let provider_metrics = &provider.provider_metrics;
                             if status == "timeout" {
                                 inc_metric!(provider_metrics, net, total_timed_out_tx);
-                            } else if status == "false" {
+                            } else if status == "fail" {
                                 inc_metric!(provider_metrics, net, failed_send_tx);
                             }
                             let mut status_map = provider_status.write().await;
@@ -352,7 +362,7 @@ pub async fn eth_batch_send_to_contract(
     transaction_retry_timeout_secs: u64,
     transaction_retries_count_limit: u64,
     retry_fee_increment_fraction: f64,
-) -> Result<(String, Vec<FeedId>)> {
+) -> Result<(String, Vec<FeedId>, Option<u64>)> {
     let mut feeds_rounds = HashMap::new();
     let serialized_updates = get_serialized_updates_for_network(
         net.as_str(),
@@ -371,6 +381,7 @@ pub async fn eth_batch_send_to_contract(
         return Ok((
             format!("No updates to send for network `{net}` block height {block_height}"),
             Vec::new(),
+            None,
         ));
     }
 
@@ -435,7 +446,7 @@ pub async fn eth_batch_send_to_contract(
     // First get the correct nonce
     let nonce = loop {
         if nonce_get_retries_count > transaction_retries_count_limit {
-            return Ok(("timeout".to_string(), feeds_to_update_ids));
+            return Ok(("timeout".to_string(), feeds_to_update_ids, None));
         }
 
         let nonce = match get_nonce(
@@ -468,7 +479,7 @@ pub async fn eth_batch_send_to_contract(
         debug!("loop begin; transaction_retries_count={transaction_retries_count} in network `{net}` block height {block_height} with transaction_retries_count_limit = {transaction_retries_count_limit} and transaction_retry_timeout_secs = {transaction_retry_timeout_secs}");
 
         if transaction_retries_count > transaction_retries_count_limit {
-            return Ok(("timeout".to_string(), feeds_to_update_ids));
+            return Ok(("timeout".to_string(), feeds_to_update_ids, Some(nonce)));
         }
 
         match get_nonce(
@@ -484,7 +495,7 @@ pub async fn eth_batch_send_to_contract(
             Ok(latest_nonce) => {
                 if latest_nonce > nonce {
                     //TODO: Check the tx hashes of all posted/retried txs for block inclusion
-                    return Ok(("true".to_string(), feeds_to_update_ids));
+                    return Ok(("success".to_string(), feeds_to_update_ids, Some(nonce)));
                 }
             }
             Err(err) => {
@@ -636,7 +647,7 @@ pub async fn eth_batch_send_to_contract(
                     Err(err) => {
                         warn!("Error while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
                         if err.to_string().contains("execution revert") {
-                            return Ok(("false".to_string(), feeds_to_update_ids));
+                            return Ok(("fail".to_string(), feeds_to_update_ids, Some(nonce)));
                         } else {
                             inc_retries_with_backoff(
                                 net.as_str(),
@@ -760,7 +771,13 @@ pub async fn eth_batch_send_to_contract(
     drop(provider);
     debug!("Released a read/write lock on provider state in network `{net}` block height {block_height}");
 
-    Ok((receipt.status().to_string(), feeds_to_update_ids))
+    let result = if receipt.status().to_string() == "true" {
+        "success"
+    } else {
+        "fail"
+    };
+
+    Ok((result.to_string(), feeds_to_update_ids, Some(nonce)))
 }
 
 pub async fn get_gas_limit(
