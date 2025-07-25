@@ -285,6 +285,7 @@ pub async fn loop_processing_batch_of_updates(
 
                 let provider_metrics = provider.lock().await.provider_metrics.clone();
                 dec_metric!(provider_metrics, net, num_transactions_in_queue);
+                inc_metric!(provider_metrics, net, total_tx_sent);
 
                 match result {
                     Ok((status, updated_feeds)) => {
@@ -671,7 +672,7 @@ pub async fn eth_batch_send_to_contract(
                 .await
             {
                 Ok(v) => {
-                    debug!("Successfully got receipt from RPC in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash}");
+                    debug!("Successfully got receipt from RPC in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash} receipt = {v:?}");
                     inc_metric!(provider_metrics, net, success_get_receipt);
                     v
                 }
@@ -687,7 +688,7 @@ pub async fn eth_batch_send_to_contract(
                         Ok(v) => match v {
                             Ok(v) => match v {
                                 Some(v) => {
-                                    debug!("Successfully got tx_receipt in network `{net}` block height {block_height}");
+                                    debug!("Successfully got receipt from RPC in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash} receipt = {v:?}");
                                     inc_metric!(provider_metrics, net, success_get_receipt);
                                     v
                                 }
@@ -734,7 +735,6 @@ pub async fn eth_batch_send_to_contract(
                 }
             };
 
-            inc_metric!(provider_metrics, net, total_tx_sent);
             info!("Successfully posted tx to RPC and got tx_hash in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash}");
 
             tx_receipt
@@ -834,7 +834,7 @@ pub async fn inc_retries_with_backoff(
     backoff_secs: u64,
 ) {
     *transaction_retries_count += 1;
-    inc_metric!(provider_metrics, net, total_tx_sent);
+    inc_metric!(provider_metrics, net, total_transaction_retries);
     // Wait before sending the next request
     let time_to_await: Duration = Duration::from_secs(backoff_secs);
     let mut interval = interval(time_to_await);
