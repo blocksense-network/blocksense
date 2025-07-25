@@ -42,7 +42,22 @@
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true
+    "skipDefaultLibCheck": true,
+    "plugins": [
+      {
+        "name": "@effect/language-service",
+        "diagnostics": true,
+        "diagnosticSeverity": {
+          "floatingEffect": "warning"
+        },
+        "quickinfo": true,
+        "completions": true,
+        "goto": true,
+        "allowedDuplicatedPackages": [],
+        "barrelImportPackages": [],
+        "namespaceImportPackages": []
+      }
+    ]
   },
   "exclude": [".yarn/unplugged", "tmp"]
 }
