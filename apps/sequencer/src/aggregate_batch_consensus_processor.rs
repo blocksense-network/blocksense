@@ -13,7 +13,7 @@ use tracing::{debug, error, info, warn};
 
 use crate::providers::eth_send_utils::{
     decrement_feeds_round_indexes, get_nonce, get_tx_retry_params, inc_retries_with_backoff,
-    log_gas_used,
+    log_gas_used, GasFees,
 };
 use crate::providers::provider::{parse_eth_address, RpcProvider, GNOSIS_SAFE_CONTRACT_NAME};
 use crate::sequencer_state::SequencerState;
@@ -247,7 +247,7 @@ pub async fn aggregation_batch_consensus_loop(
                                             continue;
                                         }
 
-                                        let tx_to_send = contract.execTransaction(
+                                        let mut tx_to_send = contract.execTransaction(
                                             safe_tx.to,
                                             safe_tx.value,
                                             safe_tx.data.clone(),
@@ -287,7 +287,7 @@ pub async fn aggregation_batch_consensus_loop(
                                                 }
                                             };
 
-                                            let (max_fee_per_gas, priority_fee) = match get_tx_retry_params(
+                                            let gas_fees = match get_tx_retry_params(
                                                 net.as_str(),
                                                 &provider.provider,
                                                 &provider.provider_metrics,
@@ -304,9 +304,17 @@ pub async fn aggregation_batch_consensus_loop(
                                                 },
                                             };
 
+                                            match gas_fees {
+                                                GasFees::Legacy(gas_price) => {
+                                                    tx_to_send = tx_to_send.gas_price(gas_price.gas_price); // Use legacy transaction if priority fee is 0
+                                                },
+                                                GasFees::Eip1559(eip1559_gas_fees) => {
+                                                    tx_to_send = tx_to_send.max_priority_fee_per_gas(eip1559_gas_fees.priority_fee)
+                                                    .max_fee_per_gas(eip1559_gas_fees.max_fee_per_gas);
+                                                },
+                                            }
+
                                             tx_to_send
-                                                .max_priority_fee_per_gas(priority_fee)
-                                                .max_fee_per_gas(max_fee_per_gas)
                                                 .nonce(nonce)
 
                                         };
