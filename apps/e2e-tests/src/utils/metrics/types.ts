@@ -6,10 +6,12 @@ const Labels = S.Record({
   value: S.String,
 });
 
-const MetricSchema = S.Struct({
+export const MetricSchema = S.Struct({
   value: S.NumberFromString,
   labels: S.optional(Labels),
 });
+
+export type Metric = typeof MetricSchema.Type;
 
 const MetricType = S.Literal('COUNTER', 'GAUGE', 'HISTOGRAM', 'SUMMARY');
 
