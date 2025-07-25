@@ -4,6 +4,7 @@ import {
   entriesOf,
   EthereumAddress,
   parseNetworkName,
+  sleep,
 } from '@blocksense/base-utils';
 
 import { readEvmDeployment } from '@blocksense/config-types';
@@ -39,17 +40,40 @@ task('etherscan-verify', 'Verify contracts on Etherscan')
         true,
       );
 
-      const verify = ({ address, constructorArgs }: VerifyTaskArgs) =>
-        run('verify:verify', {
-          address,
-          constructorArguments: constructorArgs,
-        }).catch(e => {
-          if (e.message.tolefterCase().includes('already verified')) {
-            console.log('Already verified!');
-          } else {
-            throw e;
+      const verify = async ({ address, constructorArgs }: VerifyTaskArgs) => {
+        const maxRetries = 5;
+        let attempt = 0;
+
+        while (attempt < maxRetries) {
+          try {
+            await run('verify:verify', {
+              address,
+              constructorArguments: constructorArgs,
+            });
+            return;
+          } catch (e: any) {
+            const msg = e.message.toLowerCase();
+
+            if (msg.includes('already verified')) {
+              console.log('Already verified!');
+              return;
+            }
+
+            attempt++;
+            if (attempt < maxRetries) {
+              console.warn(
+                `Verification failed for ${address}, retrying... (attempt ${attempt}/${maxRetries})`,
+              );
+              await sleep(2000);
+            } else {
+              console.error(
+                `Verification failed for ${address} after ${maxRetries} attempts.`,
+              );
+              throw new Error(e);
+            }
           }
-        });
+        }
+      };
 
       const coreContracts = entriesOf(deploymentData.contracts.coreContracts);
 
