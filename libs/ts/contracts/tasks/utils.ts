@@ -5,6 +5,9 @@ import {
   getOptionalApiKey,
   networkMetadata,
   NetworkName,
+  fromEntries,
+  keysOf,
+  entriesOf,
 } from '@blocksense/base-utils';
 
 export async function checkAddressExists(
@@ -62,7 +65,7 @@ export const adjustVInSignature = async (
 };
 
 export const getCustomChainConfig = (explorerIndex: number) =>
-  Object.entries(networkMetadata)
+  entriesOf(networkMetadata)
     .filter(([_, meta]) => meta.explorers[explorerIndex]?.apiUrl)
     .map(([name, meta]) => {
       const explorer = meta.explorers[explorerIndex];
@@ -77,8 +80,8 @@ export const getCustomChainConfig = (explorerIndex: number) =>
     });
 
 export const getApiKeys = () =>
-  Object.fromEntries(
-    Object.keys(networkMetadata).map(name => [
+  fromEntries(
+    keysOf(networkMetadata).map(name => [
       name,
       getOptionalApiKey(name as NetworkName),
     ]),
