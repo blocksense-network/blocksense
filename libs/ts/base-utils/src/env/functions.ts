@@ -17,11 +17,18 @@ export function getEnvString(varName: string): string {
   );
 }
 
+/**
+ * Retrieves the value of an environment variable or defaultValue if that envVar is not set or set to empty string.
+ *
+ * @param {string} varName - The name of the environment variable.
+ * @param {string} defaultValue - Default return value.
+ * @returns {string} - The value of the environment variable or defaultValue if that envVar is not set or set to empty string.
+ */
 export function getOptionalEnvString(
   varName: string,
   defaultValue: string,
 ): string {
-  return process.env[varName] ?? defaultValue;
+  return process.env[varName] || defaultValue;
 }
 
 export function getEnvStringNotAssert(varName: string): string {
