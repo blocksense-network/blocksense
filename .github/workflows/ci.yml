@@ -206,10 +206,15 @@ jobs:
             path: libs/ts/ui/storybook-static
             project_name: blocksense-ui
             build_command: yarn workspace @blocksense/ui build-storybook
+          - project: explorer.blocksense.network
+            path: apps/explorer.blocksense.network/out
+            project_name: blocksense-explorer
+            build_command: yarn workspace @blocksense/explorer.blocksense.network build:with-deps
     outputs:
       docsDeploymentMessage: ${{ steps.docs-ws-url.outputs.url }}
       docsUiDeploymentMessage: ${{ steps.docs-ui-ws-url.outputs.url }}
       uiDeploymentMessage: ${{ steps.ui-ws-url.outputs.url }}
+      explorerDeploymentMessage: ${{ steps.explorer-ws-url.outputs.url }}
     steps:
       - uses: actions/checkout@v4
 
@@ -267,6 +272,14 @@ jobs:
         run: |
           echo "url=$UI_DEPLOY_URL" >> $GITHUB_OUTPUT
 
+      - name: Collect Explorer Deployment URL
+        id: explorer-ws-url
+        if: matrix.project == 'explorer.blocksense.network'
+        env:
+          EXPLORER_DEPLOY_URL: ${{ steps.deploy-website.outputs.deployment-url }}
+        run: |
+          echo "url=$EXPLORER_DEPLOY_URL" >> $GITHUB_OUTPUT
+
   comment_on_pr:
     needs: [deploy_websites]
     runs-on: self-hosted
@@ -290,3 +303,4 @@ jobs:
             | 🌱 [Documentation](${{ needs.deploy_websites.outputs.docsDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |
             | 📖 [Docs UI Components](${{ needs.deploy_websites.outputs.docsUiDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |
             | 📝 [UI Components](${{ needs.deploy_websites.outputs.uiDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |
+            | 🔎 [Explorer](${{ needs.deploy_websites.outputs.explorerDeploymentMessage }}) | ${{ steps.datetime.outputs.latest_update }} | ${{ github.sha }} |
