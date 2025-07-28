@@ -110,15 +110,6 @@ start-oracle oracle-name:
 build-blocksense:
   @{{root-dir}}/scripts/build-blocksense.sh
 
-[group('blocksense')]
-[doc('Start Blocksense')]
-start-blocksense:
-  #!/usr/bin/env bash
-  set -euo pipefail
-
-  just build-blocksense
-  process-compose up
-
 [group('General')]
 [doc('Evaluate a Nix expression for a specific machine')]
 eval-machine machine commit="working-tree":
@@ -133,7 +124,7 @@ eval-machine machine commit="working-tree":
 
 [group('General')]
 [doc('Run NixOS integration tests')]
-run-tests:
+run-nix-tests:
   #!/usr/bin/env bash
   set -euo pipefail
   nix eval --json .#legacyPackages.x86_64-linux.nixosTests --apply "builtins.attrNames" | \
