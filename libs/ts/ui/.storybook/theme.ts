@@ -8,6 +8,6 @@ export default create({
 
   brandTitle: 'Blocksense Network',
   brandUrl: 'https://blocksense.network',
-  brandImage: 'src/assets/logos/primary-black.svg',
+  brandImage: '/images/primary-black.svg',
   brandTarget: '_target',
 });
