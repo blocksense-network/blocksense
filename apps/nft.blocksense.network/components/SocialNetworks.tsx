@@ -17,7 +17,7 @@ const socialNetworks = [
   },
   {
     name: 'Discord',
-    url: 'https://discord.com/invite/mYujUXwrMr',
+    url: 'https://discord.com/invite/blocksense',
     icon: discordIcon,
   },
 ];
