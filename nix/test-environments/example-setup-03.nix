@@ -38,10 +38,10 @@ in
     ./example-setup-01.nix
   ];
 
-  services.kafka.enable = lib.mkForce false;
-
   services.blocksense = {
     logsDir = lib.mkForce "$GIT_ROOT/logs/process-compose/example-setup-03";
+
+    kafka.enable = lib.mkForce false;
 
     blama.enable = lib.mkForce false;
 
