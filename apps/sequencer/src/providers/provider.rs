@@ -18,6 +18,7 @@ use alloy_primitives::{keccak256, Bytes, B256};
 use blocksense_feeds_processing::adfs_gen_calldata::RoundCounters;
 use blocksense_utils::FeedId;
 use futures::future::join_all;
+use incrementalmerkletree::{frontier::Frontier, Hashable, Level};
 use reqwest::Url;
 
 use blocksense_config::{AllFeedsConfig, PublishCriteria, SequencerConfig};
@@ -73,8 +74,24 @@ pub const EVENT_FEED_CONTRACT_NAME: &str = "event_feed";
 pub const MULTICALL_CONTRACT_NAME: &str = "multicall";
 pub const GNOSIS_SAFE_CONTRACT_NAME: &str = "gnosis_safe";
 
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+pub struct HashValue(pub B256);
+
+impl Hashable for HashValue {
+    fn combine(_level: Level, a: &Self, b: &Self) -> Self {
+        HashValue(keccak256([a.0.to_vec(), b.0.to_vec()].concat()))
+    }
+    fn empty_root(_level: Level) -> Self {
+        HashValue(B256::ZERO)
+    }
+
+    fn empty_leaf() -> Self {
+        HashValue(B256::ZERO)
+    }
+}
+
 pub struct RpcProvider {
-    pub latest_state_hash: B256,
+    pub calldatas_merkle_tree_frontier: Frontier<HashValue, 32>,
     pub network: String,
     pub provider: ProviderType,
     pub signer: PrivateKeySigner,
@@ -210,7 +227,7 @@ impl RpcProvider {
             }
         }
         RpcProvider {
-            latest_state_hash: keccak256(b"blocksense"), // TODO: Read the value from the contract on init
+            calldatas_merkle_tree_frontier: Frontier::<HashValue, 32>::empty(), // TODO: Read the value from the contract on init
             network: network.to_string(),
             provider,
             signer: signer.clone(),

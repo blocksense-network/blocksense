@@ -52,7 +52,8 @@ blocksense-gnosis-safe = { workspace = true }
 reqwest = { workspace = true }
 # async
 tokio = { workspace = true }
-
+bridgetree = { git = "https://github.com/zcash/incrementalmerkletree", package = "bridgetree" }
+incrementalmerkletree = { git = "https://github.com/zcash/incrementalmerkletree", package = "incrementalmerkletree" }
 # misc
 anyhow = { workspace = true }
 eyre = { workspace = true }
