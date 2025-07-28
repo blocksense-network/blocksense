@@ -2569,6 +2569,7 @@ __metadata:
     "@blocksense/base-utils": "workspace:*"
     "@blocksense/config-types": "workspace:*"
     "@blocksense/contracts": "workspace:*"
+    "@effect/language-service": "npm:^0.31.2"
     "@effect/platform": "npm:^0.90.0"
     "@effect/vitest": "npm:^0.25.0"
     "@types/node": "npm:^22.3.0"
@@ -3432,6 +3433,15 @@ __metadata:
   bin:
     effect-language-service: cli.js
   checksum: 10c0/81a05ec17e30637663a8828a95dd175db2a5e55fd6990950a63d3429938fc273072005822422e527cdc2a199e45da9bbc43bceacd390b1c3290caee4e85d65af
+  languageName: node
+  linkType: hard
+
+"@effect/language-service@npm:^0.31.2":
+  version: 0.31.2
+  resolution: "@effect/language-service@npm:0.31.2"
+  bin:
+    effect-language-service: cli.js
+  checksum: 10c0/5714e1a1accc48636279afb0ab600907debf354cd034148bb36b76787f74080a7d60ec41032e87c091cf1ea299714a3746d86b902757bf73388eca097c467a6e
   languageName: node
   linkType: hard
 
