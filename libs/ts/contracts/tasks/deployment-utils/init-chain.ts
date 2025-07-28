@@ -195,6 +195,7 @@ function getSafeAddresses(isOriginalDeployment: boolean) {
 
   return {
     multiSendAddress: parseEthereumAddress(
+      // aka MultiSend
       '0xd921B42f7cBa1ab24d69b647129450Ba0cFcA797',
     ),
     multiSendCallOnlyAddress: parseEthereumAddress(
@@ -211,8 +212,8 @@ function getSafeAddresses(isOriginalDeployment: boolean) {
       '0x3f5e53cFdF49F54725Ea694D57607F435fb68c1F',
     ),
     fallbackHandlerAddress: parseEthereumAddress(
-      // aka TokenCallbackHandler
-      '0x7DE3b47DFA44781E2a0517C55270BA2F83BF4E5f',
+      // aka CompatibilityFallbackHandler
+      '0x65D58E99Cb6574a5D0938fe20763c958455b0181',
     ),
     signMessageLibAddress: parseEthereumAddress(
       '0x14f03F7C9dC4e3eFdf62EA8E19bEdb0CdCc44F3f',
