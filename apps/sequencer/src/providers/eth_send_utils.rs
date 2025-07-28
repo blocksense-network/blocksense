@@ -20,8 +20,8 @@ use tokio::{
 
 use crate::{
     providers::provider::{
-        parse_eth_address, ProviderStatus, ProviderType, RpcProvider, SharedRpcProviders,
-        EVENT_FEED_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME,
+        parse_eth_address, HashValue, ProviderStatus, ProviderType, RpcProvider,
+        SharedRpcProviders, EVENT_FEED_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME,
     },
     sequencer_state::SequencerState,
 };
@@ -408,8 +408,7 @@ pub async fn eth_batch_send_to_contract(
 
     let input = Bytes::from(serialized_updates);
 
-    let latest_state_hash =
-        keccak256([provider.latest_state_hash.as_ref(), input.as_ref()].concat());
+    let latest_call_data_hash = keccak256(input.as_ref());
 
     let receipt;
     let tx_time = Instant::now();
@@ -755,7 +754,9 @@ pub async fn eth_batch_send_to_contract(
     let result = receipt.status().to_string();
     if result == "true" {
         //Transaction was successfully confirmed therefore we update the latest state hash
-        provider.latest_state_hash = latest_state_hash;
+        provider
+            .calldatas_merkle_tree_frontier
+            .append(HashValue(latest_call_data_hash));
     } // TODO: Reread round counters + latest state hash from contract
     drop(provider);
     debug!("Released a read/write lock on provider state in network `{net}` block height {block_height}");
