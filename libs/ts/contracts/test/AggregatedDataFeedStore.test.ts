@@ -13,6 +13,10 @@ import {
 import { initWrappers } from './experiments/utils/helpers/common';
 import { compareGasUsed } from './utils/helpers/compareGasWithExperiments';
 import { generateRandomFeeds } from './utils/helpers/common';
+import {
+  decodeADFSCalldata,
+  ParsedCalldata,
+} from '../lib/utils/calldata-decoder';
 
 const feeds: Feed[] = [
   {
@@ -562,4 +566,80 @@ describe('AggregatedDataFeedStore', () => {
       });
     }
   });
+});
+
+describe('ADFS input parser', () => {
+  let contract: ADFSWrapper;
+  let sequencer: HardhatEthersSigner;
+
+  beforeEach(async () => {
+    const signers = await ethers.getSigners();
+    sequencer = signers[0];
+    const accessControlOwner = signers[1];
+
+    contract = new ADFSWrapper();
+    await contract.init(accessControlOwner);
+    await contract.accessControl.setAdminStates(
+      accessControlOwner,
+      [sequencer.address],
+      [true],
+    );
+  });
+
+  it('Should decode feeds from transaction data', async () => {
+    const blockNumber = 1234;
+    const receipt = await contract.setFeeds(sequencer, feeds, {
+      blockNumber,
+    });
+    const data = receipt.data;
+    const decodedData = decodeADFSCalldata(data);
+
+    const expectedFeeds = feeds.map(feed => ({
+      stride: feed.stride,
+      feedIndex: (feed.id * 2n ** 13n + feed.index) * 2n ** feed.stride,
+      feedId: feed.id,
+      index: feed.index,
+      data: feed.data,
+    }));
+
+    expect(decodedData.blockNumber).to.equal(blockNumber);
+    expect(decodedData.sourceAccumulator).to.be.undefined;
+    expect(decodedData.destinationAccumulator).to.be.undefined;
+    expect(decodedData.feedsLength).to.equal(BigInt(feeds.length));
+    expect(decodedData.feeds).to.deep.equal(expectedFeeds);
+  });
+
+  it('Should decode ring buffer table from transaction data', async () => {
+    const blockNumber = 1234;
+    const receipt = await contract.setFeeds(sequencer, feeds, {
+      blockNumber,
+    });
+
+    const decodedData = decodeADFSCalldata(receipt.data);
+
+    const rowIndices = [
+      ...new Set(feeds.map(feed => (2n ** 115n * feed.stride + feed.id) / 16n)),
+    ].sort((a, b) => Number(a - b));
+
+    const expectedRingBufferTable: ParsedCalldata['ringBufferTable'] = [];
+    for (const rowIndex of rowIndices) {
+      const slot = await sequencer.provider.getStorage(
+        contract.contract.target,
+        // RING_BUFFER_TABLE_ADDRESS
+        BigInt('0x00000000fff00000000000000000000000000000') + rowIndex,
+      );
+
+      expectedRingBufferTable.push({
+        index: BigInt(rowIndex),
+        data: slot,
+      });
+    }
+
+    expect(decodedData.blockNumber).to.equal(blockNumber);
+    expect(decodedData.sourceAccumulator).to.be.undefined;
+    expect(decodedData.destinationAccumulator).to.be.undefined;
+    expect(decodedData.ringBufferTable).to.deep.equal(expectedRingBufferTable);
+  });
+
+  // TODO: Add history accumulator tests when implemented
 });
