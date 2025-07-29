@@ -208,7 +208,7 @@ pub struct EncodedBatchedAggregatesToSend {
     pub updates: Vec<EncodedVotedFeedUpdate>,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct PublishedFeedUpdate {
     pub feed_id: FeedId,
     pub num_updates: u128,
@@ -216,7 +216,7 @@ pub struct PublishedFeedUpdate {
     pub published: Timestamp, // in seconds since UNIX_EPOCH
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Serialize)]
 pub struct PublishedFeedUpdateError {
     pub feed_id: FeedId,
     pub num_updates: u128,
