@@ -665,6 +665,7 @@ pub fn add_admin_services(cfg: &mut ServiceConfig) {
         .service(get_feeds_config)
         .service(get_feed_config)
         .service(get_sequencer_config)
+        .service(get_last_updates_from_chain)
         .service(register_asset_feed)
         .service(delete_asset_feed)
         .service(disable_provider)
