@@ -9,6 +9,12 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
+    backgrounds: {
+      options: {
+        light: { name: 'Light', value: '#FFFBFA' },
+        dark: { name: 'Dark', value: '#1F1F1F' },
+      },
+    },
     layout: 'centered',
   },
   tags: ['autodocs'],
