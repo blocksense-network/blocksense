@@ -20,19 +20,20 @@ use curl::easy::Handler;
 use curl::easy::WriteError;
 use curl::easy::{Easy, Easy2};
 use eyre::Result;
+use futures::future::join_all;
 use json_patch::merge;
 use port_scanner::scan_port;
 use regex::Regex;
 use serde_json::json;
 use serde_json::Value;
 use std::io::stdout;
-use std::process::Command;
 use std::str::FromStr;
-use std::thread;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tokio::fs;
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
+use tokio::process::Command;
+use tokio::task::JoinHandle;
 
 const PROVIDERS_PORTS: [i32; 2] = [8547, 8548];
 const PROVIDERS_KEY_PREFIX: &str = "/tmp/key_";
@@ -88,7 +89,7 @@ async fn spawn_sequencer(
     eth_networks_ports: &[i32],
     _safe_contracts_per_net: &[String], // TODO: use when integration test starts using two rounds consensus
     contracts_in_networks: &[String],
-) -> thread::JoinHandle<()> {
+) -> JoinHandle<()> {
     let config_patch = json!(
     {
         "main_port": SEQUENCER_MAIN_PORT,
@@ -134,16 +135,19 @@ async fn spawn_sequencer(
 
     write_file("/tmp/feeds_config_v2.json", feeds.to_string().as_bytes()).await;
 
-    thread::spawn(move || {
-        let mut command = Command::new("cargo");
-        let command = command.args(["run", "--bin", "sequencer"]);
-        let sequencer = command
-            .env("SEQUENCER_LOG_LEVEL", "INFO")
-            .env("SEQUENCER_CONFIG_DIR", "/tmp")
-            .env("FEEDS_CONFIG_DIR", "/tmp");
+    tokio::task::Builder::new()
+        .name("sequencer_runner")
+        .spawn(async move {
+            let mut command = Command::new("cargo");
+            let command = command.args(["run", "--bin", "sequencer"]);
+            let sequencer = command
+                .env("SEQUENCER_LOG_LEVEL", "INFO")
+                .env("SEQUENCER_CONFIG_DIR", "/tmp")
+                .env("FEEDS_CONFIG_DIR", "/tmp");
 
-        sequencer.status().expect("process failed to execute");
-    })
+            sequencer.status().await.expect("process failed to execute");
+        })
+        .expect("Failed to spawn interrupt watcher!")
 }
 
 async fn wait_for_sequencer_to_accept_votes(max_time_to_wait_secs: u64) {
@@ -190,6 +194,7 @@ async fn deploy_contract_to_networks(ports: &Vec<i32>) -> Vec<String> {
         .env("REPORTER_MULTISIG_THRESHOLD_LOCAL", "2")
         .env("REPORTER_MULTISIG_SIGNERS_LOCAL", "0x70997970C51812dc3A010C7d01b50e0d17dc79C8,0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC")
         .status()
+        .await
         .expect("failed to deploy contract to service on port {port}");
 
         assert!(
@@ -305,22 +310,21 @@ fn verify_expected_data_in_contracts(expected_value: f64) {
     );
 }
 
-fn cleanup_spawned_processes() {
+async fn cleanup_spawned_processes() {
     let mut children = vec![];
     {
         let process = "sequencer";
         println!("Killing process: {process}");
-        children.push(thread::spawn(move || {
-            let mut command = Command::new("pkill");
-            let command = command.args(["-x", "-9", process]);
+        children.push(kill_process(process));
+    }
+    join_all(children).await;
+}
 
-            command.status().expect("process failed to execute");
-        }));
-    }
-    for child in children {
-        // Wait for the thread to finish. Returns a result.
-        let _ = child.join();
-    }
+async fn kill_process(process_name: &str) {
+    let mut command = Command::new("pkill");
+    let command = command.args(["-x", "-9", process_name]);
+
+    command.status().await.expect("process failed to execute");
 }
 
 #[tokio::main]
@@ -642,9 +646,9 @@ async fn main() -> Result<()> {
         assert_eq!(expected_response, actual_response);
     }
 
-    cleanup_spawned_processes();
+    cleanup_spawned_processes().await;
 
-    match seq.join() {
+    match seq.await {
         Ok(_) => {
             println!("Sequencer thread done.");
         }
