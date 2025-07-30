@@ -7,17 +7,10 @@ import { getProcessComposeLogsFiles } from '@blocksense/base-utils/env';
 import { entriesOf, mapValuePromises, valuesOf } from '@blocksense/base-utils';
 import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
 
-import { parseProcessesStatus } from './helpers';
+import { rgSearchForPattern, parseProcessesStatus } from './helpers';
 import { expectedPCStatuses03 } from './expected';
 import type { ProcessComposeService, UpdatesToNetwork } from './types';
-import {
-  RGLogChecker,
-  RGLogCheckerLive,
-  ProcessCompose,
-  ProcessComposeLive,
-  Sequencer,
-  SequencerLive,
-} from './types';
+import { ProcessCompose, Sequencer } from './types';
 
 describe.sequential('E2E Tests with process-compose', () => {
   const network = 'ink_sepolia';
@@ -30,7 +23,7 @@ describe.sequential('E2E Tests with process-compose', () => {
   beforeAll(() =>
     pipe(
       ProcessCompose,
-      Effect.provide(ProcessComposeLive),
+      Effect.provide(ProcessCompose.Live),
       Effect.tap(pc => pc.start('example-setup-03')),
       Effect.tap(pc => (processCompose = pc)),
       Effect.runPromise,
@@ -111,7 +104,7 @@ describe.sequential('E2E Tests with process-compose', () => {
           );
         }),
       ),
-      Effect.provide(SequencerLive),
+      Effect.provide(Sequencer.Live),
     ),
   );
 
@@ -126,7 +119,9 @@ describe.sequential('E2E Tests with process-compose', () => {
               updates === null || !valuesOf(updates[network]).every(v => v > 2),
             () => {
               return Effect.runPromise(
-                sequencer.fetchUpdatesToNetworksMetric(),
+                sequencer
+                  .fetchUpdatesToNetworksMetric()
+                  .pipe(Effect.tap(Effect.log)),
               );
             },
             10000,
@@ -139,7 +134,7 @@ describe.sequential('E2E Tests with process-compose', () => {
         );
 
         expect(processes).toEqual(expectedPCStatuses03);
-      }).pipe(Effect.provide(SequencerLive)),
+      }).pipe(Effect.provide(Sequencer.Live)),
   );
 
   it.effect('Test prices are updated', () =>
@@ -172,28 +167,26 @@ describe.sequential('E2E Tests with process-compose', () => {
 
     it.effect('Reporter should NOT panic', () =>
       Effect.gen(function* () {
-        const rgLogChecker = yield* RGLogChecker;
-        const result = yield* rgLogChecker.assertDoesNotContain({
+        const result = yield* rgSearchForPattern({
           file: reporterLogsFile,
           pattern: 'panic',
           caseInsensitive: true,
         });
 
         expect(result).toBe(1);
-      }).pipe(Effect.provide(RGLogCheckerLive)),
+      }),
     );
 
     it.effect('Reporter should NOT receive errors from Sequencer', () =>
       Effect.gen(function* () {
-        const rgLogChecker = yield* RGLogChecker;
-        const result = yield* rgLogChecker.assertDoesNotContain({
+        const result = yield* rgSearchForPattern({
           file: reporterLogsFile,
           pattern: 'Sequencer responded with status=(?!200)\\d+',
           flags: ['--pcre2'],
         });
 
         expect(result).toBe(1);
-      }).pipe(Effect.provide(RGLogCheckerLive)),
+      }),
     );
   });
 });

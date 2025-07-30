@@ -1,10 +1,13 @@
-import { ParseResult, Schema as S } from 'effect';
+import { Effect, ParseResult, Schema as S } from 'effect';
+import { NodeContext } from '@effect/platform-node';
 import { $, execa } from 'execa';
 
 import { logMessage } from '../utils/logs';
 
 import { arrayToObject } from '@blocksense/base-utils/array-iter';
 import { rootDir } from '@blocksense/base-utils/env';
+import { Command } from '@effect/platform';
+import { RGLogCheckerError } from './types';
 
 const ProcessComposeStatusSchema = S.mutable(
   S.Array(
@@ -64,3 +67,27 @@ export function logTestEnvironmentInfo(
     `${status} time: ${time.toDateString()} ${time.toTimeString()}`,
   );
 }
+
+export const rgSearchForPattern = ({
+  caseInsensitive = true,
+  file,
+  flags = [],
+  pattern,
+}: {
+  caseInsensitive?: boolean;
+  file: string;
+  flags?: Array<string>;
+  pattern: string;
+}) => {
+  const args = ['--quiet'];
+  if (caseInsensitive) args.push('-i');
+  if (flags) flags.forEach(f => args.push(f));
+  args.push(pattern, file);
+
+  return Command.make('rg', ...args)
+    .pipe(
+      Command.exitCode,
+      Effect.catchAll(error => new RGLogCheckerError({ cause: error })),
+    )
+    .pipe(Effect.provide(NodeContext.layer));
+};
