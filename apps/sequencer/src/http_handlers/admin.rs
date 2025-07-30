@@ -126,8 +126,8 @@ pub async fn adfs_get_key_from_contract(
 
     let result = provider.call(tx).await?;
     info!("Call result: {:?}", result);
-    // TODO: get from metadata the type of the value.
-    // TODO: Refector to not use dummy argument
+    // TODO: Get from metadata the type of the value.
+    // TODO: Refactor to not use dummy argument.
     let return_val =
         match FeedType::from_bytes(result.to_vec(), FeedType::Numerical(0.0), decimals as usize) {
             Ok(val) => val,
@@ -194,13 +194,7 @@ pub async fn get_key(
     info!("getting key {} for network {} ...", key, network);
     let result = actix_web::rt::time::timeout(
         Duration::from_secs(7),
-        adfs_get_key_from_contract(
-            &sequencer_state.providers,
-            &network,
-            key,
-            decimals,
-            stride as u8,
-        ),
+        adfs_get_key_from_contract(&sequencer_state.providers, &network, key, decimals, stride),
     )
     .await;
     match result {

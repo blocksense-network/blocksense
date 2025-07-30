@@ -16,7 +16,7 @@ const NUM_FEED_IDS_IN_ROUND_RECORD: u128 = 16;
 
 pub type RoundCounters = HashMap<FeedId, u64>; // for each key (feed_id) we store its round counter
 
-static STRIDES_SIZES: Lazy<HashMap<u16, u32>> = Lazy::new(|| {
+static STRIDES_SIZES: Lazy<HashMap<u8, u32>> = Lazy::new(|| {
     let mut map = HashMap::new(); // TODO: confirm the correct values for the strides we will support
     map.insert(0, 32);
     map.insert(1, 64);
@@ -157,7 +157,7 @@ pub async fn adfs_serialize_updates(
         let bytes_vec = truncate_leading_zero_bytes(bytes.to_be_bytes().to_vec());
         let bytes_length = bytes_vec.len();
 
-        let stride_as_byte = [stride as u8; 1];
+        let stride_as_byte = [stride; 1];
         let index_in_bytes_length = [index_in_bytes_length as u8; 1];
         let bytes_length = [bytes_length as u8; 1];
         let index = truncate_leading_zero_bytes(index.to_be_bytes_vec());

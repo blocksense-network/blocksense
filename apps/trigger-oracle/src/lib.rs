@@ -128,7 +128,7 @@ struct TriggerMetadata {
 #[derive(Clone, Eq, Debug, Default, Deserialize, Serialize)]
 pub struct DataFeedSetting {
     pub id: String,
-    pub stride: u16,
+    pub stride: u8,
     pub decimals: u8,
     #[serde(serialize_with = "serialize_string_as_json")]
     pub data: String,
