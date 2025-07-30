@@ -80,6 +80,7 @@ pub async fn consume_reports(
     history: Option<Arc<RwLock<FeedAggregateHistory>>>,
     feed_id: u32,
 ) -> ConsumedReports {
+    println!("end_slot_timestamp in consume_reports: {end_slot_timestamp}");
     let values = collect_reported_values(feed_type, feed_id, reports, slot);
 
     if values.is_empty() {

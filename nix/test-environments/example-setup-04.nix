@@ -21,15 +21,15 @@ in
 
     logsDir = config.devenv.root + "/logs/blocksense";
 
-    anvil = {
-      ink-sepolia = {
-        port = 8080;
-        # port = 8547;
-        chain-id = 99999999999;
-        fork-url = "http://localhost";
-        # fork-url = "wss://ws-gel-sepolia.inkonchain.com";
-      };
-    };
+    # anvil = {
+    #   ink-sepolia = {
+    #     port = 8080;
+    #     # port = 8547;
+    #     chain-id = 99999999999;
+    #     fork-url = "http://localhost";
+    #     # fork-url = "wss://ws-gel-sepolia.inkonchain.com";
+    #   };
+    # };
 
     sequencer = {
       id = 1;
@@ -47,12 +47,13 @@ in
       };
 
       providers = {
-        ink-sepolia = {
+        mock-provider = {
+          url = "http://127.0.0.1:8080/eth/rpc";
           private-key-path = "${testKeysDir}/sequencer-private-key";
           contract-address = upgradeableProxyADFSContractAddressInk;
           contract-version = 2;
-          transaction-gas-limit = 20000000;
-          impersonated-anvil-account = impersonationAddress;
+          # transaction-gas-limit = 20000000;
+          # impersonated-anvil-account = impersonationAddress;
 
           allow-feeds = [
             69696969 # unix time
@@ -78,7 +79,7 @@ in
         }
       ];
 
-      log-level = "info";
+      log-level = "debug";
     };
 
     reporters = {
@@ -93,7 +94,7 @@ in
 
     oracles = {
       dummy-oracle = {
-        exec-interval = 1;
+        exec-interval = 5;
         allowed-outbound-hosts = [
           "http://127.0.0.1:8080"
         ];

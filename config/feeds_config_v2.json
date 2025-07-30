@@ -23,7 +23,7 @@
           "base": "SPY",
           "quote": "USD"
         },
-        "decimals": 8,
+        "decimals": 3,
         "category": "Equities",
         "market_hours": "US_Equities",
         "arguments": {}

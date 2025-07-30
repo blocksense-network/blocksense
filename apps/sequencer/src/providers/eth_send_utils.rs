@@ -267,6 +267,10 @@ pub async fn loop_processing_batch_of_updates(
         let cmd_opt = chan.recv().await;
         match cmd_opt {
             Some(cmd) => {
+                println!(
+                    "updates in loop_processing_batch_of_updates: {:#?}",
+                    cmd.updates
+                );
                 let block_height = cmd.updates.block_height;
                 let provider = cmd.provider.clone();
                 let result = eth_batch_send_to_contract(
@@ -281,6 +285,8 @@ pub async fn loop_processing_batch_of_updates(
                     cmd.retry_fee_increment_fraction,
                 )
                 .await;
+
+                println!("DEBUGGING rpc-url: {}", provider.lock().await.rpc_url);
 
                 let provider_metrics = provider.lock().await.provider_metrics.clone();
                 dec_metric!(provider_metrics, net, num_transactions_in_queue);
@@ -1105,7 +1111,11 @@ pub async fn eth_batch_send_to_all_contracts(
         debug!("Releasing a read lock on sequencer_state.sequencer_config");
         debug!("Releasing a read lock on sequencer_state.providers");
     }
-    error!("{}", errors_vec.join("; "));
+
+    if errors_vec.is_empty() {
+        error!("{}", errors_vec.join("; "));
+    }
+
     Ok(())
 }
 

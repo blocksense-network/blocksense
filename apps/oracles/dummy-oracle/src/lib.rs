@@ -11,7 +11,7 @@ async fn fetch_unix_time() -> anyhow::Result<u64> {
 #[oracle_component]
 async fn oracle_request(_: Settings) -> anyhow::Result<Payload> {
     let report_value = match fetch_unix_time().await {
-        Ok(unix_time) => DataFeedResultValue::Numerical(unix_time as f64),
+        Ok(unix_time) => DataFeedResultValue::Numerical(unix_time as f64 + 0.485), // TODO: remove this magic constant for testing
         Err(err) => DataFeedResultValue::Error(err.to_string()),
     };
 

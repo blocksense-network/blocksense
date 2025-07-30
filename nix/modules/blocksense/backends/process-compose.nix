@@ -26,6 +26,10 @@ let
     flush_each_line = true;
   };
 
+  providers-needing-impersonation = lib.filterAttrs (
+    name: provider: provider.impersonated-anvil-account != null
+  ) cfg.sequencer.providers;
+
   anvilInstances = lib.mapAttrs' (
     name:
     {
@@ -54,6 +58,7 @@ let
   ) cfg.anvil;
 
   anvilImpersonateAndFundInstances = lib.mapAttrs' (name: provider: {
+
     name = "anvil-impersonate-and-fund-${name}";
     value.process-compose = {
       command = "cast rpc --rpc-url ${toString provider.url} anvil_impersonateAccount ${toString provider.impersonated-anvil-account} && \
@@ -63,7 +68,7 @@ let
         "anvil-${name}".condition = "process_healthy";
       };
     };
-  }) cfg.sequencer.providers;
+  }) providers-needing-impersonation;
 
   reporterInstances = lib.mapAttrs' (
     name:
@@ -117,7 +122,7 @@ let
         value = {
           condition = "process_completed_successfully";
         };
-      }) cfg.sequencer.providers;
+      }) providers-needing-impersonation;
       log_configuration = logsConfig;
       log_location = cfg.logsDir + "/sequencer.log";
     };

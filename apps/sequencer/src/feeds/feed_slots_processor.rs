@@ -335,7 +335,14 @@ impl FeedSlotsProcessor {
                 _ = feed_slots_time_tracker
                 .await_end_of_current_slot(&repeatability) => {
                     is_processed = true;
-                    let end_slot_timestamp = first_report_start_time + (report_interval_ms as u128) * (slot as u128 + 1);
+                    let end_slot_timestamp =
+                        first_report_start_time +
+                        (report_interval_ms as u128) * (slot as u128 + 1);
+                    println!("first_report_start_time: {first_report_start_time}");
+                    println!("report_interval_ms: {report_interval_ms}");
+                    println!("slot: {slot}");
+                    println!("slot + 1: {}", slot + 1);
+                    println!("end_slot_timestamp: {end_slot_timestamp}");
 
                     debug!("Awaiting process_end_of_slot [feed {}]", self.key);
                     match self.process_end_of_slot(
