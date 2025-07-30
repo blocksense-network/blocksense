@@ -47,7 +47,7 @@ pub async fn votes_result_sender_loop(
                         let blocksense_block_height = updates.block_height;
                         debug!("Processing eth_batch_send_to_all_contracts{blocksense_block_height}_{batch_count}");
                         match eth_batch_send_to_all_contracts(&sequencer_state, &updates, Periodic).await {
-                            Ok(_) => info!("Sending updates to relayers complete."),
+                            Ok(()) => info!("Sending updates to relayers complete."),
                             Err(err) => error!("ERROR Sending updates to relayers: {err}"),
                         };
 

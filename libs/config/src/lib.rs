@@ -88,7 +88,7 @@ impl Validated for FeedConfig {
 
 #[derive(Clone)]
 pub struct FeedStrideAndDecimals {
-    pub stride: u16,
+    pub stride: u8,
     pub decimals: u8,
 }
 
@@ -353,7 +353,7 @@ pub fn get_sequencer_and_feed_configs() -> (SequencerConfig, AllFeedsConfig) {
 
 // Utility functions for tests follow:
 
-pub fn test_feed_config(id: FeedId, stride: u16) -> FeedConfig {
+pub fn test_feed_config(id: FeedId, stride: u8) -> FeedConfig {
     FeedConfig {
         id,
         full_name: "FOXY".to_owned(),
@@ -406,7 +406,7 @@ pub fn test_feed_config(id: FeedId, stride: u16) -> FeedConfig {
     }
 }
 
-pub fn test_feeds_config(id: FeedId, stride: u16) -> HashMap<FeedId, FeedConfig> {
+pub fn test_feeds_config(id: FeedId, stride: u8) -> HashMap<FeedId, FeedConfig> {
     let mut feeds_config = HashMap::new();
     feeds_config.insert(id, test_feed_config(id, stride));
     feeds_config

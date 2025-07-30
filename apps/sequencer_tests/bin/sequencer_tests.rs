@@ -174,7 +174,7 @@ async fn deploy_contract_to_networks(ports: &Vec<i32>) -> Vec<String> {
     let mut contract_addresses = Vec::new();
 
     for port in ports {
-        let _status = Command::new("sh")
+        let status = Command::new("sh")
         .arg("-c")
         .arg("yarn && cd libs/ts/contracts && yarn && just build-ts && yarn build && echo y | yarn hardhat deploy --networks local")
         .env("NETWORKS","local")
@@ -190,16 +190,21 @@ async fn deploy_contract_to_networks(ports: &Vec<i32>) -> Vec<String> {
         .env("REPORTER_MULTISIG_THRESHOLD_LOCAL", "2")
         .env("REPORTER_MULTISIG_SIGNERS_LOCAL", "0x70997970C51812dc3A010C7d01b50e0d17dc79C8,0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC")
         .status()
-        .unwrap_or_else(|_| panic!("failed to deploy contract to service on port {port}"));
+        .expect("failed to deploy contract to service on port {port}");
+
+        assert!(
+            status.success(),
+            "Deployment process exited with a failure: {status}"
+        );
 
         let data = fs::read_to_string("config/evm_contracts_deployment_v2/local.json")
             .await
             .expect("cannot read json file");
-        let local_json: Value = serde_json::from_str(&data).expect("TODO: 1");
+        let local_json: Value = serde_json::from_str(&data).expect("Could not parse json file!");
         contract_addresses.push(
             local_json["contracts"]["coreContracts"]["UpgradeableProxyADFS"]["address"]
                 .as_str()
-                .expect("TODO: 2")
+                .expect("Could not get contracts data from json config")
                 .to_owned(),
         );
         println!("contract_addresses deployed on port {port} = {contract_addresses:?}");

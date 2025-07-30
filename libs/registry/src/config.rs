@@ -66,7 +66,7 @@ pub struct FeedConfig {
     pub feed_type: String,
     pub oracle_id: String,
     pub value_type: String,
-    pub stride: u16,
+    pub stride: u8,
     pub quorum: FeedQuorum,
     pub schedule: FeedSchedule,
     pub additional_feed_info: PriceFeedInfo,
