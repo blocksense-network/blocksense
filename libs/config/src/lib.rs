@@ -279,6 +279,8 @@ pub struct SequencerConfig {
     pub kafka_report_endpoint: KafkaReportEndpoint,
     pub http_input_buffer_size: Option<usize>,
     pub pyroscope_config: Option<PyroscopeConfig>,
+    #[serde(default = "default_is_enabled")]
+    pub send_aggregated_updates_to_publishers: bool,
 }
 
 impl Validated for SequencerConfig {
@@ -443,6 +445,7 @@ pub fn get_test_config_with_no_providers() -> SequencerConfig {
         kafka_report_endpoint: KafkaReportEndpoint { url: None },
         http_input_buffer_size: None,
         pyroscope_config: None,
+        send_aggregated_updates_to_publishers: false,
     }
 }
 

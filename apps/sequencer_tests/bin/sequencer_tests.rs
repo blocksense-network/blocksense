@@ -97,6 +97,8 @@ async fn spawn_sequencer(
             "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[0]), "contract_address": Some(contracts_in_networks[0].to_owned()), "safe_address": None::<String>, "contract_version": 2},
             "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[1]), "contract_address": Some(contracts_in_networks[1].to_owned()), "safe_address": None::<String>, "contract_version": 2}
         },
+        "send_aggregated_updates_to_publishers": false,
+
     });
 
     let (sequencer_config, feeds_config) = get_sequencer_and_feed_configs();

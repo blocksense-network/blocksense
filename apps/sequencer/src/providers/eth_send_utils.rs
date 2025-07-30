@@ -997,8 +997,8 @@ pub async fn get_tx_retry_params(
 }
 
 pub async fn eth_batch_send_to_all_contracts(
-    sequencer_state: Data<SequencerState>,
-    updates: BatchedAggregatesToSend,
+    sequencer_state: &Data<SequencerState>,
+    updates: &BatchedAggregatesToSend,
     feed_type: Repeatability,
 ) -> Result<()> {
     let span = info_span!("eth_batch_send_to_all_contracts");
@@ -1541,7 +1541,7 @@ mod tests {
         };
 
         let result =
-            eth_batch_send_to_all_contracts(sequencer_state, updates_oneshot, Oneshot).await;
+            eth_batch_send_to_all_contracts(&sequencer_state, &updates_oneshot, Oneshot).await;
         // TODO: This is actually not a good assertion since the eth_batch_send_to_all_contracts
         // will always return ok even if some or all of the sends we unsuccessful. Will be fixed in
         // followups
@@ -1658,16 +1658,13 @@ mod tests {
                 updates: vec![v3],
             };
 
-            let p1 =
-                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates1, Periodic).await;
+            let p1 = eth_batch_send_to_all_contracts(&sequencer_state, &updates1, Periodic).await;
             assert!(p1.is_ok());
 
-            let p2 =
-                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates2, Periodic).await;
+            let p2 = eth_batch_send_to_all_contracts(&sequencer_state, &updates2, Periodic).await;
             assert!(p2.is_ok());
 
-            let p3 =
-                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates3, Periodic).await;
+            let p3 = eth_batch_send_to_all_contracts(&sequencer_state, &updates3, Periodic).await;
             assert!(p3.is_ok());
         }
 

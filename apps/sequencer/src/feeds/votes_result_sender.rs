@@ -32,6 +32,9 @@ pub async fn votes_result_sender_loop(
         .spawn(async move {
             let mut batch_count = 0;
             loop {
+
+                let send_aggregated_updates_to_publishers = sequencer_state.sequencer_config.read().await.send_aggregated_updates_to_publishers;
+
                 debug!("Awaiting batched votes over `batched_votes_recv`...");
                 let recvd = batched_votes_recv.recv().await;
                 debug!(
@@ -39,6 +42,15 @@ pub async fn votes_result_sender_loop(
                 );
                 match recvd {
                     Some(updates) => {
+
+                        info!("sending updates to contracts:");
+                        let blocksense_block_height = updates.block_height;
+                        debug!("Processing eth_batch_send_to_all_contracts{blocksense_block_height}_{batch_count}");
+                        match eth_batch_send_to_all_contracts(&sequencer_state, &updates, Periodic).await {
+                            Ok(_) => info!("Sending updates to relayers complete."),
+                            Err(err) => error!("ERROR Sending updates to relayers: {err}"),
+                        };
+
                         debug!("sending aggregation consensus trigger");
                         try_send_aggregation_consensus_trigger_to_reporters(
                             &sequencer_state,
@@ -46,16 +58,12 @@ pub async fn votes_result_sender_loop(
                         )
                         .await;
 
-                        aggregated_updates_to_publishers(&sequencer_state, &updates).await;
-
-                        info!("sending updates to contracts:");
-                        let sequencer_state = sequencer_state.clone();
-                        let blocksense_block_height = updates.block_height;
-                        debug!("Processing eth_batch_send_to_all_contracts{blocksense_block_height}_{batch_count}");
-                        match eth_batch_send_to_all_contracts(sequencer_state, updates, Periodic).await {
-                            Ok(_) => info!("Sending updates to relayers complete."),
-                            Err(err) => error!("ERROR Sending updates to relayers: {err}"),
-                        };
+                        if send_aggregated_updates_to_publishers {
+                            debug!("sending aggregated updates to publishers");
+                            try_send_aggregated_updates_to_publishers(&sequencer_state, &updates).await;
+                        } else {
+                            debug!("not configured to send aggregated updates to publishers");
+                        }
                     }
                     None => {
                         panic!("Sender got RecvError"); // This error indicates a severe internal error.
@@ -70,7 +78,7 @@ pub async fn votes_result_sender_loop(
         .expect("Failed to spawn votes result sender!")
 }
 
-async fn aggregated_updates_to_publishers(
+async fn try_send_aggregated_updates_to_publishers(
     sequencer_state: &Data<SequencerState>,
     updates: &BatchedAggregatesToSend,
 ) {
@@ -95,7 +103,9 @@ async fn aggregated_updates_to_publishers(
                     .get(feed_id)
                     .cloned()
                 else {
-                    error!("Acquired and released a read lock on feeds_config; feed_id={feed_id} but feed_id not in registry!");
+                    error!(
+                        "Acquired and released a read lock on feeds_config; feed_id={feed_id} but feed_id not in registry!"
+                    );
                     continue;
                 };
                 debug!("Acquired and released a read lock on feeds_config; feed_id={feed_id}");
@@ -171,8 +181,8 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
 
             let Some(provider_settings) = providers_config.get(net).cloned() else {
                 warn!(
-                        "Network `{net}` is not configured in sequencer; skipping it during second round consensus"
-                    );
+                    "Network `{net}` is not configured in sequencer; skipping it during second round consensus"
+                );
                 debug!("About to release a read lock on sequencer_config for `{net}` [continue 1]");
                 continue;
             };
@@ -250,7 +260,9 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             let mut nonce = match contract.nonce().call().await {
                 Ok(n) => n,
                 Err(e) => {
-                    error!("Failed to get the nonce of gnosis safe contract at address {safe_address} in network {net}: {e}!");
+                    error!(
+                        "Failed to get the nonce of gnosis safe contract at address {safe_address} in network {net}: {e}!"
+                    );
                     return;
                 }
             };
@@ -365,7 +377,9 @@ async fn send_to_msg_stream(
             Ok(())
         }
         Err(e) => {
-            eyre::bail!("Failed to send batch of aggregated feed values for network: {net}, topic: {topic}, block height: {block_height} to kafka endpoint! Error: {e:?}");
+            eyre::bail!(
+                "Failed to send batch of aggregated feed values for network: {net}, topic: {topic}, block height: {block_height} to kafka endpoint! Error: {e:?}"
+            );
         }
     }
 }
