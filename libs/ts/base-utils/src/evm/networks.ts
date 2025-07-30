@@ -1184,7 +1184,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://explorer-holesky.morphl2.io',
-        apiUrl: 'https://explorer-holesky.morphl2.io/api', //to do
+        apiUrl: 'https://explorer-holesky.morphl2.io/api',
       },
     ],
     currency: Currency.ETH,
@@ -1252,7 +1252,7 @@ export const networkMetadata = {
         apiUrl: 'https://api-sepolia-optimistic.etherscan.io/api',
       },
       {
-        type: 'blockscout', //test again
+        type: 'blockscout',
         webUrl: 'https://optimism-sepolia.blockscout.com',
         apiUrl: 'https://optimism-sepolia.blockscout.com/api',
       },
@@ -1290,7 +1290,7 @@ export const networkMetadata = {
       {
         type: 'unknown',
         webUrl: 'https://testnet.pharosscan.xyz',
-        apiUrl: 'https://api.socialscan.io/pharos-testnet', //
+        apiUrl: 'https://api.socialscan.io/pharos-testnet',
       },
     ],
     currency: Currency.PHRS,
@@ -1541,7 +1541,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://coston-explorer.flare.network',
-        apiUrl: 'https://coston-explorer.flare.network/api',
+        apiUrl: 'https://coston-explorer.flare.network/api/v2',
       },
     ],
     currency: Currency.CFLR,
