@@ -21,6 +21,19 @@ import { throwError } from '@blocksense/base-utils/errors';
 import { Transaction, deployedNetworks } from '../types';
 import { startPrometheusServer } from '../utils';
 
+const networksUseSecondExplorer: NetworkName[] = [
+  'berachain-bepolia',
+  'zksync-sepolia',
+];
+
+const networksV2Api: NetworkName[] = [
+  'morph-holesky',
+  'expchain-testnet',
+  'metis-sepolia',
+  'mezo-matsnet-testnet',
+  'songbird-coston',
+];
+
 type Gauges = {
   gasCost: client.Gauge;
   cost: client.Gauge;
@@ -180,10 +193,9 @@ const fetchTransactionsForNetwork = async (
   firstTxTime: string;
   lastTxTime: string;
 }> => {
-  const apiUrl =
-    network === 'berachain-bepolia' || 'zksync-sepolia'
-      ? networkMetadata[network].explorers[1]?.apiUrl
-      : networkMetadata[network].explorers[0]?.apiUrl;
+  const apiUrl = networksUseSecondExplorer.includes(network)
+    ? networkMetadata[network].explorers[1]?.apiUrl
+    : networkMetadata[network].explorers[0]?.apiUrl;
 
   const apiKey = getOptionalApiKey(network);
   if (!apiUrl) {
@@ -201,12 +213,7 @@ const fetchTransactionsForNetwork = async (
 
     let response: AxiosResponse<any>;
     let rawTransactions: any[] = [];
-    if (
-      network === 'morph-holesky' ||
-      network === 'expchain-testnet' ||
-      network === 'metis-sepolia' ||
-      network === 'mezo-matsnet-testnet'
-    ) {
+    if (networksV2Api.includes(network)) {
       response = await axios.get(`${apiUrl}/addresses/${address}/transactions`);
       rawTransactions = response.data.items || [];
     } else if (network === 'telos-testnet') {
@@ -265,12 +272,7 @@ const fetchTransactionsForNetwork = async (
           tx.from.address.toLowerCase() === address.toLowerCase() &&
           tx.to.address.toLowerCase() !== address.toLowerCase(),
       ); //cronos has a different call
-    } else if (
-      network == 'morph-holesky' ||
-      network == 'expchain-testnet' ||
-      network == 'metis-sepolia' ||
-      network == 'mezo-matsnet-testnet'
-    ) {
+    } else if (networksV2Api.includes(network)) {
       notSelfSent = rawTransactions.filter(
         (tx: any) =>
           tx.from.hash.toLowerCase() === address.toLowerCase() &&
