@@ -7,7 +7,7 @@ import { getProcessComposeLogsFiles } from '@blocksense/base-utils/env';
 import { entriesOf, mapValuePromises, valuesOf } from '@blocksense/base-utils';
 import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
 
-import { fetchUpdatesToNetworksMetric, parseProcessesStatus } from './helpers';
+import { parseProcessesStatus } from './helpers';
 import { expectedPCStatuses03 } from './expected';
 import type { ProcessComposeService, UpdatesToNetwork } from './types';
 import {
@@ -119,12 +119,15 @@ describe.sequential('E2E Tests with process-compose', () => {
     'Test processes state after at least 2 updates of each feeds have been made',
     () =>
       Effect.gen(function* () {
+        const sequencer = yield* Sequencer;
         const _updates = yield* Effect.promise(() =>
           loopWhile(
             (updates: UpdatesToNetwork | null) =>
               updates === null || !valuesOf(updates[network]).every(v => v > 2),
             () => {
-              return Effect.runPromise(fetchUpdatesToNetworksMetric());
+              return Effect.runPromise(
+                sequencer.fetchUpdatesToNetworksMetric(),
+              );
             },
             10000,
             30,
@@ -136,7 +139,7 @@ describe.sequential('E2E Tests with process-compose', () => {
         );
 
         expect(processes).toEqual(expectedPCStatuses03);
-      }),
+      }).pipe(Effect.provide(SequencerLive)),
   );
 
   it.effect('Test prices are updated', () =>

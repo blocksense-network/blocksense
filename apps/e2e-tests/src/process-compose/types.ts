@@ -1,3 +1,4 @@
+import type { ParseResult } from 'effect';
 import { Context, Data, Effect, Layer, Schema as S } from 'effect';
 import { execa } from 'execa';
 
@@ -11,6 +12,9 @@ import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
 import { SequencerConfigV2Schema } from '@blocksense/config-types/node-config';
 import type { NewFeedsConfig } from '@blocksense/config-types';
 import { NewFeedsConfigSchema } from '@blocksense/config-types';
+import type { HttpClientError } from '@effect/platform/HttpClientError';
+import type { ParseMetricsError } from '../utils/metrics';
+import { getMetrics } from '../utils/metrics';
 
 // --- Services Definition ---
 export class ProcessCompose extends Context.Tag('@e2e-tests/ProcessCompose')<
@@ -33,8 +37,13 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
   {
     readonly configUrl: string;
     readonly feedsConfigUrl: string;
+    readonly metricsUrl: string;
     readonly getConfig: () => Effect.Effect<SequencerConfigV2, Error, never>;
     readonly getFeedsConfig: () => Effect.Effect<NewFeedsConfig, Error, never>;
+    readonly fetchUpdatesToNetworksMetric: () => Effect.Effect<
+      UpdatesToNetwork | null,
+      ParseMetricsError | HttpClientError | ParseResult.ParseError
+    >;
   }
 >() {}
 
@@ -87,10 +96,12 @@ export const SequencerLive = Layer.effect(
     const feedsConfigUrl = yield* Effect.succeed(
       'http://127.0.0.1:5553/get_feeds_config',
     );
+    const metricsUrl = yield* Effect.succeed('http://127.0.0.1:5551/metrics');
 
     return Sequencer.of({
       configUrl,
       feedsConfigUrl,
+      metricsUrl,
       getConfig: () =>
         Effect.tryPromise({
           try: () => fetchAndDecodeJSON(SequencerConfigV2Schema, configUrl),
@@ -102,6 +113,32 @@ export const SequencerLive = Layer.effect(
           try: () => fetchAndDecodeJSON(NewFeedsConfigSchema, feedsConfigUrl),
           catch: error => new Error(`Failed to fetch feeds config: ${error}`),
         }),
+      fetchUpdatesToNetworksMetric: () => {
+        return Effect.gen(function* () {
+          const metrics = yield* getMetrics(metricsUrl);
+          const updatesToNetworks = metrics.filter(
+            metric => metric.name === 'updates_to_networks',
+          )[0];
+          if (!updatesToNetworks) return null;
+
+          const decoded = S.decodeUnknownSync(UpdatesToNetworkMetric)(
+            updatesToNetworks,
+          );
+          return decoded.metrics.reduce((acc: UpdatesToNetwork, item) => {
+            const networkName = item.labels.Network;
+            const feedId = item.labels.FeedId;
+            const value = item.value;
+
+            if (!acc[networkName]) {
+              acc[networkName] = {};
+            }
+
+            acc[networkName][feedId] = value;
+
+            return acc;
+          }, {} as UpdatesToNetwork);
+        });
+      },
     });
   }),
 );
