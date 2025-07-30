@@ -19,7 +19,11 @@
     ripgrep
   ];
 
-  enterShell =
+  # NOTE: throughout the code, we're relying on `$GIT_ROOT` to be set
+  #       (intented to be used instead of `devenv`'s `root`),
+  #       so we make sure that it's set at the earlier convenience, using
+  #       the `lib.mkBefore` below
+  enterShell = lib.mkBefore (
     let
       envSecrets = [
         "CMC_API_KEY"
@@ -50,5 +54,6 @@
       ./nix/scripts/config_solidity_import_mapping.sh
 
       export GIT_ROOT="$(git rev-parse --show-toplevel)"
-    '';
+    ''
+  );
 }
