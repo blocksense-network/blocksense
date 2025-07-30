@@ -70,6 +70,7 @@ export const deployedNetworks = [
   'unichain-sepolia',
   'world-chain-sepolia',
   'zephyr-testnet',
+  'zksync-sepolia',
 ] satisfies NetworkName[];
 
 export type Transaction = {
