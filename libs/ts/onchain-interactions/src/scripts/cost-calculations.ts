@@ -181,7 +181,7 @@ const fetchTransactionsForNetwork = async (
   lastTxTime: string;
 }> => {
   const apiUrl =
-    network === 'berachain-bepolia'
+    network === 'berachain-bepolia' || 'zksync-sepolia'
       ? networkMetadata[network].explorers[1]?.apiUrl
       : networkMetadata[network].explorers[0]?.apiUrl;
 

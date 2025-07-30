@@ -1813,6 +1813,16 @@ export const networkMetadata = {
         webUrl: 'https://sepolia.explorer.zksync.io',
         apiUrl: 'https://block-explorer-api.sepolia.zksync.dev/api',
       },
+      {
+        type: 'blockscout',
+        webUrl: 'https://zksync-sepolia.blockscout.com/',
+        apiUrl: 'https://zksync-sepolia.blockscout.com/api',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://sepolia-era.zksync.network',
+        apiUrl: 'https://api-sepolia-era.zksync.network/api',
+      },
     ],
 
     currency: Currency.ETH,
