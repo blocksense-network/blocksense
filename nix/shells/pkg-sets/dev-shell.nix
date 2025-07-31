@@ -18,6 +18,7 @@
     process-compose
     coreutils
     ripgrep
+    repomix
   ];
 
   # NOTE: throughout the code, we're relying on `$GIT_ROOT` to be set
