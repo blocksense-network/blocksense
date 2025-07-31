@@ -4,8 +4,10 @@ import { ThirdwebProvider } from 'thirdweb/react';
 
 import { Navbar } from '../components/Navbar';
 import { ConsentManager } from '../components/ConsentManager';
+import { PrivacyPreferencesModal } from '../components/PrivacyPreferencesModal';
 import { Footer } from '../components/Footer';
 import { geist, geistMono } from '../src/geist';
+import { ConsentProvider } from '../components/ConsentProvider';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -84,12 +86,16 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
       suppressHydrationWarning
     >
       <body className="nft-drop-layout__body">
-        <ThirdwebProvider>
-          <Navbar />
-          <main className="nft-drop-layout__main pt-[3.85rem]">{children}</main>
-          <Footer />
-          <ConsentManager />
-        </ThirdwebProvider>
+        <ConsentProvider>
+          <ThirdwebProvider>
+            <Navbar />
+            <main className="nft-drop-layout__main pt-[3.85rem]">
+              {children}
+            </main>
+            <Footer />
+            {/* <ConsentManager /> */}
+          </ThirdwebProvider>
+        </ConsentProvider>
       </body>
     </html>
   );
