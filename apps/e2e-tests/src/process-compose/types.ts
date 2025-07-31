@@ -12,8 +12,7 @@ import { SequencerConfigV2Schema } from '@blocksense/config-types/node-config';
 import type { NewFeedsConfig } from '@blocksense/config-types';
 import { NewFeedsConfigSchema } from '@blocksense/config-types';
 import type { HttpClientError } from '@effect/platform/HttpClientError';
-import type { ParseMetricsError } from '../utils/metrics';
-import { getMetrics } from '../utils/metrics';
+import { ParseMetricsError, getMetrics } from '../utils/metrics';
 
 export class ProcessCompose extends Context.Tag('@e2e-tests/ProcessCompose')<
   ProcessCompose,
@@ -61,7 +60,7 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
     readonly getConfig: () => Effect.Effect<SequencerConfigV2, Error, never>;
     readonly getFeedsConfig: () => Effect.Effect<NewFeedsConfig, Error, never>;
     readonly fetchUpdatesToNetworksMetric: () => Effect.Effect<
-      UpdatesToNetwork | null,
+      UpdatesToNetwork,
       ParseMetricsError | HttpClientError | ParseResult.ParseError
     >;
   }
@@ -98,7 +97,13 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
             const updatesToNetworks = metrics.filter(
               metric => metric.name === 'updates_to_networks',
             )[0];
-            if (!updatesToNetworks) return null;
+
+            if (!updatesToNetworks)
+              return yield* Effect.fail(
+                new ParseMetricsError({
+                  message: 'No updates_to_networks metric found',
+                }),
+              );
 
             const decoded = S.decodeUnknownSync(UpdatesToNetworkMetric)(
               updatesToNetworks,
