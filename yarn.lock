@@ -2672,6 +2672,7 @@ __metadata:
     "@effect/platform": "npm:^0.80.13"
     "@next/third-parties": "npm:^15.3.1"
     "@radix-ui/react-dialog": "npm:^1.1.14"
+    "@radix-ui/react-slot": "npm:^1.2.3"
     "@radix-ui/react-switch": "npm:^1.2.5"
     "@tailwindcss/postcss": "npm:^4.0.7"
     "@types/node": "npm:^22.10.2"
@@ -9053,7 +9054,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@radix-ui/react-slot@npm:1.2.3":
+"@radix-ui/react-slot@npm:1.2.3, @radix-ui/react-slot@npm:^1.2.3":
   version: 1.2.3
   resolution: "@radix-ui/react-slot@npm:1.2.3"
   dependencies:
