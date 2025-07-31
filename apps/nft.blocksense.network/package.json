@@ -20,6 +20,7 @@
     "@blocksense/social-verification": "workspace:*",
     "@effect/platform": "^0.80.13",
     "@next/third-parties": "^15.3.1",
+    "@radix-ui/react-dialog": "^1.1.14",
     "@tailwindcss/postcss": "^4.0.7",
     "clsx": "^2.1.1",
     "effect": "^3.15.1",
