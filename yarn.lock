@@ -2677,6 +2677,7 @@ __metadata:
     clsx: "npm:^2.1.1"
     effect: "npm:^3.15.1"
     keccak256: "npm:^1.0.6"
+    lucide-react: "npm:^0.534.0"
     motion: "npm:^12.9.2"
     next: "npm:^15.3.4"
     postcss: "npm:^8.4.49"
@@ -24907,6 +24908,15 @@ __metadata:
   version: 2.2.1
   resolution: "ltgt@npm:2.2.1"
   checksum: 10c0/60fdad732c3aa6acf37e927a5ef58c0d1776192321d55faa1f8775c134c27fbf20ef8ec542fb7f7f33033f79c2a2df75cac39b43e274b32e9d95400154cd41f3
+  languageName: node
+  linkType: hard
+
+"lucide-react@npm:^0.534.0":
+  version: 0.534.0
+  resolution: "lucide-react@npm:0.534.0"
+  peerDependencies:
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+  checksum: 10c0/83abbdf3e0661bffe2472577dbbea51afd83660870dbc02ed8a4d28269301c72f3ef8743373ddfcd6fcb736842d33d0851df45a55957b6ba1bae5cd84c77cac4
   languageName: node
   linkType: hard
 
