@@ -1,15 +1,14 @@
-import { Effect, pipe } from 'effect';
+import { Effect, pipe, Schedule } from 'effect';
 import { afterAll, beforeAll, describe, expect, it } from '@effect/vitest';
 import { deepStrictEqual } from 'assert';
 
-import { loopWhile } from '@blocksense/base-utils/async';
 import { getProcessComposeLogsFiles } from '@blocksense/base-utils/env';
 import { entriesOf, mapValuePromises, valuesOf } from '@blocksense/base-utils';
 import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
 
 import { rgSearchPattern, parseProcessesStatus } from './helpers';
 import { expectedPCStatuses03 } from './expected';
-import type { ProcessComposeService, UpdatesToNetwork } from './types';
+import type { ProcessComposeService } from './types';
 import { ProcessCompose, Sequencer } from './types';
 
 describe.sequential('E2E Tests with process-compose', () => {
@@ -34,25 +33,24 @@ describe.sequential('E2E Tests with process-compose', () => {
 
   it.live('Test processes state shortly after start', () =>
     Effect.gen(function* () {
-      const equal = yield* Effect.promise(() =>
-        loopWhile(
-          (equal: boolean) => !equal,
-          async () => {
-            try {
-              const processes = await parseProcessesStatus();
-              deepStrictEqual(processes, expectedPCStatuses03);
-              return true;
-            } catch {
-              return false;
-            }
-          },
-          1000,
-          10,
-        ),
+      const equal = yield* Effect.retry(
+        processCompose
+          .parseStatus()
+          .pipe(
+            Effect.tap(processes =>
+              Effect.try(() =>
+                deepStrictEqual(processes, expectedPCStatuses03),
+              ),
+            ),
+          ),
+        {
+          schedule: Schedule.fixed(1000),
+          times: 10,
+        },
       );
-
+      // still validate the result
       expect(equal).toBeTruthy();
-    }),
+    }).pipe(Effect.provide(ProcessCompose.Live)),
   );
 
   it.live('Test sequencer config is available and in correct format', () =>
@@ -113,18 +111,18 @@ describe.sequential('E2E Tests with process-compose', () => {
     () =>
       Effect.gen(function* () {
         const sequencer = yield* Sequencer;
-        const _updates = yield* Effect.promise(() =>
-          loopWhile(
-            (updates: UpdatesToNetwork | null) =>
-              updates === null || !valuesOf(updates[network]).every(v => v > 2),
-            () => {
-              return Effect.runPromise(
-                sequencer.fetchUpdatesToNetworksMetric(),
-              );
-            },
-            10000,
-            30,
-          ),
+        const _updates = yield* Effect.retry(
+          sequencer
+            .fetchUpdatesToNetworksMetric()
+            .pipe(
+              Effect.filterOrFail(updates =>
+                valuesOf(updates[network]).every(v => v > 2),
+              ),
+            ),
+          {
+            schedule: Schedule.fixed(10000),
+            times: 30,
+          },
         );
 
         const processes = yield* Effect.tryPromise(() =>
