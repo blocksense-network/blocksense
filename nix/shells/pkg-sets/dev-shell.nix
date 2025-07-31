@@ -17,6 +17,7 @@
     findutils
     process-compose
     ripgrep
+    repomix
   ];
 
   enterShell =
