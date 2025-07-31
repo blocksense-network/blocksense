@@ -4,7 +4,8 @@
   "workspaces": [
     "apps/*",
     "libs/ts/*",
-    "libs/aztec_contracts/"
+    "libs/aztec_contracts/",
+    "spec/website"
   ],
   "scripts": {
     "clean": "git clean -fdx -e .env -e .direnv -e .yarn -e .vscode -e .pre-commit-config.yaml -- $(git rev-parse --show-toplevel)",

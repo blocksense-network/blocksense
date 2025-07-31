@@ -2766,6 +2766,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@blocksense/specification-website@workspace:spec/website":
+  version: 0.0.0-use.local
+  resolution: "@blocksense/specification-website@workspace:spec/website"
+  languageName: unknown
+  linkType: soft
+
 "@blocksense/ui@workspace:*, @blocksense/ui@workspace:libs/ts/ui":
   version: 0.0.0-use.local
   resolution: "@blocksense/ui@workspace:libs/ts/ui"

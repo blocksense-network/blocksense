@@ -63,6 +63,12 @@
       packages = {
         inherit blocksense-rs;
         inherit blama;
+
+        # Specification website using Quartz
+        specification-website = inputs.quartz-nix.lib.${pkgs.system}.mkQuartzSite {
+          name = "blocksense-specification";
+          src = ../../spec;
+        };
       };
       legacyPackages = {
         oracle-scripts = {

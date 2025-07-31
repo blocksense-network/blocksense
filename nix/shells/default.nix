@@ -1,7 +1,11 @@
 { ... }:
 {
   perSystem =
-    { inputs', self', ... }:
+    {
+      inputs',
+      self',
+      ...
+    }:
     let
       createShell =
         {
@@ -33,6 +37,10 @@
         js = createShell {
           module = ./pkg-sets/js.nix;
           shellName = "JS";
+        };
+        docs = createShell {
+          module = ./pkg-sets/spec-docs.nix;
+          shellName = "Documentation";
         };
         pre-commit = createShell {
           module = ./pkg-sets/pre-commit.nix;
