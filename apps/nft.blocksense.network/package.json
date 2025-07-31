@@ -39,6 +39,7 @@
     "tailwindcss-animate": "^1.0.7",
     "thirdweb": "^5.95.3",
     "tsx": "^4.19.2",
+    "universal-cookie": "^8.0.1",
     "web3": "^4.16.0"
   }
 }
