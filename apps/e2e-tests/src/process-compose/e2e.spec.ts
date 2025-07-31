@@ -32,7 +32,7 @@ describe.sequential('E2E Tests with process-compose', () => {
 
   afterAll(() => pipe(processCompose.stop(), Effect.runPromise));
 
-  it.effect('Test processes state shortly after start', () =>
+  it.live('Test processes state shortly after start', () =>
     Effect.gen(function* () {
       const equal = yield* Effect.promise(() =>
         loopWhile(
@@ -55,7 +55,7 @@ describe.sequential('E2E Tests with process-compose', () => {
     }),
   );
 
-  it.effect('Test sequencer config is available and in correct format', () =>
+  it.live('Test sequencer config is available and in correct format', () =>
     Effect.gen(function* () {
       const sequencer = yield* Sequencer;
       const sequencerConfig = yield* sequencer.getConfig();
@@ -108,7 +108,7 @@ describe.sequential('E2E Tests with process-compose', () => {
     ),
   );
 
-  it.effect(
+  it.live(
     'Test processes state after at least 2 updates of each feeds have been made',
     () =>
       Effect.gen(function* () {
@@ -135,7 +135,7 @@ describe.sequential('E2E Tests with process-compose', () => {
       }).pipe(Effect.provide(Sequencer.Live)),
   );
 
-  it.effect('Test prices are updated', () =>
+  it.live('Test prices are updated', () =>
     Effect.gen(function* () {
       const currentPrices = yield* Effect.promise(() =>
         mapValuePromises(
@@ -163,7 +163,7 @@ describe.sequential('E2E Tests with process-compose', () => {
     const reporterLogsFile =
       getProcessComposeLogsFiles('example-setup-03')['reporter-a'];
 
-    it.effect('Reporter should NOT panic', () =>
+    it.live('Reporter should NOT panic', () =>
       Effect.gen(function* () {
         const result = yield* rgSearchPattern({
           file: reporterLogsFile,
@@ -175,7 +175,7 @@ describe.sequential('E2E Tests with process-compose', () => {
       }),
     );
 
-    it.effect('Reporter should NOT receive errors from Sequencer', () =>
+    it.live('Reporter should NOT receive errors from Sequencer', () =>
       Effect.gen(function* () {
         const result = yield* rgSearchPattern({
           file: reporterLogsFile,
