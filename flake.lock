@@ -1080,6 +1080,48 @@
         "type": "github"
       }
     },
+    "quartz": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1753893816,
+        "narHash": "sha256-HnCPItXUv4kVCBqohAdXK1k17//Rnb3Yoroa+YAaGLs=",
+        "owner": "jackyzha0",
+        "repo": "quartz",
+        "rev": "efddd798e83705b0e17e074fe344b2d491051ba2",
+        "type": "github"
+      },
+      "original": {
+        "owner": "jackyzha0",
+        "ref": "v4",
+        "repo": "quartz",
+        "type": "github"
+      }
+    },
+    "quartz-nix": {
+      "inputs": {
+        "flake-utils": [
+          "mcl-blockchain",
+          "flake-utils"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "quartz": "quartz"
+      },
+      "locked": {
+        "lastModified": 1754004279,
+        "narHash": "sha256-WJo8ulWjD3oDjOwDPKHh9dReZWKvhugB/AN03fnIuiE=",
+        "owner": "blocksense-network",
+        "repo": "nix-quartz",
+        "rev": "0f19638c293ee5fa34aff76335eb230b5e19baed",
+        "type": "github"
+      },
+      "original": {
+        "owner": "blocksense-network",
+        "repo": "nix-quartz",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "blama": "blama",
@@ -1118,7 +1160,8 @@
         "nixpkgs-unstable": [
           "mcl-blockchain",
           "nixpkgs-unstable"
-        ]
+        ],
+        "quartz-nix": "quartz-nix"
       }
     },
     "rust-analyzer-src": {

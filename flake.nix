@@ -32,6 +32,11 @@
       url = "github:blocksense-network/blama";
       flake = false;
     };
+    quartz-nix = {
+      url = "github:blocksense-network/nix-quartz";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "mcl-blockchain/flake-utils";
+    };
   };
 
   outputs =
