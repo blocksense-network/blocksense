@@ -1,13 +1,18 @@
+import path from 'node:path';
+import fs from 'node:fs/promises';
+
 import { expect } from 'chai';
 import hre, { ethers, run } from 'hardhat';
-import path from 'path';
-import fs from 'fs';
-import { processFieldsAndEncodeData } from '../templates/encode-packed/utils';
-import * as sszUtils from '../templates/ssz/utils';
-import * as utils from '../templates/utils';
-import { generateDecoder as generateDecoderEP } from '../templates/encode-packed';
-import { generateDecoder as generateDecoderSSZ } from '../templates/ssz';
-import { EncodePackedDecoder, SSZDecoder } from '../typechain';
+import { BaseContract } from 'ethers';
+
+import {
+  generateEPDecoder,
+  generateSSZDecoder,
+  encodePackedData,
+  encodeSSZData,
+  TupleField,
+  DecoderContract,
+} from '../templates';
 
 describe('Template Decoder @skip-coverage', function () {
   this.timeout(1000000);
@@ -32,21 +37,18 @@ describe('Template Decoder @skip-coverage', function () {
     hre.config.solidity.compilers[0].settings.evmVersion = 'cancun';
   });
 
-  async function generateAndDeployDecoders(fields: utils.TupleField) {
-    const templateEP = await fs.promises.readFile(
-      encodePacked.templatePath,
-      'utf-8',
-    );
-    const templateSSZ = await fs.promises.readFile(ssz.templatePath, 'utf-8');
+  async function generateAndDeployDecoders(fields: TupleField) {
+    const templateEP = await fs.readFile(encodePacked.templatePath, 'utf-8');
+    const templateSSZ = await fs.readFile(ssz.templatePath, 'utf-8');
 
-    await fs.promises.writeFile(
+    await fs.writeFile(
       encodePacked.tempFilePath,
-      await generateDecoderEP(templateEP, fields),
+      await generateEPDecoder(templateEP, fields),
       'utf-8',
     );
-    await fs.promises.writeFile(
+    await fs.writeFile(
       ssz.tempFilePath,
-      await generateDecoderSSZ(templateSSZ, fields),
+      await generateSSZDecoder(templateSSZ, fields),
       'utf-8',
     );
 
@@ -57,28 +59,27 @@ describe('Template Decoder @skip-coverage', function () {
     );
     const DecoderFactorySSZ = await ethers.getContractFactory(ssz.contractName);
     return {
-      decoderEP: (await DecoderFactoryEP.deploy()) as EncodePackedDecoder,
-      decoderSSZ: (await DecoderFactorySSZ.deploy()) as SSZDecoder,
+      decoderEP: (await DecoderFactoryEP.deploy()) as BaseContract &
+        DecoderContract,
+      decoderSSZ: (await DecoderFactorySSZ.deploy()) as BaseContract &
+        DecoderContract,
     };
   }
 
-  async function testDecoder(fields: utils.TupleField, values: any[]) {
-    const sszData = await sszUtils.sszEncodeData(fields, values);
-    const [, packedValues] = processFieldsAndEncodeData(
-      [fields],
-      [structuredClone(values)],
-    );
+  async function testDecoder(fields: TupleField, values: any[]) {
+    const sszData = await encodeSSZData(fields, values);
+    const epData = encodePackedData(fields, values);
     const { decoderEP, decoderSSZ } = await generateAndDeployDecoders(fields);
 
-    const result = await decoderEP.decode(packedValues[0]);
+    const epResult = await decoderEP.decode(epData);
     const sszResult = await decoderSSZ.decode(sszData);
-    expect(result).to.deep.equal(values);
+    expect(epResult).to.deep.equal(values);
     expect(sszResult).to.deep.equal(values);
   }
 
-  afterEach(() => {
-    fs.rmSync(encodePacked.tempFilePath, { force: true });
-    fs.rmSync(ssz.tempFilePath, { force: true });
+  afterEach(async () => {
+    await fs.rm(encodePacked.tempFilePath, { force: true });
+    await fs.rm(ssz.tempFilePath, { force: true });
   });
 
   after(() => {
@@ -88,7 +89,7 @@ describe('Template Decoder @skip-coverage', function () {
 
   describe('Primitive', function () {
     it('should correctly decode packed sports data with boolean fields', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'GameData',
         type: 'tuple',
         components: [
@@ -102,7 +103,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should correctly decode packed sports data with mixed field types and sizes', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'GameData',
         type: 'tuple',
         components: [
@@ -116,7 +117,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle maximum values for each field type', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'MaxValues',
         type: 'tuple',
         components: [
@@ -131,7 +132,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle mixed field types and sizes', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'MixedFields',
         type: 'tuple',
         components: [
@@ -146,7 +147,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should correctly decode packed sports data with maximum values', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'MaxSportsData',
         type: 'tuple',
         components: [
@@ -160,7 +161,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle different int sizes and address', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'IntAndAddress',
         type: 'tuple',
         components: [
@@ -182,7 +183,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle different bytes sizes', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'BytesSizes',
         type: 'tuple',
         components: [
@@ -200,7 +201,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle complex struct with mixed types', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'ComplexStruct',
         type: 'tuple',
         components: [
@@ -222,7 +223,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle mixed types including negative integers', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'MixedWithNegatives',
         type: 'tuple',
         components: [
@@ -244,7 +245,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle large unsigned integers and small bytes', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'LargeUintSmallBytes',
         type: 'tuple',
         components: [
@@ -264,7 +265,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle multiple addresses and mixed integer sizes', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'MultiAddressMixedInts',
         type: 'tuple',
         components: [
@@ -286,7 +287,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle uint32, bytes4, bytes16, int128, bytes32, and address', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'MixedTypes',
         type: 'tuple',
         components: [
@@ -310,7 +311,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle fixed size array, uint256, bytes16, and bool', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'FixedArraysAndLargeInts',
         type: 'tuple',
         components: [
@@ -339,7 +340,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle fixed size arrays of different types and sizes', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'MixedFixedArrays',
         type: 'tuple',
         components: [
@@ -370,7 +371,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle mixed types including fixed size arrays and single values', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'MixedTypesWithArrays',
         type: 'tuple',
         components: [
@@ -403,7 +404,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle uint256 and bytes32 fixed arrays among other values', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'LargeArraysWithMixedTypes',
         type: 'tuple',
         components: [
@@ -438,7 +439,7 @@ describe('Template Decoder @skip-coverage', function () {
 
   describe('Nested', function () {
     it('should handle nested structs', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'NestedStructs',
         type: 'tuple',
         components: [
@@ -476,7 +477,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle nested structs with arrays', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'NestedStructsWithArrays',
         type: 'tuple',
         components: [
@@ -524,7 +525,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle struct fixed array', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'StructFixedArray',
         type: 'tuple',
         components: [
@@ -550,7 +551,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle structs with arrays of nested structs', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'StructWithArraysOfNestedStructs',
         type: 'tuple',
         components: [
@@ -616,7 +617,7 @@ describe('Template Decoder @skip-coverage', function () {
 
   describe('Dynamic primitive', function () {
     it('should handle dynamic array with different data types', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'DynamicArrayWithUint8Array',
         type: 'tuple',
         components: [
@@ -648,7 +649,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle dynamic array of primitive bytes', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'DynamicArrayOfAddresses',
         type: 'tuple',
         components: [
@@ -673,7 +674,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle dynamic array of addresses', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'DynamicArrayOfAddresses',
         type: 'tuple',
         components: [
@@ -693,7 +694,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle dynamic array of booleans', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'DynamicArrayOfBooleans',
         type: 'tuple',
         components: [
@@ -709,7 +710,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle dynamic array of bytes', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'DynamicArrayOfBytes',
         type: 'tuple',
         components: [
@@ -735,7 +736,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle dynamic uint256 array', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'DynamicUint256Array',
         type: 'tuple',
         components: [
@@ -760,7 +761,7 @@ describe('Template Decoder @skip-coverage', function () {
 
   describe('Fixed multidimensional primitive', function () {
     it('should handle nested fixed arrays', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'NestedDynamicArrays',
         type: 'tuple',
         components: [
@@ -780,7 +781,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle 2D fixed array', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'TwoDimensionalFixedArray',
         type: 'tuple',
         components: [
@@ -800,7 +801,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle 3D fixed array', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'ThreeDimensionalFixedArray',
         type: 'tuple',
         components: [
@@ -827,7 +828,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle 4D fixed array', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'FourDimensionalFixedArray',
         type: 'tuple',
         components: [
@@ -872,7 +873,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle 2x3 array of struct type', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'TwoDimensionalStructArray',
         type: 'tuple',
         components: [
@@ -907,7 +908,7 @@ describe('Template Decoder @skip-coverage', function () {
 
   describe('String and bytes', function () {
     it('should handle string and bytes', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'StringField',
         type: 'tuple',
         components: [
@@ -945,7 +946,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle fixed array of bytes and string', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'FixedArrayField',
         type: 'tuple',
         components: [
@@ -982,7 +983,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle struct with bytes and string fields', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'StructField',
         type: 'tuple',
         components: [
@@ -1041,7 +1042,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle dynamic array of string and bytes', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'DynamicArrayField',
         type: 'tuple',
         components: [
@@ -1084,7 +1085,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle struct with dynamic arrays of bytes and string', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'StructWithArrays',
         type: 'tuple',
         components: [
@@ -1150,7 +1151,7 @@ describe('Template Decoder @skip-coverage', function () {
 
   describe('Dynamic multidimensional', function () {
     it('should decode n-dimensional dynamic arrays', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'NDimensionalArrays',
         type: 'tuple',
         components: [
@@ -1197,7 +1198,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should decode multidimensional dynamic and fixed arrays of bytes, string, and uint', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'MultidimensionalMixedArrays',
         type: 'tuple',
         components: [
@@ -1239,7 +1240,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should decode fixed+dynamic+fixed arrays with different types of data', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'MixedArrayTypes',
         type: 'tuple',
         components: [
@@ -1270,7 +1271,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should decode complex nested arrays with mixed types', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'ComplexNestedArrays',
         type: 'tuple',
         components: [
@@ -1343,7 +1344,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should decode dynamic array of tuple', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'DynamicArrayOfTuple',
         type: 'tuple',
         components: [
@@ -1390,7 +1391,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should decode multidimensional dynamic in-between fixed arrays of tuple', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'DynamicArrayOfTuple',
         type: 'tuple',
         components: [
@@ -1444,7 +1445,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should decode multidimensional dynamic and fixed arrays of tuple', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'DynamicArrayOfTuple',
         type: 'tuple',
         components: [
@@ -1498,7 +1499,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should decode nested dynamic tuples', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'NestedStructs',
         type: 'tuple',
         components: [
@@ -1597,7 +1598,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle fixed size arrays of different types and sizes', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'MixedFixedArrays',
         type: 'tuple',
         components: [
@@ -1652,7 +1653,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should handle mixed fixed and dynamic arrays', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'MixedArrayTypes',
         type: 'tuple',
         components: [
@@ -1672,7 +1673,7 @@ describe('Template Decoder @skip-coverage', function () {
 
   describe('Extra cases', function () {
     it('should handle when same tuple exists multiple times', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'TupleWithMultiple',
         type: 'tuple',
         components: [
@@ -1699,7 +1700,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should return fixed+dynamic+fixed array of main tuple', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'Values',
         type: 'tuple[2][][1]',
         components: [
@@ -1835,7 +1836,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should decode main fixed tuple with dynamic values', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'MainFixedTuple',
         type: 'tuple[2]',
         components: [
@@ -1857,7 +1858,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should decode main fixed tuple with fixed values', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'MainFixedTuple',
         type: 'tuple[2]',
         components: [
@@ -1878,7 +1879,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should decode main dynamic tuple with dynamic values', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'MainDynamicTuple',
         type: 'tuple[]',
         components: [
@@ -1900,7 +1901,7 @@ describe('Template Decoder @skip-coverage', function () {
     });
 
     it('should decode main dynamic tuple with fixed values', async () => {
-      const fields: utils.TupleField = {
+      const fields: TupleField = {
         name: 'MainDynamicTuple',
         type: 'tuple[]',
         components: [

@@ -157,7 +157,7 @@ export const createSchema = async (
   return createSSZType(fields) as ContainerType<any>;
 };
 
-export const sszEncodeData = async (
+export const encodeSSZData = async (
   fields: PrimitiveField | TupleField,
   values: any[],
 ): Promise<string> => {
