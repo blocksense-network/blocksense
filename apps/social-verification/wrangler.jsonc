@@ -27,6 +27,11 @@
       "database_name": "nft-drop",
       "database_id": "875bdb9d-fa95-40ae-ae49-f5686162db4a",
     },
+    {
+      "binding": "newsletterDB",
+      "database_name": "newsletter",
+      "database_id": "c83cfbdb-95f9-40b9-b803-0fde43811cbc",
+    },
   ],
   /**
    * Environment Variables
