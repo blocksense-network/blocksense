@@ -1,0 +1,12 @@
+{
+  "name": "blocksense-specification",
+  "version": "1.0.0",
+  "description": "Blocksense Protocol Specification",
+  "type": "module",
+  "scripts": {
+    "build": "quartz build",
+    "serve": "quartz build --serve"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
