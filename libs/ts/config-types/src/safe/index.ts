@@ -1,6 +1,6 @@
 import * as S from 'effect/Schema';
 
-import { ethereumAddress } from '@blocksense/base-utils/evm';
+import { InverseOf } from '@blocksense/base-utils/type-level';
 
 export const safeContractName = S.Literal(
   'SimulateTxAccessor',
@@ -19,7 +19,15 @@ export const safeContractName = S.Literal(
 );
 export type SafeContractName = typeof safeContractName.Type;
 
-export const safeContracts = S.Record({
-  key: safeContractName,
-  value: ethereumAddress,
-});
+export const safeContractNameMapping = {
+  MultiSend: 'multiSendAddress',
+  MultiSendCallOnly: 'multiSendCallOnlyAddress',
+  CreateCall: 'createCallAddress',
+  Safe: 'safeSingletonAddress',
+  SafeProxyFactory: 'safeProxyFactoryAddress',
+  CompatibilityFallbackHandler: 'fallbackHandlerAddress',
+  SignMessageLib: 'signMessageLibAddress',
+  SimulateTxAccessor: 'simulateTxAccessorAddress',
+} satisfies Partial<Record<SafeContractName, string>>;
+
+export type SafeContracts = InverseOf<typeof safeContractNameMapping>;
