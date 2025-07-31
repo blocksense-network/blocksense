@@ -90,6 +90,7 @@ let
           environment = [
             "RUST_LOG=${log-level}"
             "SPIN_DATA_DIR=$GIT_ROOT/target/spin-artifacts"
+            "LD_LIBRARY_PATH=${lib.makeLibraryPath self'.legacyPackages.commonLibDeps}"
           ];
           depends_on = {
             blocksense-sequencer.condition = "process_healthy";
@@ -121,6 +122,7 @@ let
       environment = [
         "SEQUENCER_CONFIG_DIR=${cfg.config-dir}"
         "SEQUENCER_LOG_LEVEL=${lib.toUpper cfg.sequencer.log-level}"
+        "LD_LIBRARY_PATH=${lib.makeLibraryPath self'.legacyPackages.commonLibDeps}"
       ];
       shutdown.signal = 9;
       depends_on = lib.mapAttrs' (name: value: {
