@@ -1,4 +1,4 @@
-import { processFieldsAndEncodeData } from './encodeData';
+import { encodePackedData } from './encodeData';
 import { expandFields } from './expandFields';
 import { calculateFieldShift } from './adjustFields';
 import * as helpers from './helpers';
@@ -8,7 +8,7 @@ export {
   helpers,
 
   // encode data
-  processFieldsAndEncodeData,
+  encodePackedData,
 
   // expand fields
   expandFields,

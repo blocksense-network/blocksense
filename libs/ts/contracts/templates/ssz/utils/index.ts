@@ -1,11 +1,11 @@
-import { sszEncodeData, sszSchema } from './encodeData';
+import { encodeSSZData, sszSchema } from './encodeData';
 import { Schema, BytesRange, Offset, isVector, hasFields } from './types';
 import { addOffsets } from './addOffsets';
 import { handleFieldRanges } from './container';
 
 export {
   // encode data
-  sszEncodeData,
+  encodeSSZData,
   sszSchema,
 
   // types
