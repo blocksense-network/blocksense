@@ -9,6 +9,7 @@ import {
 } from '@effect/platform';
 
 import {
+  Email,
   GenerateSignaturePayloadSchema,
   ParticipantPayloadSchema,
   RetweetCheckPayloadSchema,
@@ -102,6 +103,15 @@ export const verifyApi = HttpApi.make('verify')
           ),
       )
       .prefix('/participants'),
+  )
+  .add(
+    HttpApiGroup.make('newsletter')
+      .add(
+        HttpApiEndpoint.post('register', '/register').setPayload(
+          S.Struct({ email: Email, interests: S.Array(S.String) }),
+        ),
+      )
+      .prefix('/newsletter'),
   )
   .prefix('/verify')
   .middleware(Authorization);
