@@ -5,6 +5,8 @@ import { deepStrictEqual } from 'assert';
 import { getProcessComposeLogsFiles } from '@blocksense/base-utils/env';
 import { entriesOf, mapValuePromises, valuesOf } from '@blocksense/base-utils';
 import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
+import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
+import type { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 
 import { rgSearchPattern, parseProcessesStatus } from './helpers';
 import { expectedPCStatuses03 } from './expected';
@@ -14,6 +16,8 @@ import { ProcessCompose, Sequencer } from './types';
 describe.sequential('E2E Tests with process-compose', () => {
   const network = 'ink_sepolia';
 
+  let sequencerConfig: SequencerConfigV2;
+  let feedsConfig: NewFeedsConfig;
   let feedIds: Array<bigint>;
   let processCompose: ProcessComposeService;
   let ADFSConsumer: AggregatedDataFeedStoreConsumer;
@@ -54,13 +58,14 @@ describe.sequential('E2E Tests with process-compose', () => {
     }).pipe(Effect.provide(ProcessCompose.Live)),
   );
 
-  it.live('Test sequencer config is available and in correct format', () =>
+  it.live('Test sequencer configs are available and in correct format', () =>
     Effect.gen(function* () {
       const sequencer = yield* Sequencer;
-      const sequencerConfig = yield* sequencer.getConfig();
+      sequencerConfig = yield* sequencer.getConfig();
+      feedsConfig = yield* sequencer.getFeedsConfig();
 
       expect(sequencerConfig).toBeTypeOf('object');
-      return sequencerConfig;
+      expect(feedsConfig).toBeTypeOf('object');
     }).pipe(Effect.provide(Sequencer.Live)),
   );
 
@@ -93,18 +98,12 @@ describe.sequential('E2E Tests with process-compose', () => {
 
   it.live('Test prices are updated', () =>
     Effect.gen(function* () {
-      const sequencer = yield* Sequencer;
-      const config = yield* sequencer.getConfig();
-
       // Collect initial information for the feeds and their prices
-      const url = config.providers[network].url;
-
-      const contractAddress = config.providers[network].contracts.find(
+      const url = sequencerConfig.providers[network].url;
+      const contractAddress = sequencerConfig.providers[network].contracts.find(
         c => c.name === 'AggregatedDataFeedStore',
       )!.address as `0x${string}`;
-      const allow_feeds = config.providers[network].allow_feeds;
-
-      const feedsConfig = yield* sequencer.getFeedsConfig();
+      const allow_feeds = sequencerConfig.providers[network].allow_feeds;
 
       feedIds = allow_feeds?.length
         ? (allow_feeds as Array<bigint>)
