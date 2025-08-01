@@ -14,7 +14,7 @@ use alloy::{
     },
     signers::local::PrivateKeySigner,
 };
-use alloy_primitives::{keccak256, Bytes, B256};
+use alloy_primitives::{keccak256, Bytes, B256, U256};
 use blocksense_feeds_processing::adfs_gen_calldata::RoundCounters;
 use blocksense_utils::FeedId;
 use futures::future::join_all;
@@ -92,6 +92,7 @@ impl Hashable for HashValue {
 
 pub struct RpcProvider {
     pub calldatas_merkle_tree_frontier: Frontier<HashValue, 32>,
+    pub merkle_root_in_contract: Option<HashValue>,
     pub network: String,
     pub provider: ProviderType,
     pub signer: PrivateKeySigner,
@@ -187,11 +188,24 @@ async fn get_rpc_providers(
 }
 
 async fn log_if_contracts_exist(provider_mutex: Arc<Mutex<RpcProvider>>) {
-    let rpc_provider = provider_mutex.lock().await;
-    join!(
-        rpc_provider.log_if_contract_exists(PRICE_FEED_CONTRACT_NAME),
-        rpc_provider.log_if_contract_exists(EVENT_FEED_CONTRACT_NAME),
-    );
+    let provider_mutex1 = provider_mutex.clone();
+    let provider_mutex2 = provider_mutex.clone();
+
+    let task1 = async {
+        let mut rpc_provider = provider_mutex1.lock().await;
+        rpc_provider
+            .log_if_contract_exists_and_get_latest_root(PRICE_FEED_CONTRACT_NAME)
+            .await;
+    };
+
+    let task2 = async {
+        let mut rpc_provider = provider_mutex2.lock().await;
+        rpc_provider
+            .log_if_contract_exists_and_get_latest_root(EVENT_FEED_CONTRACT_NAME)
+            .await;
+    };
+
+    join!(task1, task2);
 }
 
 impl RpcProvider {
@@ -227,7 +241,8 @@ impl RpcProvider {
             }
         }
         RpcProvider {
-            calldatas_merkle_tree_frontier: Frontier::<HashValue, 32>::empty(), // TODO: Read the value from the contract on init
+            calldatas_merkle_tree_frontier: Frontier::<HashValue, 32>::empty(),
+            merkle_root_in_contract: None,
             network: network.to_string(),
             provider,
             signer: signer.clone(),
@@ -587,9 +602,13 @@ impl RpcProvider {
         self.rpc_url.clone()
     }
 
-    pub async fn log_if_contract_exists(&self, contract_name: &str) {
-        let address = self.get_contract_address(contract_name).ok();
+    pub async fn log_if_contract_exists_and_get_latest_root(&mut self, contract_name: &str) {
         let network = self.network.as_str();
+        let Some(contract) = self.get_contract(contract_name) else {
+            warn!("{contract_name} is not configured for network {network}",);
+            return;
+        };
+        let address = self.get_contract_address(contract_name).ok();
         if let Some(addr) = address {
             info!("Contract {contract_name} for network {network} address set to {addr}. Checking if contract exists ...");
 
@@ -599,10 +618,17 @@ impl RpcProvider {
             match result {
                 Ok(exists) => {
                     if exists {
-                        info!(
-                            "Contract for network {} exists on address {}",
-                            network, addr
-                        );
+                        info!("Contract for network {network} exists on address {addr}");
+                        if contract.contract_version >= 1 {
+                            match self.provider.get_storage_at(addr, U256::from(0)).await {
+                                Ok(root) => {
+                                    self.merkle_root_in_contract = Some(HashValue(root.into()));
+                                }
+                                Err(e) => {
+                                    warn!("Failed to read root from network {network} with contract address {addr} : {e}");
+                                }
+                            };
+                        }
                     } else {
                         warn!(
                             "No contract for network {} exists on address {}",

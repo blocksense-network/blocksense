@@ -6,7 +6,7 @@ use alloy::{
     providers::{Provider, ProviderBuilder},
     rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
-use alloy_primitives::keccak256;
+use alloy_primitives::{keccak256, U256};
 use blocksense_config::FeedStrideAndDecimals;
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
@@ -403,12 +403,39 @@ pub async fn eth_batch_send_to_contract(
         contract_address, net
     );
 
+    let contract_version = provider
+        .get_contract(PRICE_FEED_CONTRACT_NAME)
+        .ok_or(eyre!("{PRICE_FEED_CONTRACT_NAME} contract is not set!"))?
+        .contract_version;
+
     let provider_metrics = &provider.provider_metrics;
     let rpc_handle = &provider.provider;
 
-    let input = Bytes::from(serialized_updates);
+    let mut input = Bytes::from(serialized_updates.clone());
 
     let latest_call_data_hash = keccak256(input.as_ref());
+
+    let mut next_calldata_merkle_tree = provider.calldatas_merkle_tree_frontier.clone();
+    next_calldata_merkle_tree.append(HashValue(latest_call_data_hash));
+
+    let prev_calldatas_merkle_tree_root = match &provider.merkle_root_in_contract {
+        Some(stored_hash) => stored_hash.clone(),
+        None => provider.calldatas_merkle_tree_frontier.root(),
+    };
+    let next_calldatas_merkle_tree_root = next_calldata_merkle_tree.root();
+
+    // Merkle tree over all call data management for ADFS contracts (version 0 is legacy).
+    if contract_version >= 1 {
+        let serialized_updates = [
+            vec![1],
+            prev_calldatas_merkle_tree_root.0.to_vec(),
+            next_calldatas_merkle_tree_root.0.to_vec(),
+            serialized_updates,
+        ]
+        .concat();
+
+        input = Bytes::from(serialized_updates);
+    }
 
     let receipt;
     let tx_time = Instant::now();
@@ -473,7 +500,7 @@ pub async fn eth_batch_send_to_contract(
             return Ok(("timeout".to_string(), feeds_to_update_ids));
         }
 
-        match get_nonce(
+        let latest_nonce = match get_nonce(
             &net,
             rpc_handle,
             &sender_address,
@@ -485,9 +512,20 @@ pub async fn eth_batch_send_to_contract(
         {
             Ok(latest_nonce) => {
                 if latest_nonce > nonce {
-                    //TODO: Check the tx hashes of all posted/retried txs for block inclusion
+                    try_to_sync(
+                        net.as_str(),
+                        &mut provider,
+                        &contract_address,
+                        block_height,
+                        &next_calldatas_merkle_tree_root,
+                        latest_nonce,
+                        nonce,
+                    )
+                    .await;
+
                     return Ok(("true".to_string(), feeds_to_update_ids));
                 }
+                latest_nonce
             }
             Err(err) => {
                 warn!("{err}");
@@ -629,6 +667,16 @@ pub async fn eth_batch_send_to_contract(
                     Err(err) => {
                         warn!("Error while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
                         if err.to_string().contains("execution revert") {
+                            try_to_sync(
+                                net.as_str(),
+                                &mut provider,
+                                &contract_address,
+                                block_height,
+                                &next_calldatas_merkle_tree_root,
+                                latest_nonce,
+                                nonce,
+                            )
+                            .await;
                             return Ok(("false".to_string(), feeds_to_update_ids));
                         } else {
                             inc_retries_with_backoff(
@@ -754,14 +802,45 @@ pub async fn eth_batch_send_to_contract(
     let result = receipt.status().to_string();
     if result == "true" {
         //Transaction was successfully confirmed therefore we update the latest state hash
-        provider
-            .calldatas_merkle_tree_frontier
-            .append(HashValue(latest_call_data_hash));
+        let root = next_calldata_merkle_tree.root();
+        provider.calldatas_merkle_tree_frontier = next_calldata_merkle_tree;
+        provider.merkle_root_in_contract = None;
+        debug!("Successfully updated contract in network `{net}` block height {block_height} Merkle root {root:?}");
     } // TODO: Reread round counters + latest state hash from contract
     drop(provider);
     debug!("Released a read/write lock on provider state in network `{net}` block height {block_height}");
 
     Ok((result, feeds_to_update_ids))
+}
+
+async fn try_to_sync(
+    net: &str,
+    provider: &mut RpcProvider,
+    contract_address: &Address,
+    block_height: u64,
+    next_calldatas_merkle_tree_root: &HashValue,
+    latest_nonce: u64,
+    previous_nonce: u64,
+) {
+    let rpc_handle = &provider.provider;
+    match rpc_handle
+        .get_storage_at(*contract_address, U256::from(0))
+        .await
+    {
+        Ok(root) => {
+            if root != next_calldatas_merkle_tree_root.0.into() {
+                // If the nonce in the contract increased and the next state root hash is not as we expect,
+                // another sequencer was able to post updates for the current block height before this one.
+                // We need to take this into account and reread the round counters of the feeds.
+                info!("Updates to contract already posted, network {net}, block_height {block_height}, latest_nonce {latest_nonce}, previous_nonce {previous_nonce}, merkle_root in contract {root}");
+                provider.merkle_root_in_contract = Some(HashValue(root.into()));
+                // TODO: Read round counters from contract
+            }
+        }
+        Err(e) => {
+            warn!("Failed to read root from network {net} with contract address {contract_address} : {e}");
+        }
+    }
 }
 
 pub async fn get_nonce(
