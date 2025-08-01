@@ -8,7 +8,7 @@ import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
 
 import { rgSearchPattern, parseProcessesStatus } from './helpers';
 import { expectedPCStatuses03 } from './expected';
-import type { ProcessComposeService } from './types';
+import type { ProcessComposeService, UpdatesToNetwork } from './types';
 import { ProcessCompose, Sequencer } from './types';
 
 describe.sequential('E2E Tests with process-compose', () => {
@@ -16,8 +16,9 @@ describe.sequential('E2E Tests with process-compose', () => {
 
   let feedIds: Array<bigint>;
   let processCompose: ProcessComposeService;
-  let ADFSConsumer;
+  let ADFSConsumer: AggregatedDataFeedStoreConsumer;
   let initialPrices: Record<string, number>;
+  let updatesToNetworks = {} as UpdatesToNetwork;
 
   beforeAll(() =>
     pipe(
@@ -60,50 +61,7 @@ describe.sequential('E2E Tests with process-compose', () => {
 
       expect(sequencerConfig).toBeTypeOf('object');
       return sequencerConfig;
-    }).pipe(
-      Effect.tap(config =>
-        Effect.gen(function* () {
-          // Collect initial information for the feeds and their prices
-          const url = config.providers[network].url;
-          const contractAddress = config.providers[network]
-            .contract_address as `0x${string}`;
-          const allow_feeds = config.providers[network].allow_feeds;
-
-          const sequencer = yield* Sequencer;
-          const feedsConfig = yield* sequencer.getFeedsConfig();
-
-          feedIds = allow_feeds?.length
-            ? (allow_feeds as Array<bigint>)
-            : feedsConfig.feeds.map(feed => feed.id);
-
-          ADFSConsumer = yield* Effect.sync(() =>
-            AggregatedDataFeedStoreConsumer.createConsumerByRpcUrl(
-              contractAddress,
-              url,
-            ),
-          );
-
-          initialPrices = feedIds.reduce(
-            (acc, feedId) => {
-              acc[feedId.toString()] = 0;
-              return acc;
-            },
-            {} as Record<string, number>,
-          );
-
-          initialPrices = yield* Effect.promise(() =>
-            mapValuePromises(
-              initialPrices,
-              async (feedId, _) =>
-                await ADFSConsumer.getLatestSingleData(feedId).then(res =>
-                  Number(res.slice(0, 50)),
-                ),
-            ),
-          );
-        }),
-      ),
-      Effect.provide(Sequencer.Live),
-    ),
+    }).pipe(Effect.provide(Sequencer.Live)),
   );
 
   it.live(
@@ -111,7 +69,7 @@ describe.sequential('E2E Tests with process-compose', () => {
     () =>
       Effect.gen(function* () {
         const sequencer = yield* Sequencer;
-        const _updates = yield* Effect.retry(
+        updatesToNetworks = yield* Effect.retry(
           sequencer
             .fetchUpdatesToNetworksMetric()
             .pipe(
@@ -135,13 +93,54 @@ describe.sequential('E2E Tests with process-compose', () => {
 
   it.live('Test prices are updated', () =>
     Effect.gen(function* () {
+      const sequencer = yield* Sequencer;
+      const config = yield* sequencer.getConfig();
+
+      // Collect initial information for the feeds and their prices
+      const url = config.providers[network].url;
+      const contractAddress = config.providers[network]
+        .contract_address as `0x${string}`;
+      const allow_feeds = config.providers[network].allow_feeds;
+
+      const feedsConfig = yield* sequencer.getFeedsConfig();
+
+      feedIds = allow_feeds?.length
+        ? (allow_feeds as Array<bigint>)
+        : feedsConfig.feeds.map(feed => feed.id);
+
+      ADFSConsumer = yield* Effect.sync(() =>
+        AggregatedDataFeedStoreConsumer.createConsumerByRpcUrl(
+          contractAddress,
+          url,
+        ),
+      );
+
+      initialPrices = feedIds.reduce(
+        (acc, feedId) => {
+          acc[feedId.toString()] = 0;
+          return acc;
+        },
+        {} as Record<string, number>,
+      );
+
+      initialPrices = yield* Effect.promise(() =>
+        mapValuePromises(
+          initialPrices,
+          async (feedId, _) =>
+            await ADFSConsumer.getSingleDataAtIndex(BigInt(feedId), 0).then(
+              res => Number(res.slice(0, 50)),
+            ),
+        ),
+      );
+
       const currentPrices = yield* Effect.promise(() =>
         mapValuePromises(
           initialPrices,
           async (feedId, _) =>
-            await ADFSConsumer.getLatestSingleData(feedId).then(res =>
-              Number(res.slice(0, 50)),
-            ),
+            await ADFSConsumer.getSingleDataAtIndex(
+              BigInt(feedId),
+              updatesToNetworks[network][feedId] - 1,
+            ).then(res => Number(res.slice(0, 50))),
         ),
       );
 
@@ -154,7 +153,7 @@ describe.sequential('E2E Tests with process-compose', () => {
         }
         expect(price).not.toEqual(initialPrices[id]);
       }
-    }),
+    }).pipe(Effect.provide(Sequencer.Live)),
   );
 
   describe.sequential('Reporter behavior based on logs', () => {
