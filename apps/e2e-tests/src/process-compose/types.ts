@@ -98,12 +98,13 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
               metric => metric.name === 'updates_to_networks',
             )[0];
 
-            if (!updatesToNetworks)
+            if (!updatesToNetworks) {
               return yield* Effect.fail(
                 new ParseMetricsError({
-                  message: 'No updates_to_networks metric found',
+                  message: `No 'updates_to_networks' metric found in the response from ${metricsUrl}`,
                 }),
               );
+            }
 
             const decoded = S.decodeUnknownSync(UpdatesToNetworkMetric)(
               updatesToNetworks,
