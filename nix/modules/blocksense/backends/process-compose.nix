@@ -52,7 +52,7 @@ let
           timeout_seconds = 30;
         };
         log_configuration = logsConfig;
-        log_location = cfg.logsDir + "/anvil-${name}.log";
+        log_location = "${cfg.logsDir}/anvil-${name}.log";
       };
     }
   ) cfg.anvil;
@@ -96,7 +96,7 @@ let
             blocksense-sequencer.condition = "process_healthy";
           };
           log_configuration = logsConfig;
-          log_location = cfg.logsDir + "/reporter-${name}.log";
+          log_location = "${cfg.logsDir}/reporter-${name}.log";
         };
     }
   ) cfg.reporters;
@@ -109,7 +109,6 @@ let
         fi
         ${mkCargoTargetExePath "sequencer"}
       '';
-
       readiness_probe = {
         exec.command = ''
           curl -fsSL http://127.0.0.1:${toString cfg.sequencer.ports.admin}/health \
@@ -132,7 +131,7 @@ let
         };
       }) cfg.sequencer.providers;
       log_configuration = logsConfig;
-      log_location = cfg.logsDir + "/sequencer.log";
+      log_location = "${cfg.logsDir}/sequencer.log";
     };
   };
 
@@ -142,7 +141,7 @@ let
       shutdown.signal = 9;
       depends_on.kafka.condition = "process_started";
       log_configuration = logsConfig;
-      log_location = cfg.logsDir + "/blockchain-reader.log";
+      log_location = "${cfg.logsDir}/blockchain-reader.log";
     };
   };
 
@@ -152,7 +151,7 @@ let
       shutdown.signal = 9;
       depends_on.kafka.condition = "process_started";
       log_configuration = logsConfig;
-      log_location = cfg.logsDir + "/aggregate-consensus-reader.log";
+      log_location = "${cfg.logsDir}/aggregate-consensus-reader.log";
     };
   };
 
@@ -162,7 +161,7 @@ let
       environment = lib.mapAttrsToList (k: v: "${k}=${v}") cfg.blama.environment;
       shutdown.signal = 9;
       log_configuration = logsConfig;
-      log_location = cfg.logsDir + "/blama.log";
+      log_location = "${cfg.logsDir}/blama.log";
       # TODO: Adequate `readiness_probe`
       # readiness_probe = {};
     };

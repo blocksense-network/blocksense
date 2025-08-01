@@ -8,8 +8,8 @@ with lib.fileset;
 
   rustSrc = rec {
     fileset = unions [
-      (root + "/Cargo.toml")
-      (root + "/Cargo.lock")
+      (lib.path.append root "Cargo.toml")
+      (lib.path.append root "Cargo.lock")
 
       (fileFilter (
         file:
@@ -22,11 +22,11 @@ with lib.fileset;
 
       # JSON files must be listed one by one, otherwise changing an
       # unrelated JSON file will cause all Rust derivations to be rebuilt
-      (root + "/apps/sequencer_tests/Safe.json")
-      (root + "/apps/oracles/eth-rpc/src/abi/VaultABI.json")
-      (root + "/apps/oracles/eth-rpc/src/abi/YieldFiyUSD.json")
-      (root + "/apps/sequencer_tests/SafeProxyFactory.json")
-      (root + "/libs/gnosis_safe/safe_abi.json")
+      (lib.path.append root "apps/sequencer_tests/Safe.json")
+      (lib.path.append root "apps/oracles/eth-rpc/src/abi/VaultABI.json")
+      (lib.path.append root "apps/oracles/eth-rpc/src/abi/YieldFiyUSD.json")
+      (lib.path.append root "apps/sequencer_tests/SafeProxyFactory.json")
+      (lib.path.append root "libs/gnosis_safe/safe_abi.json")
     ];
     src = toSource { inherit root fileset; };
   };
