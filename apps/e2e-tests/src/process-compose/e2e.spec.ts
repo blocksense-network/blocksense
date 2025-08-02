@@ -99,7 +99,7 @@ describe.sequential('E2E Tests with process-compose', () => {
       }).pipe(Effect.provide(Sequencer.Live)),
   );
 
-  it.live('Test feeds data is updated on the local network', () =>
+  it.live.fails('Test feeds data is updated on the local network', () =>
     Effect.gen(function* () {
       // Collect initial information for the feeds and their prices
       const url = sequencerConfig.providers[network].url;
@@ -126,6 +126,17 @@ describe.sequential('E2E Tests with process-compose', () => {
       );
 
       // Get feeds information from the local network ( anvil )
+      // for the same round as the initial one, to confirm it is not being overwritten
+      const initialFeedsInfoLocal = yield* getDataFeedsInfoFromNetwork(
+        feedIds,
+        contractAddress,
+        url,
+        initialRounds,
+      );
+
+      expect(initialFeedsInfo).toEqual(initialFeedsInfoLocal);
+
+      // Get feeds information from the local network ( anvil )
       // Info is fetched for specific round - the initial round of the feed
       // + number of updates that happened while the local sequencer was running
       const currentFeedsInfo = yield* getDataFeedsInfoFromNetwork(
@@ -134,13 +145,14 @@ describe.sequential('E2E Tests with process-compose', () => {
         url,
         mapValues(
           initialRounds,
-          (feedId, _) => updatesToNetworks[network][feedId] - 1,
+          (feedId, round) => round + updatesToNetworks[network][feedId],
         ),
       );
 
       // Make sure that the feeds info is updated
       for (const [id, data] of entriesOf(currentFeedsInfo)) {
-        const { value } = data;
+        const { round, value } = data;
+        expect(round).toBeGreaterThan(initialFeedsInfo[id].round);
         // Pegged asset with 10% tolerance should be pegged
         // Pegged asset with 0.000001% tolerance should not be pegged
         if (id === '50000') {

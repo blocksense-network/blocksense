@@ -58,7 +58,6 @@ in
           private-key-path = "${testKeysDir}/sequencer-private-key";
           transaction-gas-limit = 20000000;
           impersonated-anvil-account = impersonationAddress;
-          should-load-round-counters = false;
           publishing-criteria = [
             {
               feed-id = 50000; # USDT / USD Pegged
