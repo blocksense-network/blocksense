@@ -60,14 +60,12 @@ lib: with lib; {
         "url" = "http://127.0.0.1:8545";
         "transaction-timeout-secs" = 420;
         "transaction-gas-limit" = 7500000;
-        "contract-address" = "0x663F3ad617193148711d28f5334eE4Ed07016602";
       };
       "ETH2" = {
         "private-key-path" = "/tmp/priv_key_test";
         "url" = "http://127.0.0.1:8546";
         "transaction-timeout-secs" = 420;
         "transaction-gas-limit" = 7500000;
-        "contract-address" = "0x663F3ad617193148711d28f5334eE4Ed07016602";
       };
     };
   };
