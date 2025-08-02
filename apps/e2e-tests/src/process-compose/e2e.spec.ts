@@ -21,6 +21,7 @@ import { getDataFeedsInfoFromNetwork } from '../utils/onchain';
 
 describe.sequential('E2E Tests with process-compose', () => {
   const network = 'ink_sepolia';
+  const MAX_HISTORY_ELEMENTS_PER_FEED = 8192;
 
   let sequencerConfig: SequencerConfigV2;
   let feedsConfig: NewFeedsConfig;
@@ -73,26 +74,29 @@ describe.sequential('E2E Tests with process-compose', () => {
 
       expect(sequencerConfig).toBeTypeOf('object');
       expect(feedsConfig).toBeTypeOf('object');
+    }).pipe(
+      Effect.provide(Sequencer.Live),
+      // Once we have the sequencer config, we can get info about feeds
+      Effect.tap(() =>
+        Effect.gen(function* () {
+          contractAddress = sequencerConfig.providers[network].contracts.find(
+            c => c.name === 'AggregatedDataFeedStore',
+          )!.address as `0x${string}`;
+          const allow_feeds = sequencerConfig.providers[network].allow_feeds;
 
-      // Collect initial information for the feeds and their prices
-      {
-        contractAddress = sequencerConfig.providers[network].contracts.find(
-          c => c.name === 'AggregatedDataFeedStore',
-        )!.address as `0x${string}`;
-        const allow_feeds = sequencerConfig.providers[network].allow_feeds;
-
-        feedIds = allow_feeds?.length
-          ? (allow_feeds as Array<bigint>)
-          : feedsConfig.feeds.map(feed => feed.id);
-        // Get feeds information from the original network. No affection of the work of the
-        // local sequencer.
-        initialFeedsInfo = yield* getDataFeedsInfoFromNetwork(
-          feedIds,
-          contractAddress,
-          'ink-sepolia',
-        );
-      }
-    }).pipe(Effect.provide(Sequencer.Live)),
+          feedIds = allow_feeds?.length
+            ? (allow_feeds as Array<bigint>)
+            : feedsConfig.feeds.map(feed => feed.id);
+          // Get feeds information from the original network. No affection of the work of the
+          // local sequencer.
+          initialFeedsInfo = yield* getDataFeedsInfoFromNetwork(
+            feedIds,
+            contractAddress,
+            'ink-sepolia',
+          );
+        }),
+      ),
+    ),
   );
 
   it.live(
@@ -132,21 +136,36 @@ describe.sequential('E2E Tests with process-compose', () => {
       );
 
       // Get feeds information from the local network ( anvil )
+      // for the same round as the initial one, to confirm it is not being overwritten
+      const initialFeedsInfoLocal = yield* getDataFeedsInfoFromNetwork(
+        feedIds,
+        contractAddress,
+        url,
+        initialRounds,
+      );
+
+      expect(initialFeedsInfo).toEqual(initialFeedsInfoLocal);
+
+      // Get feeds information from the local network ( anvil )
       // Info is fetched for specific round - the initial round of the feed
       // + number of updates that happened while the local sequencer was running
+      // modulo the maximum number of history elements per feed
       const currentFeedsInfo = yield* getDataFeedsInfoFromNetwork(
         feedIds,
         contractAddress,
         url,
         mapValues(
           initialRounds,
-          (feedId, _) => updatesToNetworks[network][feedId] - 1,
+          (feedId, round) =>
+            (round + updatesToNetworks[network][feedId]) %
+            MAX_HISTORY_ELEMENTS_PER_FEED,
         ),
       );
 
       // Make sure that the feeds info is updated
       for (const [id, data] of entriesOf(currentFeedsInfo)) {
-        const { value } = data;
+        const { round, value } = data;
+        expect(round).toBeGreaterThan(initialFeedsInfo[id].round);
         // Pegged asset with 10% tolerance should be pegged
         // Pegged asset with 0.000001% tolerance should not be pegged
         if (id === '50000') {
