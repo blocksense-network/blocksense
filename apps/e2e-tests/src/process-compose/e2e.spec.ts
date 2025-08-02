@@ -3,8 +3,12 @@ import { afterAll, beforeAll, describe, expect, it } from '@effect/vitest';
 import { deepStrictEqual } from 'assert';
 
 import { getProcessComposeLogsFiles } from '@blocksense/base-utils/env';
-import { entriesOf, mapValuePromises, valuesOf } from '@blocksense/base-utils';
-import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
+import {
+  entriesOf,
+  fromEntries,
+  mapValues,
+  valuesOf,
+} from '@blocksense/base-utils/array-iter';
 import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
 import type { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 
@@ -12,6 +16,7 @@ import { rgSearchPattern, parseProcessesStatus } from './helpers';
 import { expectedPCStatuses03 } from './expected';
 import type { ProcessComposeService, UpdatesToNetwork } from './types';
 import { ProcessCompose, Sequencer } from './types';
+import { getDataFeedsInfoFromNetwork } from '../utils/onchain';
 
 describe.sequential('E2E Tests with process-compose', () => {
   const network = 'ink_sepolia';
@@ -20,8 +25,6 @@ describe.sequential('E2E Tests with process-compose', () => {
   let feedsConfig: NewFeedsConfig;
   let feedIds: Array<bigint>;
   let processCompose: ProcessComposeService;
-  let ADFSConsumer: AggregatedDataFeedStoreConsumer;
-  let initialPrices: Record<string, number>;
   let updatesToNetworks = {} as UpdatesToNetwork;
 
   beforeAll(() =>
@@ -96,7 +99,7 @@ describe.sequential('E2E Tests with process-compose', () => {
       }).pipe(Effect.provide(Sequencer.Live)),
   );
 
-  it.live('Test prices are updated', () =>
+  it.live('Test feeds data is updated on the local network', () =>
     Effect.gen(function* () {
       // Collect initial information for the feeds and their prices
       const url = sequencerConfig.providers[network].url;
@@ -109,50 +112,42 @@ describe.sequential('E2E Tests with process-compose', () => {
         ? (allow_feeds as Array<bigint>)
         : feedsConfig.feeds.map(feed => feed.id);
 
-      ADFSConsumer = yield* Effect.sync(() =>
-        AggregatedDataFeedStoreConsumer.createConsumerByRpcUrl(
-          contractAddress,
-          url,
+      // Get feeds information from the original network. No affection of the work of the
+      // local sequencer.
+      const initialFeedsInfo = yield* getDataFeedsInfoFromNetwork(
+        feedIds,
+        contractAddress,
+        'ink-sepolia',
+      );
+
+      // Save map of initial rounds for each feed
+      const initialRounds = fromEntries(
+        entriesOf(initialFeedsInfo).map(([id, data]) => [id, data.round]),
+      );
+
+      // Get feeds information from the local network ( anvil )
+      // Info is fetched for specific round - the initial round of the feed
+      // + number of updates that happened while the local sequencer was running
+      const currentFeedsInfo = yield* getDataFeedsInfoFromNetwork(
+        feedIds,
+        contractAddress,
+        url,
+        mapValues(
+          initialRounds,
+          (feedId, _) => updatesToNetworks[network][feedId] - 1,
         ),
       );
 
-      initialPrices = feedIds.reduce(
-        (acc, feedId) => {
-          acc[feedId.toString()] = 0;
-          return acc;
-        },
-        {} as Record<string, number>,
-      );
-
-      initialPrices = yield* Effect.promise(() =>
-        mapValuePromises(
-          initialPrices,
-          async (feedId, _) =>
-            await ADFSConsumer.getSingleDataAtIndex(BigInt(feedId), 0).then(
-              res => Number(res.slice(0, 50)),
-            ),
-        ),
-      );
-
-      const currentPrices = yield* Effect.promise(() =>
-        mapValuePromises(
-          initialPrices,
-          async (feedId, _) =>
-            await ADFSConsumer.getSingleDataAtIndex(
-              BigInt(feedId),
-              updatesToNetworks[network][feedId] - 1,
-            ).then(res => Number(res.slice(0, 50))),
-        ),
-      );
-
-      for (const [id, price] of entriesOf(currentPrices)) {
+      // Make sure that the feeds info is updated
+      for (const [id, data] of entriesOf(currentFeedsInfo)) {
+        const { value } = data;
         // Pegged asset with 10% tolerance should be pegged
         // Pegged asset with 0.000001% tolerance should not be pegged
         if (id === '50000') {
-          expect(price).toEqual(1 * 10 ** 8);
+          expect(value).toEqual(1 * 10 ** 8);
           continue;
         }
-        expect(price).not.toEqual(initialPrices[id]);
+        expect(value).not.toEqual(initialFeedsInfo[id].value);
       }
     }).pipe(Effect.provide(Sequencer.Live)),
   );
