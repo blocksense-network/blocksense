@@ -9,6 +9,7 @@ use log::error;
 use serde::Deserialize;
 use serde::Serialize;
 use std::cmp::Ordering;
+use tracing::debug;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VotedFeedUpdate {
@@ -165,6 +166,7 @@ impl VotedFeedUpdate {
                         };
                         let is_threshold_crossed =
                             diff * 100.0f64 >= criteria.skip_publish_if_less_then_percentage * a;
+                        debug!("Result for feed_id {feed_id}: last_published = {last}, candidate_value = {candidate_value}, is_threshold_crossed = {is_threshold_crossed}");
                         if is_threshold_crossed {
                             SkipDecision::DontSkip(DontSkipReason::ThresholdCrossed)
                         } else if has_heartbeat_timed_out {
