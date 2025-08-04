@@ -80,9 +80,10 @@ test-ts:
   yarn test-single @blocksense/changelog-generator
   yarn test-single @blocksense/chain-interactions
   yarn test-single @blocksense/avm-relayer
+  yarn workspace @blocksense/e2e-tests run test:unit
 
 test-e2e:
-  yarn workspace @blocksense/e2e-tests run test
+  yarn workspace @blocksense/e2e-tests run test:process-compose-e2e
 
 [group('Working with oracles')]
 [doc('Build a specific oracle')]

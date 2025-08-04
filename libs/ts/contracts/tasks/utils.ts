@@ -1,6 +1,14 @@
 import { getCreate2Address, keccak256, solidityPacked } from 'ethers';
 import { ContractNames, NetworkConfig } from './types';
 import { Artifacts } from 'hardhat/types';
+import {
+  getOptionalApiKey,
+  networkMetadata,
+  NetworkName,
+  fromEntries,
+  keysOf,
+  entriesOf,
+} from '@blocksense/base-utils';
 
 export async function checkAddressExists(
   config: NetworkConfig,
@@ -36,4 +44,65 @@ export const predictAddress = async (
     salt,
     keccak256(bytecode),
   );
+};
+
+export const adjustVInSignature = async (
+  signature: string,
+): Promise<string> => {
+  const ETHEREUM_V_VALUES = [0, 1, 27, 28];
+  const MIN_VALID_V_VALUE_FOR_SAFE_ECDSA = 27;
+  let signatureV = parseInt(signature.slice(-2), 16);
+  if (!ETHEREUM_V_VALUES.includes(signatureV)) {
+    throw new Error('Invalid signature');
+  }
+
+  if (signatureV < MIN_VALID_V_VALUE_FOR_SAFE_ECDSA) {
+    signatureV += MIN_VALID_V_VALUE_FOR_SAFE_ECDSA;
+  }
+  signatureV += 4;
+  signature = signature.slice(0, -2) + signatureV.toString(16);
+  return signature;
+};
+
+export const getCustomChainConfig = (explorerIndex: number) =>
+  entriesOf(networkMetadata)
+    .filter(([_, meta]) => meta.explorers[explorerIndex]?.apiUrl)
+    .map(([name, meta]) => {
+      const explorer = meta.explorers[explorerIndex];
+      return {
+        network: name,
+        chainId: meta.chainId,
+        urls: {
+          apiURL: explorer.apiUrl!,
+          browserURL: explorer.webUrl,
+        },
+      };
+    });
+
+export const getApiKeys = () =>
+  fromEntries(
+    keysOf(networkMetadata).map(name => [
+      name,
+      getOptionalApiKey(name as NetworkName),
+    ]),
+  );
+
+// the 'condition' could be used to make the binarySearch - lowerBound, upperBound or custom
+export const binarySearch = <T>(
+  array: T[],
+  condition: (mid: T, index: number) => boolean,
+): number => {
+  let left = 0;
+  let right = array.length;
+  while (left < right) {
+    const midIndex = Math.floor((left + right) / 2);
+    const midValue = array[midIndex];
+
+    if (condition(midValue, midIndex)) {
+      left = midIndex + 1;
+    } else {
+      right = midIndex;
+    }
+  }
+  return left;
 };

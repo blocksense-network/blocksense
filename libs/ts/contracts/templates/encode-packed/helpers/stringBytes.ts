@@ -1,4 +1,4 @@
-import { DecoderData } from '../utils';
+import { DecoderData } from '../../utils';
 
 export const generateDecoderStringBytes = (
   data: DecoderData,
@@ -22,22 +22,14 @@ export const generateDecoderStringBytes = (
       // take a mod of 32 to update the free memory pointer
       mstore(0x40, add(${fieldName}, and(add(${fieldName}_size, 64), 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFe0)))
       mstore(${fieldName}, ${fieldName}_size)
-      let ${fieldName}_j := 32
-      for {
-      } lt(${fieldName}_j, ${fieldName}_size) {
-        ${fieldName}_j := add(${fieldName}_j, 32)
-        shift := add(shift, 32)
-      } {
-        memData := mload(add(data, shift))
-        mstore(add(${fieldName}, ${fieldName}_j), memData)
-      }
-      memData := mload(add(data, shift))
-      mstore(add(${fieldName}, ${fieldName}_j), memData)
-      ${fieldName}_j := mod(${fieldName}_size, 32)
-      if iszero(${fieldName}_j) {
-        ${fieldName}_j := 32
-      }
-      shift := add(shift, ${fieldName}_j)
+
+      mcopy(
+        add(${fieldName}, 32),
+        add(data, shift),
+        ${fieldName}_size
+      )
+
+      shift := add(shift, ${fieldName}_size)
       memData := mload(add(data, shift))
     }
   `;

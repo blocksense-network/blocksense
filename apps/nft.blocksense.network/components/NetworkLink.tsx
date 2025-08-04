@@ -13,7 +13,7 @@ const networkLinks = {
   discord: {
     title: 'Community',
     description: '+80k members',
-    url: 'https://discord.com/invite/mYujUXwrMr',
+    url: 'https://discord.com/invite/blocksense',
     icon: discordIcon,
   },
 };

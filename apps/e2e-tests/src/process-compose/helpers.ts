@@ -1,10 +1,13 @@
-import { ParseResult, Schema as S } from 'effect';
+import { Effect, ParseResult, Schema as S } from 'effect';
+import { NodeContext } from '@effect/platform-node';
+import { Command } from '@effect/platform';
 import { $, execa } from 'execa';
-
-import { logMessage } from '../utils/logs';
 
 import { arrayToObject } from '@blocksense/base-utils/array-iter';
 import { rootDir } from '@blocksense/base-utils/env';
+
+import { RGLogCheckerError } from './types';
+import { logMessage } from '../utils/logs';
 
 const ProcessComposeStatusSchema = S.mutable(
   S.Array(
@@ -40,6 +43,7 @@ export async function parseProcessesStatus() {
 }
 
 export async function startEnvironment(testEnvironment: string): Promise<void> {
+  logTestEnvironmentInfo('Starting', testEnvironment);
   await execa('just', ['start-environment', testEnvironment, '--detached'], {
     env: {
       FEEDS_CONFIG_DIR: `${rootDir}/apps/e2e-tests/src/process-compose/config`,
@@ -63,3 +67,41 @@ export function logTestEnvironmentInfo(
     `${status} time: ${time.toDateString()} ${time.toTimeString()}`,
   );
 }
+
+export const rgSearchPattern = ({
+  caseInsensitive = true,
+  file,
+  flags = [],
+  pattern,
+}: {
+  caseInsensitive?: boolean;
+  file: string;
+  flags?: Array<string>;
+  pattern: string;
+}): Effect.Effect<boolean, RGLogCheckerError> => {
+  const args = caseInsensitive
+    ? ['--quiet', '-i', ...flags, pattern, file]
+    : ['--quiet', ...flags, pattern, file];
+
+  return Command.make('rg', ...args).pipe(
+    Command.exitCode,
+    Effect.matchEffect({
+      onFailure: commandError =>
+        Effect.fail(new RGLogCheckerError({ cause: commandError })),
+      onSuccess: exitCode => {
+        if (exitCode === 0) {
+          return Effect.succeed(true);
+        }
+        if (exitCode === 1) {
+          return Effect.succeed(false);
+        }
+        return Effect.fail(
+          new RGLogCheckerError({
+            cause: `ripgrep process error: exited with code ${exitCode}`,
+          }),
+        );
+      },
+    }),
+    Effect.provide(NodeContext.layer),
+  );
+};

@@ -17,13 +17,8 @@ let
     blama
     ;
 
-  mkCargoTargetExePath = executable-name: "${config.devenv.root}/target/release/${executable-name}";
-
-  feedsConfigDir =
-    if builtins.getEnv "FEEDS_CONFIG_DIR" != "" then
-      builtins.getEnv "FEEDS_CONFIG_DIR"
-    else
-      "${config.devenv.root}/config";
+  # process-compose will replace `$GIT_ROOT` on startup
+  mkCargoTargetExePath = executable-name: "$GIT_ROOT/target/release/${executable-name}";
 
   logsConfig = {
     fields_order = [
@@ -87,12 +82,15 @@ let
           command = ''
             mkdir -p "${working_dir}" &&
             cd "${working_dir}" &&
+            rm -rf ./test-keys &&
+            cp -r "$GIT_ROOT/nix/test-environments/test-keys" ./test-keys &&
             ${mkCargoTargetExePath "blocksense"} node build --up \
               --from ${cfg.config-files."reporter_config_${name}".path}
           '';
           environment = [
             "RUST_LOG=${log-level}"
-            "SPIN_DATA_DIR=${config.devenv.root}/target/spin-artifacts"
+            "SPIN_DATA_DIR=$GIT_ROOT/target/spin-artifacts"
+            "LD_LIBRARY_PATH=${lib.makeLibraryPath self'.legacyPackages.commonLibDeps}"
           ];
           depends_on = {
             blocksense-sequencer.condition = "process_healthy";
@@ -105,7 +103,13 @@ let
 
   sequencerInstance = {
     blocksense-sequencer.process-compose = {
-      command = mkCargoTargetExePath "sequencer";
+      command = ''
+        if [ -z "$FEEDS_CONFIG_DIR" ]; then
+          FEEDS_CONFIG_DIR=${../../../../config}
+        fi
+        ${mkCargoTargetExePath "sequencer"}
+      '';
+
       readiness_probe = {
         exec.command = ''
           curl -fsSL http://127.0.0.1:${toString cfg.sequencer.ports.admin}/health \
@@ -116,9 +120,9 @@ let
         timeout_seconds = 30;
       };
       environment = [
-        "FEEDS_CONFIG_DIR=${feedsConfigDir}"
         "SEQUENCER_CONFIG_DIR=${cfg.config-dir}"
         "SEQUENCER_LOG_LEVEL=${lib.toUpper cfg.sequencer.log-level}"
+        "LD_LIBRARY_PATH=${lib.makeLibraryPath self'.legacyPackages.commonLibDeps}"
       ];
       shutdown.signal = 9;
       depends_on = lib.mapAttrs' (name: value: {

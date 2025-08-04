@@ -88,7 +88,7 @@ impl Validated for FeedConfig {
 
 #[derive(Clone)]
 pub struct FeedStrideAndDecimals {
-    pub stride: u16,
+    pub stride: u8,
     pub decimals: u8,
 }
 
@@ -279,6 +279,8 @@ pub struct SequencerConfig {
     pub kafka_report_endpoint: KafkaReportEndpoint,
     pub http_input_buffer_size: Option<usize>,
     pub pyroscope_config: Option<PyroscopeConfig>,
+    #[serde(default = "default_is_enabled")]
+    pub send_aggregated_updates_to_publishers: bool,
 }
 
 impl Validated for SequencerConfig {
@@ -351,7 +353,7 @@ pub fn get_sequencer_and_feed_configs() -> (SequencerConfig, AllFeedsConfig) {
 
 // Utility functions for tests follow:
 
-pub fn test_feed_config(id: FeedId, stride: u16) -> FeedConfig {
+pub fn test_feed_config(id: FeedId, stride: u8) -> FeedConfig {
     FeedConfig {
         id,
         full_name: "FOXY".to_owned(),
@@ -404,7 +406,7 @@ pub fn test_feed_config(id: FeedId, stride: u16) -> FeedConfig {
     }
 }
 
-pub fn test_feeds_config(id: FeedId, stride: u16) -> HashMap<FeedId, FeedConfig> {
+pub fn test_feeds_config(id: FeedId, stride: u8) -> HashMap<FeedId, FeedConfig> {
     let mut feeds_config = HashMap::new();
     feeds_config.insert(id, test_feed_config(id, stride));
     feeds_config
@@ -443,6 +445,7 @@ pub fn get_test_config_with_no_providers() -> SequencerConfig {
         kafka_report_endpoint: KafkaReportEndpoint { url: None },
         http_input_buffer_size: None,
         pyroscope_config: None,
+        send_aggregated_updates_to_publishers: false,
     }
 }
 

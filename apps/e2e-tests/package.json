@@ -5,15 +5,25 @@
   "scripts": {
     "ts": "yarn node --import tsx",
     "test": "vitest run --typecheck --coverage",
+    "test:unit": "yarn vitest -w false src/utils",
     "test:process-compose-e2e": "yarn test src/process-compose/e2e.spec.ts"
   },
   "dependencies": {
     "@blocksense/base-utils": "workspace:*",
     "@blocksense/config-types": "workspace:*",
     "@blocksense/contracts": "workspace:*",
+    "@effect/cluster": "^0.46.2",
+    "@effect/experimental": "^0.54.2",
+    "@effect/language-service": "^0.31.2",
+    "@effect/platform": "^0.90.0",
+    "@effect/platform-node": "^0.94.0",
+    "@effect/rpc": "^0.68.0",
+    "@effect/sql": "^0.44.0",
+    "@effect/vitest": "^0.25.0",
     "@types/node": "^22.3.0",
     "effect": "^3.15.1",
     "execa": "^9.5.2",
+    "parse-prometheus-text-format": "^1.1.1",
     "tsx": "^4.17.0",
     "typescript": "^5.5.4",
     "vitest": "^3.2.4"

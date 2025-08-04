@@ -1,5 +1,4 @@
 {
-  config,
   lib,
   ...
 }:
@@ -7,9 +6,11 @@ let
   # Function to read and parse the JSON file
   readJson = path: builtins.fromJSON (builtins.readFile path);
 
-  testKeysDir = config.devenv.root + "/nix/test-environments/test-keys";
-  deploymentV1FilePath = config.devenv.root + "/config/evm_contracts_deployment_v1.json";
-  deploymentV2FilePath = config.devenv.root + "/config/evm_contracts_deployment_v2/ink-sepolia.json";
+  root = ../..;
+  testKeysDir = lib.path.append root "./nix/test-environments/test-keys";
+
+  deploymentV1FilePath = lib.path.append root "config/evm_contracts_deployment_v1.json";
+  deploymentV2FilePath = lib.path.append root "config/evm_contracts_deployment_v2/ink-sepolia.json";
 
   upgradeableProxyContractAddressSepolia =
     (readJson deploymentV1FilePath)."ethereum-sepolia".contracts.coreContracts.UpgradeableProxy.address;
@@ -17,6 +18,9 @@ let
     (readJson deploymentV2FilePath).contracts.coreContracts.UpgradeableProxyADFS.address;
 
   impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
+
+  reporterStateDir = "."; # Reporters start from .devenv/state/blocksense/reporter/<name>
+  apiKeysDir = "${reporterStateDir}/test-keys";
 in
 {
   services.kafka = {
@@ -25,7 +29,7 @@ in
   services.blocksense = {
     enable = true;
 
-    logsDir = config.devenv.root + "/logs/process-compose/example-setup-01";
+    logsDir = "$GIT_ROOT/logs/process-compose/example-setup-01";
 
     anvil = {
       ethereum-sepolia = {
@@ -147,13 +151,13 @@ in
         secret-key-path = "${testKeysDir}/reporter_secret_key";
         second-consensus-secret-key-path = "${testKeysDir}/reporter_second_consensus_secret_key";
         api-keys = {
-          ALPHAVANTAGE_API_KEY = "${testKeysDir}/ALPHAVANTAGE_API_KEY";
-          APCA_API_KEY_ID = "${testKeysDir}/APCA_API_KEY_ID";
-          APCA_API_SECRET_KEY = "${testKeysDir}/APCA_API_SECRET_KEY";
-          YAHOO_FINANCE_API_KEY = "${testKeysDir}/YAHOO_FINANCE_API_KEY";
-          TWELVEDATA_API_KEY = "${testKeysDir}/TWELVEDATA_API_KEY";
-          FMP_API_KEY = "${testKeysDir}/FMP_API_KEY";
-          SPOUT_RWA_API_KEY = "${testKeysDir}/SPOUT_RWA_API_KEY";
+          ALPHAVANTAGE_API_KEY = "${apiKeysDir}/ALPHAVANTAGE_API_KEY";
+          APCA_API_KEY_ID = "${apiKeysDir}/APCA_API_KEY_ID";
+          APCA_API_SECRET_KEY = "${apiKeysDir}/APCA_API_SECRET_KEY";
+          YAHOO_FINANCE_API_KEY = "${apiKeysDir}/YAHOO_FINANCE_API_KEY";
+          TWELVEDATA_API_KEY = "${apiKeysDir}/TWELVEDATA_API_KEY";
+          FMP_API_KEY = "${apiKeysDir}/FMP_API_KEY";
+          SPOUT_RWA_API_KEY = "${apiKeysDir}/SPOUT_RWA_API_KEY";
         };
       };
     };

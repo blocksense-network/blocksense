@@ -79,6 +79,7 @@ const networks = [
   'manta-sepolia',
   'mantle-mainnet',
   'mantle-sepolia',
+  'matchain-mainnet',
   'metal-l2-testnet',
   'metis-andromeda-mainnet',
   'metis-sepolia',
@@ -127,6 +128,7 @@ const networks = [
   'taiko-mainnet',
   'taiko-hekla',
   'tanssi-demo',
+  'taraxa-mainnet',
   'taraxa-testnet',
   'telos-testnet',
   'unichain-mainnet',
@@ -144,11 +146,11 @@ const chainIds = [
   338, 111557560, 18880, 839999, 250, 4002, 114, 252, 2522, 10888, 100, 10200,
   1666700000, 743111, 560048, 1663, 998, 2424, 57073, 763373, 2221, 1284, 1287,
   1285, 59144, 59141, 4202, 994873017, 2030232745, 169, 3441006, 5000, 5003,
-  1740, 59902, 6342, 31611, 10143, 2818, 2810, 72080, 8801, 5851, 10, 11155420,
-  5611, 7849306, 688688, 9746, 98866, 98867, 137, 80002, 1101, 2442, 695569,
-  11155931, 57000, 200018, 31, 534352, 534351, 11011, 5031, 50312, 1868, 1946,
-  16, 146, 57054, 1660990954, 5330, 53302, 1924, 239, 2391, 2390, 167000,
-  167009, 5678, 842, 41, 130, 1301, 4801, 1417429182, 324, 300,
+  698, 1740, 59902, 6342, 31611, 10143, 2818, 2810, 72080, 8801, 5851, 10,
+  11155420, 5611, 7849306, 688688, 9746, 98866, 98867, 137, 80002, 1101, 2442,
+  695569, 11155931, 57000, 200018, 31, 534352, 534351, 11011, 5031, 50312, 1868,
+  1946, 16, 146, 57054, 1660990954, 5330, 53302, 1924, 239, 2391, 2390, 167000,
+  167009, 5678, 841, 842, 41, 130, 1301, 4801, 1417429182, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks).annotations({
@@ -1093,6 +1095,18 @@ export const networkMetadata = {
     ],
     currency: Currency.MNT,
   },
+  'matchain-mainnet': {
+    chainId: 698,
+    isTestnet: false,
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://matchscan.io/',
+        apiUrl: 'https://matchscan.io/api',
+      },
+    ],
+    currency: Currency.ETH,
+  },
   'metal-l2-testnet': {
     chainId: 1740,
     isTestnet: true,
@@ -1184,7 +1198,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://explorer-holesky.morphl2.io',
-        apiUrl: 'https://explorer-holesky.morphl2.io/api', //to do
+        apiUrl: 'https://explorer-holesky.morphl2.io/api',
       },
     ],
     currency: Currency.ETH,
@@ -1252,7 +1266,7 @@ export const networkMetadata = {
         apiUrl: 'https://api-sepolia-optimistic.etherscan.io/api',
       },
       {
-        type: 'blockscout', //test again
+        type: 'blockscout',
         webUrl: 'https://optimism-sepolia.blockscout.com',
         apiUrl: 'https://optimism-sepolia.blockscout.com/api',
       },
@@ -1290,7 +1304,7 @@ export const networkMetadata = {
       {
         type: 'unknown',
         webUrl: 'https://testnet.pharosscan.xyz',
-        apiUrl: 'https://api.socialscan.io/pharos-testnet', //
+        apiUrl: 'https://api.socialscan.io/pharos-testnet',
       },
     ],
     currency: Currency.PHRS,
@@ -1541,7 +1555,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://coston-explorer.flare.network',
-        apiUrl: 'https://coston-explorer.flare.network/api',
+        apiUrl: 'https://coston-explorer.flare.network/api/v2',
       },
     ],
     currency: Currency.CFLR,
@@ -1705,6 +1719,18 @@ export const networkMetadata = {
     ],
     currency: Currency.TANGO,
   },
+  'taraxa-mainnet': {
+    chainId: 841,
+    isTestnet: false,
+    explorers: [
+      {
+        type: 'taraxa',
+        webUrl: 'https://mainnet.explorer.taraxa.io',
+        apiUrl: 'https://graphql.mainnet.taraxa.io',
+      },
+    ],
+    currency: Currency.TARA,
+  },
   'taraxa-testnet': {
     chainId: 842,
     isTestnet: true,
@@ -1813,6 +1839,16 @@ export const networkMetadata = {
         webUrl: 'https://sepolia.explorer.zksync.io',
         apiUrl: 'https://block-explorer-api.sepolia.zksync.dev/api',
       },
+      {
+        type: 'blockscout',
+        webUrl: 'https://zksync-sepolia.blockscout.com/',
+        apiUrl: 'https://zksync-sepolia.blockscout.com/api',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://sepolia-era.zksync.network',
+        apiUrl: 'https://api-sepolia-era.zksync.network/api',
+      },
     ],
 
     currency: Currency.ETH,
@@ -1835,6 +1871,7 @@ export const networkMetadata = {
         | 'megaeth'
         | 'bitlayer'
         | 'kava'
+        | 'taraxa'
         | 'unknown';
       webUrl: string;
       apiUrl: string | null;
