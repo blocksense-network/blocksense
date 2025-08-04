@@ -126,6 +126,7 @@ impl FeedSlotsProcessor {
                     aggregator,
                     Some(history.clone()),
                     feed_id,
+                    "feed_slot_processor",
                 )
                 .await;
 
@@ -195,7 +196,7 @@ impl FeedSlotsProcessor {
             };
         }
 
-        if skip_decision.should_skip() {
+        if skip_decision.get_value() {
             info!(
                 "Skipping publishing for [feed `{feed_name}` feed_id = {feed_id}] change is lower then threshold of {skip_publish_if_less_then_percentage} %"
             );
