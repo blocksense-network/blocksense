@@ -209,6 +209,6 @@ Before committing, **format your code** using:
 ## Getting help
 
 Whenever you're stuck or do not know how to proceed, you can always ask for help.
-We invite you to use our [public Discord](https://discord.gg/b3xmcWs4Qp) to ask questions.
+We invite you to use our [public Discord](https://discord.com/invite/blocksense) to ask questions.
 
 ## [Git Tips & Tricks](./GITTIPS.md)

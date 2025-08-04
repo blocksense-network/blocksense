@@ -15,7 +15,7 @@
       "schedule": {
         "interval_ms": 10000,
         "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -95,7 +95,7 @@
       "schedule": {
         "interval_ms": 10000,
         "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -179,7 +179,7 @@
       "schedule": {
         "interval_ms": 10000,
         "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -245,7 +245,7 @@
       "schedule": {
         "interval_ms": 10000,
         "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -314,7 +314,7 @@
       "schedule": {
         "interval_ms": 10000,
         "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -398,7 +398,7 @@
       "schedule": {
         "interval_ms": 10000,
         "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -473,7 +473,7 @@
       "schedule": {
         "interval_ms": 10000,
         "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -542,7 +542,7 @@
       "schedule": {
         "interval_ms": 10000,
         "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -623,7 +623,7 @@
       "schedule": {
         "interval_ms": 10000,
         "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -707,7 +707,7 @@
       "schedule": {
         "interval_ms": 10000,
         "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -788,7 +788,7 @@
       "schedule": {
         "interval_ms": 10000,
         "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -854,7 +854,7 @@
       "schedule": {
         "interval_ms": 10000,
         "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -927,9 +927,9 @@
         "aggregation": "median"
       },
       "schedule": {
-        "interval_ms": 30000,
+        "interval_ms": 10000,
         "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -984,9 +984,9 @@
         "aggregation": "median"
       },
       "schedule": {
-        "interval_ms": 30000,
+        "interval_ms": 10000,
         "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -1038,49 +1038,6 @@
       }
     },
     {
-      "id": "100002",
-      "full_name": "YUSD / USDC",
-      "description": "YieldFi YUSD exchangeRate call on ETH mainnet at 0x19Ebd191f7A24ECE672ba13A302212b5eF7F35cb",
-      "type": "price-feed",
-      "oracle_id": "eth-rpc",
-      "value_type": "numerical",
-      "stride": 0,
-      "quorum": {
-        "percentage": 75,
-        "aggregation": "median"
-      },
-      "schedule": {
-        "interval_ms": 10000,
-        "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
-        "first_report_start_unix_time_ms": 0
-      },
-      "additional_feed_info": {
-        "pair": {
-          "base": "YUSD",
-          "quote": "USDC"
-        },
-        "decimals": 6,
-        "category": "",
-        "market_hours": "Crypto",
-        "arguments": {
-          "divisor": 1000000,
-          "contracts": [
-            {
-              "rpc_urls": [
-                "https://eth.llamarpc.com",
-                "https://rpc.eth.gateway.fm",
-                "https://ethereum-rpc.publicnode.com"
-              ],
-              "address": "0x19Ebd191f7A24ECE672ba13A302212b5eF7F35cb",
-              "label": "YieldFi yUSD",
-              "method_name": "exchangeRate"
-            }
-          ]
-        }
-      }
-    },
-    {
       "id": "100003",
       "full_name": "ynBNBx / WBNB",
       "description": "YieldNest Restaked BNB / Wrapped BNB Redemption Rate. YieldNest convertToAssets call on BNB chain 0x32c830f5c34122c6afb8ae87aba541b7900a2c5f",
@@ -1095,7 +1052,7 @@
       "schedule": {
         "interval_ms": 10000,
         "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -1138,7 +1095,7 @@
       "schedule": {
         "interval_ms": 10000,
         "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -1228,7 +1185,7 @@
       "schedule": {
         "interval_ms": 10000,
         "heartbeat_ms": 60000,
-        "deviation_percentage": 0.0001,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -1292,9 +1249,9 @@
         "aggregation": "median"
       },
       "schedule": {
-        "interval_ms": 90000,
-        "heartbeat_ms": 3600000,
-        "deviation_percentage": 0.1,
+        "interval_ms": 10000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.0000001,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {

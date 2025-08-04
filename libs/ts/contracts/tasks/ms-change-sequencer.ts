@@ -1,16 +1,16 @@
 import { isNetworkName } from '@blocksense/base-utils';
 import { task } from 'hardhat/config';
 import { NetworkConfig } from './types';
-import Safe, { SigningMethod } from '@safe-global/protocol-kit';
+import Safe from '@safe-global/protocol-kit';
 import SafeApiKit from '@safe-global/api-kit';
 import {
   OperationType,
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
-import { adjustVInSignature } from '@safe-global/protocol-kit/dist/src/utils';
 import { readEvmDeployment } from '@blocksense/config-types';
 import { initChain } from './deployment-utils/init-chain';
 import { solidityPacked, toBeArray } from 'ethers';
+import { adjustVInSignature } from './utils';
 
 task('change-sequencer', 'Change sequencer role in Access Control contract')
   .addParam('networks', 'Network to deploy to')
@@ -72,12 +72,7 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
 
       const typedDataHash = toBeArray(safeTxHash);
       const signedData = await config.deployer.signMessage(typedDataHash);
-      const signature = await adjustVInSignature(
-        SigningMethod.ETH_SIGN,
-        signedData,
-        safeTxHash,
-        config.deployerAddress,
-      );
+      const signature = await adjustVInSignature(signedData);
 
       // Send the transaction to the Transaction Service with the signature from Owner A
       await apiKit.proposeTransaction({

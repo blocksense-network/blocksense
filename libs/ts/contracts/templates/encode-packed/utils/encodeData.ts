@@ -1,7 +1,18 @@
 import { ethers } from 'ethers';
-import { TupleField, PrimitiveField } from './types';
+import { TupleField, PrimitiveField } from '../../utils';
 
-export const processFieldsAndEncodeData = (
+export const encodePackedData = (
+  fields: PrimitiveField | TupleField,
+  values: any, // values can be of any type so it is not possible to specify the type
+): string => {
+  const [, packedValues] = processFieldsAndEncodeData(
+    [fields],
+    [structuredClone(values)],
+  );
+  return packedValues[0];
+};
+
+const processFieldsAndEncodeData = (
   fields: (PrimitiveField | TupleField)[],
   values: any[], // values can be of any type so it is not possible to specify the type
 ): [(PrimitiveField | TupleField)[], any[]] => {

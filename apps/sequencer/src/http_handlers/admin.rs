@@ -32,9 +32,9 @@ use tokio::time::Duration;
 use tracing::info_span;
 use tracing::{debug, error, info};
 
-pub async fn get_key_from_contract(
+pub async fn legacy_get_key_from_contract(
     providers: &SharedRpcProviders,
-    network: &String,
+    network: &str,
     key: String,
     decimals: u8,
 ) -> Result<String> {
@@ -73,6 +73,66 @@ pub async fn get_key_from_contract(
             Ok(val) => val,
             Err(e) => {
                 return Err(eyre!("Could not deserialize feed from bytes {e}"));
+            }
+        };
+    info!("Call result: {:?}", return_val);
+    Ok(return_val.parse_to_string())
+}
+
+pub async fn adfs_get_key_from_contract(
+    providers: &SharedRpcProviders,
+    network: &str,
+    key: String,
+    decimals: u8,
+    stride: u8,
+) -> Result<String> {
+    let get_latest_data: u8 = 0x04;
+
+    let providers = providers.read().await;
+
+    let provider = providers.get(network);
+
+    let Some(p) = provider.cloned() else {
+        return Err(eyre!("No provider found for network {}", network));
+    };
+
+    drop(providers);
+    let p = p.lock().await;
+
+    let signer = &p.signer;
+    let provider = &p.provider;
+    let contract_address = p.get_contract_address(PRICE_FEED_CONTRACT_NAME)?;
+    info!("sending data to contract_address `{contract_address}` in network `{network}`",);
+
+    let mut result = Vec::<u8>::new();
+    result.push(get_latest_data | 0x80);
+    result.push(stride);
+    let key_bytes =
+        Bytes::from_hex(key).map_err(|e| eyre!("Key is not valid hex string: {}", e))?;
+
+    let key_bytes = Bytes::copy_from_slice(&key_bytes[1..16.min(key_bytes.len())]);
+
+    let mut key_bytes_vec = key_bytes.to_vec();
+
+    result.append(&mut key_bytes_vec);
+
+    let result_bytes = Bytes::from(result);
+
+    let tx = TransactionRequest::default()
+        .to(contract_address)
+        .from(signer.address())
+        .with_chain_id(provider.get_chain_id().await?)
+        .input(Some(result_bytes).into());
+
+    let result = provider.call(tx).await?;
+    info!("Call result: {:?}", result);
+    // TODO: Get from metadata the type of the value.
+    // TODO: Refactor to not use dummy argument.
+    let return_val =
+        match FeedType::from_bytes(result.to_vec(), FeedType::Numerical(0.0), decimals as usize) {
+            Ok(val) => val,
+            Err(e) => {
+                return Err(eyre!("Could not deserialize feed from bytes {}", e));
             }
         };
     info!("Call result: {:?}", return_val);
@@ -119,10 +179,13 @@ pub async fn get_key(
         Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
     };
 
-    let decimals = {
+    let (decimals, stride) = {
         let feeds_config = sequencer_state.active_feeds.read().await;
         if let Some(feed_config) = feeds_config.get(&feed_id) {
-            feed_config.additional_feed_info.decimals
+            (
+                feed_config.additional_feed_info.decimals,
+                feed_config.stride,
+            )
         } else {
             return Err(error::ErrorBadRequest("Non-existent feed_id requested!"));
         }
@@ -131,7 +194,7 @@ pub async fn get_key(
     info!("getting key {} for network {} ...", key, network);
     let result = actix_web::rt::time::timeout(
         Duration::from_secs(7),
-        get_key_from_contract(&sequencer_state.providers, &network, key, decimals),
+        adfs_get_key_from_contract(&sequencer_state.providers, &network, key, decimals, stride),
     )
     .await;
     match result {

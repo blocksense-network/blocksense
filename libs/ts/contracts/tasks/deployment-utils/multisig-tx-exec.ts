@@ -1,18 +1,11 @@
 import { toBeArray } from 'ethers';
 
 import { SafeTransactionDataPartial } from '@safe-global/safe-core-sdk-types';
-import Safe, {
-  SigningMethod,
-  EthSafeSignature,
-} from '@safe-global/protocol-kit';
-import {
-  calculateSafeTransactionHash,
-  adjustVInSignature,
-} from '@safe-global/protocol-kit/dist/src/utils';
-
+import Safe, { EthSafeSignature } from '@safe-global/protocol-kit';
 import { assertNotNull } from '@blocksense/base-utils';
 
 import type { NetworkConfig } from '../types';
+import { adjustVInSignature } from '../utils';
 
 type Params = {
   transactions: SafeTransactionDataPartial[];
@@ -40,21 +33,11 @@ export async function executeMultisigTransaction({
     return txResponse.hash;
   }
 
-  const message = calculateSafeTransactionHash(
-    await safe.getAddress(),
-    tx.data,
-    safe.getContractVersion(),
-    await safe.getChainId(),
-  );
+  const message = await safe.getTransactionHash(tx);
   const ledger = config.deployer;
   const ledgerAddress = config.deployerAddress;
   const signedMessage = await ledger.signMessage(toBeArray(message));
-  const signature = await adjustVInSignature(
-    SigningMethod.ETH_SIGN,
-    signedMessage,
-    message,
-    ledgerAddress,
-  );
+  const signature = await adjustVInSignature(signedMessage);
   tx.addSignature(new EthSafeSignature(ledgerAddress, signature));
 
   console.log('\n[LEDGER] Proposing transaction...');

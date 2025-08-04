@@ -1,4 +1,4 @@
-import { ComponentField, Struct, TupleField } from './types';
+import { ComponentField, Struct, TupleField } from '.';
 
 export const organizeFieldsIntoStructs = (fields: TupleField) => {
   let structs: Struct[] = [];

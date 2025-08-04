@@ -6,7 +6,7 @@ export const config = {
   adoptersAltLink: 'Early Adopters',
   social_media: {
     discord: {
-      _href: 'https://discord.com/invite/mYujUXwrMr',
+      _href: 'https://discord.com/invite/blocksense',
       _alt: 'Blocksense Discord',
     },
     telegram: {

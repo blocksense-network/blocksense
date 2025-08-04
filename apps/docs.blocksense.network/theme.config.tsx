@@ -50,16 +50,6 @@ export default {
           crossOrigin="anonymous"
         />
       ))}
-      <script
-        async
-        src="https://www.googletagmanager.com/gtag/js?id=G-7S6ERW2H50"
-      ></script>
-      <script>
-        {`window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-7S6ERW2H50');`}
-      </script>
     </>
   ),
 };

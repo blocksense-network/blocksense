@@ -1,12 +1,7 @@
 {
-  config,
   lib,
   ...
 }:
-
-let
-  testKeysDir = config.devenv.root + "/nix/test-environments/test-keys";
-in
 
 {
   imports = [
@@ -16,17 +11,12 @@ in
   services.kafka.enable = true;
 
   services.blocksense = {
-    logsDir = lib.mkForce (config.devenv.root + "/logs/process-compose/example-setup-02");
+    logsDir = lib.mkForce "$GIT_ROOT/logs/process-compose/example-setup-02";
     sequencer = {
       kafka-report-endpoint = lib.mkForce "127.0.0.1:9092";
       providers = {
         ink-sepolia.safe-address = "0x23BC561ea93063B0cD12b6E3c690D40c93e29692";
       };
     };
-
-    reporters = {
-      a.second-consensus-secret-key-path = "${testKeysDir}/reporter_second_consensus_secret_key";
-    };
   };
-
 }

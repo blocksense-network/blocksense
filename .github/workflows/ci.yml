@@ -20,6 +20,14 @@ concurrency:
 
 env:
   DFCG_ARTIFACTS_ACCESS_TOKEN: ${{ secrets.DFCG_ARTIFACTS_ACCESS_TOKEN }}
+  CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
+  APCA_API_KEY_ID: ${{ secrets.APCA_API_KEY_ID }}
+  APCA_API_SECRET_KEY: ${{ secrets.APCA_API_SECRET_KEY }}
+  ALPHAVANTAGE_API_KEY: ${{ secrets.ALPHAVANTAGE_API_KEY }}
+  YAHOO_FINANCE_API_KEY: ${{ secrets.YAHOO_FINANCE_API_KEY }}
+  TWELVEDATA_API_KEY: ${{ secrets.TWELVEDATA_API_KEY }}
+  FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
+  SPOUT_RWA_API_KEY: ${{ secrets.SPOUT_RWA_API_KEY }}
 
 jobs:
   lint:

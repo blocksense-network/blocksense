@@ -1,0 +1,21 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.28;
+
+/// @notice Decoder for stored packed tuple data
+library SSZDecoder {
+  /// @notice User defined struct
+  /// @dev Using structs avoids hitting the EVM stack limit
+<%= structs.map((struct) => {
+  return `  struct ${struct.name} {
+  ${struct.fields.map((fields) => `  ${fields.type} ${fields.name};`).join('\n  ')}
+  }`
+}).join('\n\n') %>
+
+  function decode(
+    bytes memory data
+  ) external pure returns (<%= returnType %> memory <%= mainStructName %>) {
+    assembly ('memory-safe') {
+      <%= lines.join('\n') %>
+    }
+  }
+}

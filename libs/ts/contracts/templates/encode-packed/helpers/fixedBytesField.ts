@@ -1,4 +1,4 @@
-import { DecoderData } from '../utils';
+import { DecoderData } from '../../utils';
 import { generateMemoryAssignment } from './memoryAssignment';
 import { generateSwitchCase } from './switchCase';
 
@@ -41,7 +41,7 @@ export const generateDecoderFixedBytesLines = (
           shl(offset, memData)
         )
       }
-      ${generateSwitchCase(field.size, `gt(add(offset, ${field.size}), 256)`)}
+      ${generateSwitchCase(field.size, `lt(add(offset, ${field.size}), 256)`)}
       memData := mload(add(data, shift))
     }
   `;

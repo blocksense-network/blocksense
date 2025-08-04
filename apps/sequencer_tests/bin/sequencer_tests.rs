@@ -20,18 +20,20 @@ use curl::easy::Handler;
 use curl::easy::WriteError;
 use curl::easy::{Easy, Easy2};
 use eyre::Result;
+use futures::future::join_all;
 use json_patch::merge;
 use port_scanner::scan_port;
 use regex::Regex;
 use serde_json::json;
+use serde_json::Value;
 use std::io::stdout;
-use std::process::Command;
 use std::str::FromStr;
-use std::thread;
 use std::time::{SystemTime, UNIX_EPOCH};
-
+use tokio::fs;
 use tokio::fs::File;
 use tokio::io::AsyncWriteExt;
+use tokio::process::Command;
+use tokio::task::JoinHandle;
 
 const PROVIDERS_PORTS: [i32; 2] = [8547, 8548];
 const PROVIDERS_KEY_PREFIX: &str = "/tmp/key_";
@@ -86,15 +88,18 @@ async fn write_file(key_path: &str, content: &[u8]) {
 async fn spawn_sequencer(
     eth_networks_ports: &[i32],
     _safe_contracts_per_net: &[String], // TODO: use when integration test starts using two rounds consensus
-) -> thread::JoinHandle<()> {
+    contracts_in_networks: &[String],
+) -> JoinHandle<()> {
     let config_patch = json!(
     {
         "main_port": SEQUENCER_MAIN_PORT,
         "admin_port": SEQUENCER_ADMIN_PORT,
         "providers": {
-            "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[0]), "safe_address": None::<String>},
-            "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[1]), "safe_address": None::<String>}
+            "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[0]), "contract_address": Some(contracts_in_networks[0].to_owned()), "safe_address": None::<String>, "contract_version": 2},
+            "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[1]), "contract_address": Some(contracts_in_networks[1].to_owned()), "safe_address": None::<String>, "contract_version": 2}
         },
+        "send_aggregated_updates_to_publishers": false,
+
     });
 
     let (sequencer_config, feeds_config) = get_sequencer_and_feed_configs();
@@ -130,16 +135,19 @@ async fn spawn_sequencer(
 
     write_file("/tmp/feeds_config_v2.json", feeds.to_string().as_bytes()).await;
 
-    thread::spawn(move || {
-        let mut command = Command::new("cargo");
-        let command = command.args(["run", "--bin", "sequencer"]);
-        let sequencer = command
-            .env("SEQUENCER_LOG_LEVEL", "INFO")
-            .env("SEQUENCER_CONFIG_DIR", "/tmp")
-            .env("FEEDS_CONFIG_DIR", "/tmp");
+    tokio::task::Builder::new()
+        .name("sequencer_runner")
+        .spawn(async move {
+            let mut command = Command::new("cargo");
+            let command = command.args(["run", "--bin", "sequencer"]);
+            let sequencer = command
+                .env("SEQUENCER_LOG_LEVEL", "INFO")
+                .env("SEQUENCER_CONFIG_DIR", "/tmp")
+                .env("FEEDS_CONFIG_DIR", "/tmp");
 
-        sequencer.status().expect("process failed to execute");
-    })
+            sequencer.status().await.expect("process failed to execute");
+        })
+        .expect("Failed to spawn interrupt watcher!")
 }
 
 async fn wait_for_sequencer_to_accept_votes(max_time_to_wait_secs: u64) {
@@ -166,12 +174,47 @@ async fn wait_for_sequencer_to_accept_votes(max_time_to_wait_secs: u64) {
     }
 }
 
-fn deploy_contract_to_networks(networks: Vec<&str>) {
-    for net in networks {
-        send_get_request(
-            format!("http://127.0.0.1:{SEQUENCER_ADMIN_PORT}/deploy/{net}/price_feed").as_str(),
+async fn deploy_contract_to_networks(ports: &Vec<i32>) -> Vec<String> {
+    let mut contract_addresses = Vec::new();
+
+    for port in ports {
+        let status = Command::new("sh")
+        .arg("-c")
+        .arg("yarn && cd libs/ts/contracts && yarn && just build-ts && yarn build && echo y | yarn hardhat deploy --networks local")
+        .env("NETWORKS","local")
+        .env("RPC_URL_LOCAL",format!("http://127.0.0.1:{port}/").as_str())
+        .env("FEED_IDS_LOCAL", "0,3,4")
+        .env("DEPLOYER_ADDRESS_IS_LEDGER_LOCAL", "false")
+        .env("DEPLOYER_ADDRESS_LOCAL", "0x70997970C51812dc3A010C7d01b50e0d17dc79C8")
+        .env("DEPLOYER_PRIVATE_KEY_LOCAL", "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d")
+        .env("ADMIN_MULTISIG_THRESHOLD_LOCAL", "1")
+        .env("ADMIN_MULTISIG_OWNERS_LOCAL", "")
+        .env("SEQUENCER_ADDRESS_LOCAL", "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266")
+        .env("REPORTER_MULTISIG_ENABLE_LOCAL", "false")
+        .env("REPORTER_MULTISIG_THRESHOLD_LOCAL", "2")
+        .env("REPORTER_MULTISIG_SIGNERS_LOCAL", "0x70997970C51812dc3A010C7d01b50e0d17dc79C8,0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC")
+        .status()
+        .await
+        .expect("failed to deploy contract to service on port {port}");
+
+        assert!(
+            status.success(),
+            "Deployment process exited with a failure: {status}"
         );
+
+        let data = fs::read_to_string("config/evm_contracts_deployment_v2/local.json")
+            .await
+            .expect("cannot read json file");
+        let local_json: Value = serde_json::from_str(&data).expect("Could not parse json file!");
+        contract_addresses.push(
+            local_json["contracts"]["coreContracts"]["UpgradeableProxyADFS"]["address"]
+                .as_str()
+                .expect("Could not get contracts data from json config")
+                .to_owned(),
+        );
+        println!("contract_addresses deployed on port {port} = {contract_addresses:?}");
     }
+    contract_addresses
 }
 
 fn send_get_request(request: &str) -> String {
@@ -231,46 +274,57 @@ fn verify_expected_data_in_contracts(expected_value: f64) {
     println!(
         "ETH1 value = {}",
         send_get_request(
-            format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH1/00000001").as_str()
+            format!(
+                "127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH1/00000000000000000000000000000001"
+            )
+            .as_str()
         )
     );
     println!(
         "ETH2 value = {}",
         send_get_request(
-            format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH2/00000001").as_str()
+            format!(
+                "127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH2/00000000000000000000000000000001"
+            )
+            .as_str()
         )
     );
 
     // Verify expected data is set to contract in ETH1
     assert!(
         send_get_request(
-            format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH1/00000001").as_str()
+            format!(
+                "127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH1/00000000000000000000000000000001"
+            )
+            .as_str()
         ) == format!("{expected_value}")
     );
     // Verify expected data is set to contract in ETH2
     assert!(
         send_get_request(
-            format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH2/00000001").as_str()
+            format!(
+                "127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH2/00000000000000000000000000000001"
+            )
+            .as_str()
         ) == format!("{expected_value}")
     );
 }
 
-fn cleanup_spawned_processes() {
+async fn cleanup_spawned_processes() {
     let mut children = vec![];
     {
         let process = "sequencer";
         println!("Killing process: {process}");
-        children.push(thread::spawn(move || {
-            let mut command = Command::new("pkill");
-            let command = command.args(["-x", "-9", process]);
+        children.push(kill_process(process));
+    }
+    join_all(children).await;
+}
 
-            command.status().expect("process failed to execute");
-        }));
-    }
-    for child in children {
-        // Wait for the thread to finish. Returns a result.
-        let _ = child.join();
-    }
+async fn kill_process(process_name: &str) {
+    let mut command = Command::new("pkill");
+    let command = command.args(["-x", "-9", process_name]);
+
+    command.status().await.expect("process failed to execute");
 }
 
 #[tokio::main]
@@ -350,7 +404,7 @@ async fn main() -> Result<()> {
 
         println!("deploy gnosis safe receipt = {receipt:?}");
 
-        let multisig_addr = res.0;
+        let multisig_addr = res;
 
         safe_contracts_per_net.push(multisig_addr.to_string());
         println!("multisig_addr = {multisig_addr}");
@@ -370,11 +424,16 @@ async fn main() -> Result<()> {
         .await;
     }
 
-    let seq = spawn_sequencer(PROVIDERS_PORTS.as_ref(), &safe_contracts_per_net).await;
+    let contracts_in_networks = deploy_contract_to_networks(&PROVIDERS_PORTS.to_vec()).await;
+
+    let seq = spawn_sequencer(
+        PROVIDERS_PORTS.as_ref(),
+        &safe_contracts_per_net,
+        &contracts_in_networks,
+    )
+    .await;
 
     wait_for_sequencer_to_accept_votes(5 * 60).await;
-
-    deploy_contract_to_networks(vec!["ETH1", "ETH2"]);
 
     println!("\n * Assert provider status is 'AwaitingFirstUpdate' at the start:\n");
     {
@@ -587,9 +646,9 @@ async fn main() -> Result<()> {
         assert_eq!(expected_response, actual_response);
     }
 
-    cleanup_spawned_processes();
+    cleanup_spawned_processes().await;
 
-    match seq.join() {
+    match seq.await {
         Ok(_) => {
             println!("Sequencer thread done.");
         }

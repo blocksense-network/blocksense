@@ -285,6 +285,7 @@ pub async fn loop_processing_batch_of_updates(
 
                 let provider_metrics = provider.lock().await.provider_metrics.clone();
                 dec_metric!(provider_metrics, net, num_transactions_in_queue);
+                inc_metric!(provider_metrics, net, total_tx_sent);
 
                 match result {
                     Ok((status, updated_feeds)) => {
@@ -551,54 +552,63 @@ pub async fn eth_batch_send_to_contract(
             }
         };
 
-        let tx;
+        let gas_fees = match get_tx_retry_params(
+            net.as_str(),
+            rpc_handle,
+            provider_metrics,
+            &sender_address,
+            transaction_retry_timeout_secs,
+            transaction_retries_count,
+            retry_fee_increment_fraction,
+        )
+        .await
+        {
+            Ok(res) => res,
+            Err(e) => {
+                let block_height = updates.block_height;
+                warn!("Timed out on get_tx_retry_params for {transaction_retries_count}-th time in network `{net}` block height {block_height}: {e}!");
+                inc_retries_with_backoff(
+                    net.as_str(),
+                    &mut transaction_retries_count,
+                    provider_metrics,
+                    BACKOFF_SECS,
+                )
+                .await;
+                continue;
+            }
+        };
+
+        let mut tx = TransactionRequest::default()
+            .to(contract_address)
+            .with_nonce(nonce)
+            .with_from(sender_address)
+            .with_chain_id(chain_id)
+            .input(Some(input.clone()).into());
+
+        let gas_limit = get_gas_limit(
+            net.as_str(),
+            rpc_handle,
+            &tx,
+            transaction_retry_timeout_secs,
+        )
+        .await;
+
+        tx = tx.with_gas_limit(gas_limit);
+
+        match gas_fees {
+            GasFees::Legacy(gas_price) => {
+                tx = tx.with_gas_price(gas_price.gas_price).transaction_type(0);
+            }
+            GasFees::Eip1559(eip1559_gas_fees) => {
+                tx = tx
+                    .with_max_priority_fee_per_gas(eip1559_gas_fees.priority_fee)
+                    .with_max_fee_per_gas(eip1559_gas_fees.max_fee_per_gas);
+            }
+        }
+
         if transaction_retries_count == 0 {
-            tx = TransactionRequest::default()
-                .to(contract_address)
-                .with_nonce(nonce)
-                .with_from(sender_address)
-                .with_chain_id(chain_id)
-                .input(Some(input.clone()).into());
             debug!("Sending initial tx: {tx:?} in network `{net}` block height {block_height}");
         } else {
-            debug!(
-                "Retrying to send updates in network `{net}` block height {block_height} for {transaction_retries_count}-th time"
-            );
-
-            let (max_fee_per_gas, priority_fee) = match get_tx_retry_params(
-                net.as_str(),
-                rpc_handle,
-                provider_metrics,
-                &sender_address,
-                transaction_retry_timeout_secs,
-                transaction_retries_count,
-                retry_fee_increment_fraction,
-            )
-            .await
-            {
-                Ok(res) => res,
-                Err(e) => {
-                    let block_height = updates.block_height;
-                    warn!("Timed out on get_tx_retry_params for {transaction_retries_count}-th time in network `{net}` block height {block_height}: {e}!");
-                    inc_retries_with_backoff(
-                        net.as_str(),
-                        &mut transaction_retries_count,
-                        provider_metrics,
-                        BACKOFF_SECS,
-                    )
-                    .await;
-                    continue;
-                }
-            };
-
-            tx = TransactionRequest::default()
-                .to(contract_address)
-                .with_nonce(nonce)
-                .with_from(sender_address)
-                .with_max_fee_per_gas(max_fee_per_gas)
-                .with_max_priority_fee_per_gas(priority_fee)
-                .with_chain_id(chain_id)
-                .input(Some(input.clone()).into());
             debug!("Retrying for {transaction_retries_count}-th time in network `{net}` block height {block_height} tx: {tx:?}");
         }
 
@@ -662,7 +672,7 @@ pub async fn eth_batch_send_to_contract(
                 .await
             {
                 Ok(v) => {
-                    debug!("Successfully got receipt from RPC in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash}");
+                    debug!("Successfully got receipt from RPC in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash} receipt = {v:?}");
                     inc_metric!(provider_metrics, net, success_get_receipt);
                     v
                 }
@@ -678,7 +688,7 @@ pub async fn eth_batch_send_to_contract(
                         Ok(v) => match v {
                             Ok(v) => match v {
                                 Some(v) => {
-                                    debug!("Successfully got tx_receipt in network `{net}` block height {block_height}");
+                                    debug!("Successfully got receipt from RPC in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash} receipt = {v:?}");
                                     inc_metric!(provider_metrics, net, success_get_receipt);
                                     v
                                 }
@@ -725,7 +735,6 @@ pub async fn eth_batch_send_to_contract(
                 }
             };
 
-            inc_metric!(provider_metrics, net, total_tx_sent);
             info!("Successfully posted tx to RPC and got tx_hash in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash}");
 
             tx_receipt
@@ -752,6 +761,36 @@ pub async fn eth_batch_send_to_contract(
     debug!("Released a read/write lock on provider state in network `{net}` block height {block_height}");
 
     Ok((receipt.status().to_string(), feeds_to_update_ids))
+}
+
+pub async fn get_gas_limit(
+    net: &str,
+    rpc_handle: &ProviderType,
+    tx: &TransactionRequest,
+    transaction_retry_timeout_secs: u64,
+) -> u64 {
+    let default_gas_limit = 10_000_000;
+    match actix_web::rt::time::timeout(
+        Duration::from_secs(transaction_retry_timeout_secs),
+        rpc_handle.estimate_gas(tx.clone()),
+    )
+    .await
+    {
+        Ok(gas_limit_result) => match gas_limit_result {
+            Ok(gas_limit) => {
+                debug!("Got gas_limit={gas_limit} for network {net}");
+                gas_limit * 2
+            }
+            Err(err) => {
+                debug!("Failed to get gas_limit for network {net} due to {err}");
+                default_gas_limit
+            }
+        },
+        Err(err) => {
+            warn!("Timed out while getting gas_limit for network {net} due to {err}");
+            default_gas_limit
+        }
+    }
 }
 
 pub async fn get_nonce(
@@ -795,7 +834,7 @@ pub async fn inc_retries_with_backoff(
     backoff_secs: u64,
 ) {
     *transaction_retries_count += 1;
-    inc_metric!(provider_metrics, net, total_tx_sent);
+    inc_metric!(provider_metrics, net, total_transaction_retries);
     // Wait before sending the next request
     let time_to_await: Duration = Duration::from_secs(backoff_secs);
     let mut interval = interval(time_to_await);
@@ -926,6 +965,20 @@ pub async fn log_provider_enabled(
     debug!("Released a read lock on provider for network {net}");
 }
 
+pub struct Eip1559GasFees {
+    pub max_fee_per_gas: u128,
+    pub priority_fee: u128,
+}
+
+pub struct GasPrice {
+    pub gas_price: u128,
+}
+
+pub enum GasFees {
+    Legacy(GasPrice),
+    Eip1559(Eip1559GasFees),
+}
+
 pub async fn get_tx_retry_params(
     net: &str,
     rpc_handle: &ProviderType,
@@ -934,7 +987,7 @@ pub async fn get_tx_retry_params(
     transaction_retry_timeout_secs: u64,
     transaction_retries_count: u64,
     retry_fee_increment_fraction: f64,
-) -> Result<(u128, u128)> {
+) -> Result<GasFees> {
     let price_increment = 1.0 + (transaction_retries_count as f64 * retry_fee_increment_fraction);
 
     debug!("Getting gas_price for network {net}...");
@@ -978,8 +1031,8 @@ pub async fn get_tx_retry_params(
             }
             Err(err) => {
                 inc_metric!(provider_metrics, net, failed_get_max_priority_fee_per_gas);
-                debug!("Failed to get priority_fee for network {net} due to {err}");
-                return Err(err.into());
+                warn!("Failed to get priority_fee for network {net} due to {err}");
+                return Ok(GasFees::Legacy(GasPrice { gas_price }));
             }
         },
         Err(err) => {
@@ -993,12 +1046,15 @@ pub async fn get_tx_retry_params(
     let mut max_fee_per_gas = gas_price + gas_price + priority_fee;
     max_fee_per_gas = (max_fee_per_gas as f64 * price_increment) as u128;
 
-    Ok((max_fee_per_gas, priority_fee))
+    Ok(GasFees::Eip1559(Eip1559GasFees {
+        max_fee_per_gas,
+        priority_fee,
+    }))
 }
 
 pub async fn eth_batch_send_to_all_contracts(
-    sequencer_state: Data<SequencerState>,
-    updates: BatchedAggregatesToSend,
+    sequencer_state: &Data<SequencerState>,
+    updates: &BatchedAggregatesToSend,
     feed_type: Repeatability,
 ) -> Result<()> {
     let span = info_span!("eth_batch_send_to_all_contracts");
@@ -1541,7 +1597,7 @@ mod tests {
         };
 
         let result =
-            eth_batch_send_to_all_contracts(sequencer_state, updates_oneshot, Oneshot).await;
+            eth_batch_send_to_all_contracts(&sequencer_state, &updates_oneshot, Oneshot).await;
         // TODO: This is actually not a good assertion since the eth_batch_send_to_all_contracts
         // will always return ok even if some or all of the sends we unsuccessful. Will be fixed in
         // followups
@@ -1658,16 +1714,13 @@ mod tests {
                 updates: vec![v3],
             };
 
-            let p1 =
-                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates1, Periodic).await;
+            let p1 = eth_batch_send_to_all_contracts(&sequencer_state, &updates1, Periodic).await;
             assert!(p1.is_ok());
 
-            let p2 =
-                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates2, Periodic).await;
+            let p2 = eth_batch_send_to_all_contracts(&sequencer_state, &updates2, Periodic).await;
             assert!(p2.is_ok());
 
-            let p3 =
-                eth_batch_send_to_all_contracts(sequencer_state.clone(), updates3, Periodic).await;
+            let p3 = eth_batch_send_to_all_contracts(&sequencer_state, &updates3, Periodic).await;
             assert!(p3.is_ok());
         }
 

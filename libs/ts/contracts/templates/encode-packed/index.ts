@@ -3,22 +3,11 @@ import ejs from 'ejs';
 import * as prettier from 'prettier/standalone';
 import solidityPlugin from 'prettier-plugin-solidity';
 
-import {
-  calculateFieldShift,
-  expandFields,
-  helpers,
-  organizeFieldsIntoStructs,
-  TupleField,
-} from './utils';
+import { helpers, calculateFieldShift, expandFields } from './utils';
+import { TupleField, organizeFieldsIntoStructs } from '../utils';
 import { generateDecoderLines } from './helpers';
 
-export const generateDecoder = async (
-  templatePath: string,
-  tempFilePath: string,
-  fields: TupleField,
-) => {
-  const template = await fs.readFile(templatePath, 'utf-8');
-
+export const generateDecoder = async (template: string, fields: TupleField) => {
   const structs = organizeFieldsIntoStructs(fields);
   const expandedFields = calculateFieldShift(expandFields([fields])).flat();
 
@@ -57,5 +46,6 @@ export const generateDecoder = async (
     singleQuote: false,
     bracketSpacing: false,
   });
-  await fs.writeFile(tempFilePath, formattedCode, 'utf-8');
+
+  return formattedCode;
 };
