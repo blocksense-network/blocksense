@@ -138,7 +138,7 @@ pub async fn get_serialized_updates_for_network(
     debug!("Acquired a read lock on provider config for `{net}`");
     filter_allowed_feeds(net, updates, &provider_settings.allow_feeds);
     provider.peg_stable_coins_to_value(updates);
-    provider.apply_publish_criteria(updates);
+    provider.apply_publish_criteria(updates, net);
 
     // Don’t post to Smart Contract if we have 0 updates
     if updates.updates.is_empty() {
@@ -2100,7 +2100,7 @@ mod tests {
         assert_eq!(updates.updates[3].value, FeedType::Numerical(1.101f64));
         assert_eq!(updates.updates[4].value, FeedType::Numerical(1.0f64));
 
-        provider.apply_publish_criteria(&mut updates);
+        provider.apply_publish_criteria(&mut updates, "test");
         assert_eq!(updates.updates.len(), 3);
         assert_eq!(updates.updates[2].value, FeedType::Numerical(1.101f64));
     }
@@ -2154,7 +2154,7 @@ mod tests {
         assert_eq!(updates.updates[3].value, FeedType::Numerical(1.101f64));
         assert_eq!(updates.updates[4].value, FeedType::Numerical(0.991f64));
 
-        provider.apply_publish_criteria(&mut updates);
+        provider.apply_publish_criteria(&mut updates, "test");
         assert_eq!(updates.updates.len(), 5);
         assert_eq!(updates.updates[3].value, FeedType::Numerical(1.101f64));
     }

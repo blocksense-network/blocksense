@@ -76,7 +76,7 @@ pub enum SkipDecision {
 }
 
 impl SkipDecision {
-    pub fn should_skip(&self) -> bool {
+    pub fn get_value(&self) -> bool {
         match *self {
             SkipDecision::DontSkip(_) => false,
             SkipDecision::DoSkip(_) => true,
@@ -146,6 +146,7 @@ impl VotedFeedUpdate {
         &self,
         criteria: &PublishCriteria,
         history: &FeedAggregateHistory,
+        caller_context: &str,
     ) -> SkipDecision {
         if let FeedType::Numerical(candidate_value) = self.value {
             let feed_id = self.feed_id;
@@ -166,7 +167,7 @@ impl VotedFeedUpdate {
                         };
                         let is_threshold_crossed =
                             diff * 100.0f64 >= criteria.skip_publish_if_less_then_percentage * a;
-                        debug!("Result for feed_id {feed_id}: last_published = {last}, candidate_value = {candidate_value}, is_threshold_crossed = {is_threshold_crossed}");
+                        debug!("Result for feed_id {feed_id} from {caller_context}: last_published = {last}, candidate_value = {candidate_value}, is_threshold_crossed = {is_threshold_crossed}");
                         if is_threshold_crossed {
                             SkipDecision::DontSkip(DontSkipReason::ThresholdCrossed)
                         } else if has_heartbeat_timed_out {
@@ -412,7 +413,7 @@ mod tests {
 
         // No history
         assert_eq!(
-            update.should_skip(&always_publish_criteria, &history),
+            update.should_skip(&always_publish_criteria, &history, "test"),
             SkipDecision::DontSkip(DontSkipReason::NoHistory)
         );
 
@@ -422,15 +423,15 @@ mod tests {
             end_slot_timestamp - 1000_u128,
         );
         assert_eq!(
-            update.should_skip(&always_publish_criteria, &history),
+            update.should_skip(&always_publish_criteria, &history, "test"),
             SkipDecision::DontSkip(DontSkipReason::ThresholdCrossed)
         );
         assert_eq!(
-            update.should_skip(&one_percent_threshold, &history),
+            update.should_skip(&one_percent_threshold, &history, "test"),
             SkipDecision::DoSkip(DoSkipReason::TooSimilarTooSoon)
         );
         assert_eq!(
-            update.should_skip(&always_publish_every_second, &history),
+            update.should_skip(&always_publish_every_second, &history, "test"),
             SkipDecision::DontSkip(DontSkipReason::HeartbeatTimedOut)
         );
 
@@ -440,15 +441,15 @@ mod tests {
             end_slot_timestamp - 900_u128,
         );
         assert_eq!(
-            update.should_skip(&always_publish_criteria, &history),
+            update.should_skip(&always_publish_criteria, &history, "test"),
             SkipDecision::DontSkip(DontSkipReason::ThresholdCrossed)
         );
         assert_eq!(
-            update.should_skip(&one_percent_threshold, &history),
+            update.should_skip(&one_percent_threshold, &history, "test"),
             SkipDecision::DoSkip(DoSkipReason::TooSimilarTooSoon)
         );
         assert_eq!(
-            update.should_skip(&always_publish_every_second, &history),
+            update.should_skip(&always_publish_every_second, &history, "test"),
             SkipDecision::DoSkip(DoSkipReason::TooSimilarTooSoon)
         );
 
@@ -458,12 +459,12 @@ mod tests {
             end_slot_timestamp,
         };
         assert_eq!(
-            update.should_skip(&always_publish_criteria, &history),
+            update.should_skip(&always_publish_criteria, &history, "test"),
             SkipDecision::DontSkip(DontSkipReason::ThresholdCrossed)
         );
         // If the price is 1000 and it moved to 1010, I'd say it moved by 1%, not by 100/101 %.
         assert_eq!(
-            update.should_skip(&one_percent_threshold, &history),
+            update.should_skip(&one_percent_threshold, &history, "test"),
             SkipDecision::DontSkip(DontSkipReason::ThresholdCrossed)
         );
         let update = VotedFeedUpdate {
@@ -472,7 +473,7 @@ mod tests {
             end_slot_timestamp,
         };
         assert_eq!(
-            update.should_skip(&one_percent_threshold, &history),
+            update.should_skip(&one_percent_threshold, &history, "test"),
             SkipDecision::DoSkip(DoSkipReason::TooSimilarTooSoon)
         );
         let update = VotedFeedUpdate {
@@ -481,7 +482,7 @@ mod tests {
             end_slot_timestamp,
         };
         assert_eq!(
-            update.should_skip(&one_percent_threshold, &history),
+            update.should_skip(&one_percent_threshold, &history, "test"),
             SkipDecision::DoSkip(DoSkipReason::TooSimilarTooSoon)
         );
         let update = VotedFeedUpdate {
@@ -490,7 +491,7 @@ mod tests {
             end_slot_timestamp,
         };
         assert_eq!(
-            update.should_skip(&one_percent_threshold, &history),
+            update.should_skip(&one_percent_threshold, &history, "test"),
             SkipDecision::DontSkip(DontSkipReason::ThresholdCrossed)
         );
 
@@ -500,7 +501,7 @@ mod tests {
             end_slot_timestamp - 400_u128,
         );
         assert_eq!(
-            update.should_skip(&one_percent_threshold, &history),
+            update.should_skip(&one_percent_threshold, &history, "test"),
             SkipDecision::DontSkip(DontSkipReason::HistoryError)
         );
     }

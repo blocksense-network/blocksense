@@ -80,6 +80,7 @@ pub async fn consume_reports(
     aggregator: FeedAggregate,
     history: Option<Arc<RwLock<FeedAggregateHistory>>>,
     feed_id: FeedId,
+    caller_context: &str,
 ) -> ConsumedReports {
     let values = collect_reported_values(feed_type, feed_id, reports, slot);
 
@@ -145,8 +146,11 @@ pub async fn consume_reports(
                         };
                         debug!("Get a read lock on history [feed {feed_id}]");
                         let history_guard = history.read().await;
-                        let skip_decision =
-                            result_post_to_contract.should_skip(&criteria, &history_guard);
+                        let skip_decision = result_post_to_contract.should_skip(
+                            &criteria,
+                            &history_guard,
+                            caller_context,
+                        );
                         debug!("Release the read lock on history [feed {feed_id}]");
                         skip_decision
                     }
