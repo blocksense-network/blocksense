@@ -88,6 +88,15 @@ export const DataFeedsTable = ({ feeds }: { feeds: FeedsConfig['feeds'] }) => {
             <DataTableBadge>{row.additional_feed_info.category}</DataTableBadge>
           ),
         },
+        {
+          id: 'oracle_id',
+          title: 'Oracle Script',
+          header: ({ column }) => (
+            <DataTableColumnHeader title={column.title} />
+          ),
+          cell: ({ row }) => <DataTableBadge>{row.oracle_id}</DataTableBadge>,
+          facetedFilter: true,
+        },
       ]}
       data={feeds}
       filterCell="full_name"
