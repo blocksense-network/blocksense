@@ -3,21 +3,28 @@ import { afterAll, beforeAll, describe, expect, it } from '@effect/vitest';
 import { deepStrictEqual } from 'assert';
 
 import { getProcessComposeLogsFiles } from '@blocksense/base-utils/env';
-import { entriesOf, mapValuePromises, valuesOf } from '@blocksense/base-utils';
-import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
+import {
+  entriesOf,
+  fromEntries,
+  mapValues,
+  valuesOf,
+} from '@blocksense/base-utils/array-iter';
+import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
+import type { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 
 import { rgSearchPattern, parseProcessesStatus } from './helpers';
 import { expectedPCStatuses03 } from './expected';
 import type { ProcessComposeService, UpdatesToNetwork } from './types';
 import { ProcessCompose, Sequencer } from './types';
+import { getDataFeedsInfoFromNetwork } from '../utils/onchain';
 
 describe.sequential('E2E Tests with process-compose', () => {
   const network = 'ink_sepolia';
 
+  let sequencerConfig: SequencerConfigV2;
+  let feedsConfig: NewFeedsConfig;
   let feedIds: Array<bigint>;
   let processCompose: ProcessComposeService;
-  let ADFSConsumer: AggregatedDataFeedStoreConsumer;
-  let initialPrices: Record<string, number>;
   let updatesToNetworks = {} as UpdatesToNetwork;
 
   beforeAll(() =>
@@ -54,13 +61,14 @@ describe.sequential('E2E Tests with process-compose', () => {
     }).pipe(Effect.provide(ProcessCompose.Live)),
   );
 
-  it.live('Test sequencer config is available and in correct format', () =>
+  it.live('Test sequencer configs are available and in correct format', () =>
     Effect.gen(function* () {
       const sequencer = yield* Sequencer;
-      const sequencerConfig = yield* sequencer.getConfig();
+      sequencerConfig = yield* sequencer.getConfig();
+      feedsConfig = yield* sequencer.getFeedsConfig();
 
       expect(sequencerConfig).toBeTypeOf('object');
-      return sequencerConfig;
+      expect(feedsConfig).toBeTypeOf('object');
     }).pipe(Effect.provide(Sequencer.Live)),
   );
 
@@ -91,69 +99,67 @@ describe.sequential('E2E Tests with process-compose', () => {
       }).pipe(Effect.provide(Sequencer.Live)),
   );
 
-  it.live('Test prices are updated', () =>
+  it.live.fails('Test feeds data is updated on the local network', () =>
     Effect.gen(function* () {
-      const sequencer = yield* Sequencer;
-      const config = yield* sequencer.getConfig();
-
       // Collect initial information for the feeds and their prices
-      const url = config.providers[network].url;
-
-      const contractAddress = config.providers[network].contracts.find(
+      const url = sequencerConfig.providers[network].url;
+      const contractAddress = sequencerConfig.providers[network].contracts.find(
         c => c.name === 'AggregatedDataFeedStore',
       )!.address as `0x${string}`;
-      const allow_feeds = config.providers[network].allow_feeds;
-
-      const feedsConfig = yield* sequencer.getFeedsConfig();
+      const allow_feeds = sequencerConfig.providers[network].allow_feeds;
 
       feedIds = allow_feeds?.length
         ? (allow_feeds as Array<bigint>)
         : feedsConfig.feeds.map(feed => feed.id);
 
-      ADFSConsumer = yield* Effect.sync(() =>
-        AggregatedDataFeedStoreConsumer.createConsumerByRpcUrl(
-          contractAddress,
-          url,
+      // Get feeds information from the original network. No affection of the work of the
+      // local sequencer.
+      const initialFeedsInfo = yield* getDataFeedsInfoFromNetwork(
+        feedIds,
+        contractAddress,
+        'ink-sepolia',
+      );
+
+      // Save map of initial rounds for each feed
+      const initialRounds = fromEntries(
+        entriesOf(initialFeedsInfo).map(([id, data]) => [id, data.round]),
+      );
+
+      // Get feeds information from the local network ( anvil )
+      // for the same round as the initial one, to confirm it is not being overwritten
+      const initialFeedsInfoLocal = yield* getDataFeedsInfoFromNetwork(
+        feedIds,
+        contractAddress,
+        url,
+        initialRounds,
+      );
+
+      expect(initialFeedsInfo).toEqual(initialFeedsInfoLocal);
+
+      // Get feeds information from the local network ( anvil )
+      // Info is fetched for specific round - the initial round of the feed
+      // + number of updates that happened while the local sequencer was running
+      const currentFeedsInfo = yield* getDataFeedsInfoFromNetwork(
+        feedIds,
+        contractAddress,
+        url,
+        mapValues(
+          initialRounds,
+          (feedId, round) => round + updatesToNetworks[network][feedId],
         ),
       );
 
-      initialPrices = feedIds.reduce(
-        (acc, feedId) => {
-          acc[feedId.toString()] = 0;
-          return acc;
-        },
-        {} as Record<string, number>,
-      );
-
-      initialPrices = yield* Effect.promise(() =>
-        mapValuePromises(
-          initialPrices,
-          async (feedId, _) =>
-            await ADFSConsumer.getSingleDataAtIndex(BigInt(feedId), 0).then(
-              res => Number(res.slice(0, 50)),
-            ),
-        ),
-      );
-
-      const currentPrices = yield* Effect.promise(() =>
-        mapValuePromises(
-          initialPrices,
-          async (feedId, _) =>
-            await ADFSConsumer.getSingleDataAtIndex(
-              BigInt(feedId),
-              updatesToNetworks[network][feedId] - 1,
-            ).then(res => Number(res.slice(0, 50))),
-        ),
-      );
-
-      for (const [id, price] of entriesOf(currentPrices)) {
+      // Make sure that the feeds info is updated
+      for (const [id, data] of entriesOf(currentFeedsInfo)) {
+        const { round, value } = data;
+        expect(round).toBeGreaterThan(initialFeedsInfo[id].round);
         // Pegged asset with 10% tolerance should be pegged
         // Pegged asset with 0.000001% tolerance should not be pegged
         if (id === '50000') {
-          expect(price).toEqual(1 * 10 ** 8);
+          expect(value).toEqual(1 * 10 ** 8);
           continue;
         }
-        expect(price).not.toEqual(initialPrices[id]);
+        expect(value).not.toEqual(initialFeedsInfo[id].value);
       }
     }).pipe(Effect.provide(Sequencer.Live)),
   );

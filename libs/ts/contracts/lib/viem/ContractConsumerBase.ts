@@ -44,9 +44,12 @@ export abstract class ContractConsumerBase {
     contractAddress: Address,
     networkName: NetworkName,
   ): T {
+    const chain = getViemChain(networkName);
     const client = createPublicClient({
-      chain: getViemChain(networkName),
-      transport: http(getRpcUrl(networkName)),
+      chain: chain,
+      transport: chain
+        ? http(chain.rpcUrls.default.http[0])
+        : http(getRpcUrl(networkName)),
     });
     return new this(contractAddress, client);
   }
