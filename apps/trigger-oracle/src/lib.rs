@@ -873,13 +873,13 @@ impl OracleTrigger {
         feeds: Vec<DataFeedSetting>,
     ) -> anyhow::Result<Payload> {
         let component_id = component.id.clone();
-        tracing::trace!("Loading guest for `{component_id }`");
+        tracing::debug!("Loading guest for `{component_id }`");
 
         // Load the guest...
         let (instance, mut store) = engine.prepare_instance(&component_id).await?;
         let instance = BlocksenseOracle::new(&mut store, &instance)?;
 
-        tracing::trace!("Successfully loaded guest for `{component_id}`");
+        tracing::debug!("Successfully loaded guest for `{component_id}`");
 
         // We are getting the spin configuration from the Outbound HTTP host component similar to
         // `set_http_origin_from_request` in spin http trigger.
@@ -895,7 +895,7 @@ impl OracleTrigger {
         }
 
         // ...and call the entry point
-        tracing::trace!(
+        tracing::debug!(
             "Triggering application: {}; component_id: {component_id}",
             &engine.app_name
         );
@@ -921,12 +921,12 @@ impl OracleTrigger {
         };
 
         let start_time = Instant::now();
-        tracing::trace!("Calling handle oracle request for `{component_id}`");
+        tracing::debug!("Calling handle oracle request for `{component_id}`");
         let result = instance
             .call_handle_oracle_request(&mut store, &wit_settings)
             .await;
         let elapsed_time_ms = start_time.elapsed().as_millis();
-        tracing::trace!("Oracle request for `{component_id}` completed in {elapsed_time_ms}ms");
+        tracing::debug!("Oracle request for `{component_id}` completed in {elapsed_time_ms}ms");
         REPORTER_WASM_EXECUTION_TIME_GAUGE
             .with_label_values(&[&component_id.clone()])
             .set(elapsed_time_ms as i64);
