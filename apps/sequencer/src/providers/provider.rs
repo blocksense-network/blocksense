@@ -303,7 +303,7 @@ impl RpcProvider {
         }
     }
 
-    pub fn apply_publish_criteria(&self, updates: &mut BatchedAggregatesToSend) {
+    pub fn apply_publish_criteria(&self, updates: &mut BatchedAggregatesToSend, net: &str) {
         let mut res = updates
             .updates
             .iter()
@@ -311,7 +311,13 @@ impl RpcProvider {
                 self.publishing_criteria
                     .get(&update.feed_id)
                     .is_none_or(|criteria| {
-                        !update.should_skip(criteria, &self.history).should_skip()
+                        !update
+                            .should_skip(
+                                criteria,
+                                &self.history,
+                                format!("provider_for_{net}").as_str(),
+                            )
+                            .get_value()
                     })
             })
             .cloned()
