@@ -13,7 +13,9 @@ use alloy::{
 };
 use alloy_primitives::U256;
 use alloy_u256_literal::u256;
-use blocksense_feeds_processing::adfs_gen_calldata::RoundCounters;
+use blocksense_feeds_processing::adfs_gen_calldata::{
+    RoundCounters, MAX_HISTORY_ELEMENTS_PER_FEED, NUM_FEED_IDS_IN_ROUND_RECORD,
+};
 use blocksense_utils::FeedId;
 use futures::future::join_all;
 use reqwest::Url; // TODO @ymadzhunkov include URL directly from url crate
@@ -227,8 +229,11 @@ async fn load_data_from_chain(
     if conf.should_load_round_counters(network.as_str()) {
         let res = provider.load_round_counters_from_chain(&feeds_config).await;
         match res {
-            Ok(round_counters) => {
+            Ok(mut round_counters) => {
                 info!("Loaded round counters from chain {network} = {round_counters:?}");
+                for (_id, counter) in round_counters.iter_mut() {
+                    *counter = (*counter + 1) % MAX_HISTORY_ELEMENTS_PER_FEED;
+                }
                 provider.round_counters = round_counters;
             }
             Err(err) => {
@@ -543,14 +548,15 @@ impl RpcProvider {
         feed_id: &u128,
     ) -> Result<Vec<LatestRound>, eyre::Error> {
         let start_slot = u256!(0x00000000fff00000000000000000000000000000);
-        let slot = start_slot + U256::from(feed_id / 16);
+        let l = NUM_FEED_IDS_IN_ROUND_RECORD;
+        let slot = start_slot + U256::from(feed_id / l);
         let v = self.provider.get_storage_at(adfs_address, slot).await;
         match v {
             Ok(v) => {
                 let mut res: Vec<LatestRound> = vec![];
                 let data: [u8; 32] = v.to_be_bytes();
-                let x = (feed_id / 16) * 16;
-                for i in 0_usize..16_usize {
+                let x = (feed_id / l) * l;
+                for i in 0_usize..(l as usize) {
                     let offset = 2 * i;
                     res.push(LatestRound {
                         feed_id: x + i as u128,
@@ -1500,13 +1506,13 @@ mod tests {
                 ),
             )
         };
+        let feed = test_feed_config(feed_id, stride);
+        // Some arbitrary point in time in the past, nothing special about this value
+        let first_report_start_time = UNIX_EPOCH + Duration::from_secs(1524885322);
+        let end_slot_timestamp = first_report_start_time.elapsed().unwrap().as_millis();
+        let interval_ms = feed.schedule.interval_ms as u128;
 
         {
-            let feed = test_feed_config(feed_id, stride);
-            // Some arbitrary point in time in the past, nothing special about this value
-            let first_report_start_time = UNIX_EPOCH + Duration::from_secs(1524885322);
-            let end_slot_timestamp = first_report_start_time.elapsed().unwrap().as_millis();
-            let interval_ms = feed.schedule.interval_ms as u128;
             let v1 = VotedFeedUpdate {
                 feed_id: feed.id,
                 value: FeedType::Numerical(103082.01f64),
@@ -1627,7 +1633,7 @@ mod tests {
                 .unwrap();
             let provider = new_rpc_provider.lock().await;
             let counters = &provider.round_counters;
-            assert_eq!(Some(2), counters.get(&feed_id).copied());
+            assert_eq!(Some(3), counters.get(&feed_id).copied());
 
             let x = provider.get_latest_values(&[feed_id]).await.unwrap();
             assert_eq!(x.len(), 1);
@@ -1635,10 +1641,82 @@ mod tests {
             assert_eq!(v.num_updates, 2);
             assert_eq!(v.value, FeedType::Numerical(104011.78f64));
 
-            let v = provider.history.get(feed_id).unwrap();
-            let v = v.last().unwrap();
-            assert_eq!(v.update_number, 2);
-            assert_eq!(v.value, FeedType::Numerical(104011.78f64));
+            {
+                let metrics_prefix3 = "test_reading_adfs_counters_and_values3";
+
+                let (sequencer_state, collected_futures) =
+                    create_sequencer_state_and_collected_futures(
+                        sequencer_config2.clone(),
+                        metrics_prefix3,
+                        feeds_config.clone(),
+                    )
+                    .await;
+
+                let v = provider.history.get(feed_id).unwrap();
+                let v = v.last().unwrap();
+                assert_eq!(v.update_number, 2);
+                assert_eq!(v.value, FeedType::Numerical(104011.78f64));
+
+                // publish new update
+                let v4 = VotedFeedUpdate {
+                    feed_id: feed.id,
+                    value: FeedType::Numerical(94011.11f64),
+                    end_slot_timestamp: end_slot_timestamp + interval_ms * 4,
+                };
+                let updates4 = BatchedAggregatesToSend {
+                    block_height: 4,
+                    updates: vec![v4],
+                };
+
+                let p4 = eth_batch_send_to_all_contracts(
+                    &sequencer_state,
+                    &updates4,
+                    Repeatability::Periodic,
+                )
+                .await;
+
+                assert!(p4.is_ok());
+                tokio::time::sleep(Duration::from_millis(2000)).await;
+
+                let prov = sequencer_state.providers.read().await;
+                let p = prov.get(network).unwrap();
+                let round = p.lock().await.get_latest_round(&feed_id).await.unwrap();
+
+                assert_eq!(round.round, 3);
+                let x = p
+                    .lock()
+                    .await
+                    .get_historical_values_for_feed(feed_id, &[0, 1, 2, 3])
+                    .await
+                    .unwrap();
+                assert_eq!(x.len(), 4);
+                {
+                    let v = x[0].clone().unwrap();
+                    assert_eq!(v.num_updates, 0);
+                    assert_eq!(v.value, FeedType::Numerical(103082.01f64));
+                }
+                {
+                    let v = x[1].clone().unwrap();
+                    assert_eq!(v.num_updates, 1);
+                    assert_eq!(v.value, FeedType::Numerical(103012.21f64));
+                }
+                {
+                    let v = x[2].clone().unwrap();
+                    assert_eq!(v.num_updates, 2);
+                    assert_eq!(v.value, FeedType::Numerical(104011.78f64));
+                }
+                {
+                    // THIS UPDATE should come from the restarted sequencer_state :)
+                    let v = x[3].clone().unwrap();
+                    assert_eq!(v.num_updates, 3);
+                    assert_eq!(v.value, FeedType::Numerical(94011.11f64));
+                }
+                // Wait for all threads to JOIN
+                for x in collected_futures.iter() {
+                    info!("Aborting future = {:?}", x.id());
+                    x.abort();
+                }
+            }
         }
 
         Ok(())

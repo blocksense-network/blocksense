@@ -11,8 +11,8 @@ use tracing::{error, info};
 
 use once_cell::sync::Lazy;
 
-const MAX_HISTORY_ELEMENTS_PER_FEED: u64 = 8192;
-const NUM_FEED_IDS_IN_ROUND_RECORD: u128 = 16;
+pub const MAX_HISTORY_ELEMENTS_PER_FEED: u64 = 8192;
+pub const NUM_FEED_IDS_IN_ROUND_RECORD: u128 = 16;
 
 pub type RoundCounters = HashMap<FeedId, u64>; // for each key (feed_id) we store its round counter
 
