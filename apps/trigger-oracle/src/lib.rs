@@ -558,7 +558,10 @@ impl OracleTrigger {
                 "Signal {} data feeds [batch_count={batch_count}]",
                 oracle_settings.len()
             );
-            let _ = signal_sender.send(oracle_settings.clone());
+            if let Err(e) = signal_sender.send(oracle_settings.clone()) {
+                log::error!("ERROR from signal_sender.send = {e:?}");
+                continue;
+            }
 
             if metrics_url.is_none() {
                 tracing::trace!("Metrics URL not set; looping back [batch_count={batch_count}]");
