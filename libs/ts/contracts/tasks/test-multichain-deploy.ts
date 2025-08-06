@@ -339,11 +339,24 @@ task(
 const resolveBool = (value: Promise<string>) =>
   value.then(x => Boolean(Number(x)));
 
-const encodeDataWrite = (feeds: Feed[], blockNumber?: number) => {
-  blockNumber ??= Date.now() + 100;
+const encodeDataWrite = (
+  feeds: Feed[],
+  sourceAccumulator?: string,
+  destinationAccumulator?: string,
+) => {
+  sourceAccumulator ??= ethers.toBeHex(0, 32);
+  destinationAccumulator ??= ethers.toBeHex(
+    (Math.random() * 10000).toFixed(0),
+    32,
+  );
   const prefix = solidityPacked(
-    ['bytes1', 'uint64', 'uint32'],
-    [toBeHex(WriteOp.SetFeeds), blockNumber, feeds.length],
+    ['bytes1', 'bytes32', 'bytes32', 'uint32'],
+    [
+      toBeHex(WriteOp.SetFeeds),
+      sourceAccumulator,
+      destinationAccumulator,
+      feeds.length,
+    ],
   );
 
   const data = feeds.map(feed => {

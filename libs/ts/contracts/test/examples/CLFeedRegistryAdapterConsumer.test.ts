@@ -51,13 +51,20 @@ describe('Example: CLFeedRegistryAdapterConsumer', function () {
       [true],
     );
 
+    let sourceAccumulator = ethers.toBeHex(0, 32);
     for (const data of aggregatorData) {
       const newAdapter = new CLAdapterWrapper();
       await newAdapter.init(data.description, data.decimals, data.id, proxy);
       aggregators.push(newAdapter);
 
       const value = encodeDataAndTimestamp(data.id * 1000, Date.now());
-      await newAdapter.setFeed(sequencer, value, 1n);
+      const res = await newAdapter.setFeed(
+        sequencer,
+        value,
+        1n,
+        sourceAccumulator,
+      );
+      sourceAccumulator = res.destinationAccumulator;
     }
 
     feedRegistry = new CLRegistryBaseWrapper('CLRegistryV2', proxy.contract);
