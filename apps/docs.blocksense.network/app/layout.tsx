@@ -1,6 +1,6 @@
 import NextHead from 'next/head';
 import type { Metadata } from 'next';
-import { Layout, Navbar } from '@blocksense/nextra-theme-docs';
+import { Layout, Navbar } from 'nextra-theme-docs';
 import { Footer } from '@/components/common/Footer';
 import { getPageMap } from 'nextra/page-map';
 import type { FC, ReactNode } from 'react';
