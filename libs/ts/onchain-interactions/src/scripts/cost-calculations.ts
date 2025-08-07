@@ -88,6 +88,9 @@ const calculateGasCosts = (
       const txCostInEthersBigInt = BigInt(txCostInEthers.toFixed(0));
 
       totalGasCost += txCostInEthersBigInt;
+    } else if (tx.gasCost) {
+      // Taraxa testnet
+      totalGasCost += BigInt(tx.gasCost);
     } else {
       const gasUsed = BigInt(
         tx.gasUsed ?? tx.gas_used ?? tx.gas ?? tx.gasused ?? tx.gasCost,
@@ -197,7 +200,8 @@ const getTxTimestampAsDate = (tx: Transaction): Date => {
   const unixTimestamp = parseInt(
     tx.timestamp?.toString() ??
       tx.blockTime?.toString() ??
-      (tx.timeStamp?.toString() || '0'),
+      tx.tx_time?.toString() ??
+      tx.timeStamp?.toString(),
   );
   return new Date(unixTimestamp * 1000);
 };
@@ -241,6 +245,11 @@ const fetchTransactionsForNetwork = async (
       rawTransactions = response.data.results || [];
     } else if (network === 'pharos-testnet') {
       response = await axios.get(`${apiUrl}/address/${address}/transactions`);
+      rawTransactions = response.data.data || [];
+    } else if (network === 'taraxa-testnet') {
+      response = await axios.get(
+        `${apiUrl}/address/${address}/transactions?limit=100`,
+      );
       rawTransactions = response.data.data || [];
     } else if (network === 'ontology-testnet') {
       response = await axios.get(
