@@ -1198,7 +1198,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://explorer-holesky.morphl2.io',
-        apiUrl: 'https://explorer-holesky.morphl2.io/api',
+        apiUrl: 'https://explorer-api-holesky.morphl2.io/api/v2',
       },
     ],
     currency: Currency.ETH,
