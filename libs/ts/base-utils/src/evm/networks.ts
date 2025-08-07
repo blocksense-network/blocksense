@@ -1724,9 +1724,9 @@ export const networkMetadata = {
     isTestnet: false,
     explorers: [
       {
-        type: 'taraxa',
-        webUrl: 'https://mainnet.explorer.taraxa.io',
-        apiUrl: 'https://graphql.mainnet.taraxa.io',
+        type: 'blockscout',
+        webUrl: 'https://tara.to',
+        apiUrl: 'https://tara.to/api',
       },
     ],
     currency: Currency.TARA,
