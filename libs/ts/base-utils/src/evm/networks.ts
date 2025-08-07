@@ -1234,7 +1234,7 @@ export const networkMetadata = {
       {
         type: 'ontology',
         webUrl: 'https://explorer.ont.io/testnet',
-        apiUrl: 'https://explorer.ont.io/testnet/api',
+        apiUrl: 'https://polarisexplorer.ont.io/v2',
       },
     ],
     currency: Currency.ONG,
