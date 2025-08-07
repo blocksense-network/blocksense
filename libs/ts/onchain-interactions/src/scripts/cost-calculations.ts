@@ -77,9 +77,9 @@ const calculateGasCosts = (
   let totalGasUsed = BigInt(0);
 
   for (const tx of transactions) {
-    if (typeof tx.txFee === 'string') {
-      // Bitlayer
-      const txCost = tx.txFee;
+    if (typeof tx.txFee === 'string' || typeof tx.fee === 'string') {
+      // Bitlayer, Ontology
+      const txCost = tx.txFee ?? tx.fee;
       const txCostInEthers = Number(txCost) * 1000000000000000000;
       const txCostInEthersBigInt = BigInt(txCostInEthers.toFixed(0));
 
@@ -232,6 +232,11 @@ const fetchTransactionsForNetwork = async (
     } else if (network === 'telos-testnet') {
       response = await axios.get(`${apiUrl}/address/${address}/transactions`);
       rawTransactions = response.data.results || [];
+    } else if (network === 'ontology-testnet') {
+      response = await axios.get(
+        `${apiUrl}/addresses/${address}/txs?page_size=20&page_number=1`,
+      );
+      rawTransactions = response.data.result.records || [];
     } else if (network === 'cronos-testnet') {
       let currentPage = 1;
       let totalPages = 1;
@@ -300,6 +305,13 @@ const fetchTransactionsForNetwork = async (
           tx.from.address.toLowerCase() === address.toLowerCase() &&
           tx.to.address.toLowerCase() !== address.toLowerCase(),
       ); //cronos has a different call
+    } else if (network == 'ontology-testnet') {
+      notSelfSent = rawTransactions.filter(
+        (tx: any) =>
+          tx.transfers[0].from_address.toLowerCase() ===
+            address.toLowerCase() &&
+          tx.transfers[0].to_address.toLowerCase() !== address.toLowerCase(),
+      ); //ontology
     } else if (networksV2Api.includes(network)) {
       notSelfSent = rawTransactions.filter(
         (tx: any) =>
