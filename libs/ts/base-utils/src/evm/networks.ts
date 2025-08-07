@@ -488,7 +488,7 @@ export const networkMetadata = {
       {
         type: 'bitlayer',
         webUrl: 'https://btrscan.com',
-        apiUrl: 'https://api.btrscan.com/scan/api',
+        apiUrl: 'https://api.btrscan.com/scan/v1/chain',
       },
     ],
     currency: Currency.BTC,
@@ -500,7 +500,7 @@ export const networkMetadata = {
       {
         type: 'bitlayer',
         webUrl: 'https://testnet-scan.bitlayer.org',
-        apiUrl: 'https://api-testnet.bitlayer.org/scan/api',
+        apiUrl: 'https://api-testnet.btrscan.com/scan/v1/chain',
       },
     ],
     currency: Currency.BTC,
