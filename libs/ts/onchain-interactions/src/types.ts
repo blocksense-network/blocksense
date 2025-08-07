@@ -79,6 +79,7 @@ export type Transaction = {
   gasused?: string;
   txFee?: string;
   fee?: string;
+  transaction_fee?: string;
   gas: string;
   gasPrice?: string;
   gas_price: string;

@@ -77,9 +77,13 @@ const calculateGasCosts = (
   let totalGasUsed = BigInt(0);
 
   for (const tx of transactions) {
-    if (typeof tx.txFee === 'string' || typeof tx.fee === 'string') {
-      // Bitlayer, Ontology
-      const txCost = tx.txFee ?? tx.fee;
+    if (
+      typeof tx.txFee === 'string' ||
+      typeof tx.fee === 'string' ||
+      typeof tx.transaction_fee === 'string'
+    ) {
+      // Bitlayer, Ontology, Pharos
+      const txCost = tx.txFee ?? tx.fee ?? tx.transaction_fee;
       const txCostInEthers = Number(txCost) * 1000000000000000000;
       const txCostInEthersBigInt = BigInt(txCostInEthers.toFixed(0));
 
@@ -181,9 +185,12 @@ const logGasCosts = async (
 };
 
 const getTxTimestampAsDate = (tx: Transaction): Date => {
-  if (typeof tx.timestamp === 'string' && tx.timestamp.includes('T')) {
-    // Morph-style ISO string timestamp
-    return new Date(tx.timestamp);
+  if (
+    (typeof tx.timestamp === 'string' && tx.timestamp.includes('T')) ||
+    (typeof tx.create_time === 'string' && tx.create_time.includes('T'))
+  ) {
+    // ISO style string timestamp (Morph, Pharos)
+    return new Date(tx.timestamp ?? tx.create_time);
   }
 
   // Unix timestamp (either string or number)
@@ -232,6 +239,9 @@ const fetchTransactionsForNetwork = async (
     } else if (network === 'telos-testnet') {
       response = await axios.get(`${apiUrl}/address/${address}/transactions`);
       rawTransactions = response.data.results || [];
+    } else if (network === 'pharos-testnet') {
+      response = await axios.get(`${apiUrl}/address/${address}/transactions`);
+      rawTransactions = response.data.data || [];
     } else if (network === 'ontology-testnet') {
       response = await axios.get(
         `${apiUrl}/addresses/${address}/txs?page_size=20&page_number=1`,
@@ -312,6 +322,12 @@ const fetchTransactionsForNetwork = async (
             address.toLowerCase() &&
           tx.transfers[0].to_address.toLowerCase() !== address.toLowerCase(),
       ); //ontology
+    } else if (network == 'pharos-testnet') {
+      notSelfSent = rawTransactions.filter(
+        (tx: any) =>
+          tx.from_address.toLowerCase() === address.toLowerCase() &&
+          tx.to_address.toLowerCase() !== address.toLowerCase(),
+      ); //pharos
     } else if (networksV2Api.includes(network)) {
       notSelfSent = rawTransactions.filter(
         (tx: any) =>
