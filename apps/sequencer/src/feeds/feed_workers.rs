@@ -14,10 +14,10 @@ use blocksense_data_feeds::feeds_processing::VotedFeedUpdateWithProof;
 use blocksense_feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_gnosis_safe::utils::SignatureWithAddress;
+use blocksense_utils::counter_unbounded_channel::{counted_unbounded_channel, CountedReceiver};
 use futures_util::stream::FuturesUnordered;
 use std::collections::HashMap;
 use std::io::Error;
-use tokio::sync::mpsc;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tokio::task::JoinHandle;
 
@@ -34,9 +34,9 @@ pub async fn prepare_app_workers(
     feeds_management_cmd_to_block_creator_recv: UnboundedReceiver<FeedsManagementCmds>,
     feeds_slots_manager_cmd_recv: UnboundedReceiver<FeedsManagementCmds>,
     aggregate_batch_sig_recv: UnboundedReceiver<(ReporterResponse, SignatureWithAddress)>,
-    relayers_recv_channels: HashMap<String, UnboundedReceiver<BatchOfUpdatesToProcess>>,
+    relayers_recv_channels: HashMap<String, CountedReceiver<BatchOfUpdatesToProcess>>,
 ) -> FuturesUnordered<JoinHandle<Result<(), Error>>> {
-    let (batched_votes_send, batched_votes_recv) = mpsc::unbounded_channel();
+    let (batched_votes_send, batched_votes_recv) = counted_unbounded_channel();
 
     let feeds_slots_manager_loop_fut =
         feeds_slots_manager_loop(sequencer_state.clone(), feeds_slots_manager_cmd_recv).await;

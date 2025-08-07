@@ -1,5 +1,6 @@
 pub mod build_info;
 pub mod constants;
+pub mod counter_unbounded_channel;
 pub mod logging;
 pub mod test_env;
 pub mod time;
