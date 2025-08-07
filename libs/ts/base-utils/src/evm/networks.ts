@@ -1302,9 +1302,9 @@ export const networkMetadata = {
     isTestnet: true,
     explorers: [
       {
-        type: 'unknown',
+        type: 'socialscan',
         webUrl: 'https://testnet.pharosscan.xyz',
-        apiUrl: 'https://api.socialscan.io/pharos-testnet',
+        apiUrl: 'https://api.socialscan.io/pharos-testnet/v1/explorer',
       },
     ],
     currency: Currency.PHRS,
