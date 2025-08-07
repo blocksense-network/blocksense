@@ -1738,7 +1738,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://testnet.to',
-        apiUrl: 'https://testnet.to/api',
+        apiUrl: 'https://indexer.testnet.explorer.taraxa.io',
       },
     ],
     currency: Currency.TARA,
