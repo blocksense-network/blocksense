@@ -286,7 +286,9 @@ const fetchTransactionsForNetwork = async (
       );
     }
 
-    let limitedInTime = notSelfSent;
+    const notPending = notSelfSent.filter((tx: any) => tx.result !== 'pending');
+
+    let limitedInTime = notPending;
 
     if (firstTxTime != DEFAULT_FIRST_TX_TIME) {
       const firstTxTimeAsDate = new Date(firstTxTime);
