@@ -80,6 +80,7 @@ export type Transaction = {
   txFee?: string;
   fee?: string;
   transaction_fee?: string;
+  gasCost?: number;
   gas: string;
   gasPrice?: string;
   gas_price: string;
@@ -91,23 +92,34 @@ export type Transaction = {
       timeStamp: never;
       blockTime: never;
       tx_time: never;
+      create_time: never;
     }
   | {
       timeStamp: string;
       timestamp: never;
       blockTime: never;
       tx_time: never;
+      create_time: never;
     }
   | {
       blockTime: string;
       timestamp: never;
       timeStamp: never;
       tx_time: never;
+      create_time: never;
     }
   | {
       tx_time: string;
       timestamp: never;
       timeStamp: never;
       blockTime: never;
+      create_time: never;
+    }
+  | {
+      create_time: string;
+      timestamp: never;
+      timeStamp: never;
+      blockTime: never;
+      tx_time: never;
     }
 );
