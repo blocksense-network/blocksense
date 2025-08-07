@@ -263,6 +263,11 @@ const fetchTransactionsForNetwork = async (
       }
       rawTransactions = response.data.result;
     }
+
+    if (network === 'polygon-amoy') {
+      // The sort bellow will order the transactions incorrectly if we don't trim them.
+      rawTransactions.splice(numberOfTransactions * 2);
+    }
     rawTransactions.sort((a, b) => b.nonce - a.nonce);
 
     let notSelfSent: any[];
