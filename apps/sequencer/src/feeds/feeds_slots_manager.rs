@@ -281,6 +281,7 @@ pub async fn register_feed_with_config(
                 + Duration::from_millis(new_feed_config.schedule.first_report_start_unix_time_ms),
             new_feed_config.value_type.clone(),
             new_feed_config.quorum.aggregation.clone(),
+            new_feed_config.oracle_id.clone(),
             None,
         );
         reg.push(new_feed_id, new_feed_metadata);
