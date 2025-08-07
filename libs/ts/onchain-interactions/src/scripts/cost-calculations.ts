@@ -77,13 +77,24 @@ const calculateGasCosts = (
   let totalGasUsed = BigInt(0);
 
   for (const tx of transactions) {
-    const gasUsed = BigInt(tx.gasUsed ?? tx.gas_used ?? tx.gas ?? tx.gasused);
-    const gasPrice = BigInt(tx.gasPrice ?? tx.gas_price);
-    const txGasCost = gasUsed * gasPrice;
+    if (typeof tx.txFee === 'string') {
+      // Bitlayer
+      const txCost = tx.txFee;
+      const txCostInEthers = Number(txCost) * 1000000000000000000;
+      const txCostInEthersBigInt = BigInt(txCostInEthers.toFixed(0));
 
-    totalGasCost += txGasCost;
-    totalGasPrice += gasPrice;
-    totalGasUsed += gasUsed;
+      totalGasCost += txCostInEthersBigInt;
+    } else {
+      const gasUsed = BigInt(
+        tx.gasUsed ?? tx.gas_used ?? tx.gas ?? tx.gasused ?? tx.gasCost,
+      );
+      const gasPrice = BigInt(tx.gasPrice ?? tx.gas_price);
+      const txGasCost = gasUsed * gasPrice;
+
+      totalGasCost += txGasCost;
+      totalGasPrice += gasPrice;
+      totalGasUsed += gasUsed;
+    }
   }
 
   const avgGasPrice = totalGasPrice / BigInt(transactions.length);
@@ -177,7 +188,9 @@ const getTxTimestampAsDate = (tx: Transaction): Date => {
 
   // Unix timestamp (either string or number)
   const unixTimestamp = parseInt(
-    tx.timestamp?.toString() ?? (tx.timeStamp?.toString() || '0'),
+    tx.timestamp?.toString() ??
+      tx.blockTime?.toString() ??
+      (tx.timeStamp?.toString() || '0'),
   );
   return new Date(unixTimestamp * 1000);
 };
@@ -244,6 +257,16 @@ const fetchTransactionsForNetwork = async (
         totalPages = page.data.pagination.totalPage;
         currentPage += 1;
       } while (currentPage <= totalPages);
+    } else if (
+      network === 'bitlayer-testnet' ||
+      network === 'bitlayer-mainnet'
+    ) {
+      const chainId =
+        network === 'bitlayer-testnet' ? 'BITLAYERTEST' : 'BITLAYER';
+      response = await axios.get(
+        `${apiUrl}/txs/list?ps=1000&a=${address}&chainId=${chainId}`,
+      );
+      rawTransactions = response.data.data.records || [];
     } else {
       response = await axios.get(apiUrl, {
         params: {

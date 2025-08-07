@@ -77,12 +77,26 @@ export type Transaction = {
   gasUsed?: string;
   gas_used?: string;
   gasused?: string;
+  txFee?: string;
   gas: string;
   gasPrice?: string;
   gas_price: string;
   from: EthereumAddress;
   to: EthereumAddress;
 } & (
-  | { timestamp: string; timeStamp: never }
-  | { timeStamp: string; timestamp: never }
+  | {
+      timestamp: string;
+      timeStamp: never;
+      blockTime: never;
+    }
+  | {
+      timeStamp: string;
+      timestamp: never;
+      blockTime: never;
+    }
+  | {
+      blockTime: string;
+      timestamp: never;
+      timeStamp: never;
+    }
 );
