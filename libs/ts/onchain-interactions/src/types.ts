@@ -74,52 +74,11 @@ export const deployedNetworks = [
 ] satisfies NetworkName[];
 
 export type Transaction = {
-  gasUsed?: string;
-  gas_used?: string;
-  gasused?: string;
-  txFee?: string;
-  fee?: string;
-  transaction_fee?: string;
-  gasCost?: number;
-  gas: string;
-  gasPrice?: string;
-  gas_price: string;
   from: EthereumAddress;
   to: EthereumAddress;
-} & (
-  | {
-      timestamp: string;
-      timeStamp: never;
-      blockTime: never;
-      tx_time: never;
-      create_time: never;
-    }
-  | {
-      timeStamp: string;
-      timestamp: never;
-      blockTime: never;
-      tx_time: never;
-      create_time: never;
-    }
-  | {
-      blockTime: string;
-      timestamp: never;
-      timeStamp: never;
-      tx_time: never;
-      create_time: never;
-    }
-  | {
-      tx_time: string;
-      timestamp: never;
-      timeStamp: never;
-      blockTime: never;
-      create_time: never;
-    }
-  | {
-      create_time: string;
-      timestamp: never;
-      timeStamp: never;
-      blockTime: never;
-      tx_time: never;
-    }
-);
+  gasUsed: bigint;
+  fee: bigint;
+  gasCost: bigint;
+  gasPrice: bigint;
+  timestamp: number;
+};

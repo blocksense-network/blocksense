@@ -52,8 +52,8 @@ function getHourDifference(transactions: Transaction[]): number {
   if (txsLen < 2) {
     throwError('Less then 2 transactions in getHourDifference');
   }
-  const firstTransactionTime = getTxTimestampAsDate(transactions[0]);
-  const lastTransactionTime = getTxTimestampAsDate(transactions[txsLen - 1]);
+  const firstTransactionTime = new Date(transactions[0].timestamp);
+  const lastTransactionTime = new Date(transactions[txsLen - 1].timestamp);
 
   const diffMs = firstTransactionTime.getTime() - lastTransactionTime.getTime();
   const diffHours = diffMs / (1000 * 60 * 60);
@@ -77,30 +77,18 @@ const calculateGasCosts = (
   let totalGasUsed = BigInt(0);
 
   for (const tx of transactions) {
-    if (
-      typeof tx.txFee === 'string' ||
-      typeof tx.fee === 'string' ||
-      typeof tx.transaction_fee === 'string'
-    ) {
+    if (tx.fee) {
       // Bitlayer, Ontology, Pharos
-      const txCost = tx.txFee ?? tx.fee ?? tx.transaction_fee;
-      const txCostInEthers = Number(txCost) * 1000000000000000000;
-      const txCostInEthersBigInt = BigInt(txCostInEthers.toFixed(0));
-
-      totalGasCost += txCostInEthersBigInt;
+      totalGasCost += tx.fee;
     } else if (tx.gasCost) {
       // Taraxa testnet
-      totalGasCost += BigInt(tx.gasCost);
+      totalGasCost += tx.gasCost;
     } else {
-      const gasUsed = BigInt(
-        tx.gasUsed ?? tx.gas_used ?? tx.gas ?? tx.gasused ?? tx.gasCost,
-      );
-      const gasPrice = BigInt(tx.gasPrice ?? tx.gas_price);
-      const txGasCost = gasUsed * gasPrice;
+      const txGasCost = tx.gasUsed * tx.gasPrice;
 
       totalGasCost += txGasCost;
-      totalGasPrice += gasPrice;
-      totalGasUsed += gasUsed;
+      totalGasPrice += tx.gasPrice;
+      totalGasUsed += tx.gasUsed;
     }
   }
 
@@ -185,25 +173,6 @@ const logGasCosts = async (
       console.error(chalk.red(`Unexpected error: ${String(error)}`));
     }
   }
-};
-
-const getTxTimestampAsDate = (tx: Transaction): Date => {
-  if (
-    (typeof tx.timestamp === 'string' && tx.timestamp.includes('T')) ||
-    (typeof tx.create_time === 'string' && tx.create_time.includes('T'))
-  ) {
-    // ISO style string timestamp (Morph, Pharos)
-    return new Date(tx.timestamp ?? tx.create_time);
-  }
-
-  // Unix timestamp (either string or number)
-  const unixTimestamp = parseInt(
-    tx.timestamp?.toString() ??
-      tx.blockTime?.toString() ??
-      tx.tx_time?.toString() ??
-      tx.timeStamp?.toString(),
-  );
-  return new Date(unixTimestamp * 1000);
 };
 
 const fetchTransactionsForNetwork = async (
@@ -317,72 +286,90 @@ const fetchTransactionsForNetwork = async (
     }
     rawTransactions.sort((a, b) => b.nonce - a.nonce);
 
-    let notSelfSent: any[];
-    if (network == 'cronos-testnet') {
-      notSelfSent = rawTransactions.filter(
-        (tx: any) =>
-          tx.from.address.toLowerCase() === address.toLowerCase() &&
-          tx.to.address.toLowerCase() !== address.toLowerCase(),
-      ); //cronos has a different call
-    } else if (network == 'ontology-testnet') {
-      notSelfSent = rawTransactions.filter(
-        (tx: any) =>
-          tx.transfers[0].from_address.toLowerCase() ===
-            address.toLowerCase() &&
-          tx.transfers[0].to_address.toLowerCase() !== address.toLowerCase(),
-      ); //ontology
-    } else if (network == 'pharos-testnet') {
-      notSelfSent = rawTransactions.filter(
-        (tx: any) =>
-          tx.from_address.toLowerCase() === address.toLowerCase() &&
-          tx.to_address.toLowerCase() !== address.toLowerCase(),
-      ); //pharos
-    } else if (networksV2Api.includes(network)) {
-      notSelfSent = rawTransactions.filter(
-        (tx: any) =>
-          tx.from.hash.toLowerCase() === address.toLowerCase() &&
-          tx.to.hash.toLowerCase() !== address.toLowerCase(),
-      ); //morph has a different call
-    } else {
-      notSelfSent = rawTransactions.filter(
-        (tx: any) =>
-          tx.from.toLowerCase() === address.toLowerCase() &&
-          tx.to.toLowerCase() !== address.toLowerCase(), // Filter out self-sent transactions
-      );
-    }
+    let transactions: Transaction[] = rawTransactions
+      .filter((tx: any) => tx.result !== 'pending')
+      .map(tx => {
+        const gasUsed = BigInt(
+          tx.gasUsed ?? tx.gas_used ?? tx.gas ?? tx.gasused ?? tx.gasCost ?? 0,
+        );
 
-    const notPending = notSelfSent.filter((tx: any) => tx.result !== 'pending');
+        let fee = tx.txFee ?? tx.fee ?? tx.transaction_fee;
+        fee =
+          typeof fee === 'string'
+            ? BigInt((Number(fee) * 1000000000000000000).toFixed(0))
+            : BigInt(0);
 
-    let limitedInTime = notPending;
+        const gasPrice = BigInt(tx.gasPrice ?? tx.gas_price ?? 0);
 
+        let timestamp =
+          tx.timestamp?.toString() ??
+          tx.blockTime?.toString() ??
+          tx.tx_time?.toString() ??
+          tx.timeStamp?.toString() ??
+          tx.create_time?.toString();
+        timestamp = timestamp.includes('T')
+          ? new Date(timestamp).getTime()
+          : (timestamp = parseInt(timestamp) * 1000);
+
+        const from =
+          tx.from?.address ??
+          tx.from?.hash ??
+          tx.from ??
+          tx.from_address ??
+          tx.transfers[0]?.from_address;
+
+        const to =
+          tx.to?.address ??
+          tx.to?.hash ??
+          tx.to ??
+          tx.to_address ??
+          tx.transfers[0]?.to_address;
+
+        return {
+          from,
+          to,
+          gasUsed,
+          fee,
+          gasCost: BigInt(tx.gasCost ?? 0),
+          gasPrice,
+          timestamp,
+        };
+      });
+
+    // Filter out self-sent transactions
+    transactions = transactions.filter(
+      (tx: any) =>
+        tx.from.toLowerCase() === address.toLowerCase() &&
+        tx.to.toLowerCase() !== address.toLowerCase(),
+    );
+
+    // Filter out all transactions before firstTxTime
     if (firstTxTime != DEFAULT_FIRST_TX_TIME) {
       const firstTxTimeAsDate = new Date(firstTxTime);
-      limitedInTime = limitedInTime.filter((tx: Transaction) => {
-        const txTime = getTxTimestampAsDate(tx);
+      transactions = transactions.filter((tx: Transaction) => {
+        const txTime = new Date(tx.timestamp);
         return txTime >= firstTxTimeAsDate;
       });
     }
 
+    // Filter out all transactions after lastTxTime
     if (lastTxTime != DEFAULT_LAST_TX_TIME) {
       const lastTxTimeAsDate = new Date(lastTxTime);
-      limitedInTime = limitedInTime.filter((tx: any) => {
-        const txTime = getTxTimestampAsDate(tx);
+      transactions = transactions.filter((tx: any) => {
+        const txTime = new Date(tx.timestamp);
         return txTime <= lastTxTimeAsDate;
       });
     }
 
-    const transactions: Transaction[] = limitedInTime.slice(
-      0,
-      numberOfTransactions,
-    );
+    transactions.splice(numberOfTransactions);
 
     let firstTxTimeRet = '';
     let lastTxTimeRet = '';
     if (transactions.length > 0) {
-      firstTxTimeRet = getTxTimestampAsDate(
-        transactions[transactions.length - 1],
+      firstTxTimeRet = new Date(
+        transactions[transactions.length - 1].timestamp,
       ).toString();
-      lastTxTimeRet = getTxTimestampAsDate(transactions[0]).toString();
+      lastTxTimeRet = new Date(transactions[0].timestamp).toString();
     }
 
     console.log(
