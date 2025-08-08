@@ -55,3 +55,13 @@ export const ParticipantPayloadSchema = S.mutable(
 );
 
 export type ParticipantPayload = S.Schema.Type<typeof ParticipantPayloadSchema>;
+
+export const Email = S.String.pipe(
+  S.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/),
+  S.annotations({
+    title: 'Email',
+    description: 'An email address',
+  }),
+  S.brand('Email'),
+  S.annotations({ title: 'Email' }),
+);

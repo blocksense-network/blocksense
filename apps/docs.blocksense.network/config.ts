@@ -2,8 +2,6 @@ export const config = {
   blocksenseText: 'blocksense',
   github: 'Explore on GitHub',
   videoNotSupportedMsg: 'Your browser does not support the video.',
-  adoptersTextLink: 'https://airtable.com/apphcztjkgfgFU8PZ/shrmhAObEV2rbbe89',
-  adoptersAltLink: 'Early Adopters',
   social_media: {
     discord: {
       _href: 'https://discord.com/invite/blocksense',

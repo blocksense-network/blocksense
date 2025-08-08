@@ -1,0 +1,7 @@
+CREATE TABLE
+  newsletter_subscribers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    email TEXT NOT NULL UNIQUE,
+    interests TEXT NOT NULL
+  );
