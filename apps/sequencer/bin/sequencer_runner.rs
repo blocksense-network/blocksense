@@ -2,6 +2,7 @@ use actix_web::{web, App, HttpServer};
 use blocksense_feed_registry::feed_registration_cmds::FeedsManagementCmds;
 use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_gnosis_safe::utils::SignatureWithAddress;
+use blocksense_utils::counter_unbounded_channel::CountedReceiver;
 #[cfg(feature = "profile")]
 use pprof::ProfilerGuard;
 use sequencer::providers::eth_send_utils::BatchOfUpdatesToProcess;
@@ -51,7 +52,7 @@ pub async fn prepare_sequencer_state(
     UnboundedReceiver<FeedsManagementCmds>,      // feeds_management_cmd_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>,      // feeds_slots_manager_cmd_recv
     UnboundedReceiver<(ReporterResponse, SignatureWithAddress)>, // aggregate_batch_sig_recv
-    HashMap<String, UnboundedReceiver<BatchOfUpdatesToProcess>>, // relayers_recv_channels
+    HashMap<String, CountedReceiver<BatchOfUpdatesToProcess>>, // relayers_recv_channels
     Data<SequencerState>,
 ) {
     let log_handle: SharedLoggingHandle = get_shared_logging_handle();

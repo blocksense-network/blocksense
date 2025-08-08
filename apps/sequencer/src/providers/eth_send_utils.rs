@@ -9,11 +9,11 @@ use alloy::{
 use blocksense_config::FeedStrideAndDecimals;
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
-use blocksense_utils::{to_hex_string, FeedId};
+use blocksense_utils::{counter_unbounded_channel::CountedReceiver, to_hex_string, FeedId};
 use eyre::{bail, eyre, Result};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
 use tokio::{
-    sync::{mpsc::UnboundedReceiver, Mutex, RwLock},
+    sync::{Mutex, RwLock},
     time::Duration,
 };
 
@@ -228,7 +228,7 @@ pub async fn create_and_collect_relayers_futures(
     collected_futures: &FuturesUnordered<JoinHandle<Result<(), Error>>>,
     feeds_metrics: Arc<RwLock<FeedsMetrics>>,
     provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>>,
-    relayers_recv_channels: HashMap<String, UnboundedReceiver<BatchOfUpdatesToProcess>>,
+    relayers_recv_channels: HashMap<String, CountedReceiver<BatchOfUpdatesToProcess>>,
 ) {
     for (net, chan) in relayers_recv_channels.into_iter() {
         let feed_metrics_clone = feeds_metrics.clone();
@@ -258,7 +258,7 @@ pub async fn loop_processing_batch_of_updates(
     relayer_name: String,
     feeds_metrics: Arc<RwLock<FeedsMetrics>>,
     provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>>,
-    mut chan: UnboundedReceiver<BatchOfUpdatesToProcess>,
+    mut chan: CountedReceiver<BatchOfUpdatesToProcess>,
 ) {
     tracing::info!("Starting {relayer_name} loop...");
 
@@ -266,9 +266,11 @@ pub async fn loop_processing_batch_of_updates(
     // therefore the loop in iterating over the lifetime of the sequencer.
     loop {
         let cmd_opt = chan.recv().await;
+        let msgs_in_queue = chan.len();
         match cmd_opt {
             Some(cmd) => {
                 let block_height = cmd.updates.block_height;
+                tracing::info!("Processing updates for network {relayer_name}, block_height {block_height}, messages in queue = {msgs_in_queue}");
                 let provider = cmd.provider.clone();
                 let result = eth_batch_send_to_contract(
                     cmd.net,
@@ -1137,13 +1139,14 @@ pub async fn eth_batch_send_to_all_contracts(
                     let relayers = sequencer_state.relayers_send_channels.read().await;
                     let relayer_opt = relayers.get(net.as_str());
                     if let Some(relayer) = relayer_opt {
+                        let msgs_in_queue = relayer.len();
                         match relayer.send(batch_of_updates_to_process) {
-                            Ok(_) => {
-                                debug!("Sent updates to relayer for network {net} and block height {block_height}");
+                            Ok(()) => {
+                                debug!("Sent updates to relayer for network {net} and block height {block_height}, messages in queue = {msgs_in_queue}");
                                 inc_metric!(provider_metrics, net, num_transactions_in_queue);
                             }
                             Err(e) => {
-                                error!("Error while sending updates to relayer for network {net} and block height {block_height}: {e}")
+                                error!("Error while sending updates to relayer for network {net} and block height {block_height}, messages in queue = {msgs_in_queue}: {e}")
                             }
                         };
                     } else {

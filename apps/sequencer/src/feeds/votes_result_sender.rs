@@ -15,16 +15,16 @@ use blocksense_data_feeds::feeds_processing::{
 use blocksense_feed_registry::types::Repeatability::Periodic;
 use blocksense_gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use blocksense_gnosis_safe::utils::{create_safe_tx, generate_transaction_hash, SafeMultisig};
+use blocksense_utils::counter_unbounded_channel::CountedReceiver;
 use eyre::Result;
 use rdkafka::producer::{FutureProducer, FutureRecord};
 use rdkafka::util::Timeout;
 use std::io::Error;
 use std::time::Duration;
-use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, warn};
 
 pub async fn votes_result_sender_loop(
-    mut batched_votes_recv: UnboundedReceiver<BatchedAggregatesToSend>,
+    mut batched_votes_recv: CountedReceiver<BatchedAggregatesToSend>,
     sequencer_state: Data<SequencerState>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
@@ -37,8 +37,9 @@ pub async fn votes_result_sender_loop(
 
                 debug!("Awaiting batched votes over `batched_votes_recv`...");
                 let recvd = batched_votes_recv.recv().await;
+                let msgs_in_queue = batched_votes_recv.len();
                 debug!(
-                    "Received batched votes over `batched_votes_recv`; batch_count={batch_count}"
+                    "Received batched votes over `batched_votes_recv`; batch_count={batch_count}, messages in queue = {msgs_in_queue}"
                 );
                 match recvd {
                     Some(updates) => {

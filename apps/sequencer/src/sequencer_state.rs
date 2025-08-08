@@ -18,6 +18,9 @@ use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_gnosis_safe::utils::SignatureWithAddress;
 use blocksense_metrics::metrics::FeedsMetrics;
 use blocksense_registry::config::FeedConfig;
+use blocksense_utils::counter_unbounded_channel::{
+    counted_unbounded_channel, CountedReceiver, CountedSender,
+};
 use blocksense_utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
 use blocksense_utils::FeedId;
 use eyre::eyre;
@@ -50,7 +53,7 @@ pub struct SequencerState {
     pub batches_awaiting_consensus: Arc<RwLock<AggregationBatchConsensus>>,
     pub aggregate_batch_sig_send: UnboundedSender<(ReporterResponse, SignatureWithAddress)>,
     pub relayers_send_channels:
-        Arc<RwLock<HashMap<String, UnboundedSender<BatchOfUpdatesToProcess>>>>,
+        Arc<RwLock<HashMap<String, CountedSender<BatchOfUpdatesToProcess>>>>,
     // pub voting_recv_channel: Arc<RwLock<mpsc::UnboundedReceiver<(String, String)>>>,
 }
 
@@ -68,7 +71,7 @@ impl SequencerState {
         feeds_slots_manager_cmd_send: UnboundedSender<FeedsManagementCmds>,
         aggregate_batch_sig_send: UnboundedSender<(ReporterResponse, SignatureWithAddress)>,
         relayers_send_channels: Arc<
-            RwLock<HashMap<String, UnboundedSender<BatchOfUpdatesToProcess>>>,
+            RwLock<HashMap<String, CountedSender<BatchOfUpdatesToProcess>>>,
         >,
     ) -> SequencerState {
         let provider_status: HashMap<String, ProviderStatus> = sequencer_config
@@ -157,7 +160,7 @@ pub async fn create_sequencer_state_from_sequencer_config(
     UnboundedReceiver<FeedsManagementCmds>,      // feeds_management_cmd_to_block_creator_recv
     UnboundedReceiver<FeedsManagementCmds>,      // feeds_slots_manager_cmd_recv
     UnboundedReceiver<(ReporterResponse, SignatureWithAddress)>, // aggregate_batch_sig_recv
-    HashMap<String, UnboundedReceiver<BatchOfUpdatesToProcess>>, // relayers_recv_channels
+    HashMap<String, CountedReceiver<BatchOfUpdatesToProcess>>, // relayers_recv_channels
 ) {
     let log_handle = init_shared_logging_handle("INFO", false);
     let providers =
@@ -209,15 +212,15 @@ fn create_kafka_producer(
 pub async fn create_relayers_channels(
     providers: &SharedRpcProviders,
 ) -> (
-    HashMap<String, UnboundedSender<BatchOfUpdatesToProcess>>,
-    HashMap<String, UnboundedReceiver<BatchOfUpdatesToProcess>>,
+    HashMap<String, CountedSender<BatchOfUpdatesToProcess>>,
+    HashMap<String, CountedReceiver<BatchOfUpdatesToProcess>>,
 ) {
     let mut relayers_send_channels = HashMap::new();
     let mut relayers_recv_channels = HashMap::new();
     {
         let providers = providers.read().await;
         for (net_name, _provider) in providers.iter() {
-            let (s, r) = mpsc::unbounded_channel();
+            let (s, r) = counted_unbounded_channel();
             relayers_send_channels.insert(net_name.clone(), s);
             relayers_recv_channels.insert(net_name.clone(), r);
         }
