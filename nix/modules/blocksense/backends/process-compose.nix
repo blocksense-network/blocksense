@@ -116,8 +116,10 @@ let
             -H 'content-type: application/json'
         '';
         initial_delay_seconds = 0;
-        period_seconds = 1;
+        period_seconds = 10;
         timeout_seconds = 30;
+        success_threshold = 1;
+        failure_threshold = 10;
       };
       environment = [
         "SEQUENCER_CONFIG_DIR=${cfg.config-dir}"

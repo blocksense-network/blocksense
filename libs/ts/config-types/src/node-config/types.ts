@@ -39,25 +39,29 @@ const PublishingCriteriaSchema = S.Struct({
   peg_tolerance_percentage: S.Number,
 });
 
+const ContractSchema = S.Struct({
+  name: S.String,
+  address: S.NullishOr(S.String),
+  creation_byte_code: S.NullishOr(S.String),
+  deployed_byte_code: S.NullishOr(S.String),
+  min_quorum: S.NullishOr(S.Number),
+  contract_version: S.Number,
+});
+
 const ProviderSchema = S.Struct({
   private_key_path: S.String,
   url: S.String,
-  contract_address: S.NullishOr(S.String),
-  safe_address: S.NullishOr(S.String),
-  safe_min_quorum: S.Number,
-  event_contract_address: S.NullishOr(S.String),
-  multicall_contract_address: S.NullishOr(S.String),
-  transaction_retries_count_limit: S.Number,
+  transaction_retries_count_before_give_up: S.Number,
   transaction_retry_timeout_secs: S.Number,
   retry_fee_increment_fraction: S.Number,
   transaction_gas_limit: S.Number,
-  data_feed_store_byte_code: S.NullishOr(S.String),
-  data_feed_sports_byte_code: S.NullishOr(S.String),
   impersonated_anvil_account: S.NullishOr(S.String),
   is_enabled: S.Boolean,
+  should_load_round_counters: S.NullishOr(S.Boolean),
+  should_load_historical_values: S.NullishOr(S.Boolean),
   allow_feeds: S.optional(S.Array(FeedIdSchema)),
   publishing_criteria: S.Array(PublishingCriteriaSchema),
-  contract_version: S.Number,
+  contracts: S.Array(ContractSchema),
 });
 
 const PyroscopeConfigSchema = S.Struct({
