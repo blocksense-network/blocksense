@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   ...
 }:
@@ -7,8 +8,6 @@
   imports = [
     ./example-setup-01.nix
   ];
-
-  services.kafka.enable = true;
 
   services.blocksense = {
     logsDir = lib.mkForce "$GIT_ROOT/logs/process-compose/example-setup-02";
