@@ -488,7 +488,7 @@ export const networkMetadata = {
       {
         type: 'bitlayer',
         webUrl: 'https://btrscan.com',
-        apiUrl: 'https://api.btrscan.com/scan/api',
+        apiUrl: 'https://api.btrscan.com/scan/v1/chain',
       },
     ],
     currency: Currency.BTC,
@@ -500,7 +500,7 @@ export const networkMetadata = {
       {
         type: 'bitlayer',
         webUrl: 'https://testnet-scan.bitlayer.org',
-        apiUrl: 'https://api-testnet.bitlayer.org/scan/api',
+        apiUrl: 'https://api-testnet.btrscan.com/scan/v1/chain',
       },
     ],
     currency: Currency.BTC,
@@ -1198,7 +1198,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://explorer-holesky.morphl2.io',
-        apiUrl: 'https://explorer-holesky.morphl2.io/api',
+        apiUrl: 'https://explorer-api-holesky.morphl2.io/api/v2',
       },
     ],
     currency: Currency.ETH,
@@ -1234,7 +1234,7 @@ export const networkMetadata = {
       {
         type: 'ontology',
         webUrl: 'https://explorer.ont.io/testnet',
-        apiUrl: 'https://explorer.ont.io/testnet/api',
+        apiUrl: 'https://polarisexplorer.ont.io/v2',
       },
     ],
     currency: Currency.ONG,
@@ -1302,9 +1302,9 @@ export const networkMetadata = {
     isTestnet: true,
     explorers: [
       {
-        type: 'unknown',
+        type: 'socialscan',
         webUrl: 'https://testnet.pharosscan.xyz',
-        apiUrl: 'https://api.socialscan.io/pharos-testnet',
+        apiUrl: 'https://api.socialscan.io/pharos-testnet/v1/explorer',
       },
     ],
     currency: Currency.PHRS,
@@ -1724,9 +1724,9 @@ export const networkMetadata = {
     isTestnet: false,
     explorers: [
       {
-        type: 'taraxa',
-        webUrl: 'https://mainnet.explorer.taraxa.io',
-        apiUrl: 'https://graphql.mainnet.taraxa.io',
+        type: 'blockscout',
+        webUrl: 'https://tara.to',
+        apiUrl: 'https://tara.to/api',
       },
     ],
     currency: Currency.TARA,
@@ -1738,7 +1738,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://testnet.to',
-        apiUrl: 'https://testnet.to/api',
+        apiUrl: 'https://indexer.testnet.explorer.taraxa.io',
       },
     ],
     currency: Currency.TARA,

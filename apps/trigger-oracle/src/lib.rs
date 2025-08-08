@@ -555,20 +555,24 @@ impl OracleTrigger {
             );
 
             tracing::trace!(
-                "Signal {} data feeds [batch_count={batch_count}]",
+                "Orchestrator-{} Signal {} data feeds [batch_count={batch_count}]",
+                oracle_id,
                 oracle_settings.len()
             );
-            let _ = signal_sender.send(oracle_settings.clone());
+            if let Err(e) = signal_sender.send(oracle_settings.clone()) {
+                log::error!("Orchestrator-{oracle_id} ERROR from signal_sender.send = {e:?}");
+                continue;
+            }
 
             if metrics_url.is_none() {
-                tracing::trace!("Metrics URL not set; looping back [batch_count={batch_count}]");
+                tracing::trace!("Orchestrator-{oracle_id} Metrics URL not set; looping back [batch_count={batch_count}]");
                 continue;
             }
 
             let metrics_url = metrics_url
                 .clone()
                 .expect("Metrics URL should be provided.");
-            tracing::trace!("Sending metrics at {metrics_url} [batch_count={batch_count}]");
+            tracing::trace!("Orchestrator-{oracle_id} Sending metrics at {metrics_url} [batch_count={batch_count}]");
             let metrics_result = handle_prometheus_metrics(
                 &reqwest::Client::new(),
                 &metrics_url,
@@ -578,10 +582,12 @@ impl OracleTrigger {
 
             match metrics_result {
                 Ok(_) => {
-                    tracing::trace!("Sent metrics [batch_count={batch_count}]");
+                    tracing::trace!(
+                        "Orchestrator-{oracle_id} Sent metrics [batch_count={batch_count}]"
+                    );
                 }
                 Err(e) => {
-                    tracing::error!("Error handling metrics: {e:?} [batch_count={batch_count}]");
+                    tracing::error!("Orchestrator-{oracle_id} Error handling metrics: {e:?} [batch_count={batch_count}]");
                 }
             }
         }
