@@ -15,6 +15,7 @@ use blocksense_config::{
     AllFeedsConfig, SequencerConfig, ADFS_CONTRACT_NAME,
     HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
 };
+use blocksense_data_feeds::feeds_processing::{PublishedFeedUpdate, PublishedFeedUpdateError};
 use blocksense_feed_registry::feed_registration_cmds::{
     DeleteAssetFeed, FeedsManagementCmds, RegisterNewAssetFeed,
 };
@@ -28,9 +29,11 @@ use std::collections::{BTreeMap, HashSet};
 
 use crate::http_handlers::data_feeds::register_feed;
 use crate::providers::eth_send_utils::deploy_contract;
+use crate::providers::provider::LatestRound;
 use crate::providers::provider::SharedRpcProviders;
 use blocksense_feed_registry::types::FeedType;
 use blocksense_metrics::metrics_collector::gather_and_dump_metrics;
+use serde::Serialize;
 use tokio::time::Duration;
 use tracing::info_span;
 use tracing::{debug, error, info};
@@ -670,6 +673,52 @@ pub async fn health(_sequencer_state: web::Data<SequencerState>) -> Result<HttpR
         .body("".to_string()))
 }
 
+#[derive(Serialize, Debug)]
+pub struct LastUpdatesFromChain {
+    pub round: Result<LatestRound, String>,
+    pub values: Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>, String>,
+}
+
+#[get("/get_last_updates_from_chain/{network}/{feed_id}")]
+pub async fn get_last_updates_from_chain(
+    req: HttpRequest,
+    sequencer_state: web::Data<SequencerState>,
+) -> Result<HttpResponse, Error> {
+    let bad_input = error::ErrorBadRequest("Incorrect input.");
+    let feed_id = req
+        .match_info()
+        .get("feed_id")
+        .ok_or(error::ErrorBadRequest("Incorrect input."))?
+        .parse::<u128>()
+        .map_err(|_| error::ErrorBadRequest("Incorrect input."))?;
+    let network: String = req.match_info().get("network").ok_or(bad_input)?.parse()?;
+    if let Some(provider) = sequencer_state.get_provider(&network).await {
+        let provider_mutex = provider.lock().await;
+        let round = provider_mutex
+            .get_latest_round(&feed_id)
+            .await
+            .map_err(|e| format!("{e:?}"));
+        let values = provider_mutex
+            .get_latest_values(&[feed_id])
+            .await
+            .map_err(|e| format!("{e:?}"));
+        let latest_round = LastUpdatesFromChain { round, values };
+        if let Ok(serialized) = serde_json::to_string_pretty(&latest_round) {
+            Ok(HttpResponse::Ok()
+                .content_type(ContentType::json())
+                .body(serialized))
+        } else {
+            let message = format!("No provider for network {network}");
+            debug!("{message}");
+            Err(error::ErrorBadRequest(message))
+        }
+    } else {
+        let message = format!("No provider for network {network}");
+        debug!("{message}");
+        Err(error::ErrorBadRequest(message))
+    }
+}
+
 pub fn add_admin_services(cfg: &mut ServiceConfig) {
     cfg.service(get_key)
         .service(deploy)
@@ -679,6 +728,7 @@ pub fn add_admin_services(cfg: &mut ServiceConfig) {
         .service(get_feeds_config)
         .service(get_feed_config)
         .service(get_sequencer_config)
+        .service(get_last_updates_from_chain)
         .service(register_asset_feed)
         .service(delete_asset_feed)
         .service(disable_provider)
