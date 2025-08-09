@@ -8,13 +8,16 @@
       ...
     }:
     let
-      allEnvironmentNames = lib.pipe (builtins.readDir ./.) [
-        (lib.filterAttrs (
-          name: value: (lib.hasSuffix ".nix" name) && name != "default.nix" && value == "regular"
-        ))
-        builtins.attrNames
-        (builtins.map (name: lib.removeSuffix ".nix" name))
-      ];
+      # HACK:                                                           lazy trees when
+      allEnvironmentNames =
+        lib.pipe (builtins.readDir (lib.path.append ./../.. "nix/test-environments"))
+          [
+            (lib.filterAttrs (
+              name: value: (lib.hasSuffix ".nix" name) && name != "default.nix" && value == "regular"
+            ))
+            builtins.attrNames
+            (builtins.map (name: lib.removeSuffix ".nix" name))
+          ];
 
       allEnvironments = lib.pipe allEnvironmentNames [
         (builtins.map (name: {
