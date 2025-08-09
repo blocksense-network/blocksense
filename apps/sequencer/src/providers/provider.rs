@@ -92,6 +92,7 @@ pub enum ProviderStatus {
 }
 
 pub type SharedRpcProviders = Arc<RwLock<HashMap<String, Arc<Mutex<RpcProvider>>>>>;
+pub type ProvidersMetrics = HashMap<String, Arc<RwLock<ProviderMetrics>>>;
 
 pub async fn init_shared_rpc_providers(
     conf: &SequencerConfig,

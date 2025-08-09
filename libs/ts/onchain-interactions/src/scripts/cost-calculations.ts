@@ -52,8 +52,8 @@ function getHourDifference(transactions: Transaction[]): number {
   if (txsLen < 2) {
     throwError('Less then 2 transactions in getHourDifference');
   }
-  const firstTransactionTime = getTxTimestampAsDate(transactions[0]);
-  const lastTransactionTime = getTxTimestampAsDate(transactions[txsLen - 1]);
+  const firstTransactionTime = new Date(transactions[0].timestamp);
+  const lastTransactionTime = new Date(transactions[txsLen - 1].timestamp);
 
   const diffMs = firstTransactionTime.getTime() - lastTransactionTime.getTime();
   const diffHours = diffMs / (1000 * 60 * 60);
@@ -77,13 +77,19 @@ const calculateGasCosts = (
   let totalGasUsed = BigInt(0);
 
   for (const tx of transactions) {
-    const gasUsed = BigInt(tx.gasUsed ?? tx.gas_used ?? tx.gas ?? tx.gasused);
-    const gasPrice = BigInt(tx.gasPrice ?? tx.gas_price);
-    const txGasCost = gasUsed * gasPrice;
+    if (tx.fee) {
+      // Bitlayer, Ontology, Pharos
+      totalGasCost += tx.fee;
+    } else if (tx.gasCost) {
+      // Taraxa testnet
+      totalGasCost += tx.gasCost;
+    } else {
+      const txGasCost = tx.gasUsed * tx.gasPrice;
 
-    totalGasCost += txGasCost;
-    totalGasPrice += gasPrice;
-    totalGasUsed += gasUsed;
+      totalGasCost += txGasCost;
+      totalGasPrice += tx.gasPrice;
+      totalGasUsed += tx.gasUsed;
+    }
   }
 
   const avgGasPrice = totalGasPrice / BigInt(transactions.length);
@@ -169,19 +175,6 @@ const logGasCosts = async (
   }
 };
 
-const getTxTimestampAsDate = (tx: Transaction): Date => {
-  if (typeof tx.timestamp === 'string' && tx.timestamp.includes('T')) {
-    // Morph-style ISO string timestamp
-    return new Date(tx.timestamp);
-  }
-
-  // Unix timestamp (either string or number)
-  const unixTimestamp = parseInt(
-    tx.timestamp?.toString() ?? (tx.timeStamp?.toString() || '0'),
-  );
-  return new Date(unixTimestamp * 1000);
-};
-
 const fetchTransactionsForNetwork = async (
   network: NetworkName,
   address: EthereumAddress,
@@ -219,6 +212,19 @@ const fetchTransactionsForNetwork = async (
     } else if (network === 'telos-testnet') {
       response = await axios.get(`${apiUrl}/address/${address}/transactions`);
       rawTransactions = response.data.results || [];
+    } else if (network === 'pharos-testnet') {
+      response = await axios.get(`${apiUrl}/address/${address}/transactions`);
+      rawTransactions = response.data.data || [];
+    } else if (network === 'taraxa-testnet') {
+      response = await axios.get(
+        `${apiUrl}/address/${address}/transactions?limit=100`,
+      );
+      rawTransactions = response.data.data || [];
+    } else if (network === 'ontology-testnet') {
+      response = await axios.get(
+        `${apiUrl}/addresses/${address}/txs?page_size=20&page_number=1`,
+      );
+      rawTransactions = response.data.result.records || [];
     } else if (network === 'cronos-testnet') {
       let currentPage = 1;
       let totalPages = 1;
@@ -244,6 +250,16 @@ const fetchTransactionsForNetwork = async (
         totalPages = page.data.pagination.totalPage;
         currentPage += 1;
       } while (currentPage <= totalPages);
+    } else if (
+      network === 'bitlayer-testnet' ||
+      network === 'bitlayer-mainnet'
+    ) {
+      const chainId =
+        network === 'bitlayer-testnet' ? 'BITLAYERTEST' : 'BITLAYER';
+      response = await axios.get(
+        `${apiUrl}/txs/list?ps=1000&a=${address}&chainId=${chainId}`,
+      );
+      rawTransactions = response.data.data.records || [];
     } else {
       response = await axios.get(apiUrl, {
         params: {
@@ -263,59 +279,97 @@ const fetchTransactionsForNetwork = async (
       }
       rawTransactions = response.data.result;
     }
+
+    if (network === 'polygon-amoy') {
+      // The sort bellow will order the transactions incorrectly if we don't trim them.
+      rawTransactions.splice(numberOfTransactions * 2);
+    }
     rawTransactions.sort((a, b) => b.nonce - a.nonce);
 
-    let notSelfSent: any[];
-    if (network == 'cronos-testnet') {
-      notSelfSent = rawTransactions.filter(
-        (tx: any) =>
-          tx.from.address.toLowerCase() === address.toLowerCase() &&
-          tx.to.address.toLowerCase() !== address.toLowerCase(),
-      ); //cronos has a different call
-    } else if (networksV2Api.includes(network)) {
-      notSelfSent = rawTransactions.filter(
-        (tx: any) =>
-          tx.from.hash.toLowerCase() === address.toLowerCase() &&
-          tx.to.hash.toLowerCase() !== address.toLowerCase(),
-      ); //morph has a different call
-    } else {
-      notSelfSent = rawTransactions.filter(
-        (tx: any) =>
-          tx.from.toLowerCase() === address.toLowerCase() &&
-          tx.to.toLowerCase() !== address.toLowerCase(), // Filter out self-sent transactions
-      );
-    }
+    let transactions: Transaction[] = rawTransactions
+      .filter((tx: any) => tx.result !== 'pending')
+      .map(tx => {
+        const gasUsed = BigInt(
+          tx.gasUsed ?? tx.gas_used ?? tx.gas ?? tx.gasused ?? tx.gasCost ?? 0,
+        );
 
-    let limitedInTime = notSelfSent;
+        let fee = tx.txFee ?? tx.fee ?? tx.transaction_fee;
+        fee =
+          typeof fee === 'string'
+            ? BigInt((Number(fee) * 1000000000000000000).toFixed(0))
+            : BigInt(0);
 
+        const gasPrice = BigInt(tx.gasPrice ?? tx.gas_price ?? 0);
+
+        let timestamp =
+          tx.timestamp?.toString() ??
+          tx.blockTime?.toString() ??
+          tx.tx_time?.toString() ??
+          tx.timeStamp?.toString() ??
+          tx.create_time?.toString();
+        timestamp = timestamp.includes('T')
+          ? new Date(timestamp).getTime()
+          : (timestamp = parseInt(timestamp) * 1000);
+
+        const from =
+          tx.from?.address ??
+          tx.from?.hash ??
+          tx.from ??
+          tx.from_address ??
+          tx.transfers[0]?.from_address;
+
+        const to =
+          tx.to?.address ??
+          tx.to?.hash ??
+          tx.to ??
+          tx.to_address ??
+          tx.transfers[0]?.to_address;
+
+        return {
+          from,
+          to,
+          gasUsed,
+          fee,
+          gasCost: BigInt(tx.gasCost ?? 0),
+          gasPrice,
+          timestamp,
+        };
+      });
+
+    // Filter out self-sent transactions
+    transactions = transactions.filter(
+      (tx: any) =>
+        tx.from.toLowerCase() === address.toLowerCase() &&
+        tx.to.toLowerCase() !== address.toLowerCase(),
+    );
+
+    // Filter out all transactions before firstTxTime
     if (firstTxTime != DEFAULT_FIRST_TX_TIME) {
       const firstTxTimeAsDate = new Date(firstTxTime);
-      limitedInTime = limitedInTime.filter((tx: Transaction) => {
-        const txTime = getTxTimestampAsDate(tx);
+      transactions = transactions.filter((tx: Transaction) => {
+        const txTime = new Date(tx.timestamp);
         return txTime >= firstTxTimeAsDate;
       });
     }
 
+    // Filter out all transactions after lastTxTime
     if (lastTxTime != DEFAULT_LAST_TX_TIME) {
       const lastTxTimeAsDate = new Date(lastTxTime);
-      limitedInTime = limitedInTime.filter((tx: any) => {
-        const txTime = getTxTimestampAsDate(tx);
+      transactions = transactions.filter((tx: any) => {
+        const txTime = new Date(tx.timestamp);
         return txTime <= lastTxTimeAsDate;
       });
     }
 
-    const transactions: Transaction[] = limitedInTime.slice(
-      0,
-      numberOfTransactions,
-    );
+    transactions.splice(numberOfTransactions);
 
     let firstTxTimeRet = '';
     let lastTxTimeRet = '';
     if (transactions.length > 0) {
-      firstTxTimeRet = getTxTimestampAsDate(
-        transactions[transactions.length - 1],
+      firstTxTimeRet = new Date(
+        transactions[transactions.length - 1].timestamp,
       ).toString();
-      lastTxTimeRet = getTxTimestampAsDate(transactions[0]).toString();
+      lastTxTimeRet = new Date(transactions[0].timestamp).toString();
     }
 
     console.log(
