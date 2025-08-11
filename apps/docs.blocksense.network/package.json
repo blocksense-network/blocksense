@@ -44,7 +44,6 @@
     "fast-glob": "^3.3.2",
     "next": "^15.3.4",
     "nextra": "^4.3.0",
-    "nextra-theme-docs": "^4.3.0",
     "postcss": "^8.4.49",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

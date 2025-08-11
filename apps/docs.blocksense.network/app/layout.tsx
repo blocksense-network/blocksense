@@ -1,11 +1,10 @@
 import NextHead from 'next/head';
 import type { Metadata } from 'next';
-import { Layout, Navbar } from 'nextra-theme-docs';
-import { Footer } from '@/components/common/Footer';
 import { getPageMap } from 'nextra/page-map';
 import type { FC, ReactNode } from 'react';
 import './globals.css';
 import { updatePageMapWithContractsRefDoc } from '@/src/pageMap';
+import { NextraTheme } from './_components/nextra-theme';
 
 export const metadata: Metadata = {
   description:
@@ -69,15 +68,6 @@ export const metadata: Metadata = {
 };
 
 const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
-  const navbar = (
-    <Navbar
-      logo={
-        <div className="bg-[url('/images/blocksense-logo__dark.png')] dark:bg-[url('/images/blocksense-logo__light.png')] h-[29.89px] w-[142px] bg-contain bg-no-repeat" />
-      }
-      projectLink="https://github.com/blocksense-network/blocksense"
-    />
-  );
-  const footer = <Footer />;
   const pageMap = await getPageMap();
   updatePageMapWithContractsRefDoc(pageMap);
 
@@ -102,16 +92,8 @@ const RootLayout: FC<{ children: ReactNode }> = async ({ children }) => {
         />
         <meta name="twitter:image" content="/images/blocksense_og.png" />
       </NextHead>
-      <body className="md:px-4 lg:px-30">
-        <Layout
-          navbar={navbar}
-          pageMap={pageMap}
-          editLink="Edit this page on GitHub"
-          sidebar={{ defaultMenuCollapseLevel: 3 }}
-          footer={footer}
-        >
-          {children}
-        </Layout>
+      <body style={{ margin: 0 }}>
+        <NextraTheme pageMap={pageMap}>{children}</NextraTheme>
       </body>
     </html>
   );

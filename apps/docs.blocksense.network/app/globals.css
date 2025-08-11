@@ -1,5 +1,4 @@
 @import 'tailwindcss';
 /* @import '@blocksense/docs-ui/style.css'; */
 /* @import '@blocksense/docs-ui/globals.css'; */
-@import 'nextra-theme-docs/style.css';
 @plugin "tailwindcss-animate";
