@@ -1,7 +1,7 @@
 import { Effect, Schema as S } from 'effect';
 import type { ParseError } from 'effect/ParseResult';
 import type { HttpClientError } from '@effect/platform';
-import { FetchHttpClient, HttpClientRequest } from '@effect/platform';
+import { HttpClientRequest } from '@effect/platform';
 import { HttpClient } from '@effect/platform/HttpClient';
 import parsePrometheusTextFormat from 'parse-prometheus-text-format';
 
@@ -12,7 +12,8 @@ export const getMetrics = (
   url: string,
 ): Effect.Effect<
   PrometheusMetrics,
-  ParseMetricsError | HttpClientError.HttpClientError | ParseError
+  ParseMetricsError | HttpClientError.HttpClientError | ParseError,
+  HttpClient
 > => {
   return Effect.gen(function* () {
     const client = yield* HttpClient;
@@ -32,5 +33,5 @@ export const getMetrics = (
     );
 
     return decodedMetrics;
-  }).pipe(Effect.provide(FetchHttpClient.layer));
+  });
 };
