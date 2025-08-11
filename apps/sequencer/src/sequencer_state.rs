@@ -16,7 +16,7 @@ use blocksense_feed_registry::registry::{
 };
 use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_gnosis_safe::utils::SignatureWithAddress;
-use blocksense_metrics::metrics::FeedsMetrics;
+use blocksense_metrics::metrics::{FeedsMetrics, SequencerMetrics};
 use blocksense_registry::config::FeedConfig;
 use blocksense_utils::counter_unbounded_channel::{
     counted_unbounded_channel, CountedReceiver, CountedSender,
@@ -54,7 +54,7 @@ pub struct SequencerState {
     pub aggregate_batch_sig_send: UnboundedSender<(ReporterResponse, SignatureWithAddress)>,
     pub relayers_send_channels:
         Arc<RwLock<HashMap<String, CountedSender<BatchOfUpdatesToProcess>>>>,
-    // pub voting_recv_channel: Arc<RwLock<mpsc::UnboundedReceiver<(String, String)>>>,
+    pub sequencer_metrics: Arc<RwLock<SequencerMetrics>>,
 }
 
 impl SequencerState {
@@ -129,6 +129,10 @@ impl SequencerState {
             batches_awaiting_consensus: Arc::new(RwLock::new(AggregationBatchConsensus::new())),
             aggregate_batch_sig_send,
             relayers_send_channels,
+            sequencer_metrics: Arc::new(RwLock::new(
+                SequencerMetrics::new(metrics_prefix.unwrap_or(""))
+                    .expect("Failed to allocate sequencer_metrics"),
+            )),
         }
     }
 
