@@ -8,6 +8,8 @@ import {
   HttpApiSecurity,
 } from '@effect/platform';
 
+import { EmailSchema } from '@blocksense/base-utils/schemas';
+
 import {
   GenerateSignaturePayloadSchema,
   ParticipantPayloadSchema,
@@ -102,6 +104,15 @@ export const verifyApi = HttpApi.make('verify')
           ),
       )
       .prefix('/participants'),
+  )
+  .add(
+    HttpApiGroup.make('newsletter')
+      .add(
+        HttpApiEndpoint.post('register', '/register').setPayload(
+          S.Struct({ email: EmailSchema, interests: S.Array(S.String) }),
+        ),
+      )
+      .prefix('/newsletter'),
   )
   .prefix('/verify')
   .middleware(Authorization);
