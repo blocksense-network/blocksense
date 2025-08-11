@@ -278,6 +278,12 @@ async fn generate_block(
         debug!(
             "Sending batched votes over `batched_votes_send`, messages in queue = {msgs_in_queue} ..."
         );
+        sequencer_state
+            .sequencer_metrics
+            .read()
+            .await
+            .batched_votes_msgs_in_queue
+            .set(msgs_in_queue as i64);
 
         let mut value_updates = Vec::new();
         let mut proofs = HashMap::new();
