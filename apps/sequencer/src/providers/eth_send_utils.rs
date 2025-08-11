@@ -1134,7 +1134,6 @@ pub async fn eth_batch_send_to_all_contracts(
                 };
 
                 {
-                    let provider_metrics = provider.lock().await.provider_metrics.clone();
                     let relayers = sequencer_state.relayers_send_channels.read().await;
                     let relayer_opt = relayers.get(net.as_str());
                     if let Some(relayer) = relayer_opt {
@@ -1142,7 +1141,13 @@ pub async fn eth_batch_send_to_all_contracts(
                         match relayer.send(batch_of_updates_to_process) {
                             Ok(()) => {
                                 debug!("Sent updates to relayer for network {net} and block height {block_height}, messages in queue = {msgs_in_queue}");
-                                inc_metric!(provider_metrics, net, num_transactions_in_queue);
+                                if let Some(provider_metrics) =
+                                    providers_metrics_opt.and_then(|pm| pm.get(net.as_str()))
+                                {
+                                    inc_metric!(provider_metrics, net, num_transactions_in_queue);
+                                } else {
+                                    error!("No metrics found for network {net}");
+                                }
                             }
                             Err(e) => {
                                 error!("Error while sending updates to relayer for network {net} and block height {block_height}, messages in queue = {msgs_in_queue}: {e}")
