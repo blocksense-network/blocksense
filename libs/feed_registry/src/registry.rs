@@ -6,7 +6,7 @@ use std::{
 
 use crate::types::{DataFeedPayload, FeedMetaData, FeedType, Repeatability, Timestamp};
 use blocksense_config::AllFeedsConfig;
-use blocksense_utils::{time::current_unix_time, EncodedFeedId};
+use blocksense_utils::{await_time, time::current_unix_time, EncodedFeedId};
 use chrono::{DateTime, TimeZone, Utc};
 use ringbuf::{
     storage::Heap,
@@ -15,7 +15,7 @@ use ringbuf::{
 };
 use serde::{ser::SerializeMap, Deserialize, Serialize, Serializer};
 use std::time::UNIX_EPOCH;
-use tokio::{sync::RwLock, time};
+use tokio::sync::RwLock;
 use tracing::{debug, info};
 
 /// Map representing feed_id -> FeedMetaData
@@ -394,14 +394,6 @@ impl SlotTimeTracker {
     pub fn get_last_slot(&self) -> u128 {
         (current_unix_time() - self.start_time_ms) / self.slot_interval.as_millis()
     }
-}
-
-pub async fn await_time(time_to_await_ms: u64) {
-    let time_to_await: Duration = Duration::from_millis(time_to_await_ms);
-    let mut interval = time::interval(time_to_await);
-    interval.tick().await;
-    // The first tick completes immediately.
-    interval.tick().await;
 }
 
 #[cfg(test)]
