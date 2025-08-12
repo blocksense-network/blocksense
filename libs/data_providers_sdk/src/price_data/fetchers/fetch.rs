@@ -3,17 +3,40 @@ use std::time::Instant;
 use anyhow::Result;
 use futures::stream::StreamExt;
 use futures::Stream;
+use std::time::Duration;
+use tokio::time::timeout_at;
 
 use crate::price_data::{traits::prices_fetcher::PairPriceData, types::ProviderPriceData};
-
-pub async fn fetch_all_prices<S>(mut futures_set: S) -> Vec<ProviderPriceData>
+pub async fn fetch_all_prices<S>(futures_set: S, interval: &Duration) -> Vec<ProviderPriceData>
 where
     S: Stream<Item = (&'static str, Result<PairPriceData>)> + Unpin,
 {
     let mut all_fetched_prices: Vec<ProviderPriceData> = Vec::new();
     let before_fetch = Instant::now();
+    let deadline = before_fetch + *interval;
+    match timeout_at(
+        deadline.into(),
+        fetch_loop_prices(futures_set, &mut all_fetched_prices, before_fetch),
+    )
+    .await
+    {
+        Ok(()) => {
+            println!("🕛 All prices fetched in {:?}", before_fetch.elapsed());
+        }
+        Err(_) => {
+            println!("🕛 Not all prices fetched in {:?}", before_fetch.elapsed());
+        }
+    }
+    all_fetched_prices
+}
 
-    // Process results as they complete
+async fn fetch_loop_prices<S>(
+    mut futures_set: S,
+    all_fetched_prices: &mut Vec<ProviderPriceData>,
+    before_fetch: Instant,
+) where
+    S: Stream<Item = (&'static str, Result<PairPriceData>)> + Unpin,
+{
     while let Some((exchange_id, result)) = futures_set.next().await {
         match result {
             Ok(prices) => {
@@ -28,8 +51,4 @@ where
             Err(err) => println!("❌ Error fetching prices from {exchange_id}: {err:?}"),
         }
     }
-
-    println!("🕛 All prices fetched in {:?}", before_fetch.elapsed());
-
-    all_fetched_prices
 }

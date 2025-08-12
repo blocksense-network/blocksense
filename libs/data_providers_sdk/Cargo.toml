@@ -16,4 +16,5 @@ serde-this-or-that = { workspace = true }
 itertools = { workspace = true }
 serde = { workspace = true }
 futures = { workspace = true }
+tokio = { workspace = true }
 url = { workspace = true }

@@ -66,7 +66,9 @@ pub static ref REPORTER_FAILED_SEQ_REQUESTS: IntCounterVec =
 pub static ref REPORTER_WASM_EXECUTION_TIME_GAUGE: IntGaugeVec =
     register_int_gauge_vec!("WASM_EXECUTION_TIME_GAUGE",
         "Time(ms) to execute current wasm component", &["oracle_id"]).unwrap();
-
+pub static ref REPORTER_WASM_EXECUTION_TIMEOUT_GAUGE: IntGaugeVec =
+    register_int_gauge_vec!("WASM_EXECUTION_TIMEOUT_GAUGE",
+        "Time(ms) to execute current wasm component", &["oracle_id"]).unwrap();
 }
 
 #[macro_export]
