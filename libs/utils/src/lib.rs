@@ -175,6 +175,8 @@ use std::{
 
 use anyhow::{anyhow, Context, Result};
 
+use std::time::Duration;
+
 pub fn get_env_var<T>(key: &str) -> Result<T>
 where
     T: FromStr,
@@ -236,4 +238,12 @@ pub fn get_config_file_path(base_path_from_env: &str, config_file_name: &str) ->
     });
     let config_file_path: PathBuf = config_file_path.as_str().into();
     config_file_path.join(config_file_name)
+}
+
+pub async fn await_time(time_to_await_ms: u64) {
+    let time_to_await: Duration = Duration::from_millis(time_to_await_ms);
+    let mut interval = tokio::time::interval(time_to_await);
+    interval.tick().await;
+    // The first tick completes immediately.
+    interval.tick().await;
 }
