@@ -13,6 +13,7 @@ import type { NewFeedsConfig } from '@blocksense/config-types';
 import { NewFeedsConfigSchema } from '@blocksense/config-types';
 import type { HttpClientError } from '@effect/platform/HttpClientError';
 import { ParseMetricsError, getMetrics } from '../utils/metrics';
+import { FetchHttpClient } from '@effect/platform';
 
 export class ProcessCompose extends Context.Tag('@e2e-tests/ProcessCompose')<
   ProcessCompose,
@@ -93,7 +94,9 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
           }),
         fetchUpdatesToNetworksMetric: () => {
           return Effect.gen(function* () {
-            const metrics = yield* getMetrics(metricsUrl);
+            const metrics = yield* getMetrics(metricsUrl).pipe(
+              Effect.provide(FetchHttpClient.layer),
+            );
             const updatesToNetworks = metrics.filter(
               metric => metric.name === 'updates_to_networks',
             )[0];

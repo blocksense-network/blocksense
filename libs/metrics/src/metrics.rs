@@ -422,3 +422,19 @@ impl FeedsMetrics {
         })
     }
 }
+
+#[derive(Debug)]
+pub struct SequencerMetrics {
+    pub batched_votes_msgs_in_queue: IntGauge,
+}
+
+impl SequencerMetrics {
+    pub fn new(prefix: &str) -> Result<SequencerMetrics> {
+        Ok(SequencerMetrics {
+            batched_votes_msgs_in_queue: register_int_gauge!(
+                format!("{}batched_votes_msgs_in_queue", prefix),
+                "Number of not yet processed batched updates to relayers",
+            )?,
+        })
+    }
+}
