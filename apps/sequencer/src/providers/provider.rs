@@ -44,7 +44,10 @@ use tokio::time::error::Elapsed;
 use tokio::time::Duration;
 use tracing::{debug, error, info, warn};
 
-use crate::providers::eth_send_utils::{get_gas_limit, get_tx_retry_params, GasFees};
+use crate::providers::eth_send_utils::{
+    get_gas_limit, get_tx_retry_params, BatchOfUpdatesToProcess, GasFees,
+};
+use crate::providers::inflight_observations::InflightObservations;
 use std::time::Instant;
 
 pub type ProviderType =
@@ -122,6 +125,7 @@ pub struct RpcProvider {
     pub rpc_url: Url,
     pub rb_indices: RoundBufferIndices,
     num_tx_in_progress: u32,
+    pub inflight: InflightObservations,
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -354,6 +358,7 @@ impl RpcProvider {
             rpc_url,
             rb_indices: RoundBufferIndices::new(),
             num_tx_in_progress: 0,
+            inflight: InflightObservations::new(),
         }
     }
 
@@ -845,6 +850,18 @@ impl RpcProvider {
 
     pub fn get_num_tx_in_progress(&self) -> u32 {
         self.num_tx_in_progress
+    }
+
+    pub fn insert_non_finalized_update(&mut self, block_height: u64, cmd: BatchOfUpdatesToProcess) {
+        self.inflight.insert_non_finalized_update(block_height, cmd)
+    }
+
+    pub fn prune_observed_up_to(&mut self, finalized_block: u64) -> usize {
+        self.inflight.prune_observed_up_to(finalized_block)
+    }
+
+    pub fn insert_observed_block_hash(&mut self, block_height: u64, hash: B256) {
+        self.inflight.insert_observed_block_hash(block_height, hash)
     }
 }
 

@@ -1,16 +1,18 @@
 use actix_web::{rt::time::interval, web::Data};
 use alloy::{
+    eips::BlockNumberOrTag,
     hex,
     network::TransactionBuilder,
     primitives::{Address, Bytes},
     providers::{Provider, ProviderBuilder},
     rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
-use alloy_primitives::{keccak256, U256};
+use alloy_primitives::{keccak256, B256, U256};
 use blocksense_config::{FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
-use blocksense_utils::{counter_unbounded_channel::CountedReceiver, EncodedFeedId};
+use blocksense_utils::{await_time, counter_unbounded_channel::CountedReceiver, EncodedFeedId};
+use chrono::Local;
 use eyre::{bail, eyre, Result};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
 use tokio::{
@@ -20,8 +22,8 @@ use tokio::{
 
 use crate::{
     providers::provider::{
-        parse_eth_address, HashValue, ProviderStatus, ProviderType, ProvidersMetrics, RpcProvider,
-        SharedRpcProviders,
+        parse_eth_address, HashValue, LatestRBIndex, ProviderStatus, ProviderType,
+        ProvidersMetrics, RpcProvider, SharedRpcProviders,
     },
     sequencer_state::SequencerState,
 };
@@ -167,6 +169,7 @@ pub async fn create_and_collect_relayers_futures(
 ) {
     for (net, chan) in relayers_recv_channels.into_iter() {
         let feed_metrics_clone = feeds_metrics.clone();
+        let net_clone = net.clone();
         let provider_status_clone = provider_status.clone();
         let relayer_name = format!("relayer_for_network {net}");
         collected_futures.push(
@@ -174,7 +177,7 @@ pub async fn create_and_collect_relayers_futures(
                 .name(relayer_name.clone().as_str())
                 .spawn(async move {
                     loop_processing_batch_of_updates(
-                        net,
+                        net_clone,
                         relayer_name,
                         feed_metrics_clone,
                         provider_status_clone,
@@ -183,7 +186,7 @@ pub async fn create_and_collect_relayers_futures(
                     .await;
                     Ok(())
                 })
-                .expect("Failed to spawn metrics collector loop!"),
+                .expect("Failed to spawn {net} network relayer loop!"),
         );
     }
 }
@@ -198,7 +201,7 @@ pub async fn loop_processing_batch_of_updates(
     tracing::info!("Starting {relayer_name} loop...");
 
     //TODO: Create a termination reason pattern in the future. At this point networks are not added/removed dynamically in the sequencer,
-    // therefore the loop in iterating over the lifetime of the sequencer.
+    // therefore the loop is iterating over the lifetime of the sequencer.
     loop {
         let cmd_opt = chan.recv().await;
         let msgs_in_queue = chan.len();
@@ -207,17 +210,7 @@ pub async fn loop_processing_batch_of_updates(
                 let block_height = cmd.updates.block_height;
                 tracing::info!("Processing updates for network {relayer_name}, block_height {block_height}, messages in queue = {msgs_in_queue}");
                 let provider = cmd.provider.clone();
-                let result = eth_batch_send_to_contract(
-                    cmd.net,
-                    cmd.provider,
-                    cmd.provider_settings,
-                    cmd.updates,
-                    cmd.feeds_config,
-                    cmd.transaction_retry_timeout_secs,
-                    cmd.transaction_retries_count_limit,
-                    cmd.retry_fee_increment_fraction,
-                )
-                .await;
+                let result = eth_batch_send_to_contract(cmd).await;
 
                 let provider_metrics = provider.lock().await.provider_metrics.clone();
                 dec_metric!(provider_metrics, net, num_transactions_in_queue);
@@ -273,17 +266,457 @@ pub async fn loop_processing_batch_of_updates(
     }
 }
 
+pub async fn create_per_network_reorg_trackers(
+    collected_futures: &FuturesUnordered<JoinHandle<Result<(), Error>>>,
+    sequencer_state: Data<SequencerState>,
+) {
+    let providers_mutex = sequencer_state.providers.clone();
+    let providers = providers_mutex.read().await;
+
+    for (net, _p) in providers.iter() {
+        let reorg_trackers_name = format!("reorg_tracker for {net}");
+        let net_clone = net.clone();
+        let sequencer_state_providers_clone = sequencer_state.providers.clone();
+        collected_futures.push(
+            tokio::task::Builder::new()
+                .name(reorg_trackers_name.clone().as_str())
+                .spawn(async move {
+                    loop_tracking_for_reorg_in_network(net_clone, sequencer_state_providers_clone)
+                        .await;
+                    Ok(())
+                })
+                .expect("Failed to spawn tracker for reorgs loop in network {net}!"),
+        );
+    }
+}
+
+pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: SharedRpcProviders) {
+    tracing::info!("Starting tracker for reorgs in network {net} loop...");
+
+    let mut finalized_height = 0;
+    let mut observed_latest_height = 0;
+    let mut loop_count: u64 = 0;
+
+    // Loop until block generation time is determined
+    let average_block_generation_time: u64 = loop {
+        let poll_period = 60 * 1000;
+        if let Some(t) =
+            calculate_block_generation_time_in_network(net.as_str(), &providers_mutex, 100).await
+        {
+            break t;
+        } else {
+            warn!("Could not determine block generation time for network: {net}. Will retry in {poll_period}ms")
+        }
+        await_time(poll_period).await;
+    };
+
+    loop {
+        // Sleep between polls
+        await_time(average_block_generation_time).await;
+
+        loop_count += 1;
+        {
+            let now = Local::now();
+            info!("DEBUG: BEGIN loop_tracking_for_reorg_in_network for {net} loop_count: {loop_count}: {}!", now.format("%Y-%m-%d %H:%M:%S%.3f"));
+        }
+        // Scope the lock on providers so we don't hold it across awaits/sleeps
+        {
+            let providers = providers_mutex.read().await;
+            if let Some(provider_mutex) = providers.get(net.as_str()) {
+                // Gather data and perform minimal work while holding the provider lock
+                let mut need_resync_indices = false;
+                {
+                    let (rpc_handle, observed_block_hashes) = {
+                        let provider = provider_mutex.lock().await;
+                        (
+                            provider.provider.clone(),
+                            provider.inflight.observed_block_hashes.clone(),
+                        )
+                    };
+
+                    // 1) Observe latest finalized block for logging/visibility
+                    match rpc_handle
+                        .get_block_by_number(BlockNumberOrTag::Finalized)
+                        .await
+                    {
+                        Ok(res) => match res {
+                            Some(eth_finalized_block) => {
+                                let mut provider = provider_mutex.lock().await;
+
+                                // Prune non-finalized updates up to finalized height
+                                if finalized_height < eth_finalized_block.header.inner.number {
+                                    info!("Last finalized block in network {net} = {eth_finalized_block:?}");
+
+                                    finalized_height = eth_finalized_block.header.inner.number;
+                                    let removed = provider.prune_observed_up_to(finalized_height);
+                                    if removed > 0 {
+                                        info!("Pruned {removed} non-finalized updates up to finalized height {finalized_height} in `{net}`");
+                                    }
+                                }
+                                if observed_latest_height < finalized_height {
+                                    warn!("Lost track of chain in network {net} beyond a finalized checkpoint: {finalized_height}, last observed block at height: {observed_latest_height}");
+                                    observed_latest_height = finalized_height;
+                                    // Insert current hash into provider cache
+                                    provider.insert_observed_block_hash(
+                                        observed_latest_height,
+                                        eth_finalized_block.header.hash,
+                                    );
+                                    continue;
+                                }
+                            }
+                            None => {
+                                warn!("Could not get finalized block in network {net}, got None!");
+                            }
+                        },
+                        Err(e) => {
+                            warn!("Could not get finalized block in network {net}: {e:?}!");
+                        }
+                    };
+
+                    if let Ok(Some(b)) = rpc_handle
+                        .get_block_by_number(BlockNumberOrTag::Latest)
+                        .await
+                    {
+                        let _latest_hash = b.header.hash;
+                        let latest_height = b.header.inner.number;
+                        if latest_height > observed_latest_height {
+                            info!("Found new blocks in {net} loop_count = {loop_count} latest_height = {latest_height} {}", latest_height - observed_latest_height);
+
+                            // Check for reorg:
+                            let first_new_block_height = observed_latest_height + 1;
+                            if let Ok(Some(first_new_block)) = rpc_handle
+                                .get_block_by_number(BlockNumberOrTag::Number(
+                                    first_new_block_height,
+                                ))
+                                .await
+                            {
+                                if let Some(observed_latest_block_hash) =
+                                    observed_block_hashes.get(&observed_latest_height)
+                                {
+                                    if first_new_block.header.parent_hash
+                                        != *observed_latest_block_hash
+                                    {
+                                        warn!("Reorg detected in network {net}");
+
+                                        // Inspect previously observed blocks to find the
+                                        // first common ancestor and log the diverged ones.
+                                        let mut observed_heights: Vec<u64> = observed_block_hashes
+                                            .keys()
+                                            .copied()
+                                            .filter(|h| *h <= observed_latest_height)
+                                            .collect();
+                                        observed_heights.sort_unstable();
+                                        observed_heights.reverse();
+
+                                        let fmt_hash = |hash: &B256| {
+                                            format!("0x{}", hex::encode(hash.as_slice()))
+                                        };
+
+                                        let mut diverged_blocks = Vec::new();
+                                        let mut first_common: Option<(u64, B256)> = None;
+
+                                        for height in observed_heights {
+                                            let stored_hash =
+                                                match observed_block_hashes.get(&height) {
+                                                    Some(hash) => *hash,
+                                                    None => continue,
+                                                };
+
+                                            match rpc_handle
+                                                .get_block_by_number(BlockNumberOrTag::Number(
+                                                    height,
+                                                ))
+                                                .await
+                                            {
+                                                Ok(Some(chain_block)) => {
+                                                    let chain_hash = chain_block.header.hash;
+                                                    if chain_hash == stored_hash {
+                                                        first_common = Some((height, chain_hash));
+                                                        break;
+                                                    } else {
+                                                        diverged_blocks.push((
+                                                            height,
+                                                            chain_hash,
+                                                            stored_hash,
+                                                        ));
+                                                    }
+                                                }
+                                                Ok(None) => {
+                                                    warn!(
+                                                            "Block {height} missing while inspecting reorg in network {net}"
+                                                        );
+                                                }
+                                                Err(e) => {
+                                                    warn!(
+                                                            "Failed to get block {height} in network {net} while inspecting reorg: {e:?}"
+                                                        );
+                                                }
+                                            }
+                                        }
+
+                                        if !diverged_blocks.is_empty() {
+                                            let diverged_description: Vec<String> = diverged_blocks
+                                                .iter()
+                                                .map(|(height, chain_hash, stored_hash)| {
+                                                    format!(
+                                                        "height={height}, chain={}, stored={}",
+                                                        fmt_hash(chain_hash),
+                                                        fmt_hash(stored_hash),
+                                                    )
+                                                })
+                                                .collect();
+                                            warn!(
+                                                "Diverged blocks observed in network {net}: {}",
+                                                diverged_description.join("; ")
+                                            );
+                                        }
+
+                                        if let Some((common_height, common_hash)) = first_common {
+                                            info!(
+                                                    "First common ancestor for reorg in network {net} at height {common_height} with hash {}",
+                                                    fmt_hash(&common_hash)
+                                                );
+                                            let fork_height = common_height + 1;
+                                            info!(
+                                                "Fork point for reorg in network {net} is at height {fork_height}"
+                                            );
+
+                                            // Print all non-finalized updates at or above the fork height
+                                            {
+                                                let provider = provider_mutex.lock().await;
+                                                let mut heights: Vec<u64> = provider
+                                                    .inflight
+                                                    .non_finalized_updates
+                                                    .keys()
+                                                    .copied()
+                                                    .filter(|h| *h >= fork_height)
+                                                    .collect();
+                                                heights.sort_unstable();
+
+                                                if heights.is_empty() {
+                                                    info!(
+                                                        "No non_finalized_updates at or above fork height {fork_height} in network {net}"
+                                                    );
+                                                } else {
+                                                    for h in heights {
+                                                        if let Some(batch) = provider
+                                                            .inflight
+                                                            .non_finalized_updates
+                                                            .get(&h)
+                                                        {
+                                                            let updates_count =
+                                                                batch.updates.updates.len();
+                                                            info!(
+                                                                "non_finalized_update >= fork: height={h}, batch_block_height={}, updates_count={}, net={}",
+                                                                batch.updates.block_height,
+                                                                updates_count,
+                                                                batch.net,
+                                                            );
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            warn!(
+                                                    "Failed to find a common ancestor within stored block hashes for reorg in network {net}"
+                                                );
+                                        }
+                                    } else {
+                                        info!(
+                                            "Chain goes on in {net}, loop {loop_count} ... need to add {} new blocks",
+                                            latest_height - observed_latest_height
+                                        );
+                                        let mut provider = provider_mutex.lock().await;
+                                        info!("DEBUG: Adding block with height {first_new_block_height}");
+                                        provider.insert_observed_block_hash(
+                                            first_new_block_height,
+                                            first_new_block.header.hash,
+                                        );
+                                        for block_height in
+                                            first_new_block_height + 1..latest_height
+                                        {
+                                            if let Ok(Some(new_block)) = rpc_handle
+                                                .get_block_by_number(BlockNumberOrTag::Number(
+                                                    block_height,
+                                                ))
+                                                .await
+                                            {
+                                                info!("DEBUG: Further adding block with height {block_height}");
+                                                provider.insert_observed_block_hash(
+                                                    block_height,
+                                                    new_block.header.hash,
+                                                );
+                                            } else {
+                                                warn!("DEBUG: Could not get block {block_height}");
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    error!("No observed block hash for observed_latest_height = {observed_latest_height}!");
+                                }
+                            } else {
+                                warn!("DEBUG: Could not get block {first_new_block_height}");
+                            }
+                            observed_latest_height = latest_height;
+                        } else {
+                            info!("No new blocks in {net} loop_count = {loop_count} latest_height = {latest_height}");
+                        }
+                    }
+
+                    // 2) Check the on-chain ADFS root; if it differs from our local view,
+                    //    set it so subsequent txs use the correct prev-root and flag resync of indices.
+                    {
+                        let mut provider = provider_mutex.lock().await;
+                        if let Some(contract) = provider.get_latest_contract() {
+                            if let Some(contract_address) = contract.address {
+                                match rpc_handle
+                                    .get_storage_at(contract_address, U256::from(0))
+                                    .await
+                                {
+                                    Ok(chain_root) => {
+                                        let chain_root_h = HashValue(chain_root.into());
+                                        let local_frontier_root =
+                                            provider.calldata_merkle_tree_frontier.root();
+                                        let tracked_contract_root =
+                                            provider.merkle_root_in_contract.clone();
+
+                                        let differs_from_local =
+                                            local_frontier_root.0 != chain_root_h.0;
+
+                                        if differs_from_local {
+                                            info!(
+                                                "Detected state change on-chain for `{net}`. Updating tracked contract root from {:?} / local {:?} to {:?}",
+                                                tracked_contract_root, local_frontier_root, chain_root_h
+                                            );
+                                            provider.merkle_root_in_contract = Some(chain_root_h);
+                                            need_resync_indices = true;
+                                        }
+                                    }
+                                    Err(e) => {
+                                        warn!(
+                                            "Failed to read ADFS root from network `{net}`: {e:?}"
+                                        );
+                                    }
+                                }
+                            } else {
+                                warn!("Could not get contract's address for network: {net}");
+                            }
+                        } else {
+                            warn!("No ADFS contract set for network: {net}");
+                        }
+                    }
+                };
+
+                // 3) If we detected divergence, resync round-buffer indices from chain
+                if need_resync_indices {
+                    let mut provider = provider_mutex.lock().await;
+                    if let Some(contract) = provider.get_latest_contract() {
+                        if let Some(contract_address) = contract.address {
+                            try_to_sync(net.as_str(), &mut provider, &contract_address, None).await;
+                        }
+                    }
+                }
+            } else {
+                info!("Terminating reorg tracker for network {net} since it no longer has an active provider!");
+                break;
+            }
+            {
+                let now = Local::now();
+                info!("DEBUG: END loop_tracking_for_reorg_in_network for {net} loop_count: {loop_count}: {}!", now.format("%Y-%m-%d %H:%M:%S%.3f"));
+            }
+        }
+    }
+}
+
+/// Calculates the average block generation time over the last `num_blocks`
+/// as `(ts_latest - ts_{latest - num_blocks}) / num_blocks` (in milliseconds).
+/// Returns `None` if the calculation cannot be performed.
+pub async fn calculate_block_generation_time_in_network(
+    net: &str,
+    providers_mutex: &SharedRpcProviders,
+    num_blocks: u64,
+) -> Option<u64> {
+    if num_blocks == 0 {
+        warn!("num_blocks must be >= 1 for average block time in network {net}");
+        return None;
+    }
+    let providers = providers_mutex.read().await;
+    let Some(provider_mutex) = providers.get(net) else {
+        warn!("No active provider found for network {net}");
+        return None;
+    };
+    // Clone the RPC handle without holding the provider lock across awaits
+    let rpc_handle = {
+        let provider = provider_mutex.lock().await;
+        provider.provider.clone()
+    };
+
+    let latest_block = match rpc_handle
+        .get_block_by_number(BlockNumberOrTag::Latest)
+        .await
+    {
+        Ok(Some(b)) => b,
+        Ok(None) => {
+            warn!("Could not get latest block in network {net} (None)");
+            return None;
+        }
+        Err(e) => {
+            warn!("Error getting latest block in network {net}: {e:?}");
+            return None;
+        }
+    };
+
+    let latest_height = latest_block.header.inner.number;
+    if latest_height < num_blocks {
+        warn!(
+            "Latest block height {latest_height} < requested lookback {num_blocks} in network {net}"
+        );
+        return None;
+    }
+
+    let lookback_height = latest_height - num_blocks;
+    let prev_block = match rpc_handle
+        .get_block_by_number(BlockNumberOrTag::Number(lookback_height))
+        .await
+    {
+        Ok(Some(b)) => b,
+        Ok(None) => {
+            warn!("Could not get lookback block {lookback_height} in network {net} (None)");
+            return None;
+        }
+        Err(e) => {
+            warn!("Error getting lookback block {lookback_height} in network {net}: {e:?}");
+            return None;
+        }
+    };
+
+    let latest_ts = latest_block.header.inner.timestamp;
+    let prev_ts = prev_block.header.inner.timestamp;
+    if latest_ts < prev_ts {
+        warn!(
+            "Latest block timestamp < lookback block timestamp in {net}: {} < {}",
+            latest_ts, prev_ts
+        );
+        return None;
+    }
+    let total_span = latest_ts.saturating_sub(prev_ts);
+    // Convert to milliseconds before averaging to preserve precision.
+    let total_span_ms = total_span.saturating_mul(1000);
+    Some(total_span_ms / num_blocks)
+}
+
 #[allow(clippy::too_many_arguments)]
 pub async fn eth_batch_send_to_contract(
-    net: String,
-    provider_mutex: Arc<Mutex<RpcProvider>>,
-    provider_settings: blocksense_config::Provider,
-    mut updates: BatchedAggregatesToSend,
-    feeds_config: Arc<RwLock<HashMap<EncodedFeedId, FeedConfig>>>,
-    transaction_retry_timeout_secs: u64,
-    transaction_retries_count_limit: u64,
-    retry_fee_increment_fraction: f64,
+    cmd: BatchOfUpdatesToProcess,
 ) -> Result<(String, Vec<EncodedFeedId>)> {
+    let net = cmd.net.clone();
+    let provider_mutex = cmd.provider.clone();
+    let provider_settings = cmd.provider_settings.clone();
+    let feeds_config = cmd.feeds_config.clone();
+    let transaction_retry_timeout_secs = cmd.transaction_retry_timeout_secs;
+    let transaction_retries_count_limit = cmd.transaction_retries_count_limit;
+    let retry_fee_increment_fraction = cmd.retry_fee_increment_fraction;
+    let mut updates = cmd.updates.clone();
     let mut feeds_rb_indices = HashMap::new();
     let serialized_updates = get_serialized_updates_for_network(
         net.as_str(),
@@ -357,7 +790,7 @@ pub async fn eth_batch_send_to_contract(
     };
     let next_calldata_merkle_tree_root = next_calldata_merkle_tree.root();
 
-    // Merkle tree over all call data management for ADFS contracts (version 0 is legacy).
+    // Merkle tree over all call data management for ADFS contracts.
     let serialized_updates = [
         vec![1],
         prev_calldata_merkle_tree_root.0.to_vec(),
@@ -424,6 +857,9 @@ pub async fn eth_batch_send_to_contract(
         break nonce;
     };
 
+    let mut inclusion_block = None;
+    let mut inclusion_block_hash: Option<B256> = None;
+
     loop {
         debug!("loop begin; transaction_retries_count={transaction_retries_count} in network `{net}` block height {block_height} with transaction_retries_count_limit = {transaction_retries_count_limit} and transaction_retry_timeout_secs = {transaction_retry_timeout_secs}");
 
@@ -443,14 +879,15 @@ pub async fn eth_batch_send_to_contract(
         {
             Ok(latest_nonce) => {
                 if latest_nonce > nonce {
+                    // If the nonce in the contract increased and the next state root hash is not as we expect,
+                    // another sequencer was able to post updates for the current block height before this one.
+                    // We need to take this into account and reread the round counters of the feeds.
+                    info!("Updates to contract already posted, network {net}, block_height {block_height}, latest_nonce {latest_nonce}, previous_nonce {nonce}, merkle_root in contract {prev_calldata_merkle_tree_root:?}");
                     try_to_sync(
                         net.as_str(),
                         &mut provider,
                         &contract_address,
-                        block_height,
-                        &next_calldata_merkle_tree_root,
-                        latest_nonce,
-                        nonce,
+                        Some(&next_calldata_merkle_tree_root),
                     )
                     .await;
                     return Ok(("true".to_string(), feeds_to_update_ids));
@@ -606,14 +1043,12 @@ pub async fn eth_batch_send_to_contract(
                     Err(err) => {
                         warn!("Error while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
                         if err.to_string().contains("execution revert") {
+                            info!("Trying to sync due to tx revert, network {net}, block_height {block_height}, latest_nonce {latest_nonce}, previous_nonce {nonce}, merkle_root in contract {prev_calldata_merkle_tree_root:?}");
                             try_to_sync(
                                 net.as_str(),
                                 &mut provider,
                                 &contract_address,
-                                block_height,
-                                &next_calldata_merkle_tree_root,
-                                latest_nonce,
-                                nonce,
+                                Some(&next_calldata_merkle_tree_root),
                             )
                             .await;
                             return Ok(("false".to_string(), feeds_to_update_ids));
@@ -719,6 +1154,18 @@ pub async fn eth_batch_send_to_contract(
             tx_receipt
         };
 
+        if let Some(eth_block_number) = tx_receipt.block_number {
+            info!("Transaction was included in block #{}", eth_block_number);
+            inclusion_block = Some(eth_block_number);
+            if let Some(h) = tx_receipt.block_hash {
+                inclusion_block_hash = Some(h);
+            } else {
+                error!("Receipt has no block hash!");
+            }
+        } else {
+            error!("Receipt has no block number!");
+        }
+
         let tx_result_str = format!("{tx_receipt:?}");
         debug!("tx_result_str={tx_result_str} in network `{net}` block height {block_height}");
 
@@ -735,6 +1182,12 @@ pub async fn eth_batch_send_to_contract(
 
     log_gas_used(&net, &receipt, transaction_time, provider_metrics).await;
 
+    if let Some(b) = inclusion_block {
+        provider.insert_non_finalized_update(b, cmd);
+        if let Some(h) = inclusion_block_hash {
+            provider.insert_observed_block_hash(b, h);
+        }
+    }
     provider.update_history(&updates.updates);
     let result = receipt.status().to_string();
     if result == "true" {
@@ -784,10 +1237,7 @@ async fn try_to_sync(
     net: &str,
     provider: &mut RpcProvider,
     contract_address: &Address,
-    block_height: u64,
-    next_calldata_merkle_tree_root: &HashValue,
-    latest_nonce: u64,
-    previous_nonce: u64,
+    next_calldata_merkle_tree_root: Option<&HashValue>,
 ) {
     let rpc_handle = &provider.provider;
     match rpc_handle
@@ -795,13 +1245,30 @@ async fn try_to_sync(
         .await
     {
         Ok(root) => {
-            if root != next_calldata_merkle_tree_root.0.into() {
-                // If the nonce in the contract increased and the next state root hash is not as we expect,
-                // another sequencer was able to post updates for the current block height before this one.
-                // We need to take this into account and reread the round counters of the feeds.
-                info!("Updates to contract already posted, network {net}, block_height {block_height}, latest_nonce {latest_nonce}, previous_nonce {previous_nonce}, merkle_root in contract {root}");
+            if next_calldata_merkle_tree_root.is_none_or(|val| root != val.0.into()) {
                 provider.merkle_root_in_contract = Some(HashValue(root.into()));
-                // TODO: Read round counters from contract
+                let keys: Vec<EncodedFeedId> = if provider.rb_indices.is_empty() {
+                    provider.feeds_variants.keys().cloned().collect()
+                } else {
+                    provider.rb_indices.keys().cloned().collect()
+                };
+
+                let mut new_indices = provider.rb_indices.clone();
+                for encoded_feed_id in keys {
+                    match provider.get_latest_rb_index(&encoded_feed_id).await {
+                        Ok(LatestRBIndex {
+                            encoded_feed_id,
+                            index,
+                        }) => {
+                            new_indices.insert(encoded_feed_id, index as u64);
+                        }
+                        Err(e) => {
+                            warn!("Failed to refresh rb index for feed {encoded_feed_id} in network `{net}`: {e:?}");
+                        }
+                    }
+                }
+                provider.rb_indices = new_indices;
+                debug!("Refreshed rb indices from chain for `{net}`");
             }
         }
         Err(e) => {
