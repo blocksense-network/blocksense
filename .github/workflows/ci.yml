@@ -256,6 +256,8 @@ jobs:
         if: matrix.project == 'docs.blocksense.network'
         env:
           DOCS_DEPLOY_URL: ${{ steps.deploy-website.outputs.deployment-url }}
+          NEXT_PUBLIC_VERIFICATION_API_KEY: ${{ secrets.NEXT_PUBLIC_VERIFICATION_API_KEY }}
+          NEXT_PUBLIC_VERIFICATION_API_URL: ${{ secrets.NEXT_PUBLIC_VERIFICATION_API_URL }}
         run: |
           echo "url=$DOCS_DEPLOY_URL" >> $GITHUB_OUTPUT
 
