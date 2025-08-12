@@ -5,7 +5,7 @@ use crate::feeds::feeds_slots_manager::feeds_slots_manager_loop;
 use crate::feeds::votes_result_sender::votes_result_sender_loop;
 use crate::metrics_collector::metrics_collector_loop;
 use crate::providers::eth_send_utils::{
-    create_and_collect_relayers_futures, BatchOfUpdatesToProcess,
+    create_and_collect_relayers_futures, create_per_network_reorg_trackers, BatchOfUpdatesToProcess,
 };
 use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
@@ -83,6 +83,8 @@ pub async fn prepare_app_workers(
         relayers_recv_channels,
     )
     .await;
+
+    create_per_network_reorg_trackers(&collected_futures, sequencer_state.clone()).await;
 
     collected_futures
 }
