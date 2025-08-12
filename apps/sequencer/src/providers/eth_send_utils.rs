@@ -1,5 +1,6 @@
 use actix_web::{rt::time::interval, web::Data};
 use alloy::{
+    eips::BlockNumberOrTag,
     hex,
     network::TransactionBuilder,
     primitives::{Address, Bytes},
@@ -10,7 +11,9 @@ use alloy_primitives::{keccak256, U256};
 use blocksense_config::{FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
-use blocksense_utils::{counter_unbounded_channel::CountedReceiver, EncodedFeedId};
+use blocksense_utils::{
+    await_time, counter_unbounded_channel::CountedReceiver, EncodedFeedId,
+};
 use eyre::{bail, eyre, Result};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
 use tokio::{
@@ -167,6 +170,7 @@ pub async fn create_and_collect_relayers_futures(
 ) {
     for (net, chan) in relayers_recv_channels.into_iter() {
         let feed_metrics_clone = feeds_metrics.clone();
+        let net_clone = net.clone();
         let provider_status_clone = provider_status.clone();
         let relayer_name = format!("relayer_for_network {net}");
         collected_futures.push(
@@ -174,7 +178,7 @@ pub async fn create_and_collect_relayers_futures(
                 .name(relayer_name.clone().as_str())
                 .spawn(async move {
                     loop_processing_batch_of_updates(
-                        net,
+                        net_clone,
                         relayer_name,
                         feed_metrics_clone,
                         provider_status_clone,
@@ -183,7 +187,7 @@ pub async fn create_and_collect_relayers_futures(
                     .await;
                     Ok(())
                 })
-                .expect("Failed to spawn metrics collector loop!"),
+                .expect("Failed to spawn {net} network relayer loop!"),
         );
     }
 }
@@ -198,7 +202,7 @@ pub async fn loop_processing_batch_of_updates(
     tracing::info!("Starting {relayer_name} loop...");
 
     //TODO: Create a termination reason pattern in the future. At this point networks are not added/removed dynamically in the sequencer,
-    // therefore the loop in iterating over the lifetime of the sequencer.
+    // therefore the loop is iterating over the lifetime of the sequencer.
     loop {
         let cmd_opt = chan.recv().await;
         let msgs_in_queue = chan.len();
@@ -269,6 +273,72 @@ pub async fn loop_processing_batch_of_updates(
                 }
             }
             None => warn!("Relayer {relayer_name} woke up on empty channel"),
+        }
+    }
+}
+
+pub async fn create_per_network_reorg_trackers(
+    collected_futures: &FuturesUnordered<JoinHandle<Result<(), Error>>>,
+    sequencer_state: Data<SequencerState>,
+) {
+    let providers_mutex = sequencer_state.providers.clone();
+    let providers = providers_mutex.read().await;
+
+    for (net, _p) in providers.iter() {
+        let reorg_trackers_name = format!("reorg_tracker for {net}");
+        let net_clone = net.clone();
+        let sequencer_state_providers_clone = sequencer_state.providers.clone();
+        collected_futures.push(
+            tokio::task::Builder::new()
+                .name(reorg_trackers_name.clone().as_str())
+                .spawn(async move {
+                    loop_tracking_for_reorg_in_network(net_clone, sequencer_state_providers_clone)
+                        .await;
+                    Ok(())
+                })
+                .expect("Failed to spawn tracker for reorgs loop in network {net}!"),
+        );
+    }
+}
+
+pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: SharedRpcProviders) {
+    tracing::info!("Starting tracker for reorgs in network {net} loop...");
+
+    loop {
+        let providers = providers_mutex.read().await;
+        if let Some(provider_mutex) = providers.get(net.as_str()) {
+            // Get latest finalized block
+            let finalized_block_opt = {
+                // In this block we get all variables we need from the rpc provider and drop
+                // the lock as soon as possible, then process the data
+                let provider = provider_mutex.lock().await;
+                let rpc_handle = &provider.provider;
+
+                let finalized_block_opt = match rpc_handle
+                    .get_block_by_number(BlockNumberOrTag::Finalized)
+                    .await
+                {
+                    Ok(res) => match res {
+                        Some(eth_finalized_block) => Some(eth_finalized_block),
+                        None => {
+                            warn!("Could not get finalized block in network {net}, got None!");
+                            None
+                        }
+                    },
+                    Err(e) => {
+                        warn!("Could not get finalized block in network {net}: {e:?}!");
+                        None
+                    }
+                };
+                finalized_block_opt
+            };
+            info!("Last finalized block in network {net} = {finalized_block_opt:?}");
+            // TODO: clean up saved transactions up to latest finalized block
+
+            await_time(5000).await;
+        } else {
+            info!("Terminating reorg tracker for network {net} since it no longer has an active provider!");
+            break;
         }
     }
 }
@@ -718,6 +788,12 @@ pub async fn eth_batch_send_to_contract(
 
             tx_receipt
         };
+
+        if let Some(eth_block_number) = tx_receipt.block_number {
+            info!("Transaction was included in block #{}", eth_block_number);
+        } else {
+            error!("Receipt has no block number!");
+        }
 
         let tx_result_str = format!("{tx_receipt:?}");
         debug!("tx_result_str={tx_result_str} in network `{net}` block height {block_height}");
