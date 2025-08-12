@@ -81,29 +81,32 @@ The official compiler for the Blocksense Noir language, used to develop Objectiv
 ## **5\. Component Interaction Diagram**
 
 The following diagram illustrates the high-level interactions between the core components of a Blocksense node.
-\+---------------------------------+
-| Developer (via Shell) |
-\+---------------------------------+
-|
-v
-\+---------------------------------+
-| Blocksense CLI (\`blocksense\`) |
-\+---------------------------------+
-| (RPC)
-v
-\+---------------------------------+ \+------------------------------------------+
-| Blocksense Daemon (\`blocksensed\`)|-----\>| Blocksense Network (Peers/Consensus) |
-| |\<-----| |
-| \- Manages Config & Duties | \+------------------------------------------+
-| \- Launches Duty Components |
-\+---------------------------------+
-| (IPC) | (Launches Process)
-v \+-------------------\> \[ Duty-Specific Components \]
-\+---------------------+ |
-| Credentials Manager | | e.g., blocksense-oracle-runtime
-| (\`blocksense-creds\`)| | blocksense-sim
-| \- Holds Keys | | blocksense-prover
-| \- Signs Payloads | |
-\+---------------------+ \+------------------------------------------+
+
+```
++---------------------------------+
+| Developer (via Shell)           |
++---------------------------------+
+                |
+                v
++---------------------------------+
+| Blocksense CLI (`blocksense`)   |
++---------------------------------+
+                | (RPC)
+                v
++---------------------------------+     +------------------------------------------+
+| Blocksense Daemon (`blocksensed`)|----->| Blocksense Network (Peers/Consensus) |
+|                                  |<-----|                                        |
+| - Manages Config & Duties        |     +------------------------------------------+
+| - Launches Duty Components       |
++---------------------------------+
+                | (IPC)            | (Launches Process)
+                v                   +-------------------> [ Duty-Specific Components ]
++---------------------+             |
+| Credentials Manager |             | e.g., blocksense-oracle-runtime
+| (`blocksense-creds`)|             | blocksense-sim
+| - Holds Keys        |             | blocksense-prover
+| - Signs Payloads    |             |
++---------------------+             +------------------------------------------+
+```
 
 This modular architecture ensures that Blocksense is not only powerful and scalable but also secure, flexible, and easy to develop for and maintain.

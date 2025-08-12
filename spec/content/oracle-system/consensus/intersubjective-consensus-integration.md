@@ -2,9 +2,7 @@
 
 ## **1\. Introduction: Bridging Two Worlds of Truth**
 
-The Blocksense network is uniquely designed to process both objective truths (computations with deterministic outcomes) and intersubjective truths (consensus on external information).1 The power of the network lies not just in handling these two domains, but in seamlessly and verifiably integrating them. The results from the
-
-**Intersubjective Truth Machine**, powered by zkSchellingCoin, must be woven into the state of the **Boundless Throughput Engine** with the same mathematical certainty as any other state transition.1
+The Blocksense network is uniquely designed to process both objective truths (computations with deterministic outcomes) and intersubjective truths (consensus on external information).[^1] The power of the network lies not just in handling these two domains, but in seamlessly and verifiably integrating them. The results from the **Intersubjective Truth Machine**, powered by zkSchellingCoin, must be woven into the state of the **Boundless Throughput Engine** with the same mathematical certainty as any other state transition.[^1]
 
 This is achieved by ensuring that the final result of any zkSchellingCoin consensus is accompanied by a ZK proof that attests to the correct and impartial tallying of votes. This "consensus proof" is a first-class object that can be processed by the Execution Layer, creating a trustless bridge between the two layers. This integration happens through two primary mechanisms: regularly scheduled data feeds and on-demand requests from on-chain programs.
 
@@ -14,10 +12,10 @@ Scheduled data feeds are the backbone of Blocksense's oracle services, providing
 
 ### **2.1. Vote Submission and Collection**
 
-For any given data feed, a secret sub-committee of reporters is selected to vote on the outcome.1
+For any given data feed, a secret sub-committee of reporters is selected to vote on the outcome.[^1]
 
 1. **Vote Casting:** Shortly before a scheduled publication time, each reporter in the committee submits their encrypted vote as a standard transaction.
-2. **Censorship Resistance:** These vote transactions are processed by the Ordering Layer's parallel DAG mempool, which guarantees their inclusion and ordering in a censorship-resistant manner.1
+2. **Censorship Resistance:** These vote transactions are processed by the Ordering Layer's parallel DAG mempool, which guarantees their inclusion and ordering in a censorship-resistant manner.[^1]
 3. **On-Chain Aggregation:** A simple, low-cost Objective Program, specific to the data feed, is executed. Its sole function is to receive the ordered votes and append them to a dedicated on-chain list, creating a public, immutable record of all submitted (but still encrypted) votes for that round.
 
 ### **2.2. The Coordinator's Role: Tallying and Proving**
@@ -36,8 +34,8 @@ The final result is propagated through the system and delivered to external netw
 
 1. **Publication to Routing Table:** The Coordinator submits a transaction containing the final result and the tallying proof. A core system contract on the Execution Layer verifies this proof. If valid, the result is written to a special, system-wide **Routing Table**. This table acts as a central, verifiable source of truth for all oracle data.
 2. **Cross-Chain Aggregation:** A separate, permissionless relayer network monitors the Routing Table. When a new value is published, the relayer identifies which target networks (e.g., Ethereum, Solana) are subscribed to that data feed.
-3. **ADFS Payload Generation:** The relayer bundles all pending updates for a specific target network into a single payload, formatting it according to the data structure required by that chain's **Aggregated Data Feed Store (ADFS)** contract.1
-4. **Final Proof for Target Chain:** The relayer generates a final ZK proof that attests to the correct bundling and formatting of this ADFS payload. This proof, along with the payload, is submitted to the target chain. The on-chain ADFS contract only needs to perform a single, inexpensive ZK proof verification to accept thousands of data updates simultaneously, providing unparalleled cost efficiency.1
+3. **ADFS Payload Generation:** The relayer bundles all pending updates for a specific target network into a single payload, formatting it according to the data structure required by that chain's **Aggregated Data Feed Store (ADFS)** contract.[^1]
+4. **Final Proof for Target Chain:** The relayer generates a final ZK proof that attests to the correct bundling and formatting of this ADFS payload. This proof, along with the payload, is submitted to the target chain. The on-chain ADFS contract only needs to perform a single, inexpensive ZK proof verification to accept thousands of data updates simultaneously, providing unparalleled cost efficiency.[^1]
 
 ## **3\. Mechanism 2: On-Demand Requests and the Task Manifest Pattern**
 
@@ -64,7 +62,7 @@ When an Objective Program needs to trigger a new verifiable computation, it does
 
 ## **4\. A General-Purpose Primitive for Verifiable Computation**
 
-The on-demand request/response mechanism is a fundamental primitive of the Blocksense service-oriented architecture, extending far beyond simple data oracles.1 The "Task Manifest" pattern can be used to create on-chain markets for any kind of verifiable computation:
+The on-demand request/response mechanism is a fundamental primitive of the Blocksense service-oriented architecture, extending far beyond simple data oracles.[^1] The "Task Manifest" pattern can be used to create on-chain markets for any kind of verifiable computation:
 
 - **zkSchellingCoin Consensus:** A dApp can request a one-time consensus on a complex event, like the outcome of a prediction market.
 - **ZK Proof Generation Market:** A dApp can create a Task Manifest with a request to generate a complex ZK proof for a large computation. The verifier program in the manifest would be the verifier circuit for the requested proof.
@@ -72,6 +70,6 @@ The on-demand request/response mechanism is a fundamental primitive of the Block
 
 In every case, the Task Manifest Object acts as a trustless escrow and verifier, ensuring that payment is only released for correctly completed work, as validated by the appropriate proof. This makes the Blocksense network an extensible, universally verifiable platform for a new generation of decentralized services.
 
-#### **Works cited**
+## **Works Cited**
 
-1. Blocksense\_ A Litepaper for the Universal Verification Layer.pdf
+[^1]: [[Blocksense Litepaper|blocksense-litepaper]] - Core protocol overview and design principles

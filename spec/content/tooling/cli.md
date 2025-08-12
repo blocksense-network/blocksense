@@ -17,8 +17,8 @@ The design of the blocksense CLI is guided by several core principles:
 
 These options can be used with any blocksense command.
 
-- \--help, \-h: Displays help information for the specified command.
-- \--version, \-V: Displays the current version of the blocksense CLI.
+- `--help`, `-h`: Displays help information for the specified command.
+- `--version`, `-V`: Displays the current version of the blocksense CLI.
 
 ---
 
@@ -32,26 +32,26 @@ Initializes a new Blocksense project from a predefined or custom template. This 
 
 **Usage:**
 
-Bash
-
-blocksense init \<TEMPLATE\> \<PROJECT_NAME\>
+```bash
+blocksense init <TEMPLATE> <PROJECT_NAME>
+```
 
 **Arguments:**
 
-- \<TEMPLATE\>: The name of the template to use. This can be one of the official templates or a URL to a custom Git repository.
-- \<PROJECT_NAME\>: The name of the new directory to create for your project.
+- `<TEMPLATE>`: The name of the template to use. This can be one of the official templates or a URL to a custom Git repository.
+- `<PROJECT_NAME>`: The name of the new directory to create for your project.
 
 **Official Templates:**
 
-- oracle-service-rust: A minimal "hello world" Intersubjective Service in Rust, including a basic query function and unit test.
-- price-feed-oracle: A comprehensive price feed example demonstrating API fetching, advanced consensus models, and caching.
-- objective-program-noir: A minimal ZK circuit project using Blocksense Noir, including a simple circuit and test case. 1
-- zk-identity-service: A template for building a custom, ZK-powered identity service, showcasing the authorize_user API.
-- full-stack-dapp: A complete end-to-end example including an oracle service, an objective program, a frontend, and localnet configuration.
+- `oracle-service-rust`: A minimal "hello world" Intersubjective Service in Rust, including a basic query function and unit test.
+- `price-feed-oracle`: A comprehensive price feed example demonstrating API fetching, advanced consensus models, and caching.
+- `objective-program-noir`: A minimal ZK circuit project using Blocksense Noir, including a simple circuit and test case.
+- `zk-identity-service`: A template for building a custom, ZK-powered identity service, showcasing the authorize_user API.
+- `full-stack-dapp`: A complete end-to-end example including an oracle service, an objective program, a frontend, and localnet configuration.
 
 **Output:**
 
-The init command generates a new directory containing the selected template's files and a central Blocksense.toml configuration file. This manifest is used to configure builds, tests, deployments, and local network settings.
+The init command generates a new directory containing the selected template's files and a central `Blocksense.toml` configuration file. This manifest is used to configure builds, tests, deployments, and local network settings.
 
 ### **blocksense build**
 
@@ -59,18 +59,18 @@ Compiles all components within a project directory into deployable artifacts. Th
 
 **Usage:**
 
-Bash
-
+```bash
 blocksense build
+```
 
 **Arguments:**
 
-- \`\` (Optional): The path to the project or component to build. Defaults to the current directory.
+- `<PATH>` (Optional): The path to the project or component to build. Defaults to the current directory.
 
 **Behavior:**
 
-- **For Intersubjective Services (Rust):** Invokes cargo with the correct wasm32-unknown-unknown target and release profile to produce an optimized .wasm file.
-- **For Objective Programs (Noir):** Acts as a wrapper for the blocksense-noir compiler, using settings from Blocksense.toml and Prover.toml to generate the ACIR and ABI files. 1
+- **For Intersubjective Services (Rust):** Invokes cargo with the correct `wasm32-unknown-unknown` target and release profile to produce an optimized `.wasm` file.
+- **For Objective Programs (Noir):** Acts as a wrapper for the blocksense-noir compiler, using settings from `Blocksense.toml` and `Prover.toml` to generate the ACIR and ABI files.
 - **Dependency Check:** If the blocksense-noir compiler is required but not found in the system's PATH, the command will fail gracefully with a clear diagnostic message and installation instructions.
 
 ### **blocksense run**
@@ -79,13 +79,13 @@ Performs a single, one-off execution of a compiled oracle service or ZK circuit.
 
 **Usage:**
 
-Bash
-
+```bash
 blocksense run
+```
 
 **Arguments:**
 
-- \`\` (Optional): The path to the project or component to run. Defaults to the current directory. If the project is not yet built, blocksense run will trigger a build first.
+- `<PATH>` (Optional): The path to the project or component to run. Defaults to the current directory. If the project is not yet built, `blocksense run` will trigger a build first.
 
 **Output:**
 
@@ -97,28 +97,28 @@ Runs the complete test suite for a project, including unit tests for individual 
 
 **Usage:**
 
-Bash
-
+```bash
 blocksense test
+```
 
 **Behavior:**
 
-- **Unit Tests:** Discovers and runs tests written for both Rust oracle services (\#\[test\]) and Noir circuits (\#\[test\]).
+- **Unit Tests:** Discovers and runs tests written for both Rust oracle services (`#[test]`) and Noir circuits (`#[test]`).
 - **Integration Tests:** Can be configured to spin up an ephemeral instance of the localnet environment, deploy the project's programs, execute test scripts against them, and tear down the network upon completion.
 
 ### **blocksense debug**
 
-Starts a debugging session using the integrated CodeTracer time-traveling debugger. 4
+Starts a debugging session using the integrated CodeTracer time-traveling debugger.
 
 **Usage:**
 
-Bash
-
+```bash
 blocksense debug
+```
 
 **Arguments:**
 
-- \`\` (Optional): The path to the program to debug. Defaults to the current directory.
+- `<PATH>` (Optional): The path to the program to debug. Defaults to the current directory.
 
 **Behavior:**
 
@@ -128,7 +128,7 @@ The command automates the debugging workflow:
 2. Executes the program to generate a detailed execution trace.
 3. Launches the CodeTracer UI with the trace file loaded.
 
-If the codetracer executable is not found in the system's PATH, the command will provide a helpful diagnostic message with a link to installation instructions. 7
+If the `codetracer` executable is not found in the system's PATH, the command will provide a helpful diagnostic message with a link to installation instructions.
 
 ### **blocksense deploy**
 
@@ -136,17 +136,17 @@ Deploys compiled program artifacts to a specified Blocksense network.
 
 **Usage:**
 
-Bash
-
-blocksense deploy \--network \<NETWORK\>
+```bash
+blocksense deploy --network <NETWORK>
+```
 
 **Options:**
 
-- \--network \<NETWORK\>: (Required) Specifies the target network (e.g., localnet, testnet, mainnet). Network details are configured in Blocksense.toml.
+- `--network <NETWORK>`: (Required) Specifies the target network (e.g., localnet, testnet, mainnet). Network details are configured in `Blocksense.toml`.
 
 **Behavior:**
 
-- **For Objective Programs:** Wraps the deploy_module system operation to publish the immutable program code. It can then interactively prompt to create a stateful instance via create_instance.
+- **For Objective Programs:** Wraps the `deploy_module` system operation to publish the immutable program code. It can then interactively prompt to create a stateful instance via `create_instance`.
 - **For Intersubjective Services:** Deploys the service's WASM bytecode to the Intersubjective Truth Machine, making it available for execution by oracle nodes.
 
 ### **blocksense upgrade**
@@ -155,14 +155,14 @@ Performs a standard upgrade on a deployed, mutable program instance.
 
 **Usage:**
 
-Bash
-
-blocksense upgrade \--network \<NETWORK\> \<INSTANCE_ID\> \<NEW_MODULE_ADDRESS\>
+```bash
+blocksense upgrade --network <NETWORK> <INSTANCE_ID> <NEW_MODULE_ADDRESS>
+```
 
 **Arguments:**
 
-- \<INSTANCE_ID\>: The on-chain ID of the mutable program instance to be upgraded.
-- \<NEW_MODULE_ADDRESS\>: The address of the new program module to upgrade to.
+- `<INSTANCE_ID>`: The on-chain ID of the mutable program instance to be upgraded.
+- `<NEW_MODULE_ADDRESS>`: The address of the new program module to upgrade to.
 
 **Behavior:**
 
@@ -170,21 +170,21 @@ Constructs and submits the upgrade transaction to the specified network after sh
 
 ### **blocksense localnet**
 
-Manages the local simulation environment, which includes a Blocksense dev node and emulators for target networks like Ethereum. 8
+Manages the local simulation environment, which includes a Blocksense dev node and emulators for target networks like Ethereum.
 
 **Usage:**
 
-Bash
-
-blocksense localnet \<SUBCOMMAND\>
+```bash
+blocksense localnet <SUBCOMMAND>
+```
 
 **Subcommands:**
 
-- start: Starts the complete local network stack as defined in the orchestration configuration (Process Compose or Docker Compose). 9
-  - \--fork \<NETWORK_URL\>: (Optional) Starts the localnet in a "shadow fork" mode, cloning the state of a live public network from the specified JSON-RPC URL. 12
-  - \--fork-block-number \<NUMBER\>: (Optional) Used with \--fork to pin the forked state to a specific block number, ensuring deterministic test runs.
-- stop: Stops all services managed by the localnet.
-- status: Displays the current status of all localnet services.
+- `start`: Starts the complete local network stack as defined in the orchestration configuration (Process Compose or Docker Compose).
+  - `--fork <NETWORK_URL>`: (Optional) Starts the localnet in a "shadow fork" mode, cloning the state of a live public network from the specified JSON-RPC URL.
+  - `--fork-block-number <NUMBER>`: (Optional) Used with `--fork` to pin the forked state to a specific block number, ensuring deterministic test runs.
+- `stop`: Stops all services managed by the localnet.
+- `status`: Displays the current status of all localnet services.
 
 ### **blocksense account**
 
@@ -192,28 +192,40 @@ Manages local accounts used for development and testing.
 
 **Usage:**
 
-Bash
-
-blocksense account \<SUBCOMMAND\>
+```bash
+blocksense account <SUBCOMMAND>
+```
 
 **Subcommands:**
 
-- new: Creates a new keypair and saves it locally.
-- list: Lists all locally managed accounts.
-- balance \<ACCOUNT\>: Checks the balance of a specified account on a given network.
+- `new`: Creates a new keypair and saves it locally.
+- `list`: Lists all locally managed accounts.
+- `balance <ACCOUNT>`: Checks the balance of a specified account on a given network.
 
-#### **Works cited**
+## **Works Cited**
 
-1. Blocksense \- GitHub, accessed July 31, 2025, [https://github.com/blocksense-network](https://github.com/blocksense-network)
-2. Noir is a domain specific language for zero knowledge proofs \- GitHub, accessed July 31, 2025, [https://github.com/noir-lang/noir](https://github.com/noir-lang/noir)
-3. Noir Documentation, accessed July 31, 2025, [https://noir-lang.org/](https://noir-lang.org/)
-4. CodeTracer \- Open Collective, accessed July 31, 2025, [https://opencollective.com/codetracer](https://opencollective.com/codetracer)
-5. Introducing CodeTracer \- a time-travelling debugger built with Nim, for Nim., accessed July 31, 2025, [https://forum.nim-lang.org/t/12703](https://forum.nim-lang.org/t/12703)
-6. CodeTracer \- Noir Release Demo \- YouTube, accessed July 31, 2025, [https://www.youtube.com/watch?v=xZsJ55JVqmU](https://www.youtube.com/watch?v=xZsJ55JVqmU)
-7. diadata-org/oracle-pallet \- GitHub, accessed July 31, 2025, [https://github.com/diadata-org/oracle-pallet](https://github.com/diadata-org/oracle-pallet)
-8. Blocksense\_ A Litepaper for the Universal Verification Layer.pdf
-9. Process management using process-compose-flake, accessed July 31, 2025, [https://community.flake.parts/process-compose-flake](https://community.flake.parts/process-compose-flake)
-10. Process compose \- devenv, accessed July 31, 2025, [https://devenv.sh/supported-process-managers/process-compose/](https://devenv.sh/supported-process-managers/process-compose/)
-11. How Compose works \- Docker Docs, accessed July 31, 2025, [https://docs.docker.com/compose/intro/compose-application-model/](https://docs.docker.com/compose/intro/compose-application-model/)
-12. How To Fork Ethereum Mainnet with Hardhat | QuickNode Guides, accessed July 31, 2025, [https://www.quicknode.com/guides/ethereum-development/smart-contracts/how-to-fork-ethereum-mainnet-with-hardhat](https://www.quicknode.com/guides/ethereum-development/smart-contracts/how-to-fork-ethereum-mainnet-with-hardhat)
-13. Forking other networks | Ethereum development environment for professionals by Nomic Foundation \- Hardhat, accessed July 31, 2025, [https://hardhat.org/hardhat-network/docs/guides/forking-other-networks](https://hardhat.org/hardhat-network/docs/guides/forking-other-networks)
+[^1]: [[Blocksense Litepaper|blocksense-litepaper]] - Core protocol overview and design principles
+
+[^2]: [Blocksense GitHub Repository](https://github.com/blocksense-network) - Official source code
+
+[^3]: [Noir Language](https://github.com/noir-lang/noir) - Domain specific language for zero knowledge proofs
+
+[^4]: [Noir Documentation](https://noir-lang.org/) - Official Noir language documentation
+
+[^5]: [CodeTracer](https://opencollective.com/codetracer) - Time-travelling debugger
+
+[^6]: [CodeTracer Introduction](https://forum.nim-lang.org/t/12703) - Forum discussion and introduction
+
+[^7]: [CodeTracer Demo](https://www.youtube.com/watch?v=xZsJ55JVqmU) - YouTube demonstration
+
+[^8]: [Oracle Pallet](https://github.com/diadata-org/oracle-pallet) - Reference implementation
+
+[^9]: [Process Compose Flake](https://community.flake.parts/process-compose-flake) - Process management using process-compose-flake
+
+[^10]: [Process Compose](https://devenv.sh/supported-process-managers/process-compose/) - Process manager documentation
+
+[^11]: [Docker Compose](https://docs.docker.com/compose/intro/compose-application-model/) - How Compose works
+
+[^12]: [Hardhat Forking](https://www.quicknode.com/guides/ethereum-development/smart-contracts/how-to-fork-ethereum-mainnet-with-hardhat) - How To Fork Ethereum Mainnet with Hardhat
+
+[^13]: [Hardhat Network Forking](https://hardhat.org/hardhat-network/docs/guides/forking-other-networks) - Forking other networks
