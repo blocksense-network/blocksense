@@ -22,18 +22,6 @@ stride = 0
 decimals = 0
 data = '{"pair":{"base":"ynETHx","quote":"WETH"},"decimals":0,"category":"","market_hours":"Crypto","arguments":{"contracts":[{"address":"0x7b883191011AEAe40581d3Fa1B112413808C9c00","label":"a","method_name":"getReservesData","param1":"1000000000000000000","rpc_urls":["https://rpc.hyperliquid.xyz/evm"]}]}}'
 
-[[trigger.oracle.data_feeds]]
-id = "100001"
-stride = 0
-decimals = 0
-data = '{"pair":{"base":"ynETHx","quote":"WETH"},"decimals":0,"category":"","market_hours":"Crypto","arguments":{"contracts":[{"address":"0x657d9ABA1DBb59e53f9F3eCAA878447dCfC96dCb","label":"ynETHx","method_name":"convertToAssets","param1":"1000000000000000000","rpc_urls":["https://eth.llamarpc.com","https://rpc.eth.gateway.fm","https://ethereum-rpc.publicnode.com"]}]}}'
-
-[[trigger.oracle.data_feeds]]
-id = "100002"
-stride = 0
-decimals = 6
-data = '{"pair":{"base":"YUSD","quote":"USDC"},"decimals":6,"category":"","market_hours":"Crypto","arguments":{"contracts":[{"address":"0x19Ebd191f7A24ECE672ba13A302212b5eF7F35cb","label":"YieldFi yUSD","method_name":"exchangeRate","rpc_urls":["https://eth.llamarpc.com","https://rpc.eth.gateway.fm","https://ethereum-rpc.publicnode.com"]}],"divisor":1000000}}'
-
 [component.eth-rpc]
 source = "../target/wasm32-wasip1/release/eth_rpc.wasm"
 allowed_outbound_hosts = [

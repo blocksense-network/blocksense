@@ -2,7 +2,7 @@ use alloy::sol_types::SolCall;
 use alloy::{
     hex::decode,
     hex::ToHexExt,
-    primitives::{Address, Bytes, U256, address},
+    primitives::{address, Address, Bytes, U256},
     providers::ProviderBuilder,
     sol,
 };
@@ -209,10 +209,7 @@ impl Contract {
         RequestEthCall::latest(&calldata, &self.address, id)
     }
 
-    fn decode_get_reserves_rate(
-        &self,
-        out_hex: &str,
-    ) -> Result<Vec<f64>> {
+    fn decode_get_reserves_rate(&self, out_hex: &str) -> Result<Vec<f64>> {
         let mut res = Vec::new();
         // strip 0x and to bytes
         let bytes = {
@@ -229,26 +226,24 @@ impl Contract {
         for r in &reserves._0 {
             println!(
                 "symbol={} underlying={} variableBorrowRate={}",
-                r.symbol,
-                r.underlyingAsset,
-                r.variableBorrowRate
+                r.symbol, r.underlyingAsset, r.variableBorrowRate
             );
-                    // pick field
-        let field = self.rate_field.as_deref().unwrap_or("variableBorrowRate");
-        let rate_ray_u128 =  r.variableBorrowRate;
+            // pick field
+            let field = self.rate_field.as_deref().unwrap_or("variableBorrowRate");
+            let rate_ray_u128 = r.variableBorrowRate;
 
-        // to f64 APR in [0, +inf)
-        let apr = (rate_ray_u128 as f64) / RAY_F64;
+            // to f64 APR in [0, +inf)
+            let apr = (rate_ray_u128 as f64) / RAY_F64;
 
-        // APR -> APY if requested: (1 + apr/sec)^sec - 1
-        let as_apy = self.as_apy.unwrap_or(false);
-        let out = if as_apy {
-            (1.0 + apr / SECONDS_PER_YEAR_F64).powf(SECONDS_PER_YEAR_F64) - 1.0
-        } else {
-            apr
-        };
-        println!("Decoded rate: {out}");
-        res.push(out);
+            // APR -> APY if requested: (1 + apr/sec)^sec - 1
+            let as_apy = self.as_apy.unwrap_or(false);
+            let out = if as_apy {
+                (1.0 + apr / SECONDS_PER_YEAR_F64).powf(SECONDS_PER_YEAR_F64) - 1.0
+            } else {
+                apr
+            };
+            println!("Decoded rate: {out}");
+            res.push(out);
         }
 
         Ok(res)
@@ -259,40 +254,45 @@ impl Contract {
         for rpc_url_candidate in &self.rpc_urls {
             if let Ok(rpc_url) = rpc_url_candidate.as_str().parse::<Url>() {
                 let provider = ProviderBuilder::new().connect_http(rpc_url.clone());
+                println!("provider {:?}", provider);
+
+                println!(
+                    "Fetching {} from {} with method {}",
+                    self.address, rpc_url, self.method_name
+                );
                 let eth_call = match self.prepare_request(provider, id) {
                     Some(value) => value,
                     None => break,
                 };
+                println!("Prepared eth_call: {:?} for feed_id={}", eth_call, id);
                 if let Ok(mut value) =
                     http_post_json::<RequestEthCall, ResponseEthCall>(rpc_url.as_str(), eth_call)
                         .await
                 {
                     value.rpc_url = Some(rpc_url_candidate.clone());
                     if value.error.is_none() {
-                    // NEW: decode complex returns for getReservesData
-                    if self.method_name == "getReservesData" {
-                        if let Some(res_hex) = &value.result {
-                            match self.decode_get_reserves_rate(res_hex) {
-                                Ok(rate) => {
-                                    println!(
-                                        "Decoded getReservesData rate: {:?}",
-                                        rate,
-                                    );
-                                    return Some(value);
-                                }
-                                Err(e) => {
-                                    // turn it into an error, but keep last_value fallback
-                                    value.error = Some(ResponseEthCallError {
-                                        message: format!("decode_get_reserves_rate: {e:#}"),
-                                        code: -32000,
-                                    });
+                        // NEW: decode complex returns for getReservesData
+                        if self.method_name == "getReservesData" {
+                            if let Some(res_hex) = &value.result {
+                                match self.decode_get_reserves_rate(res_hex) {
+                                    Ok(rate) => {
+                                        println!("Decoded getReservesData rate: {:?}", rate,);
+                                        return Some(value);
+                                    }
+                                    Err(e) => {
+                                        println!("Error decoding getReservesData rate WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWw");
+                                        // turn it into an error, but keep last_value fallback
+                                        value.error = Some(ResponseEthCallError {
+                                            message: format!("decode_get_reserves_rate: {e:#}"),
+                                            code: -32000,
+                                        });
+                                    }
                                 }
                             }
+                        } else {
+                            // primitive case: fine, we can return immediately
+                            return Some(value);
                         }
-                    } else {
-                        // primitive case: fine, we can return immediately
-                        return Some(value);
-                    }
                     } else {
                         last_value = Some(value);
                     }
@@ -454,7 +454,7 @@ struct Contract {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub param1: Option<U256>,
 
-        // NEW (only used for getReservesData):
+    // NEW (only used for getReservesData):
     #[serde(skip_serializing_if = "Option::is_none")]
     pub select_symbol: Option<String>, // e.g. "USDC", "WETH", etc.
     #[serde(skip_serializing_if = "Option::is_none")]

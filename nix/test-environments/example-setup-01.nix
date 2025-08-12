@@ -163,16 +163,9 @@ in
     };
 
     oracles = {
-      eth-rpc = {
+      hyper = {
         exec-interval = 10;
         allowed-outbound-hosts = [
-          "https://arbitrum-one-rpc.publicnode.com"
-          "https://eth.llamarpc.com"
-          "https://rpc.eth.gateway.fm"
-          "https://ethereum-rpc.publicnode.com"
-          "https://binance.llamarpc.com"
-          "https://bsc.meowrpc.com"
-          "https://bsc.drpc.org"
           "https://rpc.hyperliquid.xyz"
         ];
       };

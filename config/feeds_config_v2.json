@@ -2,10 +2,10 @@
   "feeds": [
     {
       "id": "1",
-      "full_name": "WHYPE Borrowing Rate",
-      "description": "YieldNest Restaked Ethereum / Wrapped Ethereum Redemption Rate. YieldNest convertToAssets call on ETH mainnet at 0x657d9ABA1DBb59e53f9F3eCAA878447dCfC96dCb",
+      "full_name": "WHYPE HypurrFi Borrow Rate",
+      "description": "WHYPE Borrow Rate on HypurrFi leveraged lending marketplace for clean leverage loops on Hyperliquid.",
       "type": "price-feed",
-      "oracle_id": "eth-rpc",
+      "oracle_id": "hyper",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -20,25 +20,138 @@
       },
       "additional_feed_info": {
         "pair": {
-          "base": "ynETHx",
-          "quote": "WETH"
+          "base": "WHYPE",
+          "quote": ""
         },
-        "decimals": 0,
-        "category": "",
-        "market_hours": "Crypto",
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
         "arguments": {
-          "contracts": [
-            {
-              "rpc_urls": [
-                "https://rpc.hyperliquid.xyz/evm"
-
-              ],
-              "address": "0x7b883191011AEAe40581d3Fa1B112413808C9c00",
-              "label": "a",
-              "method_name": "getReservesData",
-              "param1": "1000000000000000000"
-            }
-          ]
+          "marketplace": "HyperLand"
+        }
+      }
+    },
+    {
+      "id": "2",
+      "full_name": "wstHYPE HypurrFi Borrow Rate",
+      "description": "wstHYPE Borrow Rate on HypurrFi leveraged lending marketplace for clean leverage loops on Hyperliquid.",
+      "type": "price-feed",
+      "oracle_id": "hyper",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "wstHYPE",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "marketplace": "HypurrFi"
+        }
+      }
+    },
+    {
+      "id": "3",
+      "full_name": "uBTC HypurrFi Borrow Rate",
+      "description": "uBTC Borrow Rate on HypurrFi leveraged lending marketplace for clean leverage loops on Hyperliquid.",
+      "type": "price-feed",
+      "oracle_id": "hyper",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "UBTC",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "marketplace": "HypurrFi"
+        }
+      }
+    },
+    {
+      "id": "4",
+      "full_name": "UETH HypurrFi Borrow Rate",
+      "description": "UETH Borrow Rate on HypurrFi leveraged lending marketplace for clean leverage loops on Hyperliquid.",
+      "type": "price-feed",
+      "oracle_id": "hyper",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "UETH",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "marketplace": "HypurrFi"
+        }
+      }
+    },
+    {
+      "id": "5",
+      "full_name": "USDe HypurrFi Borrow Rate",
+      "description": "USDe Borrow Rate on HypurrFi leveraged lending marketplace for clean leverage loops on Hyperliquid.",
+      "type": "price-feed",
+      "oracle_id": "hyper",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "USDe",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "marketplace": "HypurrFi"
         }
       }
     },

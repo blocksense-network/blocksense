@@ -4,13 +4,19 @@ const RPC = 'https://rpc.hyperliquid.xyz/evm';
 const provider = new JsonRpcProvider(RPC);
 
 const ADDRESSES = {
-  poolAddressesProvider: '0xA73ff12D177D8F1Ec938c3ba0e87D33524dD5594',
-  uiPoolDataProvider: '0x7b883191011AEAe40581d3Fa1B112413808C9c00',
+  poolAddressesProvider: '0x72c98246a98bFe64022a3190e7710E157497170C',
+  uiPoolDataProvider: '0x3Bb92CF81E38484183cc96a4Fb8fBd2d73535807',
 };
 
 const uiAbi = [
   {
-    inputs: [{ internalType: 'address', name: 'provider', type: 'address' }],
+    inputs: [
+      {
+        internalType: 'contract IPoolAddressesProvider',
+        name: 'provider',
+        type: 'address',
+      },
+    ],
     name: 'getReservesData',
     outputs: [
       {
@@ -53,11 +59,6 @@ const uiAbi = [
             name: 'borrowingEnabled',
             type: 'bool',
           },
-          {
-            internalType: 'bool',
-            name: 'stableBorrowRateEnabled',
-            type: 'bool',
-          },
           { internalType: 'bool', name: 'isActive', type: 'bool' },
           { internalType: 'bool', name: 'isFrozen', type: 'bool' },
           {
@@ -81,11 +82,6 @@ const uiAbi = [
             type: 'uint128',
           },
           {
-            internalType: 'uint128',
-            name: 'stableBorrowRate',
-            type: 'uint128',
-          },
-          {
             internalType: 'uint40',
             name: 'lastUpdateTimestamp',
             type: 'uint40',
@@ -93,11 +89,6 @@ const uiAbi = [
           {
             internalType: 'address',
             name: 'aTokenAddress',
-            type: 'address',
-          },
-          {
-            internalType: 'address',
-            name: 'stableDebtTokenAddress',
             type: 'address',
           },
           {
@@ -113,21 +104,6 @@ const uiAbi = [
           {
             internalType: 'uint256',
             name: 'availableLiquidity',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'totalPrincipalStableDebt',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'averageStableRate',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'stableDebtLastUpdateTimestamp',
             type: 'uint256',
           },
           {
@@ -153,21 +129,6 @@ const uiAbi = [
           {
             internalType: 'uint256',
             name: 'variableRateSlope2',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'stableRateSlope1',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'stableRateSlope2',
-            type: 'uint256',
-          },
-          {
-            internalType: 'uint256',
-            name: 'baseStableBorrowRate',
             type: 'uint256',
           },
           {
@@ -212,38 +173,54 @@ const uiAbi = [
             name: 'debtCeilingDecimals',
             type: 'uint256',
           },
-          {
-            internalType: 'uint8',
-            name: 'eModeCategoryId',
-            type: 'uint8',
-          },
           { internalType: 'uint256', name: 'borrowCap', type: 'uint256' },
           { internalType: 'uint256', name: 'supplyCap', type: 'uint256' },
-          { internalType: 'uint16', name: 'eModeLtv', type: 'uint16' },
-          {
-            internalType: 'uint16',
-            name: 'eModeLiquidationThreshold',
-            type: 'uint16',
-          },
-          {
-            internalType: 'uint16',
-            name: 'eModeLiquidationBonus',
-            type: 'uint16',
-          },
-          {
-            internalType: 'address',
-            name: 'eModePriceSource',
-            type: 'address',
-          },
-          { internalType: 'string', name: 'eModeLabel', type: 'string' },
           {
             internalType: 'bool',
             name: 'borrowableInIsolation',
             type: 'bool',
           },
+          {
+            internalType: 'bool',
+            name: 'virtualAccActive',
+            type: 'bool',
+          },
+          {
+            internalType: 'uint128',
+            name: 'virtualUnderlyingBalance',
+            type: 'uint128',
+          },
         ],
-        internalType: 'struct AggregatedReserveData[]',
+        internalType: 'struct IUiPoolDataProviderV3.AggregatedReserveData[]',
+        name: '',
         type: 'tuple[]',
+      },
+      {
+        components: [
+          {
+            internalType: 'uint256',
+            name: 'marketReferenceCurrencyUnit',
+            type: 'uint256',
+          },
+          {
+            internalType: 'int256',
+            name: 'marketReferenceCurrencyPriceInUsd',
+            type: 'int256',
+          },
+          {
+            internalType: 'int256',
+            name: 'networkBaseTokenPriceInUsd',
+            type: 'int256',
+          },
+          {
+            internalType: 'uint8',
+            name: 'networkBaseTokenPriceDecimals',
+            type: 'uint8',
+          },
+        ],
+        internalType: 'struct IUiPoolDataProviderV3.BaseCurrencyInfo',
+        name: '',
+        type: 'tuple',
       },
     ],
     stateMutability: 'view',
