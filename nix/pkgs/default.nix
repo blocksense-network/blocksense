@@ -70,6 +70,7 @@
           exsat-holdings = mkOracleScript "exsat-holdings";
           gecko-terminal = mkOracleScript "gecko-terminal";
           eth-rpc = mkOracleScript "eth-rpc";
+          hyper = mkOracleScript "hyper";
           stock-price-feeds = mkOracleScript "stock-price-feeds";
           spout-rwa = mkOracleScript "spout-rwa";
         };

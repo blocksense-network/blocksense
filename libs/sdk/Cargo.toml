@@ -6,6 +6,7 @@ license.workspace = true
 edition.workspace = true
 
 [dependencies]
+alloy = { workspace = true }
 blocksense-macro = { path = "macro" }
 async-trait = "0.1"
 anyhow = "1.0.82"

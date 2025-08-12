@@ -163,84 +163,13 @@ in
     };
 
     oracles = {
-      cex-price-feeds = {
-        exec-interval = 40;
-        allowed-outbound-hosts = [
-          "https://api.kraken.com"
-          "https://api.bybit.com"
-          "https://api.coinbase.com"
-          "https://api.exchange.coinbase.com"
-          "https://api1.binance.com"
-          "https://api.kucoin.com"
-          "https://api.mexc.com"
-          "https://api.crypto.com"
-          "https://api.binance.us"
-          "https://api.gemini.com"
-          "https://api-pub.bitfinex.com"
-          "https://api.upbit.com"
-          "https://api.bitget.com"
-          "https://api.gateio.ws"
-          "https://www.okx.com"
-        ];
-      };
-
-      exsat-holdings = {
-        exec-interval = 300;
-        allowed-outbound-hosts = [
-          "https://raw.githubusercontent.com"
-          "https://rpc-us.exsat.network"
-          "https://blockchain.info"
-          "https://mempool.space"
-        ];
-      };
-
-      gecko-terminal = {
+      hyper = {
         exec-interval = 10;
         allowed-outbound-hosts = [
-          "https://api.geckoterminal.com"
+          "https://rpc.hyperliquid.xyz"
         ];
       };
 
-      eth-rpc = {
-        exec-interval = 10;
-        allowed-outbound-hosts = [
-          "https://arbitrum-one-rpc.publicnode.com"
-          "https://eth.llamarpc.com"
-          "https://rpc.eth.gateway.fm"
-          "https://ethereum-rpc.publicnode.com"
-          "https://binance.llamarpc.com"
-          "https://bsc.meowrpc.com"
-          "https://bsc.drpc.org"
-        ];
-      };
-
-      stock-price-feeds = {
-        exec-interval = 60;
-        allowed-outbound-hosts = [
-          "https://data.alpaca.markets"
-          "https://www.alphavantage.co"
-          "https://yfapi.net"
-          "https://api.twelvedata.com"
-          "https://financialmodelingprep.com"
-        ];
-        api-keys = [
-          "APCA_API_KEY_ID"
-          "APCA_API_SECRET_KEY"
-          "ALPHAVANTAGE_API_KEY"
-          "YAHOO_FINANCE_API_KEY"
-          "TWELVEDATA_API_KEY"
-          "FMP_API_KEY"
-        ];
-      };
-      spout-rwa = {
-        exec-interval = 60;
-        allowed-outbound-hosts = [
-          "https://rwa-deploy-backend.onrender.com/"
-        ];
-        api-keys = [
-          "SPOUT_RWA_API_KEY"
-        ];
-      };
     };
   };
 }

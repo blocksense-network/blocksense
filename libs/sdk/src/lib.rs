@@ -16,6 +16,7 @@ pub mod wit {
 
 pub mod http;
 pub mod oracle;
+pub mod rpc;
 
 pub use spin_sdk as spin;
 

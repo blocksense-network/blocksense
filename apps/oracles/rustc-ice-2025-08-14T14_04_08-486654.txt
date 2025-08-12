@@ -1,0 +1,61 @@
+thread 'rustc' panicked at compiler/rustc_mir_transform/src/validate.rs:80:25:
+broken MIR in Item(DefId(0:100 ~ hyper[451a]::get_borrow_rates_for_marketplace::{closure#0})) (after phase change to runtime-optimized) at bb4[0]:
+Unsize coercion, but `std::pin::Pin<std::boxed::Box<{async block@hyper/src/lib.rs:454:24: 454:29}>>` isn't coercible to `std::pin::Pin<std::boxed::Box<dyn futures::Future<Output = (&str, std::result::Result<std::collections::HashMap<std::string::String, ReserveInfo>, anyhow::Error>)> + std::marker::Send>>`
+stack backtrace:
+   0:     0x7f3deca83a55 - std::backtrace::Backtrace::create::he3380f279f2dd68f
+   1:     0x7f3deca839a5 - std::backtrace::Backtrace::force_capture::h1eb9d62a188b5ecd
+   2:     0x7f3debb03890 - std[e642667a635a5e9d]::panicking::update_hook::<alloc[c8b0f4c041c69fc6]::boxed::Box<rustc_driver_impl[e28e7c817fed4f18]::install_ice_hook::{closure#1}>>::{closure#0}
+   3:     0x7f3deca9d733 - std::panicking::rust_panic_with_hook::hbded3f369514c188
+   4:     0x7f3deca9d42a - std::panicking::begin_panic_handler::{{closure}}::hbe7e185d9a70bf45
+   5:     0x7f3deca99929 - std::sys::backtrace::__rust_end_short_backtrace::h3aac1f26806aa7cf
+   6:     0x7f3deca9d0ed - __rustc[c1e88711025f73e1]::rust_begin_unwind
+   7:     0x7f3de92a41b0 - core::panicking::panic_fmt::hdac07629b4335238
+   8:     0x7f3dea84c4f2 - <rustc_mir_transform[818da99f8bb2b0fe]::validate::CfgChecker>::fail::<alloc[c8b0f4c041c69fc6]::string::String>
+   9:     0x7f3dede69f6d - <rustc_mir_transform[818da99f8bb2b0fe]::validate::Validator as rustc_mir_transform[818da99f8bb2b0fe]::pass_manager::MirPass>::run_pass
+  10:     0x7f3ded20f46b - rustc_mir_transform[818da99f8bb2b0fe]::run_optimization_passes
+  11:     0x7f3dede2f454 - rustc_mir_transform[818da99f8bb2b0fe]::optimized_mir
+  12:     0x7f3dede2ec1d - rustc_query_impl[f44fcbceeffe39c4]::plumbing::__rust_begin_short_backtrace::<rustc_query_impl[f44fcbceeffe39c4]::query_impl::optimized_mir::dynamic_query::{closure#2}::{closure#0}, rustc_middle[4080db7e9a6b7164]::query::erase::Erased<[u8; 8usize]>>
+  13:     0x7f3ded2210bd - rustc_query_system[becab106d49c268]::query::plumbing::try_execute_query::<rustc_query_impl[f44fcbceeffe39c4]::DynamicConfig<rustc_query_system[becab106d49c268]::query::caches::DefIdCache<rustc_middle[4080db7e9a6b7164]::query::erase::Erased<[u8; 8usize]>>, false, false, false>, rustc_query_impl[f44fcbceeffe39c4]::plumbing::QueryCtxt, false>
+  14:     0x7f3ded2204b4 - rustc_query_impl[f44fcbceeffe39c4]::query_impl::optimized_mir::get_query_non_incr::__rust_end_short_backtrace
+  15:     0x7f3dee6a5e1c - <rustc_middle[4080db7e9a6b7164]::ty::context::TyCtxt>::coroutine_layout
+  16:     0x7f3ded884998 - rustc_ty_utils[e61a50b59c0bed71]::layout::layout_of_uncached
+  17:     0x7f3ded876b99 - rustc_ty_utils[e61a50b59c0bed71]::layout::layout_of
+  18:     0x7f3ded876b02 - rustc_query_impl[f44fcbceeffe39c4]::plumbing::__rust_begin_short_backtrace::<rustc_query_impl[f44fcbceeffe39c4]::query_impl::layout_of::dynamic_query::{closure#2}::{closure#0}, rustc_middle[4080db7e9a6b7164]::query::erase::Erased<[u8; 16usize]>>
+  19:     0x7f3ded875953 - rustc_query_system[becab106d49c268]::query::plumbing::try_execute_query::<rustc_query_impl[f44fcbceeffe39c4]::DynamicConfig<rustc_query_system[becab106d49c268]::query::caches::DefaultCache<rustc_middle[4080db7e9a6b7164]::ty::PseudoCanonicalInput<rustc_middle[4080db7e9a6b7164]::ty::Ty>, rustc_middle[4080db7e9a6b7164]::query::erase::Erased<[u8; 16usize]>>, false, true, false>, rustc_query_impl[f44fcbceeffe39c4]::plumbing::QueryCtxt, false>
+  20:     0x7f3ded8755a9 - rustc_query_impl[f44fcbceeffe39c4]::query_impl::layout_of::get_query_non_incr::__rust_end_short_backtrace
+  21:     0x7f3dee1c10b1 - <rustc_mir_transform[818da99f8bb2b0fe]::known_panics_lint::KnownPanicsLint as rustc_mir_transform[818da99f8bb2b0fe]::pass_manager::MirLint>::run_lint
+  22:     0x7f3ded209b1c - rustc_mir_transform[818da99f8bb2b0fe]::run_analysis_to_runtime_passes
+  23:     0x7f3dedce26a7 - rustc_mir_transform[818da99f8bb2b0fe]::mir_drops_elaborated_and_const_checked
+  24:     0x7f3dedce2061 - rustc_query_impl[f44fcbceeffe39c4]::plumbing::__rust_begin_short_backtrace::<rustc_query_impl[f44fcbceeffe39c4]::query_impl::mir_drops_elaborated_and_const_checked::dynamic_query::{closure#2}::{closure#0}, rustc_middle[4080db7e9a6b7164]::query::erase::Erased<[u8; 8usize]>>
+  25:     0x7f3ded5318a6 - rustc_query_system[becab106d49c268]::query::plumbing::try_execute_query::<rustc_query_impl[f44fcbceeffe39c4]::DynamicConfig<rustc_data_structures[f4b4f21b7e0a6b90]::vec_cache::VecCache<rustc_span[5d80927273e133a4]::def_id::LocalDefId, rustc_middle[4080db7e9a6b7164]::query::erase::Erased<[u8; 8usize]>, rustc_query_system[becab106d49c268]::dep_graph::graph::DepNodeIndex>, false, false, false>, rustc_query_impl[f44fcbceeffe39c4]::plumbing::QueryCtxt, false>
+  26:     0x7f3ded5310db - rustc_query_impl[f44fcbceeffe39c4]::query_impl::mir_drops_elaborated_and_const_checked::get_query_non_incr::__rust_end_short_backtrace
+  27:     0x7f3ded52c11e - rustc_interface[ed22ebcc65056ef2]::passes::run_required_analyses
+  28:     0x7f3dede0e0de - rustc_interface[ed22ebcc65056ef2]::passes::analysis
+  29:     0x7f3dede0e0b1 - rustc_query_impl[f44fcbceeffe39c4]::plumbing::__rust_begin_short_backtrace::<rustc_query_impl[f44fcbceeffe39c4]::query_impl::analysis::dynamic_query::{closure#2}::{closure#0}, rustc_middle[4080db7e9a6b7164]::query::erase::Erased<[u8; 0usize]>>
+  30:     0x7f3dede10fba - rustc_query_system[becab106d49c268]::query::plumbing::try_execute_query::<rustc_query_impl[f44fcbceeffe39c4]::DynamicConfig<rustc_query_system[becab106d49c268]::query::caches::SingleCache<rustc_middle[4080db7e9a6b7164]::query::erase::Erased<[u8; 0usize]>>, false, false, false>, rustc_query_impl[f44fcbceeffe39c4]::plumbing::QueryCtxt, false>
+  31:     0x7f3dede10c90 - rustc_query_impl[f44fcbceeffe39c4]::query_impl::analysis::get_query_non_incr::__rust_end_short_backtrace
+  32:     0x7f3dee52fc7f - rustc_interface[ed22ebcc65056ef2]::passes::create_and_enter_global_ctxt::<core[4ab760bd5063cacb]::option::Option<rustc_interface[ed22ebcc65056ef2]::queries::Linker>, rustc_driver_impl[e28e7c817fed4f18]::run_compiler::{closure#0}::{closure#2}>::{closure#2}::{closure#0}
+  33:     0x7f3dee3e720e - rustc_interface[ed22ebcc65056ef2]::interface::run_compiler::<(), rustc_driver_impl[e28e7c817fed4f18]::run_compiler::{closure#0}>::{closure#1}
+  34:     0x7f3dee2efd7e - std[e642667a635a5e9d]::sys::backtrace::__rust_begin_short_backtrace::<rustc_interface[ed22ebcc65056ef2]::util::run_in_thread_with_globals<rustc_interface[ed22ebcc65056ef2]::util::run_in_thread_pool_with_globals<rustc_interface[ed22ebcc65056ef2]::interface::run_compiler<(), rustc_driver_impl[e28e7c817fed4f18]::run_compiler::{closure#0}>::{closure#1}, ()>::{closure#0}, ()>::{closure#0}::{closure#0}, ()>
+  35:     0x7f3dee2efa56 - <<std[e642667a635a5e9d]::thread::Builder>::spawn_unchecked_<rustc_interface[ed22ebcc65056ef2]::util::run_in_thread_with_globals<rustc_interface[ed22ebcc65056ef2]::util::run_in_thread_pool_with_globals<rustc_interface[ed22ebcc65056ef2]::interface::run_compiler<(), rustc_driver_impl[e28e7c817fed4f18]::run_compiler::{closure#0}>::{closure#1}, ()>::{closure#0}, ()>::{closure#0}::{closure#0}, ()>::{closure#1} as core[4ab760bd5063cacb]::ops::function::FnOnce<()>>::call_once::{shim:vtable#0}
+  36:     0x7f3dee2f13bd - std::sys::pal::unix::thread::Thread::new::thread_start::hdca5bcda684d30d0
+  37:     0x7f3de7e90e63 - start_thread
+  38:     0x7f3de7f14dbc - __clone3
+  39:                0x0 - <unknown>
+
+
+rustc version: 1.89.0-nightly (70b3f4666 2025-05-30)
+platform: x86_64-unknown-linux-gnu
+
+query stack during panic:
+#0 [optimized_mir] optimizing MIR for `get_borrow_rates_for_marketplace::{closure#0}`
+#1 [layout_of] computing layout of `{async fn body of get_borrow_rates_for_marketplace()}`
+#2 [mir_drops_elaborated_and_const_checked] elaborating drops for `get_borrow_rates_for_marketplace`
+#3 [analysis] running analysis passes on this crate
+end of query stack
+delayed bug: error performing operation: fully_perform
+disabled backtrace
+delayed bug: error performing operation: fully_perform
+disabled backtrace
+delayed bug: error performing operation: fully_perform
+disabled backtrace

@@ -1,10 +1,15 @@
 {
   pkgs,
   self',
+  lib,
   inputs',
   ...
 }:
 {
+  env = {
+    LD_LIBRARY_PATH = lib.makeLibraryPath self'.legacyPackages.commonLibDeps;
+  };
+
   enterShell =
     # bash
     ''

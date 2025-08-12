@@ -6,6 +6,7 @@ members = [
   "eth-rpc",
   "stock-price-feeds",
   "spout-rwa",
+  "hyper"
 ]
 
 resolver = "2"
