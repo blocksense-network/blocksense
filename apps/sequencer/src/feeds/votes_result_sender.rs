@@ -2,7 +2,9 @@ use crate::providers::eth_send_utils::{
     eth_batch_send_to_all_contracts, get_serialized_updates_for_network,
 };
 use crate::providers::eth_send_utils::{increment_feeds_round_indexes, log_provider_enabled};
-use crate::providers::provider::{GNOSIS_SAFE_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME};
+use crate::providers::provider::{
+    ProvidersMetrics, GNOSIS_SAFE_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME,
+};
 use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
 use alloy::hex::{self, ToHexExt};
@@ -15,30 +17,38 @@ use blocksense_data_feeds::feeds_processing::{
 use blocksense_feed_registry::types::Repeatability::Periodic;
 use blocksense_gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use blocksense_gnosis_safe::utils::{create_safe_tx, generate_transaction_hash, SafeMultisig};
+use blocksense_utils::counter_unbounded_channel::CountedReceiver;
 use eyre::Result;
 use rdkafka::producer::{FutureProducer, FutureRecord};
 use rdkafka::util::Timeout;
 use std::io::Error;
 use std::time::Duration;
-use tokio::sync::mpsc::UnboundedReceiver;
 use tracing::{debug, error, info, warn};
 
 pub async fn votes_result_sender_loop(
-    mut batched_votes_recv: UnboundedReceiver<BatchedAggregatesToSend>,
+    mut batched_votes_recv: CountedReceiver<BatchedAggregatesToSend>,
     sequencer_state: Data<SequencerState>,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
         .name("votes_result_sender")
         .spawn(async move {
             let mut batch_count = 0;
+
+            let mut providers_metrics = ProvidersMetrics::new();
+
+            for (net, provider) in sequencer_state.providers.read().await.iter() {
+                providers_metrics.insert(net.clone(), provider.lock().await.provider_metrics.clone());
+            }
+
             loop {
 
                 let send_aggregated_updates_to_publishers = sequencer_state.sequencer_config.read().await.send_aggregated_updates_to_publishers;
 
                 debug!("Awaiting batched votes over `batched_votes_recv`...");
                 let recvd = batched_votes_recv.recv().await;
+                let msgs_in_queue = batched_votes_recv.len();
                 debug!(
-                    "Received batched votes over `batched_votes_recv`; batch_count={batch_count}"
+                    "Received batched votes over `batched_votes_recv`; batch_count={batch_count}, messages in queue = {msgs_in_queue}"
                 );
                 match recvd {
                     Some(updates) => {
@@ -46,7 +56,7 @@ pub async fn votes_result_sender_loop(
                         info!("sending updates to contracts:");
                         let blocksense_block_height = updates.block_height;
                         debug!("Processing eth_batch_send_to_all_contracts{blocksense_block_height}_{batch_count}");
-                        match eth_batch_send_to_all_contracts(&sequencer_state, &updates, Periodic).await {
+                        match eth_batch_send_to_all_contracts(&sequencer_state, &updates, Periodic, Some(&providers_metrics)).await {
                             Ok(()) => info!("Sending updates to relayers complete."),
                             Err(err) => error!("ERROR Sending updates to relayers: {err}"),
                         };
@@ -55,6 +65,7 @@ pub async fn votes_result_sender_loop(
                         try_send_aggregation_consensus_trigger_to_reporters(
                             &sequencer_state,
                             &updates,
+                            Some(&providers_metrics),
                         )
                         .await;
 
@@ -160,6 +171,7 @@ async fn try_send_aggregated_updates_to_publishers(
 async fn try_send_aggregation_consensus_trigger_to_reporters(
     sequencer_state: &Data<SequencerState>,
     updates: &BatchedAggregatesToSend,
+    providers_metrics_opt: Option<&ProvidersMetrics>,
 ) {
     let Some(kafka_endpoint) = &sequencer_state.kafka_endpoint else {
         warn!("No Kafka endpoint set to stream consensus second round data.");
@@ -194,7 +206,13 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
 
             let is_enabled_value = provider_settings.is_enabled;
 
-            log_provider_enabled(net.as_str(), provider, is_enabled_value).await;
+            if let Some(provider_metrics) =
+                providers_metrics_opt.and_then(|pm| pm.get(net.as_str()))
+            {
+                log_provider_enabled(net.as_str(), provider_metrics, is_enabled_value).await;
+            } else {
+                error!("No metrics found for network {net}");
+            }
 
             if !is_enabled_value {
                 warn!("Network `{net}` is not enabled; skipping it for second round consensus");

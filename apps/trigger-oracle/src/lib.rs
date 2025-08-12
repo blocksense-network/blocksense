@@ -16,9 +16,6 @@ use http::uri::Scheme;
 use hyper::Request;
 use tokio::{
     sync::{
-        broadcast::{
-            channel, error::RecvError, Receiver as BroadcastReceiver, Sender as BroadcastSender,
-        },
         mpsc::{unbounded_channel, UnboundedReceiver, UnboundedSender},
         RwLock,
     },
@@ -186,7 +183,6 @@ struct Component {
 enum TerminationReason {
     ExitRequested,
     SequencerExitRequested,
-    ReceivedBadSignal(RecvError),
     Other(String),
 }
 
@@ -300,7 +296,6 @@ impl TriggerExecutor for OracleTrigger {
 
         tracing::info!("Sequencer URL provided: {}", &self.sequencer);
         let (data_feed_sender, data_feed_receiver) = unbounded_channel();
-        let (signal_data_feed_sender, _) = channel(64);
         let data_feed_results: DataFeedResults = Arc::new(RwLock::new(HashMap::new()));
         let mut feeds_config: HashMap<FeedId, FeedStrideAndDecimals> = HashMap::new();
         //TODO(adikov): Move all the logic to a different struct and handle
@@ -319,14 +314,17 @@ impl TriggerExecutor for OracleTrigger {
                 );
             }
         }
+        let mut data_feed_senders = HashMap::new();
         tracing::trace!("Starting oracle scripts");
         let mut loops: Vec<_> = self
             .queue_components
             .into_values()
             .map(|component| {
+                let (sender, receiver) = unbounded_channel();
+                data_feed_senders.insert(component.id.clone(), sender);
                 Self::start_oracle_loop(
                     engine.clone(),
-                    signal_data_feed_sender.subscribe(),
+                    receiver,
                     data_feed_sender.clone(),
                     &component,
                 )
@@ -334,11 +332,8 @@ impl TriggerExecutor for OracleTrigger {
             .collect();
 
         tracing::trace!("Starting orchestrator");
-        let mut orchestrators = Self::start_orchestrators(
-            components,
-            signal_data_feed_sender.clone(),
-            self.metrics_url,
-        );
+        let mut orchestrators =
+            Self::start_orchestrators(components, data_feed_senders, self.metrics_url);
         loops.append(&mut orchestrators);
 
         let url = Url::parse(&self.sequencer.clone())?;
@@ -386,14 +381,9 @@ impl TriggerExecutor for OracleTrigger {
                     tracing::trace!("Sequencer exit requested => exiting");
                     return Ok(());
                 }
-                TerminationReason::ReceivedBadSignal(err) => {
-                    tracing::error!("Oracle script runner received bad signal: {err:?}");
-                    tracing::trace!("Continuing to run the other runners");
-                    loops = rest;
-                }
                 TerminationReason::Other(message) => {
                     tracing::error!("Unexpected termination reason: {message}");
-                    return Err(anyhow::anyhow!("{message}"));
+                    loops = rest;
                 }
             }
         }
@@ -403,7 +393,7 @@ impl TriggerExecutor for OracleTrigger {
 impl OracleTrigger {
     fn start_oracle_loop(
         engine: Arc<TriggerAppEngine<Self>>,
-        signal_receiver: BroadcastReceiver<HashSet<DataFeedSetting>>,
+        signal_receiver: UnboundedReceiver<HashSet<DataFeedSetting>>,
         payload_sender: UnboundedSender<(String, Payload)>,
         component: &Component,
     ) -> JoinHandle<TerminationReason> {
@@ -417,7 +407,7 @@ impl OracleTrigger {
 
     async fn execute(
         engine: Arc<TriggerAppEngine<Self>>,
-        mut signal_receiver: BroadcastReceiver<HashSet<DataFeedSetting>>,
+        mut signal_receiver: UnboundedReceiver<HashSet<DataFeedSetting>>,
         payload_sender: UnboundedSender<(String, Payload)>,
         component: Component,
     ) -> TerminationReason {
@@ -425,9 +415,12 @@ impl OracleTrigger {
         tracing::trace!("Starting processing loop `{component_id}`");
         loop {
             let feeds = match signal_receiver.recv().await {
-                Ok(feeds) => feeds,
-                Err(err) => {
-                    return TerminationReason::ReceivedBadSignal(err);
+                Some(feeds) => feeds,
+                None => {
+                    tracing::info!("Woke up on empty channel for {component_id}");
+                    return TerminationReason::Other(format!(
+                        "All sender channels closed for {component_id}"
+                    ));
                 }
             };
             tracing::trace!(
@@ -505,7 +498,7 @@ impl OracleTrigger {
 
     fn start_orchestrators(
         components: HashMap<String, Component>,
-        signal_sender: BroadcastSender<HashSet<DataFeedSetting>>,
+        signal_senders: HashMap<String, UnboundedSender<HashSet<DataFeedSetting>>>,
         metrics_url: Option<String>,
     ) -> Vec<tokio::task::JoinHandle<TerminationReason>> {
         let mut join_handles = vec![];
@@ -516,7 +509,10 @@ impl OracleTrigger {
                 key.clone(),
                 time_interval,
                 component.oracle_settings.clone(),
-                signal_sender.clone(),
+                signal_senders
+                    .get(&key)
+                    .expect("Logical error, no data_feed channel for {key}")
+                    .clone(),
                 metrics_url.clone(),
             );
             join_handles.push(
@@ -534,7 +530,7 @@ impl OracleTrigger {
         oracle_id: String,
         time_interval: tokio::time::Duration,
         oracle_settings: HashSet<DataFeedSetting>,
-        signal_sender: BroadcastSender<HashSet<DataFeedSetting>>,
+        signal_sender: UnboundedSender<HashSet<DataFeedSetting>>,
         metrics_url: Option<String>,
     ) -> TerminationReason {
         tracing::trace!("Task orchestrator-{} started", oracle_id);
@@ -559,20 +555,24 @@ impl OracleTrigger {
             );
 
             tracing::trace!(
-                "Signal {} data feeds [batch_count={batch_count}]",
+                "Orchestrator-{} Signal {} data feeds [batch_count={batch_count}]",
+                oracle_id,
                 oracle_settings.len()
             );
-            let _ = signal_sender.send(oracle_settings.clone());
+            if let Err(e) = signal_sender.send(oracle_settings.clone()) {
+                log::error!("Orchestrator-{oracle_id} ERROR from signal_sender.send = {e:?}");
+                continue;
+            }
 
             if metrics_url.is_none() {
-                tracing::trace!("Metrics URL not set; looping back [batch_count={batch_count}]");
+                tracing::trace!("Orchestrator-{oracle_id} Metrics URL not set; looping back [batch_count={batch_count}]");
                 continue;
             }
 
             let metrics_url = metrics_url
                 .clone()
                 .expect("Metrics URL should be provided.");
-            tracing::trace!("Sending metrics at {metrics_url} [batch_count={batch_count}]");
+            tracing::trace!("Orchestrator-{oracle_id} Sending metrics at {metrics_url} [batch_count={batch_count}]");
             let metrics_result = handle_prometheus_metrics(
                 &reqwest::Client::new(),
                 &metrics_url,
@@ -582,10 +582,12 @@ impl OracleTrigger {
 
             match metrics_result {
                 Ok(_) => {
-                    tracing::trace!("Sent metrics [batch_count={batch_count}]");
+                    tracing::trace!(
+                        "Orchestrator-{oracle_id} Sent metrics [batch_count={batch_count}]"
+                    );
                 }
                 Err(e) => {
-                    tracing::error!("Error handling metrics: {e:?} [batch_count={batch_count}]");
+                    tracing::error!("Orchestrator-{oracle_id} Error handling metrics: {e:?} [batch_count={batch_count}]");
                 }
             }
         }

@@ -9,18 +9,18 @@ use alloy::{
 use blocksense_config::FeedStrideAndDecimals;
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
-use blocksense_utils::{to_hex_string, FeedId};
+use blocksense_utils::{counter_unbounded_channel::CountedReceiver, to_hex_string, FeedId};
 use eyre::{bail, eyre, Result};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
 use tokio::{
-    sync::{mpsc::UnboundedReceiver, Mutex, RwLock},
+    sync::{Mutex, RwLock},
     time::Duration,
 };
 
 use crate::{
     providers::provider::{
-        parse_eth_address, ProviderStatus, ProviderType, RpcProvider, SharedRpcProviders,
-        EVENT_FEED_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME,
+        parse_eth_address, ProviderStatus, ProviderType, ProvidersMetrics, RpcProvider,
+        SharedRpcProviders, EVENT_FEED_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME,
     },
     sequencer_state::SequencerState,
 };
@@ -228,7 +228,7 @@ pub async fn create_and_collect_relayers_futures(
     collected_futures: &FuturesUnordered<JoinHandle<Result<(), Error>>>,
     feeds_metrics: Arc<RwLock<FeedsMetrics>>,
     provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>>,
-    relayers_recv_channels: HashMap<String, UnboundedReceiver<BatchOfUpdatesToProcess>>,
+    relayers_recv_channels: HashMap<String, CountedReceiver<BatchOfUpdatesToProcess>>,
 ) {
     for (net, chan) in relayers_recv_channels.into_iter() {
         let feed_metrics_clone = feeds_metrics.clone();
@@ -258,7 +258,7 @@ pub async fn loop_processing_batch_of_updates(
     relayer_name: String,
     feeds_metrics: Arc<RwLock<FeedsMetrics>>,
     provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>>,
-    mut chan: UnboundedReceiver<BatchOfUpdatesToProcess>,
+    mut chan: CountedReceiver<BatchOfUpdatesToProcess>,
 ) {
     tracing::info!("Starting {relayer_name} loop...");
 
@@ -266,9 +266,11 @@ pub async fn loop_processing_batch_of_updates(
     // therefore the loop in iterating over the lifetime of the sequencer.
     loop {
         let cmd_opt = chan.recv().await;
+        let msgs_in_queue = chan.len();
         match cmd_opt {
             Some(cmd) => {
                 let block_height = cmd.updates.block_height;
+                tracing::info!("Processing updates for network {relayer_name}, block_height {block_height}, messages in queue = {msgs_in_queue}");
                 let provider = cmd.provider.clone();
                 let result = eth_batch_send_to_contract(
                     cmd.net,
@@ -344,7 +346,7 @@ pub async fn loop_processing_batch_of_updates(
 #[allow(clippy::too_many_arguments)]
 pub async fn eth_batch_send_to_contract(
     net: String,
-    provider: Arc<Mutex<RpcProvider>>,
+    provider_mutex: Arc<Mutex<RpcProvider>>,
     provider_settings: blocksense_config::Provider,
     mut updates: BatchedAggregatesToSend,
     feed_type: Repeatability,
@@ -356,7 +358,7 @@ pub async fn eth_batch_send_to_contract(
     let mut feeds_rounds = HashMap::new();
     let serialized_updates = get_serialized_updates_for_network(
         net.as_str(),
-        &provider,
+        &provider_mutex,
         &mut updates,
         &provider_settings,
         feeds_config,
@@ -380,7 +382,7 @@ pub async fn eth_batch_send_to_contract(
     );
 
     debug!("Acquiring a read/write lock on provider state for network `{net}` block height {block_height}");
-    let mut provider = provider.lock().await;
+    let mut provider = provider_mutex.lock().await;
     debug!("Acquired a read/write lock on provider state for network `{net}` block height {block_height}");
 
     let feeds_to_update_ids: Vec<FeedId> = updates
@@ -954,15 +956,10 @@ pub async fn log_gas_used(
 
 pub async fn log_provider_enabled(
     net: &str,
-    provider: &Arc<Mutex<RpcProvider>>,
+    provider_metrics: &Arc<RwLock<ProviderMetrics>>,
     is_enabled_value: bool,
 ) {
-    debug!("Acquiring a read lock on provider for network {net}");
-    let p = provider.lock().await;
-    debug!("Acquired a read lock on provider for network {net}");
-    let provider_metrics = p.provider_metrics.clone();
     set_metric!(provider_metrics, net, is_enabled, is_enabled_value);
-    debug!("Released a read lock on provider for network {net}");
 }
 
 pub struct Eip1559GasFees {
@@ -1056,6 +1053,7 @@ pub async fn eth_batch_send_to_all_contracts(
     sequencer_state: &Data<SequencerState>,
     updates: &BatchedAggregatesToSend,
     feed_type: Repeatability,
+    providers_metrics_opt: Option<&ProvidersMetrics>,
 ) -> Result<()> {
     let span = info_span!("eth_batch_send_to_all_contracts");
     let _guard = span.enter();
@@ -1075,25 +1073,10 @@ pub async fn eth_batch_send_to_all_contracts(
         debug!("Acquired a read lock on sequencer_state.sequencer_config");
         let providers_config = &providers_config_guard.providers;
 
-        // No lock, we propagete the shared objects to the created futures
+        // No lock, we propagate the shared objects to the created futures
         let feeds_config = sequencer_state.active_feeds.clone();
 
         for (net, provider) in providers.iter() {
-            let (
-                transaction_retries_count_limit,
-                transaction_retry_timeout_secs,
-                retry_fee_increment_fraction,
-            ) = {
-                debug!("Acquiring a read lock on provider for network {net}");
-                let p = provider.lock().await;
-                debug!("Acquired and releasing a read lock on provider for network {net}");
-                (
-                    p.transaction_retries_count_limit as u64,
-                    p.transaction_retry_timeout_secs as u64,
-                    p.retry_fee_increment_fraction,
-                )
-            };
-
             let net = net.clone();
 
             if let Some(provider_settings) = providers_config.get(&net) {
@@ -1105,7 +1088,13 @@ pub async fn eth_batch_send_to_all_contracts(
                 }
                 let is_enabled_value = provider_settings.is_enabled;
 
-                log_provider_enabled(net.as_str(), provider, is_enabled_value).await;
+                if let Some(provider_metrics) =
+                    providers_metrics_opt.and_then(|pm| pm.get(net.as_str()))
+                {
+                    log_provider_enabled(net.as_str(), provider_metrics, is_enabled_value).await;
+                } else {
+                    error!("No metrics found for network {net}");
+                }
 
                 if !is_enabled_value {
                     warn!("Network `{net}` is not enabled; skipping it during reporting");
@@ -1113,6 +1102,18 @@ pub async fn eth_batch_send_to_all_contracts(
                 } else {
                     info!("Network `{net}` is enabled; reporting...");
                 }
+
+                let (
+                    transaction_retries_count_limit,
+                    transaction_retry_timeout_secs,
+                    retry_fee_increment_fraction,
+                ) = {
+                    (
+                        provider_settings.transaction_retries_count_limit as u64,
+                        provider_settings.transaction_retry_timeout_secs as u64,
+                        provider_settings.retry_fee_increment_fraction,
+                    )
+                };
 
                 let updates = updates.clone();
                 let provider = provider.clone();
@@ -1133,17 +1134,23 @@ pub async fn eth_batch_send_to_all_contracts(
                 };
 
                 {
-                    let provider_metrics = provider.lock().await.provider_metrics.clone();
                     let relayers = sequencer_state.relayers_send_channels.read().await;
                     let relayer_opt = relayers.get(net.as_str());
                     if let Some(relayer) = relayer_opt {
+                        let msgs_in_queue = relayer.len();
                         match relayer.send(batch_of_updates_to_process) {
-                            Ok(_) => {
-                                debug!("Sent updates to relayer for network {net} and block height {block_height}");
-                                inc_metric!(provider_metrics, net, num_transactions_in_queue);
+                            Ok(()) => {
+                                debug!("Sent updates to relayer for network {net} and block height {block_height}, messages in queue = {msgs_in_queue}");
+                                if let Some(provider_metrics) =
+                                    providers_metrics_opt.and_then(|pm| pm.get(net.as_str()))
+                                {
+                                    inc_metric!(provider_metrics, net, num_transactions_in_queue);
+                                } else {
+                                    error!("No metrics found for network {net}");
+                                }
                             }
                             Err(e) => {
-                                error!("Error while sending updates to relayer for network {net} and block height {block_height}: {e}")
+                                error!("Error while sending updates to relayer for network {net} and block height {block_height}, messages in queue = {msgs_in_queue}: {e}")
                             }
                         };
                     } else {
@@ -1597,7 +1604,8 @@ mod tests {
         };
 
         let result =
-            eth_batch_send_to_all_contracts(&sequencer_state, &updates_oneshot, Oneshot).await;
+            eth_batch_send_to_all_contracts(&sequencer_state, &updates_oneshot, Oneshot, None)
+                .await;
         // TODO: This is actually not a good assertion since the eth_batch_send_to_all_contracts
         // will always return ok even if some or all of the sends we unsuccessful. Will be fixed in
         // followups
@@ -1714,13 +1722,16 @@ mod tests {
                 updates: vec![v3],
             };
 
-            let p1 = eth_batch_send_to_all_contracts(&sequencer_state, &updates1, Periodic).await;
+            let p1 =
+                eth_batch_send_to_all_contracts(&sequencer_state, &updates1, Periodic, None).await;
             assert!(p1.is_ok());
 
-            let p2 = eth_batch_send_to_all_contracts(&sequencer_state, &updates2, Periodic).await;
+            let p2 =
+                eth_batch_send_to_all_contracts(&sequencer_state, &updates2, Periodic, None).await;
             assert!(p2.is_ok());
 
-            let p3 = eth_batch_send_to_all_contracts(&sequencer_state, &updates3, Periodic).await;
+            let p3 =
+                eth_batch_send_to_all_contracts(&sequencer_state, &updates3, Periodic, None).await;
             assert!(p3.is_ok());
         }
 

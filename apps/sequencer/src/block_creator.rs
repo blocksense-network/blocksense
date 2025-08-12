@@ -12,6 +12,7 @@ use blocksense_feed_registry::feed_registration_cmds::{
 use blocksense_feed_registry::registry::SlotTimeTracker;
 use blocksense_feed_registry::types::Repeatability;
 use blocksense_registry::config::FeedConfig;
+use blocksense_utils::counter_unbounded_channel::CountedSender;
 use blocksense_utils::time::current_unix_time;
 use blocksense_utils::FeedId;
 use rdkafka::producer::FutureRecord;
@@ -21,7 +22,7 @@ use std::collections::{BTreeSet, HashMap, VecDeque};
 use std::io::Error;
 use std::mem;
 use std::sync::Arc;
-use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
+use tokio::sync::mpsc::UnboundedReceiver;
 use tokio::sync::RwLock;
 use tokio::time::Duration;
 use tracing::{debug, error, info, info_span, warn};
@@ -34,7 +35,7 @@ pub async fn block_creator_loop(
     sequencer_state: Data<SequencerState>,
     mut aggregated_votes_to_block_creator_recv: UnboundedReceiver<VotedFeedUpdateWithProof>,
     mut feed_management_cmds_recv: UnboundedReceiver<FeedsManagementCmds>,
-    batched_votes_send: UnboundedSender<BatchedAggregatesToSend>,
+    batched_votes_send: CountedSender<BatchedAggregatesToSend>,
     block_config: BlockConfig,
 ) -> tokio::task::JoinHandle<Result<(), Error>> {
     tokio::task::Builder::new()
@@ -213,7 +214,7 @@ async fn generate_block(
     updates: &mut Vec<VotedFeedUpdateWithProof>,
     new_feeds_to_register: &mut Vec<RegisterNewAssetFeed>,
     feeds_ids_to_delete: &mut Vec<DeleteAssetFeed>,
-    batched_votes_send: &UnboundedSender<BatchedAggregatesToSend>,
+    batched_votes_send: &CountedSender<BatchedAggregatesToSend>,
     sequencer_state: &Data<SequencerState>,
     block_height: u64,
 ) -> eyre::Result<()> {
@@ -273,7 +274,10 @@ async fn generate_block(
 
     // Process feed updates:
     if !updates.is_empty() {
-        debug!("Sending batched votes over `batched_votes_send`...");
+        let msgs_in_queue = batched_votes_send.len();
+        debug!(
+            "Sending batched votes over `batched_votes_send`, messages in queue = {msgs_in_queue} ..."
+        );
 
         let mut value_updates = Vec::new();
         let mut proofs = HashMap::new();
@@ -350,8 +354,8 @@ mod tests {
     use blocksense_data_feeds::feeds_processing::VotedFeedUpdate;
     use blocksense_data_feeds::feeds_processing::VotedFeedUpdateWithProof;
     use blocksense_feed_registry::types::{FeedType, Timestamp};
+    use blocksense_utils::counter_unbounded_channel::counted_unbounded_channel;
     use std::time::Duration;
-    use tokio::sync::mpsc;
     use tokio::time;
 
     #[actix_web::test]
@@ -381,7 +385,7 @@ mod tests {
         )
         .await;
 
-        let (batched_votes_send, mut batched_votes_recv) = mpsc::unbounded_channel();
+        let (batched_votes_send, mut batched_votes_recv) = counted_unbounded_channel();
         let vote_send = sequencer_state
             .aggregated_votes_to_block_creator_send
             .clone();
