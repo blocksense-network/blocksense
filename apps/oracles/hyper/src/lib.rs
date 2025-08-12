@@ -6,27 +6,37 @@ use alloy::{
     providers::ProviderBuilder,
     sol,
 };
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use blocksense_sdk::{
     http::http_post_json,
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
 };
-use itertools::zip;
+use itertools::Itertools;
 use prettytable::{format, Cell, Row, Table};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::str::FromStr;
 use url::Url;
 
-sol!(
-    #[allow(missing_docs)]
-    #[allow(clippy::too_many_arguments)]
-    #[sol(rpc)]
-    UiPoolDataProvider,
-    "src/abi/x.json"
-);
+pub mod hypurrfi {
+    alloy::sol! {
+        #[allow(missing_docs)]
+        #[allow(clippy::too_many_arguments)]
+        #[sol(rpc)]
+        HypurrFiUiPoolDataProvider,
+        "src/abi/HypurrFiUI.json"
+    }
+}
 
+pub mod hyperland {
+    alloy::sol! {
+        #[allow(missing_docs)]
+        #[allow(clippy::too_many_arguments)]
+        #[sol(rpc)]
+        HyperLandUiPoolDataProvider,
+        "src/abi/HyperLandUI.json"
+    }
+}
 
 const SECONDS_PER_YEAR_F64: f64 = 31_536_000.0;
 const RAY_F64: f64 = 1e27;
@@ -42,6 +52,22 @@ const HYPERLAND_POOL_ADDRESSES_PROVIDER: Address =
 
 pub type FeedId = u128;
 
+type MyProvider = alloy::providers::fillers::FillProvider<
+    alloy::providers::fillers::JoinFill<
+        alloy::providers::Identity,
+        alloy::providers::fillers::JoinFill<
+            alloy::providers::fillers::GasFiller,
+            alloy::providers::fillers::JoinFill<
+                alloy::providers::fillers::BlobGasFiller,
+                alloy::providers::fillers::JoinFill<
+                    alloy::providers::fillers::NonceFiller,
+                    alloy::providers::fillers::ChainIdFiller,
+                >,
+            >,
+        >,
+    >,
+    alloy::providers::RootProvider,
+>;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct RequestEthCallParams {
     data: String,
@@ -116,22 +142,6 @@ struct FeedConfig {
     arguments: OracleArgs,
 }
 
-type MyProvider = alloy::providers::fillers::FillProvider<
-    alloy::providers::fillers::JoinFill<
-        alloy::providers::Identity,
-        alloy::providers::fillers::JoinFill<
-            alloy::providers::fillers::GasFiller,
-            alloy::providers::fillers::JoinFill<
-                alloy::providers::fillers::BlobGasFiller,
-                alloy::providers::fillers::JoinFill<
-                    alloy::providers::fillers::NonceFiller,
-                    alloy::providers::fillers::ChainIdFiller,
-                >,
-            >,
-        >,
-    >,
-    alloy::providers::RootProvider,
->;
 // ---------- Local fetch/processing ----------
 
 fn get_resources_from_settings(settings: &Settings) -> Result<Vec<FeedConfig>> {
@@ -154,54 +164,162 @@ fn get_resources_from_settings(settings: &Settings) -> Result<Vec<FeedConfig>> {
 }
 
 #[derive(Debug, Clone)]
-struct ReserveInfo {
+pub struct ReserveInfo {
     underlying_asset: Address,
     variable_borrow_rate: f64,
 }
 
-async fn get_borrow_rates(marketplace: &str) -> Result<HashMap<String, ReserveInfo>> {
-    let rpc_url = Url::parse("https://rpc.hyperliquid.xyz/evm")?;
+// Internal normalized view (only what we need)
+#[derive(Debug, Clone)]
+struct ReserveLike {
+    symbol: String,
+    underlying_asset: Address,
+    variable_borrow_rate_ray: u128,
+}
 
-    // You don't actually need the provider to build calldata, but keeping it is fine
-    let provider = ProviderBuilder::new().connect_http(rpc_url.clone());
+type Decoder = fn(&Bytes) -> Result<Vec<ReserveLike>>;
 
-    // Based on the marketplace we determine the contract address and the call to make
-    let calldata = match marketplace {
-        "HypurrFi" => UiPoolDataProvider::new(HYPURRFI_UI_POOL_DATA_PROVIDER, provider)
+enum Marketplace {
+    HypurrFi,
+    HyperLand,
+}
+
+impl TryFrom<&str> for Marketplace {
+    type Error = anyhow::Error;
+    fn try_from(s: &str) -> Result<Self> {
+        match s {
+            "HypurrFi" => Ok(Marketplace::HypurrFi),
+            "HyperLand" => Ok(Marketplace::HyperLand),
+            other => Err(anyhow!("Unsupported marketplace: {}", other)),
+        }
+    }
+}
+
+struct CallPlan {
+    to: Address,
+    calldata: Bytes,
+    decode: Decoder,
+}
+
+// --- Concrete decoders ---
+
+fn decode_hypurrfi(bytes: &Bytes) -> Result<Vec<ReserveLike>> {
+    let ret = crate::hypurrfi::HypurrFiUiPoolDataProvider::getReservesDataCall::abi_decode_returns(
+        bytes,
+    )?;
+    Ok(ret
+        ._0
+        .into_iter()
+        .map(|r| ReserveLike {
+            symbol: r.symbol,
+            underlying_asset: r.underlyingAsset,
+            variable_borrow_rate_ray: r.variableBorrowRate,
+        })
+        .collect())
+}
+
+fn decode_hyperland(bytes: &Bytes) -> Result<Vec<ReserveLike>> {
+    let ret =
+        crate::hyperland::HyperLandUiPoolDataProvider::getReservesDataCall::abi_decode_returns(
+            bytes,
+        )?;
+    Ok(ret
+        ._0
+        .into_iter()
+        .map(|r| ReserveLike {
+            symbol: r.symbol.clone(),
+            underlying_asset: r.underlyingAsset,
+            variable_borrow_rate_ray: r.variableBorrowRate,
+        })
+        .collect())
+}
+
+// --- Planner ---
+
+fn build_call_plan(
+    marketplace: Marketplace,
+    provider: MyProvider, // whatever your concrete type is
+) -> CallPlan {
+    match marketplace {
+        Marketplace::HypurrFi => {
+            let calldata = crate::hypurrfi::HypurrFiUiPoolDataProvider::new(
+                HYPURRFI_UI_POOL_DATA_PROVIDER,
+                provider,
+            )
             .getReservesData(HYPURRFI_POOL_ADDRESSES_PROVIDER)
             .calldata()
-            .clone(),
-        _ => anyhow::bail!("Unsupported marketplace: {}", marketplace),
-    };
+            .clone();
 
-    // Build a proper JSON-RPC 2.0 request (must include `id`)
-    let req = RequestEthCall::latest(&calldata, &HYPURRFI_UI_POOL_DATA_PROVIDER);
+            CallPlan {
+                to: HYPURRFI_UI_POOL_DATA_PROVIDER,
+                calldata,
+                decode: decode_hypurrfi,
+            }
+        }
+        Marketplace::HyperLand => {
+            let calldata = crate::hyperland::HyperLandUiPoolDataProvider::new(
+                HYPERLAND_UI_POOL_DATA_PROVIDER,
+                provider,
+            )
+            .getReservesData(HYPERLAND_POOL_ADDRESSES_PROVIDER)
+            .calldata()
+            .clone();
 
+            CallPlan {
+                to: HYPERLAND_UI_POOL_DATA_PROVIDER,
+                calldata,
+                decode: decode_hyperland,
+            }
+        }
+    }
+}
+
+// --- Main function ---
+
+pub async fn get_borrow_rates(marketplace: &str) -> Result<HashMap<String, ReserveInfo>> {
+    let rpc_url = Url::parse("https://rpc.hyperliquid.xyz/evm")?;
+    let provider = ProviderBuilder::new().connect_http(rpc_url.clone());
+
+    // 1) Normalize marketplace and build the plan
+    let mkt = Marketplace::try_from(marketplace)?;
+    let plan = build_call_plan(mkt, provider);
+
+    // 2) JSON-RPC call (use the correct "to" per marketplace)
+    let req = RequestEthCall::latest(&plan.calldata, &plan.to);
     let resp = http_post_json::<RequestEthCall, ResponseEthCall>(rpc_url.as_str(), req).await?;
-
     if let Some(err) = resp.error {
-        anyhow::bail!("eth_call returned rpc error {}: {}", err.code, err.message);
+        return Err(anyhow!(
+            "eth_call returned rpc error {}: {}",
+            err.code,
+            err.message
+        ));
     }
 
-    let res_hex = resp.result.as_deref().unwrap();
-
-    // Decode ABI-encoded return bytes (strip optional 0x)
+    // 3) Decode bytes
+    let res_hex = resp
+        .result
+        .as_deref()
+        .ok_or_else(|| anyhow!("empty eth_call result"))?;
     let bytes = Bytes::from(decode(res_hex.trim_start_matches("0x"))?);
 
-    // Decode using the generated SolCall type
-    let reserves =
-        <UiPoolDataProvider::getReservesDataCall as SolCall>::abi_decode_returns(&bytes)?;
+    // 4) Marketplace-specific ABI decode -> normalized Vec<ReserveLike>
+    let reserves_like = (plan.decode)(&bytes)?;
 
-    let mut out: HashMap<String, ReserveInfo> = HashMap::new();
-
-    for r in reserves._0 {
-        let rate_ray: f64 = r.variableBorrowRate.to_string().parse().unwrap_or(0.0);
-        let apr = rate_ray / RAY_F64;
+    // 5) Normalize rates and assemble output
+    let mut out = HashMap::with_capacity(reserves_like.len());
+    for r in reserves_like {
+        // Convert RAY to APR f64
+        let rate_ray_f64: f64 = r
+            .variable_borrow_rate_ray
+            .to_string()
+            .parse()
+            .unwrap_or(0.0);
+        let apr = rate_ray_f64 / RAY_F64;
 
         out.insert(
-            r.symbol.clone(),
+            r.symbol,
             ReserveInfo {
-                underlying_asset: r.underlyingAsset,
+                underlying_asset: r.underlying_asset,
                 variable_borrow_rate: apr,
             },
         );
@@ -210,36 +328,113 @@ async fn get_borrow_rates(marketplace: &str) -> Result<HashMap<String, ReserveIn
     Ok(out)
 }
 
+type MarketplaceBorrowRates = HashMap<String, HashMap<String, ReserveInfo>>;
+
+pub async fn get_borrow_rates_for_marketplace() -> Result<MarketplaceBorrowRates> {
+    let mut marketplace_borrow_rates: MarketplaceBorrowRates = HashMap::new();
+
+    // Fetch for all known marketplaces
+    let hypurrfi_rates = get_borrow_rates("HypurrFi").await?;
+    marketplace_borrow_rates.insert("HypurrFi".to_string(), hypurrfi_rates);
+
+    let hyperland_rates = get_borrow_rates("HyperLand").await?;
+    marketplace_borrow_rates.insert("HyperLand".to_string(), hyperland_rates);
+
+    print_marketplace_data(&marketplace_borrow_rates);
+    Ok(marketplace_borrow_rates)
+}
+
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
     let feeds = get_resources_from_settings(&settings)?;
-    let mut out = Payload::new();
-
-    println!("Feeds: {:?}", feeds);
-
-    let hypeurrfi_borrow_rates = get_borrow_rates("HypurrFi").await?;
-    println!("Reserves: {:?}", hypeurrfi_borrow_rates);
-
+    let mut payload = Payload::new();
+    // Fetch borrow rates for each marketplace and store in a HashMap
+    let marketplace_borrow_rates = get_borrow_rates_for_marketplace().await?;
     for (feed) in &feeds {
         // Check which if the marketplace in the feed.arguments.marketplace
         // and get data from the corresponding provider
 
         if let Some(reserve_info) = match feed.arguments.marketplace.as_str() {
-            "HypurrFi" => hypeurrfi_borrow_rates.get(&feed.pair.base),
+            "HypurrFi" => marketplace_borrow_rates
+                .get("HypurrFi")
+                .unwrap()
+                .get(&feed.pair.base),
+            "HyperLand" => marketplace_borrow_rates
+                .get("HyperLand")
+                .unwrap()
+                .get(&feed.pair.base),
             _ => None,
         } {
-            out.values.push(DataFeedResult {
+            payload.values.push(DataFeedResult {
                 id: feed.feed_id.to_string(),
                 value: DataFeedResultValue::Numerical(reserve_info.variable_borrow_rate),
             });
         } else {
-            out.values.push(DataFeedResult {
+            payload.values.push(DataFeedResult {
                 id: feed.feed_id.to_string(),
                 value: DataFeedResultValue::Error("No data".to_string()),
             });
         }
     }
-    println!("Payload: {:?}", out);
+    print_payload(&payload, &feeds);
+    Ok(payload)
+}
 
-    Ok(out)
+fn print_marketplace_data(marketplace_borrow_rates: &MarketplaceBorrowRates) {
+    let mut table = Table::new();
+    table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
+    table.set_titles(Row::new(vec![
+        Cell::new("Marketplace"),
+        Cell::new("Symbol"),
+        Cell::new("Underlying Asset"),
+        Cell::new("Variable Borrow Rate (APR)"),
+    ]));
+
+    for (marketplace, borrow_rates) in marketplace_borrow_rates {
+        for (symbol, info) in borrow_rates {
+            table.add_row(Row::new(vec![
+                Cell::new(marketplace),
+                Cell::new(symbol),
+                Cell::new(&info.underlying_asset.to_string()),
+                Cell::new(&format!("{:.2}%", info.variable_borrow_rate * 100.0)),
+            ]));
+        }
+    }
+
+    table.printstd();
+}
+
+fn print_payload(payload: &Payload, resources: &[FeedConfig]) {
+    //Sort feeds from resources based on feed_id
+    let sorted_feeds: Vec<&FeedConfig> = resources
+        .iter()
+        .sorted_by_key(|feed| feed.feed_id)
+        .collect();
+
+    let mut table = Table::new();
+    table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
+    table.set_titles(Row::new(vec![
+        Cell::new("Feed ID"),
+        Cell::new("Feed Name"),
+        Cell::new("Value"),
+    ]));
+
+    for feed in sorted_feeds {
+        let value = payload
+            .values
+            .iter()
+            .find(|v| v.id == feed.feed_id.to_string());
+        let display_value = match value {
+            Some(v) => format!("{:?}", v.value),
+            None => "No Data".to_string(),
+        };
+
+        table.add_row(Row::new(vec![
+            Cell::new(feed.feed_id.to_string().as_str()),
+            Cell::new(&feed.pair.base),
+            Cell::new(&display_value),
+        ]));
+    }
+
+    table.printstd();
 }

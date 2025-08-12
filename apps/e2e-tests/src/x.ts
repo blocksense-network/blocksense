@@ -4,8 +4,8 @@ const RPC = 'https://rpc.hyperliquid.xyz/evm';
 const provider = new JsonRpcProvider(RPC);
 
 const ADDRESSES = {
-  poolAddressesProvider: '0x72c98246a98bFe64022a3190e7710E157497170C',
-  uiPoolDataProvider: '0x3Bb92CF81E38484183cc96a4Fb8fBd2d73535807',
+  poolAddressesProvider: '0xA73ff12D177D8F1Ec938c3ba0e87D33524dD5594',
+  uiPoolDataProvider: '0x7b883191011AEAe40581d3Fa1B112413808C9c00',
 };
 
 const uiAbi = [
@@ -233,7 +233,9 @@ const uiAbi = [
   const reserves = await ui.getReservesData(ADDRESSES.poolAddressesProvider);
   // Example: map symbol by joining with your own token list; here we just print rates.
   const SECONDS_PER_YEAR = 31536000n;
-  for (const r of reserves) {
+  console.log(reserves);
+  for (const r of reserves[0]) {
+    // console.log(r);
     // console.log(r);
     const apr = Number(r.variableBorrowRate) / 1e27;
     const apy = Math.pow(1 + apr / 31536000, 31536000) - 1;

@@ -240,6 +240,247 @@
           ]
         }
       }
+    },
+    {
+      "id": "10",
+      "full_name": "WHYPE HyperLand Borrow Rate",
+      "description": "WHYPE Borrow Rate on HyperLand leveraged lending marketplace for clean leverage loops on Hyperliquid.",
+      "type": "price-feed",
+      "oracle_id": "hyper",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "WHYPE",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "marketplace": "HyperLand"
+        }
+      }
+    },
+    {
+      "id": "20",
+      "full_name": "wstHYPE HyperLand Borrow Rate",
+      "description": "wstHYPE Borrow Rate on HyperLand leveraged lending marketplace for clean leverage loops on Hyperliquid.",
+      "type": "price-feed",
+      "oracle_id": "hyper",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "wstHYPE",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "marketplace": "HyperLand"
+        }
+      }
+    },
+    {
+      "id": "30",
+      "full_name": "uBTC HyperLand Borrow Rate",
+      "description": "uBTC Borrow Rate on HyperLand leveraged lending marketplace for clean leverage loops on Hyperliquid.",
+      "type": "price-feed",
+      "oracle_id": "hyper",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "UBTC",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "marketplace": "HyperLand"
+        }
+      }
+    },
+    {
+      "id": "40",
+      "full_name": "UETH HyperLand Borrow Rate",
+      "description": "UETH Borrow Rate on HyperLand leveraged lending marketplace for clean leverage loops on Hyperliquid.",
+      "type": "price-feed",
+      "oracle_id": "hyper",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "UETH",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "marketplace": "HyperLand"
+        }
+      }
+    },
+    {
+      "id": "50",
+      "full_name": "USDe HyperLand Borrow Rate",
+      "description": "USDe Borrow Rate on HyperLand leveraged lending marketplace for clean leverage loops on Hyperliquid.",
+      "type": "price-feed",
+      "oracle_id": "hyper",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "USDe",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "marketplace": "HyperLand"
+        }
+      }
+    },
+    {
+      "id": "100001",
+      "full_name": "ynETHx / WETH",
+      "description": "YieldNest Restaked Ethereum / Wrapped Ethereum Redemption Rate. YieldNest convertToAssets call on ETH mainnet at 0x657d9ABA1DBb59e53f9F3eCAA878447dCfC96dCb",
+      "type": "price-feed",
+      "oracle_id": "eth-rpc",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "ynETHx",
+          "quote": "WETH"
+        },
+        "decimals": 0,
+        "category": "",
+        "market_hours": "Crypto",
+        "arguments": {
+          "contracts": [
+            {
+              "rpc_urls": [
+                "https://eth.llamarpc.com",
+                "https://rpc.eth.gateway.fm",
+                "https://ethereum-rpc.publicnode.com"
+              ],
+              "address": "0x657d9ABA1DBb59e53f9F3eCAA878447dCfC96dCb",
+              "label": "ynETHx",
+              "method_name": "convertToAssets",
+              "param1": "1000000000000000000"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "100002",
+      "full_name": "YUSD / USDC",
+      "description": "YieldFi YUSD exchangeRate call on ETH mainnet at 0x19Ebd191f7A24ECE672ba13A302212b5eF7F35cb",
+      "type": "price-feed",
+      "oracle_id": "eth-rpc",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "YUSD",
+          "quote": "USDC"
+        },
+        "decimals": 6,
+        "category": "",
+        "market_hours": "Crypto",
+        "arguments": {
+          "divisor": 1000000,
+          "contracts": [
+            {
+              "rpc_urls": [
+                "https://eth.llamarpc.com",
+                "https://rpc.eth.gateway.fm",
+                "https://ethereum-rpc.publicnode.com"
+              ],
+              "address": "0x19Ebd191f7A24ECE672ba13A302212b5eF7F35cb",
+              "label": "YieldFi yUSD",
+              "method_name": "exchangeRate"
+            }
+          ]
+        }
+      }
     }
   ]
 }

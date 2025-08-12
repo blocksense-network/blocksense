@@ -22,7 +22,7 @@ capabilities = []
 id = "1"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"WHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HypurrFi"}}'
+data = '{"pair":{"base":"WHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLand"}}'
 
 [[trigger.oracle.data_feeds]]
 id = "2"
@@ -47,6 +47,37 @@ id = "5"
 stride = 0
 decimals = 18
 data = '{"pair":{"base":"USDe","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HypurrFi"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"WHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLand"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "20"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"wstHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLand"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "30"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"UBTC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLand"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "40"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"UETH","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLand"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "50"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"USDe","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLand"}}'
+
 
 [component.hyper]
 source = "../target/wasm32-wasip1/release/hyper.wasm"
