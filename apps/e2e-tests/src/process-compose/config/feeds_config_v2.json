@@ -1111,61 +1111,61 @@
             "network": "monad-testnet",
             "pool": "0x264e9b75723d75e3c607627d8e21d2c758db4c80",
             "reverse": true,
-            "min_volume_usd": 200000
+            "min_volume_usd": 42
           },
           {
             "network": "monad-testnet",
             "pool": "0x8552706d9a27013f20ea0f9df8e20b61e283d2d3",
             "reverse": true,
-            "min_volume_usd": 200000
+            "min_volume_usd": 42
           },
           {
             "network": "monad-testnet",
             "pool": "0x5323821de342c56b80c99fbc7cd725f2da8eb87b",
             "reverse": true,
-            "min_volume_usd": 200000
+            "min_volume_usd": 42
           },
           {
             "network": "monad-testnet",
             "pool": "0x6e4b7be5ef7f8950c76baa0bd90125bc9b33c8db",
             "reverse": true,
-            "min_volume_usd": 200000
+            "min_volume_usd": 42
           },
           {
             "network": "monad-testnet",
             "pool": "0x212fde77a42d55f980d0a0304e7eebe1e999c60f",
             "reverse": true,
-            "min_volume_usd": 200000
+            "min_volume_usd": 42
           },
           {
             "network": "monad-testnet",
             "pool": "0xc0ce32eee0eb8bf24fa2b00923a78abc5002f91e",
             "reverse": true,
-            "min_volume_usd": 200000
+            "min_volume_usd": 42
           },
           {
             "network": "monad-testnet",
             "pool": "0x786f4aa162457ecdf8fa4657759fa3e86c9394ff",
             "reverse": true,
-            "min_volume_usd": 200000
+            "min_volume_usd": 42
           },
           {
             "network": "monad-testnet",
             "pool": "0xf2afc5aa9965cdb2d4be94823c98411291b61297",
             "reverse": true,
-            "min_volume_usd": 200000
+            "min_volume_usd": 42
           },
           {
             "network": "monad-testnet",
             "pool": "0xf22d36b6bee8a7fd51def4e3badf35a8733b284f",
             "reverse": true,
-            "min_volume_usd": 200000
+            "min_volume_usd": 42
           },
           {
             "network": "monad-testnet",
             "pool": "0xe8a806ae6ecb1f02063e21c6f0579b145399ee5f",
             "reverse": true,
-            "min_volume_usd": 200000
+            "min_volume_usd": 42
           }
         ]
       }
@@ -1201,37 +1201,37 @@
             "network": "monad-testnet",
             "pool": "0x4d2e4c5ff07d1c82d512335dea0a1aa82c031a86",
             "reverse": false,
-            "min_volume_usd": 10000
+            "min_volume_usd": 42
           },
           {
             "network": "monad-testnet",
             "pool": "0x1076ad67c1f8ecaeeaabbdf28577fe5b7ccd5e03",
             "reverse": false,
-            "min_volume_usd": 10000
+            "min_volume_usd": 42
           },
           {
             "network": "monad-testnet",
             "pool": "0x48f7d84b7f9e86324ad4c68c9941a2c4ea781217",
             "reverse": false,
-            "min_volume_usd": 10000
+            "min_volume_usd": 42
           },
           {
             "network": "monad-testnet",
             "pool": "0x7aab85507e595d4debd8ec66b04fd9b9f6d36890",
             "reverse": false,
-            "min_volume_usd": 10000
+            "min_volume_usd": 42
           },
           {
             "network": "monad-testnet",
             "pool": "0x9ddb0832edf80dce1768a594faedaa7978a3e118",
             "reverse": false,
-            "min_volume_usd": 10000
+            "min_volume_usd": 42
           },
           {
             "network": "monad-testnet",
             "pool": "0xc0ce32eee0eb8bf24fa2b00923a78abc5002f91e",
             "reverse": false,
-            "min_volume_usd": 10000
+            "min_volume_usd": 42
           }
         ]
       }
@@ -1267,37 +1267,37 @@
             "network": "base",
             "pool": "0x70acdf2ad0bf2402c957154f944c19ef4e1cbae1",
             "reverse": false,
-            "min_volume_usd": 1000000
+            "min_volume_usd": 42
           },
           {
             "network": "base",
             "pool": "0x4e962bb3889bf030368f56810a9c96b83cb3e778",
             "reverse": false,
-            "min_volume_usd": 1000000
+            "min_volume_usd": 42
           },
           {
             "network": "base",
             "pool": "0xc211e1f853a898bd1302385ccde55f33a8c4b3f3",
             "reverse": false,
-            "min_volume_usd": 1000000
+            "min_volume_usd": 42
           },
           {
             "network": "base",
             "pool": "0xfbb6eed8e7aa03b138556eedaf5d271a5e1e43ef",
             "reverse": false,
-            "min_volume_usd": 1000000
+            "min_volume_usd": 42
           },
           {
             "network": "base",
             "pool": "0xb94b22332abf5f89877a14cc88f2abc48c34b3df",
             "reverse": false,
-            "min_volume_usd": 1000000
+            "min_volume_usd": 42
           },
           {
             "network": "base",
             "pool": "0x8c7080564b5a792a33ef2fd473fba6364d5495e5",
             "reverse": false,
-            "min_volume_usd": 1000000
+            "min_volume_usd": 42
           }
         ]
       }
