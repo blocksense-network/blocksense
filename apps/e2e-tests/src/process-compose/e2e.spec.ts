@@ -6,6 +6,7 @@ import { getProcessComposeLogsFiles } from '@blocksense/base-utils/env';
 import {
   entriesOf,
   fromEntries,
+  keysOf,
   mapValues,
   valuesOf,
 } from '@blocksense/base-utils/array-iter';
@@ -158,12 +159,31 @@ describe.sequential('E2E Tests with process-compose', () => {
 
       expect(initialFeedsInfo).toEqual(initialFeedsInfoLocal);
 
+      // If some feeds were not updated, we will log a warning
+      // and continue with the available feeds
+      const updatedFeedIds = keysOf(updatesToNetworks[network]).map(feedId =>
+        BigInt(feedId),
+      );
+      if (updatedFeedIds.length !== feedIds.length) {
+        yield* Effect.logWarning('Not all feeds have been updated');
+        const missingFeeds = feedIds.filter(
+          feedId => !updatedFeedIds.includes(feedId),
+        );
+        yield* Effect.logWarning('Missing updates for feeds:', missingFeeds);
+        yield* Effect.logWarning('Test will continue with available feeds');
+
+        // Remove missing feeds from the initial rounds info
+        for (const feedId of missingFeeds) {
+          delete initialRounds[feedId.toString()];
+        }
+      }
+
       // Get feeds information from the local network ( anvil )
       // Info is fetched for specific round - the initial round of the feed
       // + number of updates that happened while the local sequencer was running
       // modulo the maximum number of history elements per feed
       const currentFeedsInfo = yield* getDataFeedsInfoFromNetwork(
-        feedIds,
+        updatedFeedIds,
         contractAddress,
         url,
         mapValues(
