@@ -12,7 +12,11 @@ import {
 import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
 import type { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 
-import { rgSearchPattern, parseProcessesStatus } from './helpers';
+import {
+  rgSearchPattern,
+  parseProcessesStatus,
+  getInitialFeedsInfoFromNetwork,
+} from './helpers';
 import { expectedPCStatuses03 } from './expected';
 import type {
   ProcessComposeService,
@@ -27,14 +31,19 @@ describe.sequential('E2E Tests with process-compose', () => {
   const network = 'ink_sepolia';
   const MAX_HISTORY_ELEMENTS_PER_FEED = 8192;
 
+  let feedIdsFromConfig: Array<bigint>;
+  let contractAddressFromConfig: `0x${string}`;
+
   let sequencer: SequencerService;
+  let processCompose: ProcessComposeService;
+
   let sequencerConfig: SequencerConfigV2;
   let feedsConfig: NewFeedsConfig;
-  let feedIds: Array<bigint>;
-  let processCompose: ProcessComposeService;
-  let updatesToNetworks = {} as UpdatesToNetwork;
 
+  let feedIds: Array<bigint>;
   let contractAddress: `0x${string}`;
+
+  let updatesToNetworks = {} as UpdatesToNetwork;
   let initialFeedsInfo: FeedsValueAndRound;
 
   beforeAll(() =>
@@ -44,6 +53,14 @@ describe.sequential('E2E Tests with process-compose', () => {
         yield* processCompose.start('example-setup-03');
 
         sequencer = yield* Sequencer;
+
+        // Get feeds information from the original network. No affection of the work of the
+        // local sequencer.
+        ({
+          address: contractAddressFromConfig,
+          feedIds: feedIdsFromConfig,
+          initialFeedsInfo,
+        } = yield* getInitialFeedsInfoFromNetwork('ink-sepolia'));
       }),
       Effect.provide(Layer.merge(ProcessCompose.Live, Sequencer.Live)),
       Effect.runPromise,
@@ -78,31 +95,21 @@ describe.sequential('E2E Tests with process-compose', () => {
     Effect.gen(function* () {
       sequencerConfig = yield* sequencer.getConfig();
       feedsConfig = yield* sequencer.getFeedsConfig();
-
       expect(sequencerConfig).toBeTypeOf('object');
       expect(feedsConfig).toBeTypeOf('object');
-    }).pipe(
-      // Once we have the sequencer config, we can get info about feeds
-      Effect.tap(() =>
-        Effect.gen(function* () {
-          contractAddress = sequencerConfig.providers[network].contracts.find(
-            c => c.name === 'AggregatedDataFeedStore',
-          )!.address as `0x${string}`;
-          const allow_feeds = sequencerConfig.providers[network].allow_feeds;
 
-          feedIds = allow_feeds?.length
-            ? (allow_feeds as Array<bigint>)
-            : feedsConfig.feeds.map(feed => feed.id);
-          // Get feeds information from the original network. No affection of the work of the
-          // local sequencer.
-          initialFeedsInfo = yield* getDataFeedsInfoFromNetwork(
-            feedIds,
-            contractAddress,
-            'ink-sepolia',
-          );
-        }),
-      ),
-    ),
+      contractAddress = sequencerConfig.providers[network].contracts.find(
+        c => c.name === 'AggregatedDataFeedStore',
+      )!.address as `0x${string}`;
+
+      expect(contractAddress).toEqual(contractAddressFromConfig);
+
+      const allow_feeds = sequencerConfig.providers[network].allow_feeds;
+      feedIds = allow_feeds?.length
+        ? (allow_feeds as Array<bigint>)
+        : feedsConfig.feeds.map(feed => feed.id);
+      expect(feedIds).toEqual(feedIdsFromConfig);
+    }),
   );
 
   it.live(
