@@ -1,4 +1,4 @@
-import { Effect, pipe, Schedule } from 'effect';
+import { Effect, Layer, pipe, Schedule } from 'effect';
 import { afterAll, beforeAll, describe, expect, it } from '@effect/vitest';
 import { deepStrictEqual } from 'assert';
 
@@ -14,7 +14,11 @@ import type { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config'
 
 import { rgSearchPattern, parseProcessesStatus } from './helpers';
 import { expectedPCStatuses03 } from './expected';
-import type { ProcessComposeService, UpdatesToNetwork } from './types';
+import type {
+  ProcessComposeService,
+  SequencerService,
+  UpdatesToNetwork,
+} from './types';
 import { ProcessCompose, Sequencer } from './types';
 import type { FeedsValueAndRound } from '../utils/onchain';
 import { getDataFeedsInfoFromNetwork } from '../utils/onchain';
@@ -23,6 +27,7 @@ describe.sequential('E2E Tests with process-compose', () => {
   const network = 'ink_sepolia';
   const MAX_HISTORY_ELEMENTS_PER_FEED = 8192;
 
+  let sequencer: SequencerService;
   let sequencerConfig: SequencerConfigV2;
   let feedsConfig: NewFeedsConfig;
   let feedIds: Array<bigint>;
@@ -34,10 +39,13 @@ describe.sequential('E2E Tests with process-compose', () => {
 
   beforeAll(() =>
     pipe(
-      ProcessCompose,
-      Effect.provide(ProcessCompose.Live),
-      Effect.tap(pc => pc.start('example-setup-03')),
-      Effect.tap(pc => (processCompose = pc)),
+      Effect.gen(function* () {
+        processCompose = yield* ProcessCompose;
+        yield* processCompose.start('example-setup-03');
+
+        sequencer = yield* Sequencer;
+      }),
+      Effect.provide(Layer.merge(ProcessCompose.Live, Sequencer.Live)),
       Effect.runPromise,
     ),
   );
@@ -68,14 +76,12 @@ describe.sequential('E2E Tests with process-compose', () => {
 
   it.live('Test sequencer configs are available and in correct format', () =>
     Effect.gen(function* () {
-      const sequencer = yield* Sequencer;
       sequencerConfig = yield* sequencer.getConfig();
       feedsConfig = yield* sequencer.getFeedsConfig();
 
       expect(sequencerConfig).toBeTypeOf('object');
       expect(feedsConfig).toBeTypeOf('object');
     }).pipe(
-      Effect.provide(Sequencer.Live),
       // Once we have the sequencer config, we can get info about feeds
       Effect.tap(() =>
         Effect.gen(function* () {
@@ -103,7 +109,6 @@ describe.sequential('E2E Tests with process-compose', () => {
     'Test processes state after at least 2 updates of each feeds have been made',
     () =>
       Effect.gen(function* () {
-        const sequencer = yield* Sequencer;
         updatesToNetworks = yield* Effect.retry(
           sequencer
             .fetchUpdatesToNetworksMetric()
@@ -123,7 +128,7 @@ describe.sequential('E2E Tests with process-compose', () => {
         );
 
         expect(processes).toEqual(expectedPCStatuses03);
-      }).pipe(Effect.provide(Sequencer.Live)),
+      }),
   );
 
   it.live('Test feeds data is updated on the local network', () =>
@@ -174,7 +179,7 @@ describe.sequential('E2E Tests with process-compose', () => {
         }
         expect(value).not.toEqual(initialFeedsInfo[id].value);
       }
-    }).pipe(Effect.provide(Sequencer.Live)),
+    }),
   );
 
   describe.sequential('Reporter behavior based on logs', () => {
