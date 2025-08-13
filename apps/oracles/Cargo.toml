@@ -22,6 +22,7 @@ blocksense-data-providers-sdk = { path = "../../libs/data_providers_sdk" }
 
 anyhow = "1"
 futures = "0.3"
+futures-timeout = "^0.1"
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0", features = ["float_roundtrip"] }
 url = "2.5"

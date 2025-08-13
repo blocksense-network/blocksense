@@ -681,7 +681,7 @@ pub async fn eth_batch_send_to_contract(
                 Err(err) => {
                     debug!("Timed out while trying to post tx to RPC and get tx_hash in network `{net}` block height {block_height} and address {sender_address} due to {err} and will try again");
 
-                    let receipt = match actix_web::rt::time::timeout(
+                    match actix_web::rt::time::timeout(
                         Duration::from_secs(transaction_retry_timeout_secs),
                         rpc_handle.get_transaction_receipt(tx_hash),
                     )
@@ -732,8 +732,7 @@ pub async fn eth_batch_send_to_contract(
                             .await;
                             continue;
                         }
-                    };
-                    receipt
+                    }
                 }
             };
 

@@ -3,8 +3,8 @@ use std::time::Instant;
 use anyhow::Result;
 use futures::stream::StreamExt;
 use futures::Stream;
+use futures_timeout::TimeoutExt;
 use std::time::Duration;
-use tokio::time::timeout_at;
 
 use crate::price_data::{traits::prices_fetcher::PairPriceData, types::ProviderPriceData};
 pub async fn fetch_all_prices<S>(futures_set: S, interval: &Duration) -> Vec<ProviderPriceData>
@@ -13,17 +13,14 @@ where
 {
     let mut all_fetched_prices: Vec<ProviderPriceData> = Vec::new();
     let before_fetch = Instant::now();
-    let deadline = before_fetch + *interval;
-    match timeout_at(
-        deadline.into(),
-        fetch_loop_prices(futures_set, &mut all_fetched_prices, before_fetch),
-    )
-    .await
+    match fetch_loop_prices(futures_set, &mut all_fetched_prices, before_fetch)
+        .timeout(*interval)
+        .await
     {
         Ok(()) => {
             println!("🕛 All prices fetched in {:?}", before_fetch.elapsed());
         }
-        Err(_) => {
+        Err(_e) => {
             println!("🕛 Not all prices fetched in {:?}", before_fetch.elapsed());
         }
     }
