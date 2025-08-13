@@ -67,7 +67,7 @@ pub async fn get_prices(resources: &ResourceData) -> Result<PairsToResults> {
         fetch::<BybitPriceFetcher>(&[], None),
         fetch::<CoinbasePriceFetcher>(&symbols.coinbase, None),
         fetch::<CryptoComPriceFetcher>(&[], None),
-        fetch::<GateIoPriceFetcher>(&[], None),
+        // fetch::<GateIoPriceFetcher>(&[], None),
         fetch::<GeminiPriceFetcher>(&symbols.gemini, None),
         fetch::<KrakenPriceFetcher>(&[], None),
         fetch::<KuCoinPriceFetcher>(&[], None),
