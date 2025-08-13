@@ -55,7 +55,8 @@ use blocksense_metrics::{
     actix_server::handle_prometheus_metrics,
     metrics::{
         REPORTER_BATCH_COUNTER, REPORTER_FAILED_SEQ_REQUESTS, REPORTER_FAILED_WASM_EXECS,
-        REPORTER_FEED_COUNTER, REPORTER_WASM_EXECUTION_TIME_GAUGE,
+        REPORTER_FEED_COUNTER, REPORTER_WASM_EXECUTION_TIMEOUT_GAUGE,
+        REPORTER_WASM_EXECUTION_TIME_GAUGE,
     },
     TextEncoder,
 };
@@ -473,6 +474,9 @@ impl OracleTrigger {
                         "Component - ({component_id}) execution ended with timout - {}",
                         error
                     );
+                    REPORTER_WASM_EXECUTION_TIMEOUT_GAUGE
+                        .with_label_values(&[&component_id.clone()])
+                        .set(1_i64);
                     //TODO(adikov): We need to come up with proper way of handling errors in wasm
                     //components.
                     continue;
