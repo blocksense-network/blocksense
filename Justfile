@@ -38,15 +38,23 @@ build-environment environment="all":
     cp -rf --no-preserve=mode,ownership "$srcDir"/. {{process-compose-artifacts-dir}}
   else
     destDir="{{process-compose-artifacts-dir}}/{{environment}}"
-    srcDir=$(nix build --impure -L --json .#legacyPackages.{{system}}.process-compose-environments.{{environment}} | jq -r '.[0].outputs.out')
+    if [[ "${USE_LOCAL_CARGO_RESULTS:-0}" = 1 ]]; then
+      srcDir=$(nix build --impure -L --json .#legacyPackages.{{system}}.process-compose-environments-with-cargo-local.{{environment}} | jq -r '.[0].outputs.out')
+    else
+      srcDir=$(nix build --impure -L --json .#legacyPackages.{{system}}.process-compose-environments.{{environment}} | jq -r '.[0].outputs.out')
+    fi
     cp -rf --no-preserve=mode,ownership "$srcDir"/. "$destDir"
   fi
   echo "Process Compose artifacts copied to {{process-compose-artifacts-dir}}"
 
 [group('Working with process-compose environments')]
 [doc('Start a process-compose environment. This command depends on building blocksense and the environment first')]
-start-environment environment *pc-flags: build-blocksense (build-environment environment)
+start-environment environment *pc-flags: (build-environment environment)
   #!/usr/bin/env bash
+  if [[ $USE_LOCAL_CARGO_RESULTS = 1 ]]; then
+    just build-blocksense
+  fi
+
   PC_FILE="{{process-compose-artifacts-dir}}/{{environment}}/process-compose.yaml"
   process-compose up {{pc-flags}} -f "$PC_FILE"
 
