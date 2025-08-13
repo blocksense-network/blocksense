@@ -50,11 +50,15 @@ export async function parseProcessesStatus() {
 
 export async function startEnvironment(testEnvironment: string): Promise<void> {
   logTestEnvironmentInfo('Starting', testEnvironment);
-  await execa('just', ['start-environment', testEnvironment, '--detached'], {
-    env: {
-      FEEDS_CONFIG_DIR: `${E2E_TESTS_FEEDS_CONFIG_DIR}`,
+  await execa(
+    'just',
+    ['start-environment', testEnvironment, '0', '--detached'],
+    {
+      env: {
+        FEEDS_CONFIG_DIR: `${E2E_TESTS_FEEDS_CONFIG_DIR}`,
+      },
     },
-  });
+  );
 }
 
 export async function stopEnvironment(): Promise<void> {
