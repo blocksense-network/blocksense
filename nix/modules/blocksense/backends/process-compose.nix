@@ -17,8 +17,15 @@ let
     blama
     ;
 
+  useLocalCargoResult = config.services.blocksense.process-compose.use-local-cargo-result;
+
   # process-compose will replace `$GIT_ROOT` on startup
-  mkCargoTargetExePath = executable-name: "$GIT_ROOT/target/release/${executable-name}";
+  mkCargoTargetExePath =
+    executable-name:
+    if useLocalCargoResult then
+      "$GIT_ROOT/target/release/${executable-name}"
+    else
+      self'.apps.${executable-name}.program;
 
   logsConfig = {
     fields_order = [
@@ -87,11 +94,13 @@ let
             ${mkCargoTargetExePath "blocksense"} node build --up \
               --from ${cfg.config-files."reporter_config_${name}".path}
           '';
-          environment = [
-            "RUST_LOG=${log-level}"
-            "SPIN_DATA_DIR=$GIT_ROOT/target/spin-artifacts"
-            "LD_LIBRARY_PATH=${lib.makeLibraryPath self'.legacyPackages.commonLibDeps}"
-          ];
+          environment =
+            [ "RUST_LOG=${log-level}" ]
+            ++ lib.optionals useLocalCargoResult [
+              "SPIN_DATA_DIR=$GIT_ROOT/target/spin-artifacts"
+              "LD_LIBRARY_PATH=${lib.makeLibraryPath self'.legacyPackages.commonLibDeps}"
+            ];
+
           depends_on = {
             blocksense-sequencer.condition = "process_healthy";
           };
@@ -172,6 +181,13 @@ let
   };
 in
 {
+
+  options.services.blocksense.process-compose.use-local-cargo-result = lib.mkEnableOption ''
+    Use locally built Cargo artifacts (from $GIT_ROOT/target/release/$executable-name)
+    in place of Nix-built derivations to speed up the edit–build–test cycle.
+    This bypasses hermetic builds and should be used for development only.
+  '';
+
   config = lib.mkIf cfg.enable {
     processes = lib.mkMerge [
       anvilImpersonateAndFundInstances
