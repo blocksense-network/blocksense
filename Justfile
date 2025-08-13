@@ -26,26 +26,42 @@ list-environments:
 
 [group('Working with process-compose environments')]
 [doc('Build process-compose artifacts for a specific environment or all environments')]
-build-environment environment="all":
+build-environment environment="all" use-local-cargo-result="0":
   #!/usr/bin/env bash
   set -euo pipefail
-  # Collect free ports that process-compose will use
-  scripts/utils/collect-available-ports.sh {{process-compose-artifacts-dir}}/available-ports
+
+  if [[ "{{use-local-cargo-result}}" = 1 ]]; then
+    FLAKE_ATTR_PATH=process-compose-environments.with-local-cargo-artifacts.{{environment}}
+  else
+    FLAKE_ATTR_PATH=process-compose-environments.hermetic.{{environment}}
+  fi
 
   if [[ {{environment}} == "all" ]]; then
-    srcDir=$(nix build --impure --json -L .#allProcessComposeFiles | jq -r '.[0].outputs.out')
-    cp -rf --no-preserve=mode,ownership "$srcDir"/. {{process-compose-artifacts-dir}}
+    DEST_DIR="{{process-compose-artifacts-dir}}"
   else
-    destDir="{{process-compose-artifacts-dir}}/{{environment}}"
-    srcDir=$(nix build --impure -L --json .#legacyPackages.${system}.process-compose-environments.{{environment}} | jq -r '.[0].outputs.out')
-    cp -rf --no-preserve=mode,ownership "$srcDir"/. "$destDir"
+    DEST_DIR="{{process-compose-artifacts-dir}}/{{environment}}"
   fi
-  echo "Process Compose artifacts copied to {{process-compose-artifacts-dir}}"
+
+  # Collect free ports that process-compose will use
+  mkdir -p "$DEST_DIR"
+  scripts/utils/collect-available-ports.sh "$DEST_DIR/available-ports"
+
+  SRC_DIR=$(
+    nix build --impure -L --print-out-paths \
+      .#${FLAKE_ATTR_PATH}
+  )
+
+  cp -rf --no-preserve=mode,ownership "$SRC_DIR"/. "$DEST_DIR"
+  echo "Process Compose artifacts copied to $DEST_DIR"
 
 [group('Working with process-compose environments')]
 [doc('Start a process-compose environment. This command depends on building blocksense and the environment first')]
-start-environment environment *pc-flags: build-blocksense (build-environment environment)
+start-environment environment use-local-cargo-result="0" *pc-flags: (build-environment environment use-local-cargo-result)
   #!/usr/bin/env bash
+  if [[ "{{use-local-cargo-result}}" = 1 ]]; then
+    just build-blocksense
+  fi
+
   PC_FILE="{{process-compose-artifacts-dir}}/{{environment}}/process-compose.yaml"
   process-compose up {{pc-flags}} -f "$PC_FILE"
 
