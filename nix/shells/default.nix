@@ -39,6 +39,10 @@
           shellName = "Lint";
           extraImports = [ ];
         };
+        oracle-development = createShell {
+          module = ./pkg-sets/oracle-development.nix;
+          shellName = "Oracle Development";
+        };
       };
     };
 }
