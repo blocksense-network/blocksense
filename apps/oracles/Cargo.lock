@@ -1892,6 +1892,7 @@ version = "0.1.0"
 dependencies = [
  "alloy",
  "anyhow",
+ "blocksense-data-providers-sdk",
  "blocksense-sdk",
  "itertools 0.8.2",
  "prettytable-rs",

@@ -7,11 +7,13 @@ use alloy::{
     sol,
 };
 use anyhow::{anyhow, Result};
+use blocksense_data_providers_sdk::price_data::fetchers::money_markets::hyperdrive;
 use blocksense_sdk::{
     http::http_post_json,
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
 };
+use core::borrow;
 use itertools::Itertools;
 use prettytable::{format, Cell, Row, Table};
 use serde::{Deserialize, Serialize};
@@ -28,7 +30,7 @@ pub mod hypurrfi {
     }
 }
 
-pub mod hyperland {
+pub mod hyperlend {
     alloy::sol! {
         #[allow(missing_docs)]
         #[allow(clippy::too_many_arguments)]
@@ -126,10 +128,11 @@ struct PairDescription {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 struct OracleArgs {
     marketplace: String,
+    market_id: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-struct FeedConfig {
+pub struct FeedConfig {
     #[serde(default)]
     feed_id: FeedId,
     pair: PairDescription,
@@ -165,7 +168,7 @@ fn get_resources_from_settings(settings: &Settings) -> Result<Vec<FeedConfig>> {
 
 #[derive(Debug, Clone)]
 pub struct ReserveInfo {
-    underlying_asset: Address,
+    underlying_asset: Option<Address>,
     variable_borrow_rate: f64,
 }
 
@@ -181,7 +184,7 @@ type Decoder = fn(&Bytes) -> Result<Vec<ReserveLike>>;
 
 enum Marketplace {
     HypurrFi,
-    HyperLand,
+    HyperLend,
 }
 
 impl TryFrom<&str> for Marketplace {
@@ -189,7 +192,8 @@ impl TryFrom<&str> for Marketplace {
     fn try_from(s: &str) -> Result<Self> {
         match s {
             "HypurrFi" => Ok(Marketplace::HypurrFi),
-            "HyperLand" => Ok(Marketplace::HyperLand),
+            "HyperLend" => Ok(Marketplace::HyperLend),
+            "HyperDrive" => Ok(Marketplace::HyperLend), // HyperDrive is treated as HyperLend for now
             other => Err(anyhow!("Unsupported marketplace: {}", other)),
         }
     }
@@ -220,7 +224,7 @@ fn decode_hypurrfi(bytes: &Bytes) -> Result<Vec<ReserveLike>> {
 
 fn decode_hyperland(bytes: &Bytes) -> Result<Vec<ReserveLike>> {
     let ret =
-        crate::hyperland::HyperLandUiPoolDataProvider::getReservesDataCall::abi_decode_returns(
+        crate::hyperlend::HyperLandUiPoolDataProvider::getReservesDataCall::abi_decode_returns(
             bytes,
         )?;
     Ok(ret
@@ -256,8 +260,8 @@ fn build_call_plan(
                 decode: decode_hypurrfi,
             }
         }
-        Marketplace::HyperLand => {
-            let calldata = crate::hyperland::HyperLandUiPoolDataProvider::new(
+        Marketplace::HyperLend => {
+            let calldata = crate::hyperlend::HyperLandUiPoolDataProvider::new(
                 HYPERLAND_UI_POOL_DATA_PROVIDER,
                 provider,
             )
@@ -274,9 +278,43 @@ fn build_call_plan(
     }
 }
 
-// --- Main function ---
+pub async fn get_borrow_rates_from_hyperdrive(
+    feeds_config: &Vec<FeedConfig>,
+) -> Result<HashMap<String, ReserveInfo>> {
+    let mut borrow_rates: HashMap<String, ReserveInfo> = HashMap::new();
+    get_borrow_rates_from_chain("HyperDrive").await?;
+    let hyperdrive_feeds: Vec<FeedConfig> = feeds_config
+        .iter()
+        .filter(|feed| feed.arguments.marketplace == "HyperDrive")
+        .cloned()
+        .collect();
 
-pub async fn get_borrow_rates(marketplace: &str) -> Result<HashMap<String, ReserveInfo>> {
+    for feed in hyperdrive_feeds {
+        // Make sure that feeds.arguments.market_id is set, otherwise use default
+        if feed.arguments.market_id.is_none() {
+            println!(
+                "Feed {} does not have market_id set, but it is required for HyperDrive. Skipping.",
+                feed.feed_id
+            );
+            continue;
+        }
+        let rate_data =
+            hyperdrive::fetch_rates_for_market(feed.arguments.market_id.unwrap().as_str()).await?;
+        let borrow_rate = rate_data.data.first().unwrap().borrow_rate;
+        borrow_rates.insert(
+            feed.pair.base,
+            ReserveInfo {
+                underlying_asset: None,
+                variable_borrow_rate: borrow_rate / 1e18,
+            },
+        );
+    }
+    Ok(borrow_rates)
+}
+
+pub async fn get_borrow_rates_from_chain(
+    marketplace: &str,
+) -> Result<HashMap<String, ReserveInfo>> {
     let rpc_url = Url::parse("https://rpc.hyperliquid.xyz/evm")?;
     let provider = ProviderBuilder::new().connect_http(rpc_url.clone());
 
@@ -319,7 +357,7 @@ pub async fn get_borrow_rates(marketplace: &str) -> Result<HashMap<String, Reser
         out.insert(
             r.symbol,
             ReserveInfo {
-                underlying_asset: r.underlying_asset,
+                underlying_asset: Some(r.underlying_asset),
                 variable_borrow_rate: apr,
             },
         );
@@ -330,15 +368,20 @@ pub async fn get_borrow_rates(marketplace: &str) -> Result<HashMap<String, Reser
 
 type MarketplaceBorrowRates = HashMap<String, HashMap<String, ReserveInfo>>;
 
-pub async fn get_borrow_rates_for_marketplace() -> Result<MarketplaceBorrowRates> {
+pub async fn get_borrow_rates_for_marketplace(
+    feeds_config: &Vec<FeedConfig>,
+) -> Result<MarketplaceBorrowRates> {
     let mut marketplace_borrow_rates: MarketplaceBorrowRates = HashMap::new();
 
     // Fetch for all known marketplaces
-    let hypurrfi_rates = get_borrow_rates("HypurrFi").await?;
+    let hypurrfi_rates = get_borrow_rates_from_chain("HypurrFi").await?;
     marketplace_borrow_rates.insert("HypurrFi".to_string(), hypurrfi_rates);
 
-    let hyperland_rates = get_borrow_rates("HyperLand").await?;
-    marketplace_borrow_rates.insert("HyperLand".to_string(), hyperland_rates);
+    let hyperland_rates = get_borrow_rates_from_chain("HyperLend").await?;
+    marketplace_borrow_rates.insert("HyperLend".to_string(), hyperland_rates);
+
+    let hyperdrive_rates = get_borrow_rates_from_hyperdrive(feeds_config).await?;
+    marketplace_borrow_rates.insert("HyperDrive".to_string(), hyperdrive_rates);
 
     print_marketplace_data(&marketplace_borrow_rates);
     Ok(marketplace_borrow_rates)
@@ -346,11 +389,11 @@ pub async fn get_borrow_rates_for_marketplace() -> Result<MarketplaceBorrowRates
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
-    let feeds = get_resources_from_settings(&settings)?;
+    let feeds_config = get_resources_from_settings(&settings)?;
     let mut payload = Payload::new();
     // Fetch borrow rates for each marketplace and store in a HashMap
-    let marketplace_borrow_rates = get_borrow_rates_for_marketplace().await?;
-    for (feed) in &feeds {
+    let marketplace_borrow_rates = get_borrow_rates_for_marketplace(&feeds_config).await?;
+    for feed in &feeds_config {
         // Check which if the marketplace in the feed.arguments.marketplace
         // and get data from the corresponding provider
 
@@ -359,8 +402,12 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
                 .get("HypurrFi")
                 .unwrap()
                 .get(&feed.pair.base),
-            "HyperLand" => marketplace_borrow_rates
-                .get("HyperLand")
+            "HyperLend" => marketplace_borrow_rates
+                .get("HyperLend")
+                .unwrap()
+                .get(&feed.pair.base),
+            "HyperDrive" => marketplace_borrow_rates
+                .get("HyperDrive")
                 .unwrap()
                 .get(&feed.pair.base),
             _ => None,
@@ -376,7 +423,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
             });
         }
     }
-    print_payload(&payload, &feeds);
+    print_payload(&payload, &feeds_config);
     Ok(payload)
 }
 
@@ -392,10 +439,14 @@ fn print_marketplace_data(marketplace_borrow_rates: &MarketplaceBorrowRates) {
 
     for (marketplace, borrow_rates) in marketplace_borrow_rates {
         for (symbol, info) in borrow_rates {
+            let underlying_asset = match info.underlying_asset {
+                Some(addr) => addr.to_string(),
+                None => "N/A".to_string(),
+            };
             table.add_row(Row::new(vec![
                 Cell::new(marketplace),
                 Cell::new(symbol),
-                Cell::new(&info.underlying_asset.to_string()),
+                Cell::new(&underlying_asset),
                 Cell::new(&format!("{:.2}%", info.variable_borrow_rate * 100.0)),
             ]));
         }
@@ -431,7 +482,13 @@ fn print_payload(payload: &Payload, resources: &[FeedConfig]) {
 
         table.add_row(Row::new(vec![
             Cell::new(feed.feed_id.to_string().as_str()),
-            Cell::new(&feed.pair.base),
+            Cell::new(
+                format!(
+                    "{} Borrow Rate on {}",
+                    feed.pair.base, feed.arguments.marketplace
+                )
+                .as_str(),
+            ),
             Cell::new(&display_value),
         ]));
     }

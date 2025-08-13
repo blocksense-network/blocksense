@@ -22,7 +22,7 @@ capabilities = []
 id = "1"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"WHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLand"}}'
+data = '{"pair":{"base":"WHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HypurrFi"}}'
 
 [[trigger.oracle.data_feeds]]
 id = "2"
@@ -52,36 +52,62 @@ data = '{"pair":{"base":"USDe","quote":""},"decimals":18,"category":"Rates","mar
 id = "10"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"WHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLand"}}'
+data = '{"pair":{"base":"WHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLend"}}'
 
 [[trigger.oracle.data_feeds]]
 id = "20"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"wstHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLand"}}'
+data = '{"pair":{"base":"wstHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLend"}}'
 
 [[trigger.oracle.data_feeds]]
 id = "30"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"UBTC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLand"}}'
+data = '{"pair":{"base":"UBTC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLend"}}'
 
 [[trigger.oracle.data_feeds]]
 id = "40"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"UETH","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLand"}}'
+data = '{"pair":{"base":"UETH","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLend"}}'
 
 [[trigger.oracle.data_feeds]]
 id = "50"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"USDe","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLand"}}'
+data = '{"pair":{"base":"USDe","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLend"}}'
 
+[[trigger.oracle.data_feeds]]
+id = "100"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"HYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperDrive", "market_id": "1"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "101"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"USDe","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperDrive", "market_id": "2"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"USD₮0","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperDrive", "market_id": "3"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "103"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"USDhl","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperDrive", "market_id": "5"}}'
 
 [component.hyper]
 source = "../target/wasm32-wasip1/release/hyper.wasm"
-allowed_outbound_hosts = ["https://rpc.hyperliquid.xyz"]
+allowed_outbound_hosts = [
+  "https://rpc.hyperliquid.xyz",
+  "https://api.hyperdrive.fi/",
+]
 
 [component.hyper.build]
 command = "cargo build --target wasm32-wasip1 --release"

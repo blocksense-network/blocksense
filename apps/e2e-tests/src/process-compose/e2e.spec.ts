@@ -102,6 +102,7 @@ describe.sequential('E2E Tests with process-compose', () => {
         .contract_address as `0x${string}`;
       const allow_feeds = config.providers[network].allow_feeds;
 
+      console.log(allow_feeds);
       const feedsConfig = yield* sequencer.getFeedsConfig();
 
       feedIds = allow_feeds?.length
@@ -133,17 +134,23 @@ describe.sequential('E2E Tests with process-compose', () => {
         ),
       );
 
+      console.log('Initial prices:', initialPrices);
+      console.log('updatesToNetworks:', updatesToNetworks);
       const currentPrices = yield* Effect.promise(() =>
-        mapValuePromises(
-          initialPrices,
-          async (feedId, _) =>
-            await ADFSConsumer.getSingleDataAtIndex(
-              BigInt(feedId),
-              updatesToNetworks[network][feedId] - 1,
-            ).then(res => Number(res.slice(0, 50))),
-        ),
+        mapValuePromises(initialPrices, async (feedId, _) => {
+          console.log(
+            `Fetching current price for feedId=${feedId} at index=${
+              updatesToNetworks[network][feedId] - 1
+            }`,
+          );
+          return await ADFSConsumer.getSingleDataAtIndex(
+            BigInt(feedId),
+            updatesToNetworks[network][feedId] - 1,
+          ).then(res => Number(res.slice(0, 50)));
+        }),
       );
 
+      console.log('Current prices:', currentPrices);
       for (const [id, price] of entriesOf(currentPrices)) {
         // Pegged asset with 10% tolerance should be pegged
         // Pegged asset with 0.000001% tolerance should not be pegged

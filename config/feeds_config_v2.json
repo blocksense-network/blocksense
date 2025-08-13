@@ -27,7 +27,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "marketplace": "HyperLand"
+          "marketplace": "HyperLend"
         }
       }
     },
@@ -243,8 +243,8 @@
     },
     {
       "id": "10",
-      "full_name": "WHYPE HyperLand Borrow Rate",
-      "description": "WHYPE Borrow Rate on HyperLand leveraged lending marketplace for clean leverage loops on Hyperliquid.",
+      "full_name": "WHYPE HyperLend Borrow Rate",
+      "description": "WHYPE Borrow Rate on HyperLend leveraged lending marketplace for clean leverage loops on Hyperliquid.",
       "type": "price-feed",
       "oracle_id": "hyper",
       "value_type": "numerical",
@@ -268,14 +268,14 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "marketplace": "HyperLand"
+          "marketplace": "HyperLend"
         }
       }
     },
     {
       "id": "20",
-      "full_name": "wstHYPE HyperLand Borrow Rate",
-      "description": "wstHYPE Borrow Rate on HyperLand leveraged lending marketplace for clean leverage loops on Hyperliquid.",
+      "full_name": "wstHYPE HyperLend Borrow Rate",
+      "description": "wstHYPE Borrow Rate on HyperLend leveraged lending marketplace for clean leverage loops on Hyperliquid.",
       "type": "price-feed",
       "oracle_id": "hyper",
       "value_type": "numerical",
@@ -299,14 +299,14 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "marketplace": "HyperLand"
+          "marketplace": "HyperLend"
         }
       }
     },
     {
       "id": "30",
-      "full_name": "uBTC HyperLand Borrow Rate",
-      "description": "uBTC Borrow Rate on HyperLand leveraged lending marketplace for clean leverage loops on Hyperliquid.",
+      "full_name": "uBTC HyperLend Borrow Rate",
+      "description": "uBTC Borrow Rate on HyperLend leveraged lending marketplace for clean leverage loops on Hyperliquid.",
       "type": "price-feed",
       "oracle_id": "hyper",
       "value_type": "numerical",
@@ -330,14 +330,14 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "marketplace": "HyperLand"
+          "marketplace": "HyperLend"
         }
       }
     },
     {
       "id": "40",
-      "full_name": "UETH HyperLand Borrow Rate",
-      "description": "UETH Borrow Rate on HyperLand leveraged lending marketplace for clean leverage loops on Hyperliquid.",
+      "full_name": "UETH HyperLend Borrow Rate",
+      "description": "UETH Borrow Rate on HyperLend leveraged lending marketplace for clean leverage loops on Hyperliquid.",
       "type": "price-feed",
       "oracle_id": "hyper",
       "value_type": "numerical",
@@ -361,14 +361,14 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "marketplace": "HyperLand"
+          "marketplace": "HyperLend"
         }
       }
     },
     {
       "id": "50",
-      "full_name": "USDe HyperLand Borrow Rate",
-      "description": "USDe Borrow Rate on HyperLand leveraged lending marketplace for clean leverage loops on Hyperliquid.",
+      "full_name": "USDe HyperLend Borrow Rate",
+      "description": "USDe Borrow Rate on HyperLend leveraged lending marketplace for clean leverage loops on Hyperliquid.",
       "type": "price-feed",
       "oracle_id": "hyper",
       "value_type": "numerical",
@@ -392,7 +392,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "marketplace": "HyperLand"
+          "marketplace": "HyperLend"
         }
       }
     },
