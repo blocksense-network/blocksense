@@ -363,6 +363,66 @@ Command Breakdown:
   curl -fsSL http://127.0.0.1:5553/get_history | jq  '."aggregate_history"."0" | last'
   ```
 
+- Get last update of a specific feed - last published value from chain with correspodning round counter (ADFS)
+```bash
+ curl -fsSL http://127.0.0.1:5553/get_last_updates_from_chain/{network}/{feed_id}
+ ```
+
+ ```bash
+ curl -fsSL http://127.0.0.1:5553/get_last_updates_from_chain/ink_sepolia/13
+ ```
+
+ Example output:
+
+ ```json
+{
+  "round": {
+    "Ok": {
+      "feed_id": 13,
+      "round": 1162
+    }
+  },
+  "values": {
+    "Ok": [
+      {
+        "Ok": {
+          "feed_id": 13,
+          "num_updates": 1162,
+          "value": {
+            "Numerical": 815.64019143
+          },
+          "published": 0
+        }
+      }
+    ]
+  }
+}
+```
+```json
+{
+  "round": {
+    "Ok": {
+      "feed_id": 13,
+      "round": 1177
+    }
+  },
+  "values": {
+    "Ok": [
+      {
+        "Ok": {
+          "feed_id": 13,
+          "num_updates": 1177,
+          "value": {
+            "Numerical": 805.76783578
+          },
+          "published": 0
+        }
+      }
+    ]
+  }
+}⏎          
+```                                                
+
 # Production Environment
 
 soon...
