@@ -56,8 +56,7 @@ let
   ) cfg.reporters;
 
   blamaInstance = {
-    name = "blocksense-blama";
-    value = {
+    blocksense-blama = {
       description = "Blocksense Blama";
       # TODO: who needs this to be started?
       wantedBy = [ "multi-user.target" ];
@@ -94,6 +93,9 @@ in
           };
         };
       }
+      (lib.mkIf cfg.kafka.enable {
+        apache-kafka.enable = true;
+      })
       anvilInstances
       reporterInstances
       (lib.mkIf cfg.blama.enable blamaInstance)
