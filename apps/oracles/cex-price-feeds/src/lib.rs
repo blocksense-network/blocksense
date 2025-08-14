@@ -43,9 +43,10 @@ struct Data {
 async fn oracle_request(settings: Settings) -> Result<Payload> {
     println!("Starting oracle component");
 
+    let timeout_secs = settings.interval_time_in_seconds - 1;
     let resources = get_resources_from_settings(&settings)?;
 
-    let results = get_prices(&resources).await?;
+    let results = get_prices(&resources, timeout_secs).await?;
     let payload = process_results(&results)?;
 
     print_results(&resources.pairs, &results, &payload);

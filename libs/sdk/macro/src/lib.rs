@@ -56,6 +56,7 @@ pub fn oracle_component(_attr: TokenStream, item: TokenStream) -> TokenStream {
                     Self {
                         data_feeds: settings.data_feeds.into_iter().map(From::from).collect(),
                         capabilities: settings.capabilities.into_iter().map(From::from).collect(),
+                        interval_time_in_seconds: settings.interval_time_in_seconds,
                     }
                 }
             }

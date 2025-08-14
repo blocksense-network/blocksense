@@ -8,10 +8,7 @@ type Command = TriggerExecutorCommand<OracleTrigger>;
 
 use actix_web::{get, web, App, HttpServer, Responder};
 use std::time::Duration;
-use tokio::{
-    task::{JoinHandle, LocalSet},
-    time::sleep,
-};
+use tokio::task::{JoinHandle, LocalSet};
 
 use actix_web::HttpResponse;
 use futures::future::join_all;
@@ -54,8 +51,20 @@ async fn timed_out_request(
 
     let client = reqwest::Client::new();
     let response = match request_method.as_str() {
-        "POST" => match client.post(&url).send().await {
-            Ok(resp) => resp,
+        "POST" => match actix_web::rt::time::timeout(
+            Duration::from_secs(seconds),
+            client.post(&url).send(),
+        )
+        .await
+        {
+            Ok(resp_result) => match resp_result {
+                Ok(r) => r,
+                Err(e) => {
+                    return HttpResponse::BadRequest().body(format!(
+                        "failed to get response for POST request to {url}: {e}"
+                    ))
+                }
+            },
             Err(e) => {
                 return HttpResponse::BadRequest().body(format!(
                     "failed to get response for POST request to {url}: {e}"
@@ -65,8 +74,20 @@ async fn timed_out_request(
         _ =>
         // Make a GET request
         {
-            match client.get(&url).send().await {
-                Ok(resp) => resp,
+            match actix_web::rt::time::timeout(
+                Duration::from_secs(seconds),
+                client.get(&url).send(),
+            )
+            .await
+            {
+                Ok(resp_result) => match resp_result {
+                    Ok(r) => r,
+                    Err(e) => {
+                        return HttpResponse::BadRequest().body(format!(
+                            "failed to get response for GET request to {url}: {e}"
+                        ))
+                    }
+                },
                 Err(e) => {
                     return HttpResponse::BadRequest().body(format!(
                         "failed to get response for GET request to {url}: {e}"
@@ -83,11 +104,6 @@ async fn timed_out_request(
                 .body(format!("Failed to convert response to bytes: {e}"))
         }
     };
-
-    // Delay asynchronously
-    if seconds > 0 {
-        sleep(Duration::from_secs(seconds)).await;
-    }
 
     // Return empty 200 OK
     HttpResponse::Ok().body(body)

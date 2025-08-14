@@ -34,8 +34,9 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
 
     let capabilities = get_capabilities_from_settings(&settings);
     let resources = get_resources_from_settings(&settings)?;
+    let timeout_secs = settings.interval_time_in_seconds - 1;
 
-    let results = get_prices(&resources, &capabilities).await?;
+    let results = get_prices(&resources, &capabilities, timeout_secs).await?;
     let payload = process_results(&results)?;
 
     print_results(&resources.pairs, &results, &payload);
