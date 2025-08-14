@@ -97,6 +97,7 @@ let
           };
           log_configuration = logsConfig;
           log_location = cfg.logsDir + "/reporter-${name}.log";
+          shutdown.signal = 9;
         };
     }
   ) cfg.reporters;
