@@ -47,6 +47,12 @@ pub async fn votes_result_sender_loop(
                 debug!("Awaiting batched votes over `batched_votes_recv`...");
                 let recvd = batched_votes_recv.recv().await;
                 let msgs_in_queue = batched_votes_recv.len();
+                sequencer_state
+                    .sequencer_metrics
+                    .read()
+                    .await
+                    .batched_votes_msgs_in_queue
+                    .set(msgs_in_queue as i64);
                 debug!(
                     "Received batched votes over `batched_votes_recv`; batch_count={batch_count}, messages in queue = {msgs_in_queue}"
                 );

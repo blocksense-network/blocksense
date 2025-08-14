@@ -105,3 +105,13 @@ export const PortSchema = S.Int.pipe(
 });
 
 export type Port = typeof PortSchema.Type;
+
+export const EmailSchema = S.String.pipe(
+  S.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/),
+  S.annotations({
+    title: 'Email',
+    description: 'An email address',
+  }),
+  S.brand('Email'),
+  S.annotations({ title: 'Email' }),
+);

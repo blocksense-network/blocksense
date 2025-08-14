@@ -20,7 +20,7 @@ component = "spout-rwa"
 id = "101001"
 stride = 0
 decimals = 6
-data = '{"pair":{"base":"LQD","quote":"amount"},"decimals":6,"category":"","market_hours":"","arguments":{"api_url":"https://rwa-deploy-backend.onrender.com/reserves/LQD","endpoint":"reserve"}}'
+data = '{"pair":{"base":"LQD","quote":"amount"},"decimals":6,"category":"","market_hours":"","arguments":{"api_url":"https://rwa-deploy-backend.onrender.com/reserves/LQD","endpoint":"reserve","kind":"spout-rwa"}}'
 
 [component.spout-rwa]
 source = "../target/wasm32-wasip1/release/spout_rwa.wasm"

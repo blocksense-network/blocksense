@@ -20,7 +20,6 @@ import Web3 from 'web3';
 import { Authorization, verifyApi } from './api';
 import {
   DiscordUserInfoResponseSchema,
-  TweetsResponseSchema,
   XUserFollowingResponseSchema,
   XUserInfoResponseSchema,
 } from './types';
@@ -48,8 +47,11 @@ function getEnv(context: any) {
 }
 
 const cors = HttpApiBuilder.middlewareCors({
-  allowedOrigins: ['https://nft.blocksense.network', 'http://localhost:3002'],
-  allowedMethods: ['GET', 'HEAD', 'POST', 'OPTIONS'],
+  allowedOrigins: [
+    'https://docs.blocksense.network',
+    'https://blocksense.network',
+  ],
+  allowedMethods: ['GET', 'HEAD', 'POST', 'PUT', 'OPTIONS'],
   allowedHeaders: ['*'],
   maxAge: 86400,
 });
@@ -111,6 +113,11 @@ export const VerifyApiLive = HttpApiBuilder.api(verifyApi).pipe(
         .handle('checkParticipant', ({ payload }) =>
           server.checkParticipant(payload),
         ),
+    ),
+  ),
+  Layer.provide(
+    HttpApiBuilder.group(verifyApi, 'newsletter', handlers =>
+      handlers.handle('register', ({ payload }) => server.register(payload)),
     ),
   ),
 );
@@ -508,4 +515,32 @@ export const server: ApiServer<Api> = {
         },
       });
     }),
+
+  register: payload =>
+    Effect.contextWithEffect(context =>
+      Effect.tryPromise({
+        try: async () => {
+          const db = getEnv(context).newsletterDB;
+          console.log(
+            `Inserting newsletter subscriber data.\n` + JSON.stringify(payload),
+          );
+
+          const insertResult = await db
+            .prepare(
+              'INSERT INTO newsletter_subscribers (email, interests) VALUES (?, ?) ON CONFLICT(email) DO NOTHING',
+            )
+            .bind(payload.email, payload.interests.join(', '))
+            .all();
+
+          console.log(
+            `Successfully inserted newsletter subscriber data: `,
+            insertResult,
+          );
+        },
+        catch: error => {
+          console.error(error);
+          throw new Error('Failed to register email');
+        },
+      }),
+    ),
 };

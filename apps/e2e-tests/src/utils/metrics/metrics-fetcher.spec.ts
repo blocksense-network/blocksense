@@ -1,11 +1,11 @@
 import { Effect } from 'effect';
-import { afterAll, describe, expect, it, vi } from '@effect/vitest';
-import { HttpClientError } from '@effect/platform';
+import { afterAll, expect, it, vi } from '@effect/vitest';
+import { FetchHttpClient, HttpClientError } from '@effect/platform';
 
 import { getMetrics } from './metrics-fetcher';
 import { ParseMetricsError } from './types';
 
-describe('Metrics fetcher tests', () => {
+it.layer(FetchHttpClient.layer)('Metrics fetcher tests', it => {
   const test_url = 'http://localhost:8080/metrics';
 
   afterAll(() => {
