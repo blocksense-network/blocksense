@@ -194,6 +194,8 @@ describe.sequential('E2E Tests with process-compose', () => {
         ),
       );
 
+      const historyData = yield* sequencer.fetchHistory();
+
       // Make sure that the feeds info is updated
       for (const [id, data] of entriesOf(currentFeedsInfo)) {
         const { round, value } = data;
@@ -205,6 +207,14 @@ describe.sequential('E2E Tests with process-compose', () => {
           continue;
         }
         expect(value).not.toEqual(initialFeedsInfo[id].value);
+
+        const actualData = historyData.aggregate_history[id].find(
+          feed => feed.update_number === round - initialFeedsInfo[id].round - 1,
+        );
+        const decimals = feedsConfig.feeds.find(f => f.id.toString() === id)!
+          .additional_feed_info.decimals;
+
+        expect(value / 10 ** decimals).toBeCloseTo(actualData!.value.Numerical);
       }
     }),
   );
