@@ -1,4 +1,5 @@
 mod domain;
+mod providers;
 mod utils;
 
 use alloy::sol_types::SolCall;
@@ -27,6 +28,7 @@ use url::Url;
 use crate::domain::{
     get_resources_from_settings, FeedConfig, FeedId, Marketplace, Rates, ReserveInfo,
 };
+use crate::providers::onchain::{fetch_reserves, MyProvider, OnchainPlan};
 use crate::utils::logging::{print_marketplace_data, print_payload};
 use crate::utils::math::ray_to_apr;
 
@@ -59,22 +61,6 @@ const HYPERLAND_UI_POOL_DATA_PROVIDER: Address =
 const HYPERLAND_POOL_ADDRESSES_PROVIDER: Address =
     address!("0x72c98246a98bFe64022a3190e7710E157497170C");
 
-type MyProvider = alloy::providers::fillers::FillProvider<
-    alloy::providers::fillers::JoinFill<
-        alloy::providers::Identity,
-        alloy::providers::fillers::JoinFill<
-            alloy::providers::fillers::GasFiller,
-            alloy::providers::fillers::JoinFill<
-                alloy::providers::fillers::BlobGasFiller,
-                alloy::providers::fillers::JoinFill<
-                    alloy::providers::fillers::NonceFiller,
-                    alloy::providers::fillers::ChainIdFiller,
-                >,
-            >,
-        >,
-    >,
-    alloy::providers::RootProvider,
->;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct RequestEthCallParams {
     data: String,
@@ -372,6 +358,10 @@ pub async fn get_borrow_rates_for_marketplace(
 ) -> Result<HashMap<String, Rates>> {
     let mut marketplace_borrow_rates: HashMap<String, Rates> = HashMap::new();
 
+    let xxx = fetch_reserves(
+        "https://rpc.hyperliquid.xyz/evm",
+        hypurrfi::plan()
+    )
     let mut futs = FuturesUnordered::new();
     futs.push(fetch_market("HypurrFi", feeds_config));
     futs.push(fetch_market("HyperLend", feeds_config));
