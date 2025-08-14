@@ -57,6 +57,7 @@ impl SymbolsData {
 pub async fn get_prices(
     resources: &ResourceData,
     capabilities: &Capabilities,
+    timeout_secs: u64,
 ) -> Result<PairsToResults> {
     let symbols = SymbolsData::from_resources(&resources.symbols)?;
 
@@ -64,20 +65,24 @@ pub async fn get_prices(
         fetch::<AlpacaMarketsPriceFetcher>(
             &symbols.alpaca_markets,
             get_api_keys(capabilities, &["APCA_API_KEY_ID", "APCA_API_SECRET_KEY"]),
+            timeout_secs,
         ),
         fetch::<AlphaVantagePriceFetcher>(
             &symbols.alpha_vantage,
             get_api_keys(capabilities, &["ALPHAVANTAGE_API_KEY"]),
+            timeout_secs,
         ),
         fetch::<YFPriceFetcher>(
             &symbols.yahoo_finance,
             get_api_keys(capabilities, &["YAHOO_FINANCE_API_KEY"]),
+            timeout_secs,
         ),
         fetch::<TwelveDataPriceFetcher>(
             &symbols.twelvedata,
             get_api_keys(capabilities, &["TWELVEDATA_API_KEY"]),
+            timeout_secs,
         ),
-        fetch::<FMPPriceFetcher>(&symbols.fmp, get_api_keys(capabilities, &["FMP_API_KEY"])),
+        fetch::<FMPPriceFetcher>(&symbols.fmp, get_api_keys(capabilities, &["FMP_API_KEY"]), timeout_secs),
     ]);
 
     let fetched_provider_prices = fetch_all_prices(futures_set).await;

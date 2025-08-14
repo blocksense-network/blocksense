@@ -20,19 +20,20 @@ pub trait PricesFetcher<'a> {
     const NAME: &'static str;
 
     fn new(symbols: &'a [String], api_keys: Option<HashMap<String, String>>) -> Self;
-    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>>;
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>>;
 }
 
 pub fn fetch<'a, PF>(
     symbols: &'a [String],
     api_keys: Option<HashMap<String, String>>,
+    timeout_secs: u64,
 ) -> LocalBoxFuture<'a, (&'static str, Result<PairPriceData>)>
 where
     PF: PricesFetcher<'a>,
 {
     async move {
         let fetcher = PF::new(symbols, api_keys);
-        let res = fetcher.fetch().await;
+        let res = fetcher.fetch(timeout_secs).await;
         (PF::NAME, res)
     }
     .boxed_local()

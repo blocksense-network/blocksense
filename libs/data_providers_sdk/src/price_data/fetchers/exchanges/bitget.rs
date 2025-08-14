@@ -34,12 +34,13 @@ impl PricesFetcher<'_> for BitgetPriceFetcher {
     fn new(_symbols: &[String], _api_keys: Option<HashMap<String, String>>) -> Self {
         Self
     }
-    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
-        async {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+        async move {
             let response = http_get_json::<BitgetPriceResponse>(
                 "https://api.bitget.com/api/spot/v1/market/tickers",
                 None,
                 None,
+                timeout_secs,
             )
             .await?;
 

@@ -19,6 +19,7 @@ pub struct RWAResponse {
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
     let resources = get_resources_from_settings(&settings)?;
+    let timeout_secs = settings.interval_time_in_seconds - 1;
     let api_key: String = get_api_key(&settings)?;
 
     let url = resources.arguments.api_url;
@@ -26,6 +27,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
         url.as_str(),
         None,
         Some(&[("X-API-Key", api_key.as_str())]),
+        timeout_secs,
     ).await?;
 
     if resources.arguments.endpoint == "reserve" {

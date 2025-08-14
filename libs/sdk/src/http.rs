@@ -9,18 +9,26 @@ pub type QueryParam<'a, 'b> = (&'a str, &'b str);
 pub type HeaderParam<'a, 'b> = (&'a str, &'b str);
 
 pub fn prepare_get_request(
-    base_url: &str,
+    forward_url: &str,
     params: Option<&[QueryParam<'_, '_>]>,
     headers: Option<&[HeaderParam<'_, '_>]>,
+    timeout_secs: u64,
 ) -> Result<Request> {
-    let url = match params {
-        Some(p) => Url::parse_with_params(base_url, p)?,
-        None => Url::parse(base_url)?,
+    let base_url = "http://127.0.0.1:3000";
+    let forward_url_and_params = match params {
+        Some(p) => Url::parse_with_params(forward_url, p)?,
+        None => Url::parse(forward_url)?,
     };
+
+    let base_query_params = &[
+        ("seconds", timeout_secs.to_string()),
+        ("endpoint", forward_url_and_params.to_string()),
+    ];
+    let base_url_and_params = { Url::parse_with_params(base_url, base_query_params)? };
 
     let mut req = Request::builder();
     req.method(Method::Get);
-    req.uri(url.as_str());
+    req.uri(base_url_and_params.as_str());
     req.header("Accepts", "application/json");
     req.header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36");
 
@@ -37,11 +45,12 @@ pub async fn http_get_json<T>(
     url: &str,
     params: Option<&[QueryParam<'_, '_>]>,
     headers: Option<&[HeaderParam<'_, '_>]>,
+    timeout_secs: u64,
 ) -> Result<T>
 where
     T: DeserializeOwned,
 {
-    let request = prepare_get_request(url, params, headers)?;
+    let request = prepare_get_request(url, params, headers, timeout_secs)?;
     let response: Response = send(request).await?;
 
     let status_code: u16 = *response.status();

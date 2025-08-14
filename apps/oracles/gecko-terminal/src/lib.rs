@@ -105,6 +105,7 @@ pub struct GeckoTerminalFeedConfig {
 async fn fetch_pools_data_for_network(
     network: &str,
     pools: &[GeckoTerminalFeedConfig],
+    timeout_secs: u64,
 ) -> Result<GeckoTerminalMultipleResponce> {
     let r = pools
         .iter()
@@ -113,7 +114,7 @@ async fn fetch_pools_data_for_network(
         .join(",");
     let url = format!("https://api.geckoterminal.com/api/v2/networks/{network}/pools/multi/{r}");
 
-    let mut value = http_get_json::<GeckoTerminalMultipleResponce>(&url, None, None).await?;
+    let mut value = http_get_json::<GeckoTerminalMultipleResponce>(&url, None, None, timeout_secs).await?;
     for v in value.data.iter_mut() {
         if let Some(p) = pools
             .iter()
@@ -129,7 +130,7 @@ async fn fetch_pools_data_for_network(
     Ok(value)
 }
 
-async fn fetch_all_prices(resources: &Vec<FeedConfig>) -> Result<GeckoTerminalDataForFeed> {
+async fn fetch_all_prices(resources: &Vec<FeedConfig>, timeout_secs: u64) -> Result<GeckoTerminalDataForFeed> {
     let pools_by_network = group_pools_by_network(resources);
 
     let before_fetch = Instant::now();
@@ -137,7 +138,7 @@ async fn fetch_all_prices(resources: &Vec<FeedConfig>) -> Result<GeckoTerminalDa
     for network in pools_by_network.keys() {
         if let Some(pools) = pools_by_network.get(network) {
             for pools in pools.chunks(50) {
-                let response = fetch_pools_data_for_network(network, pools).await;
+                let response = fetch_pools_data_for_network(network, pools, timeout_secs).await;
                 match response {
                     Ok(re) => {
                         for d in re.data {
@@ -317,7 +318,8 @@ fn print_results(
 async fn oracle_request(settings: Settings) -> Result<Payload> {
     println!("Starting oracle component - Gecko Terminal");
     let resources = get_resources_from_settings(&settings)?;
-    let results = fetch_all_prices(&resources).await?;
+    let timeout_secs = settings.interval_time_in_seconds - 1;
+    let results = fetch_all_prices(&resources, timeout_secs).await?;
     let payload = process_results(&results)?;
     print_results(&resources, &results, &payload);
     Ok(payload)

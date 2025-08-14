@@ -48,8 +48,8 @@ impl<'a> PricesFetcher<'a> for AlpacaMarketsPriceFetcher<'a> {
         Self { symbols, api_keys }
     }
 
-    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
-        async {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+        async move {
             let api_key_id = self
                 .api_keys
                 .as_ref()
@@ -71,6 +71,7 @@ impl<'a> PricesFetcher<'a> for AlpacaMarketsPriceFetcher<'a> {
                     ("APCA-API-KEY-ID", api_key_id),
                     ("APCA-API-SECRET-KEY", api_secret_key),
                 ]),
+                timeout_secs,
             )
             .await?;
 

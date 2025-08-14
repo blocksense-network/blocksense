@@ -29,13 +29,14 @@ impl<'a> PricesFetcher<'a> for UpBitPriceFetcher<'a> {
         Self { symbols }
     }
 
-    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
-        async {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+        async move {
             let all_markets = self.symbols.join(",");
             let response = http_get_json::<UpBitResponse>(
                 "https://api.upbit.com/v1/ticker",
                 Some(&[("markets", all_markets.as_str())]),
                 None,
+                timeout_secs,
             )
             .await?;
 
