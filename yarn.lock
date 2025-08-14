@@ -2326,6 +2326,7 @@ __metadata:
   resolution: "@blocksense/base-utils@workspace:libs/ts/base-utils"
   dependencies:
     "@effect/platform": "npm:^0.90.0"
+    "@effect/vitest": "npm:^0.25.0"
     "@types/node": "npm:^22.10.2"
     "@vitest/coverage-v8": "npm:3.1.3"
     effect: "npm:^3.15.1"
@@ -2532,8 +2533,10 @@ __metadata:
     "@blocksense/data-feeds-config-generator": "workspace:*"
     "@blocksense/docs-ui": "workspace:*"
     "@blocksense/nextra-theme-docs": "workspace:*"
+    "@blocksense/social-verification": "workspace:*"
     "@blocksense/sol-reflector": "workspace:*"
     "@blocksense/ui": "workspace:*"
+    "@effect/platform": "npm:^0.80.13"
     "@tailwindcss/postcss": "npm:^4.0.7"
     "@theguild/remark-mermaid": "npm:^0.1.3"
     "@types/node": "npm:^22.10.2"
@@ -2740,6 +2743,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blocksense/social-verification@workspace:apps/social-verification"
   dependencies:
+    "@blocksense/base-utils": "workspace:*"
     "@cloudflare/vitest-pool-workers": "npm:^0.7.5"
     "@cloudflare/workers-types": "npm:^4.20250423.0"
     "@effect/platform": "npm:^0.80.13"

@@ -324,9 +324,13 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
 }
 
 #[derive(Deserialize, Debug)]
+pub struct GeckoTerminalFeedConfigSettings {
+  pub settings: Vec<GeckoTerminalFeedConfig>,
+}
+#[derive(Deserialize, Debug)]
 struct FeedArgumentsVec {
     pub pair: Pair,
-    pub arguments: Vec<GeckoTerminalFeedConfig>,
+    pub arguments: GeckoTerminalFeedConfigSettings,
 }
 
 #[derive(Deserialize, Debug)]
@@ -345,17 +349,14 @@ struct FeedConfig {
 fn get_resources_from_settings(settings: &Settings) -> Result<Vec<FeedConfig>> {
     let mut config: Vec<FeedConfig> = Vec::new();
     for feed_setting in &settings.data_feeds {
-        //TODO: (EmilIvanichkovv) This is temporary solution
-        if feed_setting.data.contains("pool") {
             let feed_config = serde_json::from_str::<FeedArgumentsVec>(&feed_setting.data)
                 .context("Couldn't parse data feed")?;
             let c = FeedConfig {
                 id: feed_setting.id.clone(),
-                arguments: feed_config.arguments,
+                arguments: feed_config.arguments.settings,
                 pair: feed_config.pair,
             };
             config.push(c);
-        }
     }
     Ok(config)
 }
