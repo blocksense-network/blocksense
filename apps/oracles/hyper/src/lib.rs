@@ -1,24 +1,34 @@
+mod domain;
+mod utils;
+
 use alloy::sol_types::SolCall;
 use alloy::{
+    hex::decode,
     hex::ToHexExt,
-    hex::{decode, encode},
     primitives::{address, Address, Bytes, U256},
     providers::ProviderBuilder,
-    sol,
 };
 use anyhow::{anyhow, Result};
-use blocksense_data_providers_sdk::price_data::fetchers::money_markets::hyperdrive;
+use blocksense_data_providers_sdk::price_data::fetchers::money_markets::hyperdrive::{
+    self, fetch_rates_for_market,
+};
+use blocksense_data_providers_sdk::price_data::types::PricePair;
 use blocksense_sdk::{
     http::http_post_json,
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
 };
-use core::borrow;
-use itertools::Itertools;
-use prettytable::{format, Cell, Row, Table};
+use futures::{stream, stream::FuturesUnordered, StreamExt};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
+use std::time::Instant;
 use url::Url;
+
+use crate::domain::{
+    get_resources_from_settings, FeedConfig, FeedId, Marketplace, Rates, ReserveInfo,
+};
+use crate::utils::logging::{print_marketplace_data, print_payload};
+use crate::utils::math::ray_to_apr;
 
 pub mod hypurrfi {
     alloy::sol! {
@@ -26,7 +36,7 @@ pub mod hypurrfi {
         #[allow(clippy::too_many_arguments)]
         #[sol(rpc)]
         HypurrFiUiPoolDataProvider,
-        "src/abi/HypurrFiUI.json"
+        "src/abi/HypurrFi/UiPoolDataProvider.json"
     }
 }
 
@@ -36,12 +46,9 @@ pub mod hyperlend {
         #[allow(clippy::too_many_arguments)]
         #[sol(rpc)]
         HyperLandUiPoolDataProvider,
-        "src/abi/HyperLandUI.json"
+        "src/abi/HyperLand/UiPoolDataProvider.json"
     }
 }
-
-const SECONDS_PER_YEAR_F64: f64 = 31_536_000.0;
-const RAY_F64: f64 = 1e27;
 
 const HYPURRFI_UI_POOL_DATA_PROVIDER: Address =
     address!("0x7b883191011AEAe40581d3Fa1B112413808C9c00");
@@ -51,8 +58,6 @@ const HYPERLAND_UI_POOL_DATA_PROVIDER: Address =
     address!("0x3Bb92CF81E38484183cc96a4Fb8fBd2d73535807");
 const HYPERLAND_POOL_ADDRESSES_PROVIDER: Address =
     address!("0x72c98246a98bFe64022a3190e7710E157497170C");
-
-pub type FeedId = u128;
 
 type MyProvider = alloy::providers::fillers::FillProvider<
     alloy::providers::fillers::JoinFill<
@@ -102,7 +107,7 @@ struct ResponseEthCall {
 }
 
 impl RequestEthCall {
-    pub fn latest(calldata: &Bytes, contract_address: &Address) -> RequestEthCall {
+    pub fn latest(calldata: &Bytes, contract_address: &Address, id: u64) -> RequestEthCall {
         let params = RequestEthCallParams {
             data: calldata.0.encode_hex_upper_with_prefix(),
             from: "0x0000000000000000000000000000000000000000".to_string(),
@@ -112,80 +117,23 @@ impl RequestEthCall {
         RequestEthCall {
             jsonrpc: "2.0".to_string(),
             method: "eth_call".to_string(),
-            id: 1,
+            id,
             params: (params, "latest".to_string()),
         }
     }
 }
 
-// ---------- Config we accept from Settings ----------
-#[derive(Serialize, Deserialize, Debug, Clone)]
-struct PairDescription {
-    base: String,
-    quote: String,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-struct OracleArgs {
-    marketplace: String,
-    market_id: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct FeedConfig {
-    #[serde(default)]
-    feed_id: FeedId,
-    pair: PairDescription,
-    #[serde(default)]
-    decimals: u32,
-    #[serde(default)]
-    category: String,
-    #[serde(default)]
-    market_hours: String,
-    arguments: OracleArgs,
-}
-
 // ---------- Local fetch/processing ----------
-
-fn get_resources_from_settings(settings: &Settings) -> Result<Vec<FeedConfig>> {
-    let mut config: Vec<FeedConfig> = Vec::new();
-    for feed_setting in &settings.data_feeds {
-        match serde_json::from_str::<FeedConfig>(&feed_setting.data) {
-            Ok(mut feed_config) => {
-                feed_config.feed_id = feed_setting.id.parse::<FeedId>()?;
-                config.push(feed_config);
-            }
-            Err(err) => {
-                println!(
-                    "Error {err} when parsing feed settings data = '{}'",
-                    &feed_setting.data
-                );
-            }
-        }
-    }
-    Ok(config)
-}
-
-#[derive(Debug, Clone)]
-pub struct ReserveInfo {
-    underlying_asset: Option<Address>,
-    variable_borrow_rate: f64,
-}
 
 // Internal normalized view (only what we need)
 #[derive(Debug, Clone)]
 struct ReserveLike {
     symbol: String,
     underlying_asset: Address,
-    variable_borrow_rate_ray: u128,
+    variable_borrow_rate_ray: U256,
 }
 
 type Decoder = fn(&Bytes) -> Result<Vec<ReserveLike>>;
-
-enum Marketplace {
-    HypurrFi,
-    HyperLend,
-}
 
 impl TryFrom<&str> for Marketplace {
     type Error = anyhow::Error;
@@ -193,7 +141,6 @@ impl TryFrom<&str> for Marketplace {
         match s {
             "HypurrFi" => Ok(Marketplace::HypurrFi),
             "HyperLend" => Ok(Marketplace::HyperLend),
-            "HyperDrive" => Ok(Marketplace::HyperLend), // HyperDrive is treated as HyperLend for now
             other => Err(anyhow!("Unsupported marketplace: {}", other)),
         }
     }
@@ -217,7 +164,7 @@ fn decode_hypurrfi(bytes: &Bytes) -> Result<Vec<ReserveLike>> {
         .map(|r| ReserveLike {
             symbol: r.symbol,
             underlying_asset: r.underlyingAsset,
-            variable_borrow_rate_ray: r.variableBorrowRate,
+            variable_borrow_rate_ray: U256::from(r.variableBorrowRate), // ensure U256
         })
         .collect())
 }
@@ -233,7 +180,7 @@ fn decode_hyperland(bytes: &Bytes) -> Result<Vec<ReserveLike>> {
         .map(|r| ReserveLike {
             symbol: r.symbol.clone(),
             underlying_asset: r.underlyingAsset,
-            variable_borrow_rate_ray: r.variableBorrowRate,
+            variable_borrow_rate_ray: U256::from(r.variableBorrowRate), // ensure U256
         })
         .collect())
 }
@@ -278,43 +225,88 @@ fn build_call_plan(
     }
 }
 
-pub async fn get_borrow_rates_from_hyperdrive(
-    feeds_config: &Vec<FeedConfig>,
-) -> Result<HashMap<String, ReserveInfo>> {
-    let mut borrow_rates: HashMap<String, ReserveInfo> = HashMap::new();
-    get_borrow_rates_from_chain("HyperDrive").await?;
-    let hyperdrive_feeds: Vec<FeedConfig> = feeds_config
-        .iter()
-        .filter(|feed| feed.arguments.marketplace == "HyperDrive")
-        .cloned()
-        .collect();
+pub async fn get_borrow_rates_from_hyperdrive(feeds_config: &Vec<FeedConfig>) -> Result<Rates> {
+    let mut borrow_rates: Rates = HashMap::new();
 
-    for feed in hyperdrive_feeds {
-        // Make sure that feeds.arguments.market_id is set, otherwise use default
-        if feed.arguments.market_id.is_none() {
-            println!(
-                "Feed {} does not have market_id set, but it is required for HyperDrive. Skipping.",
-                feed.feed_id
+    // Collect only HyperDrive feeds, grouped by market_id, but store minimal info
+    // (avoid capturing &FeedConfig across async boundaries).
+    // Vec<(base_symbol, feed_id)>
+    let mut by_market: BTreeMap<String, Vec<(String, String)>> = BTreeMap::new();
+    for feed in feeds_config
+        .iter()
+        .filter(|f| f.arguments.marketplace == "HyperDrive")
+    {
+        match &feed.arguments.market_id {
+            Some(mid) if !mid.is_empty() => {
+                by_market
+                    .entry(mid.clone())
+                    .or_default()
+                    .push((feed.pair.base.clone(), feed.feed_id.to_string()));
+            }
+            _ => {
+                eprintln!(
+                    "Feed {} missing required HyperDrive market_id. Skipping.",
+                    feed.feed_id
+                );
+            }
+        }
+    }
+
+    // Build a stream of async fetches and run them with bounded concurrency.
+    let fetches = by_market
+        .into_iter()
+        .map(|(market_id, feeds)| async move {
+            // Fetch with error boundary; do not fail the whole oracle
+            match hyperdrive::fetch_rates_for_market(&market_id).await {
+                Ok(resp) => Some((market_id, feeds, resp)),
+                Err(err) => {
+                    eprintln!(
+                        "HyperDrive fetch failed for market_id={}: {}. Skipping feeds referencing this market.",
+                        market_id, err
+                    );
+                    None
+                }
+            }
+        });
+
+    const MAX_CONCURRENCY: usize = 32;
+    let mut stream = stream::iter(fetches).buffer_unordered(MAX_CONCURRENCY);
+
+    while let Some(result) = stream.next().await {
+        let Some((market_id, feeds, resp)) = result else {
+            continue;
+        };
+
+        if resp.data.is_empty() {
+            eprintln!(
+                "HyperDrive returned empty data for market_id={}. Skipping.",
+                market_id
             );
             continue;
         }
-        let rate_data =
-            hyperdrive::fetch_rates_for_market(feed.arguments.market_id.unwrap().as_str()).await?;
-        let borrow_rate = rate_data.data.first().unwrap().borrow_rate;
-        borrow_rates.insert(
-            feed.pair.base,
-            ReserveInfo {
-                underlying_asset: None,
-                variable_borrow_rate: borrow_rate / 1e18,
-            },
-        );
+
+        // If multiple rows are possible, pick the first/newest per API contract.
+        let row = &resp.data[0];
+
+        // Assuming borrow_rate is 1e18-scaled; convert to f64 APR.
+        // Avoid integer division by using f64 scaling.
+        let borrow_rate_apr: f64 = (row.borrow_rate as f64) / 1e18f64;
+
+        for (base_symbol, _feed_id) in feeds {
+            borrow_rates.insert(
+                base_symbol,
+                ReserveInfo {
+                    underlying_asset: None,
+                    borrow_rate: borrow_rate_apr,
+                },
+            );
+        }
     }
+
     Ok(borrow_rates)
 }
 
-pub async fn get_borrow_rates_from_chain(
-    marketplace: &str,
-) -> Result<HashMap<String, ReserveInfo>> {
+pub async fn get_borrow_rates_from_chain(marketplace: &str) -> Result<Rates> {
     let rpc_url = Url::parse("https://rpc.hyperliquid.xyz/evm")?;
     let provider = ProviderBuilder::new().connect_http(rpc_url.clone());
 
@@ -323,7 +315,7 @@ pub async fn get_borrow_rates_from_chain(
     let plan = build_call_plan(mkt, provider);
 
     // 2) JSON-RPC call (use the correct "to" per marketplace)
-    let req = RequestEthCall::latest(&plan.calldata, &plan.to);
+    let req = RequestEthCall::latest(&plan.calldata, &plan.to, 1);
     let resp = http_post_json::<RequestEthCall, ResponseEthCall>(rpc_url.as_str(), req).await?;
     if let Some(err) = resp.error {
         return Err(anyhow!(
@@ -346,19 +338,13 @@ pub async fn get_borrow_rates_from_chain(
     // 5) Normalize rates and assemble output
     let mut out = HashMap::with_capacity(reserves_like.len());
     for r in reserves_like {
-        // Convert RAY to APR f64
-        let rate_ray_f64: f64 = r
-            .variable_borrow_rate_ray
-            .to_string()
-            .parse()
-            .unwrap_or(0.0);
-        let apr = rate_ray_f64 / RAY_F64;
+        let apr = ray_to_apr(r.variable_borrow_rate_ray);
 
         out.insert(
             r.symbol,
             ReserveInfo {
                 underlying_asset: Some(r.underlying_asset),
-                variable_borrow_rate: apr,
+                borrow_rate: apr,
             },
         );
     }
@@ -366,22 +352,39 @@ pub async fn get_borrow_rates_from_chain(
     Ok(out)
 }
 
-type MarketplaceBorrowRates = HashMap<String, HashMap<String, ReserveInfo>>;
+async fn fetch_market<'a>(
+    which: &'static str,
+    feeds_config: &'a Vec<FeedConfig>,
+) -> (&'static str, Result<Rates>) {
+    match which {
+        "HypurrFi" => ("HypurrFi", get_borrow_rates_from_chain("HypurrFi").await),
+        "HyperLend" => ("HyperLend", get_borrow_rates_from_chain("HyperLend").await),
+        "HyperDrive" => (
+            "HyperDrive",
+            get_borrow_rates_from_hyperdrive(feeds_config).await,
+        ),
+        _ => unreachable!(),
+    }
+}
 
 pub async fn get_borrow_rates_for_marketplace(
     feeds_config: &Vec<FeedConfig>,
-) -> Result<MarketplaceBorrowRates> {
-    let mut marketplace_borrow_rates: MarketplaceBorrowRates = HashMap::new();
+) -> Result<HashMap<String, Rates>> {
+    let mut marketplace_borrow_rates: HashMap<String, Rates> = HashMap::new();
 
-    // Fetch for all known marketplaces
-    let hypurrfi_rates = get_borrow_rates_from_chain("HypurrFi").await?;
-    marketplace_borrow_rates.insert("HypurrFi".to_string(), hypurrfi_rates);
+    let mut futs = FuturesUnordered::new();
+    futs.push(fetch_market("HypurrFi", feeds_config));
+    futs.push(fetch_market("HyperLend", feeds_config));
+    futs.push(fetch_market("HyperDrive", feeds_config));
 
-    let hyperland_rates = get_borrow_rates_from_chain("HyperLend").await?;
-    marketplace_borrow_rates.insert("HyperLend".to_string(), hyperland_rates);
-
-    let hyperdrive_rates = get_borrow_rates_from_hyperdrive(feeds_config).await?;
-    marketplace_borrow_rates.insert("HyperDrive".to_string(), hyperdrive_rates);
+    while let Some((name, res)) = futs.next().await {
+        match res {
+            Ok(rates) => {
+                marketplace_borrow_rates.insert(name.to_string(), rates);
+            }
+            Err(err) => eprintln!("{} fetch failed: {}", name, err),
+        }
+    }
 
     print_marketplace_data(&marketplace_borrow_rates);
     Ok(marketplace_borrow_rates)
@@ -392,106 +395,35 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     let feeds_config = get_resources_from_settings(&settings)?;
     let mut payload = Payload::new();
     // Fetch borrow rates for each marketplace and store in a HashMap
+    let before_fetch = Instant::now();
+
     let marketplace_borrow_rates = get_borrow_rates_for_marketplace(&feeds_config).await?;
+    let time_taken = before_fetch.elapsed();
+    println!(
+        "Fetched borrow rates for {} feeds in {:?}",
+        feeds_config.len(),
+        time_taken
+    );
+
     for feed in &feeds_config {
-        // Check which if the marketplace in the feed.arguments.marketplace
-        // and get data from the corresponding provider
+        let rate_info = marketplace_borrow_rates
+            .get(feed.arguments.marketplace.as_str())
+            .and_then(|rates| rates.get(&feed.pair.base));
 
-        if let Some(reserve_info) = match feed.arguments.marketplace.as_str() {
-            "HypurrFi" => marketplace_borrow_rates
-                .get("HypurrFi")
-                .unwrap()
-                .get(&feed.pair.base),
-            "HyperLend" => marketplace_borrow_rates
-                .get("HyperLend")
-                .unwrap()
-                .get(&feed.pair.base),
-            "HyperDrive" => marketplace_borrow_rates
-                .get("HyperDrive")
-                .unwrap()
-                .get(&feed.pair.base),
-            _ => None,
-        } {
-            payload.values.push(DataFeedResult {
-                id: feed.feed_id.to_string(),
-                value: DataFeedResultValue::Numerical(reserve_info.variable_borrow_rate),
-            });
-        } else {
-            payload.values.push(DataFeedResult {
-                id: feed.feed_id.to_string(),
-                value: DataFeedResultValue::Error("No data".to_string()),
-            });
-        }
-    }
-    print_payload(&payload, &feeds_config);
-    Ok(payload)
-}
-
-fn print_marketplace_data(marketplace_borrow_rates: &MarketplaceBorrowRates) {
-    let mut table = Table::new();
-    table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
-    table.set_titles(Row::new(vec![
-        Cell::new("Marketplace"),
-        Cell::new("Symbol"),
-        Cell::new("Underlying Asset"),
-        Cell::new("Variable Borrow Rate (APR)"),
-    ]));
-
-    for (marketplace, borrow_rates) in marketplace_borrow_rates {
-        for (symbol, info) in borrow_rates {
-            let underlying_asset = match info.underlying_asset {
-                Some(addr) => addr.to_string(),
-                None => "N/A".to_string(),
-            };
-            table.add_row(Row::new(vec![
-                Cell::new(marketplace),
-                Cell::new(symbol),
-                Cell::new(&underlying_asset),
-                Cell::new(&format!("{:.2}%", info.variable_borrow_rate * 100.0)),
-            ]));
-        }
-    }
-
-    table.printstd();
-}
-
-fn print_payload(payload: &Payload, resources: &[FeedConfig]) {
-    //Sort feeds from resources based on feed_id
-    let sorted_feeds: Vec<&FeedConfig> = resources
-        .iter()
-        .sorted_by_key(|feed| feed.feed_id)
-        .collect();
-
-    let mut table = Table::new();
-    table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
-    table.set_titles(Row::new(vec![
-        Cell::new("Feed ID"),
-        Cell::new("Feed Name"),
-        Cell::new("Value"),
-    ]));
-
-    for feed in sorted_feeds {
-        let value = payload
-            .values
-            .iter()
-            .find(|v| v.id == feed.feed_id.to_string());
-        let display_value = match value {
-            Some(v) => format!("{:?}", v.value),
-            None => "No Data".to_string(),
+        let value = match rate_info {
+            Some(info) => DataFeedResultValue::Numerical(info.borrow_rate),
+            None => DataFeedResultValue::Error(format!(
+                "No data for {} in {}",
+                feed.pair.base, feed.arguments.marketplace
+            )),
         };
 
-        table.add_row(Row::new(vec![
-            Cell::new(feed.feed_id.to_string().as_str()),
-            Cell::new(
-                format!(
-                    "{} Borrow Rate on {}",
-                    feed.pair.base, feed.arguments.marketplace
-                )
-                .as_str(),
-            ),
-            Cell::new(&display_value),
-        ]));
+        payload.values.push(DataFeedResult {
+            id: feed.feed_id.to_string(),
+            value,
+        });
     }
 
-    table.printstd();
+    print_payload(&payload, &feeds_config);
+    Ok(payload)
 }

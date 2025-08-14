@@ -1894,6 +1894,7 @@ dependencies = [
  "anyhow",
  "blocksense-data-providers-sdk",
  "blocksense-sdk",
+ "futures",
  "itertools 0.8.2",
  "prettytable-rs",
  "serde",
