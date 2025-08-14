@@ -16,44 +16,64 @@
         (builtins.map (name: lib.removeSuffix ".nix" name))
       ];
 
-      allEnvironments = lib.pipe allEnvironmentNames [
-        (builtins.map (name: {
-          inherit name;
-          value = pkgs.runCommand "process-compose-${name}" { } ''
-            mkdir -p "$out"
-            ln -s ${
-              config.devenv.shells.${name}.process.managers.process-compose.configFile
-            } "$out/process-compose.yaml"
+      allEnvironments =
+        use-local-cargo-result:
+        lib.pipe allEnvironmentNames [
+          (builtins.map (name: {
+            inherit name;
+            value =
+              let
+                shell-name = if use-local-cargo-result then "${name}-use-local-cargo-result" else name;
+              in
+              pkgs.runCommand "process-compose-${name}" { } ''
+                mkdir -p "$out"
+                ln -s ${
+                  config.devenv.shells.${shell-name}.process.managers.process-compose.configFile
+                } "$out/process-compose.yaml"
 
-            for file in ${config.devenv.shells.${name}.services.blocksense.config-dir}/*; do
-              ln -s "$file" "$out/$(basename $file)"
-            done
-          '';
-        }))
-      ];
+                for file in ${config.devenv.shells.${shell-name}.services.blocksense.config-dir}/*; do
+                  ln -s "$file" "$out/$(basename $file)"
+                done
+              '';
+          }))
+        ];
 
-      allProcessComposeFiles = pkgs.runCommand "allProcessComposeFiles" { } ''
-        mkdir "$out"
-        (
-          set -x
-          ${lib.concatMapStringsSep "\n" (x: "cp -r ${x.value} \"$out/${x.name}\"") allEnvironments}
-        )
-      '';
+      allProcessComposeFiles =
+        use-local-cargo-result:
+        pkgs.runCommand "allProcessComposeFiles" { } ''
+          mkdir "$out"
+          (
+            set -x
+            ${lib.concatMapStringsSep "\n" (x: "cp -r ${x.value} \"$out/${x.name}\"") (
+              allEnvironments use-local-cargo-result
+            )}
+          )
+        '';
     in
     {
       legacyPackages = {
-        process-compose-environments = lib.listToAttrs allEnvironments;
+        process-compose-environments = lib.listToAttrs (allEnvironments false);
+        process-compose-environments-with-cargo-local = lib.listToAttrs (allEnvironments true);
       };
 
       packages = {
-        inherit allProcessComposeFiles;
+        allProcessComposeFiles = allProcessComposeFiles false;
+        allProcessComposeFilesWithLocalCargoResult = allProcessComposeFiles true;
       };
 
-      devenv.shells = lib.genAttrs allEnvironmentNames (name: {
-        imports = [
-          self.nixosModules.blocksense-process-compose
-          ./${name}.nix
-        ];
-      });
+      devenv.shells =
+        let
+          shellCombinations =
+            allEnvironmentNames ++ (builtins.map (name: "${name}-use-local-cargo-result") allEnvironmentNames);
+        in
+        lib.genAttrs shellCombinations (name: {
+          imports = [
+            self.nixosModules.blocksense-process-compose
+            ./${lib.removeSuffix "-use-local-cargo-result" name}.nix
+            {
+              services.blocksense.process-compose.use-local-cargo-result = lib.hasSuffix "-use-local-cargo-result" name;
+            }
+          ];
+        });
     };
 }
