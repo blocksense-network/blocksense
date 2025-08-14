@@ -13,15 +13,76 @@ use tokio::{
     time::sleep,
 };
 
+use actix_web::HttpResponse;
 use futures::future::join_all;
 use futures_util::stream::FuturesUnordered;
 
 #[get("/")]
 async fn timed_out_request(
-    query: web::Query<std::collections::HashMap<String, u64>>,
+    query: web::Query<std::collections::HashMap<String, String>>,
 ) -> impl Responder {
     // Get the `seconds` parameter, default to 0
-    let seconds = query.get("seconds").cloned().unwrap_or(0);
+    let seconds = match query.get("seconds") {
+        Some(val) => match val.clone().parse::<u64>() {
+            Ok(val) => val,
+            Err(e) => {
+                let err_msg = format!("Error parsing seconds to u64: {e}");
+                tracing::error!(err_msg);
+                return HttpResponse::BadRequest().body(err_msg);
+            }
+        },
+        None => {
+            let err_msg = "Missing `seconds` parameter";
+            tracing::error!(err_msg);
+            return HttpResponse::BadRequest().body(err_msg);
+        }
+    };
+
+    let request_method = match query.get("request_method") {
+        Some(val) => val.clone(),
+        None => {
+            return HttpResponse::BadRequest().body("Missing `request_method` parameter");
+        }
+    };
+
+    let url = match query.get("url") {
+        Some(val) => val.clone(),
+        None => {
+            return HttpResponse::BadRequest().body("Missing `url` parameter");
+        }
+    };
+
+    let client = reqwest::Client::new();
+    let response = match request_method.as_str() {
+        "POST" => match client.post(&url).send().await {
+            Ok(resp) => resp,
+            Err(e) => {
+                return HttpResponse::BadRequest().body(format!(
+                    "failed to get response for POST request to {url}: {e}"
+                ))
+            }
+        },
+        _ =>
+        // Make a GET request
+        {
+            match client.get(&url).send().await {
+                Ok(resp) => resp,
+                Err(e) => {
+                    return HttpResponse::BadRequest().body(format!(
+                        "failed to get response for GET request to {url}: {e}"
+                    ))
+                }
+            }
+        }
+    };
+
+    let body = match response.bytes().await {
+        Ok(val) => val,
+        Err(e) => {
+            return HttpResponse::BadRequest()
+                .body(format!("Failed to convert response to bytes: {e}"))
+        }
+    };
 
     // Delay asynchronously
     if seconds > 0 {
@@ -29,7 +90,7 @@ async fn timed_out_request(
     }
 
     // Return empty 200 OK
-    ""
+    HttpResponse::Ok().body(body)
 }
 
 #[tokio::main]
