@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Callout } from '@blocksense/docs-ui/Callout';
 import {
@@ -24,6 +24,7 @@ import { entriesOf, keysOf } from '@blocksense/base-utils/array-iter';
 import { DataTableBadge } from '../common/DataTable/DataTableBadge';
 import { DataTableColumnHeader } from '../common/DataTable/DataTableColumnHeader';
 import { ContractAddress } from '../sol-contracts/ContractAddress';
+import { getIsLiveAndLastUpdated } from './getIsLiveAndLastUpdated';
 
 type DeployedContractsProps = {
   networks: NetworkName[];
@@ -35,6 +36,7 @@ export const DeployedContracts = ({
   deploymentInfo,
 }: DeployedContractsProps) => {
   const [selectedNetwork, setSelectedNet] = useState<NetworkName | null>(null);
+  const [proxyContracts, setProxyContracts] = useState<any[]>([]);
   const contractsRef = useRef<HTMLDivElement | null>(null);
   const { hash, setNewHash } = useHash();
 
@@ -46,6 +48,7 @@ export const DeployedContracts = ({
     }
 
     setSelectedNet(network);
+    setProxyContracts([]);
     setTimeout(() => {
       contractsRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 500);
@@ -53,16 +56,33 @@ export const DeployedContracts = ({
 
   const networkInfo = selectedNetwork ? deploymentInfo[selectedNetwork] : null;
 
-  const proxyContracts = useMemo(() => {
-    if (!networkInfo) return [];
-    return Object.entries(networkInfo.contracts.CLAggregatorAdapter).map(
-      ([feedId, { address, constructorArgs }]) => ({
-        feedId,
-        name: constructorArgs[0],
-        address,
-      }),
-    );
-  }, [networkInfo]);
+  useEffect(() => {
+    async function fetchProxyContracts() {
+      if (!networkInfo || !selectedNetwork) {
+        setProxyContracts([]);
+        return;
+      }
+      const contracts = await Promise.all(
+        Object.entries(networkInfo.contracts.CLAggregatorAdapter)
+          .slice(0, 10)
+          .map(async ([feedId, { address, constructorArgs }]) => {
+            const { isLive, lastUpdated } = await getIsLiveAndLastUpdated(
+              address as `0x${string}`,
+              selectedNetwork,
+            );
+            return {
+              feedId,
+              name: constructorArgs[0],
+              address,
+              isLive,
+              lastUpdated,
+            };
+          }),
+      );
+      setProxyContracts(contracts);
+    }
+    fetchProxyContracts();
+  }, [networkInfo, selectedNetwork]);
 
   function getRowLink(row: DataRowType) {
     return dataFeedUrl && cellHaveContent(row.feedId)
@@ -181,6 +201,42 @@ export const DeployedContracts = ({
                         copyButton={{ enableCopy: true, background: false }}
                         abbreviation={{ hasAbbreviation: false }}
                       />
+                    ),
+                  },
+                  {
+                    id: 'isLive',
+                    title: 'Is Live',
+                    header: ({ column }) => (
+                      <DataTableColumnHeader title={column.title} />
+                    ),
+                    cell: ({ row }) => (
+                      <DataTableBadge>
+                        {row.isLive ? 'Live' : 'No Live'}
+                      </DataTableBadge>
+                    ),
+                  },
+                  {
+                    id: 'lastUpdated',
+                    title: 'Last Updated',
+                    header: ({ column }) => (
+                      <DataTableColumnHeader title={column.title} />
+                    ),
+                    cell: ({ row }) => (
+                      <DataTableBadge>
+                        {row.lastUpdated
+                          ? new Date(row.lastUpdated).toLocaleString(
+                              undefined,
+                              {
+                                year: 'numeric',
+                                month: '2-digit',
+                                day: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                second: '2-digit',
+                              },
+                            )
+                          : 'N/A'}
+                      </DataTableBadge>
                     ),
                   },
                 ]}
