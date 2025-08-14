@@ -11122,6 +11122,7 @@ dependencies = [
 name = "trigger-oracle"
 version = "0.1.1"
 dependencies = [
+ "actix-web",
  "anyhow",
  "blocksense-config",
  "blocksense-crypto",
