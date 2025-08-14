@@ -1,7 +1,10 @@
 import type { ParseResult } from 'effect';
 import { Context, Data, Effect, Layer, Schema as S } from 'effect';
 
-import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
+import {
+  fetchAndDecodeJSON,
+  fetchAndDecodeJSONEffect,
+} from '@blocksense/base-utils/http';
 import {
   startEnvironment,
   stopEnvironment,
@@ -64,6 +67,11 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
       UpdatesToNetwork,
       ParseMetricsError | HttpClientError | ParseResult.ParseError
     >;
+    readonly fetchHistory: () => Effect.Effect<
+      FeedAggregateHistory,
+      Error,
+      never
+    >;
   }
 >() {
   static Live = Layer.effect(
@@ -76,6 +84,9 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
         'http://127.0.0.1:5553/get_feeds_config',
       );
       const metricsUrl = yield* Effect.succeed('http://127.0.0.1:5551/metrics');
+      const historyUrl = yield* Effect.succeed(
+        'http://127.0.0.1:5553/get_history',
+      );
 
       return Sequencer.of({
         configUrl,
@@ -127,6 +138,15 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
             }, {} as UpdatesToNetwork);
           });
         },
+        fetchHistory: () => {
+          return Effect.gen(function* () {
+            const history = yield* fetchAndDecodeJSONEffect(
+              FeedAggregateHistorySchema,
+              historyUrl,
+            ).pipe(Effect.provide(FetchHttpClient.layer));
+            return history;
+          });
+        },
       });
     }),
   );
@@ -160,3 +180,22 @@ export const UpdatesToNetworkMetric = S.Struct({
 });
 
 export type UpdatesToNetwork = Record<string, Record<string, number>>;
+
+const Numerical = S.Struct({
+  Numerical: S.Number,
+});
+
+export const FeedAggregateHistorySchema = S.Struct({
+  aggregate_history: S.Record({
+    key: S.String,
+    value: S.Array(
+      S.Struct({
+        value: Numerical,
+        update_number: S.Number,
+        end_slot_timestamp: S.Number,
+      }),
+    ),
+  }),
+});
+
+export type FeedAggregateHistory = typeof FeedAggregateHistorySchema.Type;
