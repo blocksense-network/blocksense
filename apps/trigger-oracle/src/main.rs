@@ -1,23 +1,51 @@
 use anyhow::Error;
 use clap::Parser;
 use spin_trigger::cli::TriggerExecutorCommand;
-use std::io::IsTerminal;
+use std::{io::IsTerminal, str::FromStr};
 use trigger_oracle::OracleTrigger;
 
 type Command = TriggerExecutorCommand<OracleTrigger>;
 
-use actix_web::{get, web, App, HttpServer, Responder};
 use std::time::Duration;
 use tokio::task::{JoinHandle, LocalSet};
 
-use actix_web::HttpResponse;
+use actix_web::{get, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 use futures::future::join_all;
 use futures_util::stream::FuturesUnordered;
 
+use reqwest::header as reqwest_header;
+
 #[get("/")]
 async fn timed_out_request(
+    req: HttpRequest,
     query: web::Query<std::collections::HashMap<String, String>>,
 ) -> impl Responder {
+    // Get headers for forwarding
+    let headers = req.headers();
+
+    let mut reqwest_headers = reqwest_header::HeaderMap::new();
+
+    for (key, value) in headers.iter() {
+        reqwest_headers.insert(
+            match reqwest_header::HeaderName::from_str(key.as_str()) {
+                Ok(header) => header,
+                Err(e) => {
+                    let err_msg = format!("Error parsing header key {key}: {e}");
+                    tracing::error!(err_msg);
+                    return HttpResponse::BadRequest().body(err_msg);
+                }
+            },
+            match reqwest_header::HeaderValue::from_bytes(value.as_bytes()) {
+                Ok(val) => val,
+                Err(e) => {
+                    let err_msg = format!("Error parsing header value {value:?}: {e}");
+                    tracing::error!(err_msg);
+                    return HttpResponse::BadRequest().body(err_msg);
+                }
+            },
+        );
+    }
+
     // Get the `seconds` parameter, default to 0
     let seconds = match query.get("seconds") {
         Some(val) => match val.clone().parse::<u64>() {
@@ -53,7 +81,7 @@ async fn timed_out_request(
     let response = match request_method.as_str() {
         "POST" => match actix_web::rt::time::timeout(
             Duration::from_secs(seconds),
-            client.post(&url).send(),
+            client.post(&url).headers(reqwest_headers).send(),
         )
         .await
         {
@@ -76,7 +104,7 @@ async fn timed_out_request(
         {
             match actix_web::rt::time::timeout(
                 Duration::from_secs(seconds),
-                client.get(&url).send(),
+                client.get(&url).headers(reqwest_headers).send(),
             )
             .await
             {
