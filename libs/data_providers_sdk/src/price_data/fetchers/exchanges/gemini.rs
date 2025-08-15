@@ -33,13 +33,13 @@ impl<'a> PricesFetcher<'a> for GeminiPriceFetcher<'a> {
         Self { symbols }
     }
 
-    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
-        async {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+        async move {
             let prices_futures = self
                 .symbols
                 .iter()
                 .map(Deref::deref)
-                .map(fetch_price_for_symbol);
+                .map(|symbol| fetch_price_for_symbol(symbol, timeout_secs));
 
             let mut futures = FuturesUnordered::from_iter(prices_futures);
             let mut prices = PairPriceData::new();
@@ -56,9 +56,12 @@ impl<'a> PricesFetcher<'a> for GeminiPriceFetcher<'a> {
     }
 }
 
-pub async fn fetch_price_for_symbol(symbol: &str) -> Result<(String, PricePoint)> {
+pub async fn fetch_price_for_symbol(
+    symbol: &str,
+    timeout_secs: u64,
+) -> Result<(String, PricePoint)> {
     let url = format!("https://api.gemini.com/v1/pubticker/{symbol}");
-    let response = http_get_json::<GeminiPriceResponse>(&url, None, None).await?;
+    let response = http_get_json::<GeminiPriceResponse>(&url, None, None, timeout_secs).await?;
 
     let volume_data = response
         .volume

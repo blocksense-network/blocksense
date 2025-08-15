@@ -54,14 +54,15 @@ impl<'a> PricesFetcher<'a> for BitfinexPriceFetcher<'a> {
         Self { symbols }
     }
 
-    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
-        async {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+        async move {
             let all_symbols = self.symbols.join(",");
 
             let response = http_get_json::<Vec<TradingPairTicker>>(
                 "https://api-pub.bitfinex.com/v2/tickers",
                 Some(&[("symbols", all_symbols.as_str())]),
                 None,
+                timeout_secs,
             )
             .await?;
 

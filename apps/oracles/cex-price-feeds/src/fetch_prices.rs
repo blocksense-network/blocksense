@@ -56,7 +56,7 @@ impl SymbolsData {
     }
 }
 
-pub async fn get_prices(resources: &ResourceData) -> Result<PairsToResults> {
+pub async fn get_prices(resources: &ResourceData, interval_time_in_seconds: u64) -> Result<PairsToResults> {
     let symbols = SymbolsData::from_resources(&resources.symbols)?;
 
     let futures_set = FuturesUnordered::from_iter([

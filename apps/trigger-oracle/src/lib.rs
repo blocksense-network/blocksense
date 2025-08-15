@@ -920,6 +920,7 @@ impl OracleTrigger {
                     data: capability.data,
                 })
                 .collect(),
+            interval_time_in_seconds: component.interval_time_in_seconds,
         };
 
         let start_time = Instant::now();

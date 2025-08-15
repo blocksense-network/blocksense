@@ -44,8 +44,8 @@ impl<'a> PricesFetcher<'a> for YFPriceFetcher<'a> {
         Self { symbols, api_keys }
     }
 
-    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
-        async {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+        async move {
             let api_key = self
                 .api_keys
                 .as_ref()
@@ -58,6 +58,7 @@ impl<'a> PricesFetcher<'a> for YFPriceFetcher<'a> {
                 "https://yfapi.net/v6/finance/quote",
                 Some(&[("symbols", all_symbols.as_str())]),
                 Some(&[("x-api-key", api_key)]),
+                timeout_secs,
             )
             .await?;
 

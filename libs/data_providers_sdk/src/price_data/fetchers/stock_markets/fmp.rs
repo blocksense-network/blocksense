@@ -36,8 +36,8 @@ impl<'a> PricesFetcher<'a> for FMPPriceFetcher<'a> {
         }
     }
 
-    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
-        async {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+        async move {
             let api_key = self
                 .api_keys
                 .as_ref()
@@ -50,6 +50,7 @@ impl<'a> PricesFetcher<'a> for FMPPriceFetcher<'a> {
                 format!("https://financialmodelingprep.com/api/v3/quote/{all_symbols}").as_str(),
                 Some(&[("apikey", api_key)]),
                 None,
+                timeout_secs,
             )
             .await?;
 
