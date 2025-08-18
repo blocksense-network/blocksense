@@ -4,6 +4,7 @@ members = [
   "exsat-holdings",
   "gecko-terminal",
   "eth-rpc",
+  "hyper-borrow-rates",
   "stock-price-feeds",
   "spout-rwa",
 ]

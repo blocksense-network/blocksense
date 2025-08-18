@@ -25,6 +25,8 @@ with lib.fileset;
       (root + "/apps/sequencer_tests/Safe.json")
       (root + "/apps/oracles/eth-rpc/src/abi/VaultABI.json")
       (root + "/apps/oracles/eth-rpc/src/abi/YieldFiyUSD.json")
+      (root + "/apps/oracles/hyper-borrow-rates/src/abi/HyperLand/UiPoolDataProvider.json")
+      (root + "/apps/oracles/hyper-borrow-rates/src/abi/HypurrFi/UiPoolDataProvider.json")
       (root + "/apps/sequencer_tests/SafeProxyFactory.json")
       (root + "/libs/gnosis_safe/safe_abi.json")
     ];
