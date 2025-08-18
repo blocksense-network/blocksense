@@ -132,6 +132,8 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
   );
 }
 
+export type SequencerService = Context.Tag.Service<Sequencer>;
+
 export class RGLogCheckerError extends Data.TaggedError(
   '@e2e-tests/RGLogCheckerError',
 )<{

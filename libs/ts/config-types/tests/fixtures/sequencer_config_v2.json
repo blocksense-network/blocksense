@@ -13,17 +13,10 @@
     "monad_testnet": {
       "private_key_path": "test-key",
       "url": "https://testnet-rpc.monad.xyz",
-      "contract_address": "0xADF5555555555555555555555555555555555555",
-      "safe_address": null,
-      "safe_min_quorum": 1,
-      "event_contract_address": null,
-      "multicall_contract_address": null,
-      "transaction_retries_count_limit": 5,
+      "transaction_retries_count_before_give_up": 5,
       "transaction_retry_timeout_secs": 60,
       "retry_fee_increment_fraction": 0.1,
       "transaction_gas_limit": 7500000,
-      "data_feed_store_byte_code": null,
-      "data_feed_sports_byte_code": null,
       "impersonated_anvil_account": null,
       "is_enabled": true,
       "allow_feeds": [
@@ -74,22 +67,34 @@
           "peg_tolerance_percentage": 1
         }
       ],
-      "contract_version": 2
+      "contracts": [
+        {
+          "name": "HistoricalDataFeedStoreV2",
+          "address": "0x663F3ad617193148711d28f5334eE4Ed07016602",
+          "byte_code": "0x60a060405234801561001057600080fd5b506040516101cf3803806101cf83398101604081905261002f91610040565b6001600160a01b0316608052610070565b60006020828403121561005257600080fd5b81516001600160a01b038116811461006957600080fd5b9392505050565b60805161014561008a6000396000609001526101456000f3fe608060405234801561001057600080fd5b50600060405160046000601c83013751905063e000000081161561008e5763e0000000198116632000000082161561005957806020526004356004603c20015460005260206000f35b805463800000008316156100775781600052806004601c2001546000525b634000000083161561008857806020525b60406000f35b7f00000000000000000000000000000000000000000000000000000000000000003381146100bb57600080fd5b631a2d80ac820361010a57423660045b8181101561010857600481601c376000516004601c2061ffff6001835408806100f2575060015b91829055600483013585179101556024016100cb565b005b600080fdfea26469706673582212204a7c38e6d9b723ea65e6d451d6a8436444c333499ad610af033e7360a2558aea64736f6c63430008180033",
+          "contract_version": 1
+        },
+        {
+          "name": "AggregatedDataFeedStore",
+          "address": "0xADF5555555555555555555555555555555555555",
+          "byte_code": null,
+          "contract_version": 2
+        },
+        {
+          "name": "gnosis_safe",
+          "address": "0x7f09E80DA1dFF8df7F1513E99a3458b228b9e19C",
+          "byte_code": null,
+          "contract_version": 1
+        }
+      ]
     },
     "harmony_testnet_shard0": {
       "private_key_path": "test-key",
       "url": "https://endpoints.omniatech.io/v1/harmony/testnet-0/public",
-      "contract_address": "0xADF5555555555555555555555555555555555555",
-      "safe_address": null,
-      "safe_min_quorum": 1,
-      "event_contract_address": null,
-      "multicall_contract_address": null,
-      "transaction_retries_count_limit": 5,
+      "transaction_retries_count_before_give_up": 5,
       "transaction_retry_timeout_secs": 60,
       "retry_fee_increment_fraction": 0.1,
       "transaction_gas_limit": 7500000,
-      "data_feed_store_byte_code": null,
-      "data_feed_sports_byte_code": null,
       "impersonated_anvil_account": null,
       "is_enabled": true,
       "allow_feeds": [
@@ -104,27 +109,34 @@
         "29"
       ],
       "publishing_criteria": [],
-      "contract_version": 2
+      "contracts": [
+        {
+          "name": "AggregatedDataFeedStore",
+          "address": "0xADF5555555555555555555555555555555555555",
+          "byte_code": null,
+          "contract_version": 2
+        }
+      ]
     },
     "cronos_testnet": {
       "private_key_path": "test-key",
       "url": "https://cronos-testnet.drpc.org",
-      "contract_address": "0xADF5555555555555555555555555555555555555",
-      "safe_address": null,
-      "safe_min_quorum": 1,
-      "event_contract_address": null,
-      "multicall_contract_address": null,
-      "transaction_retries_count_limit": 5,
+      "transaction_retries_count_before_give_up": 10,
       "transaction_retry_timeout_secs": 60,
       "retry_fee_increment_fraction": 0.1,
       "transaction_gas_limit": 7500000,
-      "data_feed_store_byte_code": null,
-      "data_feed_sports_byte_code": null,
       "impersonated_anvil_account": null,
       "is_enabled": true,
       "allow_feeds": [0, 1, 3, 9, 13, "16", "22", "26", "29"],
       "publishing_criteria": [],
-      "contract_version": 2
+      "contracts": [
+        {
+          "name": "AggregatedDataFeedStore",
+          "address": "0xADF5555555555555555555555555555555555555",
+          "byte_code": null,
+          "contract_version": 2
+        }
+      ]
     }
   },
   "reporters": [

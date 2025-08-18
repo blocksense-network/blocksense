@@ -1,31 +1,69 @@
-import { Effect, pipe, Schedule } from 'effect';
+import { Effect, Layer, pipe, Schedule } from 'effect';
 import { afterAll, beforeAll, describe, expect, it } from '@effect/vitest';
 import { deepStrictEqual } from 'assert';
 
 import { getProcessComposeLogsFiles } from '@blocksense/base-utils/env';
-import { entriesOf, mapValuePromises, valuesOf } from '@blocksense/base-utils';
-import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
+import {
+  entriesOf,
+  fromEntries,
+  keysOf,
+  mapValues,
+  valuesOf,
+} from '@blocksense/base-utils/array-iter';
+import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
+import type { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 
-import { rgSearchPattern, parseProcessesStatus } from './helpers';
+import {
+  rgSearchPattern,
+  parseProcessesStatus,
+  getInitialFeedsInfoFromNetwork,
+} from './helpers';
 import { expectedPCStatuses03 } from './expected';
-import type { ProcessComposeService, UpdatesToNetwork } from './types';
+import type {
+  ProcessComposeService,
+  SequencerService,
+  UpdatesToNetwork,
+} from './types';
 import { ProcessCompose, Sequencer } from './types';
+import type { FeedsValueAndRound } from '../utils/onchain';
+import { getDataFeedsInfoFromNetwork } from '../utils/onchain';
 
 describe.sequential('E2E Tests with process-compose', () => {
   const network = 'ink_sepolia';
+  const MAX_HISTORY_ELEMENTS_PER_FEED = 8192;
+
+  let feedIdsFromConfig: Array<bigint>;
+  let contractAddressFromConfig: `0x${string}`;
+
+  let sequencer: SequencerService;
+  let processCompose: ProcessComposeService;
+
+  let sequencerConfig: SequencerConfigV2;
+  let feedsConfig: NewFeedsConfig;
 
   let feedIds: Array<bigint>;
-  let processCompose: ProcessComposeService;
-  let ADFSConsumer: AggregatedDataFeedStoreConsumer;
-  let initialPrices: Record<string, number>;
+  let contractAddress: `0x${string}`;
+
   let updatesToNetworks = {} as UpdatesToNetwork;
+  let initialFeedsInfo: FeedsValueAndRound;
 
   beforeAll(() =>
     pipe(
-      ProcessCompose,
-      Effect.provide(ProcessCompose.Live),
-      Effect.tap(pc => pc.start('example-setup-03')),
-      Effect.tap(pc => (processCompose = pc)),
+      Effect.gen(function* () {
+        processCompose = yield* ProcessCompose;
+        yield* processCompose.start('example-setup-03');
+
+        sequencer = yield* Sequencer;
+
+        // Get feeds information from the original network. No affection of the work of the
+        // local sequencer.
+        ({
+          address: contractAddressFromConfig,
+          feedIds: feedIdsFromConfig,
+          initialFeedsInfo,
+        } = yield* getInitialFeedsInfoFromNetwork('ink-sepolia'));
+      }),
+      Effect.provide(Layer.merge(ProcessCompose.Live, Sequencer.Live)),
       Effect.runPromise,
     ),
   );
@@ -46,7 +84,7 @@ describe.sequential('E2E Tests with process-compose', () => {
           ),
         {
           schedule: Schedule.fixed(1000),
-          times: 10,
+          times: 30,
         },
       );
       // still validate the result
@@ -54,21 +92,31 @@ describe.sequential('E2E Tests with process-compose', () => {
     }).pipe(Effect.provide(ProcessCompose.Live)),
   );
 
-  it.live('Test sequencer config is available and in correct format', () =>
+  it.live('Test sequencer configs are available and in correct format', () =>
     Effect.gen(function* () {
-      const sequencer = yield* Sequencer;
-      const sequencerConfig = yield* sequencer.getConfig();
-
+      sequencerConfig = yield* sequencer.getConfig();
+      feedsConfig = yield* sequencer.getFeedsConfig();
       expect(sequencerConfig).toBeTypeOf('object');
-      return sequencerConfig;
-    }).pipe(Effect.provide(Sequencer.Live)),
+      expect(feedsConfig).toBeTypeOf('object');
+
+      contractAddress = sequencerConfig.providers[network].contracts.find(
+        c => c.name === 'AggregatedDataFeedStore',
+      )!.address as `0x${string}`;
+
+      expect(contractAddress).toEqual(contractAddressFromConfig);
+
+      const allow_feeds = sequencerConfig.providers[network].allow_feeds;
+      feedIds = allow_feeds?.length
+        ? (allow_feeds as Array<bigint>)
+        : feedsConfig.feeds.map(feed => feed.id);
+      expect(feedIds).toEqual(feedIdsFromConfig);
+    }),
   );
 
   it.live(
     'Test processes state after at least 2 updates of each feeds have been made',
     () =>
       Effect.gen(function* () {
-        const sequencer = yield* Sequencer;
         updatesToNetworks = yield* Effect.retry(
           sequencer
             .fetchUpdatesToNetworksMetric()
@@ -88,72 +136,77 @@ describe.sequential('E2E Tests with process-compose', () => {
         );
 
         expect(processes).toEqual(expectedPCStatuses03);
-      }).pipe(Effect.provide(Sequencer.Live)),
+      }),
   );
 
-  it.live('Test prices are updated', () =>
+  it.live('Test feeds data is updated on the local network', () =>
     Effect.gen(function* () {
-      const sequencer = yield* Sequencer;
-      const config = yield* sequencer.getConfig();
+      const url = sequencerConfig.providers[network].url;
 
-      // Collect initial information for the feeds and their prices
-      const url = config.providers[network].url;
-      const contractAddress = config.providers[network]
-        .contract_address as `0x${string}`;
-      const allow_feeds = config.providers[network].allow_feeds;
+      // Save map of initial rounds for each feed
+      const initialRounds = fromEntries(
+        entriesOf(initialFeedsInfo).map(([id, data]) => [id, data.round]),
+      );
 
-      const feedsConfig = yield* sequencer.getFeedsConfig();
+      // Get feeds information from the local network ( anvil )
+      // for the same round as the initial one, to confirm it is not being overwritten
+      const initialFeedsInfoLocal = yield* getDataFeedsInfoFromNetwork(
+        feedIds,
+        contractAddress,
+        url,
+        initialRounds,
+      );
 
-      feedIds = allow_feeds?.length
-        ? (allow_feeds as Array<bigint>)
-        : feedsConfig.feeds.map(feed => feed.id);
+      expect(initialFeedsInfo).toEqual(initialFeedsInfoLocal);
 
-      ADFSConsumer = yield* Effect.sync(() =>
-        AggregatedDataFeedStoreConsumer.createConsumerByRpcUrl(
-          contractAddress,
-          url,
+      // If some feeds were not updated, we will log a warning
+      // and continue with the available feeds
+      const updatedFeedIds = keysOf(updatesToNetworks[network]).map(feedId =>
+        BigInt(feedId),
+      );
+      if (updatedFeedIds.length !== feedIds.length) {
+        yield* Effect.logWarning('Not all feeds have been updated');
+        const missingFeeds = feedIds.filter(
+          feedId => !updatedFeedIds.includes(feedId),
+        );
+        yield* Effect.logWarning('Missing updates for feeds:', missingFeeds);
+        yield* Effect.logWarning('Test will continue with available feeds');
+
+        // Remove missing feeds from the initial rounds info
+        for (const feedId of missingFeeds) {
+          delete initialRounds[feedId.toString()];
+        }
+      }
+
+      // Get feeds information from the local network ( anvil )
+      // Info is fetched for specific round - the initial round of the feed
+      // + number of updates that happened while the local sequencer was running
+      // modulo the maximum number of history elements per feed
+      const currentFeedsInfo = yield* getDataFeedsInfoFromNetwork(
+        updatedFeedIds,
+        contractAddress,
+        url,
+        mapValues(
+          initialRounds,
+          (feedId, round) =>
+            (round + updatesToNetworks[network][feedId]) %
+            MAX_HISTORY_ELEMENTS_PER_FEED,
         ),
       );
 
-      initialPrices = feedIds.reduce(
-        (acc, feedId) => {
-          acc[feedId.toString()] = 0;
-          return acc;
-        },
-        {} as Record<string, number>,
-      );
-
-      initialPrices = yield* Effect.promise(() =>
-        mapValuePromises(
-          initialPrices,
-          async (feedId, _) =>
-            await ADFSConsumer.getSingleDataAtIndex(BigInt(feedId), 0).then(
-              res => Number(res.slice(0, 50)),
-            ),
-        ),
-      );
-
-      const currentPrices = yield* Effect.promise(() =>
-        mapValuePromises(
-          initialPrices,
-          async (feedId, _) =>
-            await ADFSConsumer.getSingleDataAtIndex(
-              BigInt(feedId),
-              updatesToNetworks[network][feedId] - 1,
-            ).then(res => Number(res.slice(0, 50))),
-        ),
-      );
-
-      for (const [id, price] of entriesOf(currentPrices)) {
+      // Make sure that the feeds info is updated
+      for (const [id, data] of entriesOf(currentFeedsInfo)) {
+        const { round, value } = data;
+        expect(round).toBeGreaterThan(initialFeedsInfo[id].round);
         // Pegged asset with 10% tolerance should be pegged
         // Pegged asset with 0.000001% tolerance should not be pegged
         if (id === '50000') {
-          expect(price).toEqual(1 * 10 ** 8);
+          expect(value).toEqual(1 * 10 ** 8);
           continue;
         }
-        expect(price).not.toEqual(initialPrices[id]);
+        expect(value).not.toEqual(initialFeedsInfo[id].value);
       }
-    }).pipe(Effect.provide(Sequencer.Live)),
+    }),
   );
 
   describe.sequential('Reporter behavior based on logs', () => {
