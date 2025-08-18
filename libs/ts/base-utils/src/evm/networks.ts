@@ -686,7 +686,7 @@ export const networkMetadata = {
       {
         type: 'cronos',
         webUrl: 'https://explorer.cronos.org/testnet',
-        apiUrl: 'https://explorer-api.cronos.org/testnet/api/v1',
+        apiUrl: 'https://explorer-api.cronos.org/testnet/api/v2',
       },
     ],
     currency: Currency.TCRO,
