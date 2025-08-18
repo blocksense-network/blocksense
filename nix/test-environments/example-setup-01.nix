@@ -199,21 +199,7 @@ in
       cex-price-feeds = {
         exec-interval = 40;
         allowed-outbound-hosts = [
-          "https://api.kraken.com"
-          "https://api.bybit.com"
-          "https://api.coinbase.com"
-          "https://api.exchange.coinbase.com"
-          "https://api1.binance.com"
-          "https://api.kucoin.com"
-          "https://api.mexc.com"
-          "https://api.crypto.com"
-          "https://api.binance.us"
-          "https://api.gemini.com"
-          "https://api-pub.bitfinex.com"
-          "https://api.upbit.com"
-          "https://api.bitget.com"
-          "https://api.gateio.ws"
-          "https://www.okx.com"
+          "http://127.0.0.1:3000"
         ];
       };
 
