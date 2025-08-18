@@ -82,7 +82,7 @@ in
             (map (x: "blocksense-anvil-${x}.service"))
           ];
           environment = {
-            FEEDS_CONFIG_DIR = "${../../../../config}";
+            FEEDS_CONFIG_DIR = "${../../../../apps/e2e-tests/src/process-compose/config}";
             SEQUENCER_CONFIG_DIR = cfg.config-dir;
             SEQUENCER_LOG_LEVEL = "${lib.toUpper cfg.sequencer.log-level}";
           };
