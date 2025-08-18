@@ -1,0 +1,113 @@
+spin_manifest_version = 2
+
+[application]
+authors = ["Emil Ivanichkov"]
+name = "Hyper"
+version = "0.1.0"
+
+[application.trigger.settings]
+interval_time_in_seconds = 10
+reporter_id = 0
+sequencer = "http://127.0.0.1:8877/post_reports_batch"
+secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
+second_consensus_secret_key = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+kafka_endpoint = "http://127.0.0.1:9092"
+
+[[trigger.oracle]]
+component = "hyper-borrow-rates"
+interval_time_in_seconds = 10
+capabilities = []
+
+[[trigger.oracle.data_feeds]]
+id = "1"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"WHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HypurrFi"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "2"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"wstHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HypurrFi"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "3"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"UBTC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HypurrFi"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "4"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"UETH","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HypurrFi"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "5"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"USDe","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HypurrFi"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"WHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLend"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "20"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"wstHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLend"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "30"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"UBTC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLend"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "40"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"UETH","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLend"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "50"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"USDe","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperLend"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "100"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"HYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperDrive", "market_id": "1"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "101"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"USDe","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperDrive", "market_id": "2"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"USD₮0","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperDrive", "market_id": "3"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "103"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"USDhl","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"marketplace":"HyperDrive", "market_id": "5"}}'
+
+[component.hyper-borrow-rates]
+source = "../target/wasm32-wasip1/release/hyper_borrow_rates.wasm"
+allowed_outbound_hosts = [
+  "https://rpc.hyperliquid.xyz",
+  "https://api.hyperdrive.fi/",
+]
+
+[component.hyper-borrow-rates.build]
+command = "cargo build --target wasm32-wasip1 --release"
