@@ -11,7 +11,7 @@ let
 in
 {
   imports = [
-    ./example-setup-03.nix
+    ./example-setup-01.nix
   ];
 
   services.blocksense = {
@@ -30,5 +30,6 @@ in
         };
       };
     };
+
   };
 }
