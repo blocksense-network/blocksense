@@ -8,6 +8,13 @@ use url::Url;
 pub type QueryParam<'a, 'b> = (&'a str, &'b str);
 pub type HeaderParam<'a, 'b> = (&'a str, &'b str);
 
+#[derive(Debug, Serialize)]
+struct Params {
+    seconds: u64,
+    endpoint_url: String,
+    request_method: String,
+}
+
 pub fn prepare_get_request(
     forward_url: &str,
     params: Option<&[QueryParam<'_, '_>]>,
@@ -20,23 +27,23 @@ pub fn prepare_get_request(
         None => Url::parse(forward_url)?,
     };
 
-    let base_query_params = &[
-        ("seconds", timeout_secs.to_string()),
-        ("endpoint", forward_url_and_params.to_string()),
-    ];
-    let base_url_and_params = { Url::parse_with_params(base_url, base_query_params)? };
-
     let mut req = Request::builder();
-    req.method(Method::Get);
-    req.uri(base_url_and_params.as_str());
-    req.header("Accepts", "application/json");
-    req.header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36");
+    req.method(Method::Post);
+    req.uri(base_url);
 
     if let Some(hdrs) = headers {
         for (key, value) in hdrs {
             req.header(*key, *value);
         }
     }
+
+    let payload = Params {
+        endpoint_url: forward_url_and_params.to_string(),
+        seconds: timeout_secs,
+        request_method: "GET".to_string(),
+    };
+
+    req.body(serde_json::to_string(&payload).unwrap());
 
     Ok(req.build())
 }
