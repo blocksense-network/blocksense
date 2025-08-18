@@ -42127,6 +42127,458 @@
       }
     },
     {
+      "id": "102001",
+      "full_name": "WHYPE HypurrFi Borrow Rate",
+      "description": "Real-time borrow rate (APR) for WHYPE on HypurrFi lending markets. ref: https://app.hypurr.fi/markets/pooled/999/0x5555555555555555555555555555555555555555",
+      "type": "price-feed",
+      "oracle_id": "hyper-borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "WHYPE",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "hyper-borrow-rates",
+          "marketplace": "HypurrFi"
+        }
+      }
+    },
+    {
+      "id": "102002",
+      "full_name": "wstHYPE HypurrFi Borrow Rate",
+      "description": "Real-time borrow rate (APR) for Staked Hype (wstHYPE) on HypurrFi lending markets. ref: https://app.hypurr.fi/markets/pooled/999/0x94e8396e0869c9F2200760aF0621aFd240E1CF38",
+      "type": "price-feed",
+      "oracle_id": "hyper-borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "wstHYPE",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "hyper-borrow-rates",
+          "marketplace": "HypurrFi"
+        }
+      }
+    },
+    {
+      "id": "102003",
+      "full_name": "UBTC HypurrFi Borrow Rate",
+      "description": "Real-time borrow rate (APR) for Unit Bitcoin (UBTC) on HypurrFi lending markets. ref: https://app.hypurr.fi/markets/pooled/999/0x9FDBdA0A5e284c32744D2f17Ee5c74B284993463",
+      "type": "price-feed",
+      "oracle_id": "hyper-borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "UBTC",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "hyper-borrow-rates",
+          "marketplace": "HypurrFi"
+        }
+      }
+    },
+    {
+      "id": "102004",
+      "full_name": "UETH HypurrFi Borrow Rate",
+      "description": "Real-time borrow rate (APR) for Unit Ethereum (UETH) on HypurrFi lending markets. ref: https://app.hypurr.fi/markets/pooled/999/0xBe6727B535545C67d5cAa73dEa54865B92CF7907",
+      "type": "price-feed",
+      "oracle_id": "hyper-borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "UETH",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "hyper-borrow-rates",
+          "marketplace": "HypurrFi"
+        }
+      }
+    },
+    {
+      "id": "102005",
+      "full_name": "USDe HypurrFi Borrow Rate",
+      "description": "Real-time borrow rate (APR) for USDe on HypurrFi lending markets. ref: https://app.hypurr.fi/markets/pooled/999/0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+      "type": "price-feed",
+      "oracle_id": "hyper-borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "USDe",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "hyper-borrow-rates",
+          "marketplace": "HypurrFi"
+        }
+      }
+    },
+    {
+      "id": "102051",
+      "full_name": "WHYPE HyperLend Borrow Rate",
+      "description": "Real-time borrow rate (APR) for WHYPE on HyperLend lending markets. ref: https://hyperlend.blockanalitica.com/markets/0x5555555555555555555555555555555555555555",
+      "type": "price-feed",
+      "oracle_id": "hyper-borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "WHYPE",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "hyper-borrow-rates",
+          "marketplace": "HyperLend"
+        }
+      }
+    },
+    {
+      "id": "102052",
+      "full_name": "wstHYPE HyperLend Borrow Rate",
+      "description": "Real-time borrow rate (APR) for Staked Hype (wstHYPE) on HyperLend lending markets. ref: https://hyperlend.blockanalitica.com/markets/0x94e8396e0869c9f2200760af0621afd240e1cf38",
+      "type": "price-feed",
+      "oracle_id": "hyper-borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "wstHYPE",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "hyper-borrow-rates",
+          "marketplace": "HyperLend"
+        }
+      }
+    },
+    {
+      "id": "102053",
+      "full_name": "UBTC HyperLend Borrow Rate",
+      "description": "Real-time borrow rate (APR) for Unit Bitcoin (UBTC) on HyperLend lending markets. ref: https://hyperlend.blockanalitica.com/markets/0x9fdbda0a5e284c32744d2f17ee5c74b284993463",
+      "type": "price-feed",
+      "oracle_id": "hyper-borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "UBTC",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "hyper-borrow-rates",
+          "marketplace": "HyperLend"
+        }
+      }
+    },
+    {
+      "id": "102054",
+      "full_name": "UETH HyperLend Borrow Rate",
+      "description": "Real-time borrow rate (APR) for Unit Ethereum (UETH) on HyperLend lending markets. ref: https://hyperlend.blockanalitica.com/markets/0xbe6727b535545c67d5caa73dea54865b92cf7907",
+      "type": "price-feed",
+      "oracle_id": "hyper-borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "UETH",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "hyper-borrow-rates",
+          "marketplace": "HyperLend"
+        }
+      }
+    },
+    {
+      "id": "102055",
+      "full_name": "USDe HyperLend Borrow Rate",
+      "description": "Real-time borrow rate (APR) for USDe on HyperLend lending markets. ref: https://hyperlend.blockanalitica.com/markets/0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34",
+      "type": "price-feed",
+      "oracle_id": "hyper-borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "USDe",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "hyper-borrow-rates",
+          "marketplace": "HyperLend"
+        }
+      }
+    },
+    {
+      "id": "102101",
+      "full_name": "HYPE HyperDrive Borrow Rate",
+      "description": "Real-time borrow rate (APR) for HYPE on HyperDrive LST Market market. ref: https://app.hyperdrive.fi/borrow/hype-lst",
+      "type": "price-feed",
+      "oracle_id": "hyper-borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "HYPE",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "hyper-borrow-rates",
+          "marketplace": "HyperDrive",
+          "market_id": "1"
+        }
+      }
+    },
+    {
+      "id": "102102",
+      "full_name": "USDe HyperDrive Borrow Rate",
+      "description": "Real-time borrow rate (APR) for USDe on HyperDrive Primary USDe Market. ref: https://app.hyperdrive.fi/borrow/usde-primary",
+      "type": "price-feed",
+      "oracle_id": "hyper-borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "USDe",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "hyper-borrow-rates",
+          "marketplace": "HyperDrive",
+          "market_id": "2"
+        }
+      }
+    },
+    {
+      "id": "102103",
+      "full_name": "USD₮0 HyperDrive Borrow Rate",
+      "description": "Real-time borrow rate (APR) for USD₮0 on HyperDrive Primary USD₮0 Market. ref: https://app.hyperdrive.fi/borrow/usdt0-primary",
+      "type": "price-feed",
+      "oracle_id": "hyper-borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "USD₮0",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "hyper-borrow-rates",
+          "marketplace": "HyperDrive",
+          "market_id": "3"
+        }
+      }
+    },
+    {
+      "id": "102104",
+      "full_name": "USDhl HyperDrive Borrow Rate",
+      "description": "Real-time borrow rate (APR) for USDhl on HyperDrive Primary USDhl Market. ref: https://app.hyperdrive.fi/borrow/usdhl-primary",
+      "type": "price-feed",
+      "oracle_id": "hyper-borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "USDhl",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "hyper-borrow-rates",
+          "marketplace": "HyperDrive",
+          "market_id": "5"
+        }
+      }
+    },
+    {
       "id": "1000000",
       "full_name": "WMON / USD",
       "description": "Price of Wrapped Monad in USD on Monad Testnet",
