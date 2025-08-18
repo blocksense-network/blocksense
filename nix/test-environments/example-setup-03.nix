@@ -56,8 +56,6 @@ in
         ink-sepolia = {
           url = "http://127.0.0.1:${toString anvilInkSepoliaPort}";
           private-key-path = "${testKeysDir}/sequencer-private-key";
-          contract-address = upgradeableProxyADFSContractAddressInk;
-          contract-version = 2;
           transaction-gas-limit = 20000000;
           impersonated-anvil-account = impersonationAddress;
           publishing-criteria = [
@@ -70,6 +68,22 @@ in
               feed-id = 50001; # USDC / USD Pegged
               peg-to-value = 1.00;
               peg-tolerance-percentage = 0.000001; # 0.000001% tolerance assures that the price will not be pegged
+            }
+          ];
+          contracts = [
+            {
+              name = "AggregatedDataFeedStore";
+              address = upgradeableProxyADFSContractAddressInk;
+              creation-byte-code = null;
+              deployed-byte-code = null;
+              contract-version = 2;
+            }
+            {
+              name = "multicall";
+              address = "0xcA11bde05977b3631167028862bE2a173976CA11";
+              creation-byte-code = null;
+              deployed-byte-code = null;
+              contract-version = 3;
             }
           ];
         };

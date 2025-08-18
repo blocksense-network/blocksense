@@ -5,9 +5,15 @@ import { $, execa } from 'execa';
 
 import { arrayToObject } from '@blocksense/base-utils/array-iter';
 import { rootDir } from '@blocksense/base-utils/env';
+import type { NetworkName } from '@blocksense/base-utils/evm/networks';
+import { readConfig, readEvmDeployment } from '@blocksense/config-types';
 
 import { RGLogCheckerError } from './types';
 import { logMessage } from '../utils/logs';
+import type { FeedsValueAndRound } from '../utils/onchain';
+import { getDataFeedsInfoFromNetwork } from '../utils/onchain';
+
+const E2E_TESTS_FEEDS_CONFIG_DIR = `${rootDir}/apps/e2e-tests/src/process-compose/config`;
 
 const ProcessComposeStatusSchema = S.mutable(
   S.Array(
@@ -46,7 +52,7 @@ export async function startEnvironment(testEnvironment: string): Promise<void> {
   logTestEnvironmentInfo('Starting', testEnvironment);
   await execa('just', ['start-environment', testEnvironment, '--detached'], {
     env: {
-      FEEDS_CONFIG_DIR: `${rootDir}/apps/e2e-tests/src/process-compose/config`,
+      FEEDS_CONFIG_DIR: `${E2E_TESTS_FEEDS_CONFIG_DIR}`,
     },
   });
 }
@@ -105,3 +111,36 @@ export const rgSearchPattern = ({
     Effect.provide(NodeContext.layer),
   );
 };
+
+export function getInitialFeedsInfoFromNetwork(
+  network: NetworkName,
+): Effect.Effect<
+  {
+    feedIds: Array<bigint>;
+    address: `0x${string}`;
+    initialFeedsInfo: FeedsValueAndRound;
+  },
+  Error,
+  never
+> {
+  return Effect.gen(function* () {
+    const feedConfig = yield* Effect.tryPromise(() =>
+      readConfig('feeds_config_v2', E2E_TESTS_FEEDS_CONFIG_DIR),
+    );
+    const feedIds = feedConfig.feeds.map(feed => BigInt(feed.id));
+
+    const deploymentConfig = yield* Effect.tryPromise(() =>
+      readEvmDeployment(network),
+    );
+    const address = deploymentConfig?.contracts.coreContracts
+      .UpgradeableProxyADFS.address as `0x${string}`;
+
+    const initialFeedsInfo = yield* getDataFeedsInfoFromNetwork(
+      feedIds,
+      address,
+      'ink-sepolia',
+    );
+
+    return { feedIds, address, initialFeedsInfo };
+  });
+}

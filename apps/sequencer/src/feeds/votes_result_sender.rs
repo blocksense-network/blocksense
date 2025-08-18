@@ -2,19 +2,21 @@ use crate::providers::eth_send_utils::{
     eth_batch_send_to_all_contracts, get_serialized_updates_for_network,
 };
 use crate::providers::eth_send_utils::{increment_feeds_round_indexes, log_provider_enabled};
-use crate::providers::provider::{
-    ProvidersMetrics, GNOSIS_SAFE_CONTRACT_NAME, PRICE_FEED_CONTRACT_NAME,
-};
+use crate::providers::provider::ProvidersMetrics;
+
 use crate::sequencer_state::SequencerState;
 use actix_web::web::Data;
 use alloy::hex::{self, ToHexExt};
 use alloy::providers::Provider;
 use alloy_primitives::map::HashMap;
 use alloy_primitives::{Address, Bytes, Uint, U256};
+use blocksense_config::{
+    ADFS_CONTRACT_NAME, GNOSIS_SAFE_CONTRACT_NAME, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME,
+};
 use blocksense_data_feeds::feeds_processing::{
     BatchedAggregatesToSend, EncodedBatchedAggregatesToSend, EncodedVotedFeedUpdate,
 };
-use blocksense_feed_registry::types::Repeatability::Periodic;
+use blocksense_feed_registry::types::Repeatability::{self, Periodic};
 use blocksense_gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use blocksense_gnosis_safe::utils::{create_safe_tx, generate_transaction_hash, SafeMultisig};
 use blocksense_utils::counter_unbounded_channel::CountedReceiver;
@@ -205,11 +207,6 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
                 continue;
             };
 
-            if provider_settings.safe_address.is_none() {
-                info!("Network `{net}` not configured for second round consensus - skipping");
-                continue;
-            }
-
             let is_enabled_value = provider_settings.is_enabled;
 
             if let Some(provider_metrics) =
@@ -227,7 +224,21 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             } else {
                 info!("Network `{net}` is enabled; initiating second round consensus");
             }
-
+            if provider_settings
+                .get_contract_config(GNOSIS_SAFE_CONTRACT_NAME)
+                .is_none()
+            {
+                info!("Network `{net}` not configured for second round consensus - skipping");
+                continue;
+            }
+            // TODO: remove when we start using ADFS contracts
+            if provider_settings
+                .get_contract_config(ADFS_CONTRACT_NAME)
+                .is_none()
+            {
+                info!("Network `{net}` uses legacy contracts; skipping second round consensus");
+                continue;
+            }
             debug!("About to release a read lock on sequencer_config for `{net}` [default]");
             provider_settings
         };
@@ -248,6 +259,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             &provider_settings,
             feeds_config,
             &mut feeds_rounds,
+            Repeatability::Periodic,
         )
         .await
         {
@@ -274,7 +286,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             let provider = provider.lock().await;
 
             let contract_address = provider
-                .get_contract_address(PRICE_FEED_CONTRACT_NAME)
+                .get_contract_address(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
                 .unwrap_or(Address::default());
             let safe_address = provider
                 .get_contract_address(GNOSIS_SAFE_CONTRACT_NAME)
