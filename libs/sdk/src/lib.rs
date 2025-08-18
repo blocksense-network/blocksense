@@ -14,6 +14,7 @@ pub mod wit {
     // });
 }
 
+pub mod eth_rpc;
 pub mod http;
 pub mod oracle;
 
