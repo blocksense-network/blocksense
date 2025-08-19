@@ -32,7 +32,7 @@ data = "EURUSD"
 [component.revolut-api-fetcher]
 source = "target/wasm32-wasip1/release/revolut_oracle.wasm"
 allowed_outbound_hosts = [
-  "https://www.revolut.com",
+  "http://127.0.0.1:3000",
 ]
 [component.revolut-api-fetcher.build]
 command = "cargo build --target wasm32-wasip1 --release"

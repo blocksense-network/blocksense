@@ -7,12 +7,15 @@ use trigger_oracle::OracleTrigger;
 
 type Command = TriggerExecutorCommand<OracleTrigger>;
 
+use std::str::FromStr;
 use std::time::Duration;
 use tokio::task::{JoinHandle, LocalSet};
 
-use actix_web::{post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{post, web, App, HttpRequest, HttpResponse, HttpServer, Responder};
 use futures::future::join_all;
 use futures_util::stream::FuturesUnordered;
+
+use reqwest::header as reqwest_header;
 
 #[derive(Debug, Deserialize)]
 struct Params {
@@ -20,6 +23,7 @@ struct Params {
     endpoint_url: String,
     #[serde(default = "default_getter")]
     request_method: String,
+    request_body: Option<String>,
 }
 
 fn default_getter() -> String {
@@ -27,7 +31,7 @@ fn default_getter() -> String {
 }
 
 #[post("/")]
-async fn timing_out_request(payload: web::Payload) -> impl Responder {
+async fn timing_out_request(req: HttpRequest, payload: web::Payload) -> impl Responder {
     // payload is a stream of Bytes objects
     let payload = match payload.to_bytes().await {
         Ok(bytes) => serde_json::from_slice::<Params>(&bytes).unwrap(),
@@ -38,38 +42,73 @@ async fn timing_out_request(payload: web::Payload) -> impl Responder {
         }
     };
 
+    let headers = req.headers();
+
+    let mut reqwest_headers = reqwest_header::HeaderMap::new();
+
+    for (key, value) in headers.iter() {
+        if key == "host" {
+            continue;
+        }
+        reqwest_headers.insert(
+            match reqwest_header::HeaderName::from_str(key.as_str()) {
+                Ok(header) => header,
+                Err(e) => {
+                    let err_msg = format!("Error parsing header key {key}: {e}");
+                    tracing::error!(err_msg);
+                    return HttpResponse::BadRequest().body(err_msg);
+                }
+            },
+            match reqwest_header::HeaderValue::from_bytes(value.as_bytes()) {
+                Ok(val) => val,
+                Err(e) => {
+                    let err_msg = format!("Error parsing header value {value:?}: {e}");
+                    tracing::error!(err_msg);
+                    return HttpResponse::BadRequest().body(err_msg);
+                }
+            },
+        );
+    }
+
     let endpoint_url = &payload.endpoint_url;
 
     let client = reqwest::Client::new();
     let response = match payload.request_method.as_str() {
-        "POST" => match actix_web::rt::time::timeout(
-            Duration::from_secs(payload.seconds),
-            client.post(endpoint_url).send(),
-        )
-        .await
-        {
-            Ok(resp_result) => match resp_result {
-                Ok(r) => r,
+        "POST" => {
+            let mut send_future = client.post(endpoint_url).headers(reqwest_headers);
+            if let Some(body) = payload.request_body {
+                send_future = send_future.body(body);
+            }
+            match actix_web::rt::time::timeout(
+                Duration::from_secs(payload.seconds),
+                send_future.send(),
+            )
+            .await
+            {
+                Ok(resp_result) => match resp_result {
+                    Ok(r) => r,
+                    Err(e) => {
+                        let err_msg = format!(
+                            "failed to get response for POST request to {endpoint_url}: {e}"
+                        );
+                        tracing::error!(err_msg);
+                        return HttpResponse::BadRequest().body(err_msg);
+                    }
+                },
                 Err(e) => {
                     let err_msg =
                         format!("failed to get response for POST request to {endpoint_url}: {e}");
                     tracing::error!(err_msg);
                     return HttpResponse::BadRequest().body(err_msg);
                 }
-            },
-            Err(e) => {
-                let err_msg =
-                    format!("failed to get response for POST request to {endpoint_url}: {e}");
-                tracing::error!(err_msg);
-                return HttpResponse::BadRequest().body(err_msg);
             }
-        },
+        }
         _ =>
         // Make a GET request
         {
             match actix_web::rt::time::timeout(
                 Duration::from_secs(payload.seconds),
-                client.get(&payload.endpoint_url).send(),
+                client.get(endpoint_url).headers(reqwest_headers).send(),
             )
             .await
             {

@@ -24,7 +24,7 @@ data = '{"pair":{"base":"LQD","quote":"amount"},"decimals":6,"category":"","mark
 
 [component.spout-rwa]
 source = "../target/wasm32-wasip1/release/spout_rwa.wasm"
-allowed_outbound_hosts = ["https://rwa-deploy-backend.onrender.com"]
+allowed_outbound_hosts = ["http://127.0.0.1:3000"]
 
 [[trigger.oracle.capabilities]]
 data = "x"
