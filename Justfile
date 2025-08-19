@@ -1,6 +1,5 @@
 root-dir := justfile_directory()
 spin-data-dir := root-dir + "/target/spin-artifacts"
-system := `nix eval --raw --impure --expr 'builtins.currentSystem'`
 process-compose-artifacts-dir := root-dir + "/config/generated/process-compose"
 
 default:
@@ -21,7 +20,7 @@ list-devshells:
 list-environments:
   #!/usr/bin/env bash
   nix eval --impure -L --json --apply builtins.attrNames \
-    .#legacyPackages.{{system}}.process-compose-environments \
+    .#legacyPackages.${system}.process-compose-environments \
     2>/dev/null \
     | jq -r '.[]'
 
@@ -38,7 +37,7 @@ build-environment environment="all":
     cp -rf --no-preserve=mode,ownership "$srcDir"/. {{process-compose-artifacts-dir}}
   else
     destDir="{{process-compose-artifacts-dir}}/{{environment}}"
-    srcDir=$(nix build --impure -L --json .#legacyPackages.{{system}}.process-compose-environments.{{environment}} | jq -r '.[0].outputs.out')
+    srcDir=$(nix build --impure -L --json .#legacyPackages.${system}.process-compose-environments.{{environment}} | jq -r '.[0].outputs.out')
     cp -rf --no-preserve=mode,ownership "$srcDir"/. "$destDir"
   fi
   echo "Process Compose artifacts copied to {{process-compose-artifacts-dir}}"
