@@ -5,7 +5,7 @@ set -euo pipefail
 SPIN_DATA_DIR="$GIT_ROOT/target/spin-artifacts"
 mkdir -p $SPIN_DATA_DIR
 
-IFS='-' read -r ARCH OS <<< $($GIT_ROOT/scripts/get-host-arch-and-os.sh)
+IFS='-' read -r ARCH OS <<<$($GIT_ROOT/scripts/get-host-arch-and-os.sh)
 
 ARCHIVE_PATH="$SPIN_DATA_DIR/trigger-oracle.tar.gz"
 
@@ -17,7 +17,7 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 MANIFEST_PATH="$TMP_DIR/trigger-oracle.json"
 
-cat > $MANIFEST_PATH << EOF
+cat >$MANIFEST_PATH <<EOF
 {
     "name": "trigger-oracle",
     "description": "Run Blocksense oracle components at timed intervals",
@@ -36,4 +36,4 @@ cat > $MANIFEST_PATH << EOF
 }
 EOF
 
-SPIN_DATA_DIR="$SPIN_DATA_DIR" spin plugin install --file $MANIFEST_PATH --yes
+SPIN_DATA_DIR="$SPIN_DATA_DIR" nix run .#spinUnwrapped -- plugin install --file $MANIFEST_PATH --yes
