@@ -238,7 +238,7 @@ async fn load_data_from_chain(
                 provider.round_counters = round_counters;
             }
             Err(err) => {
-                panic!("Error when loading round counters for {network} = {err}");
+                error!("Error when loading round counters for {network} = {err}");
             }
         }
     } else {
