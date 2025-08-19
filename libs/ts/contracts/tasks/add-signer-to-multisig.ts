@@ -7,7 +7,7 @@ import {
   EthereumAddress,
   parseEthereumAddress,
 } from '@blocksense/base-utils';
-import { readEvmDeployment } from '@blocksense/config-types';
+import { readEvmDeployment } from '@blocksense/config-types/read-write-config';
 
 import { initChain } from './deployment-utils/init-chain';
 import { executeMultisigTransaction } from './deployment-utils/multisig-tx-exec';

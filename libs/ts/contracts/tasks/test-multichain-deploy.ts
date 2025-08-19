@@ -6,7 +6,10 @@ import { OperationType } from '@safe-global/safe-core-sdk-types';
 
 import { ContractNames } from './types';
 
-import { readEvmDeployment, readConfig } from '@blocksense/config-types';
+import {
+  readEvmDeployment,
+  readConfig,
+} from '@blocksense/config-types/read-write-config';
 import { encodeDataAndTimestamp } from '../test/utils/helpers/common';
 import { Feed, WriteOp } from '../test/utils/wrappers/types';
 
