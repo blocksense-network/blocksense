@@ -211,7 +211,7 @@ id = "YAHOO_API_KEY"
 [component.yahoo]
 source = "target/wasm32-wasip1/release/yahoo_oracle.wasm"
 allowed_outbound_hosts = [
-  "https://yfapi.net:443",
+  "http://127.0.0.1:3000",
 ]
 [component.yahoo.build]
 command = "cargo build --target wasm32-wasip1 --release"

@@ -139,18 +139,20 @@ async fn fetch_all_prices(resources: &Vec<FeedConfig>, timeout_secs: u64) -> Res
         if let Some(pools) = pools_by_network.get(network) {
             for pools in pools.chunks(50) {
                 let response = fetch_pools_data_for_network(network, pools, timeout_secs).await;
+                let pools_addresses = pools
+                  .iter()
+                  .map(|x| x.pool.to_string())
+                  .collect::<Vec<String>>()
+                  .join(",");
+
                 match response {
                     Ok(re) => {
                         for d in re.data {
                             res.entry(d.feed_id.clone()).or_default().push(d);
                         }
+                        println!("ℹ️ Successfully fetched prices from network for {network}. Pools {pools_addresses}");
                     }
                     Err(err) => {
-                        let pools_addresses = pools
-                            .iter()
-                            .map(|x| x.pool.to_string())
-                            .collect::<Vec<String>>()
-                            .join(",");
                         println!("❌ Error fetching prices from network for {network}: {err:?}. Pools {pools_addresses}");
                     }
                 };

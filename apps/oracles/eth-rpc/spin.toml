@@ -43,13 +43,7 @@ data = '{"pair":{"base":"oLP","quote":"USDC"},"decimals":0,"category":"","market
 [component.eth-rpc]
 source = "../target/wasm32-wasip1/release/eth_rpc.wasm"
 allowed_outbound_hosts = [
-  "https://eth.llamarpc.com",
-  "https://rpc.eth.gateway.fm",
-  "https://ethereum-rpc.publicnode.com",
-  "https://binance.llamarpc.com",
-  "https://bsc.meowrpc.com",
-  "https://bsc.drpc.org",
-  "https://arbitrum-one-rpc.publicnode.com",
+  "http://127.0.0.1:3000"
 ]
 
 [component.eth-rpc.build]

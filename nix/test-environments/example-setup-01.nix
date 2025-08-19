@@ -1,7 +1,4 @@
-{
-  lib,
-  ...
-}:
+{ lib, ... }:
 let
   # Function to read and parse the JSON file
   readJson = path: builtins.fromJSON (builtins.readFile path);
@@ -216,31 +213,21 @@ in
       gecko-terminal = {
         exec-interval = 10;
         allowed-outbound-hosts = [
-          "https://api.geckoterminal.com"
+          "http://127.0.0.1:3000"
         ];
       };
 
       eth-rpc = {
         exec-interval = 10;
         allowed-outbound-hosts = [
-          "https://arbitrum-one-rpc.publicnode.com"
-          "https://eth.llamarpc.com"
-          "https://rpc.eth.gateway.fm"
-          "https://ethereum-rpc.publicnode.com"
-          "https://binance.llamarpc.com"
-          "https://bsc.meowrpc.com"
-          "https://bsc.drpc.org"
+          "http://127.0.0.1:3000"
         ];
       };
 
       stock-price-feeds = {
         exec-interval = 60;
         allowed-outbound-hosts = [
-          "https://data.alpaca.markets"
-          "https://www.alphavantage.co"
-          "https://yfapi.net"
-          "https://api.twelvedata.com"
-          "https://financialmodelingprep.com"
+          "http://127.0.0.1:3000"
         ];
         api-keys = [
           "APCA_API_KEY_ID"
@@ -254,7 +241,7 @@ in
       spout-rwa = {
         exec-interval = 60;
         allowed-outbound-hosts = [
-          "https://rwa-deploy-backend.onrender.com/"
+          "http://127.0.0.1:3000"
         ];
         api-keys = [
           "SPOUT_RWA_API_KEY"

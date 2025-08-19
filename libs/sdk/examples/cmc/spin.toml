@@ -855,7 +855,7 @@ id = "CMC_API_KEY"
 
 [component.coinmarketcap]
 source = "target/wasm32-wasip1/release/cmc_oracle.wasm"
-allowed_outbound_hosts = ["https://pro-api.coinmarketcap.com"]
+allowed_outbound_hosts = ["http://127.0.0.1:3000"]
 
 [component.coinmarketcap.build]
 command = "cargo build --target wasm32-wasip1 --release"

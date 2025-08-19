@@ -146,12 +146,12 @@ type MyProvider = alloy::providers::fillers::FillProvider<
     alloy::providers::RootProvider,
 >;
 
-async fn fetch_all(resourses: &[FeedConfig]) -> Result<FetchedDataHashMap> {
+async fn fetch_all(resourses: &[FeedConfig], timeout_secs: u64) -> Result<FetchedDataHashMap> {
     let mut res = FetchedDataHashMap::new();
     for feed_config in resourses {
         let mut responses = vec![];
         for contract in &feed_config.arguments.contracts {
-            if let Some(value) = contract.fetch(feed_config.feed_id).await {
+            if let Some(value) = contract.fetch(feed_config.feed_id, timeout_secs).await {
                 responses.push(value);
             }
         }
@@ -190,7 +190,7 @@ impl Contract {
         RequestEthCall::latest(&calldata, &self.address, id)
     }
 
-    async fn fetch(&self, id: FeedId) -> Option<ResponseEthCall> {
+    async fn fetch(&self, id: FeedId, timeout_secs: u64) -> Option<ResponseEthCall> {
         let mut last_value = None;
         for rpc_url_candidate in &self.rpc_urls {
             if let Ok(rpc_url) = rpc_url_candidate.as_str().parse::<Url>() {
@@ -200,7 +200,7 @@ impl Contract {
                     None => break,
                 };
                 if let Ok(mut value) =
-                    http_post_json::<RequestEthCall, ResponseEthCall>(rpc_url.as_str(), eth_call)
+                    http_post_json::<RequestEthCall, ResponseEthCall>(rpc_url.as_str(), eth_call, timeout_secs)
                         .await
                 {
                     value.rpc_url = Some(rpc_url_candidate.clone());
@@ -333,9 +333,10 @@ fn print_results(results: &FetchedDataHashMap, payload: &Payload, resourses: &[F
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
-    println!("Starting oracle component - Etherium RPC");
+    println!("Starting oracle component - Ethereum RPC");
+    let timeout_secs = settings.interval_time_in_seconds - 1;
     let resources = get_resources_from_settings(&settings)?;
-    let results = fetch_all(&resources).await?;
+    let results = fetch_all(&resources, timeout_secs).await?;
     let payload = process_results(&results, &resources)?;
     print_results(&results, &payload, &resources);
     Ok(payload)
