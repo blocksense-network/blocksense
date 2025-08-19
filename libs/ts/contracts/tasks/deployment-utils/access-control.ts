@@ -201,32 +201,38 @@ export async function setUpAccessControl({
       .createEnableModuleTx(deployData.safe.AdminExecutorModule!.address)
       .then(tx => tx.data),
 
-    ...config.reporterMultisig.owners.map(ownerAddress =>
-      reporterMultisig
-        .createAddOwnerTx({
-          ownerAddress,
-        })
-        .then(tx => tx.data),
-    ),
+    ...config.reporterMultisig.owners
+      .filter(o => o != deployerAddress)
+      .map(ownerAddress =>
+        reporterMultisig
+          .createAddOwnerTx({
+            ownerAddress,
+          })
+          .then(tx => tx.data),
+      ),
 
-    {
-      to: reporterMultisigAddress,
-      value: '0',
-      // removeOwner(address prevOwner, address owner, uint256 threshold);
-      data:
-        '0xf8dc5dd9' +
-        abiCoder
-          .encode(
-            ['address', 'address', 'uint256'],
-            [
-              config.reporterMultisig.owners[0],
-              deployerAddress,
-              config.reporterMultisig.threshold,
-            ],
-          )
-          .slice(2),
-      operation: OperationType.Call,
-    },
+    ...(!config.reporterMultisig.owners.includes(deployerAddress)
+      ? [
+          {
+            to: reporterMultisigAddress,
+            value: '0',
+            // removeOwner(address prevOwner, address owner, uint256 threshold);
+            data:
+              '0xf8dc5dd9' +
+              abiCoder
+                .encode(
+                  ['address', 'address', 'uint256'],
+                  [
+                    config.reporterMultisig.owners[0],
+                    deployerAddress,
+                    config.reporterMultisig.threshold,
+                  ],
+                )
+                .slice(2),
+            operation: OperationType.Call,
+          },
+        ]
+      : []),
   ]);
 
   console.log(

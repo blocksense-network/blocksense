@@ -7,6 +7,7 @@ import { hexlify, toUtf8Bytes } from 'ethers';
 
 import { NetworkConfig } from '../types';
 import { checkAddressExists } from '../utils';
+import { sendTx } from './send-tx';
 
 type Params = {
   config: NetworkConfig;
@@ -64,15 +65,11 @@ export async function deployMultisig({ config, type }: Params): Promise<Safe> {
     const deploymentTransaction =
       await protocolKit.createSafeDeploymentTransaction();
 
-    const transactionHash = await config.deployer.sendTransaction({
+    const transactionReceipt = await sendTx({
+      config,
       to: deploymentTransaction.to,
-      value: BigInt(deploymentTransaction.value),
-      data: deploymentTransaction.data as `0x${string}`,
+      data: deploymentTransaction.data,
     });
-
-    const transactionReceipt = await config.provider.waitForTransaction(
-      transactionHash.hash,
-    );
 
     console.log('     ✅ Safe deployment tx hash:', transactionReceipt?.hash);
   }

@@ -1,14 +1,8 @@
-import { Command } from '@effect/cli';
+import * as Command from '@effect/cli/Command';
 
-import packageJson from '../package.json';
-
-import { listFeeds } from './commands/list-feeds';
-
-const command = Command.make('changelog-generator').pipe(
-  Command.withSubcommands([listFeeds]),
-);
+const command = Command.make('hello');
 
 export const run = Command.run(command, {
-  name: packageJson.description,
-  version: packageJson.version,
+  name: 'Hello World',
+  version: '0.0.0',
 });
