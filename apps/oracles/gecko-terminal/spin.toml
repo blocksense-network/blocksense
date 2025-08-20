@@ -72,7 +72,7 @@ data = '{"pair":{"base":"cbBTC","quote":"USD"},"decimals":8,"category":"Crypto",
 
 [component.gecko-terminal]
 source = "../target/wasm32-wasip1/release/gecko_terminal.wasm"
-allowed_outbound_hosts = ["http://127.0.0.1:3000"]
+allowed_outbound_hosts = ["https://api.geckoterminal.com"]
 
 [component.gecko-terminal.build]
 command = "cargo build --target wasm32-wasip1 --release"
