@@ -45,8 +45,13 @@ impl<'a> PricesFetcher<'a> for GeminiPriceFetcher<'a> {
             let mut prices = PairPriceData::new();
 
             while let Some(result) = futures.next().await {
-                if let Ok((symbol, price_pint)) = result {
-                    prices.insert(symbol, price_pint);
+                match result {
+                    Ok((symbol, price_pint)) => {
+                        prices.insert(symbol, price_pint);
+                    }
+                    Err(err) => {
+                        anyhow::bail!("Error processing future in GeminiPriceFetcher {err:?}")
+                    }
                 }
             }
 
