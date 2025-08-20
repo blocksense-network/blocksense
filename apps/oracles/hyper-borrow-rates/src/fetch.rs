@@ -9,6 +9,7 @@ use crate::{
         RatesPerFeedPerMarket,
     },
     providers::{
+        euler::fetch_borrow_rates_from_euler,
         hyperdrive::fetch_borrow_rates_from_hyperdrive,
         hyperlend::{
             HyperLendUi, HYPERLAND_POOL_ADDRESSES_PROVIDER, HYPERLAND_UI_POOL_DATA_PROVIDER,
@@ -55,7 +56,12 @@ async fn fetch_market<'a>(
         Marketplace::HyperDrive => Ok((
             Marketplace::HyperDrive,
             fetch_borrow_rates_from_hyperdrive(feeds_config).await,
-        ))
+        )),
+
+        Marketplace::EulerFinance => Ok((
+            Marketplace::EulerFinance,
+            fetch_borrow_rates_from_euler(feeds_config).await,
+        )),
     }
 }
 
@@ -77,6 +83,10 @@ pub async fn collect_borrow_rates(feeds_config: &Vec<FeedConfig>) -> Result<Rate
     futures.push(fetch_market(
         Marketplace::HyperDrive,
         grouped_feeds.get(&Marketplace::HyperDrive),
+    ));
+    futures.push(fetch_market(
+        Marketplace::EulerFinance,
+        grouped_feeds.get(&Marketplace::EulerFinance),
     ));
 
     while let Some(result) = futures.next().await {

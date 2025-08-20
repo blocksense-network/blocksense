@@ -13,7 +13,7 @@ use blocksense_sdk::{
 
 use crate::utils::logging::print_payload;
 
-use crate::domain::{get_resources_from_settings, Marketplace};
+use crate::domain::get_resources_from_settings;
 use crate::fetch::collect_borrow_rates;
 
 #[oracle_component]

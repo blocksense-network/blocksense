@@ -13,6 +13,9 @@ pub type FeedId = u128;
 pub struct OracleArgs {
     pub marketplace: String,
     pub market_id: Option<String>,
+    pub network: Option<String>,
+    pub utils_lens_address: Option<Address>,
+    pub vault_address: Option<Address>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -45,6 +48,7 @@ pub enum Marketplace {
     HypurrFi,
     HyperLend,
     HyperDrive,
+    EulerFinance,
 }
 
 impl FromStr for Marketplace {
@@ -55,6 +59,7 @@ impl FromStr for Marketplace {
             "HypurrFi" => Ok(Marketplace::HypurrFi),
             "HyperLend" => Ok(Marketplace::HyperLend),
             "HyperDrive" => Ok(Marketplace::HyperDrive),
+            "EulerFinance" => Ok(Marketplace::EulerFinance),
             _ => Err(anyhow::anyhow!("Unknown marketplace: {}", s)),
         }
     }
