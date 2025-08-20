@@ -28,6 +28,7 @@ with lib.fileset;
       (lib.path.append root "apps/sequencer_tests/SafeProxyFactory.json")
       (lib.path.append root "apps/oracles/hyper-borrow-rates/src/abi/HyperLand/UiPoolDataProvider.json")
       (lib.path.append root "apps/oracles/hyper-borrow-rates/src/abi/HypurrFi/UiPoolDataProvider.json")
+      (lib.path.append root "apps/oracles/hyper-borrow-rates/src/abi/Euler/utilsLens.json")
       (lib.path.append root "libs/gnosis_safe/safe_abi.json")
     ];
     src = toSource { inherit root fileset; };

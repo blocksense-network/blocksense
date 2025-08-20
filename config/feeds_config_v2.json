@@ -42579,6 +42579,111 @@
       }
     },
     {
+      "id": "102151",
+      "full_name": "USDC Euler Yield Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time USDC borrow rate (APR) from Euler Yield Market on Ethereum Mainnet. ref: https://app.euler.finance/vault/0xe0a80d35bB6618CBA260120b279d357978c42BCE?network=ethereum",
+      "type": "price-feed",
+      "oracle_id": "hyper-borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "USDC",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "hyper-borrow-rates",
+          "marketplace": "EulerFinance",
+          "network": "ethereum-mainnet",
+          "utils_lens_address": "0xB8cac3e5CaaC2042B79938aFe7FEA3f44e5afcC1",
+          "vault_address": "0xe0a80d35bB6618CBA260120b279d357978c42BCE"
+        }
+      }
+    },
+    {
+      "id": "102152",
+      "full_name": "USDT Euler Yield Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time USDT borrow rate (APR) from Euler Yield Market on Ethereum Mainnet. ref: https://app.euler.finance/vault/0x7c280DBDEf569e96c7919251bD2B0edF0734C5A8?network=ethereum",
+      "type": "price-feed",
+      "oracle_id": "hyper-borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "USDT",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "hyper-borrow-rates",
+          "marketplace": "EulerFinance",
+          "network": "ethereum-mainnet",
+          "utils_lens_address": "0xB8cac3e5CaaC2042B79938aFe7FEA3f44e5afcC1",
+          "vault_address": "0x7c280DBDEf569e96c7919251bD2B0edF0734C5A8"
+        }
+      }
+    },
+    {
+      "id": "102153",
+      "full_name": "WETH Euler Prime Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time WETH borrow rate (APR) from Euler Prime Market on Ethereum Mainnet. ref: https://app.euler.finance/vault/0xD8b27CF359b7D15710a5BE299AF6e7Bf904984C2?network=ethereum",
+      "type": "price-feed",
+      "oracle_id": "hyper-borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "WETH",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "hyper-borrow-rates",
+          "marketplace": "EulerFinance",
+          "network": "ethereum-mainnet",
+          "utils_lens_address": "0xB8cac3e5CaaC2042B79938aFe7FEA3f44e5afcC1",
+          "vault_address": "0xD8b27CF359b7D15710a5BE299AF6e7Bf904984C2"
+        }
+      }
+    },
+    {
       "id": "1000000",
       "full_name": "WMON / USD",
       "description": "Price of Wrapped Monad in USD on Monad Testnet",
