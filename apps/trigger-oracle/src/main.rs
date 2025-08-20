@@ -1,5 +1,6 @@
 use anyhow::{Context, Error};
 use clap::Parser;
+use http::Uri;
 use spin_trigger::cli::TriggerExecutorCommand;
 use std::io::IsTerminal;
 use trigger_oracle::{OracleTrigger, Params};
@@ -44,8 +45,18 @@ async fn timing_out_request(req: HttpRequest, payload: web::Payload) -> impl Res
                 .split("|")
                 .map(|s| s.to_string())
                 .collect();
+            let payload_uri = match Uri::from_str(payload.endpoint_url.as_str()) {
+                Ok(uri) => uri,
+                Err(e) => {
+                    let err_msg =
+                        format!("Not a valid uri in payload = {}: {e}", payload.endpoint_url);
+                    tracing::error!(err_msg);
+                    return HttpResponse::BadRequest().body(err_msg);
+                }
+            };
+
             for allowed_host in allowed_hosts {
-                if payload.endpoint_url.contains(allowed_host.as_str()) {
+                if payload_uri.host() == Some(allowed_host.as_str()) {
                     allowed = true;
                     break;
                 }
