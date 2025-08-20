@@ -998,13 +998,13 @@ impl OutboundWasiHttpHandler for HttpRuntimeData {
                     .iter()
                     .map(|hc| match hc.host() {
                         spin_outbound_networking::HostConfig::List(items) => Ok(items.join("|")),
-                        _ => Err(()),
+                        cfg => Err(cfg),
                     })
                     .collect::<Result<Vec<_>, _>>()
                 {
                     Ok(hosts) => hosts,
-                    Err(()) => {
-                        eprintln!("Error collecting allowed hosts from config!");
+                    Err(cfg) => {
+                        eprintln!("Error collecting allowed hosts from config {cfg:?}!");
                         return Err(ErrorCode::HttpRequestDenied.into());
                     }
                 };

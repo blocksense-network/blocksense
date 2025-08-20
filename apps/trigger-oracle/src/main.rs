@@ -1,4 +1,4 @@
-use anyhow::Error;
+use anyhow::{Context, Error};
 use clap::Parser;
 use spin_trigger::cli::TriggerExecutorCommand;
 use std::io::IsTerminal;
@@ -186,15 +186,12 @@ async fn main() -> Result<(), Error> {
                     .name("timing_out_server_runner")
                     .spawn(async move {
                         tracing::info!("Starting timing out server on port 3000 ...");
-                        match HttpServer::new(|| App::new().service(timing_out_request))
+                        HttpServer::new(|| App::new().service(timing_out_request))
                             .bind("127.0.0.1:3000")
                             .expect("Could not start timing out server on port 3000")
                             .run()
                             .await
-                        {
-                            Ok(v) => Ok(v),
-                            Err(e) => Err(anyhow::anyhow!(e.to_string())),
-                        }
+                            .context("Failed timing out server")
                     })
                     .expect("Failed to spawn timing_out server!");
 
