@@ -6,7 +6,7 @@ name = "Hyper"
 version = "0.1.0"
 
 [application.trigger.settings]
-interval_time_in_seconds = 10
+interval_time_in_seconds = 3
 reporter_id = 0
 sequencer = "http://127.0.0.1:8877/post_reports_batch"
 secret_key = "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003"
@@ -15,7 +15,7 @@ kafka_endpoint = "http://127.0.0.1:9092"
 
 [[trigger.oracle]]
 component = "hyper-borrow-rates"
-interval_time_in_seconds = 10
+interval_time_in_seconds = 3
 capabilities = []
 
 [[trigger.oracle.data_feeds]]
@@ -102,11 +102,30 @@ stride = 0
 decimals = 18
 data = '{"pair":{"base":"USDhl","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"hyper-borrow-rates","market_id":"5","marketplace":"HyperDrive"}}'
 
+[[trigger.oracle.data_feeds]]
+id = "102151"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"USDC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"hyper-borrow-rates","marketplace":"EulerFinance","network":"ethereum-mainnet","utils_lens_address":"0xB8cac3e5CaaC2042B79938aFe7FEA3f44e5afcC1","vault_address":"0xe0a80d35bB6618CBA260120b279d357978c42BCE"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102152"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"USDT","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"hyper-borrow-rates","marketplace":"EulerFinance","network":"ethereum-mainnet","utils_lens_address":"0xB8cac3e5CaaC2042B79938aFe7FEA3f44e5afcC1","vault_address":"0x7c280DBDEf569e96c7919251bD2B0edF0734C5A8"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102153"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"WETH","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"hyper-borrow-rates","marketplace":"EulerFinance","network":"ethereum-mainnet","utils_lens_address":"0xB8cac3e5CaaC2042B79938aFe7FEA3f44e5afcC1","vault_address":"0xD8b27CF359b7D15710a5BE299AF6e7Bf904984C2"}}'
+
 [component.hyper-borrow-rates]
 source = "../target/wasm32-wasip1/release/hyper_borrow_rates.wasm"
 allowed_outbound_hosts = [
   "https://rpc.hyperliquid.xyz",
-  "https://api.hyperdrive.fi/",
+  "https://api.hyperdrive.fi",
+  "https://eth.llamarpc.com",
 ]
 
 [component.hyper-borrow-rates.build]

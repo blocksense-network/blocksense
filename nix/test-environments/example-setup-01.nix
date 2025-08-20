@@ -269,7 +269,8 @@ in
         exec-interval = 10;
         allowed-outbound-hosts = [
           "https://rpc.hyperliquid.xyz"
-          "https://api.hyperdrive.fi/"
+          "https://api.hyperdrive.fi"
+          "https://eth.llamarpc.com"
         ];
       };
     };

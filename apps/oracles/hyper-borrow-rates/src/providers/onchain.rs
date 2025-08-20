@@ -10,6 +10,7 @@ use url::Url;
 use crate::{domain::BorrowRateInfo, utils::math::ray_to_apr};
 
 const RPC_URL: &str = "https://rpc.hyperliquid.xyz/evm";
+pub const ETHEREUM_MAINNET_RPC_URL: &str = "https://eth.llamarpc.com";
 
 #[derive(Debug, Clone)]
 pub struct ReserveLike {
