@@ -13,6 +13,9 @@ pub type FeedId = u128;
 pub struct OracleArgs {
     pub marketplace: String,
     pub market_id: Option<String>,
+    pub network: Option<String>,
+    pub utils_lens_address: Option<Address>,
+    pub vault_address: Option<Address>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -40,28 +43,30 @@ pub type RatesPerFeed = HashMap<FeedId, BorrowRateInfo>;
 
 pub type RatesPerFeedPerMarket = HashMap<Marketplace, RatesPerFeed>;
 
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 pub enum Marketplace {
     HypurrFi,
     HyperLend,
     HyperDrive,
+    EulerFinance,
 }
 
 impl FromStr for Marketplace {
     type Err = anyhow::Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "HypurrFi" => Ok(Marketplace::HypurrFi),
-            "HyperLend" => Ok(Marketplace::HyperLend),
-            "HyperDrive" => Ok(Marketplace::HyperDrive),
-            _ => Err(anyhow::anyhow!("Unknown marketplace: {}", s)),
-        }
+        Ok(match s {
+            "HypurrFi" => Marketplace::HypurrFi,
+            "HyperLend" => Marketplace::HyperLend,
+            "HyperDrive" => Marketplace::HyperDrive,
+            "EulerFinance" => Marketplace::EulerFinance,
+            _ => anyhow::bail!("Unknown marketplace: {}", s),
+        })
     }
 }
 
 pub fn group_feeds_by_marketplace(
-    feeds_config: &Vec<FeedConfig>,
+    feeds_config: &[FeedConfig],
 ) -> HashMap<Marketplace, Vec<FeedConfig>> {
     let mut grouped: HashMap<Marketplace, Vec<FeedConfig>> = HashMap::new();
 
@@ -79,7 +84,7 @@ pub fn group_feeds_by_marketplace(
 
 pub fn map_assets_to_feeds(
     rates: Vec<BorrowRateInfo>,
-    feeds_config: &Vec<FeedConfig>,
+    feeds_config: &[FeedConfig],
 ) -> RatesPerFeed {
     let rates_map: HashMap<_, _> = rates.into_iter().map(|r| (r.asset.clone(), r)).collect();
 
