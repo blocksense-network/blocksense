@@ -37,7 +37,11 @@ data = '{"pair":{"base":"LQD","quote":"USD"},"decimals":8,"category":"Equities",
 [component.stock-price-feeds]
 source = "../target/wasm32-wasip1/release/stock_price_feeds.wasm"
 allowed_outbound_hosts = [
-  "http://127.0.0.1:3000"
+  "https://data.alpaca.markets",
+  "https://www.alphavantage.co",
+  "https://yfapi.net",
+  "https://api.twelvedata.com",
+  "https://financialmodelingprep.com",
 ]
 
 [[trigger.oracle.capabilities]]

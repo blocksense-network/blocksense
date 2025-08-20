@@ -1,9 +1,8 @@
 use anyhow::Error;
 use clap::Parser;
-use serde::Deserialize;
 use spin_trigger::cli::TriggerExecutorCommand;
 use std::io::IsTerminal;
-use trigger_oracle::OracleTrigger;
+use trigger_oracle::{OracleTrigger, Params};
 
 type Command = TriggerExecutorCommand<OracleTrigger>;
 
@@ -16,19 +15,6 @@ use futures::future::join_all;
 use futures_util::stream::FuturesUnordered;
 
 use reqwest::header as reqwest_header;
-
-#[derive(Debug, Deserialize)]
-struct Params {
-    seconds: u64,
-    endpoint_url: String,
-    #[serde(default = "default_getter")]
-    request_method: String,
-    request_body: Option<String>,
-}
-
-fn default_getter() -> String {
-    "GET".to_owned()
-}
 
 #[post("/")]
 async fn timing_out_request(req: HttpRequest, payload: web::Payload) -> impl Responder {
@@ -48,6 +34,28 @@ async fn timing_out_request(req: HttpRequest, payload: web::Payload) -> impl Res
 
     for (key, value) in headers.iter() {
         if key == "host" {
+            continue;
+        }
+        if key == "Allowed-Hosts" {
+            let mut allowed = false;
+            let allowed_hosts: Vec<String> = value
+                .to_str()
+                .unwrap()
+                .split("|")
+                .map(|s| s.to_string())
+                .collect();
+            for allowed_host in allowed_hosts {
+                if payload.endpoint_url.contains(allowed_host.as_str()) {
+                    allowed = true;
+                    break;
+                }
+            }
+            if !allowed {
+                tracing::error!("To allow requests, add 'allowed_outbound_hosts = [\"{}\"]' to the manifest component section.", payload.endpoint_url);
+                let err_msg = format!("Destination not allowed: {}", payload.endpoint_url);
+                tracing::error!(err_msg);
+                return HttpResponse::BadRequest().body(err_msg);
+            }
             continue;
         }
         reqwest_headers.insert(

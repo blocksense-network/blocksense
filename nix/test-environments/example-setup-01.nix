@@ -196,7 +196,21 @@ in
       cex-price-feeds = {
         exec-interval = 40;
         allowed-outbound-hosts = [
-          "http://127.0.0.1:3000"
+          "https://api.kraken.com"
+          "https://api.bybit.com"
+          "https://api.coinbase.com"
+          "https://api.exchange.coinbase.com"
+          "https://api1.binance.com"
+          "https://api.kucoin.com"
+          "https://api.mexc.com"
+          "https://api.crypto.com"
+          "https://api.binance.us"
+          "https://api.gemini.com"
+          "https://api-pub.bitfinex.com"
+          "https://api.upbit.com"
+          "https://api.bitget.com"
+          "https://api.gateio.ws"
+          "https://www.okx.com"
         ];
       };
 
@@ -213,21 +227,31 @@ in
       gecko-terminal = {
         exec-interval = 10;
         allowed-outbound-hosts = [
-          "http://127.0.0.1:3000"
+          "https://api.geckoterminal.com"
         ];
       };
 
       eth-rpc = {
         exec-interval = 10;
         allowed-outbound-hosts = [
-          "http://127.0.0.1:3000"
+          "https://arbitrum-one-rpc.publicnode.com"
+          "https://eth.llamarpc.com"
+          "https://rpc.eth.gateway.fm"
+          "https://ethereum-rpc.publicnode.com"
+          "https://binance.llamarpc.com"
+          "https://bsc.meowrpc.com"
+          "https://bsc.drpc.org"
         ];
       };
 
       stock-price-feeds = {
         exec-interval = 60;
         allowed-outbound-hosts = [
-          "http://127.0.0.1:3000"
+          "https://data.alpaca.markets"
+          "https://www.alphavantage.co"
+          "https://yfapi.net"
+          "https://api.twelvedata.com"
+          "https://financialmodelingprep.com"
         ];
         api-keys = [
           "APCA_API_KEY_ID"
@@ -241,7 +265,7 @@ in
       spout-rwa = {
         exec-interval = 60;
         allowed-outbound-hosts = [
-          "http://127.0.0.1:3000"
+          "https://rwa-deploy-backend.onrender.com/"
         ];
         api-keys = [
           "SPOUT_RWA_API_KEY"
