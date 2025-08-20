@@ -3,9 +3,9 @@ use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
 use blocksense_sdk::{
-    oracle::{DataFeedResult, DataFeedResultValue,Payload, Settings},
+    http::http_get_json,
+    oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
-    http::http_get_json
 };
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -22,11 +22,9 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     let api_key: String = get_api_key(&settings)?;
 
     let url = resources.arguments.api_url;
-    let response = http_get_json::<RWAResponse>(
-        url.as_str(),
-        None,
-        Some(&[("X-API-Key", api_key.as_str())]),
-    ).await?;
+    let response =
+        http_get_json::<RWAResponse>(url.as_str(), None, Some(&[("X-API-Key", api_key.as_str())]))
+            .await?;
 
     if resources.arguments.endpoint == "reserve" {
         let reserve_amount = response.reserve_amount.unwrap_or(0.0);
@@ -40,7 +38,10 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
         println!("Payload: {:?}", payload);
         Ok(payload)
     } else {
-        Err(anyhow::anyhow!("Unsupported request type: {}", resources.arguments.endpoint))
+        Err(anyhow::anyhow!(
+            "Unsupported request type: {}",
+            resources.arguments.endpoint
+        ))
     }
 }
 
@@ -61,7 +62,7 @@ struct ResourceArguments {
 
 #[derive(Serialize, Deserialize, Debug)]
 struct ResourceData {
-   pub arguments: ResourceArguments,
+    pub arguments: ResourceArguments,
 }
 
 fn get_resources_from_settings(settings: &Settings) -> Result<ResourceData> {
@@ -71,4 +72,3 @@ fn get_resources_from_settings(settings: &Settings) -> Result<ResourceData> {
         .and_then(|feed| serde_json::from_str::<ResourceData>(&feed.data).ok())
         .ok_or_else(|| anyhow::anyhow!("Couldn't parse resource data from settings"))
 }
-

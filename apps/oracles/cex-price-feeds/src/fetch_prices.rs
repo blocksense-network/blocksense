@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use anyhow::Result;
 use futures::stream::FuturesUnordered;
 use serde::{Deserialize, Serialize};
@@ -76,7 +78,7 @@ pub async fn get_prices(resources: &ResourceData) -> Result<PairsToResults> {
         fetch::<UpBitPriceFetcher>(&symbols.upbit, None),
     ]);
 
-    let fetched_provider_prices = fetch_all_prices(futures_set).await;
+    let fetched_provider_prices = fetch_all_prices(futures_set, &Duration::from_secs(59)).await;
 
     let mut final_results = PairsToResults::new();
     for price_data_for_exchange in fetched_provider_prices {

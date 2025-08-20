@@ -1,6 +1,7 @@
 use anyhow::Result;
 use futures::stream::FuturesUnordered;
 use serde::{Deserialize, Serialize};
+use std::time::Duration;
 
 use blocksense_data_providers_sdk::price_data::{
     fetchers::{
@@ -80,7 +81,7 @@ pub async fn get_prices(
         fetch::<FMPPriceFetcher>(&symbols.fmp, get_api_keys(capabilities, &["FMP_API_KEY"])),
     ]);
 
-    let fetched_provider_prices = fetch_all_prices(futures_set).await;
+    let fetched_provider_prices = fetch_all_prices(futures_set, &Duration::from_secs(59)).await;
 
     let mut final_results = PairsToResults::new();
     for price_data_for_exchange in fetched_provider_prices {
