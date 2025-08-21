@@ -200,7 +200,7 @@ impl Contract {
                     None => break,
                 };
                 if let Ok(mut value) =
-                    http_post_json::<RequestEthCall, ResponseEthCall>(rpc_url.as_str(), eth_call, timeout_secs)
+                    http_post_json::<RequestEthCall, ResponseEthCall>(rpc_url.as_str(), eth_call, Some(timeout_secs))
                         .await
                 {
                     value.rpc_url = Some(rpc_url_candidate.clone());

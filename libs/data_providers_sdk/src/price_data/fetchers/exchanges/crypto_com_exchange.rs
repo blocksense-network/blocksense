@@ -45,7 +45,7 @@ impl PricesFetcher<'_> for CryptoComPriceFetcher {
                 "https://api.crypto.com/exchange/v1/public/get-tickers",
                 None,
                 None,
-                timeout_secs,
+                Some(timeout_secs),
             )
             .await?;
 

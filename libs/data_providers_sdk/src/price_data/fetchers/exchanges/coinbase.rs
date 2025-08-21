@@ -70,7 +70,8 @@ pub async fn fetch_price_for_symbol(
     timeout_secs: u64,
 ) -> Result<(String, PricePoint)> {
     let url = format!("https://api.exchange.coinbase.com/products/{symbol}/ticker");
-    let response = http_get_json::<CoinbasePriceResponse>(&url, None, None, timeout_secs).await?;
+    let response =
+        http_get_json::<CoinbasePriceResponse>(&url, None, None, Some(timeout_secs)).await?;
 
     Ok((
         symbol.to_string().replace("-", ""),
