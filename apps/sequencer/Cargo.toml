@@ -76,7 +76,7 @@ time = { workspace = true }
 uuid = { workspace = true, features = ["v4"] }
 ringbuf = { workspace = true }
 console-subscriber = { workspace = true }
-rdkafka = { workspace = true, features = ["dynamic-linking"] }
+rdkafka = { workspace = true }
 tokio-stream = { workspace = true }
 pyroscope = "0.5.8"
 pyroscope_pprofrs = "0.2.10"

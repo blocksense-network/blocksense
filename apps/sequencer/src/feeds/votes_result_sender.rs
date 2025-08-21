@@ -11,7 +11,7 @@ use alloy::providers::Provider;
 use alloy_primitives::map::HashMap;
 use alloy_primitives::{Address, Bytes, Uint, U256};
 use blocksense_config::{
-    ADFS_CONTRACT_NAME, GNOSIS_SAFE_CONTRACT_NAME, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME,
+    ADFS_CONTRACT_NAME, GNOSIS_SAFE_CONTRACT_NAME,
 };
 use blocksense_data_feeds::feeds_processing::{
     BatchedAggregatesToSend, EncodedBatchedAggregatesToSend, EncodedVotedFeedUpdate,
@@ -286,7 +286,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             let provider = provider.lock().await;
 
             let contract_address = provider
-                .get_contract_address(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
+                .get_contract_address(ADFS_CONTRACT_NAME)
                 .unwrap_or(Address::default());
             let safe_address = provider
                 .get_contract_address(GNOSIS_SAFE_CONTRACT_NAME)
