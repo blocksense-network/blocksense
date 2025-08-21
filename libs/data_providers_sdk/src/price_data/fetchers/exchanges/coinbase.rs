@@ -51,9 +51,13 @@ impl<'a> PricesFetcher<'a> for CoinbasePriceFetcher<'a> {
                         prices.insert(symbol, price_pint);
                     }
                     Err(err) => {
-                        anyhow::bail!("Error processing future in CoinbasePriceFetcher {err:?}")
+                        eprintln!("Error processing future in CoinbasePriceFetcher {err:?}")
                     }
                 }
+            }
+
+            if prices.is_empty() {
+                anyhow::bail!("No prices fetched from Coinbase");
             }
 
             Ok(prices)

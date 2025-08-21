@@ -50,9 +50,13 @@ impl<'a> PricesFetcher<'a> for GeminiPriceFetcher<'a> {
                         prices.insert(symbol, price_pint);
                     }
                     Err(err) => {
-                        anyhow::bail!("Error processing future in GeminiPriceFetcher {err:?}")
+                        eprintln!("Error processing future in GeminiPriceFetcher {err:?}")
                     }
                 }
+            }
+
+            if prices.is_empty() {
+                anyhow::bail!("No prices fetched from Gemini");
             }
 
             Ok(prices)
