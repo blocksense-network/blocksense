@@ -70,7 +70,8 @@ pub async fn fetch_price_for_symbol(
     timeout_secs: u64,
 ) -> Result<(String, PricePoint)> {
     let url = format!("https://api.gemini.com/v1/pubticker/{symbol}");
-    let response = http_get_json::<GeminiPriceResponse>(&url, None, None, timeout_secs).await?;
+    let response =
+        http_get_json::<GeminiPriceResponse>(&url, None, None, Some(timeout_secs)).await?;
 
     let volume_data = response
         .volume

@@ -71,7 +71,7 @@ impl<'a> PricesFetcher<'a> for AlpacaMarketsPriceFetcher<'a> {
                     ("APCA-API-KEY-ID", api_key_id),
                     ("APCA-API-SECRET-KEY", api_secret_key),
                 ]),
-                timeout_secs,
+                Some(timeout_secs),
             )
             .await?;
 
