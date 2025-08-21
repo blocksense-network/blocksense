@@ -9,7 +9,7 @@ use alloy::{
 use blocksense_config::{FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
-use blocksense_utils::{counter_unbounded_channel::CountedReceiver, to_hex_string, FeedId};
+use blocksense_utils::{counter_unbounded_channel::CountedReceiver, FeedId};
 use eyre::{bail, eyre, Result};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
 use tokio::{
@@ -24,7 +24,6 @@ use crate::{
     },
     sequencer_state::SequencerState,
 };
-use blocksense_feed_registry::types::Repeatability;
 use blocksense_feeds_processing::adfs_gen_calldata::{
     adfs_serialize_updates, get_neighbour_feed_ids, RoundCounters,
 };
@@ -56,53 +55,6 @@ pub async fn deploy_contract(
     p.deploy_contract(contract_name).await
 }
 
-/// Serializes the `updates` hash map into a string.
-fn legacy_serialize_updates(
-    net: &str,
-    updates: &BatchedAggregatesToSend,
-    feeds_config: HashMap<FeedId, FeedStrideAndDecimals>,
-) -> Vec<u8> {
-    let mut result: String = Default::default();
-
-    let selector = "0x1a2d80ac";
-    result.push_str(selector);
-
-    info!("Preparing a legacy batch of feeds to network `{net}`");
-
-    let mut num_reported_feeds = 0;
-    for update in &updates.updates {
-        let feed_id = update.feed_id;
-        let feed_config = feeds_config.get(&feed_id);
-
-        let digits_in_fraction = match &feed_config {
-            Some(f) => f.decimals,
-            None => {
-                error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimal default to 18");
-                18
-            }
-        };
-
-        let (key, val) = match update.encode(
-            digits_in_fraction as usize,
-            update.end_slot_timestamp as u64,
-            true,
-        ) {
-            Ok((k, v)) => (k, v),
-            Err(e) => {
-                error!("Error converting value for feed id {} to bytes {}. Skipping inclusion in block!", update.feed_id, e);
-                continue;
-            }
-        };
-
-        num_reported_feeds += 1;
-        result += to_hex_string(key, None).as_str();
-        result += to_hex_string(val, Some(32)).as_str(); // TODO: Get size to pad to based on strinde in feed_config. Also check!
-    }
-    info!("Sending a batch of {num_reported_feeds} feeds to network `{net}`");
-
-    hex::decode(result).expect("result is a valid hex string")
-}
-
 /// If `allowed_feed_ids` is specified only the feeds from `updates` that are allowed
 /// will be added to the result. Otherwise, all feeds in `updates` will be added.
 pub fn filter_allowed_feeds(
@@ -132,7 +84,6 @@ pub async fn get_serialized_updates_for_network(
     provider_settings: &blocksense_config::Provider,
     feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
     feeds_rounds: &mut HashMap<FeedId, u64>,
-    feeds_repeatability: Repeatability,
 ) -> Result<Vec<u8>> {
     debug!("Acquiring a read lock on provider config for `{net}`");
     let provider = provider_mutex.lock().await;
@@ -146,7 +97,6 @@ pub async fn get_serialized_updates_for_network(
         return Ok(Vec::new());
     }
 
-    let contract_version = provider.get_latest_contract_version();
     drop(provider);
     debug!("Released a read lock on provider config for `{net}`");
 
@@ -171,41 +121,28 @@ pub async fn get_serialized_updates_for_network(
         );
     }
 
-    let serialized_updates = match contract_version {
-        1 => {
-            let bytes = legacy_serialize_updates(net, updates, strides_and_decimals);
-            debug!(
-                "legacy_serialize_updates result for network {} and block height {} = {}",
-                net,
-                updates.block_height,
-                hex::encode(&bytes)
-            );
-            bytes
-        }
-        2 => {
-            let provider = provider_mutex.lock().await;
-            match adfs_serialize_updates(
-                net,
-                updates,
-                Some(&provider.round_counters),
-                strides_and_decimals,
-                feeds_rounds,
-            )
-            .await
-            {
-                Ok(bytes) => {
-                    debug!(
-                        "adfs_serialize_updates result for network {} and block height {} = {}",
-                        net,
-                        updates.block_height,
-                        hex::encode(&bytes)
-                    );
-                    bytes
-                }
-                Err(e) => bail!("ADFS serialization failed: {e}!"),
+    let serialized_updates = {
+        let provider = provider_mutex.lock().await;
+        match adfs_serialize_updates(
+            net,
+            updates,
+            Some(&provider.round_counters),
+            strides_and_decimals,
+            feeds_rounds,
+        )
+        .await
+        {
+            Ok(bytes) => {
+                debug!(
+                    "adfs_serialize_updates result for network {} and block height {} = {}",
+                    net,
+                    updates.block_height,
+                    hex::encode(&bytes)
+                );
+                bytes
             }
+            Err(e) => bail!("ADFS serialization failed: {e}!"),
         }
-        _ => bail!("Unsupported contract version set for network {net}!"),
     };
 
     Ok(serialized_updates)
@@ -216,7 +153,6 @@ pub struct BatchOfUpdatesToProcess {
     pub provider: Arc<Mutex<RpcProvider>>,
     pub provider_settings: blocksense_config::Provider,
     pub updates: BatchedAggregatesToSend,
-    pub feed_type: Repeatability,
     pub feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
     pub transaction_retry_timeout_secs: u64,
     pub transaction_retries_count_before_give_up: u64,
@@ -276,7 +212,6 @@ pub async fn loop_processing_batch_of_updates(
                     cmd.provider,
                     cmd.provider_settings,
                     cmd.updates,
-                    cmd.feed_type,
                     cmd.feeds_config,
                     cmd.transaction_retry_timeout_secs,
                     cmd.transaction_retries_count_before_give_up,
@@ -348,7 +283,6 @@ pub async fn eth_batch_send_to_contract(
     provider_mutex: Arc<Mutex<RpcProvider>>,
     provider_settings: blocksense_config::Provider,
     mut updates: BatchedAggregatesToSend,
-    feed_type: Repeatability,
     feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
     transaction_retry_timeout_secs: u64,
     transaction_retries_count_before_give_up: u64,
@@ -362,7 +296,6 @@ pub async fn eth_batch_send_to_contract(
         &provider_settings,
         feeds_config,
         &mut feeds_rounds,
-        feed_type,
     )
     .await?;
 
@@ -1058,7 +991,6 @@ pub async fn get_tx_retry_params(
 pub async fn eth_batch_send_to_all_contracts(
     sequencer_state: &Data<SequencerState>,
     updates: &BatchedAggregatesToSend,
-    feed_type: Repeatability,
     providers_metrics_opt: Option<&ProvidersMetrics>,
 ) -> Result<()> {
     let span = info_span!("eth_batch_send_to_all_contracts");
@@ -1134,7 +1066,6 @@ pub async fn eth_batch_send_to_all_contracts(
                     provider: provider.clone(),
                     provider_settings,
                     updates,
-                    feed_type,
                     feeds_config,
                     transaction_retry_timeout_secs,
                     transaction_retries_count_before_give_up,
@@ -1517,105 +1448,105 @@ mod tests {
 
     #[tokio::test]
     async fn test_eth_batch_send_to_all_oneshot_contracts() {
-    //     let metrics_prefix = "test_eth_batch_send_to_all_oneshot_contracts";
+        //     let metrics_prefix = "test_eth_batch_send_to_all_oneshot_contracts";
 
-    //     /////////////////////////////////////////////////////////////////////
-    //     // BIG STEP ONE - Setup Anvil and deploy SportsDataFeedStoreV2 to it
-    //     /////////////////////////////////////////////////////////////////////
+        //     /////////////////////////////////////////////////////////////////////
+        //     // BIG STEP ONE - Setup Anvil and deploy SportsDataFeedStoreV2 to it
+        //     /////////////////////////////////////////////////////////////////////
 
-    //     // setup
-    //     let key_path = get_test_private_key_path();
+        //     // setup
+        //     let key_path = get_test_private_key_path();
 
-    //     let anvil_network1 = Anvil::new().try_spawn().unwrap();
-    //     let network1 = "ETH374";
-    //     let anvil_network2 = Anvil::new().try_spawn().unwrap();
-    //     let network2 = "ETH375";
-    //     let anvil_network3 = Anvil::new().try_spawn().unwrap();
-    //     let network3 = "ETH_test_eth_batch_send_to_all_oneshot_contracts";
+        //     let anvil_network1 = Anvil::new().try_spawn().unwrap();
+        //     let network1 = "ETH374";
+        //     let anvil_network2 = Anvil::new().try_spawn().unwrap();
+        //     let network2 = "ETH375";
+        //     let anvil_network3 = Anvil::new().try_spawn().unwrap();
+        //     let network3 = "ETH_test_eth_batch_send_to_all_oneshot_contracts";
 
-    //     let sequencer_config = get_test_config_with_multiple_providers(vec![
-    //         (
-    //             network1,
-    //             key_path.as_path(),
-    //             anvil_network1.endpoint().as_str(),
-    //         ),
-    //         (
-    //             network2,
-    //             key_path.as_path(),
-    //             anvil_network2.endpoint().as_str(),
-    //         ),
-    //         (
-    //             network3,
-    //             key_path.as_path(),
-    //             anvil_network3.endpoint().as_str(),
-    //         ),
-    //     ]);
-    //     let stride = 0;
-    //     let feeds: Vec<FeedConfig> = (0..16)
-    //         .map(|feed_id| test_feed_config(feed_id, stride))
-    //         .collect();
-    //     let feeds_config = AllFeedsConfig { feeds };
+        //     let sequencer_config = get_test_config_with_multiple_providers(vec![
+        //         (
+        //             network1,
+        //             key_path.as_path(),
+        //             anvil_network1.endpoint().as_str(),
+        //         ),
+        //         (
+        //             network2,
+        //             key_path.as_path(),
+        //             anvil_network2.endpoint().as_str(),
+        //         ),
+        //         (
+        //             network3,
+        //             key_path.as_path(),
+        //             anvil_network3.endpoint().as_str(),
+        //         ),
+        //     ]);
+        //     let stride = 0;
+        //     let feeds: Vec<FeedConfig> = (0..16)
+        //         .map(|feed_id| test_feed_config(feed_id, stride))
+        //         .collect();
+        //     let feeds_config = AllFeedsConfig { feeds };
 
-    //     let (sequencer_state, _) = create_sequencer_state_and_collected_futures(
-    //         sequencer_config.clone(),
-    //         metrics_prefix,
-    //         feeds_config,
-    //     )
-    //     .await;
+        //     let (sequencer_state, _) = create_sequencer_state_and_collected_futures(
+        //         sequencer_config.clone(),
+        //         metrics_prefix,
+        //         feeds_config,
+        //     )
+        //     .await;
 
-    //     let msg = sequencer_state
-    //         .deploy_contract(network1, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
-    //         .await
-    //         .expect("contract deployment failed");
-    //     // assert
-    //     // validate contract was deployed at expected address
-    //     let extracted_address = extract_address(&msg);
-    //     assert!(
-    //         extracted_address.is_some(),
-    //         "Did not return valid eth address"
-    //     );
-    //     let msg2 = sequencer_state
-    //         .deploy_contract(network2, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
-    //         .await
-    //         .expect("contract deployment failed");
+        //     let msg = sequencer_state
+        //         .deploy_contract(network1, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
+        //         .await
+        //         .expect("contract deployment failed");
+        //     // assert
+        //     // validate contract was deployed at expected address
+        //     let extracted_address = extract_address(&msg);
+        //     assert!(
+        //         extracted_address.is_some(),
+        //         "Did not return valid eth address"
+        //     );
+        //     let msg2 = sequencer_state
+        //         .deploy_contract(network2, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
+        //         .await
+        //         .expect("contract deployment failed");
 
-    //     // validate contract was deployed at expected address
-    //     let extracted_address = extract_address(&msg2);
-    //     assert!(
-    //         extracted_address.is_some(),
-    //         "Did not return valid eth address"
-    //     );
+        //     // validate contract was deployed at expected address
+        //     let extracted_address = extract_address(&msg2);
+        //     assert!(
+        //         extracted_address.is_some(),
+        //         "Did not return valid eth address"
+        //     );
 
-    //     /////////////////////////////////////////////////////////////////////
-    //     // BIG STEP TWO - Prepare sample updates and write to the contract
-    //     /////////////////////////////////////////////////////////////////////
+        //     /////////////////////////////////////////////////////////////////////
+        //     // BIG STEP TWO - Prepare sample updates and write to the contract
+        //     /////////////////////////////////////////////////////////////////////
 
-    //     // Updates for Oneshot
-    //     let slot1 =
-    //         String::from("0404040404040404040404040404040404040404040404040404040404040404");
-    //     let slot2 =
-    //         String::from("0505050505050505050505050505050505050505050505050505050505050505");
-    //     let value1 = format!("{:04x}{}{}", 0x0002, slot1, slot2);
-    //     let end_of_timeslot = 0_u128;
-    //     let updates_oneshot = BatchedAggregatesToSend {
-    //         block_height: 0,
-    //         updates: vec![VotedFeedUpdate::new_decode(
-    //             "00000000000000000000000000000003",
-    //             &value1,
-    //             end_of_timeslot,
-    //             FeedType::Text("".to_string()),
-    //             18,
-    //         )
-    //         .unwrap()],
-    //     };
+        //     // Updates for Oneshot
+        //     let slot1 =
+        //         String::from("0404040404040404040404040404040404040404040404040404040404040404");
+        //     let slot2 =
+        //         String::from("0505050505050505050505050505050505050505050505050505050505050505");
+        //     let value1 = format!("{:04x}{}{}", 0x0002, slot1, slot2);
+        //     let end_of_timeslot = 0_u128;
+        //     let updates_oneshot = BatchedAggregatesToSend {
+        //         block_height: 0,
+        //         updates: vec![VotedFeedUpdate::new_decode(
+        //             "00000000000000000000000000000003",
+        //             &value1,
+        //             end_of_timeslot,
+        //             FeedType::Text("".to_string()),
+        //             18,
+        //         )
+        //         .unwrap()],
+        //     };
 
-    //     let result =
-    //         eth_batch_send_to_all_contracts(&sequencer_state, &updates_oneshot, Oneshot, None)
-    //             .await;
-    //     // TODO: This is actually not a good assertion since the eth_batch_send_to_all_contracts
-    //     // will always return ok even if some or all of the sends we unsuccessful. Will be fixed in
-    //     // followups
-    //     assert!(result.is_ok());
+        //     let result =
+        //         eth_batch_send_to_all_contracts(&sequencer_state, &updates_oneshot, Oneshot, None)
+        //             .await;
+        //     // TODO: This is actually not a good assertion since the eth_batch_send_to_all_contracts
+        //     // will always return ok even if some or all of the sends we unsuccessful. Will be fixed in
+        //     // followups
+        //     assert!(result.is_ok());
     }
 
     #[tokio::test]

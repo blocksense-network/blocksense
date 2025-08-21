@@ -27,13 +27,12 @@ use blocksense_config::{
 use blocksense_data_feeds::feeds_processing::{
     BatchedAggregatesToSend, PublishedFeedUpdate, PublishedFeedUpdateError, VotedFeedUpdate,
 };
-use blocksense_feed_registry::registry::{FeedAggregateHistory, HistoryEntry};
+use blocksense_feed_registry::registry::FeedAggregateHistory;
 use blocksense_feed_registry::types::FeedType;
-use blocksense_feed_registry::types::Repeatability;
 use blocksense_metrics::{metrics::ProviderMetrics, process_provider_getter};
 use eyre::{eyre, Result};
 use paste::paste;
-use ringbuf::traits::{Consumer, Observer, RingBuffer};
+use ringbuf::traits::{Consumer, Observer};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -45,7 +44,6 @@ use tracing::{debug, error, info, warn};
 
 use crate::providers::eth_send_utils::{get_gas_limit, get_tx_retry_params, GasFees};
 use crate::providers::multicall::Multicall;
-use crate::providers::provider::Multicall::MulticallInstance;
 use std::time::Instant;
 
 pub type ProviderType =
@@ -567,9 +565,9 @@ impl RpcProvider {
         )
             -> std::result::Result<PublishedFeedUpdate, PublishedFeedUpdateError>;
 
-        let data_feed = self.get_contract_address(ADFS_CONTRACT_NAME)?;
-        let calldata_for_value: CallDataForValueFnType = calldata_for_latest_value_v2;
-        let latest: LatestFn = latest_v2;
+        let _data_feed = self.get_contract_address(ADFS_CONTRACT_NAME)?;
+        let _calldata_for_value: CallDataForValueFnType = calldata_for_latest_value_v2;
+        let _latest: LatestFn = latest_v2;
         
         // TODO: use  direct get from ADFS contract
         // let calldata: Vec<Multicall::Call> = feed_ids
@@ -600,19 +598,19 @@ impl RpcProvider {
             ));
         };
         type NthCalldataFn = fn(u128, u8, u128) -> Bytes;
-        type NthResultFn = fn(
-            u128,
-            u128,
-            FeedVariant,
-            &[u8],
-        )
-            -> std::result::Result<PublishedFeedUpdate, PublishedFeedUpdateError>;
+        // type NthResultFn = fn(
+        //     u128,
+        //     u128,
+        //     FeedVariant,
+        //     &[u8],
+        // )
+        //     -> std::result::Result<PublishedFeedUpdate, PublishedFeedUpdateError>;
 
         let data_feed: Address = self.get_contract_address(ADFS_CONTRACT_NAME)?;
         let nth_calldata: NthCalldataFn = calldata_nth_v2;
-        let nth_result: NthResultFn = nth_v2;
+        // let nth_result: NthResultFn = nth_v2;
 
-        let calldata: Vec<Multicall::Call> = updates
+        let _calldata: Vec<Multicall::Call> = updates
             .iter()
             .map(|update| Multicall::Call {
                 target: data_feed,
@@ -1039,82 +1037,82 @@ pub fn latest_v2(
     }
 }
 
-fn nth_v1(
-    feed_id: FeedId,
-    num_updates: u128,
-    variant: FeedVariant,
-    data: &[u8],
-) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
-    if data.len() != 32 {
-        return Err(PublishedFeedUpdate::error_num_update(
-            feed_id,
-            "Data size is not exactly 32 bytes",
-            num_updates,
-        ));
-    }
-    let j3: [u8; 8] = data[24..32].try_into().expect("Impossible");
-    let timestamp_u64 = u64::from_be_bytes(j3);
-    if timestamp_u64 == 0 {
-        return Err(PublishedFeedUpdate::error_num_update(
-            feed_id,
-            "Timestamp is zero",
-            num_updates,
-        ));
-    }
-    let j1: [u8; 32] = data[0..32].try_into().expect("Impossible");
-    match FeedType::from_bytes(j1.to_vec(), variant.variant, variant.decimals) {
-        Ok(value) => Ok(PublishedFeedUpdate {
-            feed_id,
-            num_updates,
-            value,
-            published: timestamp_u64 as u128,
-        }),
-        Err(msg) => Err(PublishedFeedUpdate::error_num_update(
-            feed_id,
-            &msg,
-            num_updates,
-        )),
-    }
-}
+// fn nth_v1(
+//     feed_id: FeedId,
+//     num_updates: u128,
+//     variant: FeedVariant,
+//     data: &[u8],
+// ) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
+//     if data.len() != 32 {
+//         return Err(PublishedFeedUpdate::error_num_update(
+//             feed_id,
+//             "Data size is not exactly 32 bytes",
+//             num_updates,
+//         ));
+//     }
+//     let j3: [u8; 8] = data[24..32].try_into().expect("Impossible");
+//     let timestamp_u64 = u64::from_be_bytes(j3);
+//     if timestamp_u64 == 0 {
+//         return Err(PublishedFeedUpdate::error_num_update(
+//             feed_id,
+//             "Timestamp is zero",
+//             num_updates,
+//         ));
+//     }
+//     let j1: [u8; 32] = data[0..32].try_into().expect("Impossible");
+//     match FeedType::from_bytes(j1.to_vec(), variant.variant, variant.decimals) {
+//         Ok(value) => Ok(PublishedFeedUpdate {
+//             feed_id,
+//             num_updates,
+//             value,
+//             published: timestamp_u64 as u128,
+//         }),
+//         Err(msg) => Err(PublishedFeedUpdate::error_num_update(
+//             feed_id,
+//             &msg,
+//             num_updates,
+//         )),
+//     }
+// }
 
-fn nth_v2(
-    feed_id: FeedId,
-    num_updates: u128,
-    variant: FeedVariant,
-    data: &[u8],
-) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
-    if data.len() != 32 {
-        return Err(PublishedFeedUpdate::error_num_update(
-            feed_id,
-            "Data size is not exactly 32 bytes",
-            num_updates,
-        ));
-    }
-    info!("nth_v2 {num_updates} {data:?}");
-    let j3: [u8; 8] = data[0..8].try_into().expect("Impossible");
-    let timestamp_u64 = u64::from_be_bytes(j3);
-    // if timestamp_u64 == 0 {
-    //     return Err(PublishedFeedUpdate::error_num_update(
-    //         feed_id,
-    //         "Timestamp is zero",
-    //         num_updates,
-    //     ));
-    // }
-    let j1: [u8; 32] = data[0..32].try_into().expect("Impossible");
-    match FeedType::from_bytes(j1.to_vec(), variant.variant, variant.decimals) {
-        Ok(value) => Ok(PublishedFeedUpdate {
-            feed_id,
-            num_updates,
-            value,
-            published: timestamp_u64 as u128,
-        }),
-        Err(msg) => Err(PublishedFeedUpdate::error_num_update(
-            feed_id,
-            &msg,
-            num_updates,
-        )),
-    }
-}
+// fn nth_v2(
+//     feed_id: FeedId,
+//     num_updates: u128,
+//     variant: FeedVariant,
+//     data: &[u8],
+// ) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
+//     if data.len() != 32 {
+//         return Err(PublishedFeedUpdate::error_num_update(
+//             feed_id,
+//             "Data size is not exactly 32 bytes",
+//             num_updates,
+//         ));
+//     }
+//     info!("nth_v2 {num_updates} {data:?}");
+//     let j3: [u8; 8] = data[0..8].try_into().expect("Impossible");
+//     let timestamp_u64 = u64::from_be_bytes(j3);
+//     // if timestamp_u64 == 0 {
+//     //     return Err(PublishedFeedUpdate::error_num_update(
+//     //         feed_id,
+//     //         "Timestamp is zero",
+//     //         num_updates,
+//     //     ));
+//     // }
+//     let j1: [u8; 32] = data[0..32].try_into().expect("Impossible");
+//     match FeedType::from_bytes(j1.to_vec(), variant.variant, variant.decimals) {
+//         Ok(value) => Ok(PublishedFeedUpdate {
+//             feed_id,
+//             num_updates,
+//             value,
+//             published: timestamp_u64 as u128,
+//         }),
+//         Err(msg) => Err(PublishedFeedUpdate::error_num_update(
+//             feed_id,
+//             &msg,
+//             num_updates,
+//         )),
+//     }
+// }
 
 #[cfg(test)]
 mod tests {

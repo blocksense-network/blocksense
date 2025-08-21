@@ -222,10 +222,6 @@ fn default_is_enabled() -> bool {
     true
 }
 
-fn contract_initial_version() -> u16 {
-    1
-}
-
 impl Validated for Provider {
     fn validate(&self, context: &str) -> anyhow::Result<()> {
         if self.transaction_retry_timeout_secs == 0 {
