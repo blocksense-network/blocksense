@@ -61,9 +61,22 @@ async fn timing_out_request(req: HttpRequest, payload: web::Payload) -> impl Res
                     break;
                 }
             }
+
             if !allowed {
-                tracing::error!("To allow requests, add 'allowed_outbound_hosts = [\"{}\"]' to the manifest component section.", payload.endpoint_url);
-                let err_msg = format!("Destination not allowed: {}", payload.endpoint_url);
+                let (uri_scheme, uri_host) = match (payload_uri.scheme_str(), payload_uri.host()) {
+                    (Some(uri_scheme), Some(uri_host)) => (uri_scheme, uri_host),
+                    _ => {
+                        let err_msg = format!(
+                            "Invalid URI scheme or host in payload: {}",
+                            payload.endpoint_url
+                        );
+                        tracing::error!(err_msg);
+                        return HttpResponse::BadRequest().body(err_msg);
+                    }
+                };
+
+                tracing::error!("To allow requests, add 'allowed_outbound_hosts = [\"{uri_scheme}://{uri_host}\"]' to the manifest component section.");
+                let err_msg = format!("Destination not allowed: {uri_scheme}://{uri_host}");
                 tracing::error!(err_msg);
                 return HttpResponse::BadRequest().body(err_msg);
             }
