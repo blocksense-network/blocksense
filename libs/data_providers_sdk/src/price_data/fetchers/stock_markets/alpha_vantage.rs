@@ -53,7 +53,7 @@ impl<'a> PricesFetcher<'a> for AlphaVantagePriceFetcher<'a> {
                 "https://www.alphavantage.co/query?function=REALTIME_BULK_QUOTES",
                 Some(&[("symbol", &all_symbols), ("apikey", api_key)]),
                 None,
-                timeout_secs,
+                Some(timeout_secs),
             )
             .await?;
             let results = response

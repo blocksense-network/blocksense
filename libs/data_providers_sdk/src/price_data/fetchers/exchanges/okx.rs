@@ -41,7 +41,7 @@ impl PricesFetcher<'_> for OKXPriceFetcher {
                 "https://www.okx.com/api/v5/market/tickers",
                 Some(&[("instType", "SPOT")]),
                 None,
-                timeout_secs,
+                Some(timeout_secs),
             )
             .await?;
 

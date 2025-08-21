@@ -50,7 +50,7 @@ impl<'a> PricesFetcher<'a> for FMPPriceFetcher<'a> {
                 format!("https://financialmodelingprep.com/api/v3/quote/{all_symbols}").as_str(),
                 Some(&[("apikey", api_key)]),
                 None,
-                timeout_secs,
+                Some(timeout_secs),
             )
             .await?;
 
