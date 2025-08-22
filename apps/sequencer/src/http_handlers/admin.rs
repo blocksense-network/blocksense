@@ -6,10 +6,12 @@ use actix_web::web::ServiceConfig;
 use actix_web::{error, Error};
 use actix_web::{get, web, HttpRequest};
 use actix_web::{post, HttpResponse, Responder};
+use alloy::hex;
 use alloy::{
     hex::FromHex, network::TransactionBuilder, primitives::Bytes, providers::Provider,
     rpc::types::eth::TransactionRequest,
 };
+use futures::{stream, StreamExt};
 
 use blocksense_config::{
     AllFeedsConfig, SequencerConfig, ADFS_CONTRACT_NAME,
@@ -18,13 +20,19 @@ use blocksense_config::{
 use blocksense_feed_registry::feed_registration_cmds::{
     DeleteAssetFeed, FeedsManagementCmds, RegisterNewAssetFeed,
 };
+use blocksense_feed_registry::registry::{FeedAggregateHistory, HistoryEntry};
 use blocksense_registry::config::{FeedConfig, OracleScript, OraclesResponse};
 use blocksense_utils::logging::tokio_console_active;
 use blocksense_utils::FeedId;
 use eyre::eyre;
 use eyre::Result;
-use futures::StreamExt;
-use std::collections::{BTreeMap, HashSet};
+use ringbuf::{
+    storage::Heap,
+    traits::{Consumer, RingBuffer},
+    HeapRb, SharedRb,
+};
+use serde::Serialize;
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 use crate::http_handlers::data_feeds::register_feed;
 use crate::providers::eth_send_utils::deploy_contract;
@@ -505,10 +513,66 @@ pub async fn list_provider_status(sequencer_state: web::Data<SequencerState>) ->
     }
 }
 
+#[derive(Serialize)]
+pub struct HistoryEntryDTO {
+    pub value: String,
+    pub update_number: u128,
+}
+
 #[get("/get_history")]
 pub async fn get_history(sequencer_state: web::Data<SequencerState>) -> HttpResponse {
     let history = sequencer_state.feed_aggregate_history.read().await;
-    match serde_json::to_string_pretty(&*history) {
+
+    // Step 1: clone + transform
+    let transformed: HashMap<FeedId, Vec<HistoryEntryDTO>> =
+        stream::iter(history.aggregate_history.iter())
+            .then(|(feed_id, buffer)| {
+                let sequencer_state = sequencer_state.clone();
+                let feed_id = feed_id.clone();
+
+                // Extract slices outside the async block
+                let slice_a;
+                let slice_b;
+                {
+                    let (a, b) = buffer.as_slices();
+                    slice_a = a.to_vec();
+                    slice_b = b.to_vec();
+                }
+
+                async move {
+                    let active_feeds = sequencer_state.active_feeds.read().await;
+                    let decimals = active_feeds
+                        .get(&feed_id)
+                        .map(|fc| fc.additional_feed_info.decimals)
+                        .unwrap_or(0);
+
+                    let combined: Vec<HistoryEntryDTO> = slice_a
+                        .into_iter()
+                        .chain(slice_b)
+                        .filter_map(|entry| match entry.value.as_bytes(decimals as usize, 0) {
+                            Ok(formatted) => Some(HistoryEntryDTO {
+                                value: format!("0x{}", hex::encode(formatted)),
+                                update_number: entry.update_number,
+                            }),
+                            Err(err) => {
+                                eprintln!(
+                                    "[history_serialize] failed formatting value for feed {}: {}",
+                                    feed_id, err
+                                );
+                                None
+                            }
+                        })
+                        .collect();
+
+                    (feed_id, combined)
+                }
+            })
+            .collect()
+            .await;
+
+    //
+
+    match serde_json::to_string_pretty(&transformed) {
         Ok(serialized_list) => HttpResponse::Ok()
             .content_type(ContentType::json())
             .body(serialized_list),
@@ -711,6 +775,7 @@ mod tests {
     use tokio::sync::{mpsc, RwLock};
 
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
+    use std::collections::BTreeMap;
 
     #[actix_web::test]
     async fn test_get_feed_report_interval() {
