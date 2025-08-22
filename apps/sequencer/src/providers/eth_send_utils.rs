@@ -9,7 +9,7 @@ use alloy::{
 use blocksense_config::{FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
-use blocksense_utils::{counter_unbounded_channel::CountedReceiver, to_hex_string, FeedId};
+use blocksense_utils::{counter_unbounded_channel::CountedReceiver, FeedId};
 use eyre::{bail, eyre, Result};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
 use tokio::{
@@ -24,7 +24,6 @@ use crate::{
     },
     sequencer_state::SequencerState,
 };
-use blocksense_feed_registry::types::Repeatability;
 use blocksense_feeds_processing::adfs_gen_calldata::{
     adfs_serialize_updates, get_neighbour_feed_ids, RoundCounters,
 };
@@ -56,53 +55,6 @@ pub async fn deploy_contract(
     p.deploy_contract(contract_name).await
 }
 
-/// Serializes the `updates` hash map into a string.
-fn legacy_serialize_updates(
-    net: &str,
-    updates: &BatchedAggregatesToSend,
-    feeds_config: HashMap<FeedId, FeedStrideAndDecimals>,
-) -> Vec<u8> {
-    let mut result: String = Default::default();
-
-    let selector = "0x1a2d80ac";
-    result.push_str(selector);
-
-    info!("Preparing a legacy batch of feeds to network `{net}`");
-
-    let mut num_reported_feeds = 0;
-    for update in &updates.updates {
-        let feed_id = update.feed_id;
-        let feed_config = feeds_config.get(&feed_id);
-
-        let digits_in_fraction = match &feed_config {
-            Some(f) => f.decimals,
-            None => {
-                error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimal default to 18");
-                18
-            }
-        };
-
-        let (key, val) = match update.encode(
-            digits_in_fraction as usize,
-            update.end_slot_timestamp as u64,
-            true,
-        ) {
-            Ok((k, v)) => (k, v),
-            Err(e) => {
-                error!("Error converting value for feed id {} to bytes {}. Skipping inclusion in block!", update.feed_id, e);
-                continue;
-            }
-        };
-
-        num_reported_feeds += 1;
-        result += to_hex_string(key, None).as_str();
-        result += to_hex_string(val, Some(32)).as_str(); // TODO: Get size to pad to based on strinde in feed_config. Also check!
-    }
-    info!("Sending a batch of {num_reported_feeds} feeds to network `{net}`");
-
-    hex::decode(result).expect("result is a valid hex string")
-}
-
 /// If `allowed_feed_ids` is specified only the feeds from `updates` that are allowed
 /// will be added to the result. Otherwise, all feeds in `updates` will be added.
 pub fn filter_allowed_feeds(
@@ -132,7 +84,6 @@ pub async fn get_serialized_updates_for_network(
     provider_settings: &blocksense_config::Provider,
     feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
     feeds_rounds: &mut HashMap<FeedId, u64>,
-    feeds_repeatability: Repeatability,
 ) -> Result<Vec<u8>> {
     debug!("Acquiring a read lock on provider config for `{net}`");
     let provider = provider_mutex.lock().await;
@@ -146,7 +97,6 @@ pub async fn get_serialized_updates_for_network(
         return Ok(Vec::new());
     }
 
-    let contract_version = provider.get_latest_contract_version(feeds_repeatability);
     drop(provider);
     debug!("Released a read lock on provider config for `{net}`");
 
@@ -159,8 +109,7 @@ pub async fn get_serialized_updates_for_network(
 
     for feed_id in relevant_feed_ids.iter() {
         debug!("Acquiring a read lock on feeds_config; network={net}; feed_id={feed_id}");
-        let feed_configs = feeds_config.read().await;
-        let feed_config = feed_configs.get(feed_id).cloned();
+        let feed_config = feeds_config.read().await.get(feed_id).cloned();
         debug!(
             "Acquired and released a read lock on feeds_config; network={net}; feed_id={feed_id}"
         );
@@ -171,41 +120,28 @@ pub async fn get_serialized_updates_for_network(
         );
     }
 
-    let serialized_updates = match contract_version {
-        1 => {
-            let bytes = legacy_serialize_updates(net, updates, strides_and_decimals);
-            debug!(
-                "legacy_serialize_updates result for network {} and block height {} = {}",
-                net,
-                updates.block_height,
-                hex::encode(&bytes)
-            );
-            bytes
-        }
-        2 => {
-            let provider = provider_mutex.lock().await;
-            match adfs_serialize_updates(
-                net,
-                updates,
-                Some(&provider.round_counters),
-                strides_and_decimals,
-                feeds_rounds,
-            )
-            .await
-            {
-                Ok(bytes) => {
-                    debug!(
-                        "adfs_serialize_updates result for network {} and block height {} = {}",
-                        net,
-                        updates.block_height,
-                        hex::encode(&bytes)
-                    );
-                    bytes
-                }
-                Err(e) => bail!("ADFS serialization failed: {e}!"),
+    let serialized_updates = {
+        let provider = provider_mutex.lock().await;
+        match adfs_serialize_updates(
+            net,
+            updates,
+            Some(&provider.round_counters),
+            strides_and_decimals,
+            feeds_rounds,
+        )
+        .await
+        {
+            Ok(bytes) => {
+                debug!(
+                    "adfs_serialize_updates result for network {} and block height {} = {}",
+                    net,
+                    updates.block_height,
+                    hex::encode(&bytes)
+                );
+                bytes
             }
+            Err(e) => bail!("ADFS serialization failed: {e}!"),
         }
-        _ => bail!("Unsupported contract version set for network {net}!"),
     };
 
     Ok(serialized_updates)
@@ -216,10 +152,9 @@ pub struct BatchOfUpdatesToProcess {
     pub provider: Arc<Mutex<RpcProvider>>,
     pub provider_settings: blocksense_config::Provider,
     pub updates: BatchedAggregatesToSend,
-    pub feed_type: Repeatability,
     pub feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
     pub transaction_retry_timeout_secs: u64,
-    pub transaction_retries_count_before_give_up: u64,
+    pub transaction_retries_count_limit: u64,
     pub retry_fee_increment_fraction: f64,
 }
 
@@ -276,10 +211,9 @@ pub async fn loop_processing_batch_of_updates(
                     cmd.provider,
                     cmd.provider_settings,
                     cmd.updates,
-                    cmd.feed_type,
                     cmd.feeds_config,
                     cmd.transaction_retry_timeout_secs,
-                    cmd.transaction_retries_count_before_give_up,
+                    cmd.transaction_retries_count_limit,
                     cmd.retry_fee_increment_fraction,
                 )
                 .await;
@@ -348,10 +282,9 @@ pub async fn eth_batch_send_to_contract(
     provider_mutex: Arc<Mutex<RpcProvider>>,
     provider_settings: blocksense_config::Provider,
     mut updates: BatchedAggregatesToSend,
-    feed_type: Repeatability,
     feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
     transaction_retry_timeout_secs: u64,
-    transaction_retries_count_before_give_up: u64,
+    transaction_retries_count_limit: u64,
     retry_fee_increment_fraction: f64,
 ) -> Result<(String, Vec<FeedId>)> {
     let mut feeds_rounds = HashMap::new();
@@ -362,7 +295,6 @@ pub async fn eth_batch_send_to_contract(
         &provider_settings,
         feeds_config,
         &mut feeds_rounds,
-        feed_type,
     )
     .await?;
 
@@ -394,7 +326,7 @@ pub async fn eth_batch_send_to_contract(
     increment_feeds_round_indexes(&feeds_to_update_ids, net.as_str(), &mut provider).await;
 
     let signer = &provider.signer;
-    let contract_address = if let Some(contract) = provider.get_latest_contract(feed_type) {
+    let contract_address = if let Some(contract) = provider.get_latest_contract() {
         if let Some(contract_address) = contract.address {
             contract_address
         } else {
@@ -443,7 +375,7 @@ pub async fn eth_batch_send_to_contract(
 
     // First get the correct nonce
     let nonce = loop {
-        if nonce_get_retries_count > transaction_retries_count_before_give_up {
+        if nonce_get_retries_count > transaction_retries_count_limit {
             return Ok(("timeout".to_string(), feeds_to_update_ids));
         }
 
@@ -474,9 +406,9 @@ pub async fn eth_batch_send_to_contract(
     };
 
     loop {
-        debug!("loop begin; transaction_retries_count={transaction_retries_count} in network `{net}` block height {block_height} with transaction_retries_count_before_give_up = {transaction_retries_count_before_give_up} and transaction_retry_timeout_secs = {transaction_retry_timeout_secs}");
+        debug!("loop begin; transaction_retries_count={transaction_retries_count} in network `{net}` block height {block_height} with transaction_retries_count_limit = {transaction_retries_count_limit} and transaction_retry_timeout_secs = {transaction_retry_timeout_secs}");
 
-        if transaction_retries_count > transaction_retries_count_before_give_up {
+        if transaction_retries_count > transaction_retries_count_limit {
             return Ok(("timeout".to_string(), feeds_to_update_ids));
         }
 
@@ -1085,7 +1017,6 @@ pub async fn get_tx_retry_params(
 pub async fn eth_batch_send_to_all_contracts(
     sequencer_state: &Data<SequencerState>,
     updates: &BatchedAggregatesToSend,
-    feed_type: Repeatability,
     providers_metrics_opt: Option<&ProvidersMetrics>,
 ) -> Result<()> {
     let span = info_span!("eth_batch_send_to_all_contracts");
@@ -1139,12 +1070,12 @@ pub async fn eth_batch_send_to_all_contracts(
                 }
 
                 let (
-                    transaction_retries_count_before_give_up,
+                    transaction_retries_count_limit,
                     transaction_retry_timeout_secs,
                     retry_fee_increment_fraction,
                 ) = {
                     (
-                        provider_settings.transaction_retries_count_before_give_up as u64,
+                        provider_settings.transaction_retries_count_limit as u64,
                         provider_settings.transaction_retry_timeout_secs as u64,
                         provider_settings.retry_fee_increment_fraction,
                     )
@@ -1161,10 +1092,9 @@ pub async fn eth_batch_send_to_all_contracts(
                     provider: provider.clone(),
                     provider_settings,
                     updates,
-                    feed_type,
                     feeds_config,
                     transaction_retry_timeout_secs,
-                    transaction_retries_count_before_give_up,
+                    transaction_retries_count_limit,
                     retry_fee_increment_fraction,
                 };
 
@@ -1310,8 +1240,7 @@ mod tests {
     use alloy::{node_bindings::Anvil, providers::Provider};
     use blocksense_config::{
         get_test_config_with_multiple_providers, get_test_config_with_single_provider,
-        test_feed_config, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME, MULTICALL_CONTRACT_NAME,
-        SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
+        test_feed_config, ADFS_CONTRACT_NAME, MULTICALL_CONTRACT_NAME,
     };
     use blocksense_config::{AllFeedsConfig, PublishCriteria};
     use blocksense_data_feeds::feeds_processing::VotedFeedUpdate;
@@ -1361,7 +1290,7 @@ mod tests {
             if let Some(x) = p
                 .contracts
                 .iter_mut()
-                .find(|x| x.name == HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
+                .find(|x| x.name == ADFS_CONTRACT_NAME)
             {
                 x.address = None;
             }
@@ -1376,12 +1305,7 @@ mod tests {
         .await;
 
         // run
-        let result = deploy_contract(
-            &String::from(network),
-            &providers,
-            HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME,
-        )
-        .await;
+        let result = deploy_contract(&String::from(network), &providers, ADFS_CONTRACT_NAME).await;
         // assert
         // validate contract was deployed at expected address
         if let Ok(msg) = result {
@@ -1406,601 +1330,601 @@ mod tests {
         }
     }
 
-    #[tokio::test]
-    async fn test_eth_batch_send_to_oneshot_contract() {
-        /////////////////////////////////////////////////////////////////////
-        // BIG STEP ONE - Setup Anvil and deploy SportsDataFeedStoreV2 to it
-        /////////////////////////////////////////////////////////////////////
+    /* Those tests is for legacy one shot feed ID-s. It will be refactored to reflect ADFS request responce mechanicm that covers this functionality.
+        #[tokio::test]
+        async fn test_eth_batch_send_to_oneshot_contract() {
+            /////////////////////////////////////////////////////////////////////
+            // BIG STEP ONE - Setup Anvil and deploy SportsDataFeedStoreV2 to it
+            /////////////////////////////////////////////////////////////////////
 
-        // setup
-        let anvil = Anvil::new().try_spawn().unwrap();
-        let key_path = get_test_private_key_path();
-        let network = "ETH333";
+            // setup
+            let anvil = Anvil::new().try_spawn().unwrap();
+            let key_path = get_test_private_key_path();
+            let network = "ETH333";
 
-        let cfg = get_test_config_with_single_provider(
-            network,
-            key_path.as_path(),
-            anvil.endpoint().as_str(),
-        );
-        let feed_3_config = test_feed_config(3, 0);
-        let feeds_config = AllFeedsConfig {
-            feeds: vec![feed_3_config],
-        };
-        let providers = init_shared_rpc_providers(
-            &cfg,
-            Some("test_eth_batch_send_to_oneshot_contract_"),
-            &feeds_config,
-        )
-        .await;
+            let cfg = get_test_config_with_single_provider(
+                network,
+                key_path.as_path(),
+                anvil.endpoint().as_str(),
+            );
+            let feed_3_config = test_feed_config(3, 0);
+            let feeds_config = AllFeedsConfig {
+                feeds: vec![feed_3_config],
+            };
+            let providers = init_shared_rpc_providers(
+                &cfg,
+                Some("test_eth_batch_send_to_oneshot_contract_"),
+                &feeds_config,
+            )
+            .await;
 
-        // run
-        let result = deploy_contract(
-            &String::from(network),
-            &providers,
-            SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
-        )
-        .await;
-        // assert
-        // validate contract was deployed at expected address
-        if let Ok(msg) = result {
+            // run
+            let result = deploy_contract(
+                &String::from(network),
+                &providers,
+                SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME,
+            )
+            .await;
+            // assert
+            // validate contract was deployed at expected address
+            if let Ok(msg) = result {
+                let extracted_address = extract_address(&msg);
+                assert!(
+                    extracted_address.is_some(),
+                    "Did not return valid eth address"
+                );
+            } else {
+                panic!("contract deployment failed")
+            }
+
+            /////////////////////////////////////////////////////////////////////
+            // BIG STEP TWO - Prepare sample updates and write to the contract
+            /////////////////////////////////////////////////////////////////////
+
+            let net = "ETH333".to_string();
+
+            let providers = providers.read().await;
+
+            let provider = providers.get("ETH333").unwrap();
+
+            // Updates for Oneshot
+            /*
+            struct FootballData {
+                 uint32 homeScore;
+                 uint32 awayScore;
+                 uint32 homeShots;
+                 uint32 awayShots;
+                 uint32 homePenalties;
+                 uint32 awayPenalties;
+                 uint32 homeSaves;
+                 uint32 awaySaves;
+                 uint32 homeFirstHalfTimeScore;
+                 uint32 awayFirstHalfTimeScore;
+            }
+            */
+            let result_key = String::from("00000000000000000000000000000003"); // 16 bytes of zeroes in hex
+            let number_of_slots: String = String::from("0002"); // number 2 in two-bytes hex
+            let slot1 =
+                String::from("0000000100000002000000030000000400000005000000060000000700000008");
+            let slot2 =
+                String::from("0000000900000001000000000000000000000000000000000000000000000000");
+            let payload: String = format!("{slot1}{slot2}");
+            let description =
+                String::from("0000000000000000000000000000000000000000000000000000000000000000");
+            let result_value = format!("{number_of_slots}{payload}{description}");
+
+            let end_slot_timestamp = 0_u128;
+            let voted_update = VotedFeedUpdate::new_decode(
+                &result_key,
+                &result_value,
+                end_slot_timestamp,
+                blocksense_feed_registry::types::FeedType::Numerical(0.0f64),
+                18,
+            )
+            .unwrap();
+            let updates_oneshot = BatchedAggregatesToSend {
+                block_height: 0,
+                updates: vec![voted_update],
+            };
+            let provider_settings = cfg
+                .providers
+                .get(&net)
+                .unwrap_or_else(|| panic!("Config for network {net} not found!"))
+                .clone();
+            let feeds_config = Arc::new(RwLock::new(HashMap::<FeedId, FeedConfig>::new()));
+
+            let result = eth_batch_send_to_contract(
+                net.clone(),
+                provider.clone(),
+                provider_settings,
+                updates_oneshot,
+                Oneshot,
+                feeds_config,
+                50,
+                10,
+                0.1,
+            )
+            .await;
+            assert!(result.is_ok());
+            // getter calldata will be:
+            // 0x800000030000000000000000000000000000000000000000000000000000000000000002
+            let calldata = String::from(
+                "0x800000030000000000000000000000000000000000000000000000000000000000000002",
+            );
+            let calldata_bytes = Bytes::from_hex(calldata).expect("Invalid calldata");
+            let address_to_send = provider
+                .lock()
+                .await
+                .get_contract_address(SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
+                .unwrap();
+            let result = provider
+                .lock()
+                .await
+                .provider
+                .call(TransactionRequest {
+                    to: Some(TxKind::Call(address_to_send)),
+                    input: TransactionInput {
+                        input: Some(calldata_bytes.clone()),
+                        data: Some(calldata_bytes.clone()),
+                    },
+                    ..Default::default()
+                })
+                .await;
+            println!("@@0b result: {result:?}");
+            assert!(result.is_ok(), "Call to getFeedById failed");
+            let output = result.unwrap();
+            assert_eq!(output.len(), 64, "Invalid output length");
+        }
+
+        #[tokio::test]
+        async fn test_eth_batch_send_to_all_oneshot_contracts() {
+            let metrics_prefix = "test_eth_batch_send_to_all_oneshot_contracts";
+
+            /////////////////////////////////////////////////////////////////////
+            // BIG STEP ONE - Setup Anvil and deploy SportsDataFeedStoreV2 to it
+            /////////////////////////////////////////////////////////////////////
+
+            // setup
+            let key_path = get_test_private_key_path();
+
+            let anvil_network1 = Anvil::new().try_spawn().unwrap();
+            let network1 = "ETH374";
+            let anvil_network2 = Anvil::new().try_spawn().unwrap();
+            let network2 = "ETH375";
+            let anvil_network3 = Anvil::new().try_spawn().unwrap();
+            let network3 = "ETH_test_eth_batch_send_to_all_oneshot_contracts";
+
+            let sequencer_config = get_test_config_with_multiple_providers(vec![
+                (
+                    network1,
+                    key_path.as_path(),
+                    anvil_network1.endpoint().as_str(),
+                ),
+                (
+                    network2,
+                    key_path.as_path(),
+                    anvil_network2.endpoint().as_str(),
+                ),
+                (
+                    network3,
+                    key_path.as_path(),
+                    anvil_network3.endpoint().as_str(),
+                ),
+            ]);
+            let stride = 0;
+            let feeds: Vec<FeedConfig> = (0..16)
+                .map(|feed_id| test_feed_config(feed_id, stride))
+                .collect();
+            let feeds_config = AllFeedsConfig { feeds };
+
+            let (sequencer_state, _) = create_sequencer_state_and_collected_futures(
+                sequencer_config.clone(),
+                metrics_prefix,
+                feeds_config,
+            )
+            .await;
+
+            let msg = sequencer_state
+                .deploy_contract(network1, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
+                .await
+                .expect("contract deployment failed");
+            // assert
+            // validate contract was deployed at expected address
             let extracted_address = extract_address(&msg);
             assert!(
                 extracted_address.is_some(),
                 "Did not return valid eth address"
             );
-        } else {
-            panic!("contract deployment failed")
+            let msg2 = sequencer_state
+                .deploy_contract(network2, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
+                .await
+                .expect("contract deployment failed");
+
+            // validate contract was deployed at expected address
+            let extracted_address = extract_address(&msg2);
+            assert!(
+                extracted_address.is_some(),
+                "Did not return valid eth address"
+            );
+
+            /////////////////////////////////////////////////////////////////////
+            // BIG STEP TWO - Prepare sample updates and write to the contract
+            /////////////////////////////////////////////////////////////////////
+
+            // Updates for Oneshot
+            let slot1 =
+                String::from("0404040404040404040404040404040404040404040404040404040404040404");
+            let slot2 =
+                String::from("0505050505050505050505050505050505050505050505050505050505050505");
+            let value1 = format!("{:04x}{}{}", 0x0002, slot1, slot2);
+            let end_of_timeslot = 0_u128;
+            let updates_oneshot = BatchedAggregatesToSend {
+                block_height: 0,
+                updates: vec![VotedFeedUpdate::new_decode(
+                    "00000000000000000000000000000003",
+                    &value1,
+                    end_of_timeslot,
+                    FeedType::Text("".to_string()),
+                    18,
+                )
+                .unwrap()],
+            };
+
+            let result =
+                eth_batch_send_to_all_contracts(&sequencer_state, &updates_oneshot, Oneshot, None)
+                    .await;
+            // TODO: This is actually not a good assertion since the eth_batch_send_to_all_contracts
+            // will always return ok even if some or all of the sends we unsuccessful. Will be fixed in
+            // followups
+            assert!(result.is_ok());
         }
 
-        /////////////////////////////////////////////////////////////////////
-        // BIG STEP TWO - Prepare sample updates and write to the contract
-        /////////////////////////////////////////////////////////////////////
+        #[tokio::test]
+        async fn test_eth_batch_send_to_multidata_contracts_and_read_value() {
+            let metrics_prefix = "test_eth_batch_send_to_multidata_contracts_and_read_value";
 
-        let net = "ETH333".to_string();
+            ///////////////////////////////////////////////////////////////////////////////////
+            // BIG STEP ONE - Setup Anvil and deploy HistoricalDataFeedStoreV2 and Multicall
+            ///////////////////////////////////////////////////////////////////////////////////
 
-        let providers = providers.read().await;
-
-        let provider = providers.get("ETH333").unwrap();
-
-        // Updates for Oneshot
-        /*
-        struct FootballData {
-             uint32 homeScore;
-             uint32 awayScore;
-             uint32 homeShots;
-             uint32 awayShots;
-             uint32 homePenalties;
-             uint32 awayPenalties;
-             uint32 homeSaves;
-             uint32 awaySaves;
-             uint32 homeFirstHalfTimeScore;
-             uint32 awayFirstHalfTimeScore;
-        }
-        */
-        let result_key = String::from("00000000000000000000000000000003"); // 16 bytes of zeroes in hex
-        let number_of_slots: String = String::from("0002"); // number 2 in two-bytes hex
-        let slot1 =
-            String::from("0000000100000002000000030000000400000005000000060000000700000008");
-        let slot2 =
-            String::from("0000000900000001000000000000000000000000000000000000000000000000");
-        let payload: String = format!("{slot1}{slot2}");
-        let description =
-            String::from("0000000000000000000000000000000000000000000000000000000000000000");
-        let result_value = format!("{number_of_slots}{payload}{description}");
-
-        let end_slot_timestamp = 0_u128;
-        let voted_update = VotedFeedUpdate::new_decode(
-            &result_key,
-            &result_value,
-            end_slot_timestamp,
-            blocksense_feed_registry::types::FeedType::Numerical(0.0f64),
-            18,
-        )
-        .unwrap();
-        let updates_oneshot = BatchedAggregatesToSend {
-            block_height: 0,
-            updates: vec![voted_update],
-        };
-        let provider_settings = cfg
-            .providers
-            .get(&net)
-            .unwrap_or_else(|| panic!("Config for network {net} not found!"))
-            .clone();
-        let feeds_config = Arc::new(RwLock::new(HashMap::<FeedId, FeedConfig>::new()));
-
-        let result = eth_batch_send_to_contract(
-            net.clone(),
-            provider.clone(),
-            provider_settings,
-            updates_oneshot,
-            Oneshot,
-            feeds_config,
-            50,
-            10,
-            0.1,
-        )
-        .await;
-
-        assert!(result.is_ok());
-        // getter calldata will be:
-        // 0x800000030000000000000000000000000000000000000000000000000000000000000002
-        let calldata = String::from(
-            "0x800000030000000000000000000000000000000000000000000000000000000000000002",
-        );
-        let calldata_bytes = Bytes::from_hex(calldata).expect("Invalid calldata");
-        let address_to_send = provider
-            .lock()
-            .await
-            .get_contract_address(SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
-            .unwrap();
-        let result = provider
-            .lock()
-            .await
-            .provider
-            .call(TransactionRequest {
-                to: Some(TxKind::Call(address_to_send)),
-                input: TransactionInput {
-                    input: Some(calldata_bytes.clone()),
-                    data: Some(calldata_bytes.clone()),
-                },
-                ..Default::default()
-            })
-            .await;
-        println!("@@0b result: {result:?}");
-        assert!(result.is_ok(), "Call to getFeedById failed");
-        let output = result.unwrap();
-        assert_eq!(output.len(), 64, "Invalid output length");
-    }
-
-    #[tokio::test]
-    async fn test_eth_batch_send_to_all_oneshot_contracts() {
-        let metrics_prefix = "test_eth_batch_send_to_all_oneshot_contracts";
-
-        /////////////////////////////////////////////////////////////////////
-        // BIG STEP ONE - Setup Anvil and deploy SportsDataFeedStoreV2 to it
-        /////////////////////////////////////////////////////////////////////
-
-        // setup
-        let key_path = get_test_private_key_path();
-
-        let anvil_network1 = Anvil::new().try_spawn().unwrap();
-        let network1 = "ETH374";
-        let anvil_network2 = Anvil::new().try_spawn().unwrap();
-        let network2 = "ETH375";
-        let anvil_network3 = Anvil::new().try_spawn().unwrap();
-        let network3 = "ETH_test_eth_batch_send_to_all_oneshot_contracts";
-
-        let sequencer_config = get_test_config_with_multiple_providers(vec![
-            (
+            // setup
+            let key_path = get_test_private_key_path();
+            let anvil_network1 = Anvil::new().try_spawn().unwrap();
+            let network1 = "ETH17787";
+            let mut sequencer_config = get_test_config_with_multiple_providers(vec![(
                 network1,
                 key_path.as_path(),
                 anvil_network1.endpoint().as_str(),
-            ),
-            (
-                network2,
-                key_path.as_path(),
-                anvil_network2.endpoint().as_str(),
-            ),
-            (
-                network3,
-                key_path.as_path(),
-                anvil_network3.endpoint().as_str(),
-            ),
-        ]);
-        let stride = 0;
-        let feeds: Vec<FeedConfig> = (0..16)
-            .map(|feed_id| test_feed_config(feed_id, stride))
-            .collect();
-        let feeds_config = AllFeedsConfig { feeds };
+            )]);
+            let p_entry = sequencer_config.providers.entry(network1.to_string());
+            p_entry.and_modify(|p| {
+                if let Some(x) = p
+                    .contracts
+                    .iter_mut()
+                    .find(|x| x.name == MULTICALL_CONTRACT_NAME)
+                {
+                    x.address = None;
+                    x.creation_byte_code = Some(Multicall::BYTECODE.to_string());
+                }
+                if let Some(x) = p
+                    .contracts
+                    .iter_mut()
+                    .find(|x| x.name == HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
+                {
+                    x.address = None;
+                }
+            });
+            let stride = 0;
+            let mut feeds: Vec<FeedConfig> = (0..16)
+                .map(|feed_id| test_feed_config(feed_id, stride))
+                .collect();
+            feeds[1].schedule.interval_ms = 1000; // 1 secound
+            let feed = feeds[1].clone();
+            let feeds_config = AllFeedsConfig { feeds };
 
-        let (sequencer_state, _) = create_sequencer_state_and_collected_futures(
-            sequencer_config.clone(),
-            metrics_prefix,
-            feeds_config,
-        )
-        .await;
-
-        let msg = sequencer_state
-            .deploy_contract(network1, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
-            .await
-            .expect("contract deployment failed");
-        // assert
-        // validate contract was deployed at expected address
-        let extracted_address = extract_address(&msg);
-        assert!(
-            extracted_address.is_some(),
-            "Did not return valid eth address"
-        );
-        let msg2 = sequencer_state
-            .deploy_contract(network2, SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME)
-            .await
-            .expect("contract deployment failed");
-
-        // validate contract was deployed at expected address
-        let extracted_address = extract_address(&msg2);
-        assert!(
-            extracted_address.is_some(),
-            "Did not return valid eth address"
-        );
-
-        /////////////////////////////////////////////////////////////////////
-        // BIG STEP TWO - Prepare sample updates and write to the contract
-        /////////////////////////////////////////////////////////////////////
-
-        // Updates for Oneshot
-        let slot1 =
-            String::from("0404040404040404040404040404040404040404040404040404040404040404");
-        let slot2 =
-            String::from("0505050505050505050505050505050505050505050505050505050505050505");
-        let value1 = format!("{:04x}{}{}", 0x0002, slot1, slot2);
-        let end_of_timeslot = 0_u128;
-        let updates_oneshot = BatchedAggregatesToSend {
-            block_height: 0,
-            updates: vec![VotedFeedUpdate::new_decode(
-                "00000000000000000000000000000003",
-                &value1,
-                end_of_timeslot,
-                FeedType::Text("".to_string()),
-                18,
+            let (sequencer_state, _) = create_sequencer_state_and_collected_futures(
+                sequencer_config.clone(),
+                metrics_prefix,
+                feeds_config,
             )
-            .unwrap()],
-        };
+            .await;
 
-        let result =
-            eth_batch_send_to_all_contracts(&sequencer_state, &updates_oneshot, Oneshot, None)
+            // run
+            let msg = sequencer_state
+                .deploy_contract(network1, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
+                .await
+                .expect("Data feed publishing contract deployment failed!");
+            // assert
+            // validate contract was deployed at expected address
+            let extracted_address = extract_address(&msg).expect("Did not return valid eth address");
+            let contract_address =
+                Address::parse_checksummed(&extracted_address, None).expect("valid checksum");
+
+            {
+                let providers = sequencer_state.providers.read().await;
+                let p = providers.get(network1).unwrap().lock().await;
+                let nonce = p.provider.get_transaction_count(contract_address).await;
+                assert!(nonce.is_ok());
+                assert_eq!(nonce.unwrap(), 1);
+            }
+
+            /////////////////////////////////////////////////////////////////////
+            // BIG STEP TWO - Prepare sample updates and write to the contract
+            /////////////////////////////////////////////////////////////////////
+            {
+                let providers = sequencer_state.providers.read().await;
+                let mut p = providers.get(network1).unwrap().lock().await;
+                p.history.register_feed(feed.id, 100);
+            }
+            let interval_ms = feed.schedule.interval_ms as u128;
+            {
+                // Some arbitrary point in time in the past, nothing special about this value
+                let first_report_start_time = UNIX_EPOCH + Duration::from_secs(1524885322);
+                let end_slot_timestamp = first_report_start_time.elapsed().unwrap().as_millis();
+                let v1 = VotedFeedUpdate {
+                    feed_id: feed.id,
+                    value: FeedType::Numerical(103082.01f64),
+                    end_slot_timestamp: end_slot_timestamp + interval_ms,
+                };
+                let v2 = VotedFeedUpdate {
+                    feed_id: feed.id,
+                    value: FeedType::Numerical(103012.21f64),
+                    end_slot_timestamp: end_slot_timestamp + interval_ms * 2,
+                };
+
+                let v3 = VotedFeedUpdate {
+                    feed_id: feed.id,
+                    value: FeedType::Numerical(104011.78f64),
+                    end_slot_timestamp: end_slot_timestamp + interval_ms * 3,
+                };
+
+                let updates1 = BatchedAggregatesToSend {
+                    block_height: 0,
+                    updates: vec![v1],
+                };
+                let updates2 = BatchedAggregatesToSend {
+                    block_height: 1,
+                    updates: vec![v2],
+                };
+                let updates3 = BatchedAggregatesToSend {
+                    block_height: 2,
+                    updates: vec![v3],
+                };
+
+                let p1 = eth_batch_send_to_all_contracts(
+                    &sequencer_state,
+                    &updates1,
+                    Repeatability::Periodic,
+                    None,
+                )
                 .await;
-        // TODO: This is actually not a good assertion since the eth_batch_send_to_all_contracts
-        // will always return ok even if some or all of the sends we unsuccessful. Will be fixed in
-        // followups
-        assert!(result.is_ok());
-    }
+                assert!(p1.is_ok());
 
-    #[tokio::test]
-    async fn test_eth_batch_send_to_multidata_contracts_and_read_value() {
-        let metrics_prefix = "test_eth_batch_send_to_multidata_contracts_and_read_value";
+                let p2 = eth_batch_send_to_all_contracts(
+                    &sequencer_state,
+                    &updates2,
+                    Repeatability::Periodic,
+                    None,
+                )
+                .await;
+                assert!(p2.is_ok());
 
-        ///////////////////////////////////////////////////////////////////////////////////
-        // BIG STEP ONE - Setup Anvil and deploy HistoricalDataFeedStoreV2 and Multicall
-        ///////////////////////////////////////////////////////////////////////////////////
-
-        // setup
-        let key_path = get_test_private_key_path();
-        let anvil_network1 = Anvil::new().try_spawn().unwrap();
-        let network1 = "ETH17787";
-        let mut sequencer_config = get_test_config_with_multiple_providers(vec![(
-            network1,
-            key_path.as_path(),
-            anvil_network1.endpoint().as_str(),
-        )]);
-        let p_entry = sequencer_config.providers.entry(network1.to_string());
-        p_entry.and_modify(|p| {
-            if let Some(x) = p
-                .contracts
-                .iter_mut()
-                .find(|x| x.name == MULTICALL_CONTRACT_NAME)
-            {
-                x.address = None;
-                x.creation_byte_code = Some(Multicall::BYTECODE.to_string());
+                let p3 = eth_batch_send_to_all_contracts(
+                    &sequencer_state,
+                    &updates3,
+                    Repeatability::Periodic,
+                    None,
+                )
+                .await;
+                assert!(p3.is_ok());
             }
-            if let Some(x) = p
-                .contracts
-                .iter_mut()
-                .find(|x| x.name == HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
+
+            // wait for the updates to be published
+            let time_to_await: Duration = Duration::from_millis((interval_ms * 4) as u64);
+            let mut interval = interval(time_to_await);
+            interval.tick().await;
+            // The first tick completes immediately.
+            interval.tick().await;
+
+            /////////////////////////////////////////////////////////////////////
+            // BIG STEP THREE - Read data from contract and verify that it's correct
+            /////////////////////////////////////////////////////////////////////
+
+            let msg = sequencer_state
+                .deploy_contract(network1, MULTICALL_CONTRACT_NAME)
+                .await
+                .expect("Mutlicall contract deployment failed!");
+            let _extracted_address = extract_address(&msg).expect("Did not return valid eth address");
             {
-                x.address = None;
+                let p = sequencer_state.get_provider(network1).await.unwrap();
+                let p_lock = p.lock().await;
+
+                let latest = p_lock
+                    .get_latest_values(&[feed.id])
+                    .await
+                    .expect("Can't get latest values from contract");
+                assert_eq!(latest.len(), 1);
+                let latest = latest[0].clone().expect("no error in feed");
+                assert_eq!(latest.feed_id, 1 as FeedId);
+                assert_eq!(latest.num_updates, 3_u128);
+                assert_eq!(latest.value, FeedType::Numerical(104011.78f64));
+
+                let history = p_lock
+                    .get_historical_values_for_feed(feed.id, &[0_u128, 1_u128, 2_u128, 3_u128, 4_u128])
+                    .await
+                    .expect("Error when reading historical values from contract!");
+
+                assert_eq!(history.len(), 5);
+
+                let feed_ids: Vec<FeedId> = history
+                    .iter()
+                    .map(|x| match x {
+                        Ok(x) => x.feed_id,
+                        Err(x) => x.feed_id,
+                    })
+                    .collect();
+
+                let errors: Vec<Option<&str>> = history
+                    .iter()
+                    .map(|x| match x {
+                        Ok(_) => None,
+                        Err(x) => Some(x.error.as_str()),
+                    })
+                    .collect();
+
+                let values: Vec<Option<FeedType>> = history
+                    .iter()
+                    .map(|x| match x {
+                        Ok(x) => Some(x.value.clone()),
+                        Err(_) => None,
+                    })
+                    .collect();
+
+                let vec_num_updates: Vec<u128> = history
+                    .iter()
+                    .map(|x| match x {
+                        Ok(x) => x.num_updates,
+                        Err(x) => x.num_updates,
+                    })
+                    .collect();
+
+                let vec_published: Vec<Option<u128>> = history
+                    .iter()
+                    .map(|x| match x {
+                        Ok(x) => Some(x.published),
+                        Err(_) => None,
+                    })
+                    .collect();
+
+                assert_eq!(feed_ids[0], 1 as FeedId);
+                assert_eq!(feed_ids[1], 1 as FeedId);
+                assert_eq!(feed_ids[2], 1 as FeedId);
+                assert_eq!(feed_ids[3], 1 as FeedId);
+                assert_eq!(feed_ids[4], 1 as FeedId);
+
+                assert_eq!(errors[0], Some("Timestamp is zero"));
+                assert_eq!(values[1], Some(FeedType::Numerical(103082.01f64)));
+                assert_eq!(values[2], Some(FeedType::Numerical(103012.21f64)));
+                assert_eq!(values[3], Some(FeedType::Numerical(104011.78f64)));
+                assert_eq!(errors[4], Some("Timestamp is zero"));
+
+                assert_eq!(vec_num_updates[0], 0_u128);
+                assert_eq!(vec_num_updates[1], 1_u128);
+                assert_eq!(vec_num_updates[2], 2_u128);
+                assert_eq!(vec_num_updates[3], 3_u128);
+                assert_eq!(vec_num_updates[4], 4_u128);
+
+                assert_eq!(vec_published[0], None);
+                assert_ne!(vec_published[1], Some(0_u128));
+                assert_ne!(vec_published[2], Some(0_u128));
+                assert_ne!(vec_published[3], Some(0_u128));
+                assert_eq!(vec_published[4], None);
             }
-        });
-        let stride = 0;
-        let mut feeds: Vec<FeedConfig> = (0..16)
-            .map(|feed_id| test_feed_config(feed_id, stride))
-            .collect();
-        feeds[1].schedule.interval_ms = 1000; // 1 secound
-        let feed = feeds[1].clone();
-        let feeds_config = AllFeedsConfig { feeds };
 
-        let (sequencer_state, _) = create_sequencer_state_and_collected_futures(
-            sequencer_config.clone(),
-            metrics_prefix,
-            feeds_config,
-        )
-        .await;
+            {
+                let provider = sequencer_state
+                    .get_provider(network1)
+                    .await
+                    .expect("Provider should be available");
+                let mut p_lock = provider.lock().await;
+                let num_cleared = p_lock.history.clear(feed.id);
+                assert_eq!(num_cleared, 3);
+                let limit = 2_u32;
+                let num_loaded = p_lock
+                    .load_history_from_chain_for_feed(feed.id, limit)
+                    .await
+                    .unwrap();
+                assert_eq!(num_loaded, 2);
 
-        // run
-        let msg = sequencer_state
-            .deploy_contract(network1, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
-            .await
-            .expect("Data feed publishing contract deployment failed!");
-        // assert
-        // validate contract was deployed at expected address
-        let extracted_address = extract_address(&msg).expect("Did not return valid eth address");
-        let contract_address =
-            Address::parse_checksummed(&extracted_address, None).expect("valid checksum");
+                let v = p_lock
+                    .history
+                    .get(feed.id)
+                    .expect("Give me history")
+                    .iter()
+                    .cloned()
+                    .collect::<Vec<HistoryEntry>>();
+                assert_eq!(v.len(), 2);
+                assert_eq!(v[0].update_number, 2_u128);
+                assert_eq!(v[0].value, FeedType::Numerical(103012.21f64));
+                assert_eq!(v[1].update_number, 3_u128);
+                assert_eq!(v[1].value, FeedType::Numerical(104011.78f64));
+            }
 
-        {
-            let providers = sequencer_state.providers.read().await;
-            let p = providers.get(network1).unwrap().lock().await;
-            let nonce = p.provider.get_transaction_count(contract_address).await;
-            assert!(nonce.is_ok());
-            assert_eq!(nonce.unwrap(), 1);
+            {
+                let provider = sequencer_state
+                    .get_provider(network1)
+                    .await
+                    .expect("Provider should be available");
+                let mut p_lock = provider.lock().await;
+                let num_cleared = p_lock.history.clear(feed.id);
+                assert_eq!(num_cleared, 2);
+                let limit = 3_u32;
+                let num_loaded = p_lock
+                    .load_history_from_chain_for_feed(feed.id, limit)
+                    .await
+                    .unwrap();
+                assert_eq!(num_loaded, 3);
+
+                let v = p_lock
+                    .history
+                    .get(feed.id)
+                    .expect("Give me history")
+                    .iter()
+                    .cloned()
+                    .collect::<Vec<HistoryEntry>>();
+                assert_eq!(v.len(), 3);
+                assert_eq!(v[0].update_number, 1_u128);
+                assert_eq!(v[0].value, FeedType::Numerical(103082.01f64));
+                assert_eq!(v[1].update_number, 2_u128);
+                assert_eq!(v[1].value, FeedType::Numerical(103012.21f64));
+                assert_eq!(v[2].update_number, 3_u128);
+                assert_eq!(v[2].value, FeedType::Numerical(104011.78f64));
+            }
+
+            {
+                let provider = sequencer_state
+                    .get_provider(network1)
+                    .await
+                    .expect("Provider should be available");
+                let mut p_lock = provider.lock().await;
+
+                let limit = 200_u32;
+
+                // Make sure the values are not loaded more then once in history
+                let num_loaded = p_lock
+                    .load_history_from_chain_for_feed(feed.id, limit)
+                    .await
+                    .unwrap();
+                assert_eq!(num_loaded, 0);
+
+                let v = p_lock
+                    .history
+                    .get(feed.id)
+                    .expect("Give me history")
+                    .iter()
+                    .cloned()
+                    .collect::<Vec<HistoryEntry>>();
+                assert_eq!(v.len(), 3);
+                assert_eq!(v[0].update_number, 1_u128);
+                assert_eq!(v[0].value, FeedType::Numerical(103082.01f64));
+                assert_eq!(v[1].update_number, 2_u128);
+                assert_eq!(v[1].value, FeedType::Numerical(103012.21f64));
+                assert_eq!(v[2].update_number, 3_u128);
+                assert_eq!(v[2].value, FeedType::Numerical(104011.78f64));
+                // The date and time  of publishing is determined by the smart contarct, so we don't have control of this value
+                info!(
+                    "Historical update {} publish date {:?}",
+                    v[0].update_number,
+                    v[0].get_date_time_published()
+                );
+                info!(
+                    "Historical update {} publish date {:?}",
+                    v[1].update_number,
+                    v[1].get_date_time_published()
+                );
+            }
         }
-
-        /////////////////////////////////////////////////////////////////////
-        // BIG STEP TWO - Prepare sample updates and write to the contract
-        /////////////////////////////////////////////////////////////////////
-        {
-            let providers = sequencer_state.providers.read().await;
-            let mut p = providers.get(network1).unwrap().lock().await;
-            p.history.register_feed(feed.id, 100);
-        }
-        let interval_ms = feed.schedule.interval_ms as u128;
-        {
-            // Some arbitrary point in time in the past, nothing special about this value
-            let first_report_start_time = UNIX_EPOCH + Duration::from_secs(1524885322);
-            let end_slot_timestamp = first_report_start_time.elapsed().unwrap().as_millis();
-            let v1 = VotedFeedUpdate {
-                feed_id: feed.id,
-                value: FeedType::Numerical(103082.01f64),
-                end_slot_timestamp: end_slot_timestamp + interval_ms,
-            };
-            let v2 = VotedFeedUpdate {
-                feed_id: feed.id,
-                value: FeedType::Numerical(103012.21f64),
-                end_slot_timestamp: end_slot_timestamp + interval_ms * 2,
-            };
-
-            let v3 = VotedFeedUpdate {
-                feed_id: feed.id,
-                value: FeedType::Numerical(104011.78f64),
-                end_slot_timestamp: end_slot_timestamp + interval_ms * 3,
-            };
-
-            let updates1 = BatchedAggregatesToSend {
-                block_height: 0,
-                updates: vec![v1],
-            };
-            let updates2 = BatchedAggregatesToSend {
-                block_height: 1,
-                updates: vec![v2],
-            };
-            let updates3 = BatchedAggregatesToSend {
-                block_height: 2,
-                updates: vec![v3],
-            };
-
-            let p1 = eth_batch_send_to_all_contracts(
-                &sequencer_state,
-                &updates1,
-                Repeatability::Periodic,
-                None,
-            )
-            .await;
-            assert!(p1.is_ok());
-
-            let p2 = eth_batch_send_to_all_contracts(
-                &sequencer_state,
-                &updates2,
-                Repeatability::Periodic,
-                None,
-            )
-            .await;
-            assert!(p2.is_ok());
-
-            let p3 = eth_batch_send_to_all_contracts(
-                &sequencer_state,
-                &updates3,
-                Repeatability::Periodic,
-                None,
-            )
-            .await;
-            assert!(p3.is_ok());
-        }
-
-        // wait for the updates to be published
-        let time_to_await: Duration = Duration::from_millis((interval_ms * 4) as u64);
-        let mut interval = interval(time_to_await);
-        interval.tick().await;
-        // The first tick completes immediately.
-        interval.tick().await;
-
-        /////////////////////////////////////////////////////////////////////
-        // BIG STEP THREE - Read data from contract and verify that it's correct
-        /////////////////////////////////////////////////////////////////////
-
-        let msg = sequencer_state
-            .deploy_contract(network1, MULTICALL_CONTRACT_NAME)
-            .await
-            .expect("Mutlicall contract deployment failed!");
-        let _extracted_address = extract_address(&msg).expect("Did not return valid eth address");
-        {
-            let p = sequencer_state.get_provider(network1).await.unwrap();
-            let p_lock = p.lock().await;
-
-            let latest = p_lock
-                .get_latest_values(&[feed.id])
-                .await
-                .expect("Can't get latest values from contract");
-            assert_eq!(latest.len(), 1);
-            let latest = latest[0].clone().expect("no error in feed");
-            assert_eq!(latest.feed_id, 1 as FeedId);
-            assert_eq!(latest.num_updates, 3_u128);
-            assert_eq!(latest.value, FeedType::Numerical(104011.78f64));
-
-            let history = p_lock
-                .get_historical_values_for_feed(feed.id, &[0_u128, 1_u128, 2_u128, 3_u128, 4_u128])
-                .await
-                .expect("Error when reading historical values from contract!");
-
-            assert_eq!(history.len(), 5);
-
-            let feed_ids: Vec<FeedId> = history
-                .iter()
-                .map(|x| match x {
-                    Ok(x) => x.feed_id,
-                    Err(x) => x.feed_id,
-                })
-                .collect();
-
-            let errors: Vec<Option<&str>> = history
-                .iter()
-                .map(|x| match x {
-                    Ok(_) => None,
-                    Err(x) => Some(x.error.as_str()),
-                })
-                .collect();
-
-            let values: Vec<Option<FeedType>> = history
-                .iter()
-                .map(|x| match x {
-                    Ok(x) => Some(x.value.clone()),
-                    Err(_) => None,
-                })
-                .collect();
-
-            let vec_num_updates: Vec<u128> = history
-                .iter()
-                .map(|x| match x {
-                    Ok(x) => x.num_updates,
-                    Err(x) => x.num_updates,
-                })
-                .collect();
-
-            let vec_published: Vec<Option<u128>> = history
-                .iter()
-                .map(|x| match x {
-                    Ok(x) => Some(x.published),
-                    Err(_) => None,
-                })
-                .collect();
-
-            assert_eq!(feed_ids[0], 1 as FeedId);
-            assert_eq!(feed_ids[1], 1 as FeedId);
-            assert_eq!(feed_ids[2], 1 as FeedId);
-            assert_eq!(feed_ids[3], 1 as FeedId);
-            assert_eq!(feed_ids[4], 1 as FeedId);
-
-            assert_eq!(errors[0], Some("Timestamp is zero"));
-            assert_eq!(values[1], Some(FeedType::Numerical(103082.01f64)));
-            assert_eq!(values[2], Some(FeedType::Numerical(103012.21f64)));
-            assert_eq!(values[3], Some(FeedType::Numerical(104011.78f64)));
-            assert_eq!(errors[4], Some("Timestamp is zero"));
-
-            assert_eq!(vec_num_updates[0], 0_u128);
-            assert_eq!(vec_num_updates[1], 1_u128);
-            assert_eq!(vec_num_updates[2], 2_u128);
-            assert_eq!(vec_num_updates[3], 3_u128);
-            assert_eq!(vec_num_updates[4], 4_u128);
-
-            assert_eq!(vec_published[0], None);
-            assert_ne!(vec_published[1], Some(0_u128));
-            assert_ne!(vec_published[2], Some(0_u128));
-            assert_ne!(vec_published[3], Some(0_u128));
-            assert_eq!(vec_published[4], None);
-        }
-
-        {
-            let provider = sequencer_state
-                .get_provider(network1)
-                .await
-                .expect("Provider should be available");
-            let mut p_lock = provider.lock().await;
-            let num_cleared = p_lock.history.clear(feed.id);
-            assert_eq!(num_cleared, 3);
-            let limit = 2_u32;
-            let num_loaded = p_lock
-                .load_history_from_chain_for_feed(feed.id, limit)
-                .await
-                .unwrap();
-            assert_eq!(num_loaded, 2);
-
-            let v = p_lock
-                .history
-                .get(feed.id)
-                .expect("Give me history")
-                .iter()
-                .cloned()
-                .collect::<Vec<HistoryEntry>>();
-            assert_eq!(v.len(), 2);
-            assert_eq!(v[0].update_number, 2_u128);
-            assert_eq!(v[0].value, FeedType::Numerical(103012.21f64));
-            assert_eq!(v[1].update_number, 3_u128);
-            assert_eq!(v[1].value, FeedType::Numerical(104011.78f64));
-        }
-
-        {
-            let provider = sequencer_state
-                .get_provider(network1)
-                .await
-                .expect("Provider should be available");
-            let mut p_lock = provider.lock().await;
-            let num_cleared = p_lock.history.clear(feed.id);
-            assert_eq!(num_cleared, 2);
-            let limit = 3_u32;
-            let num_loaded = p_lock
-                .load_history_from_chain_for_feed(feed.id, limit)
-                .await
-                .unwrap();
-            assert_eq!(num_loaded, 3);
-
-            let v = p_lock
-                .history
-                .get(feed.id)
-                .expect("Give me history")
-                .iter()
-                .cloned()
-                .collect::<Vec<HistoryEntry>>();
-            assert_eq!(v.len(), 3);
-            assert_eq!(v[0].update_number, 1_u128);
-            assert_eq!(v[0].value, FeedType::Numerical(103082.01f64));
-            assert_eq!(v[1].update_number, 2_u128);
-            assert_eq!(v[1].value, FeedType::Numerical(103012.21f64));
-            assert_eq!(v[2].update_number, 3_u128);
-            assert_eq!(v[2].value, FeedType::Numerical(104011.78f64));
-        }
-
-        {
-            let provider = sequencer_state
-                .get_provider(network1)
-                .await
-                .expect("Provider should be available");
-            let mut p_lock = provider.lock().await;
-
-            let limit = 200_u32;
-
-            // Make sure the values are not loaded more then once in history
-            let num_loaded = p_lock
-                .load_history_from_chain_for_feed(feed.id, limit)
-                .await
-                .unwrap();
-            assert_eq!(num_loaded, 0);
-
-            let v = p_lock
-                .history
-                .get(feed.id)
-                .expect("Give me history")
-                .iter()
-                .cloned()
-                .collect::<Vec<HistoryEntry>>();
-            assert_eq!(v.len(), 3);
-            assert_eq!(v[0].update_number, 1_u128);
-            assert_eq!(v[0].value, FeedType::Numerical(103082.01f64));
-            assert_eq!(v[1].update_number, 2_u128);
-            assert_eq!(v[1].value, FeedType::Numerical(103012.21f64));
-            assert_eq!(v[2].update_number, 3_u128);
-            assert_eq!(v[2].value, FeedType::Numerical(104011.78f64));
-            // The date and time  of publishing is determined by the smart contarct, so we don't have control of this value
-            info!(
-                "Historical update {} publish date {:?}",
-                v[0].update_number,
-                v[0].get_date_time_published()
-            );
-            info!(
-                "Historical update {} publish date {:?}",
-                v[1].update_number,
-                v[1].get_date_time_published()
-            );
-        }
-    }
-
+    */
     #[tokio::test]
     async fn compute_keys_vals_ignores_networks_not_on_the_list() {
         let selector = "1a2d80ac";
