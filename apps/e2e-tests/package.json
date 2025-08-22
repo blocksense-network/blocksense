@@ -20,6 +20,8 @@
     "@effect/rpc": "^0.68.0",
     "@effect/sql": "^0.44.0",
     "@effect/vitest": "^0.25.0",
+    "@noble/curves": "^1.9.7",
+    "@noble/hashes": "^1.8.0",
     "@types/node": "^22.3.0",
     "effect": "^3.15.1",
     "execa": "^9.5.2",

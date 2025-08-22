@@ -311,6 +311,7 @@ where
     // let obj = serde_json::from_slice::<MyObj>(&body)?;
     debug!("body = {body:?}!");
 
+    println!("xoxo: {:?}", body);
     let v: serde_json::Value = serde_json::from_str(std::str::from_utf8(&body)?)?;
     let vec_t: Vec<T> = serde_json::from_value(v)?;
     Ok(vec_t)
