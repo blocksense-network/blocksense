@@ -1463,31 +1463,13 @@ mod tests {
                 updates: vec![v3],
             };
 
-            let p1 = eth_batch_send_to_all_contracts(
-                &sequencer_state,
-                &updates1,
-                Repeatability::Periodic,
-                None,
-            )
-            .await;
+            let p1 = eth_batch_send_to_all_contracts(&sequencer_state, &updates1, None).await;
             assert!(p1.is_ok());
 
-            let p2 = eth_batch_send_to_all_contracts(
-                &sequencer_state,
-                &updates2,
-                Repeatability::Periodic,
-                None,
-            )
-            .await;
+            let p2 = eth_batch_send_to_all_contracts(&sequencer_state, &updates2, None).await;
             assert!(p2.is_ok());
 
-            let p3 = eth_batch_send_to_all_contracts(
-                &sequencer_state,
-                &updates3,
-                Repeatability::Periodic,
-                None,
-            )
-            .await;
+            let p3 = eth_batch_send_to_all_contracts(&sequencer_state, &updates3, None).await;
             assert!(p3.is_ok());
         }
 
@@ -1552,7 +1534,11 @@ mod tests {
                 .get(network)
                 .cloned()
                 .unwrap();
-            let provider = new_rpc_provider.lock().await;
+            let mut provider = new_rpc_provider.lock().await;
+            match provider.load_history_from_chain().await {
+                Ok(v) => info!("Loaded history from chain successful"),
+                Err(e) => panic!("Could not load history from chain"),
+            };
             let counters = &provider.round_counters;
             assert_eq!(Some(3), counters.get(&feed_id).copied());
 
@@ -1589,13 +1575,7 @@ mod tests {
                     updates: vec![v4],
                 };
 
-                let p4 = eth_batch_send_to_all_contracts(
-                    &sequencer_state,
-                    &updates4,
-                    Repeatability::Periodic,
-                    None,
-                )
-                .await;
+                let p4 = eth_batch_send_to_all_contracts(&sequencer_state, &updates4, None).await;
 
                 assert!(p4.is_ok());
                 tokio::time::sleep(Duration::from_millis(2000)).await;
@@ -1794,7 +1774,6 @@ mod tests {
                 let p1 = eth_batch_send_to_all_contracts(
                     &sequencer_state,
                     &updates1,
-                    Repeatability::Periodic,
                     None,
                 )
                 .await;
