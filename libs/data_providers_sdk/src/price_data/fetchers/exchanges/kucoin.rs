@@ -59,7 +59,7 @@ impl PricesFetcher<'_> for KuCoinPriceFetcher {
                 "https://api.kucoin.com/api/v1/market/allTickers",
                 None,
                 None,
-                timeout_secs,
+                Some(timeout_secs),
             )
             .await?;
 

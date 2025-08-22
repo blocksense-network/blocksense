@@ -58,7 +58,7 @@ impl<'a> PricesFetcher<'a> for YFPriceFetcher<'a> {
                 "https://yfapi.net/v6/finance/quote",
                 Some(&[("symbols", all_symbols.as_str())]),
                 Some(&[("x-api-key", api_key)]),
-                timeout_secs,
+                Some(timeout_secs),
             )
             .await?;
 

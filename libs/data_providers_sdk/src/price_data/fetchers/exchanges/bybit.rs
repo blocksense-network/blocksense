@@ -48,7 +48,7 @@ impl PricesFetcher<'_> for BybitPriceFetcher {
                 "https://api.bybit.com/v5/market/tickers",
                 Some(&[("category", "spot"), ("symbols", "")]),
                 None,
-                timeout_secs,
+                Some(timeout_secs),
             )
             .await?;
 

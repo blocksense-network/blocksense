@@ -27,7 +27,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
         url.as_str(),
         None,
         Some(&[("X-API-Key", api_key.as_str())]),
-        timeout_secs,
+        Some(timeout_secs),
     ).await?;
 
     if resources.arguments.endpoint == "reserve" {
@@ -73,4 +73,3 @@ fn get_resources_from_settings(settings: &Settings) -> Result<ResourceData> {
         .and_then(|feed| serde_json::from_str::<ResourceData>(&feed.data).ok())
         .ok_or_else(|| anyhow::anyhow!("Couldn't parse resource data from settings"))
 }
-

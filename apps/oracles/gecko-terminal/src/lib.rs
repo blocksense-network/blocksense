@@ -114,7 +114,7 @@ async fn fetch_pools_data_for_network(
         .join(",");
     let url = format!("https://api.geckoterminal.com/api/v2/networks/{network}/pools/multi/{r}");
 
-    let mut value = http_get_json::<GeckoTerminalMultipleResponce>(&url, None, None, timeout_secs).await?;
+    let mut value = http_get_json::<GeckoTerminalMultipleResponce>(&url, None, None, Some(timeout_secs)).await?;
     for v in value.data.iter_mut() {
         if let Some(p) = pools
             .iter()

@@ -36,7 +36,7 @@ impl<'a> PricesFetcher<'a> for UpBitPriceFetcher<'a> {
                 "https://api.upbit.com/v1/ticker",
                 Some(&[("markets", all_markets.as_str())]),
                 None,
-                timeout_secs,
+                Some(timeout_secs),
             )
             .await?;
 

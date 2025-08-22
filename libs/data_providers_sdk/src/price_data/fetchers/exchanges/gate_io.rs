@@ -36,7 +36,7 @@ impl PricesFetcher<'_> for GateIoPriceFetcher {
                 "https://api.gateio.ws/api/v4/spot/tickers",
                 None,
                 None,
-                timeout_secs,
+                Some(timeout_secs),
             )
             .await?;
 

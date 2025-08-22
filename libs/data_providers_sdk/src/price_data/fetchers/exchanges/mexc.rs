@@ -37,7 +37,7 @@ impl PricesFetcher<'_> for MEXCPriceFetcher {
                 "https://api.mexc.com/api/v3/ticker/24hr",
                 None,
                 None,
-                timeout_secs,
+                Some(timeout_secs),
             )
             .await?;
 

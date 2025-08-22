@@ -50,7 +50,7 @@ impl PricesFetcher<'_> for KrakenPriceFetcher {
                 "https://api.kraken.com/0/public/Ticker",
                 None,
                 None,
-                timeout_secs,
+                Some(timeout_secs),
             )
             .await?;
 

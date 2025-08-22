@@ -40,7 +40,7 @@ impl PricesFetcher<'_> for BitgetPriceFetcher {
                 "https://api.bitget.com/api/spot/v1/market/tickers",
                 None,
                 None,
-                timeout_secs,
+                Some(timeout_secs),
             )
             .await?;
 

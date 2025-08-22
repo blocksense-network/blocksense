@@ -45,7 +45,7 @@ impl<'a> PricesFetcher<'a> for BinancePriceFetcher<'a> {
                 "https://api1.binance.com/api/v3/ticker/24hr",
                 Some(&[("symbols", req_symbols.as_str())]),
                 None,
-                timeout_secs,
+                Some(timeout_secs),
             )
             .await?;
 

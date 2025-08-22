@@ -46,7 +46,7 @@ impl<'a> PricesFetcher<'a> for TwelveDataPriceFetcher<'a> {
                 "https://api.twelvedata.com/quote",
                 Some(&[("symbol", &all_symbols)]),
                 Some(&[("Authorization", format!("apikey {api_key}").as_str())]),
-                timeout_secs,
+                Some(timeout_secs),
             )
             .await?;
 

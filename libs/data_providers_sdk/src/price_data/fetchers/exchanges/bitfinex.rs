@@ -62,7 +62,7 @@ impl<'a> PricesFetcher<'a> for BitfinexPriceFetcher<'a> {
                 "https://api-pub.bitfinex.com/v2/tickers",
                 Some(&[("symbols", all_symbols.as_str())]),
                 None,
-                timeout_secs,
+                Some(timeout_secs),
             )
             .await?;
 
