@@ -25,6 +25,11 @@
       "require": "./dist/cjs/viem/index.cjs",
       "import": "./dist/esm/viem/index.mjs",
       "types": "./lib/viem/index.ts"
+    },
+    "./utils": {
+      "require": "./dist/cjs/utils/index.cjs",
+      "import": "./dist/esm/utils/index.mjs",
+      "types": "./lib/utils/index.ts"
     }
   },
   "scripts": {

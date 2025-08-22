@@ -74,6 +74,7 @@ export const deployedNetworks = [
 ] satisfies NetworkName[];
 
 export type Transaction = {
+  inputData?: string;
   from: EthereumAddress;
   to: EthereumAddress;
   gasUsed: bigint;
