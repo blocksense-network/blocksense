@@ -1202,9 +1202,8 @@ async fn increment_feeds_round_metrics(
 mod tests {
     use super::*;
 
-    use crate::providers::multicall::Multicall;
     use crate::providers::provider::init_shared_rpc_providers;
-    use crate::sequencer_state::create_sequencer_state_and_collected_futures;
+    use alloy::hex::ToHexExt;
     use alloy::rpc::types::eth::TransactionInput;
     use alloy::{
         hex::FromHex,
@@ -1213,16 +1212,16 @@ mod tests {
     use alloy::{node_bindings::Anvil, providers::Provider};
     use blocksense_config::{
         get_test_config_with_multiple_providers, get_test_config_with_single_provider,
-        test_feed_config, ADFS_CONTRACT_NAME, MULTICALL_CONTRACT_NAME,
+        test_feed_config, ADFS_ACCESS_CONTROL_CONTRACT_NAME, ADFS_CONTRACT_NAME,
+        MULTICALL_CONTRACT_NAME,
     };
     use blocksense_config::{AllFeedsConfig, PublishCriteria};
     use blocksense_data_feeds::feeds_processing::VotedFeedUpdate;
     use blocksense_feed_registry::registry::HistoryEntry;
-    use blocksense_feed_registry::types::Repeatability::Oneshot;
     use blocksense_utils::test_env::get_test_private_key_path;
 
+    use rdkafka::message::ToBytes;
     use regex::Regex;
-    use ringbuf::traits::Consumer;
     use std::str::FromStr;
     use std::time::UNIX_EPOCH;
 
@@ -1263,7 +1262,7 @@ mod tests {
             if let Some(x) = p
                 .contracts
                 .iter_mut()
-                .find(|x| x.name == ADFS_CONTRACT_NAME)
+                .find(|x| x.name == ADFS_ACCESS_CONTROL_CONTRACT_NAME)
             {
                 x.address = None;
             }
@@ -1278,7 +1277,12 @@ mod tests {
         .await;
 
         // run
-        let result = deploy_contract(&String::from(network), &providers, ADFS_CONTRACT_NAME).await;
+        let result = deploy_contract(
+            &String::from(network),
+            &providers,
+            ADFS_ACCESS_CONTROL_CONTRACT_NAME,
+        )
+        .await;
         // assert
         // validate contract was deployed at expected address
         if let Ok(msg) = result {
@@ -1898,24 +1902,57 @@ mod tests {
             }
         }
     */
+
+    fn create_round_counters_strides_and_decimals() -> (
+        std::collections::HashMap<FeedId, u64>,
+        std::collections::HashMap<FeedId, blocksense_config::FeedStrideAndDecimals>,
+    ) {
+        let mut round_counters = RoundCounters::new();
+        round_counters.insert(0x1F as FeedId, 7);
+        round_counters.insert(0x0FFF as FeedId, 8);
+        let mut strides_and_decimals = HashMap::new();
+        strides_and_decimals.insert(
+            0x1F,
+            FeedStrideAndDecimals {
+                stride: 0,
+                decimals: 8,
+            },
+        );
+        strides_and_decimals.insert(
+            0x0FFF,
+            FeedStrideAndDecimals {
+                stride: 0,
+                decimals: 8,
+            },
+        );
+        (round_counters, strides_and_decimals)
+    }
+
     #[tokio::test]
     async fn compute_keys_vals_ignores_networks_not_on_the_list() {
-        let selector = "1a2d80ac";
         let network = "dont_filter_me";
         let mut updates = BatchedAggregatesToSend {
             block_height: 0,
             updates: get_updates_test_data(),
         };
-        filter_allowed_feeds(network, &mut updates, &None);
-        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config());
 
-        let a = "0000001f6869000000000000000000000000000000000000000000000000000000000000";
-        let b = "00000fff6279650000000000000000000000000000000000000000000000000000000000";
-        let ab = hex::decode(format!("{selector}{a}{b}")).unwrap();
-        let ba = hex::decode(format!("{selector}{b}{a}")).unwrap();
-        // It is undeterministic what the order will be, so checking both possibilities.
-        assert!(ab == serialized_updates || ba == serialized_updates);
+        let (round_counters, strides_and_decimals) = create_round_counters_strides_and_decimals();
+        let mut stored_round_counters = HashMap::new();
+
+        filter_allowed_feeds(network, &mut updates, &None);
+        let serialized_updates = adfs_serialize_updates(
+            network,
+            &updates,
+            Some(&round_counters),
+            strides_and_decimals,
+            &mut stored_round_counters,
+        )
+        .await
+        .expect("Could not serialize updates!");
+
+        assert_eq!(serialized_updates.to_bytes().encode_hex(), "01000000000000000000000002000303e00701026869000401ffe00801036279650101000000000000000000000000000000000000000000000000000000000000000701ff0000000000000000000000000000000000000000000000000000000000000008");
     }
+
     use blocksense_feed_registry::types::FeedType;
 
     fn get_updates_test_data() -> Vec<VotedFeedUpdate> {
@@ -1962,12 +1999,23 @@ mod tests {
             ]),
         );
 
-        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config());
+        let (round_counters, strides_and_decimals) = create_round_counters_strides_and_decimals();
+        let mut stored_round_counters = HashMap::new();
+
+        let serialized_updates = adfs_serialize_updates(
+            network,
+            &updates,
+            Some(&round_counters),
+            strides_and_decimals.clone(),
+            &mut stored_round_counters,
+        )
+        .await
+        .expect("Could not serialize updates!");
 
         // Note: bye is filtered out:
         assert_eq!(
-            serialized_updates,
-            hex::decode(format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")).unwrap()
+            serialized_updates.to_bytes().encode_hex(),
+            "01000000000000000000000001000303e0070102686901010000000000000000000000000000000000000000000000000000000000000007"
         );
 
         // Berachain
@@ -1986,11 +2034,19 @@ mod tests {
             ]),
         );
 
-        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config());
+        let serialized_updates = adfs_serialize_updates(
+            network,
+            &updates,
+            Some(&round_counters),
+            strides_and_decimals.clone(),
+            &mut stored_round_counters,
+        )
+        .await
+        .expect("Could not serialize updates!");
 
         assert_eq!(
-            serialized_updates,
-            hex::decode(format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")).unwrap()
+            serialized_updates.to_bytes().encode_hex(),
+            "01000000000000000000000001000303e0070102686901010000000000000000000000000000000000000000000000000000000000000007"
         );
 
         // Manta
@@ -2008,11 +2064,19 @@ mod tests {
             ]),
         );
 
-        let serialized_updates = legacy_serialize_updates(network, &updates, test_feeds_config());
+        let serialized_updates = adfs_serialize_updates(
+            network,
+            &updates,
+            Some(&round_counters),
+            strides_and_decimals,
+            &mut stored_round_counters,
+        )
+        .await
+        .expect("Could not serialize updates!");
 
         assert_eq!(
-            serialized_updates,
-            hex::decode(format!("{selector}0000001f6869000000000000000000000000000000000000000000000000000000000000")).unwrap()
+            serialized_updates.to_bytes().encode_hex(),
+            "01000000000000000000000001000303e0070102686901010000000000000000000000000000000000000000000000000000000000000007"
         );
     }
 
