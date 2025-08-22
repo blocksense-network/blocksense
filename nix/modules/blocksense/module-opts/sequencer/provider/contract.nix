@@ -24,12 +24,6 @@ lib: with lib; {
       description = mdDoc "";
     };
 
-    contract-version = mkOption {
-      type = types.int;
-      default = 1;
-      description = mdDoc "";
-    };
-
     min-quorum = mkOption {
       type = types.nullOr types.int;
       default = null;
