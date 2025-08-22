@@ -1,4 +1,5 @@
-import { bls12_381 } from '@noble/curves/bls12-381';
+import { arrayToHex, skip0x } from '@blocksense/base-utils';
+import bls from '@chainsafe/bls';
 
 function u128ToBytes(value: bigint): Uint8Array {
   const buf = new ArrayBuffer(16);
@@ -68,8 +69,6 @@ export async function generateSignature(
   timestamp: bigint,
   feedResult: FeedResult,
 ): Promise<string> {
-  const key = privKeyHex.startsWith('0x') ? privKeyHex : `0x${privKeyHex}`;
-
   const feedIdBytes = new TextEncoder().encode(feedId);
   const tsBytes = u128ToBytes(timestamp);
 
@@ -92,11 +91,21 @@ export async function generateSignature(
     );
   }
 
-  // byteBuffer = new Uint8Array([0]);
-  console.log('byteBuffer:', byteBuffer);
-  const DST = 'BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_';
-  const msg = bls12_381.longSignatures.hash(byteBuffer, DST);
-  console.log('msg: ', msg.toHex());
-  const sig = bls12_381.longSignatures.sign(msg, privKeyHex);
+  const secretKey = bls.SecretKey.fromHex(privKeyHex);
+  const sig = secretKey.sign(byteBuffer);
   return sig.toHex();
 }
+
+const sig = await generateSignature(
+  '536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003',
+  '100002',
+  1755685551079n,
+  {
+    Ok: true,
+    value: {
+      kind: 'Numerical',
+      value: 1,
+    },
+  },
+);
+console.log('sig: ', sig);

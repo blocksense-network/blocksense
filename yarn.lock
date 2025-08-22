@@ -2573,6 +2573,8 @@ __metadata:
     "@blocksense/base-utils": "workspace:*"
     "@blocksense/config-types": "workspace:*"
     "@blocksense/contracts": "workspace:*"
+    "@chainsafe/bls": "npm:^8.2.0"
+    "@chainsafe/blst": "npm:^2.2.0"
     "@effect/cluster": "npm:^0.46.2"
     "@effect/experimental": "npm:^0.54.2"
     "@effect/language-service": "npm:^0.31.2"
@@ -2581,8 +2583,6 @@ __metadata:
     "@effect/rpc": "npm:^0.68.0"
     "@effect/sql": "npm:^0.44.0"
     "@effect/vitest": "npm:^0.25.0"
-    "@noble/curves": "npm:^1.9.7"
-    "@noble/hashes": "npm:^1.8.0"
     "@types/node": "npm:^22.3.0"
     "@vitest/coverage-v8": "npm:^3.2.4"
     effect: "npm:^3.15.1"
@@ -2821,6 +2821,120 @@ __metadata:
   version: 1.2.0
   resolution: "@chainsafe/as-sha256@npm:1.2.0"
   checksum: 10c0/277589bfbdfc692f669a19b87110f4eda033f94d2774cb6d8fc0f745bff3b9e895add862684dbf09ff19102ae79639fdfbc758ecafbbee1cb8e033c679c82aef
+  languageName: node
+  linkType: hard
+
+"@chainsafe/bls-hd-key@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@chainsafe/bls-hd-key@npm:0.3.0"
+  dependencies:
+    "@noble/hashes": "npm:^1.0.0"
+  checksum: 10c0/7e7f83418b1188aeaaf47db3b72147ee025a9c7d20be7776232ca5d72fd46f4f9977cf971eb29a98a204c511b2d4bc672a4dbb04e0c31c7d6ab185b3d51859e3
+  languageName: node
+  linkType: hard
+
+"@chainsafe/bls-keygen@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@chainsafe/bls-keygen@npm:0.4.0"
+  dependencies:
+    "@chainsafe/bls-hd-key": "npm:^0.3.0"
+    "@noble/hashes": "npm:^1.0.0"
+    "@scure/bip39": "npm:^1.0.0"
+  checksum: 10c0/e04e304e7501e218e536c1bb42b0da0b964123d584bc382c55a44adcc193696aef3c75e726fd3e82961830754ec15b3d6250f0843ee2792fe80148ef68b2e17b
+  languageName: node
+  linkType: hard
+
+"@chainsafe/bls@npm:^8.2.0":
+  version: 8.2.0
+  resolution: "@chainsafe/bls@npm:8.2.0"
+  dependencies:
+    "@chainsafe/bls-keygen": "npm:^0.4.0"
+    bls-eth-wasm: "npm:^1.1.1"
+  peerDependencies:
+    "@chainsafe/blst": ^1.0.0
+  peerDependenciesMeta:
+    "@chainsafe/blst":
+      optional: true
+  checksum: 10c0/2675e2674376e2462e55b52239109581466079449652ee7e0ce02bd33e0262c694fe5ced02a3daa25cddb25ab7f082aceeeedd5e6ea12d8c26898c24dc27dde0
+  languageName: node
+  linkType: hard
+
+"@chainsafe/blst-darwin-arm64@npm:2.2.0":
+  version: 2.2.0
+  resolution: "@chainsafe/blst-darwin-arm64@npm:2.2.0"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@chainsafe/blst-darwin-x64@npm:2.2.0":
+  version: 2.2.0
+  resolution: "@chainsafe/blst-darwin-x64@npm:2.2.0"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@chainsafe/blst-linux-arm64-gnu@npm:2.2.0":
+  version: 2.2.0
+  resolution: "@chainsafe/blst-linux-arm64-gnu@npm:2.2.0"
+  conditions: os=linux & cpu=arm64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@chainsafe/blst-linux-arm64-musl@npm:2.2.0":
+  version: 2.2.0
+  resolution: "@chainsafe/blst-linux-arm64-musl@npm:2.2.0"
+  conditions: os=linux & cpu=arm64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@chainsafe/blst-linux-x64-gnu@npm:2.2.0":
+  version: 2.2.0
+  resolution: "@chainsafe/blst-linux-x64-gnu@npm:2.2.0"
+  conditions: os=linux & cpu=x64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@chainsafe/blst-linux-x64-musl@npm:2.2.0":
+  version: 2.2.0
+  resolution: "@chainsafe/blst-linux-x64-musl@npm:2.2.0"
+  conditions: os=linux & cpu=x64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@chainsafe/blst-win32-x64-msvc@npm:2.2.0":
+  version: 2.2.0
+  resolution: "@chainsafe/blst-win32-x64-msvc@npm:2.2.0"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@chainsafe/blst@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@chainsafe/blst@npm:2.2.0"
+  dependencies:
+    "@chainsafe/blst-darwin-arm64": "npm:2.2.0"
+    "@chainsafe/blst-darwin-x64": "npm:2.2.0"
+    "@chainsafe/blst-linux-arm64-gnu": "npm:2.2.0"
+    "@chainsafe/blst-linux-arm64-musl": "npm:2.2.0"
+    "@chainsafe/blst-linux-x64-gnu": "npm:2.2.0"
+    "@chainsafe/blst-linux-x64-musl": "npm:2.2.0"
+    "@chainsafe/blst-win32-x64-msvc": "npm:2.2.0"
+  dependenciesMeta:
+    "@chainsafe/blst-darwin-arm64":
+      optional: true
+    "@chainsafe/blst-darwin-x64":
+      optional: true
+    "@chainsafe/blst-linux-arm64-gnu":
+      optional: true
+    "@chainsafe/blst-linux-arm64-musl":
+      optional: true
+    "@chainsafe/blst-linux-x64-gnu":
+      optional: true
+    "@chainsafe/blst-linux-x64-musl":
+      optional: true
+    "@chainsafe/blst-win32-x64-msvc":
+      optional: true
+  checksum: 10c0/1772f88adc9fafcc08b7278e449b3abaef2fd2411f5ad2c9db0f0d2ec4ea4e80663c977e7f281b326e0c253fff0ca3a85eb854d25dc81cf9dadafd1c49625a2d
   languageName: node
   linkType: hard
 
@@ -7345,15 +7459,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/curves@npm:^1.9.7":
-  version: 1.9.7
-  resolution: "@noble/curves@npm:1.9.7"
-  dependencies:
-    "@noble/hashes": "npm:1.8.0"
-  checksum: 10c0/150014751ebe8ca06a8654ca2525108452ea9ee0be23430332769f06808cddabfe84f248b6dbf836916bc869c27c2092957eec62c7506d68a1ed0a624017c2a3
-  languageName: node
-  linkType: hard
-
 "@noble/hashes@npm:1.2.0, @noble/hashes@npm:~1.2.0":
   version: 1.2.0
   resolution: "@noble/hashes@npm:1.2.0"
@@ -7403,7 +7508,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/hashes@npm:1.8.0, @noble/hashes@npm:^1.3.0, @noble/hashes@npm:^1.8.0, @noble/hashes@npm:~1.8.0":
+"@noble/hashes@npm:1.8.0, @noble/hashes@npm:^1.0.0, @noble/hashes@npm:^1.3.0, @noble/hashes@npm:^1.8.0, @noble/hashes@npm:~1.8.0":
   version: 1.8.0
   resolution: "@noble/hashes@npm:1.8.0"
   checksum: 10c0/06a0b52c81a6fa7f04d67762e08b2c476a00285858150caeaaff4037356dd5e119f45b2a530f638b77a5eeca013168ec1b655db41bae3236cb2e9d511484fc77
@@ -10291,7 +10396,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scure/bip39@npm:1.6.0, @scure/bip39@npm:^1.6.0":
+"@scure/bip39@npm:1.6.0, @scure/bip39@npm:^1.0.0, @scure/bip39@npm:^1.6.0":
   version: 1.6.0
   resolution: "@scure/bip39@npm:1.6.0"
   dependencies:
@@ -15635,6 +15740,13 @@ __metadata:
   version: 1.2.1
   resolution: "blakejs@npm:1.2.1"
   checksum: 10c0/c284557ce55b9c70203f59d381f1b85372ef08ee616a90162174d1291a45d3e5e809fdf9edab6e998740012538515152471dc4f1f9dbfa974ba2b9c1f7b9aad7
+  languageName: node
+  linkType: hard
+
+"bls-eth-wasm@npm:^1.1.1":
+  version: 1.4.0
+  resolution: "bls-eth-wasm@npm:1.4.0"
+  checksum: 10c0/a92f8c9c197a5bde6bb697f554e47804cca12274a15066fc40666a082c78b4570a12f29f9a07778824aae65e9cd2e41612e7f2c60a8e75da5774546a27bd01b4
   languageName: node
   linkType: hard
 

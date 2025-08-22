@@ -13,8 +13,13 @@ pub fn generate_keys(ikm: &[u8; 35]) -> (SecretKey, PublicKey) {
     (sk, pk)
 }
 
+/// Sign a message using the provided secret key following the IETF BLS
+/// signature draft standard v4 with ciphersuite
+/// `BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_` (and also the Ethereum Phase 0
+/// consensus spec).
 pub fn sign_message(sk: &SecretKey, message: &[u8]) -> Signature {
-    sk.sign(message, &[], &[])
+    let dst: &[u8] = "BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_".as_bytes();
+    sk.sign(message, dst, &[])
 }
 
 pub fn verify_signature(pk: &PublicKey, signature: &Signature, message: &[u8]) -> bool {
