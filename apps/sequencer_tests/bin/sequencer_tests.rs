@@ -95,8 +95,8 @@ async fn spawn_sequencer(
         "main_port": SEQUENCER_MAIN_PORT,
         "admin_port": SEQUENCER_ADMIN_PORT,
         "providers": {
-            "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[0]), "contract_address": Some(contracts_in_networks[0].to_owned()), "safe_address": None::<String>, "contract_version": 2},
-            "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[1]), "contract_address": Some(contracts_in_networks[1].to_owned()), "safe_address": None::<String>, "contract_version": 2}
+            "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[0]), "contract_address": Some(contracts_in_networks[0].to_owned()), "safe_address": None::<String>},
+            "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[1]), "contract_address": Some(contracts_in_networks[1].to_owned()), "safe_address": None::<String>}
         },
         "send_aggregated_updates_to_publishers": false,
 
