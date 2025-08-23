@@ -30,6 +30,8 @@ build-environment environment="all" use-local-cargo-result="0":
   #!/usr/bin/env bash
   set -euo pipefail
 
+  echo "Building process-compose environment: {{environment}}"
+
   if [[ "{{use-local-cargo-result}}" = 1 ]]; then
     FLAKE_ATTR_PATH=process-compose-environments.with-local-cargo-artifacts.{{environment}}
   else
@@ -47,8 +49,9 @@ build-environment environment="all" use-local-cargo-result="0":
   scripts/utils/collect-available-ports.sh "$DEST_DIR/available-ports"
 
   SRC_DIR=$(
-    nix build --impure -L --print-out-paths \
-      .#${FLAKE_ATTR_PATH}
+    nix build --no-warn-dirty --impure -L --print-out-paths \
+      .#${FLAKE_ATTR_PATH} \
+      2> >(grep -v '^Using saved setting for' >&2)
   )
 
   cp -rf --no-preserve=mode,ownership "$SRC_DIR"/. "$DEST_DIR"
