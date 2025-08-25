@@ -186,7 +186,7 @@ pub async fn aggregation_batch_consensus_loop(
                                     let mut provider = providers.get(net).unwrap().lock().await;
                                     let signer = &provider.signer;
 
-                                    let transaction_retries_count_before_give_up = provider.transaction_retries_count_before_give_up as u64;
+                                    let transaction_retries_count_limit = provider.transaction_retries_count_limit as u64;
                                     let transaction_retry_timeout_secs = provider.transaction_retry_timeout_secs as u64;
                                     let retry_fee_increment_fraction = provider.retry_fee_increment_fraction;
 
@@ -203,7 +203,7 @@ pub async fn aggregation_batch_consensus_loop(
                                     // First get the correct nonce
                                     let nonce = loop {
 
-                                        if nonce_get_retries_count > transaction_retries_count_before_give_up {
+                                        if nonce_get_retries_count > transaction_retries_count_limit {
                                             failed_tx(net, &ids_vec, &mut provider).await;
                                             eyre::bail!("Failed get the nonce for network {net}! Blocksense block height: {block_height}");
                                         }
@@ -230,7 +230,7 @@ pub async fn aggregation_batch_consensus_loop(
 
                                     let receipt = loop {
 
-                                        if transaction_retries_count > transaction_retries_count_before_give_up {
+                                        if transaction_retries_count > transaction_retries_count_limit {
                                             failed_tx(net, &ids_vec, &mut provider).await;
                                             inc_metric!(provider_metrics, net, total_timed_out_tx);
                                             eyre::bail!("Failed to post tx after {transaction_retries_count} retries for network {net}: (timed out)! Blocksense block height: {block_height}");

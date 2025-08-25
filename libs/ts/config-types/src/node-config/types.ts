@@ -45,20 +45,18 @@ const ContractSchema = S.Struct({
   creation_byte_code: S.NullishOr(S.String),
   deployed_byte_code: S.NullishOr(S.String),
   min_quorum: S.NullishOr(S.Number),
-  contract_version: S.Number,
 });
 
 const ProviderSchema = S.Struct({
   private_key_path: S.String,
   url: S.String,
-  transaction_retries_count_before_give_up: S.Number,
+  transaction_retries_count_limit: S.Number,
   transaction_retry_timeout_secs: S.Number,
   retry_fee_increment_fraction: S.Number,
   transaction_gas_limit: S.Number,
   impersonated_anvil_account: S.NullishOr(S.String),
   is_enabled: S.Boolean,
   should_load_round_counters: S.NullishOr(S.Boolean),
-  should_load_historical_values: S.NullishOr(S.Boolean),
   allow_feeds: S.optional(S.Array(FeedIdSchema)),
   publishing_criteria: S.Array(PublishingCriteriaSchema),
   contracts: S.Array(ContractSchema),
