@@ -301,7 +301,8 @@ const fetchTransactionsForNetwork = async (
           tx.blockTime?.toString() ??
           tx.tx_time?.toString() ??
           tx.timeStamp?.toString() ??
-          tx.create_time?.toString();
+          tx.create_time?.toString() ??
+          tx.block_timestamp?.toString();
         timestamp = timestamp.includes('T')
           ? new Date(timestamp).getTime()
           : (timestamp = parseInt(timestamp) * 1000);
