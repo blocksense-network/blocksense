@@ -1,5 +1,4 @@
 use crate::feeds::consensus_second_round_manager::AggregationBatchConsensus;
-use crate::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
 use crate::providers::eth_send_utils::create_and_collect_relayers_futures;
 use crate::providers::eth_send_utils::BatchOfUpdatesToProcess;
 use crate::providers::provider::ProviderStatus;
@@ -43,7 +42,6 @@ pub struct SequencerState {
     pub providers: SharedRpcProviders,
     pub log_handle: SharedLoggingHandle,
     pub reporters: SharedReporters,
-    pub feed_id_allocator: Arc<RwLock<Option<ConcurrentAllocator>>>,
     pub aggregated_votes_to_block_creator_send: UnboundedSender<VotedFeedUpdateWithProof>,
     pub feeds_metrics: Arc<RwLock<FeedsMetrics>>,
     pub active_feeds: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
@@ -69,7 +67,6 @@ impl SequencerState {
         log_handle: SharedLoggingHandle,
         sequencer_config: &SequencerConfig,
         metrics_prefix: Option<&str>,
-        feed_id_allocator: Option<ConcurrentAllocator>,
         aggregated_votes_to_block_creator_send: UnboundedSender<VotedFeedUpdateWithProof>,
         feeds_management_cmd_to_block_creator_send: UnboundedSender<FeedsManagementCmds>,
         feeds_slots_manager_cmd_send: UnboundedSender<FeedsManagementCmds>,
@@ -103,7 +100,6 @@ impl SequencerState {
             providers,
             log_handle,
             reporters: init_shared_reporters(sequencer_config, metrics_prefix),
-            feed_id_allocator: Arc::new(RwLock::new(feed_id_allocator)),
             aggregated_votes_to_block_creator_send,
             feeds_metrics: Arc::new(RwLock::new(
                 FeedsMetrics::new(metrics_prefix.unwrap_or(""))
@@ -183,14 +179,12 @@ pub async fn create_sequencer_state_from_sequencer_config(
     let (feeds_slots_manager_cmd_send, feeds_slots_manager_cmd_recv) = mpsc::unbounded_channel();
     let (aggregate_batch_sig_send, aggregate_batch_sig_recv) = mpsc::unbounded_channel();
     let aggregated_votes_to_block_creator_send = vote_send;
-    let feed_id_allocator = Some(init_concurrent_allocator());
     let sequencer_state = SequencerState::new(
         feeds_config.clone(),
         providers,
         log_handle,
         &sequencer_config,
         Some(metrics_prefix),
-        feed_id_allocator,
         aggregated_votes_to_block_creator_send,
         feeds_management_cmd_to_block_creator_send,
         feeds_slots_manager_cmd_send,

@@ -13,8 +13,6 @@ use std::{collections::HashMap, fmt::Debug};
 use std::{collections::HashSet, time::UNIX_EPOCH};
 use tracing::{info, warn};
 
-// pub const HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME: &str = "HistoricalDataFeedStoreV2";
-// pub const SPORTS_DATA_FEED_STORE_V2_CONTRACT_NAME: &str = "SportsDataFeedStoreV2";
 pub const ADFS_CONTRACT_NAME: &str = "AggregatedDataFeedStore";
 pub const ADFS_ACCESS_CONTROL_CONTRACT_NAME: &str = "ADFSAccessControl";
 pub const MULTICALL_CONTRACT_NAME: &str = "multicall";
