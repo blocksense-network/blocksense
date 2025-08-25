@@ -948,7 +948,7 @@ mod tests {
                     impersonated_anvil_account: None,
                     publishing_criteria: vec![],
                     should_load_round_counters: true,
-                    contracts: contracts,
+                    contracts,
                 }
             });
 
