@@ -20,7 +20,6 @@ use sequencer::http_handlers::data_feeds::add_main_services;
 
 use actix_web::web::Data;
 use blocksense_config::{get_sequencer_and_feed_configs, AllFeedsConfig, SequencerConfig};
-use sequencer::feeds::feed_allocator::{init_concurrent_allocator, ConcurrentAllocator};
 use sequencer::feeds::feed_workers::prepare_app_workers;
 use sequencer::http_handlers::admin::metrics;
 use std::collections::HashMap;
@@ -73,7 +72,6 @@ pub async fn prepare_sequencer_state(
     let (relayers_send_channels, relayers_recv_channels) =
         create_relayers_channels(&providers).await;
 
-    let feed_id_allocator: ConcurrentAllocator = init_concurrent_allocator();
     let (aggregated_votes_to_block_creator_send, aggregated_votes_to_block_creator_recv): VoteChannel = mpsc::unbounded_channel();
     let (feeds_management_cmd_to_block_creator_send, feeds_management_cmd_to_block_creator_recv) =
         mpsc::unbounded_channel();
@@ -86,7 +84,6 @@ pub async fn prepare_sequencer_state(
         log_handle,
         sequencer_config,
         metrics_prefix,
-        Some(feed_id_allocator),
         aggregated_votes_to_block_creator_send,
         feeds_management_cmd_to_block_creator_send,
         feeds_slots_manager_cmd_send,
