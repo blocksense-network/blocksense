@@ -91,3 +91,13 @@ export const spoutRwaArgsSchema = S.Struct({
   identifier: 'SpoutRwaOracleArgs',
   description: 'Arguments for the Spout RWA Oracle',
 });
+
+// hyper-borrow-rates Oracle related Types
+export const hyperBorrowRatesArgsSchema = S.Struct({
+  kind: S.Literal('hyper-borrow-rates'),
+  marketplace: S.String,
+  market_id: S.NullishOr(S.String),
+}).annotations({
+  identifier: 'HyperBorrowRatesOracleArgs',
+  description: 'Arguments for the Hyper Borrow Rates Oracle',
+});

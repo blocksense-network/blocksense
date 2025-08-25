@@ -1,0 +1,23 @@
+[package]
+name = "hyper-borrow-rates"
+authors = ["Emil Ivanichkov"]
+description = ""
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+wit-bindgen = "0.16.0"
+blocksense-sdk = { workspace = true }
+blocksense-data-providers-sdk = { workspace = true }
+anyhow = "1.0.82"
+serde_json = "1.0"
+serde-this-or-that = { workspace = true }
+futures = { workspace = true }
+url = "2.5"
+serde = { version = "1.0", features = ["derive"] }
+prettytable-rs = "0.10"
+alloy = { workspace = true }
+itertools = "0.8"

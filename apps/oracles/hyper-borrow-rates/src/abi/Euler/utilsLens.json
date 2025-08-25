@@ -1,0 +1,285 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_eVaultFactory",
+        "type": "address"
+      },
+      { "internalType": "address", "name": "_oracleLens", "type": "address" }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "TTL_ERROR",
+    "outputs": [{ "internalType": "int256", "name": "", "type": "int256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "TTL_INFINITY",
+    "outputs": [{ "internalType": "int256", "name": "", "type": "int256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "TTL_LIQUIDATION",
+    "outputs": [{ "internalType": "int256", "name": "", "type": "int256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "TTL_MORE_THAN_ONE_YEAR",
+    "outputs": [{ "internalType": "int256", "name": "", "type": "int256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "liabilityVault",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "liabilityValue",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address[]",
+        "name": "collaterals",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "collateralValues",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "calculateTimeToLiquidation",
+    "outputs": [{ "internalType": "int256", "name": "", "type": "int256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "uint256", "name": "borrowSPY", "type": "uint256" },
+      { "internalType": "uint256", "name": "cash", "type": "uint256" },
+      { "internalType": "uint256", "name": "borrows", "type": "uint256" },
+      { "internalType": "uint256", "name": "interestFee", "type": "uint256" }
+    ],
+    "name": "computeAPYs",
+    "outputs": [
+      { "internalType": "uint256", "name": "borrowAPY", "type": "uint256" },
+      { "internalType": "uint256", "name": "supplyAPY", "type": "uint256" }
+    ],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "eVaultFactory",
+    "outputs": [
+      {
+        "internalType": "contract GenericFactory",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "vault", "type": "address" }
+    ],
+    "name": "getAPYs",
+    "outputs": [
+      { "internalType": "uint256", "name": "borrowAPY", "type": "uint256" },
+      { "internalType": "uint256", "name": "supplyAPY", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "asset", "type": "address" },
+      { "internalType": "address", "name": "unitOfAccount", "type": "address" }
+    ],
+    "name": "getAssetPriceInfo",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "bool", "name": "queryFailure", "type": "bool" },
+          {
+            "internalType": "bytes",
+            "name": "queryFailureReason",
+            "type": "bytes"
+          },
+          { "internalType": "uint256", "name": "timestamp", "type": "uint256" },
+          { "internalType": "address", "name": "oracle", "type": "address" },
+          { "internalType": "address", "name": "asset", "type": "address" },
+          {
+            "internalType": "address",
+            "name": "unitOfAccount",
+            "type": "address"
+          },
+          { "internalType": "uint256", "name": "amountIn", "type": "uint256" },
+          {
+            "internalType": "uint256",
+            "name": "amountOutMid",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amountOutBid",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amountOutAsk",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct AssetPriceInfo",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "controller", "type": "address" },
+      { "internalType": "address", "name": "asset", "type": "address" }
+    ],
+    "name": "getControllerAssetPriceInfo",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "bool", "name": "queryFailure", "type": "bool" },
+          {
+            "internalType": "bytes",
+            "name": "queryFailureReason",
+            "type": "bytes"
+          },
+          { "internalType": "uint256", "name": "timestamp", "type": "uint256" },
+          { "internalType": "address", "name": "oracle", "type": "address" },
+          { "internalType": "address", "name": "asset", "type": "address" },
+          {
+            "internalType": "address",
+            "name": "unitOfAccount",
+            "type": "address"
+          },
+          { "internalType": "uint256", "name": "amountIn", "type": "uint256" },
+          {
+            "internalType": "uint256",
+            "name": "amountOutMid",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amountOutBid",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amountOutAsk",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct AssetPriceInfo",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "vault", "type": "address" }
+    ],
+    "name": "getVaultInfoERC4626",
+    "outputs": [
+      {
+        "components": [
+          { "internalType": "uint256", "name": "timestamp", "type": "uint256" },
+          { "internalType": "address", "name": "vault", "type": "address" },
+          { "internalType": "string", "name": "vaultName", "type": "string" },
+          { "internalType": "string", "name": "vaultSymbol", "type": "string" },
+          {
+            "internalType": "uint256",
+            "name": "vaultDecimals",
+            "type": "uint256"
+          },
+          { "internalType": "address", "name": "asset", "type": "address" },
+          { "internalType": "string", "name": "assetName", "type": "string" },
+          { "internalType": "string", "name": "assetSymbol", "type": "string" },
+          {
+            "internalType": "uint256",
+            "name": "assetDecimals",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "totalShares",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "totalAssets",
+            "type": "uint256"
+          },
+          { "internalType": "bool", "name": "isEVault", "type": "bool" }
+        ],
+        "internalType": "struct VaultInfoERC4626",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "oracleLens",
+    "outputs": [
+      { "internalType": "contract OracleLens", "name": "", "type": "address" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "spender", "type": "address" },
+      { "internalType": "address", "name": "account", "type": "address" },
+      { "internalType": "address[]", "name": "tokens", "type": "address[]" }
+    ],
+    "name": "tokenAllowances",
+    "outputs": [
+      { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "internalType": "address", "name": "account", "type": "address" },
+      { "internalType": "address[]", "name": "tokens", "type": "address[]" }
+    ],
+    "name": "tokenBalances",
+    "outputs": [
+      { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
