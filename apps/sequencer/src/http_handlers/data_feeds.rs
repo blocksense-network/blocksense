@@ -3,12 +3,10 @@ use alloy_primitives::{FixedBytes, Signature};
 use blocksense_gnosis_safe::utils::SignatureWithAddress;
 use blocksense_utils::time::current_unix_time;
 use blocksense_utils::FeedId;
-use chrono::{TimeZone, Utc};
 use eyre::Result;
 use std::str::FromStr;
-use std::sync::Arc;
 
-use actix_web::error::{ErrorBadRequest, ErrorInternalServerError};
+use actix_web::error::ErrorBadRequest;
 use actix_web::web::{self, ServiceConfig};
 use actix_web::Error;
 use actix_web::{get, post, HttpResponse};
@@ -18,23 +16,16 @@ use blocksense_feed_registry::types::{
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 
-use tracing::{debug, error, info, info_span, warn};
-use uuid::Uuid;
+use tracing::{debug, info, info_span, warn};
 
-use crate::feeds::feed_slots_processor::FeedSlotsProcessor;
 use crate::http_handlers::MAX_SIZE;
 use crate::sequencer_state::SequencerState;
 use blocksense_config::SequencerConfig;
-use blocksense_feed_registry::registry::FeedAggregateHistory;
 use blocksense_feed_registry::registry::VoteStatus;
 use blocksense_feed_registry::types::DataFeedPayload;
-use blocksense_feed_registry::types::FeedMetaData;
 use blocksense_feeds_processing::utils::check_signature;
 use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_metrics::{inc_metric, inc_vec_metric};
-use std::time::{SystemTime, UNIX_EPOCH};
-use tokio::sync::{mpsc, RwLock};
-use tokio::time::Duration;
 
 fn get_max_buffer_size(cfg: &SequencerConfig) -> usize {
     if let Some(size) = cfg.http_input_buffer_size {
@@ -476,17 +467,15 @@ pub mod tests {
     use blocksense_config::{get_test_config_with_no_providers, test_feed_config};
 
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
-    use blocksense_config::{get_test_config_with_single_provider, SequencerConfig};
+    use blocksense_config::SequencerConfig;
     use blocksense_crypto::JsonSerializableSignature;
     use blocksense_data_feeds::generate_signature::generate_signature;
     use blocksense_feed_registry::types::{DataFeedPayload, FeedType, PayloadMetaData};
     use blocksense_utils::logging::init_shared_logging_handle;
-    use regex::Regex;
     use std::collections::HashMap;
-    use std::path::PathBuf;
-    use std::str::FromStr;
+    use std::sync::Arc;
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
-    use tokio::sync::mpsc;
+    use tokio::sync::{mpsc, RwLock};
 
     #[actix_web::test]
     async fn post_report_from_unknown_reporter_fails_with_401() {
