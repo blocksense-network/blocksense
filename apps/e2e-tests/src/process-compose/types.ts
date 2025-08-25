@@ -18,10 +18,18 @@ import type { HttpClientError } from '@effect/platform/HttpClientError';
 import { ParseMetricsError, getMetrics } from '../utils/metrics';
 import { FetchHttpClient } from '@effect/platform';
 
+export class ProcessComposeFailedToStartError extends Data.TaggedError(
+  '@e2e-tests/ProcessComposeFailedToStartError',
+)<{
+  cause: unknown;
+}> {}
+
 export class ProcessCompose extends Context.Tag('@e2e-tests/ProcessCompose')<
   ProcessCompose,
   {
-    readonly start: (name: string) => Effect.Effect<void, Error, never>;
+    readonly start: (
+      name: string,
+    ) => Effect.Effect<void, ProcessComposeFailedToStartError, never>;
     readonly stop: () => Effect.Effect<void, Error, never>;
     readonly parseStatus: () => Effect.Effect<
       Record<string, { status: string; exit_code: number }>,
@@ -36,7 +44,7 @@ export class ProcessCompose extends Context.Tag('@e2e-tests/ProcessCompose')<
       start: (env: string = 'example-setup-03') =>
         Effect.tryPromise({
           try: () => startEnvironment(env),
-          catch: error => new Error(`Failed to start environment: ${error}`),
+          catch: cause => new ProcessComposeFailedToStartError({ cause }),
         }),
       stop: () =>
         Effect.tryPromise({
