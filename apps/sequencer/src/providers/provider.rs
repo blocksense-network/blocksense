@@ -1179,7 +1179,6 @@ mod tests {
     use blocksense_config::{
         get_test_config_with_single_provider, test_feed_config, ADFS_ACCESS_CONTROL_CONTRACT_NAME,
     };
-    use blocksense_feed_registry::types::Repeatability::Periodic;
     use std::time::UNIX_EPOCH;
 
     // Common setup reused by multiple tests interacting with ADFS
@@ -1536,8 +1535,8 @@ mod tests {
                 .unwrap();
             let mut provider = new_rpc_provider.lock().await;
             match provider.load_history_from_chain().await {
-                Ok(v) => info!("Loaded history from chain successful"),
-                Err(e) => panic!("Could not load history from chain"),
+                Ok(v) => info!("Loaded history from chain successful v = {v}"),
+                Err(e) => panic!("Could not load history from chain: {e}"),
             };
             let counters = &provider.round_counters;
             assert_eq!(Some(3), counters.get(&feed_id).copied());
@@ -1771,12 +1770,7 @@ mod tests {
                     updates: vec![v1],
                 };
 
-                let p1 = eth_batch_send_to_all_contracts(
-                    &sequencer_state,
-                    &updates1,
-                    None,
-                )
-                .await;
+                let p1 = eth_batch_send_to_all_contracts(&sequencer_state, &updates1, None).await;
 
                 assert!(p1.is_ok());
                 tokio::time::sleep(Duration::from_millis(2000)).await;

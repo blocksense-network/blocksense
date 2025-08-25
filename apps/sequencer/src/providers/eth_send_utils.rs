@@ -1231,26 +1231,18 @@ mod tests {
 
     use crate::providers::provider::init_shared_rpc_providers;
     use alloy::hex::ToHexExt;
-    use alloy::rpc::types::eth::TransactionInput;
-    use alloy::{
-        hex::FromHex,
-        primitives::{Address, TxKind},
-    };
-    use alloy::{node_bindings::Anvil, providers::Provider};
+    use alloy::node_bindings::Anvil;
+    use alloy::primitives::Address;
     use blocksense_config::{
-        get_test_config_with_multiple_providers, get_test_config_with_single_provider,
-        test_feed_config, ADFS_ACCESS_CONTROL_CONTRACT_NAME, ADFS_CONTRACT_NAME,
-        MULTICALL_CONTRACT_NAME,
+        get_test_config_with_single_provider, test_feed_config, ADFS_ACCESS_CONTROL_CONTRACT_NAME,
     };
     use blocksense_config::{AllFeedsConfig, PublishCriteria};
     use blocksense_data_feeds::feeds_processing::VotedFeedUpdate;
-    use blocksense_feed_registry::registry::HistoryEntry;
-    use blocksense_utils::test_env::get_test_private_key_path;
 
+    use blocksense_utils::test_env::get_test_private_key_path;
     use rdkafka::message::ToBytes;
     use regex::Regex;
     use std::str::FromStr;
-    use std::time::UNIX_EPOCH;
 
     fn extract_address(message: &str) -> Option<String> {
         let re = Regex::new(r"0x[a-fA-F0-9]{40}").expect("Invalid regex");
@@ -1258,18 +1250,6 @@ mod tests {
             return Some(mat.as_str().to_string());
         }
         None
-    }
-
-    fn test_feeds_config() -> HashMap<FeedId, FeedStrideAndDecimals> {
-        let mut feeds_config = HashMap::new();
-        feeds_config.insert(
-            0,
-            FeedStrideAndDecimals {
-                stride: 0,
-                decimals: 18,
-            },
-        );
-        feeds_config
     }
 
     #[tokio::test]
@@ -1405,7 +1385,6 @@ mod tests {
 
     #[tokio::test]
     async fn compute_keys_vals_filters_updates_for_networks_on_the_list() {
-        let selector = "0x1a2d80ac";
         // Citrea
         let network = "citrea-testnet";
 
