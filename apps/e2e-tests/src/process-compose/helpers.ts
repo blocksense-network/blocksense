@@ -73,7 +73,7 @@ export function logTestEnvironmentInfo(
   const time = new Date();
   logMessage(
     'info',
-    `${status} test environment ${name}`,
+    `${status} test environment${name ? `: ${name}` : ''}...`,
     `${status} time: ${time.toDateString()} ${time.toTimeString()}`,
   );
 }
