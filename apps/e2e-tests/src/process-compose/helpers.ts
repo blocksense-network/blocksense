@@ -54,6 +54,8 @@ export async function startEnvironment(testEnvironment: string): Promise<void> {
     'just',
     ['start-environment', testEnvironment, '0', '--detached'],
     {
+      stdout: ['inherit'],
+      stderr: ['inherit'],
       env: {
         FEEDS_CONFIG_DIR: `${E2E_TESTS_FEEDS_CONFIG_DIR}`,
       },
