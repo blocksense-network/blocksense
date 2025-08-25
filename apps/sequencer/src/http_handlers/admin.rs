@@ -947,7 +947,7 @@ mod tests {
                     allow_feeds: None,
                     impersonated_anvil_account: None,
                     publishing_criteria: vec![],
-                    should_load_round_counters: true,
+                    should_load_rb_indices: true,
                     contracts,
                 }
             });
