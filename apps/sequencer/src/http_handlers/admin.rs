@@ -23,7 +23,6 @@ use eyre::Result;
 use futures::StreamExt;
 use std::collections::{BTreeMap, HashSet};
 
-use crate::http_handlers::data_feeds::register_feed;
 use crate::providers::eth_send_utils::deploy_contract;
 use crate::providers::provider::SharedRpcProviders;
 use blocksense_feed_registry::types::FeedType;
@@ -616,7 +615,6 @@ pub fn add_admin_services(cfg: &mut ServiceConfig) {
         .service(deploy)
         .service(set_log_level)
         .service(get_feed_report_interval)
-        .service(register_feed)
         .service(get_feeds_config)
         .service(get_feed_config)
         .service(get_sequencer_config)
@@ -683,7 +681,6 @@ mod tests {
             log_handle,
             &sequencer_config,
             metrics_prefix,
-            None,
             vote_send,
             feeds_management_cmd_to_block_creator_send,
             feeds_slots_manager_cmd_send,
