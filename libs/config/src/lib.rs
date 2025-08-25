@@ -203,7 +203,7 @@ pub struct Provider {
     pub is_enabled: bool,
 
     #[serde(default = "default_is_enabled")]
-    pub should_load_round_counters: bool,
+    pub should_load_rb_indices: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub allow_feeds: Option<Vec<FeedId>>,
@@ -321,9 +321,9 @@ impl Validated for SequencerConfig {
 }
 
 impl SequencerConfig {
-    pub fn should_load_round_counters(&self, network: &str) -> bool {
+    pub fn should_load_rb_indices(&self, network: &str) -> bool {
         if let Some(p) = self.providers.get(network) {
-            p.should_load_round_counters
+            p.should_load_rb_indices
         } else {
             false
         }
@@ -487,7 +487,7 @@ pub fn get_test_config_with_multiple_providers(
                 retry_fee_increment_fraction: 0.1,
                 transaction_gas_limit: 7500000,
                 is_enabled: true,
-                should_load_round_counters: false,
+                should_load_rb_indices: false,
                 allow_feeds: None,
                 publishing_criteria: vec![],
                 impersonated_anvil_account: None,

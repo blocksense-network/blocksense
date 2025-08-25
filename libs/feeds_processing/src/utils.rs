@@ -338,7 +338,7 @@ pub async fn validate(
         &updates_to_serialize,
         None,
         feeds_config,
-        &mut batch.feeds_rounds,
+        &mut batch.feeds_rb_indices,
     )
     .await
     {
@@ -413,7 +413,7 @@ pub async fn validate(
 
 #[cfg(test)]
 pub mod tests {
-    use crate::adfs_gen_calldata::RoundCounters;
+    use crate::adfs_gen_calldata::RoundBufferIndices;
     use std::collections::HashSet;
 
     use super::*;
@@ -498,11 +498,11 @@ pub mod tests {
                 end_slot_timestamp: 1677654323,
             },
         ];
-        let mut feeds_rounds: RoundCounters = HashMap::new();
-        feeds_rounds.insert(1, 1000);
-        feeds_rounds.insert(5, 2000);
-        feeds_rounds.insert(11, 3000);
-        feeds_rounds.insert(3, 4000);
+        let mut feeds_rb_indices: RoundBufferIndices = HashMap::new();
+        feeds_rb_indices.insert(1, 1000);
+        feeds_rb_indices.insert(5, 2000);
+        feeds_rb_indices.insert(11, 3000);
+        feeds_rb_indices.insert(3, 4000);
 
         let block_height = 100;
         let network = "ETH".to_string();
@@ -517,7 +517,7 @@ pub mod tests {
             &updates_to_serialize,
             None,
             create_feeds_config(),
-            &mut feeds_rounds,
+            &mut feeds_rb_indices,
         )
         .await
         .unwrap();
@@ -558,7 +558,7 @@ pub mod tests {
             tx_hash: hex::encode(tx_hash),
             calldata: hex::encode(calldata),
             updates,
-            feeds_rounds,
+            feeds_rb_indices,
         };
 
         let feed_ids_union: HashSet<FeedId> = HashSet::from_iter(
