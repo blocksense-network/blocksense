@@ -1,5 +1,5 @@
 use crate::providers::eth_send_utils::{
-    decrement_feeds_round_indexes, get_nonce, get_tx_retry_params, inc_retries_with_backoff,
+    decrement_feed_rb_indices, get_nonce, get_tx_retry_params, inc_retries_with_backoff,
     log_gas_used, GasFees,
 };
 use crate::providers::provider::{parse_eth_address, RpcProvider};
@@ -61,8 +61,8 @@ pub async fn aggregation_batch_consensus_loop(
                             let providers = sequencer_state.providers.read().await;
                             let mut provider = providers.get(net.as_str()).unwrap().lock().await;
                             let ids_vec: Vec<_> = t.updated_feeds_ids.iter().copied().collect();
-                            warn!("Tiemed out batch {t:?} while collectiong reporters' signatures for net {net}. Decreasing the round counters for feed_ids: {ids_vec:?}");
-                            decrement_feeds_round_indexes(&ids_vec, net.as_str(), &mut provider).await
+                            warn!("Tiemed out batch {t:?} while collectiong reporters' signatures for net {net}. Decreasing the round buffer indices for feed_ids: {ids_vec:?}");
+                            decrement_feed_rb_indices(&ids_vec, net.as_str(), &mut provider).await
                         }
 
                         // Loop to process all completed futures for sending TX-s.
@@ -404,6 +404,6 @@ pub async fn aggregation_batch_consensus_loop(
 }
 
 async fn failed_tx(net: &str, ids_vec: &Vec<FeedId>, provider: &mut RpcProvider) {
-    decrement_feeds_round_indexes(ids_vec, net, provider).await;
+    decrement_feed_rb_indices(ids_vec, net, provider).await;
     provider.dec_num_tx_in_progress();
 }

@@ -14,7 +14,7 @@ use alloy::{
 use alloy_primitives::U256;
 use alloy_u256_literal::u256;
 use blocksense_feeds_processing::adfs_gen_calldata::{
-    RoundCounters, MAX_HISTORY_ELEMENTS_PER_FEED, NUM_FEED_IDS_IN_ROUND_RECORD,
+    RoundBufferIndices, MAX_HISTORY_ELEMENTS_PER_FEED, NUM_FEED_IDS_IN_RB_INDEX_RECORD,
 };
 use blocksense_utils::FeedId;
 use futures::future::join_all;
@@ -102,7 +102,7 @@ pub struct RpcProvider {
     pub feeds_variants: HashMap<FeedId, FeedVariant>,
     pub contracts: Vec<Contract>,
     pub rpc_url: Url,
-    pub round_counters: RoundCounters,
+    pub rb_indices: RoundBufferIndices,
     pub limit_multicall_data_calls: usize,
     num_tx_in_progress: u32,
 }
@@ -216,22 +216,22 @@ async fn load_data_from_chain(
     conf: SequencerConfig,
 ) {
     let mut provider = rpc_provider.lock().await;
-    if conf.should_load_round_counters(network.as_str()) {
-        let res = provider.load_round_counters_from_chain(&feeds_config).await;
+    if conf.should_load_rb_indices(network.as_str()) {
+        let res = provider.load_rb_indices_from_chain(&feeds_config).await;
         match res {
-            Ok(mut round_counters) => {
-                info!("Loaded round counters from chain {network} = {round_counters:?}");
-                for (_id, counter) in round_counters.iter_mut() {
+            Ok(mut rb_indices) => {
+                info!("Loaded round buffer indices from chain {network} = {rb_indices:?}");
+                for (_id, counter) in rb_indices.iter_mut() {
                     *counter = (*counter + 1) % MAX_HISTORY_ELEMENTS_PER_FEED;
                 }
-                provider.round_counters = round_counters;
+                provider.rb_indices = rb_indices;
             }
             Err(err) => {
-                error!("Error when loading round counters for {network} = {err}");
+                error!("Error when loading round buffer indices for {network} = {err}");
             }
         }
     } else {
-        warn!("Skipping loading round conters from chain {network}");
+        warn!("Skipping loading round buffer indices from chain {network}");
     }
 }
 
@@ -244,20 +244,20 @@ async fn log_if_contract_exists(rpc_provider: Arc<Mutex<RpcProvider>>, contract_
 }
 
 #[derive(Debug, Clone, Copy)]
-pub struct LatestRound {
+pub struct LatestRBIndex {
     pub feed_id: u128,
-    pub round: u16,
+    pub index: u16,
 }
 
-impl LatestRound {
-    pub fn new(feed_id: u128, data: &[u8]) -> LatestRound {
+impl LatestRBIndex {
+    pub fn new(feed_id: u128, data: &[u8]) -> LatestRBIndex {
         let l = data.len();
-        let round = if l > 1 {
+        let index = if l > 1 {
             u16::from_be_bytes([data[l - 2], data[l - 1]])
         } else {
             0_u16
         };
-        LatestRound { feed_id, round }
+        LatestRBIndex { feed_id, index }
     }
 
     pub fn calldata(feed_id: u128, stride: u8) -> Bytes {
@@ -330,13 +330,13 @@ impl RpcProvider {
             feeds_variants,
             contracts,
             rpc_url,
-            round_counters: RoundCounters::new(),
+            rb_indices: RoundBufferIndices::new(),
             limit_multicall_data_calls: 16,
             num_tx_in_progress: 0,
         }
     }
 
-    pub async fn load_round_counters_from_chain(
+    pub async fn load_rb_indices_from_chain(
         &mut self,
         feeds_config: &AllFeedsConfig,
     ) -> Result<HashMap<FeedId, u64>> {
@@ -354,11 +354,11 @@ impl RpcProvider {
                 let feed_id = feed.id;
                 if !res.contains_key(&feed_id) {
                     let r = self
-                        .get_latest_round_v2_from_storage(adfs_address, &feed_id)
+                        .get_latest_rb_index_v2_from_storage(adfs_address, &feed_id)
                         .await?;
-                    for round in r {
-                        if round.round != 0 || round.feed_id == feed_id {
-                            let _v = res.insert(round.feed_id, round.round as u64);
+                    for rb_index in r {
+                        if rb_index.index != 0 || rb_index.feed_id == feed_id {
+                            let _v = res.insert(rb_index.feed_id, rb_index.index as u64);
                         }
                     }
                 }
@@ -496,25 +496,25 @@ impl RpcProvider {
         false
     }
 
-    async fn get_latest_round_v2_from_storage(
+    async fn get_latest_rb_index_v2_from_storage(
         &self,
         adfs_address: Address,
         feed_id: &u128,
-    ) -> Result<Vec<LatestRound>, eyre::Error> {
+    ) -> Result<Vec<LatestRBIndex>, eyre::Error> {
         let start_slot = u256!(0x00000000fff00000000000000000000000000000);
-        let l = NUM_FEED_IDS_IN_ROUND_RECORD;
+        let l = NUM_FEED_IDS_IN_RB_INDEX_RECORD;
         let slot = start_slot + U256::from(feed_id / l);
         let v = self.provider.get_storage_at(adfs_address, slot).await;
         match v {
             Ok(v) => {
-                let mut res: Vec<LatestRound> = vec![];
+                let mut res: Vec<LatestRBIndex> = vec![];
                 let data: [u8; 32] = v.to_be_bytes();
                 let x = (feed_id / l) * l;
                 for i in 0_usize..(l as usize) {
                     let offset = 2 * i;
-                    res.push(LatestRound {
+                    res.push(LatestRBIndex {
                         feed_id: x + i as u128,
-                        round: u16::from_be_bytes([data[offset], data[offset + 1]]),
+                        index: u16::from_be_bytes([data[offset], data[offset + 1]]),
                     });
                 }
                 Ok(res)
@@ -523,10 +523,10 @@ impl RpcProvider {
         }
     }
 
-    pub async fn get_latest_round(&self, feed_id: &u128) -> Result<LatestRound, eyre::Error> {
+    pub async fn get_latest_rb_index(&self, feed_id: &u128) -> Result<LatestRBIndex, eyre::Error> {
         let adfs_address = self.get_contract_address(ADFS_CONTRACT_NAME)?;
         let r = self
-            .get_latest_round_v2_from_storage(adfs_address, feed_id)
+            .get_latest_rb_index_v2_from_storage(adfs_address, feed_id)
             .await?
             .iter()
             .find(|x| x.feed_id == *feed_id)
@@ -1029,8 +1029,8 @@ pub fn calldata_nth_v1(feed_id: FeedId, _stride: u8, update: u128) -> Bytes {
 }
 
 pub fn calldata_nth_v2(feed_id: FeedId, stride: u8, update: u128) -> Bytes {
-    //  ['0x86', stride, feed_id, roundId],
-    // abi.encodePacked(bytes1(0x86), stride, uint120(id), uint16(round))
+    //  ['0x86', stride, feed_id, rb_index],
+    // abi.encodePacked(bytes1(0x86), stride, uint120(id), uint16(index))
     let call = DynSolValue::Tuple(vec![
         DynSolValue::Uint(U256::from(0x86_u8), 8),
         DynSolValue::Uint(U256::from(stride), 8),
@@ -1315,7 +1315,7 @@ mod tests {
 
         let p_entry = sequencer_config.providers.entry(network.to_string());
         p_entry.and_modify(|p| {
-            p.should_load_round_counters = true;
+            p.should_load_rb_indices = true;
             if let Some(x) = p
                 .contracts
                 .iter_mut()
@@ -1357,9 +1357,9 @@ mod tests {
             //let block_num_at_time_of_writing_this_test = 16500374_u64;
             let block_num_at_time_of_writing_this_test = 0_u64;
             assert!(block_number > block_num_at_time_of_writing_this_test);
-            let last_round = rpc_provider.get_latest_round(&feed_id).await.unwrap();
-            assert_eq!(last_round.feed_id, feed_id);
-            assert_eq!(last_round.round, 0);
+            let last_rb_index = rpc_provider.get_latest_rb_index(&feed_id).await.unwrap();
+            assert_eq!(last_rb_index.feed_id, feed_id);
+            assert_eq!(last_rb_index.index, 0);
             (
                 rpc_provider
                     .get_contract(ADFS_CONTRACT_NAME)
@@ -1440,9 +1440,9 @@ mod tests {
             let last_values = rpc_provider.get_latest_values(&[feed_id]).await;
             info!("last_values = {last_values:?}");
 
-            let last_round = rpc_provider.get_latest_round(&feed_id).await.unwrap();
-            assert_eq!(last_round.feed_id, feed_id);
-            assert_eq!(last_round.round, 2)
+            let last_rb_index = rpc_provider.get_latest_rb_index(&feed_id).await.unwrap();
+            assert_eq!(last_rb_index.feed_id, feed_id);
+            assert_eq!(last_rb_index.index, 2)
         }
         // Wait for all threads to JOIN
         for x in collected_futures.iter() {
@@ -1494,8 +1494,8 @@ mod tests {
                 Ok(v) => info!("Loaded history from chain successful v = {v}"),
                 Err(e) => panic!("Could not load history from chain: {e}"),
             };
-            let counters = &provider.round_counters;
-            assert_eq!(Some(3), counters.get(&feed_id).copied());
+            let indices = &provider.rb_indices;
+            assert_eq!(Some(3), indices.get(&feed_id).copied());
 
             let x = provider.get_latest_values(&[feed_id]).await.unwrap();
             assert_eq!(x.len(), 1);
@@ -1537,9 +1537,9 @@ mod tests {
 
                 let prov = sequencer_state.providers.read().await;
                 let p = prov.get(network).unwrap();
-                let round = p.lock().await.get_latest_round(&feed_id).await.unwrap();
+                let rb_index = p.lock().await.get_latest_rb_index(&feed_id).await.unwrap();
 
-                assert_eq!(round.round, 3);
+                assert_eq!(rb_index.index, 3);
                 let x = p
                     .lock()
                     .await
