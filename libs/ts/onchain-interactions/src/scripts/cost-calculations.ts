@@ -226,30 +226,25 @@ const fetchTransactionsForNetwork = async (
       );
       rawTransactions = response.data.result.records || [];
     } else if (network === 'cronos-testnet') {
-      let currentPage = 1;
-      let totalPages = 1;
+      let pageCounter = 1; //max 10000 blocks per page
+      let currentBlock = latestBlock;
       do {
-        const page = await axios.get(
-          'https://explorer-api.cronos.org/testnet/api/v1/account/getTxsByAddress',
-          {
-            params: {
-              module: 'account',
-              action: 'txlist',
-              address,
-              startblock: 0,
-              endblock: latestBlock,
-              sort: 'desc',
-              apiKey,
-              limit: 100,
-              currentPage,
-            },
+        const page = await axios.get(apiUrl, {
+          params: {
+            module: 'account',
+            action: 'txlist',
+            address,
+            startblock: Number(currentBlock - 10000n),
+            endblock: Number(currentBlock),
+            apikey: apiKey,
           },
-        );
+        });
         const txFromPage = page.data.result;
+
         rawTransactions = rawTransactions.concat(txFromPage);
-        totalPages = page.data.pagination.totalPage;
-        currentPage += 1;
-      } while (currentPage <= totalPages);
+        pageCounter++;
+        currentBlock -= 10000n;
+      } while (rawTransactions.length < numberOfTransactions);
     } else if (
       network === 'bitlayer-testnet' ||
       network === 'bitlayer-mainnet'
@@ -306,7 +301,8 @@ const fetchTransactionsForNetwork = async (
           tx.blockTime?.toString() ??
           tx.tx_time?.toString() ??
           tx.timeStamp?.toString() ??
-          tx.create_time?.toString();
+          tx.create_time?.toString() ??
+          tx.block_timestamp?.toString();
         timestamp = timestamp.includes('T')
           ? new Date(timestamp).getTime()
           : (timestamp = parseInt(timestamp) * 1000);
