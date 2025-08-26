@@ -2563,6 +2563,7 @@ __metadata:
     "@blocksense/base-utils": "workspace:*"
     "@blocksense/config-types": "workspace:*"
     "@blocksense/contracts": "workspace:*"
+    "@chainsafe/bls": "npm:^8.2.0"
     "@effect/cluster": "npm:^0.48.2"
     "@effect/experimental": "npm:^0.54.6"
     "@effect/language-service": "npm:^0.38.1"
@@ -2810,6 +2811,41 @@ __metadata:
   version: 1.2.0
   resolution: "@chainsafe/as-sha256@npm:1.2.0"
   checksum: 10c0/277589bfbdfc692f669a19b87110f4eda033f94d2774cb6d8fc0f745bff3b9e895add862684dbf09ff19102ae79639fdfbc758ecafbbee1cb8e033c679c82aef
+  languageName: node
+  linkType: hard
+
+"@chainsafe/bls-hd-key@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@chainsafe/bls-hd-key@npm:0.3.0"
+  dependencies:
+    "@noble/hashes": "npm:^1.0.0"
+  checksum: 10c0/7e7f83418b1188aeaaf47db3b72147ee025a9c7d20be7776232ca5d72fd46f4f9977cf971eb29a98a204c511b2d4bc672a4dbb04e0c31c7d6ab185b3d51859e3
+  languageName: node
+  linkType: hard
+
+"@chainsafe/bls-keygen@npm:^0.4.0":
+  version: 0.4.0
+  resolution: "@chainsafe/bls-keygen@npm:0.4.0"
+  dependencies:
+    "@chainsafe/bls-hd-key": "npm:^0.3.0"
+    "@noble/hashes": "npm:^1.0.0"
+    "@scure/bip39": "npm:^1.0.0"
+  checksum: 10c0/e04e304e7501e218e536c1bb42b0da0b964123d584bc382c55a44adcc193696aef3c75e726fd3e82961830754ec15b3d6250f0843ee2792fe80148ef68b2e17b
+  languageName: node
+  linkType: hard
+
+"@chainsafe/bls@npm:^8.2.0":
+  version: 8.2.0
+  resolution: "@chainsafe/bls@npm:8.2.0"
+  dependencies:
+    "@chainsafe/bls-keygen": "npm:^0.4.0"
+    bls-eth-wasm: "npm:^1.1.1"
+  peerDependencies:
+    "@chainsafe/blst": ^1.0.0
+  peerDependenciesMeta:
+    "@chainsafe/blst":
+      optional: true
+  checksum: 10c0/2675e2674376e2462e55b52239109581466079449652ee7e0ce02bd33e0262c694fe5ced02a3daa25cddb25ab7f082aceeeedd5e6ea12d8c26898c24dc27dde0
   languageName: node
   linkType: hard
 
@@ -6734,7 +6770,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@noble/hashes@npm:1.8.0, @noble/hashes@npm:^1.3.0, @noble/hashes@npm:^1.8.0, @noble/hashes@npm:~1.8.0":
+"@noble/hashes@npm:1.8.0, @noble/hashes@npm:^1.0.0, @noble/hashes@npm:^1.3.0, @noble/hashes@npm:^1.8.0, @noble/hashes@npm:~1.8.0":
   version: 1.8.0
   resolution: "@noble/hashes@npm:1.8.0"
   checksum: 10c0/06a0b52c81a6fa7f04d67762e08b2c476a00285858150caeaaff4037356dd5e119f45b2a530f638b77a5eeca013168ec1b655db41bae3236cb2e9d511484fc77
@@ -9379,7 +9415,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@scure/bip39@npm:1.6.0, @scure/bip39@npm:^1.6.0":
+"@scure/bip39@npm:1.6.0, @scure/bip39@npm:^1.0.0, @scure/bip39@npm:^1.6.0":
   version: 1.6.0
   resolution: "@scure/bip39@npm:1.6.0"
   dependencies:
@@ -14481,6 +14517,13 @@ __metadata:
   version: 1.2.1
   resolution: "blakejs@npm:1.2.1"
   checksum: 10c0/c284557ce55b9c70203f59d381f1b85372ef08ee616a90162174d1291a45d3e5e809fdf9edab6e998740012538515152471dc4f1f9dbfa974ba2b9c1f7b9aad7
+  languageName: node
+  linkType: hard
+
+"bls-eth-wasm@npm:^1.1.1":
+  version: 1.4.0
+  resolution: "bls-eth-wasm@npm:1.4.0"
+  checksum: 10c0/a92f8c9c197a5bde6bb697f554e47804cca12274a15066fc40666a082c78b4570a12f29f9a07778824aae65e9cd2e41612e7f2c60a8e75da5774546a27bd01b4
   languageName: node
   linkType: hard
 
@@ -22736,7 +22779,29 @@ __metadata:
   languageName: node
   linkType: hard
 
-"katex@npm:^0.16.0, katex@npm:^0.16.21, katex@npm:^0.16.22, katex@npm:^0.16.9":
+"katex@npm:^0.16.0, katex@npm:^0.16.9":
+  version: 0.16.10
+  resolution: "katex@npm:0.16.10"
+  dependencies:
+    commander: "npm:^8.3.0"
+  bin:
+    katex: cli.js
+  checksum: 10c0/b465213157e5245bbb31ff6563c33ae81807c06d6f2246325b3a2397497e8929a34eebbb262f5e0991ec00fbc0cc85f388246e6dfc38ec86c28d3e481cb70afa
+  languageName: node
+  linkType: hard
+
+"katex@npm:^0.16.21":
+  version: 0.16.21
+  resolution: "katex@npm:0.16.21"
+  dependencies:
+    commander: "npm:^8.3.0"
+  bin:
+    katex: cli.js
+  checksum: 10c0/e2e4139ba72a13f2393308fbb2b4c5511611a19a40a6e39d956cf775e553af3517dbfd0a54477faaf401c923e4654e32296347846b8ff15dfa579f88ff8579bb
+  languageName: node
+  linkType: hard
+
+"katex@npm:^0.16.22":
   version: 0.16.22
   resolution: "katex@npm:0.16.22"
   dependencies:
@@ -29698,7 +29763,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sha.js@npm:^2.4.0, sha.js@npm:^2.4.11, sha.js@npm:^2.4.8":
+"sha.js@npm:^2.4.0, sha.js@npm:^2.4.8":
+  version: 2.4.11
+  resolution: "sha.js@npm:2.4.11"
+  dependencies:
+    inherits: "npm:^2.0.1"
+    safe-buffer: "npm:^5.0.1"
+  bin:
+    sha.js: ./bin.js
+  checksum: 10c0/b7a371bca8821c9cc98a0aeff67444a03d48d745cb103f17228b96793f455f0eb0a691941b89ea1e60f6359207e36081d9be193252b0f128e0daf9cfea2815a5
+  languageName: node
+  linkType: hard
+
+"sha.js@npm:^2.4.11":
   version: 2.4.12
   resolution: "sha.js@npm:2.4.12"
   dependencies:
