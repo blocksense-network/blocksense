@@ -2232,6 +2232,7 @@ dependencies = [
  "serde 1.0.217",
  "serde-this-or-that",
  "serde_json",
+ "tracing",
  "url",
 ]
 
