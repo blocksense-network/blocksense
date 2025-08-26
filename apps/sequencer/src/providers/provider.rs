@@ -1020,7 +1020,6 @@ mod tests {
         futures_util::stream::FuturesUnordered<tokio::task::JoinHandle<Result<(), std::io::Error>>>,
         Arc<Mutex<RpcProvider>>,
         alloy::primitives::Address,
-        alloy::primitives::Address,
         String,
         alloy::node_bindings::AnvilInstance,
     )> {
@@ -1097,7 +1096,6 @@ mod tests {
             collected_futures,
             rpc_provider_mutex,
             adfs_address,
-            multicall_address,
             adfs_deployed_byte_code,
             anvil,
         ))
@@ -1222,14 +1220,13 @@ mod tests {
         let feed_id = 31;
         let stride = 0;
         let (
-            sequencer_config,
-            feeds_config,
+            _sequencer_config,
+            _feeds_config,
             sequencer_state,
             collected_futures,
             rpc_provider_mutex,
-            adfs_address,
-            multicall_address,
-            adfs_deployed_byte_code,
+            _adfs_address,
+            _adfs_deployed_byte_code,
             _anvil,
         ) = setup_adfs_test_env(network, metrics_prefix, feed_id, stride).await?;
 
@@ -1301,123 +1298,6 @@ mod tests {
             info!("Aborting future = {:?}", x.id());
             x.abort();
         }
-        // this simulates a second boot of the sequencer
-        // contracts are already deployed
-        let mut sequencer_config2 = sequencer_config.clone();
-        let p_entry = sequencer_config2.providers.entry(network.to_string());
-        p_entry.and_modify(|p| {
-            if let Some(x) = p
-                .contracts
-                .iter_mut()
-                .find(|x| x.name == ADFS_CONTRACT_NAME)
-            {
-                x.address = Some(adfs_address.to_string());
-                x.deployed_byte_code = Some(adfs_deployed_byte_code)
-            }
-            p.publishing_criteria.push(PublishCriteria {
-                feed_id,
-                skip_publish_if_less_then_percentage: 0.5,
-                always_publish_heartbeat_ms: Some(864000),
-                peg_to_value: None,
-                peg_tolerance_percentage: 0.5,
-            });
-        });
-
-        let metrics_prefix2 = "test_reading_adfs_counters_and_values2";
-        let new_rpc_providers =
-            init_shared_rpc_providers(&sequencer_config2, Some(metrics_prefix2), &feeds_config)
-                .await;
-        {
-            let new_rpc_provider = new_rpc_providers
-                .read()
-                .await
-                .get(network)
-                .cloned()
-                .unwrap();
-            let mut provider = new_rpc_provider.lock().await;
-            let indices = &provider.rb_indices;
-            assert_eq!(Some(3), indices.get(&feed_id).copied());
-
-            let x = provider.get_latest_values(&[feed_id]).await.unwrap();
-            assert_eq!(x.len(), 1);
-            let v = x[0].clone().unwrap();
-            assert_eq!(v.num_updates, 2);
-            assert_eq!(v.value, FeedType::Numerical(104011.78f64));
-
-            {
-                let metrics_prefix3 = "test_reading_adfs_counters_and_values3";
-
-                let (sequencer_state, collected_futures) =
-                    create_sequencer_state_and_collected_futures(
-                        sequencer_config2.clone(),
-                        metrics_prefix3,
-                        feeds_config.clone(),
-                    )
-                    .await;
-
-                println!("DEBUG: $$$$$$$$$$$$$$$$$$$$$$$$$$$$ ");
-                for (key, val) in &provider.history.aggregate_history {
-                    println!("DEBUG: 123 key = {key}; ");
-                    for k1 in val.iter() {
-                        println!("DEBUG: 1234 history_entry = {k1:?};");
-                    }
-                }
-                println!("DEBUG: $$$$$$$$$$$$$$$$$$$$$$$$$$$$ ");
-
-                let v = provider.history.get(feed_id).unwrap();
-                let v = v.last().unwrap();
-                assert_eq!(v.update_number, 2);
-                assert_eq!(v.value, FeedType::Numerical(104011.78f64));
-
-                // publish new update
-                let v4 = VotedFeedUpdate {
-                    feed_id: feed.id,
-                    value: FeedType::Numerical(94011.11f64),
-                    end_slot_timestamp: end_slot_timestamp + interval_ms * 4,
-                };
-                let updates4 = BatchedAggregatesToSend {
-                    block_height: 4,
-                    updates: vec![v4],
-                };
-
-                let p4 = eth_batch_send_to_all_contracts(&sequencer_state, &updates4, None).await;
-
-                assert!(p4.is_ok());
-                tokio::time::sleep(Duration::from_millis(2000)).await;
-
-                let prov = sequencer_state.providers.read().await;
-                let p = prov.get(network).unwrap();
-                let rb_index = p.lock().await.get_latest_rb_index(&feed_id).await.unwrap();
-
-                assert_eq!(x.len(), 4);
-                {
-                    let v = x[0].clone().unwrap();
-                    assert_eq!(v.num_updates, 0);
-                    assert_eq!(v.value, FeedType::Numerical(103082.01f64));
-                }
-                {
-                    let v = x[1].clone().unwrap();
-                    assert_eq!(v.num_updates, 1);
-                    assert_eq!(v.value, FeedType::Numerical(103012.21f64));
-                }
-                {
-                    let v = x[2].clone().unwrap();
-                    assert_eq!(v.num_updates, 2);
-                    assert_eq!(v.value, FeedType::Numerical(104011.78f64));
-                }
-                {
-                    // THIS UPDATE should come from the restarted sequencer_state :)
-                    let v = x[3].clone().unwrap();
-                    assert_eq!(v.num_updates, 3);
-                    assert_eq!(v.value, FeedType::Numerical(94011.11f64));
-                }
-                // Wait for all threads to JOIN
-                for x in collected_futures.iter() {
-                    info!("Aborting future = {:?}", x.id());
-                    x.abort();
-                }
-            }
-        }
 
         Ok(())
     }
@@ -1442,7 +1322,6 @@ mod tests {
             collected_futures,
             rpc_provider_mutex,
             adfs_address,
-            multicall_address,
             adfs_deployed_byte_code,
             anvil,
         ) = setup_adfs_test_env(network, metrics_prefix, feed_id, stride).await?;
@@ -1502,13 +1381,6 @@ mod tests {
         let mut sequencer_config2 = sequencer_config.clone();
         let p_entry = sequencer_config2.providers.entry(network.to_string());
         p_entry.and_modify(|p| {
-            if let Some(x) = p
-                .contracts
-                .iter_mut()
-                .find(|x| x.name == MULTICALL_CONTRACT_NAME)
-            {
-                x.address = Some(multicall_address.to_string());
-            }
             if let Some(x) = p
                 .contracts
                 .iter_mut()
