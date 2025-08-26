@@ -323,4 +323,4 @@ jobs:
           env >> "$GITHUB_ENV"
 
       - name: Run NixOS tests
-        run: just run-nix-tests
+        run: just run-nixos-tests
