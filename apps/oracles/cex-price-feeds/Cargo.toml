@@ -21,3 +21,5 @@ serde_derive = { workspace = true }
 futures = { workspace = true }
 itertools = { workspace = true }
 prettytable-rs = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
