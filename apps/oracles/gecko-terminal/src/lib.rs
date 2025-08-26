@@ -11,6 +11,7 @@ use prettytable::{format, Cell, Row, Table};
 use serde::{Deserialize, Serialize};
 use serde_this_or_that::as_f64;
 use std::time::Instant;
+use tracing::{info, warn};
 
 #[derive(Debug, Default, Clone, Deserialize, Serialize)]
 pub struct PoolAttributes {
@@ -150,17 +151,17 @@ async fn fetch_all_prices(resources: &Vec<FeedConfig>, timeout_secs: u64) -> Res
                         for d in re.data {
                             res.entry(d.feed_id.clone()).or_default().push(d);
                         }
-                        println!("ℹ️ Successfully fetched prices from network for {network}. Pools {pools_addresses}");
+                        info!("ℹ️ Successfully fetched prices from network for {network}. Pools {pools_addresses}");
                     }
                     Err(err) => {
-                        println!("❌ Error fetching prices from network for {network}: {err:?}. Pools {pools_addresses}");
+                        warn!("❌ Error fetching prices from network for {network}: {err:?}. Pools {pools_addresses}");
                     }
                 };
             }
         }
     }
 
-    println!("🕛 All prices fetched in {:?}", before_fetch.elapsed());
+    info!("🕛 All prices fetched in {:?}", before_fetch.elapsed());
     Ok(res)
 }
 
@@ -318,7 +319,9 @@ fn print_results(
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
-    println!("Starting oracle component - Gecko Terminal");
+    tracing_subscriber::fmt::init();
+
+    info!("Starting oracle component - Gecko Terminal");
     let resources = get_resources_from_settings(&settings)?;
     let timeout_secs = settings.interval_time_in_seconds - 1;
     let results = fetch_all_prices(&resources, timeout_secs).await?;
