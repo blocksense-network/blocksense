@@ -22,17 +22,17 @@ use reqwest::Url; // TODO @ymadzhunkov include URL directly from url crate
 
 use blocksense_config::{
     AllFeedsConfig, ContractConfig, PublishCriteria, SequencerConfig,
-    ADFS_ACCESS_CONTROL_CONTRACT_NAME, ADFS_CONTRACT_NAME, MULTICALL_CONTRACT_NAME,
+    ADFS_ACCESS_CONTROL_CONTRACT_NAME, ADFS_CONTRACT_NAME,
 };
 use blocksense_data_feeds::feeds_processing::{
     BatchedAggregatesToSend, PublishedFeedUpdate, PublishedFeedUpdateError, VotedFeedUpdate,
 };
-use blocksense_feed_registry::registry::{FeedAggregateHistory, HistoryEntry};
+use blocksense_feed_registry::registry::FeedAggregateHistory;
 use blocksense_feed_registry::types::FeedType;
 use blocksense_metrics::{metrics::ProviderMetrics, process_provider_getter};
 use eyre::{eyre, Result};
 use paste::paste;
-use ringbuf::traits::{Consumer, Observer, RingBuffer};
+use ringbuf::traits::{Consumer, Observer};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -43,8 +43,6 @@ use tokio::time::Duration;
 use tracing::{debug, error, info, warn};
 
 use crate::providers::eth_send_utils::{get_gas_limit, get_tx_retry_params, GasFees};
-use crate::providers::multicall::Multicall;
-use crate::providers::provider::Multicall::MulticallInstance;
 use std::time::Instant;
 
 pub type ProviderType =
@@ -103,7 +101,6 @@ pub struct RpcProvider {
     pub contracts: Vec<Contract>,
     pub rpc_url: Url,
     pub rb_indices: RoundBufferIndices,
-    pub limit_multicall_data_calls: usize,
     num_tx_in_progress: u32,
 }
 
@@ -331,7 +328,6 @@ impl RpcProvider {
             contracts,
             rpc_url,
             rb_indices: RoundBufferIndices::new(),
-            limit_multicall_data_calls: 16,
             num_tx_in_progress: 0,
         }
     }
@@ -535,98 +531,49 @@ impl RpcProvider {
         r
     }
 
-    pub async fn invoke_multicall(&self, calls: &[Multicall::Call]) -> Result<Vec<Bytes>> {
-        let multicall = self.get_contract_address(MULTICALL_CONTRACT_NAME)?;
-        let contract = MulticallInstance::new(multicall, self.provider.clone());
-        let chunk_size = self.limit_multicall_data_calls;
-        let chunks: Vec<Vec<Multicall::Call>> =
-            calls.chunks(chunk_size).map(|x| x.to_vec()).collect();
-        let mut res = vec![];
-        for calldata in chunks {
-            let mut aggregate_return = contract.aggregate(calldata).call().await?;
-            res.append(&mut aggregate_return.returnData);
-        }
-        Ok(res)
-    }
-
     pub async fn get_latest_values(
         &self,
         feed_ids: &[FeedId],
     ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>, eyre::Error> {
-        let mut variants: Vec<FeedVariant> = vec![];
+        let mut results = Vec::new();
+        let adfs_contract_address = self.get_contract_address(ADFS_CONTRACT_NAME)?;
+
+        let mut variants: HashMap<FeedId, FeedVariant> = HashMap::new();
         for feed_id in feed_ids.iter() {
             let Some(variant) = self.feeds_variants.get(feed_id) else {
                 return Err(eyre!(
                     "Unknown variant and number of digits for feed with id = {feed_id}"
                 ));
             };
-            variants.push(variant.clone());
+            variants.insert(*feed_id, variant.clone());
         }
-        type LatestFn = fn(
-            u128,
-            FeedVariant,
-            &[u8],
-        )
-            -> std::result::Result<PublishedFeedUpdate, PublishedFeedUpdateError>;
 
-        let data_feed = self.get_contract_address(ADFS_CONTRACT_NAME)?;
-        let latest: LatestFn = latest_v2;
+        for feed_id in feed_ids {
+            let Some(feed_variant) = variants.get(feed_id) else {
+                return Err(eyre!(
+                    "Unknown variant and number of digits for feed with id (logical error) = {feed_id}"
+                ));
+            };
+            // abi.encodePacked(bytes1(0x82), stride, uint120(id))
+            let calldata = DynSolValue::Tuple(vec![
+                DynSolValue::Uint(U256::from(0x83_u8), 8),
+                DynSolValue::Uint(U256::from(feed_variant.stride), 8),
+                DynSolValue::Uint(U256::from(*feed_id), 120),
+            ]);
+            let calldata_bytes = Bytes::copy_from_slice(&calldata.abi_encode_packed());
 
-        let calldata: Vec<Multicall::Call> = feed_ids
-            .iter()
-            .map(|feed_id| Multicall::Call {
-                target: data_feed,
-                callData: calldata_for_latest_value_v2(*feed_id),
-            })
-            .collect();
+            let tx = TransactionRequest::default()
+                .to(adfs_contract_address)
+                .input(calldata_bytes.into());
 
-        let mutlicall_return_data = self.invoke_multicall(&calldata).await?;
-        let res = mutlicall_return_data
-            .into_iter()
-            .enumerate()
-            .map(|(count, data)| latest(feed_ids[count], variants[count].clone(), &data.0))
-            .collect();
-        Ok(res)
-    }
+            let recvd_data = self.provider.call(tx).await?;
+            info!("recvd_data = {recvd_data}");
+            let result = latest_v2(*feed_id, feed_variant.clone(), &recvd_data);
+            info!("recvd_result = {result:?}");
+            results.push(result);
+        }
 
-    pub async fn get_historical_values_for_feed(
-        &self,
-        feed_id: FeedId,
-        updates: &[u128],
-    ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>> {
-        let Some(variant) = self.feeds_variants.get(&feed_id) else {
-            return Err(eyre!(
-                "Unknown variant and number of digits for feed with id = {feed_id}"
-            ));
-        };
-        type NthCalldataFn = fn(u128, u8, u128) -> Bytes;
-        type NthResultFn = fn(
-            u128,
-            u128,
-            FeedVariant,
-            &[u8],
-        )
-            -> std::result::Result<PublishedFeedUpdate, PublishedFeedUpdateError>;
-
-        let data_feed: Address = self.get_contract_address(ADFS_CONTRACT_NAME)?;
-        let nth_calldata: NthCalldataFn = calldata_nth_v2;
-        let nth_result: NthResultFn = nth_v2;
-
-        let calldata: Vec<Multicall::Call> = updates
-            .iter()
-            .map(|update| Multicall::Call {
-                target: data_feed,
-                callData: Bytes::copy_from_slice(&nth_calldata(feed_id, variant.stride, *update)),
-            })
-            .collect();
-
-        let mutlicall_return_data = self.invoke_multicall(&calldata).await?;
-        let res = mutlicall_return_data
-            .into_iter()
-            .enumerate()
-            .map(|(count, data)| nth_result(feed_id, updates[count], variant.clone(), &data.0))
-            .collect();
-        Ok(res)
+        Ok(results)
     }
 
     pub fn get_history_capacity(&self, feed_id: FeedId) -> Option<usize> {
@@ -836,88 +783,6 @@ impl RpcProvider {
         }
     }
 
-    pub async fn load_history_from_chain_for_feed(
-        &mut self,
-        feed_id: FeedId,
-        limit_entries: u32,
-    ) -> Result<u32> {
-        let latest = self.get_latest_values(&[feed_id]).await?;
-        if !latest.is_empty() {
-            let num_updates = match &latest[0] {
-                Ok(latest) => latest.num_updates,
-                Err(latest) => latest.num_updates,
-            };
-            let limit = if (limit_entries as u128) < num_updates {
-                limit_entries
-            } else {
-                num_updates as u32
-            };
-
-            let Some(capacity) = self.get_history_capacity(feed_id) else {
-                return Err(eyre!("History is not registered for feed id = {feed_id}"));
-            };
-            let limit = if capacity < (limit as usize) {
-                capacity as u32
-            } else {
-                limit as u32
-            };
-            let end_update_num = num_updates + 1;
-            let mut start_update_num = (num_updates + 1) - (limit as u128);
-            let last_update_num = self.get_last_update_num_from_history(feed_id);
-
-            if start_update_num < last_update_num + 1 {
-                start_update_num = last_update_num + 1
-            }
-
-            let range = start_update_num..end_update_num;
-            let updates = range.collect::<Vec<u128>>();
-            let values = self
-                .get_historical_values_for_feed(feed_id, &updates)
-                .await?;
-            let Some(history) = self.history.get_mut(feed_id) else {
-                return Err(eyre!("History is not registered for feed id = {feed_id}"));
-            };
-
-            let mut count: u32 = 0;
-            for v in values {
-                let Ok(v) = v else {
-                    continue;
-                };
-                let elem = HistoryEntry {
-                    value: v.value,
-                    update_number: v.num_updates,
-                    end_slot_timestamp: v.published,
-                };
-                let _ = history.push_overwrite(elem);
-                count += 1;
-            }
-            Ok(count)
-        } else {
-            Ok(0)
-        }
-    }
-
-    pub async fn load_history_from_chain(&mut self) -> Result<u32> {
-        let mut f: Vec<(FeedId, u32)> = vec![];
-        for (feed_id, buff) in &self.history.aggregate_history {
-            if buff.occupied_len() == 0 {
-                let limit = 128_u32;
-                let len = if buff.vacant_len() < limit as usize {
-                    buff.vacant_len() as u32
-                } else {
-                    limit
-                };
-                f.push((*feed_id, len));
-            }
-        }
-        let mut total = 0_u32;
-        for (feed_id, len) in f {
-            let entries = self.load_history_from_chain_for_feed(feed_id, len).await?;
-            total += entries;
-        }
-        Ok(total)
-    }
-
     pub fn inc_num_tx_in_progress(&mut self) {
         self.num_tx_in_progress += 1;
     }
@@ -1120,45 +985,6 @@ pub fn latest_v2(
     }
 }
 
-fn nth_v2(
-    feed_id: FeedId,
-    num_updates: u128,
-    variant: FeedVariant,
-    data: &[u8],
-) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
-    if data.len() != 32 {
-        return Err(PublishedFeedUpdate::error_num_update(
-            feed_id,
-            "Data size is not exactly 32 bytes",
-            num_updates,
-        ));
-    }
-    info!("nth_v2 {num_updates} {data:?}");
-    let j3: [u8; 8] = data[0..8].try_into().expect("Impossible");
-    let timestamp_u64 = u64::from_be_bytes(j3);
-    // if timestamp_u64 == 0 {
-    //     return Err(PublishedFeedUpdate::error_num_update(
-    //         feed_id,
-    //         "Timestamp is zero",
-    //         num_updates,
-    //     ));
-    // }
-    let j1: [u8; 32] = data[0..32].try_into().expect("Impossible");
-    match FeedType::from_bytes(j1.to_vec(), variant.variant, variant.decimals) {
-        Ok(value) => Ok(PublishedFeedUpdate {
-            feed_id,
-            num_updates,
-            value,
-            published: timestamp_u64 as u128,
-        }),
-        Err(msg) => Err(PublishedFeedUpdate::error_num_update(
-            feed_id,
-            &msg,
-            num_updates,
-        )),
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1216,14 +1042,6 @@ mod tests {
         let p_entry = sequencer_config.providers.entry(network.to_string());
         p_entry.and_modify(|p| {
             p.should_load_rb_indices = true;
-            if let Some(x) = p
-                .contracts
-                .iter_mut()
-                .find(|x| x.name == MULTICALL_CONTRACT_NAME)
-            {
-                x.address = None;
-                x.creation_byte_code = Some(Multicall::BYTECODE.to_string());
-            }
         });
 
         let (sequencer_state, collected_futures) = create_sequencer_state_and_collected_futures(
@@ -1243,14 +1061,9 @@ mod tests {
             .await
             .expect("Data feed publishing contract deployment failed!");
         info!("{msg}");
-        let msg = sequencer_state
-            .deploy_contract(network, MULTICALL_CONTRACT_NAME)
-            .await
-            .expect("Error when deploying multicall contract!");
-        info!("{msg}");
 
         let rpc_provider_mutex = sequencer_state.get_provider(network).await.clone().unwrap();
-        let (adfs_address, multicall_address, adfs_deployed_byte_code) = {
+        let (adfs_address, adfs_deployed_byte_code) = {
             let mut rpc_provider = rpc_provider_mutex.lock().await;
             rpc_provider.history.register_feed(feed_id, 100);
 
@@ -1263,11 +1076,6 @@ mod tests {
             (
                 rpc_provider
                     .get_contract(ADFS_CONTRACT_NAME)
-                    .unwrap()
-                    .address
-                    .unwrap(),
-                rpc_provider
-                    .get_contract(MULTICALL_CONTRACT_NAME)
                     .unwrap()
                     .address
                     .unwrap(),
@@ -1501,13 +1309,6 @@ mod tests {
             if let Some(x) = p
                 .contracts
                 .iter_mut()
-                .find(|x| x.name == MULTICALL_CONTRACT_NAME)
-            {
-                x.address = Some(multicall_address.to_string());
-            }
-            if let Some(x) = p
-                .contracts
-                .iter_mut()
                 .find(|x| x.name == ADFS_CONTRACT_NAME)
             {
                 x.address = Some(adfs_address.to_string());
@@ -1534,10 +1335,6 @@ mod tests {
                 .cloned()
                 .unwrap();
             let mut provider = new_rpc_provider.lock().await;
-            match provider.load_history_from_chain().await {
-                Ok(v) => info!("Loaded history from chain successful v = {v}"),
-                Err(e) => panic!("Could not load history from chain: {e}"),
-            };
             let indices = &provider.rb_indices;
             assert_eq!(Some(3), indices.get(&feed_id).copied());
 
@@ -1557,6 +1354,15 @@ mod tests {
                         feeds_config.clone(),
                     )
                     .await;
+
+                println!("DEBUG: $$$$$$$$$$$$$$$$$$$$$$$$$$$$ ");
+                for (key, val) in &provider.history.aggregate_history {
+                    println!("DEBUG: 123 key = {key}; ");
+                    for k1 in val.iter() {
+                        println!("DEBUG: 1234 history_entry = {k1:?};");
+                    }
+                }
+                println!("DEBUG: $$$$$$$$$$$$$$$$$$$$$$$$$$$$ ");
 
                 let v = provider.history.get(feed_id).unwrap();
                 let v = v.last().unwrap();
@@ -1583,13 +1389,6 @@ mod tests {
                 let p = prov.get(network).unwrap();
                 let rb_index = p.lock().await.get_latest_rb_index(&feed_id).await.unwrap();
 
-                assert_eq!(rb_index.index, 3);
-                let x = p
-                    .lock()
-                    .await
-                    .get_historical_values_for_feed(feed_id, &[0, 1, 2, 3])
-                    .await
-                    .unwrap();
                 assert_eq!(x.len(), 4);
                 {
                     let v = x[0].clone().unwrap();
