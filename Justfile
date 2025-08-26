@@ -166,9 +166,11 @@ list-nixos-tests:
 run-nixos-tests:
     #!/usr/bin/env bash
     set -euo pipefail
-    just list-nixos-tests | \
-    xargs -I {} \
-    nix build --option sandbox false -L --json --accept-flake-config .#legacyPackages.x86_64-linux.nixosTests.{}
+    tests=$(just list-nixos-tests)
+    for test in $tests; do
+      echo "Running NixOS test: $test"
+      nix build --option sandbox false -L --json --accept-flake-config .#legacyPackages.x86_64-linux.nixosTests."$test"
+    done
 
 [group('General')]
 [doc('Run a command to clean the repository of untracked files')]
