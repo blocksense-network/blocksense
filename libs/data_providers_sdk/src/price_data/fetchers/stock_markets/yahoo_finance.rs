@@ -2,6 +2,7 @@ use std::collections::HashMap;
 
 use anyhow::{Error, Result};
 use futures::{future::LocalBoxFuture, FutureExt};
+use tracing::warn;
 
 use serde::Deserialize;
 use serde_json::Value;
@@ -79,7 +80,7 @@ impl<'a> PricesFetcher<'a> for YFPriceFetcher<'a> {
                             Some((value.symbol, PricePoint { price, volume }))
                         }
                         _ => {
-                            eprintln!(
+                            warn!(
                                 "[YahooFinance] Skipping symbol {}: missing {}{}{}",
                                 value.symbol,
                                 if price.is_none() { "price" } else { "" },

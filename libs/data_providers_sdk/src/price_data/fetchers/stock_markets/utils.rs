@@ -1,3 +1,5 @@
+use tracing::warn;
+
 pub fn print_missing_network_price_data<T>(
     network: &str,
     symbol: String,
@@ -13,7 +15,7 @@ pub fn print_missing_network_price_data<T>(
     }
 
     if !missing_fields.is_empty() {
-        eprintln!(
+        warn!(
             "[{network}] Skipping symbol {symbol}: missing {}",
             missing_fields.join(" and ")
         );

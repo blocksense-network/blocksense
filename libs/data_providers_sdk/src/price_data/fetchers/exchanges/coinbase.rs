@@ -11,6 +11,8 @@ use std::ops::Deref;
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 
+use tracing::warn;
+
 use blocksense_sdk::http::http_get_json;
 
 use crate::price_data::traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher};
@@ -51,7 +53,7 @@ impl<'a> PricesFetcher<'a> for CoinbasePriceFetcher<'a> {
                         prices.insert(symbol, price_pint);
                     }
                     Err(err) => {
-                        eprintln!("Error processing future in CoinbasePriceFetcher {err:?}")
+                        warn!("Error processing future in CoinbasePriceFetcher {err:?}")
                     }
                 }
             }

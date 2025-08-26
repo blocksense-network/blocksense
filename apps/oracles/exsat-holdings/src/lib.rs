@@ -7,6 +7,7 @@ use blocksense_sdk::{
 };
 use data::hardcoded_data;
 use std::collections::HashMap;
+use tracing::info;
 
 use serde::{Deserialize, Serialize};
 use url::Url;
@@ -173,7 +174,9 @@ fn initialize_store_from_hardcoded_data() -> Result<Store> {
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
-    println!("Starting oracle component - Exsat");
+    tracing_subscriber::fmt::init();
+
+    info!("Starting oracle component - Exsat");
     let mut table = table!(["BTC Address", "Balance"]);
 
     let store = initialize_store_from_hardcoded_data()?;
@@ -202,7 +205,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
         }
     }
     table.printstd();
-    println!("💰💰💰 TOTAL = {total} sats 💰💰💰");
+    info!("💰💰💰 TOTAL = {total} sats 💰💰💰");
     let mut payload: Payload = Payload::new();
     for feed in settings.data_feeds.iter() {
         payload.values.push(DataFeedResult {
