@@ -22,3 +22,5 @@ futures = { workspace = true }
 itertools = { workspace = true }
 chrono = "0.4"
 chrono-tz = "0.8"
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
