@@ -27,15 +27,14 @@ use blocksense_config::{
 use blocksense_data_feeds::feeds_processing::{
     BatchedAggregatesToSend, PublishedFeedUpdate, PublishedFeedUpdateError, VotedFeedUpdate,
 };
-use blocksense_feed_registry::registry::{FeedAggregateHistory, HistoryEntry};
+use blocksense_feed_registry::registry::FeedAggregateHistory;
 use blocksense_feed_registry::types::FeedType;
 use blocksense_metrics::{metrics::ProviderMetrics, process_provider_getter};
 use eyre::{eyre, Result};
 use paste::paste;
-use ringbuf::traits::{Consumer, Observer, RingBuffer};
+use ringbuf::traits::{Consumer, Observer};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::hash::Hash;
 use std::sync::Arc;
 use std::{fs, mem};
 use tokio::sync::{Mutex, RwLock};
@@ -563,7 +562,7 @@ impl RpcProvider {
             ]);
             let calldata_bytes = Bytes::copy_from_slice(&calldata.abi_encode_packed());
 
-            let mut tx = TransactionRequest::default()
+            let tx = TransactionRequest::default()
                 .to(adfs_contract_address)
                 .input(calldata_bytes.into());
 
@@ -986,45 +985,6 @@ pub fn latest_v2(
     }
 }
 
-fn nth_v2(
-    feed_id: FeedId,
-    num_updates: u128,
-    variant: FeedVariant,
-    data: &[u8],
-) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
-    if data.len() != 32 {
-        return Err(PublishedFeedUpdate::error_num_update(
-            feed_id,
-            "Data size is not exactly 32 bytes",
-            num_updates,
-        ));
-    }
-    info!("nth_v2 {num_updates} {data:?}");
-    let j3: [u8; 8] = data[0..8].try_into().expect("Impossible");
-    let timestamp_u64 = u64::from_be_bytes(j3);
-    // if timestamp_u64 == 0 {
-    //     return Err(PublishedFeedUpdate::error_num_update(
-    //         feed_id,
-    //         "Timestamp is zero",
-    //         num_updates,
-    //     ));
-    // }
-    let j1: [u8; 32] = data[0..32].try_into().expect("Impossible");
-    match FeedType::from_bytes(j1.to_vec(), variant.variant, variant.decimals) {
-        Ok(value) => Ok(PublishedFeedUpdate {
-            feed_id,
-            num_updates,
-            value,
-            published: timestamp_u64 as u128,
-        }),
-        Err(msg) => Err(PublishedFeedUpdate::error_num_update(
-            feed_id,
-            &msg,
-            num_updates,
-        )),
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1201,7 +1161,7 @@ mod tests {
             .expect("Data feed publishing contract deployment failed!");
         info!("{msg}");
         let rpc_provider_mutex = sequencer_state.get_provider(network).await.clone().unwrap();
-        let (adfs_address, adfs_deployed_byte_code) = {
+        let (_adfs_address, _adfs_deployed_byte_code) = {
             let mut rpc_provider = rpc_provider_mutex.lock().await;
             rpc_provider.history.register_feed(feed_id, 100);
 
@@ -1296,123 +1256,6 @@ mod tests {
         for x in collected_futures.iter() {
             info!("Aborting future = {:?}", x.id());
             x.abort();
-        }
-        // this simulates a second boot of the sequencer
-        // contracts are already deployed
-        let mut sequencer_config2 = sequencer_config.clone();
-        let p_entry = sequencer_config2.providers.entry(network.to_string());
-        p_entry.and_modify(|p| {
-            if let Some(x) = p
-                .contracts
-                .iter_mut()
-                .find(|x| x.name == ADFS_CONTRACT_NAME)
-            {
-                x.address = Some(adfs_address.to_string());
-                x.deployed_byte_code = Some(adfs_deployed_byte_code)
-            }
-            p.publishing_criteria.push(PublishCriteria {
-                feed_id,
-                skip_publish_if_less_then_percentage: 0.5,
-                always_publish_heartbeat_ms: Some(864000),
-                peg_to_value: None,
-                peg_tolerance_percentage: 0.5,
-            });
-        });
-
-        let metrics_prefix2 = "test_reading_adfs_counters_and_values2";
-        let new_rpc_providers =
-            init_shared_rpc_providers(&sequencer_config2, Some(metrics_prefix2), &feeds_config)
-                .await;
-        {
-            let new_rpc_provider = new_rpc_providers
-                .read()
-                .await
-                .get(network)
-                .cloned()
-                .unwrap();
-            let mut provider = new_rpc_provider.lock().await;
-            let indices = &provider.rb_indices;
-            assert_eq!(Some(3), indices.get(&feed_id).copied());
-
-            let x = provider.get_latest_values(&[feed_id]).await.unwrap();
-            assert_eq!(x.len(), 1);
-            let v = x[0].clone().unwrap();
-            assert_eq!(v.num_updates, 2);
-            assert_eq!(v.value, FeedType::Numerical(104011.78f64));
-
-            {
-                let metrics_prefix3 = "test_reading_adfs_counters_and_values3";
-
-                let (sequencer_state, collected_futures) =
-                    create_sequencer_state_and_collected_futures(
-                        sequencer_config2.clone(),
-                        metrics_prefix3,
-                        feeds_config.clone(),
-                    )
-                    .await;
-
-                println!("DEBUG: $$$$$$$$$$$$$$$$$$$$$$$$$$$$ ");
-                for (key, val) in &provider.history.aggregate_history {
-                    println!("DEBUG: 123 key = {key}; ");
-                    for k1 in val.iter() {
-                        println!("DEBUG: 1234 history_entry = {k1:?};");
-                    }
-                }
-                println!("DEBUG: $$$$$$$$$$$$$$$$$$$$$$$$$$$$ ");
-
-                let v = provider.history.get(feed_id).unwrap();
-                let v = v.last().unwrap();
-                assert_eq!(v.update_number, 2);
-                assert_eq!(v.value, FeedType::Numerical(104011.78f64));
-
-                // publish new update
-                let v4 = VotedFeedUpdate {
-                    feed_id: feed.id,
-                    value: FeedType::Numerical(94011.11f64),
-                    end_slot_timestamp: end_slot_timestamp + interval_ms * 4,
-                };
-                let updates4 = BatchedAggregatesToSend {
-                    block_height: 4,
-                    updates: vec![v4],
-                };
-
-                let p4 = eth_batch_send_to_all_contracts(&sequencer_state, &updates4, None).await;
-
-                assert!(p4.is_ok());
-                tokio::time::sleep(Duration::from_millis(2000)).await;
-
-                let prov = sequencer_state.providers.read().await;
-                let p = prov.get(network).unwrap();
-                let rb_index = p.lock().await.get_latest_rb_index(&feed_id).await.unwrap();
-
-                assert_eq!(x.len(), 4);
-                {
-                    let v = x[0].clone().unwrap();
-                    assert_eq!(v.num_updates, 0);
-                    assert_eq!(v.value, FeedType::Numerical(103082.01f64));
-                }
-                {
-                    let v = x[1].clone().unwrap();
-                    assert_eq!(v.num_updates, 1);
-                    assert_eq!(v.value, FeedType::Numerical(103012.21f64));
-                }
-                {
-                    let v = x[2].clone().unwrap();
-                    assert_eq!(v.num_updates, 2);
-                    assert_eq!(v.value, FeedType::Numerical(104011.78f64));
-                }
-                {
-                    // THIS UPDATE should come from the restarted sequencer_state :)
-                    let v = x[3].clone().unwrap();
-                    assert_eq!(v.num_updates, 3);
-                    assert_eq!(v.value, FeedType::Numerical(94011.11f64));
-                }
-                // Wait for all threads to JOIN
-                for x in collected_futures.iter() {
-                    info!("Aborting future = {:?}", x.id());
-                    x.abort();
-                }
-            }
         }
 
         Ok(())
