@@ -4,6 +4,7 @@ use alloy::{
     providers::ProviderBuilder,
     sol,
 };
+use tracing::{info, warn};
 use anyhow::Result;
 use blocksense_sdk::{
     http::http_post_json,
@@ -91,7 +92,7 @@ impl ResponseEthCall {
         let non_zero_bits = x.bit_len();
         // println!("Number of bits = {non_zero_bits}");
         if non_zero_bits > f64::MANTISSA_DIGITS as usize {
-            println!("f64 is not big enough to accuratly represent integer with {non_zero_bits} non zero bits");
+            warn!("f64 is not big enough to accuratly represent integer with {non_zero_bits} non zero bits");
         }
         if non_zero_bits > u128::BITS as usize {
             return Err(anyhow::anyhow!(
@@ -333,7 +334,9 @@ fn print_results(results: &FetchedDataHashMap, payload: &Payload, resourses: &[F
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
-    println!("Starting oracle component - Ethereum RPC");
+    tracing_subscriber::fmt::init();
+
+    info!("Starting oracle component - Ethereum RPC");
     let timeout_secs = settings.interval_time_in_seconds - 1;
     let resources = get_resources_from_settings(&settings)?;
     let results = fetch_all(&resources, timeout_secs).await?;
@@ -404,7 +407,7 @@ fn get_resources_from_settings(settings: &Settings) -> Result<Vec<FeedConfig>> {
                 config.push(feed_config);
             }
             Err(err) => {
-                println!(
+                warn!(
                     "Error {err} when parsing feed settings data = '{}'",
                     &feed_setting.data
                 );

@@ -7,6 +7,7 @@ use blocksense_sdk::{
     oracle_component,
     http::http_get_json
 };
+use tracing::info;
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -18,6 +19,8 @@ pub struct RWAResponse {
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
+    tracing_subscriber::fmt::init();
+
     let resources = get_resources_from_settings(&settings)?;
     let timeout_secs = settings.interval_time_in_seconds - 1;
     let api_key: String = get_api_key(&settings)?;
@@ -39,7 +42,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
             value: DataFeedResultValue::Numerical(reserve_amount),
         });
 
-        println!("Payload: {:?}", payload);
+        info!("Payload: {:?}", payload);
         Ok(payload)
     } else {
         Err(anyhow::anyhow!("Unsupported request type: {}", resources.arguments.endpoint))

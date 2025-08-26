@@ -11,6 +11,8 @@ use serde::Deserialize;
 use serde_json::Value;
 use serde_this_or_that::as_f64;
 
+use tracing::warn;
+
 use blocksense_sdk::http::http_get_json;
 
 use crate::price_data::traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher};
@@ -50,7 +52,7 @@ impl<'a> PricesFetcher<'a> for GeminiPriceFetcher<'a> {
                         prices.insert(symbol, price_pint);
                     }
                     Err(err) => {
-                        eprintln!("Error processing future in GeminiPriceFetcher {err:?}")
+                        warn!("Error processing future in GeminiPriceFetcher {err:?}")
                     }
                 }
             }
