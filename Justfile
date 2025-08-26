@@ -154,12 +154,19 @@ eval-machine machine commit="working-tree":
   nix eval --raw "${NIX_TARGET}#nixosConfigurations.{{machine}}.config.system.build.toplevel.outPath"
 
 [group('General')]
-[doc('Run NixOS integration tests')]
-run-nix-tests:
+[doc('List NixOS integration tests')]
+list-nixos-tests:
   #!/usr/bin/env bash
   set -euo pipefail
   nix eval --json .#legacyPackages.x86_64-linux.nixosTests --apply "builtins.attrNames" | \
-    jq -r '.[]' | \
+    jq -r '.[]'
+
+[group('General')]
+[doc('Run NixOS integration tests')]
+run-nixos-tests:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    just list-nixos-tests | \
     xargs -I {} \
     nix build --option sandbox false -L --json --accept-flake-config .#legacyPackages.x86_64-linux.nixosTests.{}
 
