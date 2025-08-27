@@ -13,10 +13,6 @@ let
     blockchain_reader
     aggregate_consensus_reader
     ;
-  inherit (self'.packages)
-    blama
-    ;
-
   useLocalCargoResult = config.services.blocksense.process-compose.use-local-cargo-result;
 
   # process-compose will replace `$GIT_ROOT` on startup
@@ -86,14 +82,18 @@ let
           working_dir = "$GIT_ROOT/.devenv/state/blocksense/reporter/${name}";
         in
         {
-          command = ''
-            mkdir -p "${working_dir}" &&
-            cd "${working_dir}" &&
-            rm -rf ./test-keys &&
-            cp -r "$GIT_ROOT/nix/test-environments/test-keys" ./test-keys &&
-            ${mkCargoTargetExePath "blocksense"} node build --up \
-              --from ${cfg.config-files."reporter_config_${name}".path}
-          '';
+          command =
+            lib.optionalString (!useLocalCargoResult) ''
+              PATH="${self'.legacyPackages.spinWrapped}/bin:$PATH"
+            ''
+            + ''
+              mkdir -p "${working_dir}" &&
+              cd "${working_dir}" &&
+              rm -rf ./test-keys &&
+              cp -r "$GIT_ROOT/nix/test-environments/test-keys" ./test-keys &&
+              ${mkCargoTargetExePath "blocksense"} node build --up \
+                --from ${cfg.config-files."reporter_config_${name}".path}
+            '';
           environment =
             [ "RUST_LOG=${log-level}" ]
             ++ lib.optionals useLocalCargoResult [

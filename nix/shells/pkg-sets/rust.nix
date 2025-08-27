@@ -15,7 +15,6 @@
 
   packages = self'.packages.blocksense-rs.buildInputs ++ [
     self'.legacyPackages.cargoWrapped
-    self'.legacyPackages.spinWrapped
     self'.legacyPackages.rustToolchain
     pkgs.cargo-tarpaulin
   ];
