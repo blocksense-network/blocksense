@@ -34,122 +34,226 @@
       "AdminExecutorModule": null
     },
     "CLAggregatorAdapter": {
-      "0": {
-        "address": "0x68D7d0FEF0637b68F85Ed3Fd6DD5BAf96585be1e",
+      "102001": {
+        "address": "0x21026b830b734b014981309d5AB20FdcC95595D5",
         "constructorArgs": [
-          "BTC / USD",
-          8,
-          "0",
+          "WHYPE HypurrFi Borrow Rate",
+          18,
+          "102001",
           "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
-        "feedId": "0",
-        "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
-        "quote": "0x0000000000000000000000000000000000000348"
-      },
-      "1": {
-        "address": "0xDbc0FB0784c314D82CBC00F2C22fEb21C828dBFb",
-        "constructorArgs": [
-          "BTC / USDT",
-          8,
-          "1",
-          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
-        ],
-        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
-        "feedId": "1",
+        "feedId": "102001",
         "base": null,
         "quote": null
       },
-      "3": {
-        "address": "0x9513c4e2d928B1Dd57e16af568A05CC84D483BF2",
+      "102002": {
+        "address": "0xD6046f653e970F1fd370330F4304910325D996F6",
         "constructorArgs": [
-          "ETH / USD",
-          8,
-          "3",
+          "wstHYPE HypurrFi Borrow Rate",
+          18,
+          "102002",
           "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
-        "feedId": "3",
-        "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-        "quote": "0x0000000000000000000000000000000000000348"
-      },
-      "9": {
-        "address": "0xd19051A349C8e52EA9839bdB77c2119ec0010042",
-        "constructorArgs": [
-          "XRP / USD",
-          8,
-          "9",
-          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
-        ],
-        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
-        "feedId": "9",
+        "feedId": "102002",
         "base": null,
-        "quote": "0x0000000000000000000000000000000000000348"
+        "quote": null
       },
-      "13": {
-        "address": "0x4842B1b7210a089b451ff41D229bD324Fc6CB305",
+      "102003": {
+        "address": "0xE194907153B4b751C02360936481990AC2940Ad1",
         "constructorArgs": [
-          "BNB / USD",
-          8,
-          "13",
+          "UBTC HypurrFi Borrow Rate",
+          18,
+          "102003",
           "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
-        "feedId": "13",
+        "feedId": "102003",
         "base": null,
-        "quote": "0x0000000000000000000000000000000000000348"
+        "quote": null
       },
-      "16": {
-        "address": "0x8Bf647D737c5e00814252E3cB67b90def047AA56",
+      "102004": {
+        "address": "0x4DE833dA9EfC73392a8Fa9ca010Dc98b289B4393",
         "constructorArgs": [
-          "SOL / USD",
-          8,
-          "16",
+          "UETH HypurrFi Borrow Rate",
+          18,
+          "102004",
           "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
-        "feedId": "16",
+        "feedId": "102004",
         "base": null,
-        "quote": "0x0000000000000000000000000000000000000348"
+        "quote": null
       },
-      "22": {
-        "address": "0x2a4D249a23F35eC4f378DC36C2096Be59E43cd44",
+      "102005": {
+        "address": "0xcBb08F179c23fA82ADf1899f21219d2D10dF7c8C",
         "constructorArgs": [
-          "ADA / USD",
-          8,
-          "22",
+          "USDe HypurrFi Borrow Rate",
+          18,
+          "102005",
           "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
-        "feedId": "22",
+        "feedId": "102005",
         "base": null,
-        "quote": "0x0000000000000000000000000000000000000348"
+        "quote": null
       },
-      "26": {
-        "address": "0x8282Ce4cB3C67e83a96b5fdd4238d59ddCB5D269",
+      "102051": {
+        "address": "0x3E5A24a3c19E196EabD7a2158f11a204a5EE522c",
         "constructorArgs": [
-          "DOGE / USD",
-          8,
-          "26",
+          "WHYPE HyperLend Borrow Rate",
+          18,
+          "102051",
           "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
-        "feedId": "26",
+        "feedId": "102051",
         "base": null,
-        "quote": "0x0000000000000000000000000000000000000348"
+        "quote": null
       },
-      "29": {
-        "address": "0xC32F8390A2f7A3E3C511C1c42bA2D916F43cf9A2",
+      "102052": {
+        "address": "0xa6588706c3552A90C5fbBDf5385369Efe5E40d1E",
         "constructorArgs": [
-          "TRX / USD",
-          8,
-          "29",
+          "wstHYPE HyperLend Borrow Rate",
+          18,
+          "102052",
           "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
-        "feedId": "29",
+        "feedId": "102052",
         "base": null,
-        "quote": "0x0000000000000000000000000000000000000348"
+        "quote": null
+      },
+      "102053": {
+        "address": "0x39D99566a9A88802794ca1e13a9bdB88e6DfFdfD",
+        "constructorArgs": [
+          "UBTC HyperLend Borrow Rate",
+          18,
+          "102053",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102053",
+        "base": null,
+        "quote": null
+      },
+      "102054": {
+        "address": "0x925f3696f6667Cb5F2b5D33C6c38Ffa10Ebd8bcc",
+        "constructorArgs": [
+          "UETH HyperLend Borrow Rate",
+          18,
+          "102054",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102054",
+        "base": null,
+        "quote": null
+      },
+      "102055": {
+        "address": "0xEEF81f70b1C4081B14d95E43886Cb21B41F56F6e",
+        "constructorArgs": [
+          "USDe HyperLend Borrow Rate",
+          18,
+          "102055",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102055",
+        "base": null,
+        "quote": null
+      },
+      "102101": {
+        "address": "0x8021110CEA01d77005bA8D5F0655f492364F8F63",
+        "constructorArgs": [
+          "HYPE HyperDrive Borrow Rate",
+          18,
+          "102101",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102101",
+        "base": null,
+        "quote": null
+      },
+      "102102": {
+        "address": "0x635758BB38B37b234370f929794b382f164dbBec",
+        "constructorArgs": [
+          "USDe HyperDrive Borrow Rate",
+          18,
+          "102102",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102102",
+        "base": null,
+        "quote": null
+      },
+      "102103": {
+        "address": "0x885fCB78b6dbdD9fb54835A5Bfd53735c930bbdF",
+        "constructorArgs": [
+          "USD₮0 HyperDrive Borrow Rate",
+          18,
+          "102103",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102103",
+        "base": null,
+        "quote": null
+      },
+      "102104": {
+        "address": "0x478837De2f4f86D8C8feEdBb88CfadD0032e8edf",
+        "constructorArgs": [
+          "USDhl HyperDrive Borrow Rate",
+          18,
+          "102104",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102104",
+        "base": null,
+        "quote": null
+      },
+      "102151": {
+        "address": "0x27f5eC0107694C5b9F5B57a38c8D30e973812EeF",
+        "constructorArgs": [
+          "USDC Euler Yield Borrow Rate on Ethereum Mainnet",
+          18,
+          "102151",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102151",
+        "base": null,
+        "quote": null
+      },
+      "102152": {
+        "address": "0x18d68B9b78A779Be201Eb9D7693D6911b0a31bA6",
+        "constructorArgs": [
+          "USDT Euler Yield Borrow Rate on Ethereum Mainnet",
+          18,
+          "102152",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102152",
+        "base": null,
+        "quote": null
+      },
+      "102153": {
+        "address": "0x3938b19caB5163953d9bf3736652396853c88c6d",
+        "constructorArgs": [
+          "WETH Euler Prime Borrow Rate on Ethereum Mainnet",
+          18,
+          "102153",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102153",
+        "base": null,
+        "quote": null
       }
     }
   }
