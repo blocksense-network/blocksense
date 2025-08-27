@@ -17,6 +17,7 @@ import { NewFeedsConfigSchema } from '@blocksense/config-types';
 import type { HttpClientError } from '@effect/platform/HttpClientError';
 import { ParseMetricsError, getMetrics } from '../utils/metrics';
 import { FetchHttpClient } from '@effect/platform';
+import type { FeedResult } from './generate-signature';
 
 export class ProcessComposeFailedToStartError extends Data.TaggedError(
   '@e2e-tests/ProcessComposeFailedToStartError',
@@ -69,6 +70,8 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
     readonly configUrl: string;
     readonly feedsConfigUrl: string;
     readonly metricsUrl: string;
+    readonly postReportsBatchUrl: string;
+    readonly reporterKey: string;
     readonly getConfig: () => Effect.Effect<SequencerConfigV2, Error, never>;
     readonly getFeedsConfig: () => Effect.Effect<NewFeedsConfig, Error, never>;
     readonly fetchUpdatesToNetworksMetric: () => Effect.Effect<
@@ -80,6 +83,9 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
       Error,
       never
     >;
+    readonly postReportsBatch: (
+      reports: Array<ReportData>,
+    ) => Effect.Effect<HttpClientResponse, HttpClientError | Error, never>;
   }
 >() {
   static Live = Layer.effect(
@@ -95,11 +101,19 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
       const historyUrl = yield* Effect.succeed(
         'http://127.0.0.1:5553/get_history',
       );
+      const postReportsBatchUrl = yield* Effect.succeed(
+        'http://127.0.0.1:9856/post_reports_batch',
+      );
+      const reporterKey = yield* Effect.succeed(
+        '536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003',
+      );
 
       return Sequencer.of({
         configUrl,
         feedsConfigUrl,
         metricsUrl,
+        postReportsBatchUrl,
+        reporterKey,
         getConfig: () =>
           Effect.tryPromise({
             try: () => fetchAndDecodeJSON(SequencerConfigV2Schema, configUrl),
@@ -155,6 +169,51 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
             return history;
           });
         },
+        postReportsBatch: (reports: Array<ReportData>) =>
+          Effect.gen(function* () {
+            const timestamp = yield* Clock.currentTimeMillis;
+            const reportsPayload: Array<ReportPayload> = yield* Effect.forEach(
+              reports,
+              r =>
+                Effect.gen(function* () {
+                  const signature = yield* generateSignature(
+                    reporterKey,
+                    r.feed_id,
+                    BigInt(timestamp),
+                    { Ok: { Numerical: r.value } },
+                  ).pipe(
+                    Effect.mapError(
+                      err => new Error(`Failed to generate signature: ${err}`),
+                    ),
+                  );
+
+                  return {
+                    payload_metadata: {
+                      feed_id: r.feed_id,
+                      reporter_id: 0,
+                      signature: skip0x(signature),
+                      timestamp,
+                    },
+                    result: {
+                      Ok: {
+                        Numerical: r.value,
+                      },
+                    },
+                  };
+                }),
+            );
+
+            const client = yield* HttpClient;
+            const response = HttpClientRequest.post(postReportsBatchUrl).pipe(
+              HttpClientRequest.bodyText(
+                JSON.stringify(reportsPayload),
+                'application/json; charset=UTF-8',
+              ),
+              client.execute,
+            );
+
+            return yield* response;
+          }).pipe(Effect.provide(NodeHttpClient.layer)),
       });
     }),
   );
@@ -207,3 +266,20 @@ export const FeedAggregateHistorySchema = S.Struct({
 });
 
 export type FeedAggregateHistory = typeof FeedAggregateHistorySchema.Type;
+
+export type ReportData = {
+  feed_id: string;
+  value: number;
+};
+
+type ReportPayloadData = {
+  feed_id: string;
+  reporter_id: number;
+  timestamp: number;
+  signature: string;
+};
+
+type ReportPayload = {
+  payload_metadata: ReportPayloadData;
+  result: FeedResult;
+};
