@@ -1,10 +1,6 @@
-{
-  config,
-  ...
-}:
-
+{ ... }:
 {
   services.blocksense = {
-    logsDir = config.devenv.root + "/logs/blocksense";
+    logsDir = "$GIT_ROOT/logs/blocksense";
   };
 }
