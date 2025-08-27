@@ -1,23 +1,28 @@
 import type { ParseResult } from 'effect';
-import { Context, Data, Effect, Layer, Schema as S } from 'effect';
+import type { HttpClientError } from '@effect/platform/HttpClientError';
+import { Clock, Context, Data, Effect, Layer, Schema as S } from 'effect';
+import { FetchHttpClient, HttpClientRequest } from '@effect/platform';
+import type { HttpClientResponse } from '@effect/platform/HttpClientResponse';
+import { NodeHttpClient } from '@effect/platform-node';
+import { HttpClient } from '@effect/platform/HttpClient';
 
+import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
+import type { NewFeedsConfig } from '@blocksense/config-types';
+import { SequencerConfigV2Schema } from '@blocksense/config-types/node-config';
+import { NewFeedsConfigSchema } from '@blocksense/config-types';
+import { skip0x } from '@blocksense/base-utils/buffer-and-hex';
 import {
   fetchAndDecodeJSON,
   fetchAndDecodeJSONEffect,
 } from '@blocksense/base-utils/http';
+
+import { FeedResult, generateSignature } from './generate-signature';
+import { ParseMetricsError, getMetrics } from '../utils/metrics';
 import {
   startEnvironment,
   stopEnvironment,
   parseProcessesStatus,
 } from './helpers';
-import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
-import { SequencerConfigV2Schema } from '@blocksense/config-types/node-config';
-import type { NewFeedsConfig } from '@blocksense/config-types';
-import { NewFeedsConfigSchema } from '@blocksense/config-types';
-import type { HttpClientError } from '@effect/platform/HttpClientError';
-import { ParseMetricsError, getMetrics } from '../utils/metrics';
-import { FetchHttpClient } from '@effect/platform';
-import type { FeedResult } from './generate-signature';
 
 export class ProcessComposeFailedToStartError extends Data.TaggedError(
   '@e2e-tests/ProcessComposeFailedToStartError',
