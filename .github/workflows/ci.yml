@@ -104,7 +104,9 @@ jobs:
         run: yarn build:recursive @blocksense/e2e-tests
 
       - name: Start e2e tests
-        run: just test-e2e
+        run: |
+          just test-e2e
+          cat logs/process-compose/example-setup-03/reporter-a.log
 
   smart-contracts-tests:
     timeout-minutes: 360
