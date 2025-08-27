@@ -46,8 +46,12 @@ build-environment environment="all" use-local-cargo-result="0":
 
   # Collect free ports that process-compose will use
   mkdir -p "$DEST_DIR"
-  scripts/utils/collect-available-ports.sh "$DEST_DIR/available-ports"
-  git add --intent-to-add --force "$DEST_DIR/available-ports"
+  scripts/utils/collect-available-ports.sh "{{process-compose-artifacts-dir}}/available-ports"
+  if [ -z "${GITHUB_ACTIONS:-}" ]; then
+    git update-index --skip-worktree "{{process-compose-artifacts-dir}}/available-ports" || true
+  else
+    echo "Running in CI, not updating git index"
+  fi
 
   SRC_DIR=$(
     nix build --no-warn-dirty -L --print-out-paths \

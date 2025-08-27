@@ -21,8 +21,9 @@ let
   availablePorts =
     let
       filePath = lib.path.append root "config/generated/process-compose/available-ports";
+      ports = readPortsFromFile filePath;
     in
-    if builtins.pathExists filePath then readPortsFromFile filePath else [ 8547 ];
+    if builtins.length ports > 0 then ports else [ 8547 ];
 
   testKeysDir = lib.path.append root "nix/test-environments/test-keys";
   deploymentV2FilePath = lib.path.append root "config/evm_contracts_deployment_v2/ink-sepolia.json";

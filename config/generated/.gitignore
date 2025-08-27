@@ -1,3 +1,5 @@
 *
 !.gitignore
 !README.md
+!process-compose
+!process-compose/available-ports
