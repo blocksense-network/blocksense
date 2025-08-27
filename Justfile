@@ -47,10 +47,9 @@ build-environment environment="all" use-local-cargo-result="0":
   # Collect free ports that process-compose will use
   mkdir -p "$DEST_DIR"
   scripts/utils/collect-available-ports.sh "$DEST_DIR/available-ports"
-  git add --intent-to-add --force "$DEST_DIR/available-ports"
 
   SRC_DIR=$(
-    nix build --no-warn-dirty -L --print-out-paths \
+    nix build --no-warn-dirty --impure -L --print-out-paths \
       .#${FLAKE_ATTR_PATH} \
       2> >(grep -v '^Using saved setting for' >&2)
   )
