@@ -8,6 +8,7 @@
     {
       pkgs,
       config,
+      self',
       ...
     }:
     let
@@ -106,7 +107,7 @@
           lib.listToAttrs
         ];
       packages = {
-        inherit allProcessComposeFiles;
+        inherit (self'.legacyPackages.process-compose-environments.with-local-cargo-artifacts) all;
       };
 
       legacyPackages.nixosTests = {
