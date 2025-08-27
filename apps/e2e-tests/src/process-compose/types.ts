@@ -1,25 +1,26 @@
+import path from 'path';
 import { Clock, Context, Data, Effect, Layer, Schema as S } from 'effect';
+import type { ParseError } from 'effect/ParseResult';
+import type { HttpClientResponse } from '@effect/platform/HttpClientResponse';
+import type { HttpClientError } from '@effect/platform/HttpClientError';
+import { FetchHttpClient, HttpClientRequest } from '@effect/platform';
+import { HttpClient } from '@effect/platform/HttpClient';
+import { NodeHttpClient } from '@effect/platform-node';
 
 import { fetchAndDecodeJSONEffect } from '@blocksense/base-utils/http';
+import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
+import { SequencerConfigV2Schema } from '@blocksense/config-types/node-config';
+import type { NewFeedsConfig } from '@blocksense/config-types';
+import { NewFeedsConfigSchema } from '@blocksense/config-types';
+import { rootDir, selectDirectory, skip0x } from '@blocksense/base-utils';
+
+import { ParseMetricsError, getMetrics } from '../utils/metrics';
+import { generateSignature, type FeedResult } from './generate-signature';
 import {
   startEnvironment,
   stopEnvironment,
   parseProcessesStatus,
 } from './helpers';
-import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
-import { SequencerConfigV2Schema } from '@blocksense/config-types/node-config';
-import type { NewFeedsConfig } from '@blocksense/config-types';
-import { NewFeedsConfigSchema } from '@blocksense/config-types';
-import type { HttpClientError } from '@effect/platform/HttpClientError';
-import { ParseMetricsError, getMetrics } from '../utils/metrics';
-import { FetchHttpClient, HttpClientRequest } from '@effect/platform';
-import { HttpClient } from '@effect/platform/HttpClient';
-import { generateSignature, type FeedResult } from './generate-signature';
-import type { ParseError } from 'effect/ParseResult';
-import type { HttpClientResponse } from '@effect/platform/HttpClientResponse';
-import { rootDir, selectDirectory, skip0x } from '@blocksense/base-utils';
-import { NodeHttpClient } from '@effect/platform-node';
-import path from 'path';
 
 export class ProcessComposeFailedToStartError extends Data.TaggedError(
   '@e2e-tests/ProcessComposeFailedToStartError',
