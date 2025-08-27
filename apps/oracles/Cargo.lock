@@ -985,6 +985,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "borrow-rates"
+version = "0.1.0"
+dependencies = [
+ "alloy",
+ "anyhow",
+ "blocksense-data-providers-sdk",
+ "blocksense-sdk",
+ "futures",
+ "itertools 0.8.2",
+ "prettytable-rs",
+ "serde",
+ "serde-this-or-that",
+ "serde_json",
+ "url",
+ "wit-bindgen",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.19.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1914,24 +1932,6 @@ dependencies = [
  "smallvec",
  "tokio",
  "want",
-]
-
-[[package]]
-name = "hyper-borrow-rates"
-version = "0.1.0"
-dependencies = [
- "alloy",
- "anyhow",
- "blocksense-data-providers-sdk",
- "blocksense-sdk",
- "futures",
- "itertools 0.8.2",
- "prettytable-rs",
- "serde",
- "serde-this-or-that",
- "serde_json",
- "url",
- "wit-bindgen",
 ]
 
 [[package]]
