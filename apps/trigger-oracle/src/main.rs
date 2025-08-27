@@ -213,6 +213,7 @@ async fn main() -> Result<(), Error> {
                         HttpServer::new(|| App::new().service(timing_out_request))
                             .bind("127.0.0.1:3000")
                             .expect("Could not start timing out server on port 3000")
+                            .disable_signals()
                             .run()
                             .await
                             .context("Failed timing out server")
