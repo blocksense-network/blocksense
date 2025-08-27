@@ -45,12 +45,18 @@
         ${lib.getExe' rustToolchain "cargo"} "$@"
       '';
 
-      spinUnwrapped = inputs'.nixpkgs-unstable.legacyPackages.fermyon-spin;
-
-      spinWrapped = pkgs.writeShellScriptBin "spin" ''
+      # Minimally wrapped spin binary (to access shared libraries)
+      # without nix-based plugin dir, for faster local development.
+      spin = pkgs.writeShellScriptBin "spin" ''
         export LD_LIBRARY_PATH="${ldLibraryPath}:$LD_LIBRARY_PATH"
+        ${lib.getExe' inputs'.nixpkgs-unstable.legacyPackages.fermyon-spin "spin"} "$@"
+      '';
+
+      # Fully wrapped spin binary (with nix-based plugin dir).
+      # For production use.
+      spinWrapped = pkgs.writeShellScriptBin "spin" ''
         export SPIN_DATA_DIR="${self'.legacyPackages.spinPlugins.triggerOracle}"
-        ${lib.getExe' spinUnwrapped "spin"} "$@"
+        ${lib.getExe' spin "spin"} "$@"
       '';
     in
     {
@@ -59,8 +65,8 @@
           rustToolchain
           commonLibDeps
           cargoWrapped
+          spin
           spinWrapped
-          spinUnwrapped
           ;
         inherit (inputs'.mcl-nixos-modules.checks) foundry;
       };
