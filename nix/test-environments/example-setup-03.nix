@@ -40,7 +40,7 @@ in
   services.kafka.enable = lib.mkForce false;
 
   services.blocksense = {
-    logsDir = lib.mkForce "$GIT_ROOT/logs/blocksense/example-setup-03";
+    logsDir = lib.mkForce "$GIT_ROOT/logs/process-compose/example-setup-03";
 
     blama.enable = lib.mkForce false;
 
