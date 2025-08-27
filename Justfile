@@ -114,14 +114,24 @@ build-oracle oracle-name:
 
 [group('Working with oracles')]
 [doc('Start a specific oracle')]
-start-oracle oracle-name:
+start-oracle oracle-name trigger-oracle-build-type="--use-local-cargo-artifacts":
   #!/usr/bin/env bash
   set -euo pipefail
 
-  export SPIN_DATA_DIR={{spin-data-dir}}
+  if [[ "{{trigger-oracle-build-type}}" = "--use-local-cargo-artifacts" ]]; then
+    export SPIN_DATA_DIR={{spin-data-dir}}
+    export SPIN="$(nix build --print-out-paths "{{root-dir}}#spin")/bin/spin"
+    just build-blocksense
+  elif [[ "{{trigger-oracle-build-type}}" = "--hermetic" ]]; then
+    export SPIN="$(nix build --print-out-paths "{{root-dir}}#spinWrapped")/bin/spin"
+  else
+    echo "Invalid trigger-oracle-build-type: {{trigger-oracle-build-type}}"
+    echo -e "Valid values are:\n  --use-local-cargo-artifacts\n  --hermetic"
+    exit 1
+  fi
 
   cd "{{root-dir}}/apps/oracles/{{oracle-name}}"
-  RUST_LOG=trigger=info "${SPIN:-spin}" build --up
+  RUST_LOG=trigger=info "$SPIN" build --up
 
 [group('blocksense')]
 [doc('Build Blocksense')]
