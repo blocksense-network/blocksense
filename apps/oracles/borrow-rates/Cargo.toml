@@ -1,5 +1,5 @@
 [package]
-name = "hyper-borrow-rates"
+name = "borrow-rates"
 authors = ["Emil Ivanichkov"]
 description = ""
 version = "0.1.0"

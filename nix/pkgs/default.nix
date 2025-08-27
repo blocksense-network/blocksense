@@ -69,7 +69,7 @@
           cex-price-feeds = mkOracleScript "cex-price-feeds";
           exsat-holdings = mkOracleScript "exsat-holdings";
           gecko-terminal = mkOracleScript "gecko-terminal";
-          hyper-borrow-rates = mkOracleScript "hyper-borrow-rates";
+          borrow-rates = mkOracleScript "borrow-rates";
           eth-rpc = mkOracleScript "eth-rpc";
           stock-price-feeds = mkOracleScript "stock-price-feeds";
           spout-rwa = mkOracleScript "spout-rwa";

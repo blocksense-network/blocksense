@@ -42131,7 +42131,7 @@
       "full_name": "WHYPE HypurrFi Borrow Rate",
       "description": "Real-time borrow rate (APR) for WHYPE on HypurrFi lending markets. ref: https://app.hypurr.fi/markets/pooled/999/0x5555555555555555555555555555555555555555",
       "type": "price-feed",
-      "oracle_id": "hyper-borrow-rates",
+      "oracle_id": "borrow-rates",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -42153,7 +42153,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "kind": "hyper-borrow-rates",
+          "kind": "borrow-rates",
           "marketplace": "HypurrFi"
         }
       }
@@ -42163,7 +42163,7 @@
       "full_name": "wstHYPE HypurrFi Borrow Rate",
       "description": "Real-time borrow rate (APR) for Staked Hype (wstHYPE) on HypurrFi lending markets. ref: https://app.hypurr.fi/markets/pooled/999/0x94e8396e0869c9F2200760aF0621aFd240E1CF38",
       "type": "price-feed",
-      "oracle_id": "hyper-borrow-rates",
+      "oracle_id": "borrow-rates",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -42185,7 +42185,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "kind": "hyper-borrow-rates",
+          "kind": "borrow-rates",
           "marketplace": "HypurrFi"
         }
       }
@@ -42195,7 +42195,7 @@
       "full_name": "UBTC HypurrFi Borrow Rate",
       "description": "Real-time borrow rate (APR) for Unit Bitcoin (UBTC) on HypurrFi lending markets. ref: https://app.hypurr.fi/markets/pooled/999/0x9FDBdA0A5e284c32744D2f17Ee5c74B284993463",
       "type": "price-feed",
-      "oracle_id": "hyper-borrow-rates",
+      "oracle_id": "borrow-rates",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -42217,7 +42217,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "kind": "hyper-borrow-rates",
+          "kind": "borrow-rates",
           "marketplace": "HypurrFi"
         }
       }
@@ -42227,7 +42227,7 @@
       "full_name": "UETH HypurrFi Borrow Rate",
       "description": "Real-time borrow rate (APR) for Unit Ethereum (UETH) on HypurrFi lending markets. ref: https://app.hypurr.fi/markets/pooled/999/0xBe6727B535545C67d5cAa73dEa54865B92CF7907",
       "type": "price-feed",
-      "oracle_id": "hyper-borrow-rates",
+      "oracle_id": "borrow-rates",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -42249,7 +42249,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "kind": "hyper-borrow-rates",
+          "kind": "borrow-rates",
           "marketplace": "HypurrFi"
         }
       }
@@ -42259,7 +42259,7 @@
       "full_name": "USDe HypurrFi Borrow Rate",
       "description": "Real-time borrow rate (APR) for USDe on HypurrFi lending markets. ref: https://app.hypurr.fi/markets/pooled/999/0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
       "type": "price-feed",
-      "oracle_id": "hyper-borrow-rates",
+      "oracle_id": "borrow-rates",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -42281,7 +42281,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "kind": "hyper-borrow-rates",
+          "kind": "borrow-rates",
           "marketplace": "HypurrFi"
         }
       }
@@ -42291,7 +42291,7 @@
       "full_name": "WHYPE HyperLend Borrow Rate",
       "description": "Real-time borrow rate (APR) for WHYPE on HyperLend lending markets. ref: https://hyperlend.blockanalitica.com/markets/0x5555555555555555555555555555555555555555",
       "type": "price-feed",
-      "oracle_id": "hyper-borrow-rates",
+      "oracle_id": "borrow-rates",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -42313,7 +42313,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "kind": "hyper-borrow-rates",
+          "kind": "borrow-rates",
           "marketplace": "HyperLend"
         }
       }
@@ -42323,7 +42323,7 @@
       "full_name": "wstHYPE HyperLend Borrow Rate",
       "description": "Real-time borrow rate (APR) for Staked Hype (wstHYPE) on HyperLend lending markets. ref: https://hyperlend.blockanalitica.com/markets/0x94e8396e0869c9f2200760af0621afd240e1cf38",
       "type": "price-feed",
-      "oracle_id": "hyper-borrow-rates",
+      "oracle_id": "borrow-rates",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -42345,7 +42345,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "kind": "hyper-borrow-rates",
+          "kind": "borrow-rates",
           "marketplace": "HyperLend"
         }
       }
@@ -42355,7 +42355,7 @@
       "full_name": "UBTC HyperLend Borrow Rate",
       "description": "Real-time borrow rate (APR) for Unit Bitcoin (UBTC) on HyperLend lending markets. ref: https://hyperlend.blockanalitica.com/markets/0x9fdbda0a5e284c32744d2f17ee5c74b284993463",
       "type": "price-feed",
-      "oracle_id": "hyper-borrow-rates",
+      "oracle_id": "borrow-rates",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -42377,7 +42377,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "kind": "hyper-borrow-rates",
+          "kind": "borrow-rates",
           "marketplace": "HyperLend"
         }
       }
@@ -42387,7 +42387,7 @@
       "full_name": "UETH HyperLend Borrow Rate",
       "description": "Real-time borrow rate (APR) for Unit Ethereum (UETH) on HyperLend lending markets. ref: https://hyperlend.blockanalitica.com/markets/0xbe6727b535545c67d5caa73dea54865b92cf7907",
       "type": "price-feed",
-      "oracle_id": "hyper-borrow-rates",
+      "oracle_id": "borrow-rates",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -42409,7 +42409,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "kind": "hyper-borrow-rates",
+          "kind": "borrow-rates",
           "marketplace": "HyperLend"
         }
       }
@@ -42419,7 +42419,7 @@
       "full_name": "USDe HyperLend Borrow Rate",
       "description": "Real-time borrow rate (APR) for USDe on HyperLend lending markets. ref: https://hyperlend.blockanalitica.com/markets/0x5d3a1ff2b6bab83b63cd9ad0787074081a52ef34",
       "type": "price-feed",
-      "oracle_id": "hyper-borrow-rates",
+      "oracle_id": "borrow-rates",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -42441,7 +42441,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "kind": "hyper-borrow-rates",
+          "kind": "borrow-rates",
           "marketplace": "HyperLend"
         }
       }
@@ -42451,7 +42451,7 @@
       "full_name": "HYPE HyperDrive Borrow Rate",
       "description": "Real-time borrow rate (APR) for HYPE on HyperDrive LST Market market. ref: https://app.hyperdrive.fi/borrow/hype-lst",
       "type": "price-feed",
-      "oracle_id": "hyper-borrow-rates",
+      "oracle_id": "borrow-rates",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -42473,7 +42473,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "kind": "hyper-borrow-rates",
+          "kind": "borrow-rates",
           "marketplace": "HyperDrive",
           "market_id": "1"
         }
@@ -42484,7 +42484,7 @@
       "full_name": "USDe HyperDrive Borrow Rate",
       "description": "Real-time borrow rate (APR) for USDe on HyperDrive Primary USDe Market. ref: https://app.hyperdrive.fi/borrow/usde-primary",
       "type": "price-feed",
-      "oracle_id": "hyper-borrow-rates",
+      "oracle_id": "borrow-rates",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -42506,7 +42506,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "kind": "hyper-borrow-rates",
+          "kind": "borrow-rates",
           "marketplace": "HyperDrive",
           "market_id": "2"
         }
@@ -42517,7 +42517,7 @@
       "full_name": "USD₮0 HyperDrive Borrow Rate",
       "description": "Real-time borrow rate (APR) for USD₮0 on HyperDrive Primary USD₮0 Market. ref: https://app.hyperdrive.fi/borrow/usdt0-primary",
       "type": "price-feed",
-      "oracle_id": "hyper-borrow-rates",
+      "oracle_id": "borrow-rates",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -42539,7 +42539,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "kind": "hyper-borrow-rates",
+          "kind": "borrow-rates",
           "marketplace": "HyperDrive",
           "market_id": "3"
         }
@@ -42550,7 +42550,7 @@
       "full_name": "USDhl HyperDrive Borrow Rate",
       "description": "Real-time borrow rate (APR) for USDhl on HyperDrive Primary USDhl Market. ref: https://app.hyperdrive.fi/borrow/usdhl-primary",
       "type": "price-feed",
-      "oracle_id": "hyper-borrow-rates",
+      "oracle_id": "borrow-rates",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -42572,7 +42572,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "kind": "hyper-borrow-rates",
+          "kind": "borrow-rates",
           "marketplace": "HyperDrive",
           "market_id": "5"
         }
@@ -42583,7 +42583,7 @@
       "full_name": "USDC Euler Yield Borrow Rate on Ethereum Mainnet",
       "description": "Real-time USDC borrow rate (APR) from Euler Yield Market on Ethereum Mainnet. ref: https://app.euler.finance/vault/0xe0a80d35bB6618CBA260120b279d357978c42BCE?network=ethereum",
       "type": "price-feed",
-      "oracle_id": "hyper-borrow-rates",
+      "oracle_id": "borrow-rates",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -42605,7 +42605,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "kind": "hyper-borrow-rates",
+          "kind": "borrow-rates",
           "marketplace": "EulerFinance",
           "network": "ethereum-mainnet",
           "utils_lens_address": "0xB8cac3e5CaaC2042B79938aFe7FEA3f44e5afcC1",
@@ -42618,7 +42618,7 @@
       "full_name": "USDT Euler Yield Borrow Rate on Ethereum Mainnet",
       "description": "Real-time USDT borrow rate (APR) from Euler Yield Market on Ethereum Mainnet. ref: https://app.euler.finance/vault/0x7c280DBDEf569e96c7919251bD2B0edF0734C5A8?network=ethereum",
       "type": "price-feed",
-      "oracle_id": "hyper-borrow-rates",
+      "oracle_id": "borrow-rates",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -42640,7 +42640,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "kind": "hyper-borrow-rates",
+          "kind": "borrow-rates",
           "marketplace": "EulerFinance",
           "network": "ethereum-mainnet",
           "utils_lens_address": "0xB8cac3e5CaaC2042B79938aFe7FEA3f44e5afcC1",
@@ -42653,7 +42653,7 @@
       "full_name": "WETH Euler Prime Borrow Rate on Ethereum Mainnet",
       "description": "Real-time WETH borrow rate (APR) from Euler Prime Market on Ethereum Mainnet. ref: https://app.euler.finance/vault/0xD8b27CF359b7D15710a5BE299AF6e7Bf904984C2?network=ethereum",
       "type": "price-feed",
-      "oracle_id": "hyper-borrow-rates",
+      "oracle_id": "borrow-rates",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
@@ -42675,7 +42675,7 @@
         "category": "Rates",
         "market_hours": "",
         "arguments": {
-          "kind": "hyper-borrow-rates",
+          "kind": "borrow-rates",
           "marketplace": "EulerFinance",
           "network": "ethereum-mainnet",
           "utils_lens_address": "0xB8cac3e5CaaC2042B79938aFe7FEA3f44e5afcC1",
