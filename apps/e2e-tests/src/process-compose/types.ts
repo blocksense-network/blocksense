@@ -1,4 +1,4 @@
-import { Context, Data, Effect, Layer, Schema as S } from 'effect';
+import { Clock, Context, Data, Effect, Layer, Schema as S } from 'effect';
 
 import { fetchAndDecodeJSONEffect } from '@blocksense/base-utils/http';
 import {
@@ -12,8 +12,20 @@ import type { NewFeedsConfig } from '@blocksense/config-types';
 import { NewFeedsConfigSchema } from '@blocksense/config-types';
 import type { HttpClientError } from '@effect/platform/HttpClientError';
 import { ParseMetricsError, getMetrics } from '../utils/metrics';
-import { FetchHttpClient } from '@effect/platform';
+import { FetchHttpClient, HttpClientRequest } from '@effect/platform';
+import { HttpClient } from '@effect/platform/HttpClient';
+import { generateSignature, type FeedResult } from './generate-signature';
 import type { ParseError } from 'effect/ParseResult';
+import type { HttpClientResponse } from '@effect/platform/HttpClientResponse';
+import { rootDir, selectDirectory, skip0x } from '@blocksense/base-utils';
+import { NodeHttpClient } from '@effect/platform-node';
+import path from 'path';
+
+export class ProcessComposeFailedToStartError extends Data.TaggedError(
+  '@e2e-tests/ProcessComposeFailedToStartError',
+)<{
+  cause: unknown;
+}> {}
 
 export class ProcessCompose extends Context.Tag('@e2e-tests/ProcessCompose')<
   ProcessCompose,
@@ -68,6 +80,8 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
     readonly configUrl: string;
     readonly feedsConfigUrl: string;
     readonly metricsUrl: string;
+    readonly postReportsBatchUrl: string;
+    readonly reporterKey: string;
     readonly getConfig: () => Effect.Effect<
       SequencerConfigV2,
       HttpClientError | ParseError,
@@ -87,26 +101,54 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
       HttpClientError | ParseError,
       never
     >;
+    readonly postReportsBatch: (
+      reports: Array<ReportData>,
+    ) => Effect.Effect<HttpClientResponse, HttpClientError | Error, never>;
   }
 >() {
   static Live = Layer.effect(
     Sequencer,
     Effect.gen(function* () {
+      const mainPort = 9856;
+      const adminPort = 5553;
+      const metricsPort = 5551;
+      const localhost = 'http://127.0.0.1';
+
       const configUrl = yield* Effect.succeed(
-        'http://127.0.0.1:5553/get_sequencer_config',
+        `${localhost}:${adminPort}/get_sequencer_config`,
       );
       const feedsConfigUrl = yield* Effect.succeed(
-        'http://127.0.0.1:5553/get_feeds_config',
+        `${localhost}:${adminPort}/get_feeds_config`,
       );
-      const metricsUrl = yield* Effect.succeed('http://127.0.0.1:5551/metrics');
+      const metricsUrl = yield* Effect.succeed(
+        `${localhost}:${metricsPort}/metrics`,
+      );
       const historyUrl = yield* Effect.succeed(
-        'http://127.0.0.1:5553/get_history',
+        `${localhost}:${adminPort}/get_history`,
+      );
+      const postReportsBatchUrl = yield* Effect.succeed(
+        `${localhost}:${mainPort}/post_reports_batch`,
+      );
+
+      const reporterKey = yield* Effect.tryPromise(() =>
+        selectDirectory(
+          path.resolve(rootDir, 'nix/test-environments/test-keys'),
+        )
+          .read({ base: 'reporter_secret_key' })
+          .then(s => s.trim()),
+      ).pipe(
+        Effect.catchAll(err => {
+          console.log('error: ', err);
+          return Effect.fail(new Error(String(err)));
+        }),
       );
 
       return Sequencer.of({
         configUrl,
         feedsConfigUrl,
         metricsUrl,
+        postReportsBatchUrl,
+        reporterKey,
         getConfig: () =>
           Effect.gen(function* () {
             return yield* fetchAndDecodeJSONEffect(
@@ -165,6 +207,45 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
             return history;
           });
         },
+        postReportsBatch: (reports: Array<ReportData>) =>
+          Effect.gen(function* () {
+            const timestamp = yield* Clock.currentTimeMillis;
+            const reportsPayload: Array<ReportPayload> = yield* Effect.forEach(
+              reports,
+              r =>
+                Effect.gen(function* () {
+                  const signature = yield* generateSignature(
+                    reporterKey,
+                    r.feed_id,
+                    BigInt(timestamp),
+                    r.value,
+                  ).pipe(
+                    Effect.mapError(
+                      err => new Error(`Failed to generate signature: ${err}`),
+                    ),
+                  );
+
+                  return {
+                    payload_metadata: {
+                      feed_id: r.feed_id,
+                      reporter_id: 0,
+                      signature: skip0x(signature),
+                      timestamp,
+                    },
+                    result: r.value,
+                  };
+                }),
+            );
+
+            const client = yield* HttpClient;
+            const response = HttpClientRequest.post(postReportsBatchUrl).pipe(
+              HttpClientRequest.setHeader('Content-Type', 'application/json'),
+              HttpClientRequest.bodyText(JSON.stringify(reportsPayload)),
+              client.execute,
+            );
+
+            return yield* response;
+          }).pipe(Effect.provide(NodeHttpClient.layer)),
       });
     }),
   );
@@ -218,3 +299,20 @@ export const FeedAggregateHistorySchema = S.Struct({
 });
 
 export type FeedAggregateHistory = typeof FeedAggregateHistorySchema.Type;
+
+export type ReportData = {
+  feed_id: string;
+  value: FeedResult;
+};
+
+type ReportPayloadData = {
+  feed_id: string;
+  reporter_id: number;
+  timestamp: number;
+  signature: string;
+};
+
+type ReportPayload = {
+  payload_metadata: ReportPayloadData;
+  result: FeedResult;
+};
