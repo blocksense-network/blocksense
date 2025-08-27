@@ -397,9 +397,7 @@ pub async fn eth_batch_send_to_contract(
     let provider_metrics = &provider.provider_metrics;
     let rpc_handle = &provider.provider;
 
-    let mut input = Bytes::from(serialized_updates.clone());
-
-    let latest_call_data_hash = keccak256(input.as_ref());
+    let latest_call_data_hash = keccak256(&serialized_updates);
 
     let mut next_calldata_merkle_tree = provider.calldata_merkle_tree_frontier.clone();
     next_calldata_merkle_tree.append(HashValue(latest_call_data_hash));
@@ -410,16 +408,26 @@ pub async fn eth_batch_send_to_contract(
     };
     let next_calldata_merkle_tree_root = next_calldata_merkle_tree.root();
 
-    // Merkle tree over all call data management for ADFS contracts (version 0 is legacy).
-    let serialized_updates = [
-        vec![1],
-        prev_calldata_merkle_tree_root.0.to_vec(),
-        next_calldata_merkle_tree_root.0.to_vec(),
-        serialized_updates,
-    ]
-    .concat();
+    // Merkle tree over all call data management for ADFS contracts
+    let prev_root_bytes = prev_calldata_merkle_tree_root.0.as_slice();
+    let next_root_bytes = next_calldata_merkle_tree_root.0.as_slice();
 
-    input = Bytes::from(serialized_updates);
+    // Compute (with just one allocation) the new input bytes
+    // from the serialized updates with roots
+    let mut serialized_updates_with_roots = Vec::with_capacity(
+        1 + prev_root_bytes.len() + next_root_bytes.len() + serialized_updates.len(),
+    );
+
+    // - Command index (`1` is for writing)
+    serialized_updates_with_roots.push(1);
+    // - Previous merkle root bytes
+    serialized_updates_with_roots.extend_from_slice(prev_root_bytes);
+    // - Next merkle root bytes
+    serialized_updates_with_roots.extend_from_slice(next_root_bytes);
+    // - Original serialized updates
+    serialized_updates_with_roots.extend_from_slice(&serialized_updates);
+
+    let input = Bytes::from(serialized_updates_with_roots);
 
     let receipt;
     let tx_time = Instant::now();
@@ -513,6 +521,8 @@ pub async fn eth_batch_send_to_contract(
                         );
                     }
 
+                    // TODO: maybe move into an else clause of the `if` above,
+                    //       i.e. only do it when there were no included transactions found
                     try_to_sync(
                         net.as_str(),
                         &mut provider,
@@ -1678,7 +1688,7 @@ mod tests {
         .await
         .expect("Could not serialize updates!");
 
-        assert_eq!(serialized_updates.to_bytes().encode_hex(), "01000000000000000000000002000303e00701026869000401ffe00801036279650101000000000000000000000000000000000000000000000000000000000000000701ff0000000000000000000000000000000000000000000000000000000000000008");
+        assert_eq!(serialized_updates.to_bytes().encode_hex(), "00000002000303e00701026869000401ffe00801036279650101000000000000000000000000000000000000000000000000000000000000000701ff0000000000000000000000000000000000000000000000000000000000000008");
     }
 
     use blocksense_feed_registry::types::FeedType;
@@ -1742,7 +1752,7 @@ mod tests {
         // Note: bye is filtered out:
         assert_eq!(
             serialized_updates.to_bytes().encode_hex(),
-            "01000000000000000000000001000303e0070102686901010000000000000000000000000000000000000000000000000000000000000007"
+            "00000001000303e0070102686901010000000000000000000000000000000000000000000000000000000000000007"
         );
 
         // Berachain
@@ -1773,7 +1783,7 @@ mod tests {
 
         assert_eq!(
             serialized_updates.to_bytes().encode_hex(),
-            "01000000000000000000000001000303e0070102686901010000000000000000000000000000000000000000000000000000000000000007"
+            "00000001000303e0070102686901010000000000000000000000000000000000000000000000000000000000000007"
         );
 
         // Manta
@@ -1803,7 +1813,7 @@ mod tests {
 
         assert_eq!(
             serialized_updates.to_bytes().encode_hex(),
-            "01000000000000000000000001000303e0070102686901010000000000000000000000000000000000000000000000000000000000000007"
+            "00000001000303e0070102686901010000000000000000000000000000000000000000000000000000000000000007"
         );
     }
 
