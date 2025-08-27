@@ -10,7 +10,7 @@
   services.kafka.enable = true;
 
   services.blocksense = {
-    logsDir = lib.mkForce "$GIT_ROOT/logs/blocksense/example-setup-02";
+    logsDir = lib.mkForce "$GIT_ROOT/logs/process-compose/example-setup-02";
     sequencer = {
       kafka-report-endpoint = lib.mkForce "127.0.0.1:9092";
       providers = {
