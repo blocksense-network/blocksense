@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   ...
 }:
@@ -20,7 +21,7 @@ let
 
   availablePorts =
     let
-      filePath = lib.path.append root "config/generated/process-compose/available-ports";
+      filePath = "${config.devenv.root}/config/generated/process-compose/example-setup-03/available-ports";
       ports = if builtins.pathExists filePath then readPortsFromFile filePath else [ ];
     in
     if builtins.length ports > 0 then ports else [ 8547 ];
