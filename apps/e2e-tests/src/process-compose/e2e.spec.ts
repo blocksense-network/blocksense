@@ -1,4 +1,4 @@
-import { Effect, Layer, pipe, Schedule } from 'effect';
+import { Effect, Exit, Layer, pipe, Schedule } from 'effect';
 import { afterAll, beforeAll, describe, expect, it } from '@effect/vitest';
 import { deepStrictEqual } from 'assert';
 
@@ -37,6 +37,7 @@ describe.sequential('E2E Tests with process-compose', () => {
 
   let sequencer: SequencerService;
   let processCompose: ProcessComposeService;
+  let hasProcessComposeStarted = false;
 
   let sequencerConfig: SequencerConfigV2;
   let feedsConfig: NewFeedsConfig;
@@ -47,11 +48,14 @@ describe.sequential('E2E Tests with process-compose', () => {
   let updatesToNetworks = {} as UpdatesToNetwork;
   let initialFeedsInfo: FeedsValueAndRound;
 
-  beforeAll(() =>
-    pipe(
+  beforeAll(async () => {
+    const testEnvironment = 'example-setup-03';
+
+    const res = await pipe(
       Effect.gen(function* () {
         processCompose = yield* ProcessCompose;
-        yield* processCompose.start('example-setup-03');
+        yield* processCompose.start(testEnvironment);
+        hasProcessComposeStarted = true;
 
         sequencer = yield* Sequencer;
 
@@ -64,11 +68,24 @@ describe.sequential('E2E Tests with process-compose', () => {
         } = yield* getInitialFeedsInfoFromNetwork('ink-sepolia'));
       }),
       Effect.provide(Layer.merge(ProcessCompose.Live, Sequencer.Live)),
-      Effect.runPromise,
-    ),
-  );
+      Effect.runPromiseExit,
+    );
 
-  afterAll(() => pipe(processCompose.stop(), Effect.runPromise));
+    if (Exit.isFailure(res)) {
+      throw new Error(`Failed to start test environment: ${testEnvironment}`);
+    }
+  });
+
+  beforeAll(() => {
+    feedIds = feedIdsFromConfig;
+    contractAddress = contractAddressFromConfig;
+  });
+
+  afterAll(() => {
+    if (hasProcessComposeStarted) {
+      return pipe(processCompose.stop(), Effect.runPromise);
+    }
+  });
 
   it.live('Test processes state shortly after start', () =>
     Effect.gen(function* () {
@@ -194,6 +211,8 @@ describe.sequential('E2E Tests with process-compose', () => {
         ),
       );
 
+      const historyData = yield* sequencer.fetchHistory();
+
       // Make sure that the feeds info is updated
       for (const [id, data] of entriesOf(currentFeedsInfo)) {
         const { round, value } = data;
@@ -205,6 +224,14 @@ describe.sequential('E2E Tests with process-compose', () => {
           continue;
         }
         expect(value).not.toEqual(initialFeedsInfo[id].value);
+
+        const actualData = historyData.aggregate_history[id].find(
+          feed => feed.update_number === round - initialFeedsInfo[id].round - 1,
+        );
+        const decimals = feedsConfig.feeds.find(f => f.id.toString() === id)!
+          .additional_feed_info.decimals;
+
+        expect(value / 10 ** decimals).toBeCloseTo(actualData!.value.Numerical);
       }
     }),
   );

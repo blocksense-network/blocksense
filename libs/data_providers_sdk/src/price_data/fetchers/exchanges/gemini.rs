@@ -11,6 +11,8 @@ use serde::Deserialize;
 use serde_json::Value;
 use serde_this_or_that::as_f64;
 
+use tracing::warn;
+
 use blocksense_sdk::http::http_get_json;
 
 use crate::price_data::traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher};
@@ -33,21 +35,30 @@ impl<'a> PricesFetcher<'a> for GeminiPriceFetcher<'a> {
         Self { symbols }
     }
 
-    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
-        async {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+        async move {
             let prices_futures = self
                 .symbols
                 .iter()
                 .map(Deref::deref)
-                .map(fetch_price_for_symbol);
+                .map(|symbol| fetch_price_for_symbol(symbol, timeout_secs));
 
             let mut futures = FuturesUnordered::from_iter(prices_futures);
             let mut prices = PairPriceData::new();
 
             while let Some(result) = futures.next().await {
-                if let Ok((symbol, price_pint)) = result {
-                    prices.insert(symbol, price_pint);
+                match result {
+                    Ok((symbol, price_pint)) => {
+                        prices.insert(symbol, price_pint);
+                    }
+                    Err(err) => {
+                        warn!("Error processing future in GeminiPriceFetcher {err:?}")
+                    }
                 }
+            }
+
+            if prices.is_empty() {
+                anyhow::bail!("No prices fetched from Gemini");
             }
 
             Ok(prices)
@@ -56,9 +67,13 @@ impl<'a> PricesFetcher<'a> for GeminiPriceFetcher<'a> {
     }
 }
 
-pub async fn fetch_price_for_symbol(symbol: &str) -> Result<(String, PricePoint)> {
+pub async fn fetch_price_for_symbol(
+    symbol: &str,
+    timeout_secs: u64,
+) -> Result<(String, PricePoint)> {
     let url = format!("https://api.gemini.com/v1/pubticker/{symbol}");
-    let response = http_get_json::<GeminiPriceResponse>(&url, None, None).await?;
+    let response =
+        http_get_json::<GeminiPriceResponse>(&url, None, None, Some(timeout_secs)).await?;
 
     let volume_data = response
         .volume

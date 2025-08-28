@@ -17,7 +17,10 @@ import { padNumber } from '@blocksense/base-utils/string';
 import { readline } from '@blocksense/base-utils/tty';
 
 import { DeploymentConfigV2 } from '@blocksense/config-types/evm-contracts-deployment';
-import { readConfig, writeEvmDeployment } from '@blocksense/config-types';
+import {
+  readConfig,
+  writeEvmDeployment,
+} from '@blocksense/config-types/read-write-config';
 
 import { NetworkConfig, ContractNames, DeployContract } from './types';
 import { predictAddress } from './utils';

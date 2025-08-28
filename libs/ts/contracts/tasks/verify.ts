@@ -7,7 +7,7 @@ import {
   sleep,
 } from '@blocksense/base-utils';
 
-import { readEvmDeployment } from '@blocksense/config-types';
+import { readEvmDeployment } from '@blocksense/config-types/read-write-config';
 import { ZeroAddress } from 'ethers';
 
 import { binarySearch, getApiKeys, getCustomChainConfig } from './utils';

@@ -30,12 +30,13 @@ impl PricesFetcher<'_> for GateIoPriceFetcher {
         Self
     }
 
-    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
-        async {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+        async move {
             let response = http_get_json::<GateIoPriceResponse>(
                 "https://api.gateio.ws/api/v4/spot/tickers",
                 None,
                 None,
+                Some(timeout_secs),
             )
             .await?;
 

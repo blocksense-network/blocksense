@@ -56,24 +56,24 @@ impl SymbolsData {
     }
 }
 
-pub async fn get_prices(resources: &ResourceData) -> Result<PairsToResults> {
+pub async fn get_prices(resources: &ResourceData, timeout_secs: u64) -> Result<PairsToResults> {
     let symbols = SymbolsData::from_resources(&resources.symbols)?;
 
     let futures_set = FuturesUnordered::from_iter([
-        fetch::<BinancePriceFetcher>(&symbols.binance, None),
-        fetch::<BinanceUsPriceFetcher>(&symbols.binance_us, None),
-        fetch::<BitfinexPriceFetcher>(&symbols.bitfinex, None),
-        fetch::<BitgetPriceFetcher>(&[], None),
-        fetch::<BybitPriceFetcher>(&[], None),
-        fetch::<CoinbasePriceFetcher>(&symbols.coinbase, None),
-        fetch::<CryptoComPriceFetcher>(&[], None),
-        // fetch::<GateIoPriceFetcher>(&[], None),
-        fetch::<GeminiPriceFetcher>(&symbols.gemini, None),
-        fetch::<KrakenPriceFetcher>(&[], None),
-        fetch::<KuCoinPriceFetcher>(&[], None),
-        fetch::<MEXCPriceFetcher>(&[], None),
-        fetch::<OKXPriceFetcher>(&[], None),
-        fetch::<UpBitPriceFetcher>(&symbols.upbit, None),
+        fetch::<BinancePriceFetcher>(&symbols.binance, None, timeout_secs),
+        fetch::<BinanceUsPriceFetcher>(&symbols.binance_us, None, timeout_secs),
+        fetch::<BitfinexPriceFetcher>(&symbols.bitfinex, None, timeout_secs),
+        fetch::<BitgetPriceFetcher>(&[], None, timeout_secs),
+        fetch::<BybitPriceFetcher>(&[], None, timeout_secs),
+        fetch::<CoinbasePriceFetcher>(&symbols.coinbase, None, timeout_secs),
+        fetch::<CryptoComPriceFetcher>(&[], None, timeout_secs),
+        fetch::<GateIoPriceFetcher>(&[], None, timeout_secs),
+        fetch::<GeminiPriceFetcher>(&symbols.gemini, None, timeout_secs),
+        fetch::<KrakenPriceFetcher>(&[], None, timeout_secs),
+        fetch::<KuCoinPriceFetcher>(&[], None, timeout_secs),
+        fetch::<MEXCPriceFetcher>(&[], None, timeout_secs),
+        fetch::<OKXPriceFetcher>(&[], None, timeout_secs),
+        fetch::<UpBitPriceFetcher>(&symbols.upbit, None, timeout_secs),
     ]);
 
     let fetched_provider_prices = fetch_all_prices(futures_set).await;

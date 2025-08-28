@@ -1,7 +1,4 @@
-{
-  lib,
-  ...
-}:
+{ lib, ... }:
 let
   # Function to read and parse the JSON file
   readJson = path: builtins.fromJSON (builtins.readFile path);
@@ -272,6 +269,14 @@ in
         ];
         api-keys = [
           "SPOUT_RWA_API_KEY"
+        ];
+      };
+      borrow-rates = {
+        exec-interval = 10;
+        allowed-outbound-hosts = [
+          "https://rpc.hyperliquid.xyz"
+          "https://api.hyperdrive.fi"
+          "https://eth.llamarpc.com"
         ];
       };
     };

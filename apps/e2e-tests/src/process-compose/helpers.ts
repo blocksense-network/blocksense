@@ -50,11 +50,17 @@ export async function parseProcessesStatus() {
 
 export async function startEnvironment(testEnvironment: string): Promise<void> {
   logTestEnvironmentInfo('Starting', testEnvironment);
-  await execa('just', ['start-environment', testEnvironment, '--detached'], {
-    env: {
-      FEEDS_CONFIG_DIR: `${E2E_TESTS_FEEDS_CONFIG_DIR}`,
+  await execa(
+    'just',
+    ['start-environment', testEnvironment, '0', '--detached'],
+    {
+      stdout: ['inherit'],
+      stderr: ['inherit'],
+      env: {
+        FEEDS_CONFIG_DIR: `${E2E_TESTS_FEEDS_CONFIG_DIR}`,
+      },
     },
-  });
+  );
 }
 
 export async function stopEnvironment(): Promise<void> {
@@ -69,7 +75,7 @@ export function logTestEnvironmentInfo(
   const time = new Date();
   logMessage(
     'info',
-    `${status} test environment ${name}`,
+    `${status} test environment${name ? `: ${name}` : ''}...`,
     `${status} time: ${time.toDateString()} ${time.toTimeString()}`,
   );
 }

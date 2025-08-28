@@ -39,8 +39,8 @@ impl<'a> PricesFetcher<'a> for AlphaVantagePriceFetcher<'a> {
         }
     }
 
-    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
-        async {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+        async move {
             let api_key = self
                 .api_keys
                 .as_ref()
@@ -53,6 +53,7 @@ impl<'a> PricesFetcher<'a> for AlphaVantagePriceFetcher<'a> {
                 "https://www.alphavantage.co/query?function=REALTIME_BULK_QUOTES",
                 Some(&[("symbol", &all_symbols), ("apikey", api_key)]),
                 None,
+                Some(timeout_secs),
             )
             .await?;
             let results = response

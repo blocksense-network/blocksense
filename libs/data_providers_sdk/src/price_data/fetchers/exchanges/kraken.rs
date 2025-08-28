@@ -44,12 +44,13 @@ impl PricesFetcher<'_> for KrakenPriceFetcher {
         Self
     }
 
-    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
-        async {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+        async move {
             let response = http_get_json::<KrakenPriceResponse>(
                 "https://api.kraken.com/0/public/Ticker",
                 None,
                 None,
+                Some(timeout_secs),
             )
             .await?;
 

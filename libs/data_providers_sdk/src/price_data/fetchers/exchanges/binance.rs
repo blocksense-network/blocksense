@@ -34,8 +34,8 @@ impl<'a> PricesFetcher<'a> for BinancePriceFetcher<'a> {
         Self { symbols }
     }
 
-    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
-        async {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+        async move {
             let req_symbols = format!(
                 "[{}]",
                 self.symbols.iter().map(|s| format!("\"{s}\"")).join(",")
@@ -45,6 +45,7 @@ impl<'a> PricesFetcher<'a> for BinancePriceFetcher<'a> {
                 "https://api1.binance.com/api/v3/ticker/24hr",
                 Some(&[("symbols", req_symbols.as_str())]),
                 None,
+                Some(timeout_secs),
             )
             .await?;
 

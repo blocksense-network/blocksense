@@ -16,3 +16,5 @@ serde_json = { workspace = true }
 url = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 prettytable-rs = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }

@@ -45,3 +45,5 @@ hyper = { workspace = true }
 wasmtime = { workspace = true }
 wasmtime-wasi = { workspace = true }
 wasmtime-wasi-http = { workspace = true }
+actix-web = { workspace = true }
+http-body-util = "0.1.3"
