@@ -19,6 +19,7 @@ use crate::{
     },
     utils::logging::print_marketplace_data,
 };
+use tracing::warn;
 
 async fn fetch_market<'a>(
     which: Marketplace,
@@ -88,10 +89,10 @@ pub async fn collect_borrow_rates(feeds_config: &Vec<FeedConfig>) -> Result<Rate
                 borrow_rates_per_marketplace.insert(name, rates);
             }
             Ok((name, Err(err))) => {
-                eprintln!("{:?} fetch failed: {}", name, err);
+                warn!("{:?} fetch failed: {}", name, err);
             }
             Err(err) => {
-                eprintln!("fetch_market future failed: {}", err);
+                warn!("fetch_market future failed: {}", err);
             }
         }
     }
