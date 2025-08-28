@@ -1,7 +1,7 @@
 pub mod in_mem_db;
 
 use anyhow::Result;
-use blocksense_utils::FeedId;
+use blocksense_utils::{EncodedFeedId, FeedId};
 use ssz_rs::prelude::*;
 
 pub const DATA_CHUNK_SIZE: usize = 32;
@@ -72,7 +72,7 @@ impl BlockHeader {
 pub struct FeedActions {
     pub block_height: u64,
     pub new_feeds: [Option<BlockFeedConfig>; MAX_NEW_FEEDS_IN_BLOCK],
-    pub feed_ids_to_rm: [Option<FeedId>; MAX_FEED_ID_TO_DELETE_IN_BLOCK],
+    pub feed_ids_to_rm: [Option<EncodedFeedId>; MAX_FEED_ID_TO_DELETE_IN_BLOCK],
 }
 
 impl FeedActions {
