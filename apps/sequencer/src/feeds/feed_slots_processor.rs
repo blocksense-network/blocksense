@@ -13,7 +13,7 @@ use blocksense_feed_registry::{aggregate::FeedAggregate, registry::FeedReports};
 use blocksense_feeds_processing::utils::{consume_reports, ConsumedReports};
 use blocksense_metrics::{inc_metric, metrics::FeedsMetrics};
 use blocksense_utils::time::current_unix_time;
-use blocksense_utils::FeedId;
+use blocksense_utils::EncodedFeedId;
 use eyre::{eyre, ContextCompat, Result};
 use std::sync::Arc;
 use std::time::Duration;
@@ -24,11 +24,11 @@ use tracing::{debug, info};
 
 pub struct FeedSlotsProcessor {
     name: String,
-    key: FeedId,
+    key: EncodedFeedId,
 }
 
 impl FeedSlotsProcessor {
-    pub fn new(name: String, key: FeedId) -> FeedSlotsProcessor {
+    pub fn new(name: String, key: EncodedFeedId) -> FeedSlotsProcessor {
         FeedSlotsProcessor { name, key }
     }
 
@@ -45,18 +45,18 @@ impl FeedSlotsProcessor {
 
     async fn get_reports_for_feed(
         &self,
-        feed_id: FeedId,
+        encoded_feed_id: EncodedFeedId,
         reports: &Arc<RwLock<AllFeedsReports>>,
     ) -> Option<Arc<RwLock<FeedReports>>> {
-        debug!("Get a read lock on all reports [feed {feed_id}]");
-        let result: Option<Arc<RwLock<FeedReports>>> = match reports.read().await.get(feed_id) {
+        debug!("Get a read lock on all reports [feed {encoded_feed_id}]");
+        let result: Option<Arc<RwLock<FeedReports>>> = match reports.read().await.get(encoded_feed_id) {
             Some(x) => Some(x),
             None => {
                 info!("No reports found!");
                 None
             }
         };
-        debug!("Release the read lock on all reports [feed {feed_id}]");
+        debug!("Release the read lock on all reports [feed {encoded_feed_id}]");
         result
     }
 
