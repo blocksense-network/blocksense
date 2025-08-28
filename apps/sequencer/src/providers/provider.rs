@@ -254,7 +254,7 @@ async fn log_if_contract_exists(rpc_provider: Arc<Mutex<RpcProvider>>, contract_
         .await
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Serialize)]
 pub struct LatestRound {
     pub feed_id: u128,
     pub round: u16,
