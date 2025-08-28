@@ -43465,6 +43465,38 @@
           ]
         }
       }
+    },
+    {
+      "id": "2000003",
+      "full_name": "MYR / USD",
+      "description": "Price of Malaysian Ringgit (MYR) in USD",
+      "type": "price-feed",
+      "oracle_id": "stock-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 600000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "MYR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "stock-price-feeds",
+          "providers": ["twelvedata"]
+        }
+      }
     }
   ]
 }
