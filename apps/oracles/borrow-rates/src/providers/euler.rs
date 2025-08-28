@@ -6,6 +6,7 @@ use alloy::sol_types::SolCall;
 use anyhow::Result;
 use futures::{stream::FuturesUnordered, StreamExt};
 use url::Url;
+use tracing::warn;
 
 use crate::domain::{BorrowRateInfo, FeedConfig, RatesPerFeed};
 use crate::providers::onchain::{MyProvider, ETHEREUM_MAINNET_RPC_URL};
@@ -102,7 +103,7 @@ async fn fetch_borrow_rates_on_ethereum_mainnet(feeds: &[FeedConfig]) -> Result<
                 );
             }
             Result::Err(err) => {
-                eprintln!("Error fetching borrow rate for feed {}: {}", feed_id, err);
+                warn!("Error fetching borrow rate for feed {}: {}", feed_id, err);
             }
         }
     }
@@ -121,7 +122,7 @@ pub fn group_feeds_by_network(
             || feed.arguments.utils_lens_address.is_none()
             || feed.arguments.vault_address.is_none()
         {
-            eprintln!(
+            warn!(
                 "Feed {} missing network or required addresses. Skipping.",
                 feed.feed_id
             );
@@ -133,7 +134,7 @@ pub fn group_feeds_by_network(
         match SupportedNetworks::from_str(network.as_str()) {
             Ok(network) => grouped.entry(network).or_default().push(feed.clone()),
             Err(_) => {
-                eprintln!("Unknown network: {}", network);
+                warn!("Unknown network: {}", network);
             }
         }
     }

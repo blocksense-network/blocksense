@@ -15,9 +15,12 @@ use crate::utils::logging::print_payload;
 
 use crate::domain::get_resources_from_settings;
 use crate::fetch::collect_borrow_rates;
+use tracing::info;
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
+    tracing_subscriber::fmt::init();
+
     let feeds_config = get_resources_from_settings(&settings)?;
     let mut payload = Payload::new();
 
@@ -26,7 +29,7 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     let borrow_rates_per_feed = collect_borrow_rates(&feeds_config).await?;
 
     let time_taken = before_fetch.elapsed();
-    println!(
+    info!(
         "Fetched borrow rates for {} feeds in {:?}",
         feeds_config.len(),
         time_taken
