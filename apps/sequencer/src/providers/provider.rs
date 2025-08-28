@@ -14,9 +14,9 @@ use alloy::{
 use alloy_primitives::U256;
 use alloy_u256_literal::u256;
 use blocksense_feeds_processing::adfs_gen_calldata::{
-    RoundBufferIndices, MAX_HISTORY_ELEMENTS_PER_FEED, NUM_FEED_IDS_IN_RB_INDEX_RECORD,
+    calc_row_index, RoundBufferIndices, MAX_HISTORY_ELEMENTS_PER_FEED, NUM_FEED_IDS_IN_RB_INDEX_RECORD
 };
-use blocksense_utils::FeedId;
+use blocksense_utils::{EncodedFeedId, FeedId};
 use futures::future::join_all;
 use reqwest::Url; // TODO @ymadzhunkov include URL directly from url crate
 
@@ -96,8 +96,8 @@ pub struct RpcProvider {
     pub transaction_gas_limit: u32,
     pub impersonated_anvil_account: Option<Address>,
     pub history: FeedAggregateHistory,
-    pub publishing_criteria: HashMap<FeedId, PublishCriteria>,
-    pub feeds_variants: HashMap<FeedId, FeedVariant>,
+    pub publishing_criteria: HashMap<EncodedFeedId, PublishCriteria>,
+    pub feeds_variants: HashMap<EncodedFeedId, FeedVariant>,
     pub contracts: Vec<Contract>,
     pub rpc_url: Url,
     pub rb_indices: RoundBufferIndices,
@@ -242,19 +242,19 @@ async fn log_if_contract_exists(rpc_provider: Arc<Mutex<RpcProvider>>, contract_
 
 #[derive(Debug, Clone, Copy)]
 pub struct LatestRBIndex {
-    pub feed_id: u128,
+    pub encoded_feed_id: EncodedFeedId,
     pub index: u16,
 }
 
 impl LatestRBIndex {
-    pub fn new(feed_id: u128, data: &[u8]) -> LatestRBIndex {
+    pub fn new(encoded_feed_id: EncodedFeedId, data: &[u8]) -> LatestRBIndex {
         let l = data.len();
         let index = if l > 1 {
             u16::from_be_bytes([data[l - 2], data[l - 1]])
         } else {
             0_u16
         };
-        LatestRBIndex { feed_id, index }
+        LatestRBIndex { encoded_feed_id, index }
     }
 
     pub fn calldata(feed_id: u128, stride: u8) -> Bytes {
@@ -293,13 +293,13 @@ impl RpcProvider {
             .and_then(|x| parse_eth_address(x.as_str()));
         let (history, publishing_criteria) = RpcProvider::prepare_history(p);
         let contracts = RpcProvider::prepare_contracts(p).expect("Error in prepare_contracts");
-        let mut feeds_variants: HashMap<FeedId, FeedVariant> = HashMap::new();
+        let mut feeds_variants: HashMap<EncodedFeedId, FeedVariant> = HashMap::new();
         for f in feeds_config.feeds.iter() {
             debug!("Registering feed for network; feed={f:?}; network={network}");
             match FeedType::get_variant_from_string(f.value_type.as_str()) {
                 Ok(variant) => {
                     feeds_variants.insert(
-                        f.id,
+                        EncodedFeedId::new(f.id, f.stride),
                         FeedVariant {
                             variant,
                             decimals: f.additional_feed_info.decimals as usize,
@@ -335,8 +335,8 @@ impl RpcProvider {
     pub async fn load_rb_indices_from_chain(
         &mut self,
         feeds_config: &AllFeedsConfig,
-    ) -> Result<HashMap<FeedId, u64>> {
-        let mut res: HashMap<FeedId, u64> = HashMap::new();
+    ) -> Result<HashMap<EncodedFeedId, u64>> {
+        let mut res: HashMap<EncodedFeedId, u64> = HashMap::new();
 
         let adfs_address_opt = self.contracts.iter().find_map(|x| {
             if x.name == ADFS_CONTRACT_NAME {
@@ -348,13 +348,15 @@ impl RpcProvider {
         if let Some(adfs_address) = adfs_address_opt {
             for feed in feeds_config.feeds.iter() {
                 let feed_id = feed.id;
-                if !res.contains_key(&feed_id) {
+                let stride = feed.stride;
+                let encoded_feed_id = EncodedFeedId::new(feed_id, stride);
+                if !res.contains_key(&encoded_feed_id) {
                     let r = self
-                        .get_latest_rb_index_v2_from_storage(adfs_address, &feed_id)
+                        .get_latest_rb_index_v2_from_storage(adfs_address, &encoded_feed_id)
                         .await?;
                     for rb_index in r {
-                        if rb_index.index != 0 || rb_index.feed_id == feed_id {
-                            let _v = res.insert(rb_index.feed_id, rb_index.index as u64);
+                        if rb_index.index != 0 || rb_index.encoded_feed_id == encoded_feed_id {
+                            let _v = res.insert(rb_index.encoded_feed_id, rb_index.index as u64);
                         }
                     }
                 }
@@ -365,15 +367,15 @@ impl RpcProvider {
 
     pub fn prepare_history(
         p: &blocksense_config::Provider,
-    ) -> (FeedAggregateHistory, HashMap<FeedId, PublishCriteria>) {
+    ) -> (FeedAggregateHistory, HashMap<EncodedFeedId, PublishCriteria>) {
         let mut history = FeedAggregateHistory::new();
-        let mut publishing_criteria: HashMap<FeedId, PublishCriteria> = HashMap::new();
+        let mut publishing_criteria: HashMap<EncodedFeedId, PublishCriteria> = HashMap::new();
 
         for crit in p.publishing_criteria.iter() {
-            let feed_id = crit.feed_id;
+            let feed_id = crit.encoded_feed_id;
             let buf_size = 256;
             if publishing_criteria
-                .insert(crit.feed_id, crit.clone())
+                .insert(crit.encoded_feed_id, crit.clone())
                 .is_none()
             {
                 history.register_feed(feed_id, buf_size);
@@ -392,9 +394,9 @@ impl RpcProvider {
 
     pub fn update_history(&mut self, updates: &[VotedFeedUpdate]) {
         for update in updates.iter() {
-            let feed_id = update.feed_id;
+            let encoded_feed_id = update.encoded_feed_id;
             self.history
-                .push_next(feed_id, update.value.clone(), update.end_slot_timestamp);
+                .push_next(encoded_feed_id, update.value.clone(), update.end_slot_timestamp);
         }
     }
 
@@ -404,7 +406,7 @@ impl RpcProvider {
             .iter()
             .filter(|update| {
                 self.publishing_criteria
-                    .get(&update.feed_id)
+                    .get(&update.encoded_feed_id)
                     .is_none_or(|criteria| {
                         !update
                             .should_skip(
@@ -434,7 +436,7 @@ impl RpcProvider {
             if let FeedType::Numerical(value) = u.value {
                 if let Some(criteria) = self
                     .publishing_criteria
-                    .get(&u.feed_id)
+                    .get(&u.encoded_feed_id)
                     .filter(|criteria| criteria.should_peg(value))
                 {
                     Self::peg_value(criteria, &mut u.value);
@@ -495,11 +497,13 @@ impl RpcProvider {
     async fn get_latest_rb_index_v2_from_storage(
         &self,
         adfs_address: Address,
-        feed_id: &u128,
+        encoded_feed_id: &EncodedFeedId,
     ) -> Result<Vec<LatestRBIndex>, eyre::Error> {
         let start_slot = u256!(0x00000000fff00000000000000000000000000000);
         let l = NUM_FEED_IDS_IN_RB_INDEX_RECORD;
-        let slot = start_slot + U256::from(feed_id / l);
+        let feed_id = encoded_feed_id.get_id();
+        let stride = encoded_feed_id.get_stride();
+        let slot = start_slot + calc_row_index(feed_id, stride);
         let v = self.provider.get_storage_at(adfs_address, slot).await;
         match v {
             Ok(v) => {
@@ -509,7 +513,7 @@ impl RpcProvider {
                 for i in 0_usize..(l as usize) {
                     let offset = 2 * i;
                     res.push(LatestRBIndex {
-                        feed_id: x + i as u128,
+                        encoded_feed_id: EncodedFeedId::new(x + i as u128, stride),
                         index: u16::from_be_bytes([data[offset], data[offset + 1]]),
                     });
                 }
@@ -519,13 +523,13 @@ impl RpcProvider {
         }
     }
 
-    pub async fn get_latest_rb_index(&self, feed_id: &u128) -> Result<LatestRBIndex, eyre::Error> {
+    pub async fn get_latest_rb_index(&self, encoded_feed_id: &EncodedFeedId) -> Result<LatestRBIndex, eyre::Error> {
         let adfs_address = self.get_contract_address(ADFS_CONTRACT_NAME)?;
         let r = self
-            .get_latest_rb_index_v2_from_storage(adfs_address, feed_id)
+            .get_latest_rb_index_v2_from_storage(adfs_address, encoded_feed_id)
             .await?
             .iter()
-            .find(|x| x.feed_id == *feed_id)
+            .find(|x| x.encoded_feed_id == *encoded_feed_id)
             .cloned()
             .ok_or(eyre!("Result not found!?"));
         r
@@ -533,32 +537,32 @@ impl RpcProvider {
 
     pub async fn get_latest_values(
         &self,
-        feed_ids: &[FeedId],
+        encoded_feed_ids: &[EncodedFeedId],
     ) -> Result<Vec<Result<PublishedFeedUpdate, PublishedFeedUpdateError>>, eyre::Error> {
         let mut results = Vec::new();
         let adfs_contract_address = self.get_contract_address(ADFS_CONTRACT_NAME)?;
 
-        let mut variants: HashMap<FeedId, FeedVariant> = HashMap::new();
-        for feed_id in feed_ids.iter() {
-            let Some(variant) = self.feeds_variants.get(feed_id) else {
+        let mut variants: HashMap<EncodedFeedId, FeedVariant> = HashMap::new();
+        for encoded_feed_id in encoded_feed_ids.iter() {
+            let Some(variant) = self.feeds_variants.get(encoded_feed_id) else {
                 return Err(eyre!(
-                    "Unknown variant and number of digits for feed with id = {feed_id}"
+                    "Unknown variant and number of digits for feed with encoded_feed_id = {encoded_feed_id}"
                 ));
             };
-            variants.insert(*feed_id, variant.clone());
+            variants.insert(*encoded_feed_id, variant.clone());
         }
 
-        for feed_id in feed_ids {
-            let Some(feed_variant) = variants.get(feed_id) else {
+        for encoded_feed_id in encoded_feed_ids {
+            let Some(feed_variant) = variants.get(encoded_feed_id) else {
                 return Err(eyre!(
-                    "Unknown variant and number of digits for feed with id (logical error) = {feed_id}"
+                    "Unknown variant and number of digits for feed with id (logical error) = {encoded_feed_id}"
                 ));
             };
             // abi.encodePacked(bytes1(0x82), stride, uint120(id))
             let calldata = DynSolValue::Tuple(vec![
                 DynSolValue::Uint(U256::from(0x83_u8), 8),
                 DynSolValue::Uint(U256::from(feed_variant.stride), 8),
-                DynSolValue::Uint(U256::from(*feed_id), 120),
+                DynSolValue::Uint(U256::from(encoded_feed_id.get_id()), 120),
             ]);
             let calldata_bytes = Bytes::copy_from_slice(&calldata.abi_encode_packed());
 
@@ -568,7 +572,7 @@ impl RpcProvider {
 
             let recvd_data = self.provider.call(tx).await?;
             info!("recvd_data = {recvd_data}");
-            let result = latest_v2(*feed_id, feed_variant.clone(), &recvd_data);
+            let result = latest_v2(*encoded_feed_id, feed_variant.clone(), &recvd_data);
             info!("recvd_result = {result:?}");
             results.push(result);
         }
@@ -576,14 +580,14 @@ impl RpcProvider {
         Ok(results)
     }
 
-    pub fn get_history_capacity(&self, feed_id: FeedId) -> Option<usize> {
-        self.history.get(feed_id).map(|x| x.capacity().get())
+    pub fn get_history_capacity(&self, encoded_feed_id: EncodedFeedId) -> Option<usize> {
+        self.history.get(encoded_feed_id).map(|x| x.capacity().get())
     }
 
-    pub fn get_last_update_num_from_history(&self, feed_id: FeedId) -> u128 {
+    pub fn get_last_update_num_from_history(&self, encoded_feed_id: EncodedFeedId) -> u128 {
         let default = 0;
         self.history
-            .get(feed_id)
+            .get(encoded_feed_id)
             .map_or(default, |x| x.last().map_or(default, |x| x.update_number))
     }
 
@@ -922,19 +926,19 @@ pub fn calldata_for_latest_value_v1(feed_id: FeedId) -> Bytes {
 }
 
 pub fn latest_v1(
-    feed_id: FeedId,
+    encoded_feed_id: EncodedFeedId,
     variant: FeedVariant,
     data: &[u8],
 ) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
     if data.is_empty() {
         return Err(PublishedFeedUpdate::error(
-            feed_id,
+            encoded_feed_id,
             "Data shows no published updates on chain",
         ));
     }
     if data.len() != 64 {
         return Err(PublishedFeedUpdate::error(
-            feed_id,
+            encoded_feed_id,
             "Data size is not exactly 64 bytes",
         ));
     }
@@ -944,29 +948,29 @@ pub fn latest_v1(
     let timestamp_u64 = u64::from_be_bytes(j3);
     match FeedType::from_bytes(j1.to_vec(), variant.variant, variant.decimals) {
         Ok(latest) => Ok(PublishedFeedUpdate {
-            feed_id,
+            encoded_feed_id,
             num_updates: u128::from_be_bytes(j2),
             value: latest,
             published: timestamp_u64 as u128,
         }),
-        Err(msg) => Err(PublishedFeedUpdate::error(feed_id, &msg)),
+        Err(msg) => Err(PublishedFeedUpdate::error(encoded_feed_id, &msg)),
     }
 }
 
 pub fn latest_v2(
-    feed_id: FeedId,
+    encoded_feed_id: EncodedFeedId,
     variant: FeedVariant,
     data: &[u8],
 ) -> Result<PublishedFeedUpdate, PublishedFeedUpdateError> {
     if data.is_empty() {
         return Err(PublishedFeedUpdate::error(
-            feed_id,
+            encoded_feed_id,
             "Data shows no published updates on chain",
         ));
     }
     if data.len() != 64 {
         return Err(PublishedFeedUpdate::error(
-            feed_id,
+            encoded_feed_id,
             "Data size is not exactly 64 bytes",
         ));
     }
@@ -976,12 +980,12 @@ pub fn latest_v2(
     let timestamp = u128::from_be_bytes(timestamp_bytes);
     match FeedType::from_bytes(value_bytes.to_vec(), variant.variant, variant.decimals) {
         Ok(latest) => Ok(PublishedFeedUpdate {
-            feed_id,
+            encoded_feed_id,
             num_updates: u128::from_be_bytes(update_bytes),
             value: latest,
             published: timestamp,
         }),
-        Err(msg) => Err(PublishedFeedUpdate::error(feed_id, &msg)),
+        Err(msg) => Err(PublishedFeedUpdate::error(encoded_feed_id, &msg)),
     }
 }
 
