@@ -27,16 +27,20 @@ export const listFeeds = Command.make(
         readEvmDeployment(network, true),
       );
 
-      const rows: Array<TableRow> = feedConfig.feeds.map(feed => {
-        const cl = deploymentData?.contracts?.CLAggregatorAdapter[`${feed.id}`];
-        return [
-          feed.full_name,
-          cl?.address ?? '',
-          `${cl?.constructorArgs[1] ?? ''}`,
-          cl?.base ?? '',
-          cl?.quote ?? '',
-        ];
-      });
+      const rows: Array<TableRow> = feedConfig.feeds
+        .filter(
+          feed => `${feed.id}` in deploymentData.contracts.CLAggregatorAdapter,
+        )
+        .map(feed => {
+          const cl = deploymentData.contracts.CLAggregatorAdapter[`${feed.id}`];
+          return [
+            feed.full_name,
+            cl?.address ?? '',
+            `${cl?.constructorArgs[1] ?? ''}`,
+            cl?.base ?? '',
+            cl?.quote ?? '',
+          ];
+        });
 
       renderTui(
         drawTable([...rows], {
