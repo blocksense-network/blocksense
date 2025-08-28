@@ -1,7 +1,7 @@
 use blocksense_gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use blocksense_gnosis_safe::data_types::ReporterResponse;
 use blocksense_gnosis_safe::utils::{SafeTx, SignatureWithAddress};
-use blocksense_utils::FeedId;
+use blocksense_utils::EncodedFeedId;
 use std::collections::HashSet;
 use std::collections::{HashMap, VecDeque};
 use tracing::{debug, error, warn};
@@ -17,7 +17,7 @@ pub struct CallDataWithSignatures {
     pub tx_hash: String,
     pub safe_tx: SafeTx,
     pub signatures: HashMap<u64, SignatureWithAddress>,
-    pub updated_feeds_ids: HashSet<FeedId>,
+    pub updated_feeds_ids: HashSet<EncodedFeedId>,
 }
 
 pub struct AggregationBatchConsensus {

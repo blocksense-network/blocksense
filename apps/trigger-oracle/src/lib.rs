@@ -1087,13 +1087,13 @@ fn update_latest_votes(
     batch: Vec<DataFeedPayload>,
 ) {
     for vote in batch {
-        let feed_id = vote.payload_metadata.feed_id.parse().unwrap();
+        let encoded_feed_id = vote.payload_metadata.feed_id.parse().unwrap();
 
         if let Ok(value) = vote.result {
             _ = latest_votes.insert(
-                feed_id,
+                encoded_feed_id,
                 VotedFeedUpdate {
-                    feed_id,
+                    encoded_feed_id,
                     value,
                     end_slot_timestamp: vote.payload_metadata.timestamp,
                 },

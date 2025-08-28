@@ -3,7 +3,7 @@ use alloy_primitives::U256;
 use anyhow::Result;
 use blocksense_config::FeedStrideAndDecimals;
 use blocksense_data_feeds::feeds_processing::BatchedAggregatesToSend;
-use blocksense_utils::{from_hex_string, to_hex_string, FeedId};
+use blocksense_utils::{from_hex_string, to_hex_string, EncodedFeedId, FeedId};
 use std::cmp::max;
 use std::collections::{BTreeMap, HashMap, HashSet};
 
@@ -14,7 +14,7 @@ use once_cell::sync::Lazy;
 pub const MAX_HISTORY_ELEMENTS_PER_FEED: u64 = 8192;
 pub const NUM_FEED_IDS_IN_RB_INDEX_RECORD: u128 = 16;
 
-pub type RoundBufferIndices = HashMap<FeedId, u64>; // for each key (feed_id) we store its round buffer index
+pub type RoundBufferIndices = HashMap<EncodedFeedId, u64>; // for each key (feed_id) we store its round buffer index
 
 static STRIDES_SIZES: Lazy<HashMap<u8, u32>> = Lazy::new(|| {
     let mut map = HashMap::new(); // TODO: confirm the correct values for the strides we will support

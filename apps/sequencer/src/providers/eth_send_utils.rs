@@ -10,7 +10,7 @@ use alloy_primitives::{keccak256, U256};
 use blocksense_config::{FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
-use blocksense_utils::{counter_unbounded_channel::CountedReceiver, FeedId};
+use blocksense_utils::{counter_unbounded_channel::CountedReceiver, EncodedFeedId};
 use eyre::{bail, eyre, Result};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
 use tokio::{
@@ -61,7 +61,7 @@ pub async fn deploy_contract(
 pub fn filter_allowed_feeds(
     net: &str,
     updates: &mut BatchedAggregatesToSend,
-    allow_feeds: &Option<Vec<FeedId>>,
+    allow_feeds: &Option<Vec<EncodedFeedId>>,
 ) {
     if let Some(allowed_feed_ids) = allow_feeds {
         let mut res: Vec<VotedFeedUpdate> = vec![];
@@ -83,8 +83,8 @@ pub async fn get_serialized_updates_for_network(
     provider_mutex: &Arc<Mutex<RpcProvider>>,
     updates: &mut BatchedAggregatesToSend,
     provider_settings: &blocksense_config::Provider,
-    feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
-    feeds_rb_indices: &mut HashMap<FeedId, u64>,
+    feeds_config: Arc<RwLock<HashMap<EncodedFeedId, FeedConfig>>>,
+    feeds_rb_indices: &mut HashMap<EncodedFeedId, u64>,
 ) -> Result<Vec<u8>> {
     debug!("Acquiring a read lock on provider config for `{net}`");
     let provider = provider_mutex.lock().await;
@@ -153,7 +153,7 @@ pub struct BatchOfUpdatesToProcess {
     pub provider: Arc<Mutex<RpcProvider>>,
     pub provider_settings: blocksense_config::Provider,
     pub updates: BatchedAggregatesToSend,
-    pub feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
+    pub feeds_config: Arc<RwLock<HashMap<EncodedFeedId, FeedConfig>>>,
     pub transaction_retry_timeout_secs: u64,
     pub transaction_retries_count_limit: u64,
     pub retry_fee_increment_fraction: f64,
@@ -279,11 +279,11 @@ pub async fn eth_batch_send_to_contract(
     provider_mutex: Arc<Mutex<RpcProvider>>,
     provider_settings: blocksense_config::Provider,
     mut updates: BatchedAggregatesToSend,
-    feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
+    feeds_config: Arc<RwLock<HashMap<EncodedFeedId, FeedConfig>>>,
     transaction_retry_timeout_secs: u64,
     transaction_retries_count_limit: u64,
     retry_fee_increment_fraction: f64,
-) -> Result<(String, Vec<FeedId>)> {
+) -> Result<(String, Vec<EncodedFeedId>)> {
     let mut feeds_rb_indices = HashMap::new();
     let serialized_updates = get_serialized_updates_for_network(
         net.as_str(),
@@ -314,7 +314,7 @@ pub async fn eth_batch_send_to_contract(
     let mut provider = provider_mutex.lock().await;
     debug!("Acquired a read/write lock on provider state for network `{net}` block height {block_height}");
 
-    let feeds_to_update_ids: Vec<FeedId> = updates
+    let feeds_to_update_ids: Vec<EncodedFeedId> = updates
         .updates
         .iter()
         .map(|update| update.feed_id)
@@ -1192,7 +1192,7 @@ pub async fn eth_batch_send_to_all_contracts(
 
 async fn log_rb_indices(
     prefix: &str,
-    updated_feeds: &Vec<FeedId>,
+    updated_feeds: &Vec<EncodedFeedId>,
     rb_indices: &mut RoundBufferIndices,
     net: &str,
 ) {
@@ -1206,7 +1206,7 @@ async fn log_rb_indices(
 }
 
 pub async fn increment_feeds_rb_indices(
-    updated_feeds: &Vec<FeedId>,
+    updated_feeds: &Vec<EncodedFeedId>,
     net: &str,
     provider: &mut RpcProvider,
 ) {
@@ -1234,7 +1234,7 @@ pub async fn increment_feeds_rb_indices(
 // Since we update the round buffer index when we post the tx and before we
 // receive its receipt if the tx fails we need to decrease the round indices.
 pub async fn decrement_feed_rb_indices(
-    updated_feeds: &Vec<FeedId>,
+    updated_feeds: &Vec<EncodedFeedId>,
     net: &str,
     provider: &mut RpcProvider,
 ) {
@@ -1263,7 +1263,7 @@ pub async fn decrement_feed_rb_indices(
 }
 
 async fn increment_feeds_rb_metrics(
-    updated_feeds: &Vec<FeedId>,
+    updated_feeds: &Vec<EncodedFeedId>,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     net: &str,
 ) {
