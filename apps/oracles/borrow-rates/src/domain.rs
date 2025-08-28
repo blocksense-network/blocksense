@@ -4,6 +4,7 @@ use alloy::primitives::Address;
 use anyhow::Result;
 use blocksense_sdk::oracle::Settings;
 use serde::{Deserialize, Serialize};
+use tracing::warn;
 
 use blocksense_data_providers_sdk::price_data::types::PricePair;
 
@@ -74,7 +75,7 @@ pub fn group_feeds_by_marketplace(
         match Marketplace::from_str(feed.arguments.marketplace.as_str()) {
             Ok(market) => grouped.entry(market).or_default().push(feed.clone()),
             Err(_) => {
-                eprintln!("Unknown marketplace: {}", feed.arguments.marketplace);
+                warn!("Unknown marketplace: {}", feed.arguments.marketplace);
             }
         }
     }
@@ -95,7 +96,7 @@ pub fn map_assets_to_feeds(
             match rates_map.get(base) {
                 Some(rate) => Some((feed.feed_id.clone(), rate.clone())),
                 None => {
-                    eprintln!(
+                    warn!(
                         "[map_assets_to_feeds] No reserve info found for feed_id={} with base={}",
                         feed.feed_id, base
                     );

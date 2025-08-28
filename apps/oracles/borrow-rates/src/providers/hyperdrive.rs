@@ -5,6 +5,7 @@ use blocksense_sdk::http::http_get_json;
 use futures::{future::join_all};
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
+use tracing::warn;
 
 use crate::domain::{BorrowRateInfo, FeedConfig, RatesPerFeed};
 
@@ -28,7 +29,7 @@ pub async fn fetch_borrow_rates_from_hyperdrive(
                     .push((feed.pair.base.clone(), feed.feed_id));
             }
             _ => {
-                eprintln!(
+                warn!(
                     "Feed {} missing required HyperDrive market_id. Skipping.",
                     feed.feed_id
                 );
@@ -42,7 +43,7 @@ pub async fn fetch_borrow_rates_from_hyperdrive(
             match fetch_rates_for_market(&market_id).await {
                 Ok(resp) => Some((feeds, resp)),
                 Err(err) => {
-                    eprintln!(
+                    warn!(
                         "HyperDrive fetch failed for market_id={}: {}. Skipping feeds referencing this market.",
                         market_id, err
                     );
@@ -60,7 +61,7 @@ pub async fn fetch_borrow_rates_from_hyperdrive(
         };
 
         let Some(row) = resp.data.first() else {
-            eprintln!("HyperDrive returned empty data. Skipping.");
+            warn!("HyperDrive returned empty data. Skipping.");
             continue;
         };
         let borrow_rate_apr = (row.borrow_rate as f64) / 1e18;
