@@ -5,11 +5,75 @@ pub mod logging;
 pub mod test_env;
 pub mod time;
 
+use ssz_rs::prelude::*;
+use ssz_rs::DeserializeError;   
+
 pub type FeedId = u128;
+pub type Stride = u8;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, serde::Serialize, serde::Deserialize, SimpleSerialize, Default)]
+pub struct EncodedFeedId {
+    /// Packed layout: [ stride:8 | feed_id:120 ]
+    pub data: u128
+}
+
+impl EncodedFeedId {
+    pub const FEED_BITS: u32 = 120;
+    pub const STRIDE_BITS: u32 = 8;
+    pub const FEED_MASK: u128 = (1u128 << Self::FEED_BITS) - 1;
+
+    #[inline]
+    pub fn new(feed_id: FeedId, stride: Stride) -> Self {
+        assert!(
+            (feed_id & !Self::FEED_MASK) == 0,
+            "feed_id must fit in 120 bits (15 bytes)"
+        );
+        Self { data: Self::encode(stride, feed_id) }
+    }
+
+    #[inline]
+    pub fn try_new(feed_id: FeedId, stride: Stride) -> Option<Self> {
+        ((feed_id & !Self::FEED_MASK) == 0)
+            .then(|| Self { data: Self::encode(stride, feed_id) })
+    }
+
+    /// Pack (stride, feed_id) into a single u128.
+    /// Layout: [ stride:8 | feed_id:120 ]
+    #[inline]
+    pub fn encode(stride: Stride, feed_id: FeedId) -> u128 {
+        let hi = (stride as u128) << Self::FEED_BITS;
+        hi | (feed_id & Self::FEED_MASK)
+    }
+
+    /// Unpack from self.
+    #[inline]
+    pub fn decode(&self) -> (Stride, FeedId) {
+        let stride = self.get_stride();
+        let feed_id = self.get_id();
+        (stride, feed_id)
+    }
+
+    #[inline]
+    pub fn get_id(&self) -> FeedId {
+        self.data & Self::FEED_MASK
+    }
+
+    #[inline]
+    pub fn get_stride(&self) -> Stride {
+        (self.data >> Self::FEED_BITS) as u8
+    }
+}
+
+// Implement Display for "{}" printing
+impl fmt::Display for EncodedFeedId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "EncodedFeedId(feed_id={}, stride={})", self.get_id(), self.get_stride())
+    }
+}
 
 use std::{
     env,
-    fmt::{Debug, Display},
+    fmt::{self, Debug, Display},
     fs::File,
     hash::{DefaultHasher, Hash, Hasher},
     io::{Read, Write},

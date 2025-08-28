@@ -4,7 +4,7 @@ use blocksense_feed_registry::{
     registry::FeedAggregateHistory,
     types::{DataFeedPayload, FeedType, Timestamp},
 };
-use blocksense_utils::{from_hex_string, FeedId};
+use blocksense_utils::{from_hex_string, EncodedFeedId, FeedId, Stride};
 use log::error;
 use serde::Deserialize;
 use serde::Serialize;
@@ -13,7 +13,7 @@ use tracing::debug;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VotedFeedUpdate {
-    pub feed_id: FeedId,
+    pub encoded_feed_id: EncodedFeedId,
     pub value: FeedType,
     pub end_slot_timestamp: Timestamp,
 }
@@ -34,7 +34,7 @@ pub struct VotedFeedUpdateWithProof {
 // Implement Eq and PartialEq
 impl PartialEq for VotedFeedUpdateWithProof {
     fn eq(&self, other: &Self) -> bool {
-        self.update.feed_id == other.update.feed_id
+        self.update.encoded_feed_id == other.update.encoded_feed_id
     }
 }
 
@@ -43,13 +43,13 @@ impl Eq for VotedFeedUpdateWithProof {}
 // Implement Ord and PartialOrd
 impl PartialOrd for VotedFeedUpdateWithProof {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.update.feed_id.cmp(&other.update.feed_id))
+        Some(self.update.encoded_feed_id.cmp(&other.update.encoded_feed_id))
     }
 }
 
 impl Ord for VotedFeedUpdateWithProof {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.update.feed_id.cmp(&other.update.feed_id)
+        self.update.encoded_feed_id.cmp(&other.update.encoded_feed_id)
     }
 }
 
@@ -94,15 +94,15 @@ impl VotedFeedUpdate {
         Ok((
             {
                 if legacy {
-                    if self.feed_id > u32::MAX as u128 {
+                    if self.encoded_feed_id.get_id() > u32::MAX as u128 {
                         anyhow::bail!(
                             "Error converting feed id {} to bytes for legacy contract - feed id does not fit in 4 bytes!",
-                            self.feed_id,
+                            self.encoded_feed_id,
                         )
                     }
-                    (self.feed_id as u32).to_be_bytes().to_vec()
+                    (self.encoded_feed_id.get_id() as u32).to_be_bytes().to_vec()
                 } else {
-                    self.feed_id.to_be_bytes().to_vec()
+                    self.encoded_feed_id.get_id().to_be_bytes().to_vec()
                 }
             },
             {
@@ -111,7 +111,7 @@ impl VotedFeedUpdate {
                     Err(e) => {
                         anyhow::bail!(
                             "Error converting value for feed id {} to bytes {}",
-                            self.feed_id,
+                            self.encoded_feed_id,
                             e
                         )
                     }
@@ -122,6 +122,7 @@ impl VotedFeedUpdate {
 
     pub fn new_decode(
         key: &str,
+        stride: Stride,
         value: &str,
         end_slot_timestamp: Timestamp,
         variant: FeedType, // variant is only a type placeholder.
@@ -135,8 +136,10 @@ impl VotedFeedUpdate {
         let value = FeedType::from_bytes(value_bytes, variant, digits_in_fraction)
             .map_err(|e| anyhow!("{e}"))?;
 
+        let encoded_feed_id = EncodedFeedId::new(feed_id, stride);
+
         Ok(VotedFeedUpdate {
-            feed_id,
+            encoded_feed_id,
             value,
             end_slot_timestamp,
         })
@@ -149,7 +152,7 @@ impl VotedFeedUpdate {
         caller_context: &str,
     ) -> SkipDecision {
         if let FeedType::Numerical(candidate_value) = self.value {
-            let feed_id = self.feed_id;
+            let feed_id = self.encoded_feed_id;
             let res = match history.last(feed_id) {
                 Some(last_published) => match last_published.value {
                     FeedType::Numerical(last) => {

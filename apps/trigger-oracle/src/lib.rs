@@ -59,7 +59,7 @@ use blocksense_metrics::{
     },
     TextEncoder,
 };
-use blocksense_utils::{time::current_unix_time, FeedId};
+use blocksense_utils::{time::current_unix_time, EncodedFeedId, FeedId};
 
 use blocksense_gnosis_safe::{
     data_types::{ConsensusSecondRoundBatch, ReporterResponse},
@@ -76,7 +76,7 @@ use blocksense::oracle::oracle_types as oracle;
 
 pub(crate) type RuntimeData = HttpRuntimeData;
 pub(crate) type _Store = spin_core::Store<RuntimeData>;
-type DataFeedResults = Arc<RwLock<HashMap<FeedId, VotedFeedUpdate>>>;
+type DataFeedResults = Arc<RwLock<HashMap<EncodedFeedId, VotedFeedUpdate>>>;
 
 #[derive(Debug, Deserialize)]
 pub struct Params {
@@ -1083,7 +1083,7 @@ impl OutboundWasiHttpHandler for HttpRuntimeData {
 }
 
 fn update_latest_votes(
-    latest_votes: &mut HashMap<FeedId, VotedFeedUpdate>,
+    latest_votes: &mut HashMap<EncodedFeedId, VotedFeedUpdate>,
     batch: Vec<DataFeedPayload>,
 ) {
     for vote in batch {

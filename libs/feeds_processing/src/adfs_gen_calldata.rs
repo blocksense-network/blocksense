@@ -80,10 +80,10 @@ pub async fn adfs_serialize_updates(
 
     // Fill the value updates:
     for update in updates.iter() {
-        let feed_id = update.feed_id;
-        feeds_ids_with_value_updates.insert(feed_id);
+        let encoded_feed_id = update.encoded_feed_id;
+        feeds_ids_with_value_updates.insert(encoded_feed_id.get_id());
 
-        let (stride, digits_in_fraction) = match &strides_and_decimals.get(&feed_id) {
+        let (stride, digits_in_fraction) = match &strides_and_decimals.get(&encoded_feed_id.get_id()) {
             Some(f) => (f.stride, f.decimals),
             None => {
                 error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimal default to 18");
@@ -95,7 +95,7 @@ pub async fn adfs_serialize_updates(
             Some(rc) => {
                 let mut updated_feed_id_rb_index: u64 = 0;
                 // Add the feed id-s that are part of each record that will be updated
-                for additional_feed_id in get_neighbour_feed_ids(update.feed_id) {
+                for additional_feed_id in get_neighbour_feed_ids(update.encoded_feed_id.get_id()) {
                     let rb_index = rc.get(&additional_feed_id).cloned().unwrap_or(0);
 
 
@@ -109,14 +109,14 @@ pub async fn adfs_serialize_updates(
                         }
                     };
                     feeds_info.insert(additional_feed_id, (stride, rb_index));
-                    if additional_feed_id == update.feed_id {
+                    if additional_feed_id == update.encoded_feed_id.get_id() {
                         updated_feed_id_rb_index = rb_index;
                     }
                 }
                 updated_feed_id_rb_index
             }
-            None => *feeds_rb_indexes.get(&feed_id).unwrap_or_else(|| {
-                error!("feeds_rb_indexes does not contain updates count for feed_id {feed_id}. Rolling back to 0!");
+            None => *feeds_rb_indexes.get(&encoded_feed_id.get_id()).unwrap_or_else(|| {
+                error!("feeds_rb_indexes does not contain updates count for feed_id {encoded_feed_id}. Rolling back to 0!");
                 &0
             }),
         };
@@ -132,13 +132,13 @@ pub async fn adfs_serialize_updates(
             Err(e) => {
                 error!(
                     "Got an error trying to encode value of feed ID {}: {}",
-                    update.feed_id, e
+                    update.encoded_feed_id, e
                 );
                 continue;
             }
         }; // Key is not needed. It is the bytes of the feed_id
 
-        let id = U256::from(update.feed_id);
+        let id = U256::from(update.encoded_feed_id.get_id());
         let rb_index = U256::from(rb_index);
         let index = (id * U256::from(2).pow(U256::from(13u32)) + rb_index)
             * U256::from(2).pow(U256::from(stride));

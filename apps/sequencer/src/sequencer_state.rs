@@ -23,7 +23,7 @@ use blocksense_utils::counter_unbounded_channel::{
     counted_unbounded_channel, CountedReceiver, CountedSender,
 };
 use blocksense_utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
-use blocksense_utils::FeedId;
+use blocksense_utils::EncodedFeedId;
 use eyre::eyre;
 use futures::stream::FuturesUnordered;
 use rdkafka::producer::FutureProducer;
@@ -44,7 +44,7 @@ pub struct SequencerState {
     pub reporters: SharedReporters,
     pub aggregated_votes_to_block_creator_send: UnboundedSender<VotedFeedUpdateWithProof>,
     pub feeds_metrics: Arc<RwLock<FeedsMetrics>>,
-    pub active_feeds: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
+    pub active_feeds: Arc<RwLock<HashMap<EncodedFeedId, FeedConfig>>>,
     pub sequencer_config: Arc<RwLock<SequencerConfig>>,
     pub feed_aggregate_history: Arc<RwLock<FeedAggregateHistory>>,
     pub feeds_management_cmd_to_block_creator_send: UnboundedSender<FeedsManagementCmds>,

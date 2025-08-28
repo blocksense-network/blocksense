@@ -4,7 +4,7 @@ use blocksense_registry::config::{
 use blocksense_utils::constants::{
     FEEDS_CONFIG_DIR, FEEDS_CONFIG_FILE, SEQUENCER_CONFIG_DIR, SEQUENCER_CONFIG_FILE,
 };
-use blocksense_utils::{get_config_file_path, read_file, FeedId};
+use blocksense_utils::{get_config_file_path, read_file, EncodedFeedId, FeedId};
 use hex::decode;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
@@ -154,7 +154,7 @@ impl Validated for ReporterConfig {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct PublishCriteria {
-    pub feed_id: FeedId,
+    pub encoded_feed_id: EncodedFeedId,
     #[serde(default)]
     pub skip_publish_if_less_then_percentage: f64,
 

@@ -18,7 +18,7 @@ use blocksense_gnosis_safe::{
     data_types::ConsensusSecondRoundBatch,
     utils::{create_safe_tx, generate_transaction_hash},
 };
-use blocksense_utils::FeedId;
+use blocksense_utils::{EncodedFeedId, FeedId};
 use itertools::Itertools;
 use ringbuf::traits::consumer::Consumer;
 use std::collections::HashMap;
@@ -79,10 +79,10 @@ pub async fn consume_reports(
     is_oneshot: bool,
     aggregator: FeedAggregate,
     history: Option<Arc<RwLock<FeedAggregateHistory>>>,
-    feed_id: FeedId,
+    encoded_feed_id: EncodedFeedId,
     caller_context: &str,
 ) -> ConsumedReports {
-    let values = collect_reported_values(feed_type, feed_id, reports, slot);
+    let values = collect_reported_values(feed_type, encoded_feed_id, reports, slot);
 
     if values.is_empty() {
         info!("No reports found for feed: {} slot: {}!", name, &slot);
@@ -106,7 +106,7 @@ pub async fn consume_reports(
 
         // Dispatch to concrete FeedAggregate implementation.
         let result_post_to_contract = VotedFeedUpdate {
-            feed_id,
+            encoded_feed_id,
             value: aggregator.aggregate(&values[..]), // Perform the concrete aggregation
             end_slot_timestamp,
         };
@@ -123,7 +123,7 @@ pub async fn consume_reports(
             if let Some(history) = history {
                 if let FeedType::Numerical(candidate_value) = result_post_to_contract.value {
                     let ad_score =
-                        perform_anomaly_detection(feed_id, history.clone(), candidate_value).await;
+                        perform_anomaly_detection(encoded_feed_id, history.clone(), candidate_value).await;
                     match ad_score {
                         Ok(ad_score) => {
                             info!(
@@ -138,20 +138,20 @@ pub async fn consume_reports(
                     }
                     {
                         let criteria = PublishCriteria {
-                            feed_id,
+                            encoded_feed_id,
                             skip_publish_if_less_then_percentage,
                             always_publish_heartbeat_ms,
                             peg_to_value: None,
                             peg_tolerance_percentage: 0.0f64,
                         };
-                        debug!("Get a read lock on history [feed {feed_id}]");
+                        debug!("Get a read lock on history [feed {encoded_feed_id}]");
                         let history_guard = history.read().await;
                         let skip_decision = result_post_to_contract.should_skip(
                             &criteria,
                             &history_guard,
                             caller_context,
                         );
-                        debug!("Release the read lock on history [feed {feed_id}]");
+                        debug!("Release the read lock on history [feed {encoded_feed_id}]");
                         skip_decision
                     }
                 } else {
@@ -173,14 +173,14 @@ pub async fn consume_reports(
             }),
             end_slot_timestamp,
         };
-        info!("[feed {feed_id}] result_post_to_contract = {:?}", res);
+        info!("[feed {encoded_feed_id}] result_post_to_contract = {:?}", res);
         res
     }
 }
 
 pub fn collect_reported_values(
     expected_feed_type: &FeedType,
-    feed_id: FeedId,
+    encoded_feed_id: EncodedFeedId,
     reports: &HashMap<u64, DataFeedPayload>,
     slot: u64,
 ) -> Vec<FeedType> {
@@ -191,13 +191,13 @@ pub fn collect_reported_values(
                 if value.same_enum_type_as(expected_feed_type) {
                     values.push(value.clone());
                 } else {
-                    warn!("Wrong value type reported by reporter {} for feed id {} slot {}! {} expected", kv.0, feed_id, slot, expected_feed_type.enum_type_to_string());
+                    warn!("Wrong value type reported by reporter {} for feed id {} slot {}! {} expected", kv.0, encoded_feed_id, slot, expected_feed_type.enum_type_to_string());
                 }
             }
             Err(_) => {
                 warn!(
                     "Got error from reporter {} for feed id {} slot {}",
-                    kv.0, feed_id, slot
+                    kv.0, encoded_feed_id, slot
                 );
             }
         }
@@ -206,18 +206,18 @@ pub fn collect_reported_values(
 }
 
 pub async fn perform_anomaly_detection(
-    feed_id: FeedId,
+    encoded_feed_id: EncodedFeedId,
     history: Arc<RwLock<FeedAggregateHistory>>,
     candidate_value: f64,
 ) -> Result<f64, anyhow::Error> {
     let anomaly_detection_future = async move {
-        debug!("Get a read lock on history [feed {feed_id}]");
+        debug!("Get a read lock on history [feed {encoded_feed_id}]");
         let history_lock = history.read().await;
 
         // The first slice is from the current read position to the end of the array
         // The second slice represents the segment from the start of the array up to the current write position if the buffer has wrapped around
         let heap = history_lock
-            .get(feed_id)
+            .get(encoded_feed_id)
             .context("Missing key from History!")?;
         let (first, last) = heap.as_slices();
         let history_vec: Vec<&FeedType> =
@@ -238,13 +238,13 @@ pub async fn perform_anomaly_detection(
             .collect();
 
         drop(history_lock);
-        debug!("Release the read lock on history [feed {feed_id}]");
+        debug!("Release the read lock on history [feed {encoded_feed_id}]");
 
         numerical_vec.push(candidate_value);
 
         // Get AD prediction only if enough data is present
         if numerical_vec.len() > AD_MIN_DATA_POINTS_THRESHOLD {
-            debug!("Starting anomaly detection for [feed {feed_id}]");
+            debug!("Starting anomaly detection for [feed {encoded_feed_id}]");
             anomaly_detector_aggregate(numerical_vec).map_err(|e| anyhow!("{e}"))
         } else {
             Err(anyhow!(
@@ -266,34 +266,34 @@ pub async fn perform_anomaly_detection(
 fn check_aggregated_votes_deviation(
     updates: &[VotedFeedUpdate],
     block_height: u64,
-    last_votes: &HashMap<FeedId, VotedFeedUpdate>,
-    tolerated_deviations: &HashMap<FeedId, f64>,
+    last_votes: &HashMap<EncodedFeedId, VotedFeedUpdate>,
+    tolerated_deviations: &HashMap<EncodedFeedId, f64>,
 ) -> Result<()> {
     let mut errors = Vec::new();
 
     for update in updates {
-        let feed_id = update.feed_id;
-        let Some(reporter_vote) = last_votes.get(&feed_id) else {
-            anyhow::bail!("Failed to get latest vote for feed_id: {}", feed_id);
+        let encoded_feed_id = update.encoded_feed_id;
+        let Some(reporter_vote) = last_votes.get(&encoded_feed_id) else {
+            anyhow::bail!("Failed to get latest vote for feed: {}", encoded_feed_id);
         };
 
         let update_aggregate_value = match update.value {
             FeedType::Numerical(v) => v,
             _ => anyhow::bail!(
-                "Non numeric value in update_aggregate_value for feed_id: {}",
-                feed_id
+                "Non numeric value in update_aggregate_value for feed: {}",
+                encoded_feed_id
             ),
         };
 
         let reporter_voted_value = match reporter_vote.value {
             FeedType::Numerical(v) => v,
             _ => anyhow::bail!(
-                "Non numeric value in reporter_vote for feed_id: {}",
-                feed_id
+                "Non numeric value in reporter_vote for feed: {}",
+                encoded_feed_id
             ),
         };
 
-        let tolerated_diff_percent = tolerated_deviations.get(&feed_id).unwrap_or(&0.5);
+        let tolerated_diff_percent = tolerated_deviations.get(&encoded_feed_id).unwrap_or(&0.5);
         let tolerated_difference = (tolerated_diff_percent / 100.0) * reporter_voted_value;
 
         let lower_bound = reporter_voted_value - tolerated_difference;
@@ -303,9 +303,9 @@ fn check_aggregated_votes_deviation(
         let deviated_by_percent = (difference / reporter_voted_value) * 100.0;
 
         if update_aggregate_value < lower_bound || update_aggregate_value > upper_bound {
-            errors.push(format!("Final answer for feed={feed_id}, block height = {block_height}, deviates by more than {tolerated_diff_percent}% ({deviated_by_percent}%). Reported value is {reporter_voted_value}. Sequencer reported {update_aggregate_value}"));
+            errors.push(format!("Final answer for feed={encoded_feed_id}, block height = {block_height}, deviates by more than {tolerated_diff_percent}% ({deviated_by_percent}%). Reported value is {reporter_voted_value}. Sequencer reported {update_aggregate_value}"));
         }
-        debug!("Final answer for feed={feed_id}, block height = {block_height}, deviates by {deviated_by_percent}%");
+        debug!("Final answer for feed={encoded_feed_id}, block height = {block_height}, deviates by {deviated_by_percent}%");
     }
 
     if !errors.is_empty() {
@@ -318,8 +318,8 @@ fn check_aggregated_votes_deviation(
 pub async fn validate(
     feeds_config: HashMap<FeedId, FeedStrideAndDecimals>,
     mut batch: ConsensusSecondRoundBatch,
-    last_votes: HashMap<FeedId, VotedFeedUpdate>,
-    tolerated_deviations: HashMap<FeedId, f64>,
+    last_votes: HashMap<EncodedFeedId, VotedFeedUpdate>,
+    tolerated_deviations: HashMap<EncodedFeedId, f64>,
 ) -> Result<()> {
     check_aggregated_votes_deviation(
         &batch.updates,
