@@ -5,11 +5,91 @@ pub mod logging;
 pub mod test_env;
 pub mod time;
 
-pub type FeedId = u128;
+use ssz_rs::prelude::*;
+use ssz_rs::DeserializeError;   
 
+pub type FeedId = u128;
+pub type Stride = u8;
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, serde::Serialize, serde::Deserialize, SimpleSerialize, Default)]
+pub struct EncodedFeedId {
+    /// Packed layout: [ stride:8 | feed_id:120 ]
+    pub data: u128
+}
+
+impl EncodedFeedId {
+    pub const FEED_BITS: u32 = 120;
+    pub const STRIDE_BITS: u32 = 8;
+    pub const FEED_MASK: u128 = (1u128 << Self::FEED_BITS) - 1;
+
+    #[inline]
+    pub fn new(feed_id: FeedId, stride: Stride) -> Self {
+        assert!(
+            (feed_id & !Self::FEED_MASK) == 0,
+            "feed_id must fit in 120 bits (15 bytes)"
+        );
+        Self { data: Self::encode(stride, feed_id) }
+    }
+
+    #[inline]
+    pub fn try_new(feed_id: FeedId, stride: Stride) -> Option<Self> {
+        ((feed_id & !Self::FEED_MASK) == 0)
+            .then(|| Self { data: Self::encode(stride, feed_id) })
+    }
+
+    /// Pack (stride, feed_id) into a single u128.
+    /// Layout: [ stride:8 | feed_id:120 ]
+    #[inline]
+    pub fn encode(stride: Stride, feed_id: FeedId) -> u128 {
+        let hi = (stride as u128) << Self::FEED_BITS;
+        hi | (feed_id & Self::FEED_MASK)
+    }
+
+    /// Unpack from self.
+    #[inline]
+    pub fn decode(&self) -> (Stride, FeedId) {
+        let stride = self.get_stride();
+        let feed_id = self.get_id();
+        (stride, feed_id)
+    }
+
+    #[inline]
+    pub fn get_id(&self) -> FeedId {
+        self.data & Self::FEED_MASK
+    }
+
+    #[inline]
+    pub fn get_stride(&self) -> Stride {
+        (self.data >> Self::FEED_BITS) as u8
+    }
+}
+
+/// Pretty-print as "stride:feed_id"
+impl fmt::Display for EncodedFeedId {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}:{}", self.get_stride(), self.get_id())
+    }
+}
+
+/// Parse from "stride:feed_id"
+impl FromStr for EncodedFeedId {
+    type Err = ParseIntError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut parts = s.split(':');
+        let stride_str = parts.next().unwrap_or("");
+        let feed_str = parts.next().unwrap_or("");
+        // You can add extra validation: exactly 2 parts, etc.
+        let stride: u8 = stride_str.parse()?;
+        let feed_id: u128 = feed_str.parse()?;
+        Ok(EncodedFeedId::new(feed_id, stride))
+    }
+}
+
+use std::num::ParseIntError;
 use std::{
     env,
-    fmt::{Debug, Display},
+    fmt::{self, Debug, Display},
     fs::File,
     hash::{DefaultHasher, Hash, Hasher},
     io::{Read, Write},

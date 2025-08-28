@@ -59,7 +59,7 @@ use blocksense_metrics::{
     },
     TextEncoder,
 };
-use blocksense_utils::{time::current_unix_time, FeedId};
+use blocksense_utils::{time::current_unix_time, EncodedFeedId, FeedId};
 
 use blocksense_gnosis_safe::{
     data_types::{ConsensusSecondRoundBatch, ReporterResponse},
@@ -76,7 +76,7 @@ use blocksense::oracle::oracle_types as oracle;
 
 pub(crate) type RuntimeData = HttpRuntimeData;
 pub(crate) type _Store = spin_core::Store<RuntimeData>;
-type DataFeedResults = Arc<RwLock<HashMap<FeedId, VotedFeedUpdate>>>;
+type DataFeedResults = Arc<RwLock<HashMap<EncodedFeedId, VotedFeedUpdate>>>;
 
 #[derive(Debug, Deserialize)]
 pub struct Params {
@@ -310,7 +310,7 @@ impl TriggerExecutor for OracleTrigger {
         tracing::info!("Sequencer URL provided: {}", &self.sequencer);
         let (data_feed_sender, data_feed_receiver) = unbounded_channel();
         let data_feed_results: DataFeedResults = Arc::new(RwLock::new(HashMap::new()));
-        let mut feeds_config: HashMap<FeedId, FeedStrideAndDecimals> = HashMap::new();
+        let mut feeds_config: HashMap<EncodedFeedId, FeedStrideAndDecimals> = HashMap::new();
         //TODO(adikov): Move all the logic to a different struct and handle
         //errors properly.
         // For each component, run its own timer loop
@@ -319,7 +319,7 @@ impl TriggerExecutor for OracleTrigger {
         for component in components.values() {
             for df in &component.oracle_settings {
                 feeds_config.insert(
-                    df.id.parse::<FeedId>()?,
+                    EncodedFeedId::new(df.id.parse::<FeedId>()?, df.stride),
                     FeedStrideAndDecimals {
                         stride: df.stride,
                         decimals: df.decimals,
@@ -803,7 +803,7 @@ impl OracleTrigger {
 
     async fn process_aggregated_consensus(
         mut ss_rx: UnboundedReceiver<ConsensusSecondRoundBatch>,
-        feeds_config: HashMap<FeedId, FeedStrideAndDecimals>,
+        feeds_config: HashMap<EncodedFeedId, FeedStrideAndDecimals>,
         latest_votes: DataFeedResults,
         sequencer: Url,
         second_consensus_secret_key: String,
@@ -1083,17 +1083,17 @@ impl OutboundWasiHttpHandler for HttpRuntimeData {
 }
 
 fn update_latest_votes(
-    latest_votes: &mut HashMap<FeedId, VotedFeedUpdate>,
+    latest_votes: &mut HashMap<EncodedFeedId, VotedFeedUpdate>,
     batch: Vec<DataFeedPayload>,
 ) {
     for vote in batch {
-        let feed_id = vote.payload_metadata.feed_id.parse().unwrap();
+        let encoded_feed_id = vote.payload_metadata.feed_id.parse().unwrap();
 
         if let Ok(value) = vote.result {
             _ = latest_votes.insert(
-                feed_id,
+                encoded_feed_id,
                 VotedFeedUpdate {
-                    feed_id,
+                    encoded_feed_id,
                     value,
                     end_slot_timestamp: vote.payload_metadata.timestamp,
                 },
