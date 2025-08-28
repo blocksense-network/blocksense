@@ -17,7 +17,7 @@ use blocksense_feed_registry::feed_registration_cmds::{
 };
 use blocksense_registry::config::{FeedConfig, OracleScript, OraclesResponse};
 use blocksense_utils::logging::tokio_console_active;
-use blocksense_utils::FeedId;
+use blocksense_utils::EncodedFeedId;
 use eyre::eyre;
 use eyre::Result;
 use futures::StreamExt;
@@ -122,14 +122,14 @@ pub async fn get_key(
     let network: String = req.match_info().get("network").ok_or(bad_input)?.parse()?;
     let key: String = req.match_info().query("key").parse()?;
 
-    let feed_id: FeedId = match key.parse() {
+    let encoded_feed_id: EncodedFeedId = match key.parse() {
         Ok(v) => v,
         Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
     };
 
     let (decimals, stride) = {
         let feeds_config = sequencer_state.active_feeds.read().await;
-        if let Some(feed_config) = feeds_config.get(&feed_id) {
+        if let Some(feed_config) = feeds_config.get(&encoded_feed_id) {
             (
                 feed_config.additional_feed_info.decimals,
                 feed_config.stride,
@@ -192,15 +192,15 @@ pub async fn get_feed_report_interval(
     let bad_input = error::ErrorBadRequest("Incorrect input.");
     let feed_id: String = req.match_info().get("feed_id").ok_or(bad_input)?.parse()?;
 
-    let feed_id: FeedId = match feed_id.parse() {
+    let encoded_feed_id: EncodedFeedId = match feed_id.parse() {
         Ok(r) => r,
         Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
     };
 
     let feed = {
         let reg = sequencer_state.registry.read().await;
-        debug!("getting feed_id = {}", &feed_id);
-        match reg.get(feed_id) {
+        debug!("getting encoded_feed_id = {}", &feed_id);
+        match reg.get(&encoded_feed_id) {
             Some(x) => x,
             None => {
                 drop(reg);
@@ -238,14 +238,14 @@ pub async fn get_feed_config(
     let bad_input = error::ErrorBadRequest("Incorrect input.");
     let feed_id: String = req.match_info().get("feed_id").ok_or(bad_input)?.parse()?;
 
-    let feed_id: FeedId = match feed_id.parse() {
+    let encoded_feed_id: EncodedFeedId = match feed_id.parse() {
         Ok(r) => r,
         Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
     };
 
     let active_feeds = sequencer_state.active_feeds.read().await;
     let feed_config = active_feeds
-        .get(&feed_id)
+        .get(&encoded_feed_id)
         .ok_or(error::ErrorNotFound("Data feed with this ID not found"))?;
     let feed_config_pretty = serde_json::to_string_pretty::<FeedConfig>(feed_config)?;
 
@@ -305,8 +305,10 @@ pub async fn register_asset_feed(
         let reg = sequencer_state.registry.read().await;
         let keys = reg.get_keys();
         let new_feed_id = new_feed_config.id;
+        let stride = new_feed_config.stride;
+        let new_encoded_feed_id = EncodedFeedId::new(new_feed_id, stride);
 
-        if keys.contains(&new_feed_id) {
+        if keys.contains(&new_encoded_feed_id) {
             let err_msg = format!(
                 "Can not register this data feed. Feed with ID {new_feed_id} already exists."
             );
@@ -467,15 +469,15 @@ pub async fn delete_asset_feed(
     let bad_input = error::ErrorBadRequest("Incorrect input.");
     let feed_id: String = req.match_info().get("feed_id").ok_or(bad_input)?.parse()?;
 
-    let feed_id: FeedId = match feed_id.parse() {
+    let encoded_feed_id: EncodedFeedId = match feed_id.parse() {
         Ok(r) => r,
         Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
     };
 
     let feed = {
         let reg = sequencer_state.registry.read().await;
-        debug!("getting feed_id = {}", &feed_id);
-        match reg.get(feed_id) {
+        debug!("getting encoded_feed_id = {}", &encoded_feed_id);
+        match reg.get(&encoded_feed_id) {
             Some(x) => x,
             None => {
                 drop(reg);
@@ -487,10 +489,10 @@ pub async fn delete_asset_feed(
     match sequencer_state
         .feeds_management_cmd_to_block_creator_send
         .send(FeedsManagementCmds::DeleteAssetFeed(DeleteAssetFeed {
-            id: feed_id,
+            id: encoded_feed_id,
         })) {
         Ok(_) => {
-            info!("Scheduled deletion for feed_id: {feed_id}",);
+            info!("Scheduled deletion for encoded_feed_id: {encoded_feed_id}",);
         }
         Err(e) => {
             error!(
