@@ -998,6 +998,8 @@ dependencies = [
  "serde",
  "serde-this-or-that",
  "serde_json",
+ "tracing",
+ "tracing-subscriber",
  "url",
  "wit-bindgen",
 ]
