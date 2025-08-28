@@ -39,6 +39,13 @@ export const ConsentManager = () => {
         </section>
         <section className="flex md:gap-2.5 gap-2">
           <button
+            // onClick={handleAccept}
+            onClick={handleAccept}
+            className="bg-[var(--white)] text-[#2B2929] px-6 py-3.5 rounded-full"
+          >
+            Manage Preferences
+          </button>
+          <button
             onClick={handleAccept}
             className="bg-[var(--white)] text-[#2B2929] px-6 py-3.5 rounded-full"
           >
