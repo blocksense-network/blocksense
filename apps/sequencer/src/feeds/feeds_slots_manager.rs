@@ -6,6 +6,7 @@ use blocksense_feed_registry::feed_registration_cmds::{
 };
 use blocksense_feed_registry::types::{FeedMetaData, FeedsSlotProcessorCmds::Terminate};
 use blocksense_registry::config::FeedConfig;
+use blocksense_utils::EncodedFeedId;
 use eyre::Result;
 use futures::select;
 use futures::stream::{FuturesUnordered, StreamExt};
@@ -30,7 +31,7 @@ pub async fn feeds_slots_manager_loop(
             let keys = reg.get_keys();
 
             for key in keys {
-                debug!("key = {} : value = {:?}", key, reg.get(key));
+                debug!("key = {} : value = {:?}", key, reg.get(&key));
 
                 sequencer_state
                     .feed_aggregate_history
@@ -38,7 +39,7 @@ pub async fn feeds_slots_manager_loop(
                     .await
                     .register_feed(key, 10_000); //TODO(snikolov): How to avoid borrow?
 
-                let feed = match reg.get(key) {
+                let feed = match reg.get(&key) {
                     Some(x) => x,
                     None => panic!("Error timer for feed that was not registered."),
                 };
@@ -152,12 +153,14 @@ async fn handle_feeds_slots_manager_cmd(
                 Ok(registered_feed_metadata) => {
                     let new_name = register_new_asset_feed.config.full_name;
                     let new_id = register_new_asset_feed.config.id;
-                    let feed_slots_processor = FeedSlotsProcessor::new(new_name, new_id);
+                    let new_stride = register_new_asset_feed.config.stride;
+                    let encoded_feed_id = EncodedFeedId::new(new_id, new_stride);
+                    let feed_slots_processor = FeedSlotsProcessor::new(new_name, encoded_feed_id);
                     let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
 
                     {
                         let reg = sequencer_state.registry.read().await;
-                        let feed = match reg.get(new_id) {
+                        let feed = match reg.get(&encoded_feed_id) {
                             Some(x) => x,
                             None => panic!("Error feed was not registered."),
                         };
@@ -198,7 +201,7 @@ async fn handle_feeds_slots_manager_cmd(
         FeedsManagementCmds::DeleteAssetFeed(delete_asset_feed) => {
             {
                 let reg = sequencer_state.registry.read().await;
-                let feed = match reg.get(delete_asset_feed.id) {
+                let feed = match reg.get(&delete_asset_feed.id) {
                     Some(x) => x,
                     None => panic!("Error feed was not registered."),
                 };
@@ -264,7 +267,7 @@ pub async fn register_feed_with_config(
 
         let keys = reg.get_keys();
 
-        new_feed_id = new_feed_config.id;
+        new_feed_id = EncodedFeedId::new(new_feed_config.id, new_feed_config.stride);
         new_name = new_feed_config.full_name.clone();
 
         if keys.contains(&new_feed_id) {
@@ -287,14 +290,14 @@ pub async fn register_feed_with_config(
     }
     {
         let mut active_feeds = sequencer_state.active_feeds.write().await;
-        active_feeds.insert(new_feed_config.id, new_feed_config.clone());
+        active_feeds.insert(EncodedFeedId::new(new_feed_config.id, new_feed_config.stride), new_feed_config.clone());
     }
     {
         let registered_feed_metadata = sequencer_state
             .registry
             .read()
             .await
-            .get(new_feed_id)
+            .get(&new_feed_id)
             .unwrap();
 
         // update feeds slots processor

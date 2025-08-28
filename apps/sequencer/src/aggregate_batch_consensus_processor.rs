@@ -15,7 +15,7 @@ use blocksense_gnosis_safe::utils::SafeMultisig;
 use blocksense_gnosis_safe::utils::{signature_to_bytes, SignatureWithAddress};
 use blocksense_metrics::{inc_metric, process_provider_getter};
 use blocksense_utils::time::current_unix_time;
-use blocksense_utils::FeedId;
+use blocksense_utils::EncodedFeedId;
 use futures_util::stream::{FuturesUnordered, StreamExt};
 use paste::paste;
 use std::time::Instant;
@@ -403,7 +403,7 @@ pub async fn aggregation_batch_consensus_loop(
         .expect("Failed to spawn aggregation_batch_consensus_loop!")
 }
 
-async fn failed_tx(net: &str, ids_vec: &Vec<FeedId>, provider: &mut RpcProvider) {
+async fn failed_tx(net: &str, ids_vec: &Vec<EncodedFeedId>, provider: &mut RpcProvider) {
     decrement_feed_rb_indices(ids_vec, net, provider).await;
     provider.dec_num_tx_in_progress();
 }

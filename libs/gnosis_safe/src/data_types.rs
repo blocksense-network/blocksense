@@ -1,5 +1,5 @@
 use blocksense_data_feeds::feeds_processing::VotedFeedUpdate;
-use blocksense_utils::FeedId;
+use blocksense_utils::EncodedFeedId;
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
@@ -16,7 +16,7 @@ pub struct ConsensusSecondRoundBatch {
     pub tx_hash: String,
     pub calldata: String, // TODO: send all data needed to validate and recreate calldata.
     pub updates: Vec<VotedFeedUpdate>,
-    pub feeds_rb_indices: HashMap<FeedId, u64>,
+    pub feeds_rb_indices: HashMap<EncodedFeedId, u64>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
