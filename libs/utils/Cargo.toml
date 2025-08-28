@@ -16,6 +16,8 @@ once_cell = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true, features = ["async-await", "log"] }
 tracing-subscriber = { workspace = true, features = ["json"] }
+serde = { workspace = true }
+ssz_rs = { workspace = true }
 
 [build-dependencies]
 # All features enabled
