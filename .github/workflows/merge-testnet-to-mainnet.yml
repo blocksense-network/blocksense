@@ -2,6 +2,9 @@ name: 'Merge Testnet to Mainnet'
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   promote_to_mainnet:
     name: Merge Testnet into Mainnet
