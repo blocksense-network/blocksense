@@ -7,6 +7,7 @@ use std::{collections::HashMap, fmt::Write};
 use anyhow::{Context, Error, Result};
 use itertools::Itertools;
 use prettytable::{format, Cell, Row, Table};
+use tracing::{info, warn};
 
 use blocksense_data_providers_sdk::price_data::types::{PairsToResults, ProvidersSymbols};
 use blocksense_data_providers_sdk::price_data::wap::vwap::compute_vwap;
@@ -24,18 +25,21 @@ use crate::utils::markets_are_closed;
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
+    tracing_subscriber::fmt::init();
+
     let now_et = Utc::now().with_timezone(&Eastern);
     if markets_are_closed(now_et) {
-        println!("❌ Markets are closed. Prices can't be fetched.");
+        warn!("❌ Markets are closed. Prices can't be fetched.");
         return Err(Error::msg("Markets are closed. Prices can't be fetched."));
     }
 
-    println!("Starting oracle component - Stock Price Feeds");
+    info!("Starting oracle component - Stock Price Feeds");
 
     let capabilities = get_capabilities_from_settings(&settings);
     let resources = get_resources_from_settings(&settings)?;
+    let timeout_secs = settings.interval_time_in_seconds - 1;
 
-    let results = get_prices(&resources, &capabilities).await?;
+    let results = get_prices(&resources, &capabilities, timeout_secs).await?;
     let payload = process_results(&results)?;
 
     print_results(&resources.pairs, &results, &payload);
@@ -193,12 +197,12 @@ fn print_results(resources: &[ResourcePairData], results: &PairsToResults, paylo
         ]));
     }
 
-    println!("\n{pairs_with_missing_provider_data_count} Pairs with no provider data:");
-    println!("[{pairs_with_missing_provider_data}]");
+    warn!("\n{pairs_with_missing_provider_data_count} Pairs with no provider data:");
+    warn!("[{pairs_with_missing_provider_data}]");
 
-    println!("\n{missing_prices_count} Pairs with missing price / volume data from provider:");
-    println!("[{missing_prices}]");
+    warn!("\n{missing_prices_count} Pairs with missing price / volume data from provider:");
+    warn!("[{missing_prices}]");
 
-    println!("\nResults:");
+    info!("\nResults:");
     table.printstd();
 }

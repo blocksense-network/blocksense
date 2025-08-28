@@ -7,7 +7,7 @@ import {
   OperationType,
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
-import { readEvmDeployment } from '@blocksense/config-types';
+import { readEvmDeployment } from '@blocksense/config-types/read-write-config';
 import { initChain } from './deployment-utils/init-chain';
 import { solidityPacked, toBeArray } from 'ethers';
 import { adjustVInSignature } from './utils';

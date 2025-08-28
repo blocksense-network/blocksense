@@ -10,6 +10,7 @@ use anyhow::{Context, Result};
 use itertools::Itertools;
 use prettytable::{format, Cell, Row, Table};
 use serde::{Deserialize, Serialize};
+use tracing::{info, warn};
 
 use blocksense_data_providers_sdk::price_data::types::{
     PairsToResults, PricePair, ProviderName, ProvidersSymbols,
@@ -41,11 +42,14 @@ struct Data {
 
 #[oracle_component]
 async fn oracle_request(settings: Settings) -> Result<Payload> {
-    println!("Starting oracle component");
+    tracing_subscriber::fmt::init();
 
+    info!("Starting oracle component");
+
+    let timeout_secs = settings.interval_time_in_seconds - 1;
     let resources = get_resources_from_settings(&settings)?;
 
-    let results = get_prices(&resources).await?;
+    let results = get_prices(&resources, timeout_secs).await?;
     let payload = process_results(&results)?;
 
     print_results(&resources.pairs, &results, &payload);
@@ -193,12 +197,12 @@ fn print_results(resources: &[ResourcePairData], results: &PairsToResults, paylo
         ]));
     }
 
-    println!("\n{pairs_with_missing_exchange_data_count} Pairs with no exchange data:");
-    println!("[{pairs_with_missing_exchange_data}]");
+    warn!("\n{pairs_with_missing_exchange_data_count} Pairs with no exchange data:");
+    warn!("[{pairs_with_missing_exchange_data}]");
 
-    println!("\n{missing_prices_count} Pairs with missing price / volume data from exchange:");
-    println!("[{missing_prices}]");
+    warn!("\n{missing_prices_count} Pairs with missing price / volume data from exchange:");
+    warn!("[{missing_prices}]");
 
-    println!("\nResults:");
+    info!("\nResults:");
     table.printstd();
 }

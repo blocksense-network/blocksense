@@ -1,7 +1,6 @@
 {
   pkgs,
   self',
-  inputs',
   ...
 }:
 {
@@ -16,7 +15,6 @@
 
   packages = self'.packages.blocksense-rs.buildInputs ++ [
     self'.legacyPackages.cargoWrapped
-    inputs'.nixpkgs-unstable.legacyPackages.fermyon-spin
     self'.legacyPackages.rustToolchain
     pkgs.cargo-tarpaulin
   ];

@@ -32,8 +32,8 @@ impl<'a> PricesFetcher<'a> for TwelveDataPriceFetcher<'a> {
         Self { symbols, api_keys }
     }
 
-    fn fetch(&self) -> LocalBoxFuture<Result<PairPriceData>> {
-        async {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+        async move {
             let api_key = self
                 .api_keys
                 .as_ref()
@@ -46,6 +46,7 @@ impl<'a> PricesFetcher<'a> for TwelveDataPriceFetcher<'a> {
                 "https://api.twelvedata.com/quote",
                 Some(&[("symbol", &all_symbols)]),
                 Some(&[("Authorization", format!("apikey {api_key}").as_str())]),
+                Some(timeout_secs),
             )
             .await?;
 

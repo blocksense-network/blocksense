@@ -7,6 +7,7 @@ import {
   geckoTerminalArgsSchema,
   spoutRwaArgsSchema,
   stockPriceFeedsArgsSchema,
+  hyperBorrowRatesArgsSchema,
 } from './oracles';
 /**
  * Schema for the data feed category ( Chainlink compatible ).
@@ -24,6 +25,7 @@ export const FeedCategorySchema = S.Union(
   S.Literal('Economic index'),
   S.Literal('US Treasuries'),
   S.Literal('Tokenized Asset'),
+  S.Literal('Rates'),
 ).annotations({ identifier: 'FeedCategory' });
 
 /**
@@ -203,6 +205,7 @@ export const NewFeedSchema = S.mutable(
           ethRpcArgsSchema,
           spoutRwaArgsSchema,
           exSatHoldingsArgsSchema,
+          hyperBorrowRatesArgsSchema,
         ).annotations({ identifier: 'OracleScriptArguments' }),
 
         compatibility_info: S.UndefinedOr(

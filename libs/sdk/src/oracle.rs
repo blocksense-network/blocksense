@@ -15,13 +15,19 @@ pub struct Capability {
 pub struct Settings {
     pub data_feeds: Vec<DataFeedSetting>,
     pub capabilities: Vec<Capability>,
+    pub interval_time_in_seconds: u64,
 }
 
 impl Settings {
-    pub fn new(data_feeds: Vec<DataFeedSetting>, capabilities: Vec<Capability>) -> Self {
+    pub fn new(
+        data_feeds: Vec<DataFeedSetting>,
+        capabilities: Vec<Capability>,
+        interval_time_in_seconds: u64,
+    ) -> Self {
         Self {
             data_feeds,
             capabilities,
+            interval_time_in_seconds,
         }
     }
 }

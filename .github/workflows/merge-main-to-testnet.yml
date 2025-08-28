@@ -1,0 +1,14 @@
+name: 'Merge Main to Testnet'
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  promote_to_testnet:
+    name: Merge Main into Testnet
+    uses: blocksense-network/nixos-modules/.github/workflows/reusable-merge.yml@main
+    with:
+      source_branch: 'main'
+      target_branch: 'testnet'

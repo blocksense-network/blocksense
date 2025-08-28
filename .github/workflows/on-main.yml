@@ -45,6 +45,9 @@ jobs:
         run: yarn install
 
       - name: Build
+        env:
+          NEXT_PUBLIC_VERIFICATION_API_KEY: ${{ secrets.NEXT_PUBLIC_VERIFICATION_API_KEY }}
+          NEXT_PUBLIC_VERIFICATION_API_URL: ${{ secrets.NEXT_PUBLIC_VERIFICATION_API_URL }}
         id: build
         run: ${{ matrix.build_command }}
 

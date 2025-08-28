@@ -78,6 +78,19 @@ pub(crate) type RuntimeData = HttpRuntimeData;
 pub(crate) type _Store = spin_core::Store<RuntimeData>;
 type DataFeedResults = Arc<RwLock<HashMap<FeedId, VotedFeedUpdate>>>;
 
+#[derive(Debug, Deserialize)]
+pub struct Params {
+    pub seconds: u64,
+    pub endpoint_url: String,
+    #[serde(default = "default_getter")]
+    pub request_method: String,
+    pub request_body: Option<String>,
+}
+
+fn default_getter() -> String {
+    "GET".to_owned()
+}
+
 const TIME_BEFORE_KAFKA_READ_RETRY_IN_MS: u64 = 500;
 const TOTAL_RETRIES_FOR_KAFKA_READ: u64 = 10;
 
@@ -920,6 +933,7 @@ impl OracleTrigger {
                     data: capability.data,
                 })
                 .collect(),
+            interval_time_in_seconds: component.interval_time_in_seconds,
         };
 
         let start_time = Instant::now();
@@ -968,44 +982,78 @@ pub struct HttpRuntimeData {
 impl OutboundWasiHttpHandler for HttpRuntimeData {
     fn send_request(
         data: &mut spin_core::Data<Self>,
-        request: Request<HyperOutgoingBody>,
+        mut request: Request<HyperOutgoingBody>,
         config: wasmtime_wasi_http::types::OutgoingRequestConfig,
     ) -> HttpResult<wasmtime_wasi_http::types::HostFutureIncomingResponse> {
         let this = data.as_mut();
 
-        let uri = request.uri();
-        let uri_string = uri.to_string();
-        let unallowed = !this.allowed_hosts.allows(
-            &OutboundUrl::parse(uri_string, "https")
-                .map_err(|_| ErrorCode::HttpRequestUriInvalid)?,
-        );
-        if unallowed {
-            tracing::error!("Destination not allowed: {}", request.uri());
-            let host = if unallowed {
-                // Safe to unwrap because absolute urls have a host by definition.
-                let host = uri.authority().map(|a| a.host()).unwrap();
-                let port = uri.authority().map(|a| a.port()).unwrap();
-                let port = match port {
-                    Some(port_str) => port_str.to_string(),
-                    None => uri
-                        .scheme()
-                        .and_then(|s| (s == &Scheme::HTTP).then_some(80))
-                        .unwrap_or(443)
-                        .to_string(),
-                };
-                terminal::warn!(
-                    "A component tried to make a HTTP request to non-allowed host '{host}'."
-                );
-                let scheme = uri.scheme().unwrap_or(&Scheme::HTTPS);
-                format!("{scheme}://{host}:{port}")
-            } else {
-                terminal::warn!("A component tried to make a HTTP request to the same component but it does not have permission.");
-                "self".into()
-            };
-            eprintln!("To allow requests, add 'allowed_outbound_hosts = [\"{host}\"]' to the manifest component section.");
-            return Err(ErrorCode::HttpRequestDenied.into());
-        }
+        let uri_to_check = request.uri();
 
+        if (uri_to_check.authority().map(|a| a.as_str()) == Some("localhost:3000")
+            || uri_to_check.authority().map(|a| a.as_str()) == Some("127.0.0.1:3000"))
+            && uri_to_check.scheme_str() == Some("http")
+        {
+            if let AllowedHostsConfig::SpecificHosts(allowed_hosts_config) = &this.allowed_hosts {
+                let allowed_hosts = match allowed_hosts_config
+                    .iter()
+                    .map(|hc| match hc.host() {
+                        spin_outbound_networking::HostConfig::List(items) => Ok(items.join("|")),
+                        cfg => Err(cfg),
+                    })
+                    .collect::<Result<Vec<_>, _>>()
+                {
+                    Ok(hosts) => hosts,
+                    Err(cfg) => {
+                        eprintln!("Error collecting allowed hosts from config {cfg:?}!");
+                        return Err(ErrorCode::HttpRequestDenied.into());
+                    }
+                };
+
+                let header_value_result =
+                    http::header::HeaderValue::from_str(allowed_hosts.join("|").as_str());
+                match header_value_result {
+                    Ok(value) => {
+                        request.headers_mut().insert("Allowed-Hosts", value);
+                    }
+                    Err(e) => {
+                        eprintln!("Error creating header containing the allowed hosts: {e}!");
+                        return Err(ErrorCode::HttpRequestDenied.into());
+                    }
+                };
+            }
+        } else {
+            let uri_string = uri_to_check.to_string();
+            let unallowed = !this.allowed_hosts.allows(
+                &OutboundUrl::parse(uri_string, "https")
+                    .map_err(|_| ErrorCode::HttpRequestUriInvalid)?,
+            );
+            if unallowed {
+                tracing::error!("Destination not allowed: {}", request.uri());
+                let host = if unallowed {
+                    // Safe to unwrap because absolute urls have a host by definition.
+                    let host = uri_to_check.authority().map(|a| a.host()).unwrap();
+                    let port = uri_to_check.authority().map(|a| a.port()).unwrap();
+                    let port = match port {
+                        Some(port_str) => port_str.to_string(),
+                        None => uri_to_check
+                            .scheme()
+                            .and_then(|s| (s == &Scheme::HTTP).then_some(80))
+                            .unwrap_or(443)
+                            .to_string(),
+                    };
+                    terminal::warn!(
+                        "A component tried to make a HTTP request to non-allowed host '{host}'."
+                    );
+                    let scheme = uri_to_check.scheme().unwrap_or(&Scheme::HTTPS);
+                    format!("{scheme}://{host}:{port}")
+                } else {
+                    terminal::warn!("A component tried to make a HTTP request to the same component but it does not have permission.");
+                    "self".into()
+                };
+                eprintln!("To allow requests, add 'allowed_outbound_hosts = [\"{host}\"]' to the manifest component section.");
+                return Err(ErrorCode::HttpRequestDenied.into());
+            }
+        }
         let current_span = tracing::Span::current();
         let uri = request.uri();
         if let Some(authority) = uri.authority() {

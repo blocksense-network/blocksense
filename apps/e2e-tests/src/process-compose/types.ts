@@ -1,7 +1,10 @@
 import type { ParseResult } from 'effect';
 import { Context, Data, Effect, Layer, Schema as S } from 'effect';
 
-import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
+import {
+  fetchAndDecodeJSON,
+  fetchAndDecodeJSONEffect,
+} from '@blocksense/base-utils/http';
 import {
   startEnvironment,
   stopEnvironment,
@@ -15,10 +18,18 @@ import type { HttpClientError } from '@effect/platform/HttpClientError';
 import { ParseMetricsError, getMetrics } from '../utils/metrics';
 import { FetchHttpClient } from '@effect/platform';
 
+export class ProcessComposeFailedToStartError extends Data.TaggedError(
+  '@e2e-tests/ProcessComposeFailedToStartError',
+)<{
+  cause: unknown;
+}> {}
+
 export class ProcessCompose extends Context.Tag('@e2e-tests/ProcessCompose')<
   ProcessCompose,
   {
-    readonly start: (name: string) => Effect.Effect<void, Error, never>;
+    readonly start: (
+      name: string,
+    ) => Effect.Effect<void, ProcessComposeFailedToStartError, never>;
     readonly stop: () => Effect.Effect<void, Error, never>;
     readonly parseStatus: () => Effect.Effect<
       Record<string, { status: string; exit_code: number }>,
@@ -33,7 +44,7 @@ export class ProcessCompose extends Context.Tag('@e2e-tests/ProcessCompose')<
       start: (env: string = 'example-setup-03') =>
         Effect.tryPromise({
           try: () => startEnvironment(env),
-          catch: error => new Error(`Failed to start environment: ${error}`),
+          catch: cause => new ProcessComposeFailedToStartError({ cause }),
         }),
       stop: () =>
         Effect.tryPromise({
@@ -64,6 +75,11 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
       UpdatesToNetwork,
       ParseMetricsError | HttpClientError | ParseResult.ParseError
     >;
+    readonly fetchHistory: () => Effect.Effect<
+      FeedAggregateHistory,
+      Error,
+      never
+    >;
   }
 >() {
   static Live = Layer.effect(
@@ -76,6 +92,9 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
         'http://127.0.0.1:5553/get_feeds_config',
       );
       const metricsUrl = yield* Effect.succeed('http://127.0.0.1:5551/metrics');
+      const historyUrl = yield* Effect.succeed(
+        'http://127.0.0.1:5553/get_history',
+      );
 
       return Sequencer.of({
         configUrl,
@@ -127,6 +146,15 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
             }, {} as UpdatesToNetwork);
           });
         },
+        fetchHistory: () => {
+          return Effect.gen(function* () {
+            const history = yield* fetchAndDecodeJSONEffect(
+              FeedAggregateHistorySchema,
+              historyUrl,
+            ).pipe(Effect.provide(FetchHttpClient.layer));
+            return history;
+          });
+        },
       });
     }),
   );
@@ -160,3 +188,22 @@ export const UpdatesToNetworkMetric = S.Struct({
 });
 
 export type UpdatesToNetwork = Record<string, Record<string, number>>;
+
+const Numerical = S.Struct({
+  Numerical: S.Number,
+});
+
+export const FeedAggregateHistorySchema = S.Struct({
+  aggregate_history: S.Record({
+    key: S.String,
+    value: S.Array(
+      S.Struct({
+        value: Numerical,
+        update_number: S.Number,
+        end_slot_timestamp: S.Number,
+      }),
+    ),
+  }),
+});
+
+export type FeedAggregateHistory = typeof FeedAggregateHistorySchema.Type;
