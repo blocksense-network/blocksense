@@ -285,7 +285,7 @@ mod tests {
     fn voted_feed_update_encode() {
         let end_slot_timestamp = 1_735_902_088_000_u128; // 3 Jan 2025 time of refactoring this test
         let update = VotedFeedUpdate {
-            feed_id: 42 as FeedId,
+            encoded_feed_id: EncodedFeedId::new(42, 0),
             value: FeedType::Numerical(142.0),
             end_slot_timestamp,
         };
@@ -301,14 +301,14 @@ mod tests {
     fn voted_feed_update_new_decode() {
         let end_slot_timestamp = 1_735_902_088_000_u128; // 3 Jan 2025 time of refactoring this test
                                                          // Send test votes
-        let k1 = "ab000000000000000000000000000001";
+        let k1 = "00ab0000000000000000000000000001";
         let v1 = "000000000000000000000000000010f0da2079987e1000000000000000000000";
         let vote_1 =
-            VotedFeedUpdate::new_decode(k1, v1, end_slot_timestamp, FeedType::Numerical(0.0), 18)
+            VotedFeedUpdate::new_decode(k1, 0, v1, end_slot_timestamp, FeedType::Numerical(0.0), 18)
                 .unwrap();
         assert_eq!(
-            vote_1.feed_id,
-            227297987279220614266551007307938922497 as FeedId
+            vote_1.encoded_feed_id.get_id(),
+            887882762809455524478714872296636417 as FeedId
         );
         assert_eq!(vote_1.value, FeedType::Numerical(80000.8f64));
     }
@@ -317,15 +317,16 @@ mod tests {
     fn voted_feed_update_should_skip() {
         let end_slot_timestamp = 1_735_902_088_000_u128; // 3 Jan 2025 time of refactoring this test
         let feed_id = 55;
+        let encoded_feed_id = EncodedFeedId::new(feed_id, 0);
         let update = VotedFeedUpdate {
-            feed_id,
+            encoded_feed_id: EncodedFeedId::new(feed_id, 0),
             value: FeedType::Numerical(1000.0),
             end_slot_timestamp,
         };
         let mut history = FeedAggregateHistory::new();
-        history.register_feed(feed_id, 100);
+        history.register_feed(EncodedFeedId::new(feed_id, 0), 100);
         let always_publish_criteria = PublishCriteria {
-            feed_id,
+            encoded_feed_id: EncodedFeedId::new(feed_id, 0),
             skip_publish_if_less_then_percentage: 0.0f64,
             always_publish_heartbeat_ms: None,
             peg_to_value: None,
@@ -333,7 +334,7 @@ mod tests {
         };
 
         let one_percent_threshold = PublishCriteria {
-            feed_id,
+            encoded_feed_id: EncodedFeedId::new(feed_id, 0),
             skip_publish_if_less_then_percentage: 1.0f64,
             always_publish_heartbeat_ms: None,
             peg_to_value: None,
@@ -341,7 +342,7 @@ mod tests {
         };
 
         let always_publish_every_second = PublishCriteria {
-            feed_id,
+            encoded_feed_id: EncodedFeedId::new(feed_id, 0),
             skip_publish_if_less_then_percentage: 1000.0f64,
             always_publish_heartbeat_ms: Some(1000_u128),
             peg_to_value: None,
@@ -355,7 +356,7 @@ mod tests {
         );
 
         history.push_next(
-            feed_id,
+            encoded_feed_id,
             FeedType::Numerical(1000.0f64),
             end_slot_timestamp - 1000_u128,
         );
@@ -373,7 +374,7 @@ mod tests {
         );
 
         history.push_next(
-            feed_id,
+            encoded_feed_id,
             FeedType::Numerical(1000.0f64),
             end_slot_timestamp - 900_u128,
         );
@@ -391,7 +392,7 @@ mod tests {
         );
 
         let update = VotedFeedUpdate {
-            feed_id,
+            encoded_feed_id,
             value: FeedType::Numerical(1010.0),
             end_slot_timestamp,
         };
@@ -405,7 +406,7 @@ mod tests {
             SkipDecision::DontSkip(DontSkipReason::ThresholdCrossed)
         );
         let update = VotedFeedUpdate {
-            feed_id,
+            encoded_feed_id,
             value: FeedType::Numerical(1009.999),
             end_slot_timestamp,
         };
@@ -414,7 +415,7 @@ mod tests {
             SkipDecision::DoSkip(DoSkipReason::TooSimilarTooSoon)
         );
         let update = VotedFeedUpdate {
-            feed_id,
+            encoded_feed_id,
             value: FeedType::Numerical(990.001),
             end_slot_timestamp,
         };
@@ -423,7 +424,7 @@ mod tests {
             SkipDecision::DoSkip(DoSkipReason::TooSimilarTooSoon)
         );
         let update = VotedFeedUpdate {
-            feed_id,
+            encoded_feed_id,
             value: FeedType::Numerical(990.000),
             end_slot_timestamp,
         };
@@ -433,7 +434,7 @@ mod tests {
         );
 
         history.push_next(
-            feed_id,
+            encoded_feed_id,
             FeedType::Text("spiderman".to_owned()),
             end_slot_timestamp - 400_u128,
         );
@@ -450,7 +451,7 @@ mod tests {
             .unwrap()
             .as_millis();
         let update = VotedFeedUpdate {
-            feed_id: 42 as FeedId,
+            encoded_feed_id: EncodedFeedId::new(42, 0),
             value: FeedType::Numerical(142.0),
             end_slot_timestamp,
         };
@@ -462,14 +463,14 @@ mod tests {
         );
 
         // Send test votes
-        let k1 = "ab000000000000000000000000000001";
+        let k1 = "00ab0000000000000000000000000001";
         let v1 = "000000000000000000000000000010f0da2079987e1000000000000000000000";
         let vote_1 =
-            VotedFeedUpdate::new_decode(k1, v1, end_slot_timestamp, FeedType::Numerical(0.0), 18)
+            VotedFeedUpdate::new_decode(k1, 0, v1, end_slot_timestamp, FeedType::Numerical(0.0), 18)
                 .unwrap();
         assert_eq!(
-            vote_1.feed_id,
-            227297987279220614266551007307938922497 as FeedId
+            vote_1.encoded_feed_id.get_id(),
+            887882762809455524478714872296636417 as FeedId
         );
         assert_eq!(vote_1.value, FeedType::Numerical(80000.8f64));
     }
