@@ -6,6 +6,7 @@ members = [
   "eth-rpc",
   "borrow-rates",
   "stock-price-feeds",
+  "forex-price-feeds",
   "spout-rwa",
 ]
 
