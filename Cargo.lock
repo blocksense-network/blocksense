@@ -2987,6 +2987,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6245d59a3e82a7fc217c5828a6692dbc6dfb63a0c8c90495621f7b9d79704a0e"
 
 [[package]]
+name = "convert_case"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "baaaa0ecca5b51987b9423ccdc971514dd8b0bb7b4060b983d3664dad3f1f89f"
+dependencies = [
+ "unicode-segmentation",
+]
+
+[[package]]
 name = "cookie"
 version = "0.16.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3559,7 +3568,7 @@ version = "0.99.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f33878137e4dafd7fa914ad4e259e18a4e8e532b9617a2d0150262bf53abfce"
 dependencies = [
- "convert_case",
+ "convert_case 0.4.0",
  "proc-macro2",
  "quote",
  "rustc_version 0.4.1",
@@ -11849,6 +11858,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "wasmparser"
+version = "0.238.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c0ad4ca2ecb86b79ea410cd970985665de1d05774b7107b214bc5852b1bcbad7"
+dependencies = [
+ "bitflags 2.9.1",
+ "indexmap 2.7.1",
+ "semver 1.0.24",
+]
+
+[[package]]
 name = "wasmprinter"
 version = "0.2.80"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -12709,6 +12729,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "wit-converter"
+version = "0.1.1"
+dependencies = [
+ "anyhow",
+ "clap 4.5.26",
+ "convert_case 0.8.0",
+ "futures",
+ "log",
+ "regex",
+ "reqwest 0.12.12",
+ "serde 1.0.217",
+ "serde_json",
+ "wit-parser 0.238.0",
+]
+
+[[package]]
 name = "wit-parser"
 version = "0.200.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -12742,6 +12778,24 @@ dependencies = [
  "serde_json",
  "unicode-xid",
  "wasmparser 0.209.1",
+]
+
+[[package]]
+name = "wit-parser"
+version = "0.238.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d28fd1ea7579c62574b01b413d80293a0a3f3076d387752cd823a3b0e43e96f0"
+dependencies = [
+ "anyhow",
+ "id-arena",
+ "indexmap 2.7.1",
+ "log",
+ "semver 1.0.24",
+ "serde 1.0.217",
+ "serde_derive",
+ "serde_json",
+ "unicode-xid",
+ "wasmparser 0.238.0",
 ]
 
 [[package]]
