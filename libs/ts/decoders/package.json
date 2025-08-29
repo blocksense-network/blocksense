@@ -1,0 +1,36 @@
+{
+  "name": "@blocksense/decoders",
+  "scripts": {
+    "clean": "git clean -fdx -e .env",
+    "build": "hardhat compile && yarn build:typecheck",
+    "test": "hardhat test",
+    "ts": "yarn node --import tsx --no-deprecation",
+    "deploy:local": "hardhat run --network localhost"
+  },
+  "devDependencies": {
+    "@chainsafe/ssz": "^1.0.2",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.8",
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.12",
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.1.0",
+    "@types/chai": "4",
+    "@types/ejs": "^3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.10.2",
+    "chai": "4",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "ethers": "^6.13.4",
+    "hardhat": "^2.22.17",
+    "prettier": "^3.4.1",
+    "prettier-plugin-solidity": "^1.4.1",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.2",
+    "typechain": "^8.3.2"
+  },
+  "dependencies": {
+    "tslib": "^2.8.1"
+  }
+}
