@@ -25,19 +25,10 @@ export const generateDecoderStringBytes = (
       mstore(0x40, add(${fieldName}, and(add(${fieldName}_size, 64), 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFe0)))
       mstore(${fieldName}, ${fieldName}_size)
 
-      let ${fieldName}_i := 32
-      for {
-      } lt(${fieldName}_i, ${fieldName}_size) {
-        ${fieldName}_i := add(${fieldName}_i, 32)
-      } {
-        mstore(
-          add(${fieldName}, ${fieldName}_i),
-          mload(add(data, add(${start}, sub(${fieldName}_i, 32))))
-        )
-      }
-      mstore(
-        add(${fieldName}, ${fieldName}_i),
-        mload(add(data, add(${start}, sub(${fieldName}_i, 32))))
+      mcopy(
+        add(${fieldName}, 32),
+        add(data, ${start}),
+        ${fieldName}_size
       )
     }
   `;
