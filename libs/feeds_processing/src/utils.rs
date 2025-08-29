@@ -413,17 +413,19 @@ pub async fn validate(
 
 #[cfg(test)]
 pub mod tests {
+    use blocksense_utils::FeedId;
+
     use crate::adfs_gen_calldata::RoundBufferIndices;
     use std::collections::HashSet;
 
     use super::*;
 
-    fn create_feeds_config() -> HashMap<FeedId, FeedStrideAndDecimals> {
+    fn create_feeds_config() -> HashMap<EncodedFeedId, FeedStrideAndDecimals> {
         let mut config = HashMap::new();
 
         for feed_id in 0..15 {
             config.insert(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedStrideAndDecimals {
                     stride: 0,
                     decimals: 18,
@@ -431,14 +433,14 @@ pub mod tests {
             );
         }
         config.insert(
-            5,
+            EncodedFeedId::new(5, 0),
             FeedStrideAndDecimals {
                 stride: 0,
                 decimals: 8,
             },
         );
         config.insert(
-            11,
+            EncodedFeedId::new(11, 0),
             FeedStrideAndDecimals {
                 stride: 1,
                 decimals: 4,
@@ -456,25 +458,25 @@ pub mod tests {
         let mut last_votes = HashMap::new();
         // The last votes of the reporter.
         last_votes.insert(
-            reporter_feed_ids[0],
+            EncodedFeedId::new(reporter_feed_ids[0], 0),
             VotedFeedUpdate {
-                feed_id: 1,
+                encoded_feed_id: EncodedFeedId::new(1, 0),
                 value: FeedType::Numerical(reporter_last_votes[0]),
                 end_slot_timestamp: 1677654321,
             },
         );
         last_votes.insert(
-            reporter_feed_ids[1],
+            EncodedFeedId::new(reporter_feed_ids[1], 0),
             VotedFeedUpdate {
-                feed_id: 5,
+                encoded_feed_id: EncodedFeedId::new(5, 0),
                 value: FeedType::Numerical(reporter_last_votes[1]),
                 end_slot_timestamp: 1677654322,
             },
         );
         last_votes.insert(
-            reporter_feed_ids[2],
+            EncodedFeedId::new(reporter_feed_ids[2], 0),
             VotedFeedUpdate {
-                feed_id: 11,
+                encoded_feed_id: EncodedFeedId::new(11, 0),
                 value: FeedType::Numerical(reporter_last_votes[2]),
                 end_slot_timestamp: 1677654323,
             },
@@ -483,26 +485,26 @@ pub mod tests {
         // Aggregated values proposed by the sequencer.
         let updates = vec![
             VotedFeedUpdate {
-                feed_id: aggregated_feed_ids[0],
+                encoded_feed_id: EncodedFeedId::new(aggregated_feed_ids[0], 0),
                 value: FeedType::Numerical(aggregated_values[0]),
                 end_slot_timestamp: 1677654321,
             },
             VotedFeedUpdate {
-                feed_id: aggregated_feed_ids[1],
+                encoded_feed_id: EncodedFeedId::new(aggregated_feed_ids[1], 0),
                 value: FeedType::Numerical(aggregated_values[1]),
                 end_slot_timestamp: 1677654322,
             },
             VotedFeedUpdate {
-                feed_id: aggregated_feed_ids[2],
+                encoded_feed_id: EncodedFeedId::new(aggregated_feed_ids[2], 0),
                 value: FeedType::Numerical(aggregated_values[2]),
                 end_slot_timestamp: 1677654323,
             },
         ];
         let mut feeds_rb_indices: RoundBufferIndices = HashMap::new();
-        feeds_rb_indices.insert(1, 1000);
-        feeds_rb_indices.insert(5, 2000);
-        feeds_rb_indices.insert(11, 3000);
-        feeds_rb_indices.insert(3, 4000);
+        feeds_rb_indices.insert(EncodedFeedId::new(1, 0), 1000);
+        feeds_rb_indices.insert(EncodedFeedId::new(5, 0), 2000);
+        feeds_rb_indices.insert(EncodedFeedId::new(11, 0), 3000);
+        feeds_rb_indices.insert(EncodedFeedId::new(3, 0), 4000);
 
         let block_height = 100;
         let network = "ETH".to_string();
@@ -570,7 +572,7 @@ pub mod tests {
 
         let tolerated_deviations = feed_ids_union
             .into_iter()
-            .map(|feed_id| (feed_id, 1.0))
+            .map(|feed_id| (EncodedFeedId::new(feed_id, 0), 1.0))
             .collect();
 
         validate(
@@ -641,7 +643,7 @@ pub mod tests {
         )
         .await;
 
-        let expected_error = "Failed to get latest vote for feed_id: 5";
+        let expected_error = "Failed to get latest vote for feed: 0:5";
 
         // Extract the error and check
         let error_message = result.unwrap_err().to_string();
