@@ -29,7 +29,9 @@ impl<'a> Converter<'a> {
             .types
             .iter()
             .filter_map(|(id, ty_def)| {
-                if let (Some(name), TypeDefKind::Record(_) | TypeDefKind::Variant(_)) = (&ty_def.name, &ty_def.kind) {
+                if let (Some(name), TypeDefKind::Record(_) | TypeDefKind::Variant(_)) =
+                    (&ty_def.name, &ty_def.kind)
+                {
                     Some((id, Self::convert_name(name, true)))
                 } else {
                     None
@@ -115,8 +117,7 @@ impl<'a> Converter<'a> {
                 let mut components = Vec::new();
                 for field in &record.fields {
                     let name = Self::convert_name(&field.name, false);
-                    components
-                        .push(self.convert_type(&field.ty, Self::convert_name(&name, false))?);
+                    components.push(self.convert_type(&field.ty, name)?);
                 }
                 Ok(ComponentFieldEnum::Composite(CompositeField {
                     name: field_name,
