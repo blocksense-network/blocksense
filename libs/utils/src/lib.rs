@@ -64,13 +64,29 @@ impl EncodedFeedId {
     }
 }
 
-// Implement Display for "{}" printing
+/// Pretty-print as "stride:feed_id"
 impl fmt::Display for EncodedFeedId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "EncodedFeedId(feed_id={}, stride={})", self.get_id(), self.get_stride())
+        write!(f, "{}:{}", self.get_stride(), self.get_id())
     }
 }
 
+/// Parse from "stride:feed_id"
+impl FromStr for EncodedFeedId {
+    type Err = ParseIntError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut parts = s.split(':');
+        let stride_str = parts.next().unwrap_or("");
+        let feed_str = parts.next().unwrap_or("");
+        // You can add extra validation: exactly 2 parts, etc.
+        let stride: u8 = stride_str.parse()?;
+        let feed_id: u128 = feed_str.parse()?;
+        Ok(EncodedFeedId::new(feed_id, stride))
+    }
+}
+
+use std::num::ParseIntError;
 use std::{
     env,
     fmt::{self, Debug, Display},

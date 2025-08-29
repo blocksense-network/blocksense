@@ -110,24 +110,24 @@ async fn try_send_aggregated_updates_to_publishers(
         updates: {
             let mut encoded_voted_feed_updates = Vec::new();
             for v in &updates.updates {
-                let feed_id = &v.feed_id;
-                debug!("Acquiring a read lock on feeds_config; feed_id={feed_id}");
+                let encoded_feed_id = &v.encoded_feed_id;
+                debug!("Acquiring a read lock on feeds_config; encoded_feed_id={encoded_feed_id}");
                 let Some(feed_config) = sequencer_state
                     .active_feeds
                     .read()
                     .await
-                    .get(feed_id)
+                    .get(encoded_feed_id)
                     .cloned()
                 else {
                     error!(
-                        "Acquired and released a read lock on feeds_config; feed_id={feed_id} but feed_id not in registry!"
+                        "Acquired and released a read lock on feeds_config; encoded_feed_id={encoded_feed_id} but feed_id not in registry!"
                     );
                     continue;
                 };
-                debug!("Acquired and released a read lock on feeds_config; feed_id={feed_id}");
+                debug!("Acquired and released a read lock on feeds_config; encoded_feed_id={encoded_feed_id}");
 
                 encoded_voted_feed_updates.push(EncodedVotedFeedUpdate {
-                    feed_id: *feed_id,
+                    encoded_feed_id: *encoded_feed_id,
                     value: match v.value.as_bytes(
                         feed_config.additional_feed_info.decimals as usize,
                         v.end_slot_timestamp as u64,

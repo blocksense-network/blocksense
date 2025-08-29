@@ -206,7 +206,7 @@ pub struct Provider {
     pub should_load_rb_indices: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub allow_feeds: Option<Vec<FeedId>>,
+    pub allow_feeds: Option<Vec<EncodedFeedId>>,
 
     #[serde(default)]
     pub publishing_criteria: Vec<PublishCriteria>,

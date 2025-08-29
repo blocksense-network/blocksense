@@ -20,7 +20,7 @@ pub struct VotedFeedUpdate {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EncodedVotedFeedUpdate {
-    pub feed_id: FeedId,
+    pub encoded_feed_id: EncodedFeedId,
     pub value: Vec<u8>,
     pub end_slot_timestamp: Timestamp,
 }

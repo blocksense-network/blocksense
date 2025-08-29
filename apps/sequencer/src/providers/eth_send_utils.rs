@@ -105,7 +105,7 @@ pub async fn get_serialized_updates_for_network(
     let mut relevant_feed_ids = HashSet::new();
 
     for update in updates.updates.iter() {
-        relevant_feed_ids.extend(get_neighbour_feed_ids(update.feed_id));
+        relevant_feed_ids.extend(get_neighbour_feed_ids(update.encoded_feed_id));
     }
 
     for feed_id in relevant_feed_ids.iter() {
@@ -317,7 +317,7 @@ pub async fn eth_batch_send_to_contract(
     let feeds_to_update_ids: Vec<EncodedFeedId> = updates
         .updates
         .iter()
-        .map(|update| update.feed_id)
+        .map(|update| update.encoded_feed_id)
         .collect();
 
     increment_feeds_rb_indices(&feeds_to_update_ids, net.as_str(), &mut provider).await;
