@@ -404,6 +404,7 @@ pub async fn await_time(time_to_await_ms: u64) {
 #[cfg(test)]
 mod tests {
     use blocksense_utils::time::current_unix_time;
+    use blocksense_utils::EncodedFeedId;
     use blocksense_utils::FeedId;
 
     use crate::registry::new_feeds_meta_data_reg_with_test_data;
@@ -424,7 +425,7 @@ mod tests {
     async fn basic_test() {
         let fmdr = new_feeds_meta_data_reg_with_test_data();
 
-        let mut expected_keys_vec = vec![0, 1, 2];
+        let mut expected_keys_vec = vec![EncodedFeedId::new(0, 0), EncodedFeedId::new(1, 0), EncodedFeedId::new(2, 0)];
         let mut actual_keys_vec = fmdr.get_keys().clone();
 
         expected_keys_vec.sort();
@@ -435,7 +436,7 @@ mod tests {
 
         println!("fmdr.get_keys()={fmdr:?}");
         assert!(
-            fmdr.get(0)
+            fmdr.get(&EncodedFeedId::new(0, 0))
                 .expect("ID not present in registry")
                 .read()
                 .await
@@ -443,7 +444,7 @@ mod tests {
                 == 0
         );
         assert!(
-            fmdr.get(1)
+            fmdr.get(&EncodedFeedId::new(1, 0))
                 .expect("ID not present in registry")
                 .read()
                 .await
@@ -452,20 +453,20 @@ mod tests {
         );
 
         assert!(
-            fmdr.get(0).expect("ID not present in registry").read().await.get_report_interval_ms() as u128 ==
-            fmdr.get(1).expect("ID not present in registry").read().await.get_report_interval_ms() as u128 * 2,
+            fmdr.get(&EncodedFeedId::new(0, 0)).expect("ID not present in registry").read().await.get_report_interval_ms() as u128 ==
+            fmdr.get(&EncodedFeedId::new(1, 0)).expect("ID not present in registry").read().await.get_report_interval_ms() as u128 * 2,
             "The test expects that Feed ID 0 has twice longer report interval compared to Feed ID 1"
         );
 
         current_time_as_ms += fmdr
-            .get(1)
+            .get(&EncodedFeedId::new(1, 0))
             .expect("ID not present in registry")
             .read()
             .await
             .get_report_interval_ms() as u128
             + 1u128;
         assert!(
-            fmdr.get(0)
+            fmdr.get(&EncodedFeedId::new(0, 0))
                 .expect("ID not present in registry")
                 .read()
                 .await
@@ -473,7 +474,7 @@ mod tests {
                 == 0
         );
         assert!(
-            fmdr.get(1)
+            fmdr.get(&EncodedFeedId::new(1, 0))
                 .expect("ID not present in registry")
                 .read()
                 .await
@@ -481,7 +482,7 @@ mod tests {
                 == 1
         );
         current_time_as_ms += fmdr
-            .get(1)
+            .get(&EncodedFeedId::new(1, 0))
             .expect("ID not present in registry")
             .read()
             .await
@@ -489,7 +490,7 @@ mod tests {
             + 1u128;
 
         assert!(
-            fmdr.get(0)
+            fmdr.get(&EncodedFeedId::new(0, 0))
                 .expect("ID not present in registry")
                 .read()
                 .await
@@ -497,7 +498,7 @@ mod tests {
                 == 1
         );
         assert!(
-            fmdr.get(1)
+            fmdr.get(&EncodedFeedId::new(1, 0))
                 .expect("ID not present in registry")
                 .read()
                 .await
@@ -516,7 +517,7 @@ mod tests {
 
         let mut msg_timestamp = current_time_as_ms;
 
-        let feed = fmdr.get(DATA_FEED_ID).expect("ID not present in registry");
+        let feed = fmdr.get(&EncodedFeedId::new(DATA_FEED_ID, 0)).expect("ID not present in registry");
 
         println!("fmdr.get_keys()={fmdr:?}");
         assert!(
@@ -729,7 +730,7 @@ mod tests {
                 let feed = fmdr
                     .read()
                     .await
-                    .get(0)
+                    .get(&EncodedFeedId::new(0, 0))
                     .expect("ID not present in registry");
 
                 let current_time_as_ms = msg_timestamp + i as u128;
@@ -745,7 +746,7 @@ mod tests {
                     .write()
                     .await
                     .push(
-                        DATA_FEED_ID,
+                        EncodedFeedId::new(DATA_FEED_ID, 0),
                         i.into(),
                         test_payload_from_result(Ok(FeedType::Numerical(0.1))),
                     )
@@ -759,7 +760,7 @@ mod tests {
 
         let reports = reports.write().await;
         let reports = reports
-            .get(DATA_FEED_ID)
+            .get(EncodedFeedId::new(DATA_FEED_ID, 0))
             .expect("ID not present in registry");
         let reports = reports.read().await;
         // Process the reports:
