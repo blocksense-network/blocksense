@@ -4,6 +4,13 @@ import { Logo, LogoVariant } from './Logo';
 
 const meta = {
   component: Logo,
+  title: 'Components/Logo',
+  parameters: {
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/design/mLzd40iFjBBPTPBhGIfa3z/Brand-Assets?node-id=1-51&p=f&m=dev',
+    },
+  },
 } satisfies Meta<typeof Logo>;
 export default meta;
 
@@ -13,12 +20,7 @@ export const Base: Story = {
   args: {
     variant: 'primary-neon',
     className: '',
-  },
-  parameters: {
-    design: {
-      type: 'figma',
-      url: 'https://www.figma.com/design/mLzd40iFjBBPTPBhGIfa3z/Brand-Assets?node-id=1-51&p=f&m=dev',
-    },
+    width: 200,
   },
 };
 
