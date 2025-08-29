@@ -6,8 +6,9 @@ use blocksense_utils::constants::{
 };
 use blocksense_utils::{get_config_file_path, read_file, EncodedFeedId, FeedId};
 use hex::decode;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use std::path::Path;
+use std::str::FromStr;
 use std::time::SystemTime;
 use std::{collections::HashMap, fmt::Debug};
 use std::{collections::HashSet, time::UNIX_EPOCH};
@@ -154,6 +155,7 @@ impl Validated for ReporterConfig {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct PublishCriteria {
+    #[serde(deserialize_with = "encoded_feed_id_from_str")]
     pub encoded_feed_id: EncodedFeedId,
     #[serde(default)]
     pub skip_publish_if_less_then_percentage: f64,
@@ -163,6 +165,14 @@ pub struct PublishCriteria {
     pub peg_to_value: Option<f64>,
     #[serde(default)]
     pub peg_tolerance_percentage: f64,
+}
+
+fn encoded_feed_id_from_str<'de, D>(deserializer: D) -> Result<EncodedFeedId, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+    EncodedFeedId::from_str(&s).map_err(serde::de::Error::custom)
 }
 
 impl PublishCriteria {
@@ -205,7 +215,9 @@ pub struct Provider {
     #[serde(default = "default_is_enabled")]
     pub should_load_rb_indices: bool,
 
+    #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(deserialize_with = "deserialize_optional_encoded_feed_id_vec")]
     pub allow_feeds: Option<Vec<EncodedFeedId>>,
 
     #[serde(default)]
@@ -217,6 +229,24 @@ pub struct Provider {
 
 fn default_is_enabled() -> bool {
     true
+}
+
+fn deserialize_optional_encoded_feed_id_vec<'de, D>(deserializer: D) -> Result<Option<Vec<EncodedFeedId>>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let raw: Vec<String> = Vec::<String>::deserialize(deserializer)?;
+
+    if raw.is_empty() {
+        return Ok(None);
+    }
+
+    let feeds: Vec<EncodedFeedId> = raw
+        .into_iter()
+        .map(|s| EncodedFeedId::from_str(&s).map_err(serde::de::Error::custom))
+        .collect::<Result<Vec<_>, _>>()?;
+
+    Ok(Some(feeds))
 }
 
 impl Validated for Provider {
@@ -612,36 +642,36 @@ mod tests {
             "safe_min_quorum": 1,
             "publishing_criteria": [
                 {
-                    "feed_id": 13,
+                    "encoded_feed_id": "0:13",
                     "skip_publish_if_less_then_percentage": 13.2,
                     "always_publish_heartbeat_ms": 50000
                 },
                 {
-                    "feed_id": 15,
+                    "encoded_feed_id": "0:15",
                     "skip_publish_if_less_then_percentage": 2.2
                 },
                 {
-                    "feed_id": 8,
+                    "encoded_feed_id": "0:8",
                     "always_publish_heartbeat_ms": 12345
                 },
                 {
-                    "feed_id": 2
+                    "encoded_feed_id": "0:2"
                 },
                 {
-                    "feed_id": 22,
+                    "encoded_feed_id": "0:22",
                     "peg_to_value": 1.995
                 },
                 {
-                    "feed_id": 23,
+                    "encoded_feed_id": "0:23",
                     "peg_to_value": 1.00,
                     "peg_tolerance_percentage": 1.3
                 },
                 {
-                    "feed_id": 24,
+                    "encoded_feed_id": "0:24",
                     "peg_tolerance_percentage": 4.3
                 },
                 {
-                    "feed_id": 25,
+                    "encoded_feed_id": "0:25",
                     "skip_publish_if_less_then_percentage": 1.32,
                     "always_publish_heartbeat_ms": 45000,
                     "peg_to_value": 5.00,
@@ -683,7 +713,7 @@ mod tests {
 
         {
             let c = &p.publishing_criteria[0];
-            assert_eq!(c.feed_id, 13);
+            assert_eq!(c.encoded_feed_id, EncodedFeedId::new(13, 0));
             assert_eq!(c.skip_publish_if_less_then_percentage, 13.2f64);
             assert_eq!(c.always_publish_heartbeat_ms, Some(50_000));
             assert_eq!(p.publishing_criteria[0].peg_to_value, None);
@@ -692,7 +722,7 @@ mod tests {
 
         {
             let c = &p.publishing_criteria[1];
-            assert_eq!(c.feed_id, 15);
+            assert_eq!(c.encoded_feed_id, EncodedFeedId::new(15, 0));
             assert_eq!(c.skip_publish_if_less_then_percentage, 2.2f64);
             assert_eq!(c.always_publish_heartbeat_ms, None);
             assert_eq!(c.peg_to_value, None);
@@ -700,7 +730,7 @@ mod tests {
         }
         {
             let c = &p.publishing_criteria[2];
-            assert_eq!(c.feed_id, 8);
+            assert_eq!(c.encoded_feed_id, EncodedFeedId::new(8, 0));
             assert_eq!(c.skip_publish_if_less_then_percentage, 0.0f64);
             assert_eq!(c.always_publish_heartbeat_ms, Some(12_345));
             assert_eq!(c.peg_to_value, None);
@@ -708,7 +738,7 @@ mod tests {
         }
         {
             let c = &p.publishing_criteria[3];
-            assert_eq!(c.feed_id, 2);
+            assert_eq!(c.encoded_feed_id, EncodedFeedId::new(2, 0));
             assert_eq!(c.skip_publish_if_less_then_percentage, 0.0f64);
             assert_eq!(c.always_publish_heartbeat_ms, None);
             assert_eq!(c.peg_to_value, None);
@@ -716,7 +746,7 @@ mod tests {
         }
         {
             let c = &p.publishing_criteria[4];
-            assert_eq!(c.feed_id, 22);
+            assert_eq!(c.encoded_feed_id, EncodedFeedId::new(22, 0));
             assert_eq!(c.skip_publish_if_less_then_percentage, 0.0f64);
             assert_eq!(c.always_publish_heartbeat_ms, None);
             assert_eq!(c.peg_to_value, Some(1.995f64));
@@ -724,7 +754,7 @@ mod tests {
         }
         {
             let c = &p.publishing_criteria[5];
-            assert_eq!(c.feed_id, 23);
+            assert_eq!(c.encoded_feed_id, EncodedFeedId::new(23, 0));
             assert_eq!(c.skip_publish_if_less_then_percentage, 0.0f64);
             assert_eq!(c.always_publish_heartbeat_ms, None);
             assert_eq!(c.peg_to_value, Some(1.0f64));
@@ -732,7 +762,7 @@ mod tests {
         }
         {
             let c = &p.publishing_criteria[6];
-            assert_eq!(c.feed_id, 24);
+            assert_eq!(c.encoded_feed_id, EncodedFeedId::new(24, 0));
             assert_eq!(c.skip_publish_if_less_then_percentage, 0.0f64);
             assert_eq!(c.always_publish_heartbeat_ms, None);
             assert_eq!(c.peg_to_value, None);
@@ -741,7 +771,7 @@ mod tests {
 
         {
             let c = &p.publishing_criteria[7];
-            assert_eq!(c.feed_id, 25);
+            assert_eq!(c.encoded_feed_id, EncodedFeedId::new(25, 0));
             assert_eq!(c.skip_publish_if_less_then_percentage, 1.32f64);
             assert_eq!(c.always_publish_heartbeat_ms, Some(45_000));
             assert_eq!(c.peg_to_value, Some(5.0f64));
