@@ -216,7 +216,7 @@ pub struct EncodedBatchedAggregatesToSend {
 
 #[derive(Clone, Debug)]
 pub struct PublishedFeedUpdate {
-    pub feed_id: FeedId,
+    pub encoded_feed_id: EncodedFeedId,
     pub num_updates: u128,
     pub value: FeedType,
     pub published: Timestamp, // in seconds since UNIX_EPOCH
@@ -224,26 +224,26 @@ pub struct PublishedFeedUpdate {
 
 #[derive(Clone, Debug)]
 pub struct PublishedFeedUpdateError {
-    pub feed_id: FeedId,
+    pub encoded_feed_id: EncodedFeedId,
     pub num_updates: u128,
     pub error: String,
 }
 
 impl PublishedFeedUpdate {
-    pub fn error(feed_id: FeedId, message: &str) -> PublishedFeedUpdateError {
+    pub fn error(encoded_feed_id: EncodedFeedId, message: &str) -> PublishedFeedUpdateError {
         PublishedFeedUpdateError {
-            feed_id,
+            encoded_feed_id,
             num_updates: 0,
             error: message.to_owned(),
         }
     }
 
     pub fn error_num_update(
-        feed_id: FeedId,
+        encoded_feed_id: EncodedFeedId,
         message: &str,
         num_updates: u128,
     ) -> PublishedFeedUpdateError {
-        let mut r = PublishedFeedUpdate::error(feed_id, message);
+        let mut r = PublishedFeedUpdate::error(encoded_feed_id, message);
         r.num_updates = num_updates;
         r
     }

@@ -66,11 +66,11 @@ pub fn filter_allowed_feeds(
     if let Some(allowed_feed_ids) = allow_feeds {
         let mut res: Vec<VotedFeedUpdate> = vec![];
         for u in &updates.updates {
-            let feed_id = u.feed_id;
-            if allowed_feed_ids.is_empty() || allowed_feed_ids.contains(&feed_id) {
+            let encoded_feed_id = u.encoded_feed_id;
+            if allowed_feed_ids.is_empty() || allowed_feed_ids.contains(&encoded_feed_id) {
                 res.push(u.clone());
             } else {
-                debug!("Skipping feed id {feed_id} for special network `{net}`");
+                debug!("Skipping encoded_feed_id {encoded_feed_id} for special network `{net}`");
             }
         }
         updates.updates = mem::take(&mut res);

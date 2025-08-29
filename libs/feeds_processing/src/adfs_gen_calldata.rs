@@ -3,7 +3,7 @@ use alloy_primitives::U256;
 use anyhow::Result;
 use blocksense_config::FeedStrideAndDecimals;
 use blocksense_data_feeds::feeds_processing::BatchedAggregatesToSend;
-use blocksense_utils::{from_hex_string, to_hex_string, EncodedFeedId, FeedId};
+use blocksense_utils::{from_hex_string, to_hex_string, EncodedFeedId, FeedId, Stride};
 use std::cmp::max;
 use std::collections::{BTreeMap, HashMap, HashSet};
 
@@ -56,6 +56,12 @@ fn encode_packed(items: &[&[u8]]) -> (Vec<u8>, String) {
     let res = res.join(&[][..]);
     let hexed = hex::encode(&res);
     (res, hexed)
+}
+
+pub fn calc_row_index(feed_id: FeedId, stride: Stride) -> alloy_primitives::Uint<256, 4> {
+    (U256::from(2).pow(U256::from(115)) * U256::from(stride)
+        + U256::from(feed_id))
+        / U256::from(NUM_FEED_IDS_IN_RB_INDEX_RECORD)
 }
 
 /// Serializes the `updates` hash map into a string.
@@ -196,9 +202,7 @@ pub async fn adfs_serialize_updates(
         }
         let feed_id = encoded_feed_id.get_id();
         let rb_index = U256::from(rb_index);
-        let row_index = (U256::from(2).pow(U256::from(115)) * U256::from(*stride)
-            + U256::from(feed_id))
-            / U256::from(NUM_FEED_IDS_IN_RB_INDEX_RECORD);
+        let row_index = calc_row_index(feed_id, *stride);
         let slot_position = feed_id % NUM_FEED_IDS_IN_RB_INDEX_RECORD;
 
         batch_feeds.entry(row_index).or_insert_with(|| {

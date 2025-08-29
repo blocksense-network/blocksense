@@ -90,7 +90,7 @@ impl SequencerState {
         let provider_status = Arc::new(RwLock::new(provider_status));
         let mut history = FeedAggregateHistory::new();
         for feed in &feeds_config.feeds {
-            history.register_feed(feed.id, 100);
+            history.register_feed(EncodedFeedId::new(feed.id, feed.stride), 100);
         }
         SequencerState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
@@ -109,7 +109,7 @@ impl SequencerState {
                 feeds_config
                     .feeds
                     .into_iter()
-                    .map(|feed| (feed.id, feed))
+                    .map(|feed| (EncodedFeedId::new(feed.id, feed.stride), feed))
                     .collect(),
             )),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
