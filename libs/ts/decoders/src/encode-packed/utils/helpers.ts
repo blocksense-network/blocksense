@@ -1,4 +1,5 @@
 import { ExpandedFieldOrArray } from '../../utils';
+import { DecoderImplementations, DecoderLines } from './types';
 
 export const checkForDynamicData = (fields: ExpandedFieldOrArray[]) => {
   let containsDynamicData = false;
@@ -17,3 +18,27 @@ export const checkForDynamicData = (fields: ExpandedFieldOrArray[]) => {
 
   return containsDynamicData;
 };
+
+export const decoderImplementationsMap: Record<string, DecoderImplementations> =
+  {
+    cancun: {
+      generateDecoderPrimitiveLines: require('../helpers/primitiveFieldCancun')
+        .generateDecoderPrimitiveLines as DecoderLines,
+      generateDecoderStringBytes: require('../helpers/stringBytesCancun')
+        .generateDecoderStringBytes as DecoderLines,
+    },
+    default: {
+      generateDecoderPrimitiveLines: require('../helpers/primitiveField')
+        .generateDecoderPrimitiveLines as DecoderLines,
+      generateDecoderStringBytes: require('../helpers/stringBytes')
+        .generateDecoderStringBytes as DecoderLines,
+    },
+  };
+
+/**
+ * Returns the decoder implementations for the given key.
+ * If the key is not "cancun", returns the default implementation.
+ */
+export function getDecoderImplementations(key: string): DecoderImplementations {
+  return decoderImplementationsMap[key] ?? decoderImplementationsMap.default;
+}
