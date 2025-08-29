@@ -4,6 +4,7 @@
     "clean": "git clean -fdx -e .env",
     "build": "hardhat compile && yarn build:typecheck",
     "test": "hardhat test",
+    "test:paris": "EVM_VERSION=paris yarn hardhat test",
     "ts": "yarn node --import tsx --no-deprecation",
     "deploy:local": "hardhat run --network localhost"
   },
