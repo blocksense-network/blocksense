@@ -1,13 +1,21 @@
 import fs from 'fs/promises';
+
 import ejs from 'ejs';
 import * as prettier from 'prettier/standalone';
 import solidityPlugin from 'prettier-plugin-solidity';
 
-import { Schema, sszSchema } from './utils';
-import { TupleField, organizeFieldsIntoStructs } from '../utils';
-import { generateDecoderLines } from './helpers';
+import type { EvmVersion, TupleField } from '../utils';
+import { organizeFieldsIntoStructs } from '../utils';
 
-export const generateDecoder = async (template: string, fields: TupleField) => {
+import { generateDecoderLines } from './helpers';
+import type { Schema } from './utils';
+import { sszSchema } from './utils';
+
+export const generateDecoder = async (
+  template: string,
+  fields: TupleField,
+  evmVersion: EvmVersion = 'cancun',
+) => {
   const schema: Schema[] = await sszSchema(fields);
 
   const structs = organizeFieldsIntoStructs(fields);
@@ -16,7 +24,11 @@ export const generateDecoder = async (template: string, fields: TupleField) => {
   const isMainStructDynamic = fields.type.endsWith('[]');
   const returnType =
     fields.name + (fields.type.match(/\[(\d*)\]/g) || []).join('');
-  const generatedLines = generateDecoderLines(schema[0], mainStructName);
+  const generatedLines = generateDecoderLines(
+    schema[0],
+    mainStructName,
+    evmVersion,
+  );
 
   const generatedCode = ejs.render(
     template,

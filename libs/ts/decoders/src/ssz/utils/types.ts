@@ -42,3 +42,27 @@ export const isVector = (
 ): schema is Schema & { length: number } => {
   return schema.typeName.startsWith('Vector') && schema.length !== undefined;
 };
+
+export type DecoderPrimitiveLines = (
+  schema: Schema,
+  location: string,
+  index: number,
+  isBytes: boolean,
+  start: Offset,
+  end: Offset,
+  counter?: string,
+) => string;
+
+export type DecoderStringBytes = (
+  schema: Schema,
+  location: string,
+  index: number,
+  start: Offset,
+  end: Offset,
+  counter?: string,
+) => string;
+
+export type DecoderImplementations = {
+  generateDecoderPrimitiveLines: DecoderPrimitiveLines;
+  generateDecoderStringBytes: DecoderStringBytes;
+};

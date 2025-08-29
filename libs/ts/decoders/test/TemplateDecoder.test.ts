@@ -1,21 +1,24 @@
-import path from 'node:path';
 import fs from 'node:fs/promises';
+import path from 'node:path';
 
 import { expect } from 'chai';
+import type { BaseContract } from 'ethers';
 import hre, { ethers, run } from 'hardhat';
-import { BaseContract } from 'ethers';
 
+import type { DecoderContract, TupleField } from '../src';
 import {
-  generateEPDecoder,
-  generateSSZDecoder,
   encodePackedData,
   encodeSSZData,
-  TupleField,
-  DecoderContract,
+  generateEPDecoder,
+  generateSSZDecoder,
 } from '../src';
+import type { EvmVersion } from '../src/utils';
 
 describe('Template Decoder', function () {
   this.timeout(1000000);
+
+  const evmVersionBefore = hre.config.solidity.compilers[0].settings.evmVersion;
+  const evmVersion = (process.env.EVM_VERSION || 'cancun') as EvmVersion;
 
   const encodePacked = {
     contractName: 'EncodePackedDecoder',
@@ -29,9 +32,9 @@ describe('Template Decoder', function () {
     tempFilePath: path.join(__dirname, '../contracts/SSZDecoder.sol'),
   };
 
-  before(() => {
+  before(function () {
     hre.config.solidity.compilers[0].settings.viaIR = true;
-    hre.config.solidity.compilers[0].settings.evmVersion = 'cancun';
+    hre.config.solidity.compilers[0].settings.evmVersion = evmVersion;
   });
 
   async function generateAndDeployDecoders(fields: TupleField) {
@@ -44,12 +47,12 @@ describe('Template Decoder', function () {
 
     await fs.writeFile(
       encodePacked.tempFilePath,
-      await generateEPDecoder(templateEP, fields),
+      await generateEPDecoder(templateEP, fields, evmVersion),
       'utf-8',
     );
     await fs.writeFile(
       ssz.tempFilePath,
-      await generateSSZDecoder(templateSSZ, fields),
+      await generateSSZDecoder(templateSSZ, fields, evmVersion),
       'utf-8',
     );
 
@@ -86,7 +89,7 @@ describe('Template Decoder', function () {
 
   after(() => {
     hre.config.solidity.compilers[0].settings.viaIR = false;
-    hre.config.solidity.compilers[0].settings.evmVersion = '';
+    hre.config.solidity.compilers[0].settings.evmVersion = evmVersionBefore;
 
     // Check if `contracts` directory is empty, if yes remove it
     const contractsDir = path.join(__dirname, '../contracts');

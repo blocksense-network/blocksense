@@ -1,3 +1,5 @@
+export type EvmVersion = 'cancun' | 'legacy';
+
 export type PrimitiveField = {
   name: string;
   type: string;

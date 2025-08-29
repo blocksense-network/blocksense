@@ -7,6 +7,7 @@ export type {
   GenerateDecoderConfig,
   DecoderData,
   Struct,
+  EvmVersion,
 } from './types';
 
 export { organizeFieldsIntoStructs } from './parseStructs';

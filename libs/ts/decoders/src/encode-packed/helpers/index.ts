@@ -1,19 +1,23 @@
 import {
   DecoderData,
+  EvmVersion,
   ExpandedField,
   ExpandedFieldOrArray,
   GenerateDecoderConfig,
 } from '../../utils';
+import { getDecoderImplementations } from '../utils';
 import { generateDecoderDynamicDataLines } from './dynArrayStringBytes';
 import { generateDecoderFixedBytesLines } from './fixedBytesField';
-import { generateDecoderPrimitiveLines } from './primitiveField';
-import { generateDecoderStringBytes } from './stringBytes';
 
 export const generateDecoderLines = (
   expandedFields: Exclude<ExpandedFieldOrArray, ExpandedField>,
   name: string,
   isMainStructDynamic: boolean,
+  evmVersion: EvmVersion = 'cancun',
 ) => {
+  const { generateDecoderPrimitiveLines, generateDecoderStringBytes } =
+    getDecoderImplementations(evmVersion);
+
   let shift = false;
   let isPrevShifted = false;
   const config: GenerateDecoderConfig = {
@@ -152,6 +156,7 @@ export const generateDecoderLines = (
                 ...data,
                 location: currentLocation,
               },
+              generateDecoderStringBytes,
               parentIndex,
             ),
           );
