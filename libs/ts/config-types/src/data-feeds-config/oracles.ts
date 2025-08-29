@@ -46,6 +46,14 @@ export const stockPriceFeedsArgsSchema = S.mutable(
   }),
 );
 
+// `forex-price-feeds` Oracle related Types
+export const forexPriceFeedsArgsSchema = S.mutable(
+  S.Struct({
+    kind: S.Literal('forex-price-feeds'),
+    providers: S.Array(S.String),
+  }),
+);
+
 // `eth-rpc` Oracle related Types
 // Schema for a single URL string
 const UrlSchema = S.String.pipe(
