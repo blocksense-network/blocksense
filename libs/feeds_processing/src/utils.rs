@@ -18,7 +18,7 @@ use blocksense_gnosis_safe::{
     data_types::ConsensusSecondRoundBatch,
     utils::{create_safe_tx, generate_transaction_hash},
 };
-use blocksense_utils::{EncodedFeedId, FeedId};
+use blocksense_utils::EncodedFeedId;
 use itertools::Itertools;
 use ringbuf::traits::consumer::Consumer;
 use std::collections::HashMap;
@@ -316,7 +316,7 @@ fn check_aggregated_votes_deviation(
 }
 
 pub async fn validate(
-    feeds_config: HashMap<FeedId, FeedStrideAndDecimals>,
+    feeds_config: HashMap<EncodedFeedId, FeedStrideAndDecimals>,
     mut batch: ConsensusSecondRoundBatch,
     last_votes: HashMap<EncodedFeedId, VotedFeedUpdate>,
     tolerated_deviations: HashMap<EncodedFeedId, f64>,

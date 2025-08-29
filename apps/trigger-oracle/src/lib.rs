@@ -310,7 +310,7 @@ impl TriggerExecutor for OracleTrigger {
         tracing::info!("Sequencer URL provided: {}", &self.sequencer);
         let (data_feed_sender, data_feed_receiver) = unbounded_channel();
         let data_feed_results: DataFeedResults = Arc::new(RwLock::new(HashMap::new()));
-        let mut feeds_config: HashMap<FeedId, FeedStrideAndDecimals> = HashMap::new();
+        let mut feeds_config: HashMap<EncodedFeedId, FeedStrideAndDecimals> = HashMap::new();
         //TODO(adikov): Move all the logic to a different struct and handle
         //errors properly.
         // For each component, run its own timer loop
@@ -319,7 +319,7 @@ impl TriggerExecutor for OracleTrigger {
         for component in components.values() {
             for df in &component.oracle_settings {
                 feeds_config.insert(
-                    df.id.parse::<FeedId>()?,
+                    EncodedFeedId::new(df.id.parse::<FeedId>()?, df.stride),
                     FeedStrideAndDecimals {
                         stride: df.stride,
                         decimals: df.decimals,
@@ -803,7 +803,7 @@ impl OracleTrigger {
 
     async fn process_aggregated_consensus(
         mut ss_rx: UnboundedReceiver<ConsensusSecondRoundBatch>,
-        feeds_config: HashMap<FeedId, FeedStrideAndDecimals>,
+        feeds_config: HashMap<EncodedFeedId, FeedStrideAndDecimals>,
         latest_votes: DataFeedResults,
         sequencer: Url,
         second_consensus_secret_key: String,
