@@ -1,0 +1,20 @@
+[package]
+name = "wit-converter"
+authors = { workspace = true }
+version = { workspace = true }
+license = { workspace = true }
+edition = { workspace = true }
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = { workspace = true }
+convert_case = "0.8"
+clap = { version = "4.5", features = ["derive", "env"] }
+futures = { workspace = true }
+log = { workspace = true }
+regex = "1.11"
+reqwest = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+wit-parser = "0.238"
