@@ -28,6 +28,10 @@ jobs:
             path: libs/ts/ui/storybook-static
             project_name: blocksense-ui
             build_command: yarn workspace @blocksense/ui build-storybook
+          - project: explorer.blocksense.network
+            path: apps/explorer.blocksense.network/out
+            project_name: blocksense-explorer
+            build_command: yarn workspace @blocksense/explorer.blocksense.network build:with-deps
     steps:
       - uses: actions/checkout@v4
 
