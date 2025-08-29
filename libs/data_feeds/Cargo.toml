@@ -25,3 +25,4 @@ dirs = { workspace = true }
 strum = { workspace = true, features = ["derive"] }
 http = { workspace = true }
 tokio = { workspace = true }
+hex = { workspace = true }

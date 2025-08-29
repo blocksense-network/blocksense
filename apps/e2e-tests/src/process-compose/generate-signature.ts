@@ -35,55 +35,77 @@ export type FeedError = typeof FeedErrorSchema.Type;
 export type FeedResult = typeof FeedResultSchema.Type;
 export type DataFeedPayload = typeof DataFeedPayloadSchema.Type;
 
-const u128ToBytes = (value: bigint): Effect.Effect<Buffer, never> =>
-  Effect.sync(() => {
-    const buf = Buffer.alloc(16);
+function truncate(str: string, maxLen: number): string {
+  return str.length > maxLen ? str.slice(0, maxLen) : str;
+}
 
-    const hi = value >> 64n;
-    const lo = value & ((1n << 64n) - 1n);
+function pow10(n: number): bigint {
+  if (n < 0) throw new Error('pow10: n must be >= 0');
+  let p = 1n;
+  for (let i = 0; i < n; i++) p *= 10n;
+  return p;
+}
 
-    buf.writeBigUInt64BE(hi, 0);
-    buf.writeBigUInt64BE(lo, 8);
+function bigIntToBytesBE(x: bigint): Uint8Array {
+  if (x < 0n) throw new Error('bigIntToBytesBE: negative not supported');
+  if (x === 0n) return new Uint8Array([0]);
 
-    return buf;
-  });
+  const bytes: Array<number> = [];
+  let n = x;
+  while (n > 0n) {
+    bytes.push(Number(n & 0xffn));
+    n >>= 8n;
+  }
+  bytes.reverse();
+  return new Uint8Array(bytes);
+}
 
-// TODO: (danielstoyanov): Implement proper encoding for floating point number, Text and Bytes
-const feedTypeToBytes = (
+function asBytes(
   feed: FeedType,
   timestamp: bigint,
-): Effect.Effect<Buffer, Error> =>
-  Effect.sync(() => {
-    const tsBuf = Buffer.allocUnsafe(8);
-    tsBuf.writeBigUInt64BE(timestamp, 0);
+  digitsInFraction: number,
+): Effect.Effect<Buffer, Error> {
+  const timestampBuf = Buffer.allocUnsafe(8);
+  timestampBuf.writeBigUInt64BE(timestamp, 0);
 
-    if ('Numerical' in feed) {
-      const scaled = BigInt(Math.trunc(feed.Numerical * 1e18));
+  if ('Numerical' in feed) {
+    const [integerPart, fractionalPart] = String(feed.Numerical).split('.');
+    const integer = BigInt(integerPart);
 
-      const hi = scaled >> 64n;
-      const lo = scaled & ((1n << 64n) - 1n);
+    let actualDigitsInFraction: number;
+    let fraction: bigint;
+    if (fractionalPart) {
+      const truncated = truncate(fractionalPart.toString(), 18);
+      actualDigitsInFraction = truncated.length;
+      fraction = BigInt(truncated || '0');
+    } else {
+      actualDigitsInFraction = 0;
+      fraction = 0n;
+    }
+    const result =
+      integer * pow10(digitsInFraction) +
+      fraction * pow10(digitsInFraction - actualDigitsInFraction);
 
-      const buf = Buffer.alloc(24);
-      buf.writeBigUInt64BE(hi, 0);
-      buf.writeBigUInt64BE(lo, 16);
+    let valueBytes = bigIntToBytesBE(result);
 
-      return Buffer.concat([buf, tsBuf]);
+    if (valueBytes.length > 32) {
+      valueBytes = valueBytes.slice(valueBytes.length - 32);
     }
 
-    if ('Text' in feed) {
-      const textBuf = new TextEncoder().encode(feed.Text);
-      return Buffer.concat([textBuf, tsBuf]);
-    }
-    if ('Bytes' in feed) {
-      const bytes = feed.Bytes;
-      const bytesBuf = Buffer.isBuffer(bytes)
-        ? bytes
-        : Buffer.from(Uint8Array.from(bytes));
-      return Buffer.concat([bytesBuf, tsBuf]);
-    }
+    let bytesBuffer = new Uint8Array(32);
+    bytesBuffer.set(valueBytes, 32 - valueBytes.length);
 
-    return Buffer.from([]);
-  });
+    bytesBuffer = Buffer.from(bytesBuffer.slice(8));
+    return Effect.succeed(Buffer.concat([bytesBuffer, timestampBuf]));
+  } else if ('Text' in feed) {
+    return Effect.succeed(Buffer.from(feed.Text));
+  } else if ('Bytes' in feed) {
+    s;
+    return Effect.succeed(Buffer.from(feed.Bytes));
+  }
+
+  return Effect.fail(new Error('Invalid feed result type!'));
+}
 
 export const generateSignature = (
   privKeyHex: string,
@@ -93,12 +115,14 @@ export const generateSignature = (
 ): Effect.Effect<string, Error, never> =>
   Effect.gen(function* () {
     const feedIdBytes = Buffer.from(feedId);
-    const tsBytes = yield* u128ToBytes(timestamp);
 
-    let byteBuffer = Buffer.concat([feedIdBytes, tsBytes]);
+    const timestampBuf = Buffer.allocUnsafe(16);
+    timestampBuf.writeBigUInt64BE(timestamp, 8);
+
+    let byteBuffer = Buffer.concat([feedIdBytes, timestampBuf]);
 
     if ('Ok' in feedResult) {
-      const valueBytes = yield* feedTypeToBytes(feedResult.Ok, timestamp);
+      const valueBytes = yield* asBytes(feedResult.Ok, timestamp, 18);
       byteBuffer = Buffer.concat([byteBuffer, valueBytes]);
     } else {
       const err = feedResult.Err;

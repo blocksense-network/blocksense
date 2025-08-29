@@ -246,8 +246,9 @@ impl FeedType {
                 bytes_vec.append(&mut value_bytes);
 
                 bytes_vec.drain(..8);
+                println!("before extend bytes_vec: {:?}", bytes_vec);
                 bytes_vec.extend(timestamp.to_be_bytes());
-
+                println!("after extend bytes_vec: {:?}", bytes_vec);
                 Ok(bytes_vec)
             }
             FeedType::Text(s) => Ok(s.as_bytes().to_vec()),
