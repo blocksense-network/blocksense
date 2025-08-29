@@ -31,7 +31,7 @@
               let
                 shell-name = getShellName name local;
               in
-              pkgs.runCommand "process-compose-${name}" { } ''
+              pkgs.runCommandNoCCLocal "process-compose-${name}" { } ''
                 mkdir -p "$out"
                 ln -s ${
                   config.devenv.shells.${shell-name}.process.managers.process-compose.configFile
@@ -46,7 +46,7 @@
 
       allProcessComposeFiles =
         { local }:
-        pkgs.runCommand "allProcessComposeFiles" { } ''
+        pkgs.runCommandNoCCLocal "allProcessComposeFiles" { } ''
           mkdir "$out"
           (
             set -x

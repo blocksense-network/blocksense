@@ -1,17 +1,20 @@
 {
   self,
+  self',
   cfg,
   pkgs,
   lib,
   ...
-}@specialArgs:
+}:
 with lib;
 let
   mkSubmodule =
     module:
     lib.types.submoduleWith {
-      inherit specialArgs;
-      modules = [ module ];
+      modules = [
+        { _module.args = { inherit cfg self' pkgs; }; }
+        module
+      ];
     };
 in
 {
@@ -31,7 +34,10 @@ in
     description = mdDoc "Package to use as Sequencer node.";
   };
 
-  sequencer = import ./sequencer lib;
+  sequencer = mkOption {
+    type = mkSubmodule ./sequencer;
+    description = mdDoc "Sequencer configuration.";
+  };
 
   oracles = mkOption {
     type = types.attrsOf (mkSubmodule ./oracle-script.nix);
