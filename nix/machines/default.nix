@@ -4,6 +4,30 @@
   ...
 }:
 let
+  allEnvironmentPaths = lib.filter (path: lib.hasPrefix "example-setup-" (builtins.baseNameOf path)) (
+    lib.attrValues (builtins.readDir ../test-environments)
+  );
+
+  systems = [
+    "x86_64-linux"
+    "aarch64-linux"
+    "x86_64-darwin"
+    "aarch64-darwin"
+  ];
+  allEnvironmentMachines = lib.foldl' (
+    acc: path:
+    let
+      baseName = builtins.baseNameOf path;
+      machinesForPath = lib.listToAttrs (
+        lib.map (system: {
+          name = if system == "x86_64-linux" then baseName else "${baseName}-${system}";
+          value = testEnvironmentConfig path system;
+        }) systems
+      );
+    in
+    acc // machinesForPath
+  ) { } allEnvironmentPaths;
+
   testEnvironmentConfig =
     conf: system:
     lib.nixosSystem {
@@ -40,8 +64,5 @@ in
     };
     environment.defaultPackages = [ self.legacyPackages.x86_64-linux.foundry ];
   };
-  flake.nixosConfigurations = {
-    example-setup-01 = testEnvironmentConfig ../test-environments/example-setup-01.nix "x86_64-linux";
-    # example-setup-02 = testEnvironmentConfig ../test-environments/example-setup-02.nix "x86_64-linux"; #services.kafka doesn't exist
-  };
+  flake.nixosConfigurations = { } // allEnvironmentMachines;
 }
