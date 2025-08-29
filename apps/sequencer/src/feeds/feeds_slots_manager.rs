@@ -402,7 +402,6 @@ mod tests {
             log_handle,
             &sequencer_config,
             metrics_prefix,
-            None,
             vote_send,
             feeds_management_cmd_to_block_creator_send,
             feeds_slots_manager_cmd_send,

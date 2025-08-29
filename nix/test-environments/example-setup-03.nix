@@ -78,14 +78,12 @@ in
               address = upgradeableProxyADFSContractAddressInk;
               creation-byte-code = null;
               deployed-byte-code = null;
-              contract-version = 2;
             }
             {
               name = "multicall";
               address = "0xcA11bde05977b3631167028862bE2a173976CA11";
               creation-byte-code = null;
               deployed-byte-code = null;
-              contract-version = 3;
             }
           ];
         };
