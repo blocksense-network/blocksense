@@ -273,6 +273,10 @@ in
           "https://eth.llamarpc.com"
         ];
       };
+      forex-price-feeds = {
+        exec-interval = 10;
+        allowed-outbound-hosts = [ ];
+      };
     };
   };
 }
