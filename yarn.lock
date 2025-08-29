@@ -1537,6 +1537,30 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@blocksense/decoders@workspace:libs/ts/decoders":
+  version: 0.0.0-use.local
+  resolution: "@blocksense/decoders@workspace:libs/ts/decoders"
+  dependencies:
+    "@chainsafe/ssz": "npm:^1.0.2"
+    "@nomicfoundation/hardhat-chai-matchers": "npm:^2.1.0"
+    "@nomicfoundation/hardhat-ethers": "npm:^3.1.0"
+    "@typechain/ethers-v6": "npm:^0.5.1"
+    "@typechain/hardhat": "npm:^9.1.0"
+    "@types/chai": "npm:4"
+    "@types/ejs": "npm:^3"
+    "@types/mocha": "npm:^10.0.10"
+    "@types/node": "npm:^24.3.1"
+    chai: "npm:4"
+    ejs: "npm:^3.1.10"
+    ethers: "npm:^6.15.0"
+    hardhat: "npm:^2.26.3"
+    prettier: "npm:^3.4.1"
+    prettier-plugin-solidity: "npm:^1.4.1"
+    tslib: "npm:^2.8.1"
+    typechain: "npm:^8.3.2"
+  languageName: unknown
+  linkType: soft
+
 "@blocksense/dev@workspace:apps/dev":
   version: 0.0.0-use.local
   resolution: "@blocksense/dev@workspace:apps/dev"

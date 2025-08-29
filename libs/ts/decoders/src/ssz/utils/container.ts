@@ -1,5 +1,5 @@
 import { generateSwapEndianness32bit } from '../helpers/convertToBE';
-import { Schema, BytesRange, Offset, addOffsets } from '../utils';
+import { Schema, BytesRange, Offset, addOffsets } from '.';
 
 export const handleFieldRanges = (
   schema: Schema,
