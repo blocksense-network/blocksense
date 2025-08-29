@@ -1,4 +1,4 @@
-import type { EvmVersion, ExpandedFieldOrArray } from '../../utils';
+import type { EvmVersion } from '../../utils';
 import { generateDecoderPrimitiveLines } from '../helpers/primitiveField';
 import { generateDecoderPrimitiveLines as generateDecoderPrimitiveLinesCancun } from '../helpers/primitiveFieldCancun';
 import { generateDecoderStringBytes } from '../helpers/stringBytes';
@@ -6,28 +6,7 @@ import { generateDecoderStringBytes as generateDecoderStringBytesCancun } from '
 
 import type { DecoderImplementations } from './types';
 
-export const checkForDynamicData = (fields: ExpandedFieldOrArray[]) => {
-  let containsDynamicData = false;
-
-  fields.forEach(field => {
-    if (Array.isArray(field)) {
-      containsDynamicData = containsDynamicData || checkForDynamicData(field);
-    } else if (field.isDynamic) {
-      containsDynamicData = true;
-      return;
-    } else if ('components' in field) {
-      containsDynamicData =
-        containsDynamicData || checkForDynamicData(field.components!);
-    }
-  });
-
-  return containsDynamicData;
-};
-
-export const decoderImplementationsMap: Record<
-  EvmVersion,
-  DecoderImplementations
-> = {
+const decoderImplementationsMap: Record<EvmVersion, DecoderImplementations> = {
   cancun: {
     generateDecoderPrimitiveLines: generateDecoderPrimitiveLinesCancun,
     generateDecoderStringBytes: generateDecoderStringBytesCancun,

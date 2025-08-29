@@ -1,13 +1,24 @@
 import fs from 'fs/promises';
+
 import ejs from 'ejs';
 import * as prettier from 'prettier/standalone';
 import solidityPlugin from 'prettier-plugin-solidity';
 
-import { helpers, calculateFieldShift, expandFields } from './utils';
-import { TupleField, organizeFieldsIntoStructs } from '../utils';
-import { generateDecoderLines } from './helpers';
+import type { EvmVersion, TupleField } from '../utils';
+import { organizeFieldsIntoStructs } from '../utils';
 
-export const generateDecoder = async (template: string, fields: TupleField) => {
+import { generateDecoderLines } from './helpers';
+import {
+  calculateFieldShift,
+  checkForDynamicData,
+  expandFields,
+} from './utils';
+
+export const generateDecoder = async (
+  template: string,
+  fields: TupleField,
+  evmVersion: EvmVersion = 'cancun',
+) => {
   const structs = organizeFieldsIntoStructs(fields);
   const expandedFields = calculateFieldShift(expandFields([fields])).flat();
 
@@ -20,6 +31,7 @@ export const generateDecoder = async (template: string, fields: TupleField) => {
     expandedFields,
     mainStructName,
     isMainStructDynamic,
+    evmVersion,
   );
 
   const generatedCode = ejs.render(
@@ -30,7 +42,7 @@ export const generateDecoder = async (template: string, fields: TupleField) => {
       mainStructName,
       isMainStructDynamic,
       returnType,
-      containsDynamicData: helpers.checkForDynamicData(expandedFields),
+      containsDynamicData: checkForDynamicData(expandedFields),
     },
     {
       root: (await fs.realpath(__dirname)) + '/',
