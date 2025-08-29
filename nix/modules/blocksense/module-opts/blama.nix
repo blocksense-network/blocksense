@@ -17,8 +17,14 @@ in
       default = blama;
     };
 
+    host = mkOption {
+      type = types.str;
+      default = "127.0.0.1";
+      description = "The host to use for the Blama instance.";
+    };
+
     port = mkOption {
-      type = types.int;
+      type = types.port;
       default = 7331;
       description = "The port to use for the Blama instance.";
     };
