@@ -465,6 +465,7 @@ pub mod tests {
     use actix_web::{test, App};
     use blocksense_config::AllFeedsConfig;
     use blocksense_config::{get_test_config_with_no_providers, test_feed_config};
+    use blocksense_utils::FeedId;
 
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
     use blocksense_config::SequencerConfig;
@@ -660,7 +661,7 @@ pub mod tests {
 
         let get_last_published_value_and_time_request: Vec<GetLastPublishedRequestData> =
             vec![GetLastPublishedRequestData {
-                feed_id: "1".to_string(),
+                feed_id: "0:1".to_string(),
             }];
 
         // Send the request
@@ -681,7 +682,7 @@ pub mod tests {
         let last_values: Vec<LastPublishedValue> =
             serde_json::from_value(v).expect("Can't parse repsonse");
         assert_eq!(last_values.len(), 1);
-        assert_eq!(last_values[0].feed_id, "1".to_string());
+        assert_eq!(last_values[0].feed_id, "0:1".to_string());
         assert_eq!(last_values[0].value, None);
         // TODO, maybe we can expect error, that the feed is not registered !?
         assert!(last_values[0].error.is_some());
@@ -706,7 +707,7 @@ pub mod tests {
         .await;
         {
             let mut history = sequencer_state.feed_aggregate_history.write().await;
-            history.register_feed(1, 100);
+            history.register_feed(EncodedFeedId::new(1, 0), 100);
         }
 
         // Initialize the service
@@ -719,7 +720,7 @@ pub mod tests {
 
         let get_last_published_value_and_time_request: Vec<GetLastPublishedRequestData> =
             vec![GetLastPublishedRequestData {
-                feed_id: "1".to_string(),
+                feed_id: "0:1".to_string(),
             }];
 
         // Send the request
@@ -740,7 +741,7 @@ pub mod tests {
         let last_values: Vec<LastPublishedValue> =
             serde_json::from_value(v).expect("Can't parse repsonse");
         assert_eq!(last_values.len(), 1);
-        assert_eq!(last_values[0].feed_id, "1".to_string());
+        assert_eq!(last_values[0].feed_id, "0:1".to_string());
         assert_eq!(last_values[0].value, None);
         assert!(last_values[0].error.is_none())
     }
@@ -763,14 +764,14 @@ pub mod tests {
         {
             let mut history = sequencer_state.feed_aggregate_history.write().await;
             let feed_id = 1 as FeedId;
-            history.register_feed(feed_id, 100);
+            history.register_feed(EncodedFeedId::new(feed_id, 0), 100);
             let feed_value = FeedType::Numerical(102754.0f64);
             let end_slot_timestamp = first_report_start_time
                 .duration_since(UNIX_EPOCH)
                 .expect("Unknown error")
                 .as_millis()
                 + 300_u128 * 10_u128;
-            history.push_next(feed_id, feed_value, end_slot_timestamp);
+            history.push_next(EncodedFeedId::new(feed_id, 0), feed_value, end_slot_timestamp);
         }
 
         // Initialize the service
@@ -783,7 +784,7 @@ pub mod tests {
 
         let get_last_published_value_and_time_request: Vec<GetLastPublishedRequestData> =
             vec![GetLastPublishedRequestData {
-                feed_id: "1".to_string(),
+                feed_id: "0:1".to_string(),
             }];
 
         // Send the request
@@ -804,7 +805,7 @@ pub mod tests {
         let last_values: Vec<LastPublishedValue> =
             serde_json::from_value(v).expect("Can't parse repsonse");
         assert_eq!(last_values.len(), 1);
-        assert_eq!(last_values[0].feed_id, "1".to_string());
+        assert_eq!(last_values[0].feed_id, "0:1".to_string());
         assert_eq!(last_values[0].value, Some(FeedType::Numerical(102754.0)));
         assert_eq!(last_values[0].timeslot_end, 1524885325000);
         assert!(last_values[0].error.is_none())
@@ -833,30 +834,30 @@ pub mod tests {
         {
             let mut history = sequencer_state.feed_aggregate_history.write().await;
             let feed_id = 1 as FeedId;
-            history.register_feed(feed_id, 3);
+            history.register_feed(EncodedFeedId::new(feed_id, 0), 3);
 
             history.push_next(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedType::Numerical(102754.2f64),
                 end_slot_timestamp, /* + 300_u128 * 0*/
             );
             history.push_next(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedType::Numerical(122756.7f64),
                 end_slot_timestamp + 300_u128, /* * 1*/
             );
             history.push_next(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedType::Numerical(102753.0f64),
                 end_slot_timestamp + 300_u128 * 2,
             );
             history.push_next(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedType::Numerical(102244.3f64),
                 end_slot_timestamp + 300_u128 * 3,
             );
             history.push_next(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedType::Numerical(112754.2f64),
                 end_slot_timestamp + 300_u128 * 4,
             );
@@ -872,7 +873,7 @@ pub mod tests {
 
         let get_last_published_value_and_time_request: Vec<GetLastPublishedRequestData> =
             vec![GetLastPublishedRequestData {
-                feed_id: "1".to_string(),
+                feed_id: "0:1".to_string(),
             }];
 
         // Send the request
@@ -893,7 +894,7 @@ pub mod tests {
         let last_values: Vec<LastPublishedValue> =
             serde_json::from_value(v).expect("Can't parse repsonse");
         assert_eq!(last_values.len(), 1);
-        assert_eq!(last_values[0].feed_id, "1".to_string());
+        assert_eq!(last_values[0].feed_id, "0:1".to_string());
         assert_eq!(last_values[0].value, Some(FeedType::Numerical(112754.2f64)));
         assert_eq!(
             last_values[0].timeslot_end,

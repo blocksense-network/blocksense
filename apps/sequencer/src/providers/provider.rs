@@ -1196,15 +1196,15 @@ mod tests {
         let rpc_provider_mutex = sequencer_state.get_provider(network).await.clone().unwrap();
         let (_adfs_address, _adfs_deployed_byte_code) = {
             let mut rpc_provider = rpc_provider_mutex.lock().await;
-            rpc_provider.history.register_feed(feed_id, 100);
+            rpc_provider.history.register_feed(EncodedFeedId::new(feed_id, 0), 100);
 
             let block_number = rpc_provider.provider.get_block_number().await.unwrap();
             //println!("Block number from provider = {number}");
             //let block_num_at_time_of_writing_this_test = 16500374_u64;
             let block_num_at_time_of_writing_this_test = 0_u64;
             assert!(block_number > block_num_at_time_of_writing_this_test);
-            let last_rb_index = rpc_provider.get_latest_rb_index(&feed_id).await.unwrap();
-            assert_eq!(last_rb_index.feed_id, feed_id);
+            let last_rb_index = rpc_provider.get_latest_rb_index(&EncodedFeedId::new(feed_id, 0)).await.unwrap();
+            assert_eq!(last_rb_index.encoded_feed_id, EncodedFeedId::new(feed_id, 0));
             assert_eq!(last_rb_index.index, 0);
             (
                 rpc_provider
@@ -1230,18 +1230,18 @@ mod tests {
 
         {
             let v1 = VotedFeedUpdate {
-                feed_id: feed.id,
+                encoded_feed_id: EncodedFeedId::new(feed.id, 0),
                 value: FeedType::Numerical(103082.01f64),
                 end_slot_timestamp: end_slot_timestamp + interval_ms,
             };
             let v2 = VotedFeedUpdate {
-                feed_id: feed.id,
+                encoded_feed_id: EncodedFeedId::new(feed.id, 0),
                 value: FeedType::Numerical(103012.21f64),
                 end_slot_timestamp: end_slot_timestamp + interval_ms * 2,
             };
 
             let v3 = VotedFeedUpdate {
-                feed_id: feed.id,
+                encoded_feed_id: EncodedFeedId::new(feed.id, 0),
                 value: FeedType::Numerical(104011.78f64),
                 end_slot_timestamp: end_slot_timestamp + interval_ms * 3,
             };
@@ -1278,11 +1278,13 @@ mod tests {
             let block_num_at_time_of_writing_this_test = 3_u64;
             assert!(block_number > block_num_at_time_of_writing_this_test);
 
-            let last_values = rpc_provider.get_latest_values(&[feed_id]).await;
+            let encoded_feed_id = EncodedFeedId::new(feed_id, 0);
+
+            let last_values = rpc_provider.get_latest_values(&[encoded_feed_id]).await;
             info!("last_values = {last_values:?}");
 
-            let last_rb_index = rpc_provider.get_latest_rb_index(&feed_id).await.unwrap();
-            assert_eq!(last_rb_index.feed_id, feed_id);
+            let last_rb_index = rpc_provider.get_latest_rb_index(&encoded_feed_id).await.unwrap();
+            assert_eq!(last_rb_index.encoded_feed_id, encoded_feed_id);
             assert_eq!(last_rb_index.index, 2)
         }
         // Wait for all threads to JOIN
