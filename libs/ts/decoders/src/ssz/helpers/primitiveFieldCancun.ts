@@ -38,9 +38,9 @@ export const generateDecoderPrimitiveLines = (
         for {
           let ${fieldName}_i := 0
           ${fieldSize >= 256 ? `let shiftBytes := 0` : ''}
-        } lt(${fieldName}_i, ${fieldName}_size) {
-          ${fieldName}_i := add(${fieldName}_i, 1)
-          offset := add(offset, ${fieldSize})
+          } lt(${fieldName}_i, ${fieldName}_size) {
+            ${fieldName}_i := add(${fieldName}_i, 1)
+            offset := add(offset, ${fieldSize})
         } {
           if gt(${isBytes ? `add(offset, ${fieldSize})` : 'offset'}, 256) {
             shift := add(shift, div(${isBytes ? 'offset' : `sub(offset, ${fieldSize})`}, 8))
@@ -58,16 +58,11 @@ export const generateDecoderPrimitiveLines = (
         }
         `
           : `
-        for {
-          let ${fieldName}_i := 0
-        } lt(${fieldName}_i, ${fieldName}_size) {
-          ${fieldName}_i := add(${fieldName}_i, 1)
-        } {
-          mstore(
-            add(${fieldName}, mul(0x20, add(${fieldName}_i, 1))),
-            mload(add(data, add(${start}, mul(32, ${fieldName}_i))))
-          )
-        }
+        mcopy(
+          add(${fieldName}, 32),
+          add(data, ${start}),
+          shl(5, ${fieldName}_size)
+        )
         `
       }
     }

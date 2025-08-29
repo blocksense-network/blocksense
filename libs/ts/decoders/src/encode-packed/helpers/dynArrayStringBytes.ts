@@ -1,10 +1,11 @@
 import { DecoderData } from '../../utils';
+import { DecoderLines } from '../utils/types';
 import { generateMemoryAssignment } from './memoryAssignment';
-import { generateDecoderStringBytes } from './stringBytes';
 
 // dynamic array of bytes or string data
 export const generateDecoderDynamicDataLines = (
   data: DecoderData,
+  generateDecoderStringBytes: DecoderLines,
   parentIndex?: string,
 ) => {
   const { config, field, index, location } = data;
