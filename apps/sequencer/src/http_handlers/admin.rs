@@ -702,7 +702,7 @@ mod tests {
         .await;
 
         let req = test::TestRequest::get()
-            .uri("/get_feed_report_interval/1")
+            .uri("/get_feed_report_interval/0:1")
             .to_request();
 
         // Execute the request and read the response
@@ -849,7 +849,7 @@ mod tests {
                 // positive test
                 let feed_id = 1;
                 let req = test::TestRequest::get()
-                    .uri(format!("/get_feed_config/{feed_id}").as_str())
+                    .uri(format!("/get_feed_config/0:{feed_id}").as_str())
                     .to_request();
 
                 // Execute the request and read the response
@@ -876,7 +876,7 @@ mod tests {
                 //negative test
                 let feed_id = 1_000_000; // we consider this value is high enough for now
                 let req = test::TestRequest::get()
-                    .uri(format!("/get_feed_config/{feed_id}").as_str())
+                    .uri(format!("/get_feed_config/0:{feed_id}").as_str())
                     .to_request();
 
                 // Execute the request and read the response
