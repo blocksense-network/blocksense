@@ -1,11 +1,12 @@
 import { encodePackedData } from './encodeData';
 import { expandFields } from './expandFields';
 import { calculateFieldShift } from './adjustFields';
-import * as helpers from './helpers';
+import { checkForDynamicData, getDecoderImplementations } from './helpers';
 
 export {
   // helpers
-  helpers,
+  checkForDynamicData,
+  getDecoderImplementations,
 
   // encode data
   encodePackedData,

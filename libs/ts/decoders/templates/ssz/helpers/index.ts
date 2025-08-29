@@ -1,11 +1,17 @@
 import { Schema, Offset, isVector, hasFields } from '../utils/';
 import { addOffsets } from '../utils/addOffsets';
 import { handleFieldRanges } from '../utils/container';
-import { generateDecoderPrimitiveLines } from './primitiveField';
-import { generateDecoderStringBytes } from './stringBytes';
+import { getDecoderImplementations } from '../utils';
 import { generateNestedDynamic } from './nestedDynamic';
 
-export const generateDecoderLines = (schema: Schema, name: string) => {
+export const generateDecoderLines = (
+  schema: Schema,
+  name: string,
+  evmVersion: string,
+): string[] => {
+  const { generateDecoderPrimitiveLines, generateDecoderStringBytes } =
+    getDecoderImplementations(evmVersion);
+
   let dynamicIndex = 0;
   const generateDecoderLines = (
     schema: Schema,
