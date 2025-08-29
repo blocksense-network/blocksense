@@ -4,6 +4,7 @@ members = [
   "apps/sequencer",
   "apps/sequencer_tests",
   "apps/trigger-oracle",
+  "apps/wit-converter",
   "libs/alpaca_core",
   "libs/anomaly_detection",
   "libs/blockchain_data_model",
