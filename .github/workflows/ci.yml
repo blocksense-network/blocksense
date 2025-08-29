@@ -144,7 +144,37 @@ jobs:
       - name: Measure contract size
         run: yarn workspace @blocksense/contracts size
 
-  set-runner-system-matrix:
+  decoders-tests:
+    timeout-minutes: 360
+    runs-on: [self-hosted, nixos, x86-64-v3]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: metacraft-labs/nixos-modules/.github/install-nix@main
+        with:
+          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          cachix-cache: ${{ vars.CACHIX_CACHE }}
+          trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
+          substituters: ${{ vars.SUBSTITUTERS }}
+
+      - name: Build & activate the Nix Dev Shell
+        run: |
+          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.js || echo exit 1)"
+          env >> "$GITHUB_ENV"
+      - name: Install JS deps
+        run: yarn install
+
+      - name: Build all contracts
+        run: yarn build:recursive @blocksense/decoders
+
+      - name: Test all contracts
+        run: |
+          yarn workspace @blocksense/decoders test
+          yarn workspace @blocksense/decoders test:paris
+
+  set-runner-matrix-for-rust:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set.outputs.matrix }}
@@ -163,12 +193,11 @@ jobs:
             ']}' >> $GITHUB_OUTPUT
           fi
 
-  build-nix-environments-and-push-to-cachix:
-    name: Build Nix Environments and push to Cachix
-    needs: set-runner-system-matrix
-    timeout-minutes: 60
+  rust:
+    needs: set-runner-matrix-for-rust
+    timeout-minutes: 360
     strategy:
-      matrix: ${{ fromJson(needs.set-runner-system-matrix.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.set-runner-matrix-for-rust.outputs.matrix) }}
     runs-on: ${{ matrix.runner }}
 
     steps:
@@ -182,36 +211,21 @@ jobs:
           trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
           substituters: ${{ vars.SUBSTITUTERS }}
 
-      - name: Build Nix Environments and push to Cachix
-        run: |
-          nix build --impure -L --print-out-paths \
-            .#{spin,spinWrapped,process-compose-environments.hermetic.all,process-compose-environments.with-local-cargo-artifacts.all,devShells.${{ matrix.system }}.default} | \
-          cachix push blocksense
-
-  rust:
-    timeout-minutes: 360
-    runs-on: [self-hosted, nixos, x86-64-v3]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Nix
-        uses: metacraft-labs/nixos-modules/.github/install-nix@main
-        with:
-          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          cachix-cache: ${{ vars.CACHIX_CACHE }}
-          trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
-          substituters: ${{ vars.SUBSTITUTERS }}
+      - name: Install current Bash on macOS
+        if: runner.os == 'macOS'
+        run: brew install bash
 
       - name: Build & activate the Nix Dev Shell
         run: |
-          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
+          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.${{ matrix.system }}.default || echo exit 1)"
           env >> "$GITHUB_ENV"
 
       - name: Build Rust workspace
+        if: ${{ runner.environment == 'self-hosted' }}
         run: cargo build
 
       - name: Test Rust workspace
+        if: ${{ runner.environment == 'self-hosted' }}
         run: cargo test
 
   deploy_websites:
