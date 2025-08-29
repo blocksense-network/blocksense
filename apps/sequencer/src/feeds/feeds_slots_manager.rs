@@ -417,7 +417,7 @@ mod tests {
             .write()
             .await
             .push(
-                1,
+                EncodedFeedId::new(1, 0),
                 reporter_id,
                 test_payload_from_result(Ok(original_report_data.clone())),
             )
