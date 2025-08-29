@@ -406,11 +406,12 @@ mod tests {
         let end_of_timeslot: Timestamp = 0;
 
         // Send test votes
-        let k1 = "ab000000000000000000000000000001";
+        let k1 = "00ab0000000000000000000000000001";
         let v1 = "000000000000000000000000000010f0da2079987e1000000000000000000000";
         let vote_1 = VotedFeedUpdateWithProof {
             update: VotedFeedUpdate::new_decode(
                 k1,
+                0,
                 v1,
                 end_of_timeslot,
                 FeedType::Numerical(0.0),
@@ -419,11 +420,12 @@ mod tests {
             .unwrap(),
             proof: Vec::new(),
         };
-        let k2 = "ac000000000000000000000000000002";
+        let k2 = "00ac0000000000000000000000000002";
         let v2 = "000000000000000000000000000010f0da2079987e2000000000000000000000";
         let vote_2 = VotedFeedUpdateWithProof {
             update: VotedFeedUpdate::new_decode(
                 k2,
+                0,
                 v2,
                 end_of_timeslot,
                 FeedType::Numerical(0.0),
@@ -432,11 +434,12 @@ mod tests {
             .unwrap(),
             proof: Vec::new(),
         };
-        let k3 = "ad000000000000000000000000000003";
+        let k3 = "00ad0000000000000000000000000003";
         let v3 = "000000000000000000000000000010f0da2079987e3000000000000000000000";
         let vote_3 = VotedFeedUpdateWithProof {
             update: VotedFeedUpdate::new_decode(
                 k3,
+                0,
                 v3,
                 end_of_timeslot,
                 FeedType::Numerical(0.0),
@@ -445,11 +448,12 @@ mod tests {
             .unwrap(),
             proof: Vec::new(),
         };
-        let k4 = "af000000000000000000000000000004";
+        let k4 = "00af0000000000000000000000000004";
         let v4 = "000000000000000000000000000010f0da2079987e4000000000000000000000";
         let vote_4 = VotedFeedUpdateWithProof {
             update: VotedFeedUpdate::new_decode(
                 k4,
+                0,
                 v4,
                 end_of_timeslot,
                 FeedType::Numerical(0.0),
