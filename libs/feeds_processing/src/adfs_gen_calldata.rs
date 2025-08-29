@@ -274,7 +274,7 @@ pub mod tests {
     fn create_voted_feed_update(feed_id: FeedId, value: &str) -> VotedFeedUpdate {
         let bytes = from_hex_string(value).unwrap();
         VotedFeedUpdate {
-            feed_id,
+            encoded_feed_id: EncodedFeedId::new(feed_id, 0),
             value: FeedType::from_bytes(bytes, FeedType::Bytes(Vec::new()), 18).unwrap(),
             end_slot_timestamp: 0,
         }
@@ -283,7 +283,7 @@ pub mod tests {
     fn setup_updates_rb_indexes_and_config() -> (
         BatchedAggregatesToSend,
         RoundBufferIndices,
-        HashMap<FeedId, FeedStrideAndDecimals>,
+        HashMap<EncodedFeedId, FeedStrideAndDecimals>,
     ) {
         let updates = BatchedAggregatesToSend {
             block_height: 1234567890,
@@ -297,17 +297,17 @@ pub mod tests {
         };
 
         let mut rb_indices = RoundBufferIndices::new();
-        rb_indices.insert(1, 6);
-        rb_indices.insert(2, 5);
-        rb_indices.insert(3, 4);
-        rb_indices.insert(4, 3);
-        rb_indices.insert(5, 2);
+        rb_indices.insert(EncodedFeedId::new(1, 0), 6);
+        rb_indices.insert(EncodedFeedId::new(2, 0), 5);
+        rb_indices.insert(EncodedFeedId::new(3, 0), 4);
+        rb_indices.insert(EncodedFeedId::new(4, 0), 3);
+        rb_indices.insert(EncodedFeedId::new(5, 0), 2);
 
         let mut config = HashMap::new();
 
         for feed_id in 0..16 {
             config.insert(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedStrideAndDecimals {
                     stride: 0,
                     decimals: 18,
@@ -315,7 +315,7 @@ pub mod tests {
             );
         }
         config.insert(
-            1,
+            EncodedFeedId::new(1, 0),
             FeedStrideAndDecimals {
                 stride: 1,
                 decimals: 18,
@@ -366,7 +366,7 @@ pub mod tests {
         let net = "ETH";
 
         let (updates, mut rb_indices, config) = setup_updates_rb_indexes_and_config();
-        rb_indices.insert(6, 5);
+        rb_indices.insert(EncodedFeedId::new(6, 0), 5);
 
         let expected_result = "000000050102400c0107123432676435730002400501022456000260040102367800028003010248900002a00201025abc010000000000000500040003000200040000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
 

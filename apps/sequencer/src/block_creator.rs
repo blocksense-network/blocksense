@@ -411,6 +411,7 @@ mod tests {
         let vote_1 = VotedFeedUpdateWithProof {
             update: VotedFeedUpdate::new_decode(
                 k1,
+                0,
                 v1,
                 end_of_timeslot,
                 FeedType::Numerical(0.0),
@@ -424,6 +425,7 @@ mod tests {
         let vote_2 = VotedFeedUpdateWithProof {
             update: VotedFeedUpdate::new_decode(
                 k2,
+                0,
                 v2,
                 end_of_timeslot,
                 FeedType::Numerical(0.0),
@@ -437,6 +439,7 @@ mod tests {
         let vote_3 = VotedFeedUpdateWithProof {
             update: VotedFeedUpdate::new_decode(
                 k3,
+                0,
                 v3,
                 end_of_timeslot,
                 FeedType::Numerical(0.0),
@@ -450,6 +453,7 @@ mod tests {
         let vote_4 = VotedFeedUpdateWithProof {
             update: VotedFeedUpdate::new_decode(
                 k4,
+                0,
                 v4,
                 end_of_timeslot,
                 FeedType::Numerical(0.0),
