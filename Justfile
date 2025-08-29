@@ -84,6 +84,7 @@ build-ts package="all":
     yarn build-single @blocksense/config-types
     yarn build-single @blocksense/sol-reflector
     yarn build-single @blocksense/contracts
+    yarn build-single @blocksense/decoders
     yarn build-single @blocksense/data-feeds-config-generator
     yarn build-single @blocksense/dev
     yarn build-single @blocksense/adfs-indexer
