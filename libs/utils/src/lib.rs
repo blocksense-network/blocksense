@@ -62,6 +62,18 @@ impl EncodedFeedId {
     pub fn get_stride(&self) -> Stride {
         (self.data >> Self::FEED_BITS) as u8
     }
+
+    /// Lowercase hex, fixed width 32 nibbles, no `0x` prefix.
+    #[inline]
+    pub fn to_hex(&self) -> String {
+        format!("{:032x}", self.data)
+    }
+
+    /// Lowercase hex with `0x` prefix, fixed width (0x + 32 nibbles).
+    #[inline]
+    pub fn to_hex_prefixed(&self) -> String {
+        format!("{:#034x}", self.data) // width includes "0x"
+    }
 }
 
 /// Pretty-print as "stride:feed_id"
