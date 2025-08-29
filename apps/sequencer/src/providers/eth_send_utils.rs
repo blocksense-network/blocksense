@@ -1331,6 +1331,7 @@ mod tests {
     use alloy::network::EthereumWallet;
     use alloy::signers::local::PrivateKeySigner;
     use blocksense_utils::test_env::get_test_private_key_path;
+    use blocksense_utils::FeedId;
     use rdkafka::message::ToBytes;
     use regex::Regex;
     use std::fs;
@@ -1410,22 +1411,24 @@ mod tests {
     }
 
     fn create_rb_index_strides_and_decimals() -> (
-        std::collections::HashMap<FeedId, u64>,
-        std::collections::HashMap<FeedId, blocksense_config::FeedStrideAndDecimals>,
+        std::collections::HashMap<EncodedFeedId, u64>,
+        std::collections::HashMap<EncodedFeedId, blocksense_config::FeedStrideAndDecimals>,
     ) {
+        let key1 = EncodedFeedId::new(0x1F as FeedId, 0);
+        let key2 = EncodedFeedId::new(0x0FFF as FeedId, 0);
         let mut rb_indices = RoundBufferIndices::new();
-        rb_indices.insert(0x1F as FeedId, 7);
-        rb_indices.insert(0x0FFF as FeedId, 8);
+        rb_indices.insert(key1, 7);
+        rb_indices.insert(key2, 8);
         let mut strides_and_decimals = HashMap::new();
         strides_and_decimals.insert(
-            0x1F,
+            key1,
             FeedStrideAndDecimals {
                 stride: 0,
                 decimals: 8,
             },
         );
         strides_and_decimals.insert(
-            0x0FFF,
+            key2,
             FeedStrideAndDecimals {
                 stride: 0,
                 decimals: 8,
@@ -1600,12 +1603,12 @@ mod tests {
         //let updates = HashMap::from([("001f", "hi"), ("0fff", "bye")]);
         let end_slot_timestamp = 0_u128;
         let v1 = VotedFeedUpdate {
-            feed_id: 0x1F as FeedId,
+            encoded_feed_id: EncodedFeedId::new(0x1F as FeedId, 0),
             value: FeedType::Text("hi".to_string()),
             end_slot_timestamp,
         };
         let v2 = VotedFeedUpdate {
-            feed_id: 0x0FFF,
+            encoded_feed_id: EncodedFeedId::new(0x0FFF as FeedId, 0),
             value: FeedType::Text("bye".to_string()),
             end_slot_timestamp,
         };
@@ -1627,15 +1630,15 @@ mod tests {
             network,
             &mut updates,
             &Some(vec![
-                31,  // BTC/USD
-                47,  // ETH/USD
-                65,  // EURC/USD
-                236, // USDT/USD
-                131, // USDC/USD
-                21,  // PAXG/USD
-                206, // TBTC/USD
-                43,  // WBTC/USD
-                4,   // WSTETH/USD
+                EncodedFeedId::new(31, 0),  // BTC/USD
+                EncodedFeedId::new(47, 0),  // ETH/USD
+                EncodedFeedId::new(65, 0),  // EURC/USD
+                EncodedFeedId::new(236, 0), // USDT/USD
+                EncodedFeedId::new(131, 0), // USDC/USD
+                EncodedFeedId::new(21, 0),  // PAXG/USD
+                EncodedFeedId::new(206, 0), // TBTC/USD
+                EncodedFeedId::new(43, 0),  // WBTC/USD
+                EncodedFeedId::new(4, 0),   // WSTETH/USD
             ]),
         );
 
@@ -1665,12 +1668,12 @@ mod tests {
             network,
             &mut updates,
             &Some(vec![
-                31,  // BTC/USD
-                47,  // ETH/USD
-                65,  // EURC/USD
-                236, // USDT/USD
-                131, // USDC/USD
-                21,  // PAXG/USD
+                EncodedFeedId::new(31, 0),  // BTC/USD
+                EncodedFeedId::new(47, 0),  // ETH/USD
+                EncodedFeedId::new(65, 0),  // EURC/USD
+                EncodedFeedId::new(236, 0), // USDT/USD
+                EncodedFeedId::new(131, 0), // USDC/USD
+                EncodedFeedId::new(21, 0),  // PAXG/USD
             ]),
         );
 
@@ -1696,11 +1699,11 @@ mod tests {
             network,
             &mut updates,
             &Some(vec![
-                31,  // BTC/USD
-                47,  // ETH/USD
-                236, // USDT/USD
-                131, // USDC/USD
-                43,  // WBTC/USD
+                EncodedFeedId::new(31, 0),  // BTC/USD
+                EncodedFeedId::new(47, 0),  // ETH/USD
+                EncodedFeedId::new(236, 0), // USDT/USD
+                EncodedFeedId::new(131, 0), // USDC/USD
+                EncodedFeedId::new(43, 0),  // WBTC/USD
             ]),
         );
 
@@ -1723,28 +1726,28 @@ mod tests {
     fn peg_stable_coin_updates_data() -> BatchedAggregatesToSend {
         let end_slot_timestamp = 0_u128;
         let v1 = VotedFeedUpdate {
-            feed_id: 0x1F as FeedId,
+            encoded_feed_id: EncodedFeedId::new(0x1F as FeedId, 0),
             value: FeedType::Text("hi".to_string()),
             end_slot_timestamp,
         };
         let v2 = VotedFeedUpdate {
-            feed_id: 0x0FFF,
+            encoded_feed_id: EncodedFeedId::new(0x0FFF as FeedId, 0),
             value: FeedType::Text("bye".to_string()),
             end_slot_timestamp,
         };
         let v3 = VotedFeedUpdate {
-            feed_id: 0x001 as FeedId,
+            encoded_feed_id: EncodedFeedId::new(0x001 as FeedId, 0),
             value: FeedType::Numerical(1.001f64),
             end_slot_timestamp,
         };
 
         let v4 = VotedFeedUpdate {
-            feed_id: 0x001 as FeedId,
+            encoded_feed_id: EncodedFeedId::new(0x001 as FeedId, 0),
             value: FeedType::Numerical(1.101f64),
             end_slot_timestamp,
         };
         let v5 = VotedFeedUpdate {
-            feed_id: 0x001 as FeedId,
+            encoded_feed_id: EncodedFeedId::new(0x001 as FeedId, 0),
             value: FeedType::Numerical(0.991f64),
             end_slot_timestamp,
         };
@@ -1769,7 +1772,7 @@ mod tests {
             .entry(network.to_string())
             .and_modify(|p| {
                 let c = PublishCriteria {
-                    feed_id: 1 as FeedId,
+                    encoded_feed_id: EncodedFeedId::new(1 as FeedId, 0),
                     skip_publish_if_less_then_percentage: 0.3f64,
                     always_publish_heartbeat_ms: None,
                     peg_to_value: Some(1f64),
@@ -1792,7 +1795,7 @@ mod tests {
         let mut provider = prov2.get_mut(network).unwrap().lock().await;
 
         provider.update_history(&[VotedFeedUpdate {
-            feed_id: 0x001 as FeedId,
+            encoded_feed_id: EncodedFeedId::new(0x001 as FeedId, 0),
             value: FeedType::Numerical(1.0f64),
             end_slot_timestamp: 0_u128,
         }]);
@@ -1824,7 +1827,7 @@ mod tests {
             .entry(network.to_string())
             .and_modify(|p| {
                 let c = PublishCriteria {
-                    feed_id: 1 as FeedId,
+                    encoded_feed_id: EncodedFeedId::new(1 as FeedId, 0),
                     skip_publish_if_less_then_percentage: 0.0f64,
                     always_publish_heartbeat_ms: None,
                     peg_to_value: None,
@@ -1846,7 +1849,7 @@ mod tests {
         let mut provider = prov2.get_mut(network).unwrap().lock().await;
 
         provider.update_history(&[VotedFeedUpdate {
-            feed_id: 0x001 as FeedId,
+            encoded_feed_id: EncodedFeedId::new(0x001 as FeedId, 0),
             value: FeedType::Numerical(1.0f64),
             end_slot_timestamp: 0_u128,
         }]);
