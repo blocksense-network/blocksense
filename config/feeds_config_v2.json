@@ -43392,7 +43392,7 @@
         "market_hours": "US_Equities",
         "arguments": {
           "kind": "stock-price-feeds",
-          "providers": ["AlphaVantage", "YahooFinance", "twelvedata", "FMP"]
+          "providers": ["AlphaVantage", "YahooFinance", "FMP"]
         }
       }
     },
@@ -43424,7 +43424,7 @@
         "market_hours": "US_Equities",
         "arguments": {
           "kind": "stock-price-feeds",
-          "providers": ["AlphaVantage", "YahooFinance", "twelvedata", "FMP"]
+          "providers": ["AlphaVantage", "YahooFinance", "FMP"]
         }
       }
     },
@@ -43456,13 +43456,7 @@
         "market_hours": "US_Equities",
         "arguments": {
           "kind": "stock-price-feeds",
-          "providers": [
-            "AlpacaMarkets",
-            "AlphaVantage",
-            "YahooFinance",
-            "twelvedata",
-            "FMP"
-          ]
+          "providers": ["AlpacaMarkets", "AlphaVantage", "YahooFinance", "FMP"]
         }
       }
     }
