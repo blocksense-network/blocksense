@@ -1,5 +1,5 @@
 module.exports = {
-  skipFiles: ['Decoder.sol', 'test/'],
+  skipFiles: ['test/'],
   mocha: {
     grep: '@skip-coverage',
     invert: true,
