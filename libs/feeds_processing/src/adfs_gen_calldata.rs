@@ -271,20 +271,20 @@ pub mod tests {
     use super::*;
 
     // Helper function to create VotedFeedUpdate
-    fn create_voted_feed_update(feed_id: FeedId, value: &str) -> VotedFeedUpdate {
+    fn create_voted_feed_update(encoded_feed_id: EncodedFeedId, value: &str) -> VotedFeedUpdate {
         let bytes = from_hex_string(value).unwrap();
         VotedFeedUpdate {
-            feed_id,
+            encoded_feed_id,
             value: FeedType::from_bytes(bytes, FeedType::Bytes(Vec::new()), 18).unwrap(),
             end_slot_timestamp: 0,
         }
     }
 
-    fn default_config() -> HashMap<FeedId, FeedStrideAndDecimals> {
+    fn default_config() -> HashMap<EncodedFeedId, FeedStrideAndDecimals> {
         let mut config = HashMap::new();
         for feed_id in 0..16 {
             config.insert(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedStrideAndDecimals {
                     stride: 0,
                     decimals: 18,
@@ -292,7 +292,7 @@ pub mod tests {
             );
         }
         config.insert(
-            1,
+            EncodedFeedId::new(1, 0),
             FeedStrideAndDecimals {
                 stride: 1,
                 decimals: 18,
@@ -301,14 +301,14 @@ pub mod tests {
         config
     }
 
-    fn setup_updates_rounds_and_config(
-        updates_init: &[(FeedId, &str)],
-        rb_indices_init: &[(FeedId, u64)],
-        config_init: HashMap<FeedId, FeedStrideAndDecimals>,
+    fn setup_updates_rb_indices_and_config(
+        updates_init: &[(EncodedFeedId, &str)],
+        rb_indices_init: &[(EncodedFeedId, u64)],
+        config_init: HashMap<EncodedFeedId, FeedStrideAndDecimals>,
     ) -> (
         BatchedAggregatesToSend,
         RoundBufferIndices,
-        HashMap<FeedId, FeedStrideAndDecimals>,
+        HashMap<EncodedFeedId, FeedStrideAndDecimals>,
     ) {
         let updates = BatchedAggregatesToSend {
             block_height: 1234567890,
@@ -319,11 +319,15 @@ pub mod tests {
         };
 
         let mut rb_indices = RoundBufferIndices::new();
-        for (feed_id, index) in rb_indices_init.iter() {
-            rb_indices.insert(*feed_id, *index);
+        for (feed_id, round) in rb_indices_init.iter() {
+            rb_indices.insert(*feed_id, *round);
         }
 
         (updates, rb_indices, config_init)
+    }
+
+    fn encoded_feed_id_for_stride_zero(feed_id: FeedId) -> EncodedFeedId {
+        EncodedFeedId::new(feed_id, 0)
     }
 
     #[tokio::test]
@@ -331,17 +335,23 @@ pub mod tests {
         let net = "ETH";
 
         let updates_init = vec![
-            (1, "12343267643573"),
-            (2, "2456"),
-            (3, "3678"),
-            (4, "4890"),
-            (5, "5abc"),
+            (encoded_feed_id_for_stride_zero(1), "12343267643573"),
+            (encoded_feed_id_for_stride_zero(2), "2456"),
+            (encoded_feed_id_for_stride_zero(3), "3678"),
+            (encoded_feed_id_for_stride_zero(4), "4890"),
+            (encoded_feed_id_for_stride_zero(5), "5abc"),
         ];
-        let rb_indices_init = vec![(1, 6), (2, 5), (3, 4), (4, 3), (5, 2)];
+        let round_counters_init = vec![
+            (encoded_feed_id_for_stride_zero(1), 6),
+            (encoded_feed_id_for_stride_zero(2), 5),
+            (encoded_feed_id_for_stride_zero(3), 4),
+            (encoded_feed_id_for_stride_zero(4), 3),
+            (encoded_feed_id_for_stride_zero(5), 2)
+        ];
 
         let config_init = default_config();
         let (updates, rb_indices, config) =
-            setup_updates_rounds_and_config(&updates_init, &rb_indices_init, config_init);
+            setup_updates_rb_indices_and_config(&updates_init, &round_counters_init, config_init);
 
         let expected_result = "000000050102400c0107123432676435730002400501022456000260040102367800028003010248900002a00201025abc010000000000000500040003000200000000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
 
@@ -379,18 +389,24 @@ pub mod tests {
         let net = "ETH";
 
         let updates_init = vec![
-            (1, "12343267643573"),
-            (2, "2456"),
-            (3, "3678"),
-            (4, "4890"),
-            (5, "5abc"),
+            (encoded_feed_id_for_stride_zero(1), "12343267643573"),
+            (encoded_feed_id_for_stride_zero(2), "2456"),
+            (encoded_feed_id_for_stride_zero(3), "3678"),
+            (encoded_feed_id_for_stride_zero(4), "4890"),
+            (encoded_feed_id_for_stride_zero(5), "5abc"),
         ];
-        let rb_indices_init = vec![(1, 6), (2, 5), (3, 4), (4, 3), (5, 2)];
+        let round_counters_init = vec![
+            (encoded_feed_id_for_stride_zero(1), 6),
+            (encoded_feed_id_for_stride_zero(2), 5),
+            (encoded_feed_id_for_stride_zero(3), 4),
+            (encoded_feed_id_for_stride_zero(4), 3),
+            (encoded_feed_id_for_stride_zero(5), 2)
+        ];
 
         let config_init = default_config();
         let (updates, mut rb_indices, config) =
-            setup_updates_rounds_and_config(&updates_init, &rb_indices_init, config_init);
-        rb_indices.insert(6, 5);
+            setup_updates_rb_indices_and_config(&updates_init, &round_counters_init, config_init);
+        rb_indices.insert(encoded_feed_id_for_stride_zero(6), 5);
 
         let expected_result = "000000050102400c0107123432676435730002400501022456000260040102367800028003010248900002a00201025abc010000000000000500040003000200040000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
 
@@ -428,18 +444,24 @@ pub mod tests {
         let net = "ETH";
 
         let updates_init = vec![
-            (1, "12343267643573"),
-            (2, "2456"),
-            (3, "3678"),
-            (4, "4890"),
-            (5, "5abc"),
+            (encoded_feed_id_for_stride_zero(1), "12343267643573"),
+            (encoded_feed_id_for_stride_zero(2), "2456"),
+            (encoded_feed_id_for_stride_zero(3), "3678"),
+            (encoded_feed_id_for_stride_zero(4), "4890"),
+            (encoded_feed_id_for_stride_zero(5), "5abc"),
         ];
-        let round_counters_init = vec![(1, 6), (2, 5), (3, 4), (4, 9000), (5, 2)];
+        let round_counters_init = vec![
+            (encoded_feed_id_for_stride_zero(1), 6),
+            (encoded_feed_id_for_stride_zero(2), 5),
+            (encoded_feed_id_for_stride_zero(3), 4),
+            (encoded_feed_id_for_stride_zero(4), 9000),
+            (encoded_feed_id_for_stride_zero(5), 2)
+        ];
 
         let config_init = default_config();
         let (updates, mut round_counters, config) =
-            setup_updates_rounds_and_config(&updates_init, &round_counters_init, config_init);
-        round_counters.insert(6, 5);
+            setup_updates_rb_indices_and_config(&updates_init, &round_counters_init, config_init);
+        round_counters.insert(encoded_feed_id_for_stride_zero(6), 5);
 
         let expected_result = "000000050102400c0107123432676435730002400501022456000260040102367800028328010248900002a00201025abc010000000000000500040328000200040000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
 

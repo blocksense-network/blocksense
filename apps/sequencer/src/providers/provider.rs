@@ -1097,13 +1097,13 @@ mod tests {
         let rpc_provider_mutex = sequencer_state.get_provider(network).await.clone().unwrap();
         let (adfs_address, adfs_deployed_byte_code) = {
             let mut rpc_provider = rpc_provider_mutex.lock().await;
-            rpc_provider.history.register_feed(feed_id, 100);
+            rpc_provider.history.register_feed(EncodedFeedId::new(feed_id, 0), 100);
 
             let block_number = rpc_provider.provider.get_block_number().await.unwrap();
             let block_num_at_time_of_writing_this_test = 0_u64;
             assert!(block_number > block_num_at_time_of_writing_this_test);
-            let last_rb_index = rpc_provider.get_latest_rb_index(&feed_id).await.unwrap();
-            assert_eq!(last_rb_index.feed_id, feed_id);
+            let last_rb_index = rpc_provider.get_latest_rb_index(&EncodedFeedId::new(feed_id, 0)).await.unwrap();
+            assert_eq!(last_rb_index.encoded_feed_id, EncodedFeedId::new(feed_id, 0));
             assert_eq!(last_rb_index.index, 0);
             (
                 rpc_provider
@@ -1271,18 +1271,18 @@ mod tests {
 
         {
             let v1 = VotedFeedUpdate {
-                feed_id: feed.id,
+                encoded_feed_id: EncodedFeedId::new(feed.id, 0),
                 value: FeedType::Numerical(103082.01f64),
                 end_slot_timestamp: end_slot_timestamp + interval_ms,
             };
             let v2 = VotedFeedUpdate {
-                feed_id: feed.id,
+                encoded_feed_id: EncodedFeedId::new(feed.id, 0),
                 value: FeedType::Numerical(103012.21f64),
                 end_slot_timestamp: end_slot_timestamp + interval_ms * 2,
             };
 
             let v3 = VotedFeedUpdate {
-                feed_id: feed.id,
+                encoded_feed_id: EncodedFeedId::new(feed.id, 0),
                 value: FeedType::Numerical(104011.78f64),
                 end_slot_timestamp: end_slot_timestamp + interval_ms * 3,
             };
@@ -1319,11 +1319,13 @@ mod tests {
             let block_num_at_time_of_writing_this_test = 3_u64;
             assert!(block_number > block_num_at_time_of_writing_this_test);
 
-            let last_values = rpc_provider.get_latest_values(&[feed_id]).await;
+            let encoded_feed_id = EncodedFeedId::new(feed_id, 0);
+
+            let last_values = rpc_provider.get_latest_values(&[encoded_feed_id]).await;
             info!("last_values = {last_values:?}");
 
-            let last_rb_index = rpc_provider.get_latest_rb_index(&feed_id).await.unwrap();
-            assert_eq!(last_rb_index.feed_id, feed_id);
+            let last_rb_index = rpc_provider.get_latest_rb_index(&encoded_feed_id).await.unwrap();
+            assert_eq!(last_rb_index.encoded_feed_id, encoded_feed_id);
             assert_eq!(last_rb_index.index, 2)
         }
         // Wait for all threads to JOIN
@@ -1337,8 +1339,8 @@ mod tests {
 
     #[tokio::test]
     async fn test_recover_after_read_overflowed_rb_index_value() -> Result<()> {
-        let round_counter_val = 9111;
-        let wrapped_val = round_counter_val % MAX_HISTORY_ELEMENTS_PER_FEED as u16 + 1;
+        let rb_index = 9111;
+        let wrapped_val = rb_index % MAX_HISTORY_ELEMENTS_PER_FEED as u16 + 1;
 
         let metrics_prefix = "test_recover_after_read_overflowed_rb_index_value";
 
@@ -1394,9 +1396,10 @@ mod tests {
             let pending_tx = provider.send_transaction(tx).await.expect("send tx");
             let receipt = pending_tx.get_receipt().await.expect("get receipt");
             info!("Receipt = {receipt:?}");
-            let last_index = p.get_latest_rb_index(&feed_id).await.unwrap();
-            assert_eq!(last_index.feed_id, feed_id);
-            assert_eq!(last_index.index, round_counter_val);
+            let encoded_feed_id = EncodedFeedId::new(feed_id, stride);
+            let last_index = p.get_latest_rb_index(&encoded_feed_id).await.unwrap();
+            assert_eq!(last_index.encoded_feed_id, encoded_feed_id);
+            assert_eq!(last_index.index, rb_index);
         }
 
         // Some arbitrary point in time in the past, nothing special about this value
@@ -1423,7 +1426,7 @@ mod tests {
                 x.deployed_byte_code = Some(adfs_deployed_byte_code)
             }
             p.publishing_criteria.push(PublishCriteria {
-                feed_id,
+                encoded_feed_id: EncodedFeedId::new(feed_id, stride),
                 skip_publish_if_less_then_percentage: 0.5,
                 always_publish_heartbeat_ms: Some(864000),
                 peg_to_value: None,
@@ -1444,12 +1447,13 @@ mod tests {
                 .unwrap();
             let provider = new_rpc_provider.lock().await;
             let counters = &provider.rb_indices;
-            assert_eq!(Some(wrapped_val as u64), counters.get(&feed_id).copied());
+            let encoded_feed_id = EncodedFeedId::new(feed_id, stride);
+            assert_eq!(Some(wrapped_val as u64), counters.get(&encoded_feed_id).copied());
 
-            let x = provider.get_latest_values(&[feed_id]).await.unwrap();
+            let x = provider.get_latest_values(&[encoded_feed_id]).await.unwrap();
             assert_eq!(x.len(), 1);
             let v = x[0].clone().unwrap();
-            assert_eq!(v.num_updates, round_counter_val.into());
+            assert_eq!(v.num_updates, rb_index.into());
 
             {
                 let metrics_prefix3 = "test_recover_after_read_overflowed_rb_index_value_3";
@@ -1465,7 +1469,7 @@ mod tests {
                 // publish new update
                 let new_update = FeedType::Numerical(94011.11f64);
                 let v1 = VotedFeedUpdate {
-                    feed_id,
+                    encoded_feed_id,
                     value: new_update.clone(),
                     end_slot_timestamp: end_slot_timestamp + interval_ms * 4,
                 };
@@ -1474,18 +1478,23 @@ mod tests {
                     updates: vec![v1],
                 };
 
-                let p1 = eth_batch_send_to_all_contracts(&sequencer_state, &updates1, None).await;
+                let p1 = eth_batch_send_to_all_contracts(
+                    &sequencer_state,
+                    &updates1,
+                    None,
+                )
+                .await;
 
                 assert!(p1.is_ok());
                 tokio::time::sleep(Duration::from_millis(2000)).await;
 
                 let prov = sequencer_state.providers.read().await;
                 let p = prov.get(network).unwrap();
-                let round = p.lock().await.get_latest_rb_index(&feed_id).await.unwrap();
+                let round = p.lock().await.get_latest_rb_index(&encoded_feed_id).await.unwrap();
                 let vals = p
                     .lock()
                     .await
-                    .get_latest_values(&[feed_id])
+                    .get_latest_values(&[encoded_feed_id])
                     .await
                     .expect("Could not get latest value");
                 let val = vals[0]
@@ -1495,7 +1504,10 @@ mod tests {
                 // Assert that the value of the round counter in the contract is as expected.
                 // Note: The sequencer tracks the index of the *next* slot to write,
                 // while the contract stores the index of the *last* written value.
-                assert_eq!(round.index, wrapped_val);
+                assert_eq!(
+                    round.index,
+                    wrapped_val
+                );
 
                 assert_eq!(val.value, new_update);
 
