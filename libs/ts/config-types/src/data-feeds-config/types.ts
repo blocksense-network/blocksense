@@ -8,6 +8,7 @@ import {
   spoutRwaArgsSchema,
   stockPriceFeedsArgsSchema,
   hyperBorrowRatesArgsSchema,
+  forexPriceFeedsArgsSchema,
 } from './oracles';
 /**
  * Schema for the data feed category ( Chainlink compatible ).
@@ -200,6 +201,7 @@ export const NewFeedSchema = S.mutable(
         market_hours: S.NullishOr(MarketHoursSchema),
         arguments: S.Union(
           stockPriceFeedsArgsSchema,
+          forexPriceFeedsArgsSchema,
           cexPriceFeedsArgsSchema,
           geckoTerminalArgsSchema,
           ethRpcArgsSchema,
