@@ -2444,6 +2444,36 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@blocksense/decoders@workspace:libs/ts/decoders":
+  version: 0.0.0-use.local
+  resolution: "@blocksense/decoders@workspace:libs/ts/decoders"
+  dependencies:
+    "@chainsafe/ssz": "npm:^1.0.2"
+    "@nomicfoundation/hardhat-chai-matchers": "npm:^2.0.8"
+    "@nomicfoundation/hardhat-ethers": "npm:^3.0.8"
+    "@nomicfoundation/hardhat-network-helpers": "npm:^1.0.12"
+    "@nomicfoundation/hardhat-toolbox": "npm:^5.0.0"
+    "@nomiclabs/hardhat-ethers": "npm:^2.2.3"
+    "@typechain/ethers-v6": "npm:^0.5.1"
+    "@typechain/hardhat": "npm:^9.1.0"
+    "@types/chai": "npm:4"
+    "@types/ejs": "npm:^3"
+    "@types/mocha": "npm:^10.0.10"
+    "@types/node": "npm:^22.10.2"
+    chai: "npm:4"
+    dotenv: "npm:^16.4.7"
+    ejs: "npm:^3.1.10"
+    ethers: "npm:^6.13.4"
+    hardhat: "npm:^2.22.17"
+    prettier: "npm:^3.4.1"
+    prettier-plugin-solidity: "npm:^1.4.1"
+    ts-node: "npm:^10.9.2"
+    tslib: "npm:^2.8.1"
+    tsx: "npm:^4.19.2"
+    typechain: "npm:^8.3.2"
+  languageName: unknown
+  linkType: soft
+
 "@blocksense/docs-ui@workspace:*, @blocksense/docs-ui@workspace:libs/ts/docs-ui":
   version: 0.0.0-use.local
   resolution: "@blocksense/docs-ui@workspace:libs/ts/docs-ui"

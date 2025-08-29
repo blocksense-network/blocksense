@@ -1,0 +1,15 @@
+{
+  "extends": "../../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "isolatedModules": false,
+    "strictPropertyInitialization": true,
+    "noImplicitOverride": false,
+    "noPropertyAccessFromIndexSignature": false,
+    "moduleResolution": "NodeNext",
+    "outDir": "dist",
+    "rootDir": "."
+  },
+  "include": ["**/*.ts", "./test/TemplateDecoder.test.ts", "@types/**/*.d.ts"],
+  "exclude": ["artifacts", "cache", "contracts", "dist"]
+}
