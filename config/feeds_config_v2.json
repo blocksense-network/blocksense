@@ -41766,6 +41766,70 @@
       }
     },
     {
+      "id": "10000",
+      "full_name": "EUR / USD",
+      "description": "Price of Euro (EUR) in USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "EUR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10001",
+      "full_name": "MYR / USD",
+      "description": "Price of Malaysian Ringgit (MYR) in USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "MYR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
       "id": "50000",
       "full_name": "USDT / USD Peg-aware",
       "description": "Peg-aware price of USDT in USD",
