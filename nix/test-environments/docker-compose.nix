@@ -6,33 +6,9 @@
 let
   cfg = config.services.blocksense;
 
-  # Function to read and parse the JSON file
-  readJson = path: builtins.fromJSON (builtins.readFile path);
-
-  readPortsFromFile =
-    path:
-    let
-      content = builtins.readFile path;
-      lines = lib.strings.splitString "\n" content;
-      nonEmpty = builtins.filter (s: s != "") lines;
-      asInts = builtins.map builtins.fromJSON nonEmpty;
-    in
-    asInts;
-
-  availablePorts =
-    let
-      filePath = "${config.devenv.root}/config/generated/process-compose/available-ports";
-    in
-    if builtins.pathExists filePath then readPortsFromFile filePath else [ 8547 ];
-
   testKeysDir = config.devenv.root + "/nix/test-environments/test-keys";
-  e2eTestKeysDir = config.devenv.root + "/apps/e2e-tests/test-keys";
-  deploymentV2FilePath = config.devenv.root + "/config/evm_contracts_deployment_v2/ink-sepolia.json";
 
-  upgradeableProxyADFSContractAddressInk =
-    (readJson deploymentV2FilePath).contracts.coreContracts.UpgradeableProxyADFS.address;
   impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
-  anvilInkSepoliaPort = builtins.elemAt availablePorts 0;
 in
 {
   imports = [
@@ -48,20 +24,17 @@ in
 
     anvil = lib.mkForce {
       ink-sepolia = {
-        host = "127.0.0.1";
-        port = anvilInkSepoliaPort;
+        host = "anvil-ink-sepolia";
         chain-id = 99999999999;
         fork-url = "wss://ws-gel-sepolia.inkonchain.com";
       };
     };
 
     sequencer = {
+      host = "blocksense-sequencer";
       providers = lib.mkForce {
         ink-sepolia = {
-          url = "http://anvil-ink-sepolia:${toString anvilInkSepoliaPort}";
           private-key-path = "/run/secrets/blocksense-sequencer-evm-priv-key";
-          contract-address = upgradeableProxyADFSContractAddressInk;
-          contract-version = 2;
           transaction-gas-limit = 20000000;
           impersonated-anvil-account = impersonationAddress;
           publishing-criteria = [

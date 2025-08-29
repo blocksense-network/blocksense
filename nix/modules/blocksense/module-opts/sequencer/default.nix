@@ -12,6 +12,12 @@ with lib;
       description = mdDoc "An identifier for the sequencer, useful when we have more than one.";
     };
 
+    host = mkOption {
+      type = types.str;
+      default = "127.0.0.1";
+      description = "The host to use for the sequencer instance.";
+    };
+
     ports = {
       main = mkOption {
         type = types.port;

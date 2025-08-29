@@ -6,9 +6,9 @@ configs:
   blocksense-feeds:
     file: ../../feeds_config_v2.json
   blocksense-sequencer:
-    file: ./config/sequencer_config.json
+    file: ../../generated/process-compose/docker-compose/sequencer_config.json
   blocksense-reporter:
-    file: ./config/reporter_config_a.json
+    file: ../../generated/process-compose/docker-compose/reporter_config_a.json
 
 secrets:
   blocksense-sequencer-evm-priv-key:
@@ -34,15 +34,22 @@ secrets:
     file: ../../../nix/test-environments/test-keys/YAHOO_FINANCE_API_KEY
 
 services:
-  # anvil:
-  #   image: ghcr.io/blocksense-network/blocksense/sequencer:1.0.0
-  #   networks:
-  #     - blocksense
-  #   ports:
-  #     - "8545:8545" # ETH EL JSON RPC port
+  anvil-ink-sepolia:
+    image: ghcr.io/foundry-rs/foundry:latest
+    entrypoint: >
+      /usr/local/bin/anvil
+      --host 0.0.0.0
+      --port 8544
+      --chain-id 99999999999
+      --fork-url wss://ws-gel-sepolia.inkonchain.com
+    networks:
+      - blocksense
+    ports:
+      - '8544:8544' # ETH EL JSON RPC port
 
   blocksense-sequencer:
     image: blocksense/sequencer:dev
+    stop_grace_period: 0s
     networks:
       - blocksense
     ports:
@@ -62,14 +69,19 @@ services:
         target: /etc/blocksense/feeds_config_v2.json
 
   blocksense-reporter-a:
+    stop_grace_period: 0s
     depends_on:
       - blocksense-sequencer
     image: blocksense/reporter:dev
+    working_dir: /tmp
     networks:
       - blocksense
     configs:
       - source: blocksense-reporter
         target: /etc/blocksense/reporter_config_a.json
+    environment:
+      - RUST_BACKTRACE=full
+      - RUST_LOG=trigger=trace,feeds_processing=info
     secrets:
       - blocksense-reporter-bls-priv-key
       - blocksense-reporter-evm-priv-key
@@ -80,18 +92,3 @@ services:
       - blocksense-reporter-spout-rwa-api-key
       - blocksense-reporter-twelvedata-api-key
       - blocksense-reporter-yahoo-finance-api-key
-
-  # grafana:
-  #   image: grafana/grafana
-  #   networks:
-  #     - observability
-  #   ports:
-  #     - 3000:3000
-
-  # prometheus:
-  #   image: prom/prometheus
-  #   networks:
-  #     - observability
-  #     - blocksense
-  #   ports:
-  #     - 9090:9090

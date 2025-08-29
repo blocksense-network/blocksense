@@ -102,6 +102,20 @@
             name = "blocksense/reporter";
             tag = version;
 
+            copyToRoot = pkgs.buildEnv {
+              name = "root";
+              paths = builtins.attrValues self'.legacyPackages.oracle-scripts ++ [
+                self'.legacyPackages.spinWrapped
+                pkgs.bashInteractive
+                pkgs.coreutils
+                pkgs.curl
+                pkgs.ripgrep
+              ];
+              pathsToLink = [
+                "/bin"
+              ];
+            };
+
             config = {
               cmd = [
                 "${self'.apps.blocksense.program}"
