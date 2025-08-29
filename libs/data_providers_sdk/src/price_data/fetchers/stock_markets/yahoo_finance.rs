@@ -2,14 +2,16 @@ use std::collections::HashMap;
 
 use anyhow::{Error, Result};
 use futures::{future::LocalBoxFuture, FutureExt};
-use tracing::warn;
 
 use serde::Deserialize;
 use serde_json::Value;
 
 use blocksense_sdk::http::http_get_json;
 
-use crate::price_data::traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher};
+use crate::price_data::{
+    fetchers::stock_markets::utils::print_missing_network_price_data,
+    traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
+};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -80,16 +82,11 @@ impl<'a> PricesFetcher<'a> for YFPriceFetcher<'a> {
                             Some((value.symbol, PricePoint { price, volume }))
                         }
                         _ => {
-                            warn!(
-                                "[YahooFinance] Skipping symbol {}: missing {}{}{}",
-                                value.symbol,
-                                if price.is_none() { "price" } else { "" },
-                                if price.is_none() && volume.is_none() {
-                                    " and "
-                                } else {
-                                    ""
-                                },
-                                if volume.is_none() { "volume" } else { "" },
+                            print_missing_network_price_data(
+                                "YahooFinance",
+                                value.symbol.clone(),
+                                price,
+                                volume,
                             );
                             None
                         }
