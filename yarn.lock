@@ -3662,17 +3662,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@effect/schema@npm:^0.75.5":
-  version: 0.75.5
-  resolution: "@effect/schema@npm:0.75.5"
-  dependencies:
-    fast-check: "npm:^3.21.0"
-  peerDependencies:
-    effect: ^3.9.2
-  checksum: 10c0/287a860f67eb41d54d0b46f2303eba273b35a9db41f1c2c352fc94023e88574969e03c6284d5dcefdda953f56eabdd98d2cdd268fa872f5966108f540c9e3f44
-  languageName: node
-  linkType: hard
-
 "@effect/sql@npm:^0.37.10":
   version: 0.37.10
   resolution: "@effect/sql@npm:0.37.10"
@@ -16522,10 +16511,19 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "chicken@workspace:apps/chicken"
   dependencies:
-    "@effect/schema": "npm:^0.75.5"
+    "@effect/cli": "npm:0.63.9"
+    "@effect/cluster": "npm:^0.38.14"
+    "@effect/experimental": "npm:^0.48.10"
+    "@effect/platform": "npm:0.84.9"
+    "@effect/platform-node": "npm:0.85.14"
+    "@effect/printer": "npm:^0.44.5"
+    "@effect/printer-ansi": "npm:^0.44.5"
+    "@effect/rpc": "npm:^0.61.13"
+    "@effect/sql": "npm:^0.37.10"
+    "@effect/typeclass": "npm:^0.35.5"
     "@types/express": "npm:^5.0.3"
     "@types/node": "npm:^24.3.0"
-    effect: "npm:^3.17.9"
+    effect: "npm:^3.15.1"
     express: "npm:^5.1.0"
     tsx: "npm:^4.20.5"
     typescript: "npm:^5.9.2"
@@ -18613,16 +18611,6 @@ __metadata:
     "@standard-schema/spec": "npm:^1.0.0"
     fast-check: "npm:^3.23.1"
   checksum: 10c0/45947604b1e070fadea0bdb68f710b737a44c1ee0e39ad900ce9f65c5265ca79d3018a76c9475dce5d70425430990416772416b92cb167f2a1aff854aa4c75a4
-  languageName: node
-  linkType: hard
-
-"effect@npm:^3.17.9":
-  version: 3.17.9
-  resolution: "effect@npm:3.17.9"
-  dependencies:
-    "@standard-schema/spec": "npm:^1.0.0"
-    fast-check: "npm:^3.23.1"
-  checksum: 10c0/44e76cca2b8aba3287dc2dc2356867436dca204aba9037eb67e458d1ed0146b9fca4c279fea0fa2c5b54f3b2b409d4aa8b1e08dce1a1e0c2e3640d5591f5e92d
   languageName: node
   linkType: hard
 
@@ -20761,7 +20749,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-check@npm:^3.21.0, fast-check@npm:^3.23.1":
+"fast-check@npm:^3.23.1":
   version: 3.23.2
   resolution: "fast-check@npm:3.23.2"
   dependencies:

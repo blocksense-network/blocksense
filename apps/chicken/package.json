@@ -6,13 +6,24 @@
   "scripts": {
     "dev": "tsx src/main.ts",
     "dev:effect": "tsx src/effect-main.ts",
+    "dev:effect2": "tsx src/effect-main-v2.ts",
+    "dev:effect3": "tsx src/effect-main-v3.ts",
     "build": "tsc",
     "start": "node dist/main.js"
   },
   "dependencies": {
-    "@effect/schema": "^0.75.5",
+    "@effect/cli": "0.63.9",
+    "@effect/cluster": "^0.38.14",
+    "@effect/experimental": "^0.48.10",
+    "@effect/platform": "0.84.9",
+    "@effect/platform-node": "0.85.14",
+    "@effect/printer": "^0.44.5",
+    "@effect/printer-ansi": "^0.44.5",
+    "@effect/rpc": "^0.61.13",
+    "@effect/sql": "^0.37.10",
+    "@effect/typeclass": "^0.35.5",
     "@types/express": "^5.0.3",
-    "effect": "^3.17.9",
+    "effect": "^3.15.1",
     "express": "^5.1.0"
   },
   "devDependencies": {

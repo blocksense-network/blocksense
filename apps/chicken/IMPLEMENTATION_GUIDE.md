@@ -6,10 +6,6 @@
 
 ### Tasks
 
-1. **Repo setup**
-
-   - Monorepo structure (`apps/api`, `packages/core`, `packages/db`, `packages/testkit`).
-   - Configure TypeScript base config, strict mode, pnpm workspace.
 
 2. **Domain & Schema**
 
