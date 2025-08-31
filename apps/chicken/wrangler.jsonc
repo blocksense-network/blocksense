@@ -1,0 +1,9 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "chicken",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-04-23",
+  "observability": {
+    "enabled": true
+  }
+}
