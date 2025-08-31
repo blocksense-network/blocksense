@@ -29,7 +29,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
     "eslint-plugin-storybook": "^9.0.14",
-    "next": "^15.0.0",
+    "next": "^15.4.7",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "storybook": "^9.0.14",
