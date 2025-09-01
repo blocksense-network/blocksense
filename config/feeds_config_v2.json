@@ -32,7 +32,7 @@
       }
     },
     {
-      "id": "0",
+      "id": "1",
       "full_name": "Eggs Price",
       "description": "Total price of Eggs",
       "type": "price-feed",

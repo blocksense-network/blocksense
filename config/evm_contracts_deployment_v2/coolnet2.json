@@ -1,0 +1,58 @@
+{
+  "network": "coolnet2",
+  "chainId": "99999999999",
+  "contracts": {
+    "coreContracts": {
+      "UpgradeableProxyADFS": {
+        "address": "0xeBcC1bC9ba50E6F10FE4c4083abC84565D34A205",
+        "constructorArgs": [
+          "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05"
+        ],
+        "salt": "0xf8f3965692216a43513fd1ea951d2b3c9d48fac5a96a95a159ce854886f7c1bd"
+      },
+      "AggregatedDataFeedStore": {
+        "address": "0x8D731985A1A0E2455Dc4f2f094f74510e1670fB0",
+        "constructorArgs": [
+          "0x235DFbb56294754625E3f662D719Ba4a39768ABb"
+        ],
+        "salt": "0x71b411ccc58b0bf522c76bab9a977992a03cfbc078d3852ee8ee8b6d5311a477"
+      },
+      "AccessControl": {
+        "address": "0x235DFbb56294754625E3f662D719Ba4a39768ABb",
+        "constructorArgs": [
+          "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05"
+        ],
+        "salt": "0x26186f5256760fb01ab0053f874a1674c76a40b87c3031918056ef3ace009aac"
+      },
+      "CLFeedRegistryAdapter": {
+        "address": "0x1b9a2260ac064f083fc39d63D8066AbDc88FA5fc",
+        "constructorArgs": [
+          "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05",
+          "0xeBcC1bC9ba50E6F10FE4c4083abC84565D34A205"
+        ],
+        "salt": "0xd1adaede68d344519025e2ff574650cd99d3830fe6d274c7a7843cdc00e17938"
+      }
+    },
+    "safe": {
+      "AdminMultisig": "0x2DCe5D714Fe5eAE59a59940D0f5365F211110a05",
+      "ReporterMultisig": null,
+      "OnlySequencerGuard": null,
+      "AdminExecutorModule": null
+    },
+    "CLAggregatorAdapter": {
+      "0": {
+        "address": "0xe407C6Bfb07884ef95F0A6F8F8B3D604616E40F2",
+        "constructorArgs": [
+          "Eggs Price",
+          8,
+          "0",
+          "0xeBcC1bC9ba50E6F10FE4c4083abC84565D34A205"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "0",
+        "base": "0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB",
+        "quote": "0x0000000000000000000000000000000000000348"
+      }
+    }
+  }
+}

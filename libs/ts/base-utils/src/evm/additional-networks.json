@@ -1,0 +1,8 @@
+{
+  "coolnet2": {
+    "chainId": 99999999999,
+    "isTestnet": false,
+    "explorers": [],
+    "currency": "ETH"
+  }
+}

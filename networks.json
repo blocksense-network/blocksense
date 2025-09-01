@@ -1,0 +1,7 @@
+{
+  "testtest": {
+    "chainId": "2",
+    "isTestnet": false,
+    "explorers": []
+  }
+}
