@@ -28,7 +28,6 @@
     "test": "vitest run --typecheck --coverage"
   },
   "devDependencies": {
-    "@types/keccak": "^3",
     "@types/node": "^22.10.2",
     "@vitest/coverage-v8": "^3.2.4",
     "tsx": "^4.19.2",
@@ -42,8 +41,7 @@
     "@octokit/rest": "^21.1.1",
     "effect": "^3.15.1",
     "glob": "^11.0.0",
-    "keccak": "^3.0.4",
-    "keccak256": "^1.0.6",
+    "viem": "^2.36.0",
     "web3": "^4.16.0",
     "yahoo-finance2": "^2.13.2"
   }
