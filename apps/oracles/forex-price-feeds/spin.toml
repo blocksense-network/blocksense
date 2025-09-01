@@ -17,14 +17,840 @@ reporter_id = 0
 component = "forex-price-feeds"
 
 [[trigger.oracle.data_feeds]]
-id = "0"
+id = "10000"
 stride = 0
 decimals = 8
-data = 'dummy'
+data = '{"pair":{"base":"GBP","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10001"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"EUR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10002"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"XAU","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10003"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"AUD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10004"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"XAG","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10005"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"GEL","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10006"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"NZD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10007"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"CNH","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10008"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"CHF","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10009"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"ZAR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10010"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"SEK","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10011"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"SGD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10012"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"PLN","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10013"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"KRW","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10014"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"HUF","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10015"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"DKK","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10016"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"MXN","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10017"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"CZK","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10018"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"NOK","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10019"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"HKD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10020"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"TWD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10021"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"INR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10022"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"TRY","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10023"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"IDR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10024"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"PHP","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10025"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"BRL","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10026"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"RON","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10027"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"JPY","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10028"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"RUB","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10029"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"ARS","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10030"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"COP","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10031"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"THB","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10032"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"ISK","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10033"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"ILS","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10034"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"EGP","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10035"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"FJD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10036"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"CNY","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10037"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"SAR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10038"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"MYR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10039"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"OMR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10040"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"MKD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10041"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"KWD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10042"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"SCR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10043"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"RSD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10044"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"BHD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10045"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"AED","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10046"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"DZD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10047"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"BGN","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10048"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"VND","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10049"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"MDL","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10050"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"MUR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10051"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"CDF","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10052"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"UZS","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10053"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"LYD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10054"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"TJS","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10055"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"BAM","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10056"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"AWG","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10057"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"XPF","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10058"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"KMF","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10059"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"YER","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10060"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"SHP","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10061"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"MVR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10062"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"MZN","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10063"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"UYU","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10064"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"CLP","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10065"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"KES","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10066"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"TMT","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10067"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"LKR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10068"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"BBD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10069"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"HNL","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10070"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"NPR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10071"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"LSL","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10072"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"ALL","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10073"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"PGK","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10074"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"SVC","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10075"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"SOS","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10076"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"TZS","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10077"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"ETB","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10078"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"GYD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10079"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"MOP","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10080"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"IQD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10081"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"MAD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10082"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"NIO","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10083"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"BIF","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10084"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"CVE","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10085"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"KZT","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10086"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"PKR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10087"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"PAB","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10088"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"PEN","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10089"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"GTQ","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10090"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"BWP","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10091"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"KHR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10092"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"BSD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10093"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"BZD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10094"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"KYD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10095"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"LAK","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10096"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"TND","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10097"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"RWF","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10098"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"CUP","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10099"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"HTG","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10100"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"SZL","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10101"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"BDT","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10102"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"CRC","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10103"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"JOD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10104"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"NGN","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10105"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"ZMW","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10106"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"MGA","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10107"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"JMD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10108"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"GNF","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10109"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"BND","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10110"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"QAR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10111"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"GHS","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10112"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"SDG","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10113"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"BOB","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10114"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"UAH","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10115"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"LRD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10116"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"PYG","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10117"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"LBP","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10118"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"TTD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10119"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"UGX","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10120"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"DJF","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10121"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"DOP","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10122"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"NAD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10123"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"GMD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10124"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"MWK","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10125"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"AFN","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10126"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"AMD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10127"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"BMD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10128"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"CAD","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10129"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"MMK","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10130"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"MXV","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10131"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"SLL","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10132"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"XAF","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10133"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"XDR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10134"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"XOF","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.data_feeds]]
+id = "10135"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"ZAC","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage"]}}'
+
+[[trigger.oracle.capabilities]]
+data = "x"
+id = "ALPHAVANTAGE_API_KEY"
+
+[[trigger.oracle.capabilities]]
+data = "x"
+id = "TWELVEDATA_API_KEY"
+
+[[trigger.oracle.capabilities]]
+data = "x"
+id = "YAHOO_FINANCE_API_KEY"
 
 [component.forex-price-feeds]
 source = "../target/wasm32-wasip1/release/forex_price_feeds.wasm"
-allowed_outbound_hosts = []
+allowed_outbound_hosts = [
+  "https://yfapi.net",
+  "https://www.alphavantage.co",
+  "https://api.twelvedata.com",
+]
 
 [component.forex-price-feeds.build]
 command = "cargo build --target wasm32-wasip1 --release"
