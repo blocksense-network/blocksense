@@ -83,6 +83,6 @@
   "dependencies": {
     "effect": "^3.15.1",
     "tslib": "^2.8.1",
-    "viem": "^2.31.4"
+    "viem": "^2.36.0"
   }
 }
