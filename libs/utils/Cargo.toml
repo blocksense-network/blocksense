@@ -16,6 +16,8 @@ once_cell = { workspace = true }
 console-subscriber = { workspace = true }
 dirs = { workspace = true }
 anyhow = { workspace = true }
+serde = { workspace = true }
+ssz_rs = { workspace = true }
 
 [build-dependencies]
 # All features enabled
