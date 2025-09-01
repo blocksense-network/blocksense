@@ -25,6 +25,7 @@
     "get-providers-data": "yarn ts scripts/get-providers-data.ts",
     "fetch-symbols": "yarn ts src/data-services/fetchers/scripts/fetch-symbols.ts",
     "update-exchanges-argument-config": "yarn ts scripts/update-exchanges-argument-config.ts",
+    "add-forex-feeds": "QUOTE=\"${QUOTE:-USD}\" FOREX_LIMIT=\"${FOREX_LIMIT:-300}\" yarn ts ./scripts/forex-volume-ranker.ts",
     "test": "vitest run --typecheck --coverage"
   },
   "devDependencies": {
