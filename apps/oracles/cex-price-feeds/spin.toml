@@ -4429,7 +4429,7 @@ decimals = 8
 data = '{"pair":{"base":"USDC","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["USDCUSDT"]},"BinanceUS":{"symbol":["USDCUSD","USDCUSDT"]},"Bitget":{"symbol":["USDCUSDT"]},"Bybit":{"symbol":["USDCUSDT"]},"GateIo":{"id":["USDC_USDT"]},"Gemini":{"symbol":["USDCUSD"]},"Kraken":{"pair":["USDCUSD","USDCUSDT"],"wsname":["USDC/USD","USDC/USDT"]},"KuCoin":{"symbol":["USDC-USDT"]},"MEXC":{"symbol":["USDCUSDT"]},"OKX":{"instId":["USDC-USDT"]},"Upbit":{"market":["USDT-USDC"]}},"kind":"cex-price-feeds"}}'
 
 [[trigger.oracle.data_feeds]]
-id = "50002"
+id = "733"
 stride = 0
 decimals = 8
 data = '{"pair":{"base":"WOJAK","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["WOJAKUSDT"]},"Coinbase":{"id":["WOJAK-USD"]},"GateIo":{"id":["WOJAK_USDT"]},"KuCoin":{"symbol":["WOJAK-USDT"]},"MEXC":{"symbol":["WOJAKUSDT"]},"OKX":{"instId":["WOJAK-USDT"]}},"kind":"cex-price-feeds"}}'
