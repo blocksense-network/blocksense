@@ -275,44 +275,31 @@ fn verify_expected_data_in_contracts(expected_value: f64) {
     println!(
         "ETH1 value = {}",
         send_get_request(
-            format!(
-                "127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH1/0:{FEED_ID}"
-            )
-            .as_str()
+            format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH1/0:{FEED_ID}").as_str()
         )
     );
     println!(
         "ETH2 value = {}",
         send_get_request(
-            format!(
-                "127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH2/0:{FEED_ID}"
-            )
-            .as_str()
+            format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH2/0:{FEED_ID}").as_str()
         )
     );
 
     // Verify expected data is set to contract in ETH1
     println!("DEBUG: expected_value = {expected_value}");
     let recvd_val = send_get_request(
-        format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH1/0:{FEED_ID}")
-            .as_str(),
+        format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH1/0:{FEED_ID}").as_str(),
     );
     println!("DEBUG: recvd_val = {recvd_val}");
     assert!(
         send_get_request(
-            format!(
-                "127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH1/0:{FEED_ID}"
-            )
-            .as_str()
+            format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH1/0:{FEED_ID}").as_str()
         ) == format!("{expected_value}")
     );
     // Verify expected data is set to contract in ETH2
     assert!(
         send_get_request(
-            format!(
-                "127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH2/0:{FEED_ID}"
-            )
-            .as_str()
+            format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH2/0:{FEED_ID}").as_str()
         ) == format!("{expected_value}")
     );
 }
@@ -461,11 +448,12 @@ async fn main() -> Result<()> {
             .expect("System clock set before EPOCH")
             .as_millis();
 
-        let encoded_feed_id = format!("0:{}", FEED_ID);
+        let encoded_feed_id = format!("0:{FEED_ID}");
 
         let result = Ok(FeedType::Numerical(REPORT_VAL));
         let (id, key) = REPORTERS_INFO[0];
-        let signature = generate_signature(key, encoded_feed_id.as_str(), timestamp, &result).unwrap();
+        let signature =
+            generate_signature(key, encoded_feed_id.as_str(), timestamp, &result).unwrap();
 
         let payload = DataFeedPayload {
             payload_metadata: PayloadMetaData {
@@ -514,7 +502,7 @@ async fn main() -> Result<()> {
 
         let mut payload = Vec::new();
 
-        let encoded_feed_id = format!("0:{}", FEED_ID);
+        let encoded_feed_id = format!("0:{FEED_ID}");
 
         // Prepare the batch to be sent
         for (id, key) in REPORTERS_INFO {
@@ -525,7 +513,8 @@ async fn main() -> Result<()> {
                     feed_id: encoded_feed_id.clone(),
                     timestamp,
                     signature: JsonSerializableSignature {
-                        sig: generate_signature(key, encoded_feed_id.as_str(), timestamp, &result).unwrap(),
+                        sig: generate_signature(key, encoded_feed_id.as_str(), timestamp, &result)
+                            .unwrap(),
                     },
                 },
                 result,
@@ -557,7 +546,7 @@ async fn main() -> Result<()> {
 
         let mut payload = Vec::new();
 
-        let encoded_feed_id = format!("0:{}", FEED_ID);
+        let encoded_feed_id = format!("0:{FEED_ID}");
 
         // Prepare the batch to be sent
         for (i, (id, key)) in REPORTERS_INFO.iter().enumerate() {

@@ -14,7 +14,8 @@ use alloy::{
 use alloy_primitives::U256;
 use alloy_u256_literal::u256;
 use blocksense_feeds_processing::adfs_gen_calldata::{
-    calc_row_index, RoundBufferIndices, MAX_HISTORY_ELEMENTS_PER_FEED, NUM_FEED_IDS_IN_RB_INDEX_RECORD
+    calc_row_index, RoundBufferIndices, MAX_HISTORY_ELEMENTS_PER_FEED,
+    NUM_FEED_IDS_IN_RB_INDEX_RECORD,
 };
 use blocksense_utils::{EncodedFeedId, FeedId};
 use futures::future::join_all;
@@ -254,7 +255,10 @@ impl LatestRBIndex {
         } else {
             0_u16
         };
-        LatestRBIndex { encoded_feed_id, index }
+        LatestRBIndex {
+            encoded_feed_id,
+            index,
+        }
     }
 
     pub fn calldata(feed_id: u128, stride: u8) -> Bytes {
@@ -367,7 +371,10 @@ impl RpcProvider {
 
     pub fn prepare_history(
         p: &blocksense_config::Provider,
-    ) -> (FeedAggregateHistory, HashMap<EncodedFeedId, PublishCriteria>) {
+    ) -> (
+        FeedAggregateHistory,
+        HashMap<EncodedFeedId, PublishCriteria>,
+    ) {
         let mut history = FeedAggregateHistory::new();
         let mut publishing_criteria: HashMap<EncodedFeedId, PublishCriteria> = HashMap::new();
 
@@ -395,8 +402,11 @@ impl RpcProvider {
     pub fn update_history(&mut self, updates: &[VotedFeedUpdate]) {
         for update in updates.iter() {
             let encoded_feed_id = update.encoded_feed_id;
-            self.history
-                .push_next(encoded_feed_id, update.value.clone(), update.end_slot_timestamp);
+            self.history.push_next(
+                encoded_feed_id,
+                update.value.clone(),
+                update.end_slot_timestamp,
+            );
         }
     }
 
@@ -523,7 +533,10 @@ impl RpcProvider {
         }
     }
 
-    pub async fn get_latest_rb_index(&self, encoded_feed_id: &EncodedFeedId) -> Result<LatestRBIndex, eyre::Error> {
+    pub async fn get_latest_rb_index(
+        &self,
+        encoded_feed_id: &EncodedFeedId,
+    ) -> Result<LatestRBIndex, eyre::Error> {
         let adfs_address = self.get_contract_address(ADFS_CONTRACT_NAME)?;
         let r = self
             .get_latest_rb_index_v2_from_storage(adfs_address, encoded_feed_id)
@@ -581,7 +594,9 @@ impl RpcProvider {
     }
 
     pub fn get_history_capacity(&self, encoded_feed_id: EncodedFeedId) -> Option<usize> {
-        self.history.get(encoded_feed_id).map(|x| x.capacity().get())
+        self.history
+            .get(encoded_feed_id)
+            .map(|x| x.capacity().get())
     }
 
     pub fn get_last_update_num_from_history(&self, encoded_feed_id: EncodedFeedId) -> u128 {
@@ -1068,13 +1083,21 @@ mod tests {
         let rpc_provider_mutex = sequencer_state.get_provider(network).await.clone().unwrap();
         let (adfs_address, adfs_deployed_byte_code) = {
             let mut rpc_provider = rpc_provider_mutex.lock().await;
-            rpc_provider.history.register_feed(EncodedFeedId::new(feed_id, 0), 100);
+            rpc_provider
+                .history
+                .register_feed(EncodedFeedId::new(feed_id, 0), 100);
 
             let block_number = rpc_provider.provider.get_block_number().await.unwrap();
             let block_num_at_time_of_writing_this_test = 0_u64;
             assert!(block_number > block_num_at_time_of_writing_this_test);
-            let last_rb_index = rpc_provider.get_latest_rb_index(&EncodedFeedId::new(feed_id, 0)).await.unwrap();
-            assert_eq!(last_rb_index.encoded_feed_id, EncodedFeedId::new(feed_id, 0));
+            let last_rb_index = rpc_provider
+                .get_latest_rb_index(&EncodedFeedId::new(feed_id, 0))
+                .await
+                .unwrap();
+            assert_eq!(
+                last_rb_index.encoded_feed_id,
+                EncodedFeedId::new(feed_id, 0)
+            );
             assert_eq!(last_rb_index.index, 0);
             (
                 rpc_provider
@@ -1295,7 +1318,10 @@ mod tests {
             let last_values = rpc_provider.get_latest_values(&[encoded_feed_id]).await;
             info!("last_values = {last_values:?}");
 
-            let last_rb_index = rpc_provider.get_latest_rb_index(&encoded_feed_id).await.unwrap();
+            let last_rb_index = rpc_provider
+                .get_latest_rb_index(&encoded_feed_id)
+                .await
+                .unwrap();
             assert_eq!(last_rb_index.encoded_feed_id, encoded_feed_id);
             assert_eq!(last_rb_index.index, 2)
         }
@@ -1419,9 +1445,15 @@ mod tests {
             let provider = new_rpc_provider.lock().await;
             let counters = &provider.rb_indices;
             let encoded_feed_id = EncodedFeedId::new(feed_id, stride);
-            assert_eq!(Some(wrapped_val as u64), counters.get(&encoded_feed_id).copied());
+            assert_eq!(
+                Some(wrapped_val as u64),
+                counters.get(&encoded_feed_id).copied()
+            );
 
-            let x = provider.get_latest_values(&[encoded_feed_id]).await.unwrap();
+            let x = provider
+                .get_latest_values(&[encoded_feed_id])
+                .await
+                .unwrap();
             assert_eq!(x.len(), 1);
             let v = x[0].clone().unwrap();
             assert_eq!(v.num_updates, rb_index.into());
@@ -1449,19 +1481,19 @@ mod tests {
                     updates: vec![v1],
                 };
 
-                let p1 = eth_batch_send_to_all_contracts(
-                    &sequencer_state,
-                    &updates1,
-                    None,
-                )
-                .await;
+                let p1 = eth_batch_send_to_all_contracts(&sequencer_state, &updates1, None).await;
 
                 assert!(p1.is_ok());
                 tokio::time::sleep(Duration::from_millis(2000)).await;
 
                 let prov = sequencer_state.providers.read().await;
                 let p = prov.get(network).unwrap();
-                let round = p.lock().await.get_latest_rb_index(&encoded_feed_id).await.unwrap();
+                let round = p
+                    .lock()
+                    .await
+                    .get_latest_rb_index(&encoded_feed_id)
+                    .await
+                    .unwrap();
                 let vals = p
                     .lock()
                     .await
@@ -1475,10 +1507,7 @@ mod tests {
                 // Assert that the value of the round counter in the contract is as expected.
                 // Note: The sequencer tracks the index of the *next* slot to write,
                 // while the contract stores the index of the *last* written value.
-                assert_eq!(
-                    round.index,
-                    wrapped_val
-                );
+                assert_eq!(round.index, wrapped_val);
 
                 assert_eq!(val.value, new_update);
 

@@ -49,13 +49,14 @@ impl FeedSlotsProcessor {
         reports: &Arc<RwLock<AllFeedsReports>>,
     ) -> Option<Arc<RwLock<FeedReports>>> {
         debug!("Get a read lock on all reports [feed {encoded_feed_id}]");
-        let result: Option<Arc<RwLock<FeedReports>>> = match reports.read().await.get(encoded_feed_id) {
-            Some(x) => Some(x),
-            None => {
-                info!("No reports found!");
-                None
-            }
-        };
+        let result: Option<Arc<RwLock<FeedReports>>> =
+            match reports.read().await.get(encoded_feed_id) {
+                Some(x) => Some(x),
+                None => {
+                    info!("No reports found!");
+                    None
+                }
+            };
         debug!("Release the read lock on all reports [feed {encoded_feed_id}]");
         result
     }
@@ -401,7 +402,8 @@ pub mod tests {
         match received {
             Ok(Some(vote)) => {
                 assert_eq!(
-                    EncodedFeedId::new(feed_id, 0), vote.update.encoded_feed_id,
+                    EncodedFeedId::new(feed_id, 0),
+                    vote.update.encoded_feed_id,
                     "The key does not match the expected value"
                 );
                 assert_eq!(vote.update.value, original_report_data);
@@ -510,7 +512,8 @@ pub mod tests {
         }
 
         tokio::spawn(async move {
-            let feed_slots_processor = FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
+            let feed_slots_processor =
+                FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
             let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
 
             feed_slots_processor
@@ -597,7 +600,8 @@ pub mod tests {
             Arc::new(RwLock::new(FeedAggregateHistory::new()));
         let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
         tokio::spawn(async move {
-            let feed_slots_processor = FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
+            let feed_slots_processor =
+                FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
             feed_slots_processor
                 .start_loop(
                     &sequencer_state,
@@ -717,7 +721,8 @@ pub mod tests {
         }
 
         tokio::spawn(async move {
-            let feed_slots_processor = FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
+            let feed_slots_processor =
+                FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
             let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
 
             feed_slots_processor
@@ -825,7 +830,8 @@ pub mod tests {
         }
 
         tokio::spawn(async move {
-            let feed_slots_processor = FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
+            let feed_slots_processor =
+                FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
             let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
 
             feed_slots_processor
@@ -933,7 +939,8 @@ pub mod tests {
         }
 
         tokio::spawn(async move {
-            let feed_slots_processor = FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
+            let feed_slots_processor =
+                FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
             let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
 
             feed_slots_processor
@@ -1030,7 +1037,8 @@ pub mod tests {
         }
 
         tokio::spawn(async move {
-            let feed_slots_processor = FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
+            let feed_slots_processor =
+                FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
             let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
             feed_slots_processor
                 .start_loop(

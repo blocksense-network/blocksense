@@ -146,7 +146,13 @@ pub async fn get_key(
     info!("getting key {} for network {} ...", key, network);
     let result = actix_web::rt::time::timeout(
         Duration::from_secs(7),
-        adfs_get_key_from_contract(&sequencer_state.providers, &network, encoded_feed_id.to_hex(), decimals, stride),
+        adfs_get_key_from_contract(
+            &sequencer_state.providers,
+            &network,
+            encoded_feed_id.to_hex(),
+            decimals,
+            stride,
+        ),
     )
     .await;
     match result {
