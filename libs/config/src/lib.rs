@@ -231,7 +231,9 @@ fn default_is_enabled() -> bool {
     true
 }
 
-fn deserialize_optional_encoded_feed_id_vec<'de, D>(deserializer: D) -> Result<Option<Vec<EncodedFeedId>>, D::Error>
+fn deserialize_optional_encoded_feed_id_vec<'de, D>(
+    deserializer: D,
+) -> Result<Option<Vec<EncodedFeedId>>, D::Error>
 where
     D: Deserializer<'de>,
 {
