@@ -41766,6 +41766,4358 @@
       }
     },
     {
+      "id": "10000",
+      "description": "Price of British Pound in US Dollar",
+      "full_name": "GBP / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "GBP",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10001",
+      "description": "Price of Euro in US Dollar",
+      "full_name": "EUR / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "EUR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10002",
+      "description": "Price of Gold in US Dollar",
+      "full_name": "XAU / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "XAU",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10003",
+      "description": "Price of Australian Dollar in US Dollar",
+      "full_name": "AUD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "AUD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10004",
+      "description": "Price of Silver in US Dollar",
+      "full_name": "XAG / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "XAG",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10005",
+      "description": "Price of Georgian Lari in US Dollar",
+      "full_name": "GEL / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "GEL",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10006",
+      "description": "Price of New Zealand Dollar in US Dollar",
+      "full_name": "NZD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "NZD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10007",
+      "description": "Price of Chinese Yuan (offshore) in US Dollar",
+      "full_name": "CNH / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "CNH",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10008",
+      "description": "Price of Swiss Franc in US Dollar",
+      "full_name": "CHF / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "CHF",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10009",
+      "description": "Price of South African Rand in US Dollar",
+      "full_name": "ZAR / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "ZAR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10010",
+      "description": "Price of Swedish Krona in US Dollar",
+      "full_name": "SEK / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "SEK",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10011",
+      "description": "Price of Singapore Dollar in US Dollar",
+      "full_name": "SGD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "SGD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10012",
+      "description": "Price of Polish Zloty in US Dollar",
+      "full_name": "PLN / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "PLN",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10013",
+      "description": "Price of South Korean Won in US Dollar",
+      "full_name": "KRW / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "KRW",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10014",
+      "description": "Price of Hungarian Forint in US Dollar",
+      "full_name": "HUF / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "HUF",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10015",
+      "description": "Price of Danish Krone in US Dollar",
+      "full_name": "DKK / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "DKK",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10016",
+      "description": "Price of Mexican Peso in US Dollar",
+      "full_name": "MXN / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "MXN",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10017",
+      "description": "Price of Czech Koruna in US Dollar",
+      "full_name": "CZK / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "CZK",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10018",
+      "description": "Price of Norwegian Krone in US Dollar",
+      "full_name": "NOK / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "NOK",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10019",
+      "description": "Price of Hong Kong Dollar in US Dollar",
+      "full_name": "HKD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "HKD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10020",
+      "description": "Price of New Taiwan Dollar in US Dollar",
+      "full_name": "TWD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "TWD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10021",
+      "description": "Price of Indian Rupee in US Dollar",
+      "full_name": "INR / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "INR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10022",
+      "description": "Price of Turkish Lira in US Dollar",
+      "full_name": "TRY / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "TRY",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10023",
+      "description": "Price of Indonesian Rupiah in US Dollar",
+      "full_name": "IDR / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "IDR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10024",
+      "description": "Price of Philippine Peso in US Dollar",
+      "full_name": "PHP / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "PHP",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10025",
+      "description": "Price of Brazilian Real in US Dollar",
+      "full_name": "BRL / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "BRL",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10026",
+      "description": "Price of Romanian Leu in US Dollar",
+      "full_name": "RON / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "RON",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10027",
+      "description": "Price of Japanese Yen in US Dollar",
+      "full_name": "JPY / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "JPY",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10028",
+      "description": "Price of Russian Ruble in US Dollar",
+      "full_name": "RUB / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "RUB",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10029",
+      "description": "Price of Argentine Peso in US Dollar",
+      "full_name": "ARS / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "ARS",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10030",
+      "description": "Price of Colombian Peso in US Dollar",
+      "full_name": "COP / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "COP",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10031",
+      "description": "Price of Thai Baht in US Dollar",
+      "full_name": "THB / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "THB",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10032",
+      "description": "Price of Icelandic Króna in US Dollar",
+      "full_name": "ISK / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "ISK",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10033",
+      "description": "Price of Israeli New Shekel in US Dollar",
+      "full_name": "ILS / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "ILS",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10034",
+      "description": "Price of Egyptian Pound in US Dollar",
+      "full_name": "EGP / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "EGP",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10035",
+      "description": "Price of Fijian Dollar in US Dollar",
+      "full_name": "FJD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "FJD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10036",
+      "description": "Price of Chinese Yuan in US Dollar",
+      "full_name": "CNY / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "CNY",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10037",
+      "description": "Price of Saudi Riyal in US Dollar",
+      "full_name": "SAR / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "SAR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10038",
+      "description": "Price of Malaysian Ringgit in US Dollar",
+      "full_name": "MYR / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "MYR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10039",
+      "description": "Price of Omani Rial in US Dollar",
+      "full_name": "OMR / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "OMR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10040",
+      "description": "Price of Macedonian Denar in US Dollar",
+      "full_name": "MKD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "MKD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10041",
+      "description": "Price of Kuwaiti Dinar in US Dollar",
+      "full_name": "KWD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "KWD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10042",
+      "description": "Price of Seychellois Rupee in US Dollar",
+      "full_name": "SCR / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "SCR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10043",
+      "description": "Price of Serbian Dinar in US Dollar",
+      "full_name": "RSD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "RSD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10044",
+      "description": "Price of Bahraini Dinar in US Dollar",
+      "full_name": "BHD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "BHD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10045",
+      "description": "Price of United Arab Emirates Dirham in US Dollar",
+      "full_name": "AED / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "AED",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10046",
+      "description": "Price of Algerian Dinar in US Dollar",
+      "full_name": "DZD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "DZD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10047",
+      "description": "Price of Bulgarian Lev in US Dollar",
+      "full_name": "BGN / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "BGN",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10048",
+      "description": "Price of Vietnamese Dong in US Dollar",
+      "full_name": "VND / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "VND",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10049",
+      "description": "Price of Moldovan Leu in US Dollar",
+      "full_name": "MDL / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "MDL",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10050",
+      "description": "Price of Mauritian Rupee in US Dollar",
+      "full_name": "MUR / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "MUR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10051",
+      "description": "Price of Congolese Franc in US Dollar",
+      "full_name": "CDF / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "CDF",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10052",
+      "description": "Price of Uzbekistani Som in US Dollar",
+      "full_name": "UZS / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "UZS",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10053",
+      "description": "Price of Libyan Dinar in US Dollar",
+      "full_name": "LYD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "LYD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10054",
+      "description": "Price of Tajikistani Somoni in US Dollar",
+      "full_name": "TJS / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "TJS",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10055",
+      "description": "Price of Bosnia-Herzegovina Convertible Mark in US Dollar",
+      "full_name": "BAM / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "BAM",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10056",
+      "description": "Price of Aruban Florin in US Dollar",
+      "full_name": "AWG / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "AWG",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10057",
+      "description": "Price of CFP Franc in US Dollar",
+      "full_name": "XPF / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "XPF",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10058",
+      "description": "Price of Comorian Franc in US Dollar",
+      "full_name": "KMF / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "KMF",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10059",
+      "description": "Price of Yemeni Rial in US Dollar",
+      "full_name": "YER / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "YER",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10060",
+      "description": "Price of St. Helena Pound in US Dollar",
+      "full_name": "SHP / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "SHP",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10061",
+      "description": "Price of Maldivian Rufiyaa in US Dollar",
+      "full_name": "MVR / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "MVR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10062",
+      "description": "Price of Mozambican Metical in US Dollar",
+      "full_name": "MZN / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "MZN",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10063",
+      "description": "Price of Uruguayan Peso in US Dollar",
+      "full_name": "UYU / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "UYU",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10064",
+      "description": "Price of Chilean Peso in US Dollar",
+      "full_name": "CLP / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "CLP",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10065",
+      "description": "Price of Kenyan Shilling in US Dollar",
+      "full_name": "KES / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "KES",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10066",
+      "description": "Price of Turkmenistani Manat in US Dollar",
+      "full_name": "TMT / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "TMT",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10067",
+      "description": "Price of Sri Lankan Rupee in US Dollar",
+      "full_name": "LKR / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "LKR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10068",
+      "description": "Price of Barbadian Dollar in US Dollar",
+      "full_name": "BBD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "BBD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10069",
+      "description": "Price of Honduran Lempira in US Dollar",
+      "full_name": "HNL / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "HNL",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10070",
+      "description": "Price of Nepalese Rupee in US Dollar",
+      "full_name": "NPR / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "NPR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10071",
+      "description": "Price of Lesotho Loti in US Dollar",
+      "full_name": "LSL / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "LSL",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10072",
+      "description": "Price of Albanian Lek in US Dollar",
+      "full_name": "ALL / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "ALL",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10073",
+      "description": "Price of Papua New Guinean Kina in US Dollar",
+      "full_name": "PGK / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "PGK",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10074",
+      "description": "Price of Salvadoran Colón in US Dollar",
+      "full_name": "SVC / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "SVC",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10075",
+      "description": "Price of Somali Shilling in US Dollar",
+      "full_name": "SOS / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "SOS",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10076",
+      "description": "Price of Tanzanian Shilling in US Dollar",
+      "full_name": "TZS / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "TZS",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10077",
+      "description": "Price of Ethiopian Birr in US Dollar",
+      "full_name": "ETB / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "ETB",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10078",
+      "description": "Price of Guyanaese Dollar in US Dollar",
+      "full_name": "GYD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "GYD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10079",
+      "description": "Price of Macanese Pataca in US Dollar",
+      "full_name": "MOP / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "MOP",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10080",
+      "description": "Price of Iraqi Dinar in US Dollar",
+      "full_name": "IQD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "IQD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10081",
+      "description": "Price of Moroccan Dirham in US Dollar",
+      "full_name": "MAD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "MAD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10082",
+      "description": "Price of Nicaraguan Córdoba in US Dollar",
+      "full_name": "NIO / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "NIO",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10083",
+      "description": "Price of Burundian Franc in US Dollar",
+      "full_name": "BIF / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "BIF",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10084",
+      "description": "Price of Cape Verdean Escudo in US Dollar",
+      "full_name": "CVE / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "CVE",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10085",
+      "description": "Price of Kazakhstani Tenge in US Dollar",
+      "full_name": "KZT / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "KZT",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10086",
+      "description": "Price of Pakistani Rupee in US Dollar",
+      "full_name": "PKR / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "PKR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10087",
+      "description": "Price of Panamanian Balboa in US Dollar",
+      "full_name": "PAB / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "PAB",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10088",
+      "description": "Price of Peruvian Sol in US Dollar",
+      "full_name": "PEN / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "PEN",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10089",
+      "description": "Price of Guatemalan Quetzal in US Dollar",
+      "full_name": "GTQ / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "GTQ",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10090",
+      "description": "Price of Botswanan Pula in US Dollar",
+      "full_name": "BWP / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "BWP",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10091",
+      "description": "Price of Cambodian Riel in US Dollar",
+      "full_name": "KHR / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "KHR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10092",
+      "description": "Price of Bahamian Dollar in US Dollar",
+      "full_name": "BSD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "BSD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10093",
+      "description": "Price of Belize Dollar in US Dollar",
+      "full_name": "BZD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "BZD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10094",
+      "description": "Price of Cayman Islands Dollar in US Dollar",
+      "full_name": "KYD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "KYD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10095",
+      "description": "Price of Laotian Kip in US Dollar",
+      "full_name": "LAK / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "LAK",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10096",
+      "description": "Price of Tunisian Dinar in US Dollar",
+      "full_name": "TND / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "TND",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10097",
+      "description": "Price of Rwandan Franc in US Dollar",
+      "full_name": "RWF / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "RWF",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10098",
+      "description": "Price of Cuban Peso in US Dollar",
+      "full_name": "CUP / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "CUP",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10099",
+      "description": "Price of Haitian Gourde in US Dollar",
+      "full_name": "HTG / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "HTG",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10100",
+      "description": "Price of Swazi Lilangeni in US Dollar",
+      "full_name": "SZL / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "SZL",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10101",
+      "description": "Price of Bangladeshi Taka in US Dollar",
+      "full_name": "BDT / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "BDT",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10102",
+      "description": "Price of Costa Rican Colón in US Dollar",
+      "full_name": "CRC / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "CRC",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10103",
+      "description": "Price of Jordanian Dinar in US Dollar",
+      "full_name": "JOD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "JOD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10104",
+      "description": "Price of Nigerian Naira in US Dollar",
+      "full_name": "NGN / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "NGN",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10105",
+      "description": "Price of Zambian Kwacha in US Dollar",
+      "full_name": "ZMW / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "ZMW",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10106",
+      "description": "Price of Malagasy Ariary in US Dollar",
+      "full_name": "MGA / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "MGA",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10107",
+      "description": "Price of Jamaican Dollar in US Dollar",
+      "full_name": "JMD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "JMD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10108",
+      "description": "Price of Guinean Franc in US Dollar",
+      "full_name": "GNF / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "GNF",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10109",
+      "description": "Price of Brunei Dollar in US Dollar",
+      "full_name": "BND / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "BND",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10110",
+      "description": "Price of Qatari Riyal in US Dollar",
+      "full_name": "QAR / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "QAR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10111",
+      "description": "Price of Ghanaian Cedi in US Dollar",
+      "full_name": "GHS / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "GHS",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10112",
+      "description": "Price of Sudanese Pound in US Dollar",
+      "full_name": "SDG / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "SDG",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10113",
+      "description": "Price of Bolivian Boliviano in US Dollar",
+      "full_name": "BOB / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "BOB",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10114",
+      "description": "Price of Ukrainian Hryvnia in US Dollar",
+      "full_name": "UAH / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "UAH",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10115",
+      "description": "Price of Liberian Dollar in US Dollar",
+      "full_name": "LRD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "LRD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10116",
+      "description": "Price of Paraguayan Guarani in US Dollar",
+      "full_name": "PYG / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "PYG",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10117",
+      "description": "Price of Lebanese Pound in US Dollar",
+      "full_name": "LBP / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "LBP",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10118",
+      "description": "Price of Trinidad & Tobago Dollar in US Dollar",
+      "full_name": "TTD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "TTD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10119",
+      "description": "Price of Ugandan Shilling in US Dollar",
+      "full_name": "UGX / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "UGX",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10120",
+      "description": "Price of Djiboutian Franc in US Dollar",
+      "full_name": "DJF / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "DJF",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10121",
+      "description": "Price of Dominican Peso in US Dollar",
+      "full_name": "DOP / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "DOP",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10122",
+      "description": "Price of Namibian Dollar in US Dollar",
+      "full_name": "NAD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "NAD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10123",
+      "description": "Price of Gambian Dalasi in US Dollar",
+      "full_name": "GMD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "GMD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10124",
+      "description": "Price of Malawian Kwacha in US Dollar",
+      "full_name": "MWK / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "MWK",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10125",
+      "description": "Price of Afghan Afghani in US Dollar",
+      "full_name": "AFN / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "AFN",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10126",
+      "description": "Price of Armenian Dram in US Dollar",
+      "full_name": "AMD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "AMD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10127",
+      "description": "Price of Bermudan Dollar in US Dollar",
+      "full_name": "BMD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "BMD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10128",
+      "description": "Price of Canadian Dollar in US Dollar",
+      "full_name": "CAD / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "CAD",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10129",
+      "description": "Price of Myanmar Kyat in US Dollar",
+      "full_name": "MMK / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "MMK",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10130",
+      "description": "Price of Mexican Investment Unit in US Dollar",
+      "full_name": "MXV / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "MXV",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10131",
+      "description": "Price of Sierra Leonean Leone (1964—2022) in US Dollar",
+      "full_name": "SLL / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "SLL",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10132",
+      "description": "Price of Central African CFA Franc in US Dollar",
+      "full_name": "XAF / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "XAF",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10133",
+      "description": "Price of Special Drawing Rights in US Dollar",
+      "full_name": "XDR / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "XDR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10134",
+      "description": "Price of West African CFA Franc in US Dollar",
+      "full_name": "XOF / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "XOF",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
+      "id": "10135",
+      "description": "Price of ZAC in US Dollar",
+      "full_name": "ZAC / USD",
+      "type": "price-feed",
+      "oracle_id": "forex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.5,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "ZAC",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Forex",
+        "market_hours": "Forex",
+        "arguments": {
+          "kind": "forex-price-feeds",
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+        }
+      }
+    },
+    {
       "id": "50000",
       "full_name": "USDT / USD Peg-aware",
       "description": "Peg-aware price of USDT in USD",
