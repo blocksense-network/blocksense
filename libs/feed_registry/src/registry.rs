@@ -210,7 +210,10 @@ impl FeedAggregateHistory {
         self.aggregate_history.get(&encoded_feed_id)
     }
 
-    pub fn get_mut(&mut self, encoded_feed_id: EncodedFeedId) -> Option<&mut SharedRb<Heap<HistoryEntry>>> {
+    pub fn get_mut(
+        &mut self,
+        encoded_feed_id: EncodedFeedId,
+    ) -> Option<&mut SharedRb<Heap<HistoryEntry>>> {
         self.aggregate_history.get_mut(&encoded_feed_id)
     }
 
@@ -425,7 +428,11 @@ mod tests {
     async fn basic_test() {
         let fmdr = new_feeds_meta_data_reg_with_test_data();
 
-        let mut expected_keys_vec = vec![EncodedFeedId::new(0, 0), EncodedFeedId::new(1, 0), EncodedFeedId::new(2, 0)];
+        let mut expected_keys_vec = vec![
+            EncodedFeedId::new(0, 0),
+            EncodedFeedId::new(1, 0),
+            EncodedFeedId::new(2, 0),
+        ];
         let mut actual_keys_vec = fmdr.get_keys().clone();
 
         expected_keys_vec.sort();
@@ -517,7 +524,9 @@ mod tests {
 
         let mut msg_timestamp = current_time_as_ms;
 
-        let feed = fmdr.get(&EncodedFeedId::new(DATA_FEED_ID, 0)).expect("ID not present in registry");
+        let feed = fmdr
+            .get(&EncodedFeedId::new(DATA_FEED_ID, 0))
+            .expect("ID not present in registry");
 
         println!("fmdr.get_keys()={fmdr:?}");
         assert!(
