@@ -24,6 +24,7 @@ in
     enable = true;
 
     logsDir = "$GIT_ROOT/logs/process-compose/example-setup-01";
+    kafka.enable = true;
 
     anvil = {
       ethereum-sepolia = {

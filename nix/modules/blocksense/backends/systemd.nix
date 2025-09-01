@@ -56,8 +56,7 @@ let
   ) cfg.reporters;
 
   blamaInstance = {
-    name = "blocksense-blama";
-    value = {
+    blocksense-blama = {
       description = "Blocksense Blama";
       # TODO: who needs this to be started?
       wantedBy = [ "multi-user.target" ];
@@ -83,7 +82,7 @@ in
             (map (x: "blocksense-anvil-${x}.service"))
           ];
           environment = {
-            FEEDS_CONFIG_DIR = "${../../../../config}";
+            FEEDS_CONFIG_DIR = "${../../../../apps/e2e-tests/src/process-compose/config}";
             SEQUENCER_CONFIG_DIR = cfg.config-dir;
             SEQUENCER_LOG_LEVEL = "${lib.toUpper cfg.sequencer.log-level}";
           };
@@ -94,6 +93,9 @@ in
           };
         };
       }
+      (lib.mkIf cfg.kafka.enable {
+        apache-kafka.enable = true;
+      })
       anvilInstances
       reporterInstances
       (lib.mkIf cfg.blama.enable blamaInstance)

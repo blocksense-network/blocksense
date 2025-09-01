@@ -38,10 +38,10 @@ in
     ./example-setup-01.nix
   ];
 
-  services.kafka.enable = lib.mkForce false;
-
   services.blocksense = {
     logsDir = lib.mkForce "$GIT_ROOT/logs/process-compose/example-setup-03";
+
+    kafka.enable = lib.mkForce false;
 
     blama.enable = lib.mkForce false;
 
@@ -96,15 +96,14 @@ in
         };
       };
     };
-
-    reporters.a.default-exec-interval = lib.mkForce 10;
+    reporters.a.default-exec-interval = lib.mkForce 60;
 
     oracles = {
-      cex-price-feeds.exec-interval = lib.mkForce 10;
-      exsat-holdings.exec-interval = lib.mkForce 10;
-      gecko-terminal.exec-interval = lib.mkForce 10;
-      eth-rpc.exec-interval = lib.mkForce 10;
-      stock-price-feeds.exec-interval = lib.mkForce 10;
+      cex-price-feeds.exec-interval = lib.mkForce 60;
+      exsat-holdings.exec-interval = lib.mkForce 60;
+      gecko-terminal.exec-interval = lib.mkForce 60;
+      eth-rpc.exec-interval = lib.mkForce 60;
+      stock-price-feeds.exec-interval = lib.mkForce 60;
     };
   };
 }

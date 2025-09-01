@@ -19,6 +19,10 @@ in
     Enable the Blocksense sequencer and reporter node services.
   '');
 
+  kafka.enable = mkEnableOption (mdDoc ''
+    Enable Kafka.
+  '');
+
   logsDir = mkOption {
     type = types.nullOr types.str;
     default = null;

@@ -190,13 +190,14 @@ in
   '';
 
   config = lib.mkIf cfg.enable {
+    services.kafka.enable = cfg.kafka.enable;
     processes = lib.mkMerge [
       anvilImpersonateAndFundInstances
       reporterInstances
       sequencerInstance
       anvilInstances
-      (lib.mkIf config.services.kafka.enable blockchainReader)
-      (lib.mkIf config.services.kafka.enable aggregateConsensusReader)
+      (lib.mkIf cfg.kafka.enable blockchainReader)
+      (lib.mkIf cfg.kafka.enable aggregateConsensusReader)
       (lib.mkIf cfg.blama.enable blamaInstance)
     ];
   };
