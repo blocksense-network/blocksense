@@ -4432,7 +4432,7 @@ data = '{"pair":{"base":"USDC","quote":"USD"},"decimals":8,"category":"Crypto","
 id = "733"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"WOJAK","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["WOJAKUSDT"]},"Coinbase":{"id":["WOJAK-USD"]},"GateIo":{"id":["WOJAK_USDT"]},"KuCoin":{"symbol":["WOJAK-USDT"]},"MEXC":{"symbol":["WOJAKUSDT"]},"OKX":{"instId":["WOJAK-USDT"]}},"kind":"cex-price-feeds"}}'
+data = '{"pair":{"base":"WOJAK","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["WOJAKUSDT"]},"GateIo":{"id":["WOJAK_USDT"]},"KuCoin":{"symbol":["WOJAK-USDT"]},"MEXC":{"symbol":["WOJAKUSDT"]},"OKX":{"instId":["WOJAK-USDT"]}},"kind":"cex-price-feeds"}}'
 
 [component.cex-price-feeds]
 source = "../target/wasm32-wasip1/release/cex_price_feeds.wasm"
