@@ -136,8 +136,10 @@ async fn recvd_feed_update_to_block(
     match recvd_feed_update {
         Some(voted_update) => {
             let digits_in_fraction: usize = {
-                if let Some(feed_config) =
-                    feeds_config.read().await.get(&voted_update.update.encoded_feed_id)
+                if let Some(feed_config) = feeds_config
+                    .read()
+                    .await
+                    .get(&voted_update.update.encoded_feed_id)
                 {
                     feed_config.additional_feed_info.decimals.into()
                 } else {
