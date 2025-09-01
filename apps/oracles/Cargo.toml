@@ -7,6 +7,7 @@ members = [
   "borrow-rates",
   "stock-price-feeds",
   "spout-rwa",
+  "chicken",
 ]
 
 resolver = "2"

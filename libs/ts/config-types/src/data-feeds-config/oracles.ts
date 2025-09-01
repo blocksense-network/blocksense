@@ -104,3 +104,10 @@ export const hyperBorrowRatesArgsSchema = S.Struct({
   identifier: 'HyperBorrowRatesOracleArgs',
   description: 'Arguments for the Hyper Borrow Rates Oracle',
 });
+
+export const chickenArgsSchema = S.Struct({
+  kind: S.Literal('chicken'),
+}).annotations({
+  identifier: 'ChickenOracleArgs',
+  description: 'Arguments for the Chicken Oracle',
+});

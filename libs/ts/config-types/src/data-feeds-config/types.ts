@@ -8,6 +8,7 @@ import {
   spoutRwaArgsSchema,
   stockPriceFeedsArgsSchema,
   hyperBorrowRatesArgsSchema,
+  chickenArgsSchema,
 } from './oracles';
 /**
  * Schema for the data feed category ( Chainlink compatible ).
@@ -206,6 +207,7 @@ export const NewFeedSchema = S.mutable(
           spoutRwaArgsSchema,
           exSatHoldingsArgsSchema,
           hyperBorrowRatesArgsSchema,
+          chickenArgsSchema,
         ).annotations({ identifier: 'OracleScriptArguments' }),
 
         compatibility_info: S.UndefinedOr(

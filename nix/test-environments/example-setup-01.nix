@@ -279,6 +279,12 @@ in
           "https://eth.llamarpc.com"
         ];
       };
+      chicken = {
+        exec-interval = 10;
+        allowed-outbound-hosts = [
+          "http://localhost"
+        ];
+      };
     };
   };
 }
