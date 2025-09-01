@@ -41,7 +41,7 @@ export const chainlinkNetworkNameToChainId = {
 
 export const chainlinkNetworkName = S.Literal(
   ...keysOf(chainlinkNetworkNameToChainId),
-);
+).annotations({ identifier: 'ChainlinkNetworkFilename' });
 
 export type ChainlinkNetworkName = typeof chainlinkNetworkName.Type;
 
