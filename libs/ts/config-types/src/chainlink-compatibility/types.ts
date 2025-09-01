@@ -45,7 +45,12 @@ export const chainlinkNetworkName = S.Literal(
 
 export type ChainlinkNetworkName = typeof chainlinkNetworkName.Type;
 
-export const parseNetworkFilename = S.decodeUnknownSync(chainlinkNetworkName);
+export function parseNetworkFilename(filename: string): ChainlinkNetworkName {
+  const fName = S.decodeUnknownSync(chainlinkSupportedNetworkFileName)(
+    filename,
+  );
+  return fName.slice(6, -5) as ChainlinkNetworkName;
+}
 
 export const chainlinkSupportedNetworkFileName = S.TemplateLiteral(
   S.Literal('feeds-'),
