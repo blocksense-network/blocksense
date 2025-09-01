@@ -290,7 +290,10 @@ pub async fn register_feed_with_config(
     }
     {
         let mut active_feeds = sequencer_state.active_feeds.write().await;
-        active_feeds.insert(EncodedFeedId::new(new_feed_config.id, new_feed_config.stride), new_feed_config.clone());
+        active_feeds.insert(
+            EncodedFeedId::new(new_feed_config.id, new_feed_config.stride),
+            new_feed_config.clone(),
+        );
     }
     {
         let registered_feed_metadata = sequencer_state

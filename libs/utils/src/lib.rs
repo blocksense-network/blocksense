@@ -6,15 +6,28 @@ pub mod test_env;
 pub mod time;
 
 use ssz_rs::prelude::*;
-use ssz_rs::DeserializeError;   
+use ssz_rs::DeserializeError;
 
 pub type FeedId = u128;
 pub type Stride = u8;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, serde::Serialize, serde::Deserialize, SimpleSerialize, Default)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Hash,
+    PartialOrd,
+    Ord,
+    serde::Serialize,
+    serde::Deserialize,
+    SimpleSerialize,
+    Default,
+)]
 pub struct EncodedFeedId {
     /// Packed layout: [ stride:8 | feed_id:120 ]
-    pub data: u128
+    pub data: u128,
 }
 
 impl EncodedFeedId {
@@ -28,13 +41,16 @@ impl EncodedFeedId {
             (feed_id & !Self::FEED_MASK) == 0,
             "feed_id must fit in 120 bits (15 bytes)"
         );
-        Self { data: Self::encode(stride, feed_id) }
+        Self {
+            data: Self::encode(stride, feed_id),
+        }
     }
 
     #[inline]
     pub fn try_new(feed_id: FeedId, stride: Stride) -> Option<Self> {
-        ((feed_id & !Self::FEED_MASK) == 0)
-            .then(|| Self { data: Self::encode(stride, feed_id) })
+        ((feed_id & !Self::FEED_MASK) == 0).then(|| Self {
+            data: Self::encode(stride, feed_id),
+        })
     }
 
     /// Pack (stride, feed_id) into a single u128.

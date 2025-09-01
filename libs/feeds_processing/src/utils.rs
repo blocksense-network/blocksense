@@ -122,8 +122,12 @@ pub async fn consume_reports(
         let skip_decision = if !is_oneshot {
             if let Some(history) = history {
                 if let FeedType::Numerical(candidate_value) = result_post_to_contract.value {
-                    let ad_score =
-                        perform_anomaly_detection(encoded_feed_id, history.clone(), candidate_value).await;
+                    let ad_score = perform_anomaly_detection(
+                        encoded_feed_id,
+                        history.clone(),
+                        candidate_value,
+                    )
+                    .await;
                     match ad_score {
                         Ok(ad_score) => {
                             info!(
@@ -173,7 +177,10 @@ pub async fn consume_reports(
             }),
             end_slot_timestamp,
         };
-        info!("[feed {encoded_feed_id}] result_post_to_contract = {:?}", res);
+        info!(
+            "[feed {encoded_feed_id}] result_post_to_contract = {:?}",
+            res
+        );
         res
     }
 }

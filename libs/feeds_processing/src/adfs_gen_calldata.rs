@@ -59,8 +59,7 @@ fn encode_packed(items: &[&[u8]]) -> (Vec<u8>, String) {
 }
 
 pub fn calc_row_index(feed_id: FeedId, stride: Stride) -> alloy_primitives::Uint<256, 4> {
-    (U256::from(2).pow(U256::from(115)) * U256::from(stride)
-        + U256::from(feed_id))
+    (U256::from(2).pow(U256::from(115)) * U256::from(stride) + U256::from(feed_id))
         / U256::from(NUM_FEED_IDS_IN_RB_INDEX_RECORD)
 }
 
@@ -71,9 +70,9 @@ pub async fn adfs_serialize_updates(
     rb_indices: Option<&RoundBufferIndices>,
     strides_and_decimals: HashMap<EncodedFeedId, FeedStrideAndDecimals>,
     feeds_rb_indexes: &mut HashMap<EncodedFeedId, u64>, /* The round buffer indices table for the relevant feeds. If the rb_indices are provided,
-                                                 this map will be filled with the update count for each feed from it. If the
-                                                 rb_indices is None, feeds_rb_indexes will be used as the source of the updates
-                                                 count. */
+                                                        this map will be filled with the update count for each feed from it. If the
+                                                        rb_indices is None, feeds_rb_indexes will be used as the source of the updates
+                                                        count. */
 ) -> Result<Vec<u8>> {
     let mut result = Vec::<u8>::new();
     let updates = &feed_updates.updates;
@@ -198,7 +197,7 @@ pub async fn adfs_serialize_updates(
     let mut batch_feeds = BTreeMap::new();
 
     for (encoded_feed_id, (stride, mut rb_index)) in feeds_info.iter() {
-        feeds_rb_indexes.insert(encoded_feed_id.clone(), rb_index);
+        feeds_rb_indexes.insert(*encoded_feed_id, rb_index);
         if !feeds_ids_with_value_updates.contains(encoded_feed_id) && rb_index > 0 {
             rb_index -= 1; // Get the index of the last updated value
         }
@@ -348,7 +347,7 @@ pub mod tests {
             (encoded_feed_id_for_stride_zero(2), 5),
             (encoded_feed_id_for_stride_zero(3), 4),
             (encoded_feed_id_for_stride_zero(4), 3),
-            (encoded_feed_id_for_stride_zero(5), 2)
+            (encoded_feed_id_for_stride_zero(5), 2),
         ];
 
         let config_init = default_config();
@@ -402,7 +401,7 @@ pub mod tests {
             (encoded_feed_id_for_stride_zero(2), 5),
             (encoded_feed_id_for_stride_zero(3), 4),
             (encoded_feed_id_for_stride_zero(4), 3),
-            (encoded_feed_id_for_stride_zero(5), 2)
+            (encoded_feed_id_for_stride_zero(5), 2),
         ];
 
         let config_init = default_config();
@@ -457,7 +456,7 @@ pub mod tests {
             (encoded_feed_id_for_stride_zero(2), 5),
             (encoded_feed_id_for_stride_zero(3), 4),
             (encoded_feed_id_for_stride_zero(4), 9000),
-            (encoded_feed_id_for_stride_zero(5), 2)
+            (encoded_feed_id_for_stride_zero(5), 2),
         ];
 
         let config_init = default_config();

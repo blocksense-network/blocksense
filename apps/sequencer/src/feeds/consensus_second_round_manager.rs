@@ -71,7 +71,11 @@ impl AggregationBatchConsensus {
                 tx_hash: batch.tx_hash.clone(),
                 safe_tx: safe_transaction,
                 signatures: HashMap::new(),
-                updated_feeds_ids: batch.updates.iter().map(|update| update.encoded_feed_id).collect(),
+                updated_feeds_ids: batch
+                    .updates
+                    .iter()
+                    .map(|update| update.encoded_feed_id)
+                    .collect(),
             },
         );
     }

@@ -273,7 +273,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             debug!("No aggregated batch update for network {net}");
             continue;
         }
-        // After filtering for the network, we extract the feed_id-s that need round counter increment
+        // After filtering for the network, we extract the feed_id-s that need round buffer index increment
         let updated_feeds_ids = updates.updates.iter().map(|u| u.encoded_feed_id).collect();
 
         let serialized_updates_hex = hex::encode(&serialized_updates);
