@@ -43,13 +43,19 @@ impl Eq for VotedFeedUpdateWithProof {}
 // Implement Ord and PartialOrd
 impl PartialOrd for VotedFeedUpdateWithProof {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.update.encoded_feed_id.cmp(&other.update.encoded_feed_id))
+        Some(
+            self.update
+                .encoded_feed_id
+                .cmp(&other.update.encoded_feed_id),
+        )
     }
 }
 
 impl Ord for VotedFeedUpdateWithProof {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.update.encoded_feed_id.cmp(&other.update.encoded_feed_id)
+        self.update
+            .encoded_feed_id
+            .cmp(&other.update.encoded_feed_id)
     }
 }
 
@@ -100,7 +106,9 @@ impl VotedFeedUpdate {
                             self.encoded_feed_id,
                         )
                     }
-                    (self.encoded_feed_id.get_id() as u32).to_be_bytes().to_vec()
+                    (self.encoded_feed_id.get_id() as u32)
+                        .to_be_bytes()
+                        .to_vec()
                 } else {
                     self.encoded_feed_id.get_id().to_be_bytes().to_vec()
                 }
@@ -303,9 +311,15 @@ mod tests {
                                                          // Send test votes
         let k1 = "00ab0000000000000000000000000001";
         let v1 = "000000000000000000000000000010f0da2079987e1000000000000000000000";
-        let vote_1 =
-            VotedFeedUpdate::new_decode(k1, 0, v1, end_slot_timestamp, FeedType::Numerical(0.0), 18)
-                .unwrap();
+        let vote_1 = VotedFeedUpdate::new_decode(
+            k1,
+            0,
+            v1,
+            end_slot_timestamp,
+            FeedType::Numerical(0.0),
+            18,
+        )
+        .unwrap();
         assert_eq!(
             vote_1.encoded_feed_id.get_id(),
             887882762809455524478714872296636417 as FeedId
@@ -465,9 +479,15 @@ mod tests {
         // Send test votes
         let k1 = "00ab0000000000000000000000000001";
         let v1 = "000000000000000000000000000010f0da2079987e1000000000000000000000";
-        let vote_1 =
-            VotedFeedUpdate::new_decode(k1, 0, v1, end_slot_timestamp, FeedType::Numerical(0.0), 18)
-                .unwrap();
+        let vote_1 = VotedFeedUpdate::new_decode(
+            k1,
+            0,
+            v1,
+            end_slot_timestamp,
+            FeedType::Numerical(0.0),
+            18,
+        )
+        .unwrap();
         assert_eq!(
             vote_1.encoded_feed_id.get_id(),
             887882762809455524478714872296636417 as FeedId

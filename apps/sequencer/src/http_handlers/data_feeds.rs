@@ -51,7 +51,8 @@ async fn process_report(
             Some(x) => {
                 let reporter = x.1;
                 let reporter_metrics = reporter.read().await.reporter_metrics.clone();
-                encoded_feed_id = match data_feed.payload_metadata.feed_id.parse::<EncodedFeedId>() {
+                encoded_feed_id = match data_feed.payload_metadata.feed_id.parse::<EncodedFeedId>()
+                {
                     Ok(val) => val,
                     Err(e) => {
                         inc_metric!(reporter_metrics, reporter_id, non_valid_feed_id_reports);
@@ -771,7 +772,11 @@ pub mod tests {
                 .expect("Unknown error")
                 .as_millis()
                 + 300_u128 * 10_u128;
-            history.push_next(EncodedFeedId::new(feed_id, 0), feed_value, end_slot_timestamp);
+            history.push_next(
+                EncodedFeedId::new(feed_id, 0),
+                feed_value,
+                end_slot_timestamp,
+            );
         }
 
         // Initialize the service
