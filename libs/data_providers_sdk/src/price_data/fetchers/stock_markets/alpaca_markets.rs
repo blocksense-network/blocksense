@@ -9,7 +9,7 @@ use serde_this_or_that::as_f64;
 use blocksense_sdk::http::http_get_json;
 
 use crate::price_data::{
-    fetchers::stock_markets::utils::print_missing_network_price_data,
+    fetchers::stock_markets::utils::print_missing_provider_price_data,
     traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
 };
 
@@ -84,7 +84,7 @@ impl<'a> PricesFetcher<'a> for AlpacaMarketsPriceFetcher<'a> {
                     if price > 0.0 && volume > 0.0 {
                         Some((symbol, PricePoint { price, volume }))
                     } else {
-                        print_missing_network_price_data(
+                        print_missing_provider_price_data(
                             "AlpacaMarkets",
                             symbol,
                             (price > 0.0).then_some(price),

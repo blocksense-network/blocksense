@@ -7,7 +7,7 @@ use serde::Deserialize;
 
 use blocksense_sdk::http::http_get_json;
 
-use crate::price_data::fetchers::stock_markets::utils::print_missing_network_price_data;
+use crate::price_data::fetchers::stock_markets::utils::print_missing_provider_price_data;
 use crate::price_data::traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -63,7 +63,7 @@ impl<'a> PricesFetcher<'a> for TwelveDataPriceFetcher<'a> {
                             Some((value.symbol.clone(), PricePoint { price, volume }))
                         }
                         _ => {
-                            print_missing_network_price_data(
+                            print_missing_provider_price_data(
                                 "TwelveData",
                                 value.symbol.clone(),
                                 price,
