@@ -10,6 +10,7 @@ export const generateDecoderLines = (
   schema: Schema,
   name: string,
   evmVersion: EvmVersion = 'cancun',
+  start: number = 0,
 ): string[] => {
   const { generateDecoderPrimitiveLines, generateDecoderStringBytes } =
     getDecoderImplementations(evmVersion);
@@ -288,12 +289,23 @@ export const generateDecoderLines = (
     );
   };
 
-  return generateDecoderLines(
-    schema,
-    name,
-    0,
-    32, // data starts 32 bytes after beginning (this is where length is stored)
-    'add(mload(data), 32)', // load length of data
-    null,
+  const lines: string[] = [];
+  let length = 'mload(data)'; // default length location
+  if (start) {
+    lines.push(
+      `let data_length := shr(${256 - start * 8}, mload(add(data, 32)))`,
+    );
+    length = 'data_length';
+  }
+
+  return lines.concat(
+    generateDecoderLines(
+      schema,
+      name,
+      0,
+      32 + start, // data starts 32 bytes after beginning (this is where length is stored)
+      `add(${length}, 32)`, // load length of data
+      null,
+    ),
   );
 };
