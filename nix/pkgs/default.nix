@@ -70,6 +70,7 @@
           exsat-holdings = mkOracleScript "exsat-holdings";
           gecko-terminal = mkOracleScript "gecko-terminal";
           borrow-rates = mkOracleScript "borrow-rates";
+          chicken-farm = mkOracleScript "chicken-farm";
           eth-rpc = mkOracleScript "eth-rpc";
           stock-price-feeds = mkOracleScript "stock-price-feeds";
           forex-price-feeds = mkOracleScript "forex-price-feeds";
