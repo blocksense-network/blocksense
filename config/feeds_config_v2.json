@@ -54,7 +54,7 @@
               "id": ["BTC_USDC", "BTC_USDT"]
             },
             "Gemini": {
-              "symbol": ["BTCUSD", "BTCUSDC", "BTCUSDT"]
+              "symbol": ["BTCUSD", "BTCUSDC", "BTCUSDCPERP", "BTCUSDT"]
             },
             "KuCoin": {
               "symbol": ["BTC-USDC", "BTC-USDT"]
@@ -198,7 +198,7 @@
               "id": ["BTC_USDC"]
             },
             "Gemini": {
-              "symbol": ["BTCUSDC"]
+              "symbol": ["BTCUSDC", "BTCUSDCPERP"]
             },
             "KuCoin": {
               "symbol": ["BTC-USDC"]
@@ -270,7 +270,7 @@
               "id": ["ETH_USDC", "ETH_USDT"]
             },
             "Gemini": {
-              "symbol": ["ETHUSD", "ETHUSDC", "ETHUSDT"]
+              "symbol": ["ETHUSD", "ETHUSDC", "ETHUSDCPERP", "ETHUSDT"]
             },
             "Kraken": {
               "pair": ["ETHUSDC", "ETHUSDT", "XETHZUSD"],
@@ -497,7 +497,7 @@
               "id": ["ETH_USDC"]
             },
             "Gemini": {
-              "symbol": ["ETHUSDC"]
+              "symbol": ["ETHUSDC", "ETHUSDCPERP"]
             },
             "Kraken": {
               "pair": ["ETHUSDC"],
@@ -7484,6 +7484,9 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
+            "Bitfinex": {
+              "symbol": ["tMNTUSD"]
+            },
             "Bybit": {
               "symbol": ["MNTUSDC", "MNTUSDT"]
             },
@@ -10624,12 +10627,6 @@
             "Bitfinex": {
               "symbol": ["tMKRUSD"]
             },
-            "Bitget": {
-              "symbol": ["MKRUSDT"]
-            },
-            "Bybit": {
-              "symbol": ["MKRUSDT"]
-            },
             "Coinbase": {
               "id": ["MKR-USD"]
             },
@@ -10641,10 +10638,6 @@
             },
             "Gemini": {
               "symbol": ["MKRUSD", "MKRUSDC"]
-            },
-            "Kraken": {
-              "pair": ["MKRUSD"],
-              "wsname": ["MKR/USD"]
             },
             "KuCoin": {
               "symbol": ["MKR-USDT"]
@@ -10740,12 +10733,6 @@
               "symbol": ["MKRUSDT"]
             },
             "BinanceUS": {
-              "symbol": ["MKRUSDT"]
-            },
-            "Bitget": {
-              "symbol": ["MKRUSDT"]
-            },
-            "Bybit": {
               "symbol": ["MKRUSDT"]
             },
             "CryptoCom": {
@@ -17279,6 +17266,9 @@
             },
             "MEXC": {
               "symbol": ["AEROUSDT"]
+            },
+            "Upbit": {
+              "market": ["USDT-AERO"]
             }
           },
           "aggregators": {
@@ -17336,6 +17326,9 @@
             },
             "MEXC": {
               "symbol": ["AEROUSDT"]
+            },
+            "Upbit": {
+              "market": ["USDT-AERO"]
             }
           }
         },
@@ -29932,7 +29925,7 @@
           "kind": "cex-price-feeds",
           "exchanges": {
             "Binance": {
-              "symbol": ["UMAUSDT"]
+              "symbol": ["UMAUSDC", "UMAUSDT"]
             },
             "Bitget": {
               "symbol": ["UMAUSDT"]
@@ -30064,6 +30057,9 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
+            "Binance": {
+              "symbol": ["UMAUSDC"]
+            },
             "Gemini": {
               "symbol": ["UMAUSDC"]
             }
@@ -41767,8 +41763,8 @@
     },
     {
       "id": "10000",
-      "description": "Price of British Pound in US Dollar",
       "full_name": "GBP / USD",
+      "description": "Price of British Pound in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -41799,8 +41795,8 @@
     },
     {
       "id": "10001",
-      "description": "Price of Euro in US Dollar",
       "full_name": "EUR / USD",
+      "description": "Price of Euro in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -41831,8 +41827,8 @@
     },
     {
       "id": "10002",
-      "description": "Price of Gold in US Dollar",
       "full_name": "XAU / USD",
+      "description": "Price of Gold in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -41863,8 +41859,8 @@
     },
     {
       "id": "10003",
-      "description": "Price of Australian Dollar in US Dollar",
       "full_name": "AUD / USD",
+      "description": "Price of Australian Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -41895,8 +41891,8 @@
     },
     {
       "id": "10004",
-      "description": "Price of Silver in US Dollar",
       "full_name": "XAG / USD",
+      "description": "Price of Silver in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -41927,8 +41923,8 @@
     },
     {
       "id": "10005",
-      "description": "Price of Georgian Lari in US Dollar",
       "full_name": "GEL / USD",
+      "description": "Price of Georgian Lari in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -41959,8 +41955,8 @@
     },
     {
       "id": "10006",
-      "description": "Price of New Zealand Dollar in US Dollar",
       "full_name": "NZD / USD",
+      "description": "Price of New Zealand Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -41991,8 +41987,8 @@
     },
     {
       "id": "10007",
-      "description": "Price of Chinese Yuan (offshore) in US Dollar",
       "full_name": "CNH / USD",
+      "description": "Price of Chinese Yuan (offshore) in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42023,8 +42019,8 @@
     },
     {
       "id": "10008",
-      "description": "Price of Swiss Franc in US Dollar",
       "full_name": "CHF / USD",
+      "description": "Price of Swiss Franc in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42055,8 +42051,8 @@
     },
     {
       "id": "10009",
-      "description": "Price of South African Rand in US Dollar",
       "full_name": "ZAR / USD",
+      "description": "Price of South African Rand in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42087,8 +42083,8 @@
     },
     {
       "id": "10010",
-      "description": "Price of Swedish Krona in US Dollar",
       "full_name": "SEK / USD",
+      "description": "Price of Swedish Krona in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42119,8 +42115,8 @@
     },
     {
       "id": "10011",
-      "description": "Price of Singapore Dollar in US Dollar",
       "full_name": "SGD / USD",
+      "description": "Price of Singapore Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42151,8 +42147,8 @@
     },
     {
       "id": "10012",
-      "description": "Price of Polish Zloty in US Dollar",
       "full_name": "PLN / USD",
+      "description": "Price of Polish Zloty in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42183,8 +42179,8 @@
     },
     {
       "id": "10013",
-      "description": "Price of South Korean Won in US Dollar",
       "full_name": "KRW / USD",
+      "description": "Price of South Korean Won in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42215,8 +42211,8 @@
     },
     {
       "id": "10014",
-      "description": "Price of Hungarian Forint in US Dollar",
       "full_name": "HUF / USD",
+      "description": "Price of Hungarian Forint in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42247,8 +42243,8 @@
     },
     {
       "id": "10015",
-      "description": "Price of Danish Krone in US Dollar",
       "full_name": "DKK / USD",
+      "description": "Price of Danish Krone in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42279,8 +42275,8 @@
     },
     {
       "id": "10016",
-      "description": "Price of Mexican Peso in US Dollar",
       "full_name": "MXN / USD",
+      "description": "Price of Mexican Peso in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42311,8 +42307,8 @@
     },
     {
       "id": "10017",
-      "description": "Price of Czech Koruna in US Dollar",
       "full_name": "CZK / USD",
+      "description": "Price of Czech Koruna in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42343,8 +42339,8 @@
     },
     {
       "id": "10018",
-      "description": "Price of Norwegian Krone in US Dollar",
       "full_name": "NOK / USD",
+      "description": "Price of Norwegian Krone in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42375,8 +42371,8 @@
     },
     {
       "id": "10019",
-      "description": "Price of Hong Kong Dollar in US Dollar",
       "full_name": "HKD / USD",
+      "description": "Price of Hong Kong Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42407,8 +42403,8 @@
     },
     {
       "id": "10020",
-      "description": "Price of New Taiwan Dollar in US Dollar",
       "full_name": "TWD / USD",
+      "description": "Price of New Taiwan Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42439,8 +42435,8 @@
     },
     {
       "id": "10021",
-      "description": "Price of Indian Rupee in US Dollar",
       "full_name": "INR / USD",
+      "description": "Price of Indian Rupee in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42471,8 +42467,8 @@
     },
     {
       "id": "10022",
-      "description": "Price of Turkish Lira in US Dollar",
       "full_name": "TRY / USD",
+      "description": "Price of Turkish Lira in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42503,8 +42499,8 @@
     },
     {
       "id": "10023",
-      "description": "Price of Indonesian Rupiah in US Dollar",
       "full_name": "IDR / USD",
+      "description": "Price of Indonesian Rupiah in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42535,8 +42531,8 @@
     },
     {
       "id": "10024",
-      "description": "Price of Philippine Peso in US Dollar",
       "full_name": "PHP / USD",
+      "description": "Price of Philippine Peso in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42567,8 +42563,8 @@
     },
     {
       "id": "10025",
-      "description": "Price of Brazilian Real in US Dollar",
       "full_name": "BRL / USD",
+      "description": "Price of Brazilian Real in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42599,8 +42595,8 @@
     },
     {
       "id": "10026",
-      "description": "Price of Romanian Leu in US Dollar",
       "full_name": "RON / USD",
+      "description": "Price of Romanian Leu in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42631,8 +42627,8 @@
     },
     {
       "id": "10027",
-      "description": "Price of Japanese Yen in US Dollar",
       "full_name": "JPY / USD",
+      "description": "Price of Japanese Yen in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42663,8 +42659,8 @@
     },
     {
       "id": "10028",
-      "description": "Price of Russian Ruble in US Dollar",
       "full_name": "RUB / USD",
+      "description": "Price of Russian Ruble in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42695,8 +42691,8 @@
     },
     {
       "id": "10029",
-      "description": "Price of Argentine Peso in US Dollar",
       "full_name": "ARS / USD",
+      "description": "Price of Argentine Peso in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42727,8 +42723,8 @@
     },
     {
       "id": "10030",
-      "description": "Price of Colombian Peso in US Dollar",
       "full_name": "COP / USD",
+      "description": "Price of Colombian Peso in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42759,8 +42755,8 @@
     },
     {
       "id": "10031",
-      "description": "Price of Thai Baht in US Dollar",
       "full_name": "THB / USD",
+      "description": "Price of Thai Baht in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42791,8 +42787,8 @@
     },
     {
       "id": "10032",
-      "description": "Price of Icelandic Króna in US Dollar",
       "full_name": "ISK / USD",
+      "description": "Price of Icelandic Króna in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42823,8 +42819,8 @@
     },
     {
       "id": "10033",
-      "description": "Price of Israeli New Shekel in US Dollar",
       "full_name": "ILS / USD",
+      "description": "Price of Israeli New Shekel in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42855,8 +42851,8 @@
     },
     {
       "id": "10034",
-      "description": "Price of Egyptian Pound in US Dollar",
       "full_name": "EGP / USD",
+      "description": "Price of Egyptian Pound in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42887,8 +42883,8 @@
     },
     {
       "id": "10035",
-      "description": "Price of Fijian Dollar in US Dollar",
       "full_name": "FJD / USD",
+      "description": "Price of Fijian Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42919,8 +42915,8 @@
     },
     {
       "id": "10036",
-      "description": "Price of Chinese Yuan in US Dollar",
       "full_name": "CNY / USD",
+      "description": "Price of Chinese Yuan in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42951,8 +42947,8 @@
     },
     {
       "id": "10037",
-      "description": "Price of Saudi Riyal in US Dollar",
       "full_name": "SAR / USD",
+      "description": "Price of Saudi Riyal in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -42983,8 +42979,8 @@
     },
     {
       "id": "10038",
-      "description": "Price of Malaysian Ringgit in US Dollar",
       "full_name": "MYR / USD",
+      "description": "Price of Malaysian Ringgit in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43015,8 +43011,8 @@
     },
     {
       "id": "10039",
-      "description": "Price of Omani Rial in US Dollar",
       "full_name": "OMR / USD",
+      "description": "Price of Omani Rial in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43047,8 +43043,8 @@
     },
     {
       "id": "10040",
-      "description": "Price of Macedonian Denar in US Dollar",
       "full_name": "MKD / USD",
+      "description": "Price of Macedonian Denar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43079,8 +43075,8 @@
     },
     {
       "id": "10041",
-      "description": "Price of Kuwaiti Dinar in US Dollar",
       "full_name": "KWD / USD",
+      "description": "Price of Kuwaiti Dinar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43111,8 +43107,8 @@
     },
     {
       "id": "10042",
-      "description": "Price of Seychellois Rupee in US Dollar",
       "full_name": "SCR / USD",
+      "description": "Price of Seychellois Rupee in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43143,8 +43139,8 @@
     },
     {
       "id": "10043",
-      "description": "Price of Serbian Dinar in US Dollar",
       "full_name": "RSD / USD",
+      "description": "Price of Serbian Dinar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43175,8 +43171,8 @@
     },
     {
       "id": "10044",
-      "description": "Price of Bahraini Dinar in US Dollar",
       "full_name": "BHD / USD",
+      "description": "Price of Bahraini Dinar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43207,8 +43203,8 @@
     },
     {
       "id": "10045",
-      "description": "Price of United Arab Emirates Dirham in US Dollar",
       "full_name": "AED / USD",
+      "description": "Price of United Arab Emirates Dirham in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43239,8 +43235,8 @@
     },
     {
       "id": "10046",
-      "description": "Price of Algerian Dinar in US Dollar",
       "full_name": "DZD / USD",
+      "description": "Price of Algerian Dinar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43271,8 +43267,8 @@
     },
     {
       "id": "10047",
-      "description": "Price of Bulgarian Lev in US Dollar",
       "full_name": "BGN / USD",
+      "description": "Price of Bulgarian Lev in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43303,8 +43299,8 @@
     },
     {
       "id": "10048",
-      "description": "Price of Vietnamese Dong in US Dollar",
       "full_name": "VND / USD",
+      "description": "Price of Vietnamese Dong in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43335,8 +43331,8 @@
     },
     {
       "id": "10049",
-      "description": "Price of Moldovan Leu in US Dollar",
       "full_name": "MDL / USD",
+      "description": "Price of Moldovan Leu in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43367,8 +43363,8 @@
     },
     {
       "id": "10050",
-      "description": "Price of Mauritian Rupee in US Dollar",
       "full_name": "MUR / USD",
+      "description": "Price of Mauritian Rupee in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43399,8 +43395,8 @@
     },
     {
       "id": "10051",
-      "description": "Price of Congolese Franc in US Dollar",
       "full_name": "CDF / USD",
+      "description": "Price of Congolese Franc in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43431,8 +43427,8 @@
     },
     {
       "id": "10052",
-      "description": "Price of Uzbekistani Som in US Dollar",
       "full_name": "UZS / USD",
+      "description": "Price of Uzbekistani Som in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43463,8 +43459,8 @@
     },
     {
       "id": "10053",
-      "description": "Price of Libyan Dinar in US Dollar",
       "full_name": "LYD / USD",
+      "description": "Price of Libyan Dinar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43495,8 +43491,8 @@
     },
     {
       "id": "10054",
-      "description": "Price of Tajikistani Somoni in US Dollar",
       "full_name": "TJS / USD",
+      "description": "Price of Tajikistani Somoni in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43527,8 +43523,8 @@
     },
     {
       "id": "10055",
-      "description": "Price of Bosnia-Herzegovina Convertible Mark in US Dollar",
       "full_name": "BAM / USD",
+      "description": "Price of Bosnia-Herzegovina Convertible Mark in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43559,8 +43555,8 @@
     },
     {
       "id": "10056",
-      "description": "Price of Aruban Florin in US Dollar",
       "full_name": "AWG / USD",
+      "description": "Price of Aruban Florin in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43591,8 +43587,8 @@
     },
     {
       "id": "10057",
-      "description": "Price of CFP Franc in US Dollar",
       "full_name": "XPF / USD",
+      "description": "Price of CFP Franc in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43623,8 +43619,8 @@
     },
     {
       "id": "10058",
-      "description": "Price of Comorian Franc in US Dollar",
       "full_name": "KMF / USD",
+      "description": "Price of Comorian Franc in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43655,8 +43651,8 @@
     },
     {
       "id": "10059",
-      "description": "Price of Yemeni Rial in US Dollar",
       "full_name": "YER / USD",
+      "description": "Price of Yemeni Rial in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43687,8 +43683,8 @@
     },
     {
       "id": "10060",
-      "description": "Price of St. Helena Pound in US Dollar",
       "full_name": "SHP / USD",
+      "description": "Price of St. Helena Pound in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43719,8 +43715,8 @@
     },
     {
       "id": "10061",
-      "description": "Price of Maldivian Rufiyaa in US Dollar",
       "full_name": "MVR / USD",
+      "description": "Price of Maldivian Rufiyaa in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43751,8 +43747,8 @@
     },
     {
       "id": "10062",
-      "description": "Price of Mozambican Metical in US Dollar",
       "full_name": "MZN / USD",
+      "description": "Price of Mozambican Metical in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43783,8 +43779,8 @@
     },
     {
       "id": "10063",
-      "description": "Price of Uruguayan Peso in US Dollar",
       "full_name": "UYU / USD",
+      "description": "Price of Uruguayan Peso in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43815,8 +43811,8 @@
     },
     {
       "id": "10064",
-      "description": "Price of Chilean Peso in US Dollar",
       "full_name": "CLP / USD",
+      "description": "Price of Chilean Peso in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43847,8 +43843,8 @@
     },
     {
       "id": "10065",
-      "description": "Price of Kenyan Shilling in US Dollar",
       "full_name": "KES / USD",
+      "description": "Price of Kenyan Shilling in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43879,8 +43875,8 @@
     },
     {
       "id": "10066",
-      "description": "Price of Turkmenistani Manat in US Dollar",
       "full_name": "TMT / USD",
+      "description": "Price of Turkmenistani Manat in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43911,8 +43907,8 @@
     },
     {
       "id": "10067",
-      "description": "Price of Sri Lankan Rupee in US Dollar",
       "full_name": "LKR / USD",
+      "description": "Price of Sri Lankan Rupee in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43943,8 +43939,8 @@
     },
     {
       "id": "10068",
-      "description": "Price of Barbadian Dollar in US Dollar",
       "full_name": "BBD / USD",
+      "description": "Price of Barbadian Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -43975,8 +43971,8 @@
     },
     {
       "id": "10069",
-      "description": "Price of Honduran Lempira in US Dollar",
       "full_name": "HNL / USD",
+      "description": "Price of Honduran Lempira in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44007,8 +44003,8 @@
     },
     {
       "id": "10070",
-      "description": "Price of Nepalese Rupee in US Dollar",
       "full_name": "NPR / USD",
+      "description": "Price of Nepalese Rupee in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44039,8 +44035,8 @@
     },
     {
       "id": "10071",
-      "description": "Price of Lesotho Loti in US Dollar",
       "full_name": "LSL / USD",
+      "description": "Price of Lesotho Loti in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44071,8 +44067,8 @@
     },
     {
       "id": "10072",
-      "description": "Price of Albanian Lek in US Dollar",
       "full_name": "ALL / USD",
+      "description": "Price of Albanian Lek in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44103,8 +44099,8 @@
     },
     {
       "id": "10073",
-      "description": "Price of Papua New Guinean Kina in US Dollar",
       "full_name": "PGK / USD",
+      "description": "Price of Papua New Guinean Kina in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44135,8 +44131,8 @@
     },
     {
       "id": "10074",
-      "description": "Price of Salvadoran Colón in US Dollar",
       "full_name": "SVC / USD",
+      "description": "Price of Salvadoran Colón in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44167,8 +44163,8 @@
     },
     {
       "id": "10075",
-      "description": "Price of Somali Shilling in US Dollar",
       "full_name": "SOS / USD",
+      "description": "Price of Somali Shilling in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44199,8 +44195,8 @@
     },
     {
       "id": "10076",
-      "description": "Price of Tanzanian Shilling in US Dollar",
       "full_name": "TZS / USD",
+      "description": "Price of Tanzanian Shilling in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44231,8 +44227,8 @@
     },
     {
       "id": "10077",
-      "description": "Price of Ethiopian Birr in US Dollar",
       "full_name": "ETB / USD",
+      "description": "Price of Ethiopian Birr in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44263,8 +44259,8 @@
     },
     {
       "id": "10078",
-      "description": "Price of Guyanaese Dollar in US Dollar",
       "full_name": "GYD / USD",
+      "description": "Price of Guyanaese Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44295,8 +44291,8 @@
     },
     {
       "id": "10079",
-      "description": "Price of Macanese Pataca in US Dollar",
       "full_name": "MOP / USD",
+      "description": "Price of Macanese Pataca in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44327,8 +44323,8 @@
     },
     {
       "id": "10080",
-      "description": "Price of Iraqi Dinar in US Dollar",
       "full_name": "IQD / USD",
+      "description": "Price of Iraqi Dinar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44359,8 +44355,8 @@
     },
     {
       "id": "10081",
-      "description": "Price of Moroccan Dirham in US Dollar",
       "full_name": "MAD / USD",
+      "description": "Price of Moroccan Dirham in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44391,8 +44387,8 @@
     },
     {
       "id": "10082",
-      "description": "Price of Nicaraguan Córdoba in US Dollar",
       "full_name": "NIO / USD",
+      "description": "Price of Nicaraguan Córdoba in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44423,8 +44419,8 @@
     },
     {
       "id": "10083",
-      "description": "Price of Burundian Franc in US Dollar",
       "full_name": "BIF / USD",
+      "description": "Price of Burundian Franc in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44455,8 +44451,8 @@
     },
     {
       "id": "10084",
-      "description": "Price of Cape Verdean Escudo in US Dollar",
       "full_name": "CVE / USD",
+      "description": "Price of Cape Verdean Escudo in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44487,8 +44483,8 @@
     },
     {
       "id": "10085",
-      "description": "Price of Kazakhstani Tenge in US Dollar",
       "full_name": "KZT / USD",
+      "description": "Price of Kazakhstani Tenge in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44519,8 +44515,8 @@
     },
     {
       "id": "10086",
-      "description": "Price of Pakistani Rupee in US Dollar",
       "full_name": "PKR / USD",
+      "description": "Price of Pakistani Rupee in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44551,8 +44547,8 @@
     },
     {
       "id": "10087",
-      "description": "Price of Panamanian Balboa in US Dollar",
       "full_name": "PAB / USD",
+      "description": "Price of Panamanian Balboa in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44583,8 +44579,8 @@
     },
     {
       "id": "10088",
-      "description": "Price of Peruvian Sol in US Dollar",
       "full_name": "PEN / USD",
+      "description": "Price of Peruvian Sol in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44615,8 +44611,8 @@
     },
     {
       "id": "10089",
-      "description": "Price of Guatemalan Quetzal in US Dollar",
       "full_name": "GTQ / USD",
+      "description": "Price of Guatemalan Quetzal in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44647,8 +44643,8 @@
     },
     {
       "id": "10090",
-      "description": "Price of Botswanan Pula in US Dollar",
       "full_name": "BWP / USD",
+      "description": "Price of Botswanan Pula in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44679,8 +44675,8 @@
     },
     {
       "id": "10091",
-      "description": "Price of Cambodian Riel in US Dollar",
       "full_name": "KHR / USD",
+      "description": "Price of Cambodian Riel in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44711,8 +44707,8 @@
     },
     {
       "id": "10092",
-      "description": "Price of Bahamian Dollar in US Dollar",
       "full_name": "BSD / USD",
+      "description": "Price of Bahamian Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44743,8 +44739,8 @@
     },
     {
       "id": "10093",
-      "description": "Price of Belize Dollar in US Dollar",
       "full_name": "BZD / USD",
+      "description": "Price of Belize Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44775,8 +44771,8 @@
     },
     {
       "id": "10094",
-      "description": "Price of Cayman Islands Dollar in US Dollar",
       "full_name": "KYD / USD",
+      "description": "Price of Cayman Islands Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44807,8 +44803,8 @@
     },
     {
       "id": "10095",
-      "description": "Price of Laotian Kip in US Dollar",
       "full_name": "LAK / USD",
+      "description": "Price of Laotian Kip in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44839,8 +44835,8 @@
     },
     {
       "id": "10096",
-      "description": "Price of Tunisian Dinar in US Dollar",
       "full_name": "TND / USD",
+      "description": "Price of Tunisian Dinar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44871,8 +44867,8 @@
     },
     {
       "id": "10097",
-      "description": "Price of Rwandan Franc in US Dollar",
       "full_name": "RWF / USD",
+      "description": "Price of Rwandan Franc in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44903,8 +44899,8 @@
     },
     {
       "id": "10098",
-      "description": "Price of Cuban Peso in US Dollar",
       "full_name": "CUP / USD",
+      "description": "Price of Cuban Peso in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44935,8 +44931,8 @@
     },
     {
       "id": "10099",
-      "description": "Price of Haitian Gourde in US Dollar",
       "full_name": "HTG / USD",
+      "description": "Price of Haitian Gourde in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44967,8 +44963,8 @@
     },
     {
       "id": "10100",
-      "description": "Price of Swazi Lilangeni in US Dollar",
       "full_name": "SZL / USD",
+      "description": "Price of Swazi Lilangeni in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -44999,8 +44995,8 @@
     },
     {
       "id": "10101",
-      "description": "Price of Bangladeshi Taka in US Dollar",
       "full_name": "BDT / USD",
+      "description": "Price of Bangladeshi Taka in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45031,8 +45027,8 @@
     },
     {
       "id": "10102",
-      "description": "Price of Costa Rican Colón in US Dollar",
       "full_name": "CRC / USD",
+      "description": "Price of Costa Rican Colón in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45063,8 +45059,8 @@
     },
     {
       "id": "10103",
-      "description": "Price of Jordanian Dinar in US Dollar",
       "full_name": "JOD / USD",
+      "description": "Price of Jordanian Dinar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45095,8 +45091,8 @@
     },
     {
       "id": "10104",
-      "description": "Price of Nigerian Naira in US Dollar",
       "full_name": "NGN / USD",
+      "description": "Price of Nigerian Naira in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45127,8 +45123,8 @@
     },
     {
       "id": "10105",
-      "description": "Price of Zambian Kwacha in US Dollar",
       "full_name": "ZMW / USD",
+      "description": "Price of Zambian Kwacha in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45159,8 +45155,8 @@
     },
     {
       "id": "10106",
-      "description": "Price of Malagasy Ariary in US Dollar",
       "full_name": "MGA / USD",
+      "description": "Price of Malagasy Ariary in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45191,8 +45187,8 @@
     },
     {
       "id": "10107",
-      "description": "Price of Jamaican Dollar in US Dollar",
       "full_name": "JMD / USD",
+      "description": "Price of Jamaican Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45223,8 +45219,8 @@
     },
     {
       "id": "10108",
-      "description": "Price of Guinean Franc in US Dollar",
       "full_name": "GNF / USD",
+      "description": "Price of Guinean Franc in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45255,8 +45251,8 @@
     },
     {
       "id": "10109",
-      "description": "Price of Brunei Dollar in US Dollar",
       "full_name": "BND / USD",
+      "description": "Price of Brunei Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45287,8 +45283,8 @@
     },
     {
       "id": "10110",
-      "description": "Price of Qatari Riyal in US Dollar",
       "full_name": "QAR / USD",
+      "description": "Price of Qatari Riyal in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45319,8 +45315,8 @@
     },
     {
       "id": "10111",
-      "description": "Price of Ghanaian Cedi in US Dollar",
       "full_name": "GHS / USD",
+      "description": "Price of Ghanaian Cedi in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45351,8 +45347,8 @@
     },
     {
       "id": "10112",
-      "description": "Price of Sudanese Pound in US Dollar",
       "full_name": "SDG / USD",
+      "description": "Price of Sudanese Pound in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45383,8 +45379,8 @@
     },
     {
       "id": "10113",
-      "description": "Price of Bolivian Boliviano in US Dollar",
       "full_name": "BOB / USD",
+      "description": "Price of Bolivian Boliviano in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45415,8 +45411,8 @@
     },
     {
       "id": "10114",
-      "description": "Price of Ukrainian Hryvnia in US Dollar",
       "full_name": "UAH / USD",
+      "description": "Price of Ukrainian Hryvnia in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45447,8 +45443,8 @@
     },
     {
       "id": "10115",
-      "description": "Price of Liberian Dollar in US Dollar",
       "full_name": "LRD / USD",
+      "description": "Price of Liberian Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45479,8 +45475,8 @@
     },
     {
       "id": "10116",
-      "description": "Price of Paraguayan Guarani in US Dollar",
       "full_name": "PYG / USD",
+      "description": "Price of Paraguayan Guarani in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45511,8 +45507,8 @@
     },
     {
       "id": "10117",
-      "description": "Price of Lebanese Pound in US Dollar",
       "full_name": "LBP / USD",
+      "description": "Price of Lebanese Pound in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45543,8 +45539,8 @@
     },
     {
       "id": "10118",
-      "description": "Price of Trinidad & Tobago Dollar in US Dollar",
       "full_name": "TTD / USD",
+      "description": "Price of Trinidad & Tobago Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45575,8 +45571,8 @@
     },
     {
       "id": "10119",
-      "description": "Price of Ugandan Shilling in US Dollar",
       "full_name": "UGX / USD",
+      "description": "Price of Ugandan Shilling in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45607,8 +45603,8 @@
     },
     {
       "id": "10120",
-      "description": "Price of Djiboutian Franc in US Dollar",
       "full_name": "DJF / USD",
+      "description": "Price of Djiboutian Franc in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45639,8 +45635,8 @@
     },
     {
       "id": "10121",
-      "description": "Price of Dominican Peso in US Dollar",
       "full_name": "DOP / USD",
+      "description": "Price of Dominican Peso in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45671,8 +45667,8 @@
     },
     {
       "id": "10122",
-      "description": "Price of Namibian Dollar in US Dollar",
       "full_name": "NAD / USD",
+      "description": "Price of Namibian Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45703,8 +45699,8 @@
     },
     {
       "id": "10123",
-      "description": "Price of Gambian Dalasi in US Dollar",
       "full_name": "GMD / USD",
+      "description": "Price of Gambian Dalasi in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45735,8 +45731,8 @@
     },
     {
       "id": "10124",
-      "description": "Price of Malawian Kwacha in US Dollar",
       "full_name": "MWK / USD",
+      "description": "Price of Malawian Kwacha in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45767,8 +45763,8 @@
     },
     {
       "id": "10125",
-      "description": "Price of Afghan Afghani in US Dollar",
       "full_name": "AFN / USD",
+      "description": "Price of Afghan Afghani in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45799,8 +45795,8 @@
     },
     {
       "id": "10126",
-      "description": "Price of Armenian Dram in US Dollar",
       "full_name": "AMD / USD",
+      "description": "Price of Armenian Dram in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45831,8 +45827,8 @@
     },
     {
       "id": "10127",
-      "description": "Price of Bermudan Dollar in US Dollar",
       "full_name": "BMD / USD",
+      "description": "Price of Bermudan Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45863,8 +45859,8 @@
     },
     {
       "id": "10128",
-      "description": "Price of Canadian Dollar in US Dollar",
       "full_name": "CAD / USD",
+      "description": "Price of Canadian Dollar in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45895,8 +45891,8 @@
     },
     {
       "id": "10129",
-      "description": "Price of Myanmar Kyat in US Dollar",
       "full_name": "MMK / USD",
+      "description": "Price of Myanmar Kyat in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45927,8 +45923,8 @@
     },
     {
       "id": "10130",
-      "description": "Price of Mexican Investment Unit in US Dollar",
       "full_name": "MXV / USD",
+      "description": "Price of Mexican Investment Unit in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45959,8 +45955,8 @@
     },
     {
       "id": "10131",
-      "description": "Price of Sierra Leonean Leone (1964—2022) in US Dollar",
       "full_name": "SLL / USD",
+      "description": "Price of Sierra Leonean Leone (1964—2022) in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -45991,8 +45987,8 @@
     },
     {
       "id": "10132",
-      "description": "Price of Central African CFA Franc in US Dollar",
       "full_name": "XAF / USD",
+      "description": "Price of Central African CFA Franc in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -46023,8 +46019,8 @@
     },
     {
       "id": "10133",
-      "description": "Price of Special Drawing Rights in US Dollar",
       "full_name": "XDR / USD",
+      "description": "Price of Special Drawing Rights in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -46055,8 +46051,8 @@
     },
     {
       "id": "10134",
-      "description": "Price of West African CFA Franc in US Dollar",
       "full_name": "XOF / USD",
+      "description": "Price of West African CFA Franc in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
@@ -46087,8 +46083,8 @@
     },
     {
       "id": "10135",
-      "description": "Price of ZAC in US Dollar",
       "full_name": "ZAC / USD",
+      "description": "Price of ZAC in US Dollar",
       "type": "price-feed",
       "oracle_id": "forex-price-feeds",
       "value_type": "numerical",
