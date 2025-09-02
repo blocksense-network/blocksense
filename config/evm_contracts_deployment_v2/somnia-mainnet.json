@@ -73,6 +73,19 @@
         "base": "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
         "quote": "0x0000000000000000000000000000000000000348"
       },
+      "7": {
+        "address": "0x69B5f1f24Edf988aC82e406B00F899Ea9570B0A9",
+        "constructorArgs": [
+          "USDT / USD",
+          8,
+          "7",
+          "0xADF5aa88570d10BB51a5787ef98eC7895e3AC558"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "7",
+        "base": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
       "9": {
         "address": "0xbA721b658b4543D182A57cC9a2647D973224358A",
         "constructorArgs": [
@@ -110,6 +123,19 @@
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "16",
         "base": null,
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "19": {
+        "address": "0xa858264E3bc286C6133C82b13E68F10780625deb",
+        "constructorArgs": [
+          "USDC / USD",
+          8,
+          "19",
+          "0xADF5aa88570d10BB51a5787ef98eC7895e3AC558"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "19",
+        "base": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
         "quote": "0x0000000000000000000000000000000000000348"
       },
       "22": {
@@ -150,6 +176,32 @@
         "feedId": "29",
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "32": {
+        "address": "0xc0CeeaF4ddF6cd66FE3B0eC1744FfF34e94f49c8",
+        "constructorArgs": [
+          "wBTC / USD",
+          18,
+          "32",
+          "0xADF5aa88570d10BB51a5787ef98eC7895e3AC558"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "32",
+        "base": null,
+        "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "733": {
+        "address": "0x4B4B6e27e1BFCd70BBCF7B4e067A1683782BADB4",
+        "constructorArgs": [
+          "SOMI / USD",
+          18,
+          "733",
+          "0xADF5aa88570d10BB51a5787ef98eC7895e3AC558"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "733",
+        "base": null,
+        "quote": null
       }
     }
   }
