@@ -11,9 +11,7 @@ use alloy_primitives::{keccak256, U256};
 use blocksense_config::{FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
-use blocksense_utils::{
-    await_time, counter_unbounded_channel::CountedReceiver, EncodedFeedId,
-};
+use blocksense_utils::{await_time, counter_unbounded_channel::CountedReceiver, EncodedFeedId};
 use eyre::{bail, eyre, Result};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
 use tokio::{
@@ -23,8 +21,8 @@ use tokio::{
 
 use crate::{
     providers::provider::{
-        parse_eth_address, HashValue, ProviderStatus, ProviderType, ProvidersMetrics, RpcProvider,
-        SharedRpcProviders,
+        parse_eth_address, HashValue, LatestRBIndex, ProviderStatus, ProviderType,
+        ProvidersMetrics, RpcProvider, SharedRpcProviders,
     },
     sequencer_state::SequencerState,
 };
@@ -305,41 +303,107 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
     tracing::info!("Starting tracker for reorgs in network {net} loop...");
 
     loop {
-        let providers = providers_mutex.read().await;
-        if let Some(provider_mutex) = providers.get(net.as_str()) {
-            // Get latest finalized block
-            let finalized_block_opt = {
-                // In this block we get all variables we need from the rpc provider and drop
-                // the lock as soon as possible, then process the data
-                let provider = provider_mutex.lock().await;
-                let rpc_handle = &provider.provider;
+        // Scope the lock on providers so we don't hold it across awaits/sleeps
+        {
+            let providers = providers_mutex.read().await;
+            if let Some(provider_mutex) = providers.get(net.as_str()) {
+                // Gather data and perform minimal work while holding the provider lock
+                let mut need_resync_indices = false;
+                let finalized_block_opt = {
+                    let provider = provider_mutex.lock().await;
+                    let rpc_handle = &provider.provider;
 
-                let finalized_block_opt = match rpc_handle
-                    .get_block_by_number(BlockNumberOrTag::Finalized)
-                    .await
-                {
-                    Ok(res) => match res {
-                        Some(eth_finalized_block) => Some(eth_finalized_block),
-                        None => {
-                            warn!("Could not get finalized block in network {net}, got None!");
+                    // 1) Observe latest finalized block for logging/visibility
+                    let finalized_block_opt = match rpc_handle
+                        .get_block_by_number(BlockNumberOrTag::Finalized)
+                        .await
+                    {
+                        Ok(res) => match res {
+                            Some(eth_finalized_block) => Some(eth_finalized_block),
+                            None => {
+                                warn!("Could not get finalized block in network {net}, got None!");
+                                None
+                            }
+                        },
+                        Err(e) => {
+                            warn!("Could not get finalized block in network {net}: {e:?}!");
                             None
                         }
-                    },
-                    Err(e) => {
-                        warn!("Could not get finalized block in network {net}: {e:?}!");
-                        None
-                    }
-                };
-                finalized_block_opt
-            };
-            info!("Last finalized block in network {net} = {finalized_block_opt:?}");
-            // TODO: clean up saved transactions up to latest finalized block
+                    };
 
-            await_time(5000).await;
-        } else {
-            info!("Terminating reorg tracker for network {net} since it no longer has an active provider!");
-            break;
+                    // 2) Check the on-chain ADFS root; if it differs from our local view,
+                    //    set it so subsequent txs use the correct prev-root and flag resync of indices.
+                    if let Some(contract) = provider.get_latest_contract() {
+                        if let Some(contract_address) = contract.address {
+                            match rpc_handle
+                                .get_storage_at(contract_address, U256::from(0))
+                                .await
+                            {
+                                Ok(chain_root) => {
+                                    let chain_root_h = HashValue(chain_root.into());
+                                    let local_frontier_root =
+                                        provider.calldata_merkle_tree_frontier.root();
+                                    let tracked_contract_root =
+                                        provider.merkle_root_in_contract.clone();
+
+                                    let differs_from_local =
+                                        local_frontier_root.0 != chain_root_h.0;
+
+                                    if differs_from_local {
+                                        info!("Detected state change on-chain for `{net}`. Updating tracked contract root from {:?} / local {:?} to {:?}", tracked_contract_root, local_frontier_root, chain_root_h);
+                                        // Update the tracked root so next tx uses correct prev-root
+                                        // and mark that we should resync indices below.
+                                        drop(provider);
+                                        let mut provider = provider_mutex.lock().await;
+                                        provider.merkle_root_in_contract = Some(chain_root_h);
+                                        need_resync_indices = true;
+                                    }
+                                }
+                                Err(e) => {
+                                    warn!("Failed to read ADFS root from network `{net}`: {e:?}");
+                                }
+                            }
+                        }
+                    }
+
+                    finalized_block_opt
+                };
+                info!("Last finalized block in network {net} = {finalized_block_opt:?}");
+
+                // 3) If we detected divergence, resync round-buffer indices from chain
+                if need_resync_indices {
+                    let mut provider = provider_mutex.lock().await;
+                    let keys: Vec<EncodedFeedId> = if provider.rb_indices.is_empty() {
+                        provider.feeds_variants.keys().cloned().collect()
+                    } else {
+                        provider.rb_indices.keys().cloned().collect()
+                    };
+
+                    let mut new_indices = provider.rb_indices.clone();
+                    for encoded_feed_id in keys {
+                        match provider.get_latest_rb_index(&encoded_feed_id).await {
+                            Ok(LatestRBIndex {
+                                encoded_feed_id,
+                                index,
+                            }) => {
+                                new_indices.insert(encoded_feed_id, index as u64);
+                            }
+                            Err(e) => {
+                                warn!("Failed to refresh rb index for feed {encoded_feed_id} in network `{net}`: {e:?}");
+                            }
+                        }
+                    }
+                    provider.rb_indices = new_indices;
+                    debug!("Refreshed rb indices from chain for `{net}`");
+                }
+            } else {
+                info!("Terminating reorg tracker for network {net} since it no longer has an active provider!");
+                break;
+            }
         }
+
+        // Sleep between polls
+        await_time(5000).await;
     }
 }
 
