@@ -20,6 +20,7 @@ const networks = [
   'ethereum-mainnet',
   'ethereum-sepolia',
   'ethereum-holesky',
+  'ethereum-hoodi',
   'abstract-testnet',
   'arbitrum-mainnet',
   'arbitrum-sepolia',
@@ -60,7 +61,6 @@ const networks = [
   'gnosis-chiado',
   'harmony-testnet-shard0',
   'hemi-sepolia',
-  'hoodi-testnet',
   'horizen-gobi',
   'hyperevm-mainnet',
   'hyperliquid-evm-testnet',
@@ -82,10 +82,10 @@ const networks = [
   'mantle-mainnet',
   'mantle-sepolia',
   'matchain-mainnet',
+  'megaeth-testnet',
   'metal-l2-testnet',
   'metis-andromeda-mainnet',
   'metis-sepolia',
-  'megaeth-testnet',
   'mezo-matsnet-testnet',
   'monad-testnet',
   'morph-mainnet',
@@ -93,9 +93,9 @@ const networks = [
   'nexera-testnet',
   'okto-testnet',
   'ontology-testnet',
+  'opbnb-testnet',
   'optimism-mainnet',
   'optimism-sepolia',
-  'opbnb-testnet',
   'ozean-poseidon-testnet',
   'pharos-testnet',
   'plasma-testnet',
@@ -142,18 +142,18 @@ const networks = [
 ] as const;
 
 const chainIds = [
-  99999999999, 1, 11155111, 17000, 11124, 1088, 42161, 421614, 1313161555,
-  43114, 43113, 123420001114, 8453, 84532, 80094, 80069, 200901, 200810, 81457,
-  168587773, 56288, 9728, 288, 28882, 56, 97, 325000, 42220, 44787, 5115, 66665,
-  338, 111557560, 18880, 839999, 250, 4002, 114, 252, 2522, 10888, 100, 10200,
-  1666700000, 743111, 560048, 1663, 999, 998, 2424, 57073, 763373, 747474, 2221,
-  1284, 1287, 1285, 59144, 59141, 4202, 994873017, 2030232745, 169, 3441006,
-  5000, 5003, 698, 1740, 59902, 6342, 31611, 10143, 2818, 2810, 72080, 8801,
-  5851, 10, 11155420, 5611, 7849306, 688688, 9746, 98866, 98867, 137, 80002,
-  1101, 2442, 695569, 11155931, 57000, 200018, 31, 534352, 534351, 11011, 5031,
-  50312, 1868, 1946, 16, 146, 57054, 1660990954, 5330, 53302, 1924, 239, 2391,
-  2390, 167000, 167009, 5678, 841, 842, 41, 130, 1301, 4801, 1417429182, 324,
-  300,
+  99999999999, 1, 11155111, 17000, 560048, 11124, 1088, 42161, 421614,
+  1313161555, 43114, 43113, 123420001114, 8453, 84532, 80094, 80069, 200901,
+  200810, 81457, 168587773, 56288, 9728, 288, 28882, 56, 97, 325000, 42220,
+  44787, 5115, 66665, 338, 111557560, 18880, 839999, 250, 4002, 114, 252, 2522,
+  10888, 100, 10200, 1666700000, 743111, 1663, 999, 998, 2424, 57073, 763373,
+  747474, 2221, 1284, 1287, 1285, 59144, 59141, 4202, 994873017, 2030232745,
+  169, 3441006, 5000, 5003, 698, 6342, 1740, 59902, 31611, 10143, 2818, 2810,
+  72080, 8801, 5851, 5611, 10, 11155420, 7849306, 688688, 9746, 98866, 98867,
+  137, 80002, 1101, 2442, 695569, 11155931, 57000, 200018, 31, 534352, 534351,
+  11011, 5031, 50312, 1868, 1946, 16, 146, 57054, 1660990954, 5330, 53302, 1924,
+  239, 2391, 2390, 167000, 167009, 5678, 841, 842, 41, 130, 1301, 4801,
+  1417429182, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks).annotations({
@@ -315,6 +315,23 @@ export const networkMetadata = {
         type: 'blockscout',
         webUrl: 'https://eth-holesky.blockscout.com',
         apiUrl: 'https://eth-holesky.blockscout.com/api',
+      },
+    ],
+    currency: Currency.ETH,
+  },
+  'ethereum-hoodi': {
+    chainId: 560048,
+    isTestnet: true,
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://eth-hoodi.blockscout.com',
+        apiUrl: 'https://eth-hoodi.blockscout.com/api',
+      },
+      {
+        type: 'etherscan',
+        webUrl: 'https://hoodi.etherscan.io',
+        apiUrl: 'https://api-hoodi.etherscan.io/api',
       },
     ],
     currency: Currency.ETH,
@@ -689,7 +706,7 @@ export const networkMetadata = {
       {
         type: 'cronos',
         webUrl: 'https://explorer.cronos.org/testnet',
-        apiUrl: 'https://explorer-api.cronos.org/testnet/api/v1',
+        apiUrl: 'https://explorer-api.cronos.org/testnet/api/v2',
       },
     ],
     currency: Currency.TCRO,
@@ -846,23 +863,6 @@ export const networkMetadata = {
         type: 'blockscout',
         webUrl: 'https://testnet.explorer.hemi.xyz',
         apiUrl: 'https://testnet.explorer.hemi.xyz/api',
-      },
-    ],
-    currency: Currency.ETH,
-  },
-  'hoodi-testnet': {
-    chainId: 560048,
-    isTestnet: true,
-    explorers: [
-      {
-        type: 'blockscout',
-        webUrl: 'https://eth-hoodi.blockscout.com',
-        apiUrl: 'https://eth-hoodi.blockscout.com/api',
-      },
-      {
-        type: 'etherscan',
-        webUrl: 'https://hoodi.etherscan.io',
-        apiUrl: 'https://api-hoodi.etherscan.io/api',
       },
     ],
     currency: Currency.ETH,
@@ -1134,6 +1134,18 @@ export const networkMetadata = {
     ],
     currency: Currency.ETH,
   },
+  'megaeth-testnet': {
+    chainId: 6342,
+    isTestnet: true,
+    explorers: [
+      {
+        type: 'megaeth',
+        webUrl: 'https://megaexplorer.xyz',
+        apiUrl: 'https://megaexplorer.xyz/api',
+      },
+    ],
+    currency: Currency.ETH,
+  },
   'metal-l2-testnet': {
     chainId: 1740,
     isTestnet: true,
@@ -1169,18 +1181,6 @@ export const networkMetadata = {
       },
     ],
     currency: Currency.sMETIS,
-  },
-  'megaeth-testnet': {
-    chainId: 6342,
-    isTestnet: true,
-    explorers: [
-      {
-        type: 'megaeth',
-        webUrl: 'https://megaexplorer.xyz',
-        apiUrl: 'https://megaexplorer.xyz/api',
-      },
-    ],
-    currency: Currency.ETH,
   },
   'mezo-matsnet-testnet': {
     chainId: 31611,
@@ -1266,6 +1266,18 @@ export const networkMetadata = {
     ],
     currency: Currency.ONG,
   },
+  'opbnb-testnet': {
+    chainId: 5611,
+    isTestnet: true,
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://opbnb-testnet.bscscan.com',
+        apiUrl: 'https://api-opbnb-testnet.bscscan.com/api',
+      },
+    ],
+    currency: Currency.tBNB,
+  },
   'optimism-mainnet': {
     chainId: 10,
     isTestnet: false,
@@ -1299,18 +1311,6 @@ export const networkMetadata = {
       },
     ],
     currency: Currency.ETH,
-  },
-  'opbnb-testnet': {
-    chainId: 5611,
-    isTestnet: true,
-    explorers: [
-      {
-        type: 'etherscan',
-        webUrl: 'https://opbnb-testnet.bscscan.com',
-        apiUrl: 'https://api-opbnb-testnet.bscscan.com/api',
-      },
-    ],
-    currency: Currency.tBNB,
   },
   'ozean-poseidon-testnet': {
     chainId: 7849306,

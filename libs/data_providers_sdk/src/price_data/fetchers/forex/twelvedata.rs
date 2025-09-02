@@ -11,14 +11,12 @@ use crate::price_data::fetchers::stock_markets::utils::print_missing_provider_pr
 use crate::price_data::traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct PriceData {
+pub struct RateData {
     pub symbol: String,
-    pub close: Option<String>,
-    pub volume: Option<String>,
-    pub previous_close: Option<String>,
+    pub rate: Option<f64>,
 }
 
-type TwelveDataResponse = HashMap<String, PriceData>;
+type TwelveDataResponse = HashMap<String, RateData>;
 
 pub struct TwelveDataPriceFetcher<'a> {
     pub symbols: &'a [String],
@@ -40,10 +38,15 @@ impl<'a> PricesFetcher<'a> for TwelveDataPriceFetcher<'a> {
                 .and_then(|map| map.get("TWELVEDATA_API_KEY"))
                 .ok_or_else(|| Error::msg("Missing TWELVEDATA_API_KEY"))?;
 
-            let all_symbols = self.symbols.join(",");
+            let all_symbols = self
+                .symbols
+                .iter()
+                .map(|s| s.replace(':', "/"))
+                .collect::<Vec<String>>()
+                .join(",");
 
             let response = http_get_json::<TwelveDataResponse>(
-                "https://api.twelvedata.com/quote",
+                "https://api.twelvedata.com/exchange_rate",
                 Some(&[("symbol", &all_symbols)]),
                 Some(&[("Authorization", format!("apikey {api_key}").as_str())]),
                 Some(timeout_secs),
@@ -53,21 +56,16 @@ impl<'a> PricesFetcher<'a> for TwelveDataPriceFetcher<'a> {
             let results = response
                 .values()
                 .filter_map(|value| {
-                    let price = value.close.clone().or(value.previous_close.clone());
-                    let volume = value.volume.clone();
-
-                    match (price.clone(), volume.clone()) {
-                        (Some(price), Some(volume)) => {
-                            let price = price.parse::<f64>().unwrap_or(0.0);
-                            let volume = volume.parse::<f64>().unwrap_or(0.0);
-                            Some((value.symbol.clone(), PricePoint { price, volume }))
-                        }
+                    let price = value.rate;
+                    let pair = value.symbol.replace('/', "");
+                    match price {
+                        Some(price) => Some((pair, PricePoint { price, volume: 1.0 })),
                         _ => {
                             print_missing_provider_price_data(
                                 "TwelveData",
                                 value.symbol.clone(),
                                 price,
-                                volume,
+                                Some(1.0),
                             );
                             None
                         }

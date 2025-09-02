@@ -2,8 +2,7 @@
  * @deprecated This script is deprecated and should no longer be used.
  */
 
-import { Schema as S, ParseResult } from 'effect';
-const { decodeUnknownSync } = ParseResult;
+import { Schema as S } from 'effect';
 
 import { selectDirectory } from '@blocksense/base-utils/fs';
 import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/chainlink-compatibility';
@@ -28,18 +27,24 @@ import {
   getCLFeedsOnMainnet,
 } from '../src/generation/initial/utils/chainlink';
 
-async function createArtifact<A, I = A>(
+async function createArtifact<T, EncodedT = T>(
   name: string,
-  schema: S.Schema<A, I, never> | null,
-  create: () => Promise<A>,
+  schema: S.Schema<T, EncodedT, never> | null,
+  create: () => Promise<T>,
   artifacts: any[],
-) {
+): Promise<T> {
   let json: unknown;
   json = await create();
-  const artifact = schema ? decodeUnknownSync(schema)(json) : (json as A);
-  artifacts.push({ name, content: artifact });
+  if (schema) {
+    const asserts: (u: unknown) => asserts u is T = S.asserts(schema);
+    asserts(json);
+    const encoded: EncodedT = S.encodeSync(schema)(json);
+    artifacts.push({ name, content: encoded });
+  } else {
+    artifacts.push({ name, content: json });
+  }
 
-  return artifact;
+  return json as T;
 }
 
 async function saveConfigsToDir(

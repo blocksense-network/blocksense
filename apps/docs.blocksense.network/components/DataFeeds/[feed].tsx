@@ -40,10 +40,7 @@ export default async function DataFeed({ params }: DataFeedProps) {
     return <Error404 />;
   }
 
-  const deploymentInfo = await readAllEvmDeployments([
-    'local',
-    'somnia-mainnet',
-  ]);
+  const deploymentInfo = await readAllEvmDeployments(['local']);
 
   const feedDeploymentInfo = prepareDeploymentData(
     valuesOf(deploymentInfo),

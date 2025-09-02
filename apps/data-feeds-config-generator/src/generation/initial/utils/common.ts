@@ -1,4 +1,4 @@
-import keccak256 from 'keccak256';
+import { keccak256 } from 'viem';
 
 import { createPair, pairToString } from '@blocksense/config-types';
 
@@ -84,8 +84,8 @@ export function sortFeedsConfig(
   const sortedRankedFeeds = rankedFeeds.sort((a, b) => a.rank! - b.rank!);
 
   const sortedUnrankedFeeds = unrankedFeeds.sort((a, b) => {
-    const a_ = keccak256(a.description).toString();
-    const b_ = keccak256(b.description).toString();
+    const a_ = keccak256(Buffer.from(a.description));
+    const b_ = keccak256(Buffer.from(b.description));
     return a_.localeCompare(b_);
   });
 

@@ -19,7 +19,6 @@ pub struct PriceData {
     pub symbol: String,
     pub regular_market_previous_close: Option<f64>,
     pub regular_market_price: Option<f64>,
-    pub regular_market_volume: Option<f64>,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -55,7 +54,12 @@ impl<'a> PricesFetcher<'a> for YFPriceFetcher<'a> {
                 .and_then(|map| map.get("YAHOO_FINANCE_API_KEY"))
                 .ok_or_else(|| Error::msg("Missing YAHOO_FINANCE_API_KEY"))?;
 
-            let all_symbols = self.symbols.join(",");
+            let all_symbols = self
+                .symbols
+                .iter()
+                .map(|s| format!("{}=X", s.replace(':', "")))
+                .collect::<Vec<String>>()
+                .join(",");
 
             let response = http_get_json::<YFResponse>(
                 "https://yfapi.net/v6/finance/quote",
@@ -75,18 +79,16 @@ impl<'a> PricesFetcher<'a> for YFPriceFetcher<'a> {
                         .regular_market_price
                         .or(value.regular_market_previous_close);
 
-                    let volume = value.regular_market_volume;
-
-                    match (price, volume) {
-                        (Some(price), Some(volume)) => {
-                            Some((value.symbol, PricePoint { price, volume }))
-                        }
+                    let volume = 1.0;
+                    let symbol = value.symbol.replace("=X", "");
+                    match price {
+                        Some(price) => Some((symbol, PricePoint { price, volume })),
                         _ => {
                             print_missing_provider_price_data(
                                 "YahooFinance",
                                 value.symbol.clone(),
                                 price,
-                                volume,
+                                Some(volume),
                             );
                             None
                         }

@@ -41,11 +41,16 @@ export const chainlinkNetworkNameToChainId = {
 
 export const chainlinkNetworkName = S.Literal(
   ...keysOf(chainlinkNetworkNameToChainId),
-);
+).annotations({ identifier: 'ChainlinkNetworkFilename' });
 
 export type ChainlinkNetworkName = typeof chainlinkNetworkName.Type;
 
-export const parseNetworkFilename = S.decodeUnknownSync(chainlinkNetworkName);
+export function parseNetworkFilename(filename: string): ChainlinkNetworkName {
+  const fName = S.decodeUnknownSync(chainlinkSupportedNetworkFileName)(
+    filename,
+  );
+  return fName.slice(6, -5) as ChainlinkNetworkName;
+}
 
 export const chainlinkSupportedNetworkFileName = S.TemplateLiteral(
   S.Literal('feeds-'),
@@ -60,12 +65,13 @@ export const isChainlinkSupportedNetworkFileName = S.is(
   chainlinkSupportedNetworkFileName,
 );
 
-export const ChainlinkAggregatorsSchema = S.Record({
-  key: S.Literal(
-    ...valuesOf(chainlinkNetworkNameToChainId).filter(x => x !== null),
+export const ChainlinkAggregatorsSchema = S.Struct(
+  Object.fromEntries(
+    valuesOf(chainlinkNetworkNameToChainId)
+      .filter(x => x !== null)
+      .map(name => [name, S.optional(ethereumAddress)] as const),
   ),
-  value: S.UndefinedOr(ethereumAddress),
-}).annotations({ identifier: 'ChainlinkAggregators' });
+).annotations({ identifier: 'ChainlinkAggregators' });
 
 export type ChainlinkAggregators = typeof ChainlinkAggregatorsSchema.Type;
 

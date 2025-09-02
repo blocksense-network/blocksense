@@ -7,7 +7,7 @@ use serde::Deserialize;
 
 use blocksense_sdk::http::http_get_json;
 
-use crate::price_data::fetchers::stock_markets::utils::print_missing_network_price_data;
+use crate::price_data::fetchers::stock_markets::utils::print_missing_provider_price_data;
 use crate::price_data::traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher};
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -65,7 +65,7 @@ impl<'a> PricesFetcher<'a> for FMPPriceFetcher<'a> {
                             Some((value.symbol, PricePoint { price, volume }))
                         }
                         _ => {
-                            print_missing_network_price_data("FMP", value.symbol, price, volume);
+                            print_missing_provider_price_data("FMP", value.symbol, price, volume);
                             None
                         }
                     }

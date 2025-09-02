@@ -72,6 +72,7 @@
           borrow-rates = mkOracleScript "borrow-rates";
           eth-rpc = mkOracleScript "eth-rpc";
           stock-price-feeds = mkOracleScript "stock-price-feeds";
+          forex-price-feeds = mkOracleScript "forex-price-feeds";
           spout-rwa = mkOracleScript "spout-rwa";
         };
 

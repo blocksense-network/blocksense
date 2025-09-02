@@ -110,6 +110,7 @@
     "@effect/platform": "^0.90.0",
     "@effect/vitest": "^0.25.0",
     "effect": "^3.15.1",
+    "string-width": "^8.0.0",
     "tslib": "^2.8.1"
   }
 }
