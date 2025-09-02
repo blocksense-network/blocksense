@@ -7,8 +7,8 @@ import { listEvmNetworks, readAllEvmDeployments } from '@blocksense/config-types
 import { DeployedContracts } from '@/components/DeployedContracts/DeployedContracts';
 
 export default async function DeployedContractsPage() {
-  const networks = await listEvmNetworks(['local', 'somnia-mainnet']);
-  const deploymentInfo = await readAllEvmDeployments(['local', 'somnia-mainnet']);
+  const networks = await listEvmNetworks(['local']);
+  const deploymentInfo = await readAllEvmDeployments(['local']);
 
   return (
     <DeployedContracts
