@@ -1,5 +1,5 @@
 {
-  "network": "hoodi-testnet",
+  "network": "ethereum-hoodi",
   "chainId": "560048",
   "contracts": {
     "coreContracts": {
