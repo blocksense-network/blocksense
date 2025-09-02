@@ -1539,6 +1539,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@blocksense/decoders@workspace:libs/ts/decoders"
   dependencies:
+    "@blocksense/base-utils": "workspace:*"
+    "@blocksense/contracts": "workspace:*"
     "@chainsafe/ssz": "npm:^1.0.2"
     "@nomicfoundation/hardhat-chai-matchers": "npm:^2.1.0"
     "@nomicfoundation/hardhat-ethers": "npm:^3.1.0"
@@ -1552,6 +1554,7 @@ __metadata:
     ejs: "npm:^3.1.10"
     ethers: "npm:^6.15.0"
     hardhat: "npm:^2.26.3"
+    hardhat-dependency-compiler: "npm:^1.2.1"
     prettier: "npm:^3.4.1"
     prettier-plugin-solidity: "npm:^1.4.1"
     tslib: "npm:^2.8.1"
@@ -18698,6 +18701,15 @@ __metadata:
   peerDependencies:
     hardhat: ^2.0.0
   checksum: 10c0/c339c91d166ba27c4230682690d1c0ca5f104dc55001983e152236f73717bf5f97aeb8ac601fd0e2037e7ba1789c998726bf367e0ddd2c268ab40b33f51dcef1
+  languageName: node
+  linkType: hard
+
+"hardhat-dependency-compiler@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "hardhat-dependency-compiler@npm:1.2.1"
+  peerDependencies:
+    hardhat: ^2.0.0
+  checksum: 10c0/d4373422849fe8851d06f1151f51fe17d00fb9f3425cc77cce53bd2d0c9f325d4f1520f2aa8eae305b3a0d012b9841b398d57c3f2d5e7a3d29b6dd4aaebc1f6e
   languageName: node
   linkType: hard
 

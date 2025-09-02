@@ -33,7 +33,6 @@ describe('Template Decoder', function () {
   };
 
   before(function () {
-    hre.config.solidity.compilers[0].settings.viaIR = true;
     hre.config.solidity.compilers[0].settings.evmVersion = evmVersion;
   });
 
@@ -88,7 +87,6 @@ describe('Template Decoder', function () {
   });
 
   after(() => {
-    hre.config.solidity.compilers[0].settings.viaIR = false;
     hre.config.solidity.compilers[0].settings.evmVersion = evmVersionBefore;
 
     // Check if `contracts` directory is empty, if yes remove it
