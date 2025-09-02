@@ -48065,6 +48065,68 @@
           "providers": ["AlpacaMarkets", "AlphaVantage", "YahooFinance", "FMP"]
         }
       }
+    },
+    {
+      "id": "5000000",
+      "full_name": "Eggs Supply",
+      "description": "Total supply of Eggs",
+      "type": "price-feed",
+      "oracle_id": "chicken-farm",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 1000,
+        "heartbeat_ms": 600000,
+        "deviation_percentage": 0.01,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "supply",
+          "quote": ""
+        },
+        "decimals": 0,
+        "category": "Equities",
+        "market_hours": "US_Equities",
+        "arguments": {
+          "kind": "chicken-farm"
+        }
+      }
+    },
+    {
+      "id": "5000001",
+      "full_name": "Eggs Price",
+      "description": "Total price of Eggs",
+      "type": "price-feed",
+      "oracle_id": "chicken-farm",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 1000,
+        "heartbeat_ms": 600000,
+        "deviation_percentage": 0.01,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "price",
+          "quote": ""
+        },
+        "decimals": 8,
+        "category": "Equities",
+        "market_hours": "US_Equities",
+        "arguments": {
+          "kind": "chicken-farm"
+        }
+      }
     }
   ]
 }
