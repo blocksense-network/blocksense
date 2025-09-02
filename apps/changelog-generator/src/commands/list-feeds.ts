@@ -10,7 +10,7 @@ import {
 import { Command, Options } from '@effect/cli';
 import { Effect } from 'effect';
 
-const availableNetworks = await listEvmNetworks(['somnia-mainnet']);
+const availableNetworks = await listEvmNetworks();
 
 export const listFeeds = Command.make(
   'list-feeds',
