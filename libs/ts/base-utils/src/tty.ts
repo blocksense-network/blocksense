@@ -1,7 +1,5 @@
 import { createInterface, Interface } from 'node:readline/promises';
 
-import getTextWidth from 'string-width';
-
 import { assert } from './assert';
 
 let _readline: Interface | null = null;
@@ -201,6 +199,57 @@ export const alignRight = (text: string, width: number, padding = ' ') =>
   alignText(text, width, 'right', padding);
 export const alignCenter = (text: string, width: number, padding = ' ') =>
   alignText(text, width, 'center', padding);
+
+export function getTextWidth(str: string) {
+  // 1. Remove ANSI escape sequences.
+  const cleanedStr = str.replace(/\u001b\[[0-9;?]*m/g, '');
+  if (!cleanedStr) return 0; // Handle empty or only-ANSI string
+
+  const segmenter = new Intl.Segmenter(undefined, {
+    granularity: 'grapheme',
+  });
+
+  let width = 0;
+  for (const { segment: grapheme } of segmenter.segment(cleanedStr)) {
+    const firstCodePoint = grapheme.codePointAt(0);
+    // 2. Disallow newline/tab.
+    if (grapheme === '\n' || grapheme === '\t' || firstCodePoint == null) {
+      throw new Error(
+        `Unsupported char: '${grapheme === '\n' ? '\\n' : '\\t'}'`,
+      );
+    }
+
+    // Check if the grapheme is composed of exactly this single code point.
+    const isSingleCodePointGrapheme =
+      String.fromCodePoint(firstCodePoint) === grapheme;
+
+    // 3. Handle single-width characters:
+    //    - Printable ASCII (U+0020 space to U+007E ~)
+    //    - Box Drawing characters (U+2500 to U+257F)
+    if (
+      isSingleCodePointGrapheme &&
+      ((firstCodePoint >= 0x20 && firstCodePoint <= 0x7e) ||
+        (firstCodePoint >= 0x2000 && firstCodePoint <= 0x206f) || // General Punctuation
+        (firstCodePoint >= 0x2500 && firstCodePoint <= 0x257f))
+    ) {
+      width += 1;
+      // 4. Approximate emoji detection (width 2):
+      //    - Grapheme's first char is Extended_Pictographic OR
+      //    - Grapheme consists of more than one Unicode scalar value (complex emoji).
+    } else if (
+      /\p{Extended_Pictographic}/u.test(String.fromCodePoint(firstCodePoint)) ||
+      !isSingleCodePointGrapheme
+    ) {
+      width += 2;
+    } else {
+      // 5. Throw for anything else.
+      throw new Error(
+        `Unsupported grapheme: '${grapheme}' (U+${firstCodePoint.toString(16).toUpperCase()})`,
+      );
+    }
+  }
+  return width;
+}
 
 export type RenderArgs = { maxWidth: number };
 
