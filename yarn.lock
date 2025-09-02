@@ -1439,7 +1439,6 @@ __metadata:
     "@nomicfoundation/hardhat-toolbox": "npm:^5.0.0"
     "@nomicfoundation/hardhat-verify": "npm:^2.1.1"
     "@nomicfoundation/hardhat-viem": "npm:^2.1.1"
-    "@nomiclabs/hardhat-ethers": "npm:^2.2.3"
     "@openzeppelin/contracts": "npm:^5.1.0"
     "@safe-global/api-kit": "npm:^4.0.0"
     "@safe-global/protocol-kit": "npm:^6.1.0"
@@ -1694,7 +1693,7 @@ __metadata:
     typescript: "npm:5.9.2"
     wrangler: "npm:^4.15.2"
   dependenciesMeta:
-    "@openzeppelin/contracts@5.0.2":
+    "@openzeppelin/contracts@5.1.0":
       unplugged: true
     next@14.2.5:
       unplugged: true
@@ -6434,16 +6433,6 @@ __metadata:
     "@nomicfoundation/solidity-analyzer-win32-x64-msvc":
       optional: true
   checksum: 10c0/1feee48a9506125d7736e3d1200d997cd07777f52ee6c71f7fad7d50b6705f7d3e028894968b449ca6e950991e726e9464ee5dc0c52d1066d127632be29667b4
-  languageName: node
-  linkType: hard
-
-"@nomiclabs/hardhat-ethers@npm:^2.2.3":
-  version: 2.2.3
-  resolution: "@nomiclabs/hardhat-ethers@npm:2.2.3"
-  peerDependencies:
-    ethers: ^5.0.0
-    hardhat: ^2.0.0
-  checksum: 10c0/cae46d1966108ab02b50fabe7945c8987fa1e9d5d0a7a06f79afc274ff1abc312e8a82375191a341b28571b897c22433d3a2826eb30077ed88d5983d01e381d0
   languageName: node
   linkType: hard
 
