@@ -10,11 +10,11 @@ export const generateDecoderPrimitiveLines = (
   end: Offset,
   counter?: string,
 ) => {
-  const fieldName = schema.fieldName;
+  const fieldName = '_' + schema.fieldName;
   const fieldSize = schema.fixedSize * 8;
 
   return `
-    // List basic for ${fieldName}
+    // List basic for ${schema.fieldName}
     {
       let ${fieldName}_size := div(sub(${end}, ${start}), ${schema.fixedSize})
 
