@@ -9,6 +9,7 @@ members = [
   "forex-price-feeds",
   "spout-rwa",
   "commodities-price-feeds",
+  "chicken-farm",
 ]
 
 resolver = "2"

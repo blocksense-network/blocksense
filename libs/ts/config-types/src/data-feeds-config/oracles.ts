@@ -120,3 +120,15 @@ export const hyperBorrowRatesArgsSchema = S.Struct({
   identifier: 'HyperBorrowRatesOracleArgs',
   description: 'Arguments for the Hyper Borrow Rates Oracle',
 });
+
+// `chicken-farm` Oracle related Types
+export const chickenFarmArgsSchema = S.mutable(
+  S.Struct({
+    kind: S.Literal('chicken-farm'),
+  }),
+).annotations({
+  identifier: 'ChickenFarmOracleArgs',
+  description: 'Arguments for the Chicken Farm Oracle',
+});
+
+// Union of all Oracle argument schemas
