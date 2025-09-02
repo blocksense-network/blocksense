@@ -9,7 +9,10 @@ export const encodePackedData = (
     [fields],
     [structuredClone(values)],
   );
-  return packedValues[0];
+
+  const maxEPDataSlots = Math.ceil((packedValues[0].length - 2) / 64);
+
+  return packedValues[0].padEnd(maxEPDataSlots * 64 + 2, '0');
 };
 
 const processFieldsAndEncodeData = (
