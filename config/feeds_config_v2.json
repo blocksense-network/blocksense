@@ -41762,6 +41762,57 @@
       }
     },
     {
+      "id": "733",
+      "full_name": "SOMI / USD",
+      "description": "Price of Somnia (SOMI) in USD",
+      "type": "price-feed",
+      "oracle_id": "cex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "SOMI",
+          "quote": "USD"
+        },
+        "decimals": 18,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "kind": "cex-price-feeds",
+          "exchanges": {
+            "Binance": {
+              "symbol": ["SOMIUSDC", "SOMIUSDT"]
+            },
+            "Bitget": {
+              "symbol": ["SOMIUSDT"]
+            },
+            "Bybit": {
+              "symbol": ["SOMIUSDT"]
+            },
+            "GateIo": {
+              "id": ["SOMI_USDT"]
+            },
+            "KuCoin": {
+              "symbol": ["SOMI-USDT"]
+            },
+            "MEXC": {
+              "symbol": ["SOMIUSDC", "SOMIUSDT"]
+            }
+          }
+        }
+      }
+    },
+    {
       "id": "10000",
       "full_name": "GBP / USD",
       "description": "Price of British Pound in US Dollar",
