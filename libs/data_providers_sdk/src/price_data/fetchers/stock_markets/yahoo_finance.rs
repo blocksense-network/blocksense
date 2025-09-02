@@ -9,7 +9,7 @@ use serde_json::Value;
 use blocksense_sdk::http::http_get_json;
 
 use crate::price_data::{
-    fetchers::stock_markets::utils::print_missing_network_price_data,
+    fetchers::stock_markets::utils::print_missing_provider_price_data,
     traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher},
 };
 
@@ -82,7 +82,7 @@ impl<'a> PricesFetcher<'a> for YFPriceFetcher<'a> {
                             Some((value.symbol, PricePoint { price, volume }))
                         }
                         _ => {
-                            print_missing_network_price_data(
+                            print_missing_provider_price_data(
                                 "YahooFinance",
                                 value.symbol.clone(),
                                 price,
