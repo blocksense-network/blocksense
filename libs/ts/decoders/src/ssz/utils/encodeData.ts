@@ -160,6 +160,7 @@ export const createSchema = async (
 export const encodeSSZData = async (
   fields: PrimitiveField | TupleField,
   values: any[],
+  encodeLengthPrefixBytes: number = 0,
 ): Promise<string> => {
   const ssz = await import('@chainsafe/ssz');
 
@@ -202,7 +203,21 @@ export const encodeSSZData = async (
 
   const schema = await createSchema(fields);
   const populatedData = populateInputData(schema, values);
-  return ethers.hexlify(schema.serialize(populatedData));
+  const sszData = ethers.hexlify(schema.serialize(populatedData));
+
+  if (!encodeLengthPrefixBytes) {
+    return sszData;
+  }
+
+  // prepend sszData with its length as uint16
+  const prependedSSZData =
+    ethers.toBeHex(
+      (sszData.length - 2) / 2 + encodeLengthPrefixBytes,
+      encodeLengthPrefixBytes,
+    ) + sszData.slice(2);
+
+  const maxSSZSlots = Math.ceil((prependedSSZData.length - 2) / 64);
+  return prependedSSZData.padEnd(maxSSZSlots * 64 + 2, '0');
 };
 
 export const sszSchema = async (
