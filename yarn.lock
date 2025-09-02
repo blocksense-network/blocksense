@@ -1470,10 +1470,8 @@ __metadata:
     "@nomicfoundation/hardhat-chai-matchers": "npm:^2.1.0"
     "@nomicfoundation/hardhat-ethers": "npm:^3.1.0"
     "@nomicfoundation/hardhat-network-helpers": "npm:^1.1.0"
-    "@nomicfoundation/hardhat-toolbox": "npm:^5.0.0"
     "@nomicfoundation/hardhat-verify": "npm:^2.1.1"
     "@nomicfoundation/hardhat-viem": "npm:^2.1.1"
-    "@nomiclabs/hardhat-ethers": "npm:^2.2.3"
     "@openzeppelin/contracts": "npm:^5.1.0"
     "@safe-global/api-kit": "npm:^4.0.0"
     "@safe-global/protocol-kit": "npm:^6.1.0"
@@ -1722,7 +1720,7 @@ __metadata:
     typescript: "npm:5.9.2"
     wrangler: "npm:^4.15.2"
   dependenciesMeta:
-    "@openzeppelin/contracts@5.0.2":
+    "@openzeppelin/contracts@5.1.0":
       unplugged: true
     next@14.2.5:
       unplugged: true
@@ -6298,32 +6296,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nomicfoundation/hardhat-toolbox@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "@nomicfoundation/hardhat-toolbox@npm:5.0.0"
-  peerDependencies:
-    "@nomicfoundation/hardhat-chai-matchers": ^2.0.0
-    "@nomicfoundation/hardhat-ethers": ^3.0.0
-    "@nomicfoundation/hardhat-ignition-ethers": ^0.15.0
-    "@nomicfoundation/hardhat-network-helpers": ^1.0.0
-    "@nomicfoundation/hardhat-verify": ^2.0.0
-    "@typechain/ethers-v6": ^0.5.0
-    "@typechain/hardhat": ^9.0.0
-    "@types/chai": ^4.2.0
-    "@types/mocha": ">=9.1.0"
-    "@types/node": ">=18.0.0"
-    chai: ^4.2.0
-    ethers: ^6.4.0
-    hardhat: ^2.11.0
-    hardhat-gas-reporter: ^1.0.8
-    solidity-coverage: ^0.8.1
-    ts-node: ">=8.0.0"
-    typechain: ^8.3.0
-    typescript: ">=4.5.0"
-  checksum: 10c0/34087be8fa62a5e4d6536c46719d0ad3a5414f1e440199d02947ad76bb26850eb2779dd34ff81a12d6ff2a24774b4f5a577e6a5a6f1342b8c8a46f96c9ec1fb4
-  languageName: node
-  linkType: hard
-
 "@nomicfoundation/hardhat-verify@npm:^2.1.1":
   version: 2.1.1
   resolution: "@nomicfoundation/hardhat-verify@npm:2.1.1"
@@ -6462,16 +6434,6 @@ __metadata:
     "@nomicfoundation/solidity-analyzer-win32-x64-msvc":
       optional: true
   checksum: 10c0/1feee48a9506125d7736e3d1200d997cd07777f52ee6c71f7fad7d50b6705f7d3e028894968b449ca6e950991e726e9464ee5dc0c52d1066d127632be29667b4
-  languageName: node
-  linkType: hard
-
-"@nomiclabs/hardhat-ethers@npm:^2.2.3":
-  version: 2.2.3
-  resolution: "@nomiclabs/hardhat-ethers@npm:2.2.3"
-  peerDependencies:
-    ethers: ^5.0.0
-    hardhat: ^2.0.0
-  checksum: 10c0/cae46d1966108ab02b50fabe7945c8987fa1e9d5d0a7a06f79afc274ff1abc312e8a82375191a341b28571b897c22433d3a2826eb30077ed88d5983d01e381d0
   languageName: node
   linkType: hard
 
