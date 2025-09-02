@@ -8,10 +8,10 @@ export const generateDecoderStringBytes = (
   end: Offset,
   counter?: string,
 ) => {
-  const fieldName = schema.fieldName;
+  let fieldName = '_' + schema.fieldName;
 
   return `
-    // String/Bytes for ${fieldName}
+    // String/Bytes for ${schema.fieldName}
     {
       let ${fieldName}_size := sub(${end}, ${start})
       let ${fieldName} := mload(0x40)
