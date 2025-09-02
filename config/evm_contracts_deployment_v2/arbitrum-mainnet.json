@@ -1,0 +1,247 @@
+{
+  "network": "arbitrum-mainnet",
+  "chainId": "42161",
+  "contracts": {
+    "coreContracts": {
+      "UpgradeableProxyADFS": {
+        "address": "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249",
+        "constructorArgs": ["0xe029f9EE758c61Ec8613c8a4F1122239d96473eb"],
+        "salt": "0x63825ccf72de9605025ad334e6c7dfb5be7f746ed772c17a317aafeca601097e"
+      },
+      "AggregatedDataFeedStore": {
+        "address": "0x4A01d6BefF95ADc721630C2913992E0438e6B796",
+        "constructorArgs": ["0x5985F6247985e0cB7750893093214A77F0F9D3cE"],
+        "salt": "0x71b411ccc58b0bf522c76bab9a977992a03cfbc078d3852ee8ee8b6d5311a477"
+      },
+      "AccessControl": {
+        "address": "0x5985F6247985e0cB7750893093214A77F0F9D3cE",
+        "constructorArgs": ["0xe029f9EE758c61Ec8613c8a4F1122239d96473eb"],
+        "salt": "0x26186f5256760fb01ab0053f874a1674c76a40b87c3031918056ef3ace009aac"
+      },
+      "CLFeedRegistryAdapter": {
+        "address": "0x43662b6eD1EDEA444Ed2bA4e1e008403C5F32bAc",
+        "constructorArgs": [
+          "0xe029f9EE758c61Ec8613c8a4F1122239d96473eb",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xd1adaede68d344519025e2ff574650cd99d3830fe6d274c7a7843cdc00e17938"
+      }
+    },
+    "safe": {
+      "AdminMultisig": "0xe029f9EE758c61Ec8613c8a4F1122239d96473eb",
+      "ReporterMultisig": null,
+      "OnlySequencerGuard": null,
+      "AdminExecutorModule": null
+    },
+    "CLAggregatorAdapter": {
+      "10000": {
+        "address": "0x3713195f887045CD3cB81196CA4a1cE377cdE81a",
+        "constructorArgs": [
+          "GBP / USD",
+          8,
+          "10000",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10000",
+        "base": null,
+        "quote": null
+      },
+      "10001": {
+        "address": "0x08C3acCbBE2714132Ff91e886210Fc52D2DeDca9",
+        "constructorArgs": [
+          "EUR / USD",
+          8,
+          "10001",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10001",
+        "base": null,
+        "quote": null
+      },
+      "10002": {
+        "address": "0x12A2DD070DD109142Fb307D1c59964e7E4B70552",
+        "constructorArgs": [
+          "XAU / USD",
+          8,
+          "10002",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10002",
+        "base": null,
+        "quote": null
+      },
+      "10003": {
+        "address": "0xc14df5DF67CC5B71Da947c9FEd6cD669B356F666",
+        "constructorArgs": [
+          "AUD / USD",
+          8,
+          "10003",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10003",
+        "base": null,
+        "quote": null
+      },
+      "10004": {
+        "address": "0x0DCEa44a2fb403f2b7Dd17057Ee2E7d7C1Ac11c1",
+        "constructorArgs": [
+          "XAG / USD",
+          8,
+          "10004",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10004",
+        "base": null,
+        "quote": null
+      },
+      "10005": {
+        "address": "0x028E718468e8fe5960f976DFa124b8d144219CEc",
+        "constructorArgs": [
+          "GEL / USD",
+          8,
+          "10005",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10005",
+        "base": null,
+        "quote": null
+      },
+      "10006": {
+        "address": "0x00EFd6Ac770A9Fb756a8215e510F5c2BD1e37C7e",
+        "constructorArgs": [
+          "NZD / USD",
+          8,
+          "10006",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10006",
+        "base": null,
+        "quote": null
+      },
+      "10007": {
+        "address": "0xA1E4d91796563F417338e8b3842cA2Db12890c7b",
+        "constructorArgs": [
+          "CNH / USD",
+          8,
+          "10007",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10007",
+        "base": null,
+        "quote": null
+      },
+      "10008": {
+        "address": "0x1DAA996298Bebc4a723485Db66A3bbdFD3622aBd",
+        "constructorArgs": [
+          "CHF / USD",
+          8,
+          "10008",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10008",
+        "base": null,
+        "quote": null
+      },
+      "10009": {
+        "address": "0x72F4A9Ec5BAAE9E08C065D8cEe14C5e3367B4dc6",
+        "constructorArgs": [
+          "ZAR / USD",
+          8,
+          "10009",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10009",
+        "base": null,
+        "quote": null
+      },
+      "10010": {
+        "address": "0x73B06C7b78d7Ef2E84B8Ac8Bc5b6A4B8efC12270",
+        "constructorArgs": [
+          "SEK / USD",
+          8,
+          "10010",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10010",
+        "base": null,
+        "quote": null
+      },
+      "10011": {
+        "address": "0x8a65aCa696bb667eef30db4f005A8E0D71B65484",
+        "constructorArgs": [
+          "SGD / USD",
+          8,
+          "10011",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10011",
+        "base": null,
+        "quote": null
+      },
+      "10012": {
+        "address": "0xd7C05D4290214Bb8D17d158cCA0257fB93dd87D5",
+        "constructorArgs": [
+          "PLN / USD",
+          8,
+          "10012",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10012",
+        "base": null,
+        "quote": null
+      },
+      "10013": {
+        "address": "0xf3AE2D3F1cf52c64D1d55488E7aA131CC603Dca2",
+        "constructorArgs": [
+          "KRW / USD",
+          8,
+          "10013",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10013",
+        "base": null,
+        "quote": null
+      },
+      "10014": {
+        "address": "0x62504931eCCA21740Ea7D358b319699519FB9A16",
+        "constructorArgs": [
+          "HUF / USD",
+          8,
+          "10014",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10014",
+        "base": null,
+        "quote": null
+      },
+      "10038": {
+        "address": "0x728Af9A808AA8005c99Be49087cfEB43Ef39Bbfc",
+        "constructorArgs": [
+          "MYR / USD",
+          8,
+          "10038",
+          "0xADF5aaa34D0A2FbAeE73353ab1622E47d0600249"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10038",
+        "base": null,
+        "quote": null
+      }
+    }
+  }
+}
