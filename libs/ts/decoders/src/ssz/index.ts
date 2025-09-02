@@ -15,6 +15,7 @@ export const generateDecoder = async (
   template: string,
   fields: TupleField,
   evmVersion: EvmVersion = 'cancun',
+  start: number = 0,
 ) => {
   const schema: Schema[] = await sszSchema(fields);
 
@@ -28,6 +29,7 @@ export const generateDecoder = async (
     schema[0],
     mainStructName,
     evmVersion,
+    start,
   );
 
   const generatedCode = ejs.render(
