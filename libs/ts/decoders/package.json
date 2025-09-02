@@ -8,6 +8,8 @@
     "deploy:local": "hardhat run --network localhost"
   },
   "devDependencies": {
+    "@blocksense/base-utils": "workspace:*",
+    "@blocksense/contracts": "workspace:*",
     "@chainsafe/ssz": "^1.0.2",
     "@nomicfoundation/hardhat-chai-matchers": "^2.1.0",
     "@nomicfoundation/hardhat-ethers": "^3.1.0",
@@ -21,6 +23,7 @@
     "ejs": "^3.1.10",
     "ethers": "^6.15.0",
     "hardhat": "^2.26.3",
+    "hardhat-dependency-compiler": "^1.2.1",
     "prettier": "^3.4.1",
     "prettier-plugin-solidity": "^1.4.1",
     "typechain": "^8.3.2"
