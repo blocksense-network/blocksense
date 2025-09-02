@@ -1,5 +1,6 @@
 {
   "name": "@blocksense/contracts",
+  "version": "1.0.0",
   "exports": {
     "./docs/*": {
       "require": "./artifacts/docs/*.json",
@@ -25,7 +26,13 @@
       "require": "./dist/cjs/viem/index.cjs",
       "import": "./dist/esm/viem/index.mjs",
       "types": "./lib/viem/index.ts"
-    }
+    },
+    "./utils/*": {
+      "require": "./test/utils/*.ts",
+      "types": "./test/utils/*.ts"
+    },
+    "./contracts/*": "./contracts/*",
+    "./artifacts/*": "./artifacts/*"
   },
   "scripts": {
     "clean": "git clean -fdx -e .env",
@@ -52,7 +59,6 @@
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@nomicfoundation/hardhat-verify": "^2.0.12",
     "@nomicfoundation/hardhat-viem": "^2.0.6",
-    "@nomiclabs/hardhat-ethers": "^2.2.3",
     "@openzeppelin/contracts": "^5.1.0",
     "@safe-global/api-kit": "^4.0.0",
     "@safe-global/protocol-kit": "^6.1.0",

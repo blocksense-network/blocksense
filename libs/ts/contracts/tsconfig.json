@@ -10,6 +10,6 @@
     "outDir": "dist",
     "rootDir": "."
   },
-  "include": ["**/*.ts"],
+  "include": ["**/*.ts", "abis/**/*.json"],
   "exclude": ["artifacts", "cache", "contracts", "dist"]
 }

@@ -23,7 +23,7 @@
     "test:all": "yarn workspaces foreach --all -p --topological-dev run test"
   },
   "dependenciesMeta": {
-    "@openzeppelin/contracts@5.0.2": {
+    "@openzeppelin/contracts@5.1.0": {
       "unplugged": true
     },
     "next@14.2.5": {
