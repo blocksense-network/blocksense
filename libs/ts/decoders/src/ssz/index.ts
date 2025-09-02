@@ -21,7 +21,7 @@ export const generateDecoder = async (
 
   const structs = organizeFieldsIntoStructs(fields);
   const mainStructName =
-    fields.name.charAt(0).toLowerCase() + fields.name.slice(1);
+    '_' + fields.name.charAt(0).toLowerCase() + fields.name.slice(1);
   const isMainStructDynamic = fields.type.endsWith('[]');
   const returnType =
     fields.name + (fields.type.match(/\[(\d*)\]/g) || []).join('');

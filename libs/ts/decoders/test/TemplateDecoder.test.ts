@@ -1933,5 +1933,39 @@ describe('Template Decoder', function () {
 
       await testDecoder(fields, values);
     });
+
+    it('should decode main tuple with lower case name', async () => {
+      const fields: TupleField = {
+        name: 'mainTuple',
+        type: 'tuple',
+        components: [
+          { name: 'id', type: 'uint256', size: 256 },
+          {
+            name: 'record',
+            type: 'string',
+          },
+        ],
+      };
+      const values = [123, 'Some data string'];
+
+      await testDecoder(fields, values);
+    });
+
+    it('should decode main tuple with "data" field', async () => {
+      const fields: TupleField = {
+        name: 'MainTuple',
+        type: 'tuple',
+        components: [
+          { name: 'id', type: 'uint256', size: 256 },
+          {
+            name: 'data',
+            type: 'string',
+          },
+        ],
+      };
+      const values = [123, 'Some data string'];
+
+      await testDecoder(fields, values);
+    });
   });
 });
