@@ -1,0 +1,60 @@
+{
+  "payload": {
+    "name": "payload",
+    "type": "tuple",
+    "components": [
+      {
+        "name": "values",
+        "type": "dataFeedResult[]"
+      },
+      {
+        "name": "unionType",
+        "type": "union",
+        "components": [
+          {
+            "name": "error",
+            "type": "string"
+          },
+          {
+            "name": "data",
+            "type": "bytes"
+          }
+        ]
+      },
+      {
+        "name": "status",
+        "type": "TEST"
+      }
+    ]
+  },
+  "dataFeedResult": {
+    "name": "dataFeedResult",
+    "type": "tuple",
+    "components": [
+      {
+        "name": "id",
+        "type": "string"
+      },
+      {
+        "name": "value",
+        "type": "union",
+        "components": [
+          {
+            "name": "error",
+            "type": "string"
+          },
+          {
+            "name": "numerical",
+            "type": "bytes8",
+            "size": 64
+          }
+        ]
+      }
+    ]
+  },
+  "TEST": {
+    "name": "TEST",
+    "type": "tuple",
+    "components": []
+  }
+}
