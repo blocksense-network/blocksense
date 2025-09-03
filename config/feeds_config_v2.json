@@ -17638,7 +17638,7 @@
           "quote": "USD"
         },
         "decimals": 8,
-        "category": "",
+        "category": "Crypto",
         "market_hours": null,
         "arguments": {
           "kind": "cex-price-feeds",
@@ -17695,7 +17695,7 @@
           "quote": "USDT"
         },
         "decimals": 8,
-        "category": "",
+        "category": "Crypto",
         "market_hours": null,
         "arguments": {
           "kind": "cex-price-feeds",
@@ -17746,7 +17746,7 @@
           "quote": "USDC"
         },
         "decimals": 8,
-        "category": "",
+        "category": "Crypto",
         "market_hours": null,
         "arguments": {
           "kind": "cex-price-feeds"
@@ -20414,7 +20414,7 @@
           "quote": "USD"
         },
         "decimals": 8,
-        "category": "",
+        "category": "Crypto",
         "market_hours": "",
         "arguments": {
           "kind": "cex-price-feeds",
@@ -20459,7 +20459,7 @@
           "quote": "USDT"
         },
         "decimals": 8,
-        "category": "",
+        "category": "Crypto",
         "market_hours": "",
         "arguments": {
           "kind": "cex-price-feeds",
@@ -33104,7 +33104,7 @@
           "quote": "USD"
         },
         "decimals": 8,
-        "category": "",
+        "category": "Crypto",
         "market_hours": null,
         "arguments": {
           "kind": "cex-price-feeds",
@@ -33149,7 +33149,7 @@
           "quote": "USDT"
         },
         "decimals": 8,
-        "category": "",
+        "category": "Crypto",
         "market_hours": null,
         "arguments": {
           "kind": "cex-price-feeds",
@@ -33872,7 +33872,7 @@
           "quote": "USD"
         },
         "decimals": 8,
-        "category": "",
+        "category": "Crypto",
         "market_hours": "",
         "arguments": {
           "kind": "cex-price-feeds",
@@ -33924,7 +33924,7 @@
           "quote": "USDT"
         },
         "decimals": 8,
-        "category": "",
+        "category": "Crypto",
         "market_hours": "",
         "arguments": {
           "kind": "cex-price-feeds",
@@ -37839,7 +37839,7 @@
           "quote": "USD"
         },
         "decimals": 8,
-        "category": "",
+        "category": "Crypto",
         "market_hours": null,
         "arguments": {
           "kind": "cex-price-feeds",
@@ -37896,7 +37896,7 @@
           "quote": "USDT"
         },
         "decimals": 8,
-        "category": "",
+        "category": "Crypto",
         "market_hours": null,
         "arguments": {
           "kind": "cex-price-feeds",
@@ -40494,7 +40494,7 @@
           "quote": "USD"
         },
         "decimals": 8,
-        "category": "",
+        "category": "Crypto",
         "market_hours": null,
         "arguments": {
           "kind": "cex-price-feeds",
@@ -40534,7 +40534,7 @@
           "quote": "USDT"
         },
         "decimals": 8,
-        "category": "",
+        "category": "Crypto",
         "market_hours": null,
         "arguments": {
           "kind": "cex-price-feeds"
