@@ -61,6 +61,22 @@ describe.sequential('E2E Tests with process-compose', () => {
         yield* processCompose.start(testEnvironment);
         hasProcessComposeStarted = true;
 
+        if (!process.listenerCount('SIGINT')) {
+          process.once('SIGINT', () => {
+            if (hasProcessComposeStarted) {
+              Effect.runPromise(
+                processCompose
+                  .stop()
+                  .pipe(Effect.catchAll(() => Effect.succeed(undefined))),
+              ).finally(() => {
+                process.exit(130);
+              });
+            } else {
+              process.exit(130);
+            }
+          });
+        }
+
         sequencer = yield* Sequencer;
 
         // Get feeds information from the original network. No affection of the work of the
