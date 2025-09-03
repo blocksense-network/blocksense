@@ -1,5 +1,4 @@
 import { getAddressExplorerUrl } from '@blocksense/base-utils/evm';
-import type { TableRow } from '@blocksense/base-utils/tty';
 import { renderTui, drawTable } from '@blocksense/base-utils/tty';
 import {
   configDir,
@@ -21,8 +20,11 @@ export const listFeeds = Command.make(
       'table',
       'markdown-list',
     ]).pipe(Options.withDefault('table')),
+    includeFeedRegistryInfo: Options.boolean('include-feed-registry-info').pipe(
+      Options.withDefault(false),
+    ),
   },
-  ({ dir, displayMode, network }) =>
+  ({ dir, displayMode, includeFeedRegistryInfo, network }) =>
     Effect.gen(function* () {
       const feedConfig = yield* Effect.tryPromise(() =>
         readConfig('feeds_config_v2', dir),
@@ -32,39 +34,64 @@ export const listFeeds = Command.make(
         readEvmDeployment(network, true),
       );
 
-      const feeds: Array<TableRow> = feedConfig.feeds.reduce((res, feed) => {
-        const f = `${feed.id}`;
-        if (f in deploymentData.contracts.CLAggregatorAdapter) {
-          const cl = deploymentData.contracts.CLAggregatorAdapter[f];
-          return [...res, { feed, cl }];
-        } else {
-          return res;
-        }
-      }, []);
+      const feeds = feedConfig.feeds.reduce(
+        (
+          res: Array<{ feed: (typeof feedConfig.feeds)[number]; cl: any }>,
+          feed,
+        ) => {
+          const f = `${feed.id}`;
+          if (f in deploymentData.contracts.CLAggregatorAdapter) {
+            const cl = deploymentData.contracts.CLAggregatorAdapter[f];
+            return [...res, { feed, cl }];
+          } else {
+            return res;
+          }
+        },
+        [],
+      );
 
       if (displayMode == 'table') {
+        const baseHeaders = [
+          'Feed Id',
+          'Feed Name',
+          'CLAdapter Address',
+          'Decimals',
+          'Category',
+          'Threshold',
+          'Heartbeat (ms)',
+          'Oracle Script',
+        ];
+        const extendedHeaders = includeFeedRegistryInfo
+          ? [
+              ...baseHeaders,
+              'CLRegistryAdapter Base Address',
+              'CLRegistryAdapter Quote Address',
+            ]
+          : baseHeaders;
+
         const rows = feeds.map(({ cl, feed }) => {
-          return [
+          const baseRow = [
+            `${feed.id}`,
             feed.full_name,
             cl?.address ?? '',
-            `${cl?.constructorArgs[1] ?? ''}`,
-            cl?.base ?? '',
-            cl?.quote ?? '',
+            `${feed.additional_feed_info.decimals}`,
+            `${feed.additional_feed_info.category}`,
+            `${feed.schedule.deviation_percentage}`,
+            `${feed.schedule.heartbeat_ms}`,
+            `${feed.oracle_id}`,
           ];
+          return includeFeedRegistryInfo
+            ? [...baseRow, cl?.base ?? '-', cl?.quote ?? '-']
+            : baseRow;
         });
+
         renderTui(
           drawTable([...rows], {
-            headers: [
-              'Feed Name',
-              'Address',
-              'Decimals',
-              'Base Address',
-              'Quote Address',
-            ],
+            headers: extendedHeaders,
           }),
         );
       } else if (displayMode == 'markdown-list') {
-        const rows: string = feeds.map(({ cl, feed }) => {
+        const rows = feeds.map(({ cl, feed }) => {
           const addr = cl?.address ?? '';
           const addrLink = `[\`${addr}\`](${getAddressExplorerUrl(network, addr)})`;
           const docsLink = `https://docs.blocksense.network/docs/data-feeds/feed/${feed.id}#${network}`;
