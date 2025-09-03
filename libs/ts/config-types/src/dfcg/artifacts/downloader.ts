@@ -1,13 +1,18 @@
 import { Octokit } from '@octokit/rest';
 import { RequestError } from '@octokit/request-error';
 import type { Schema as S } from 'effect';
-import { ParseResult } from 'effect';
 
 import { getOptionalEnvString } from '@blocksense/base-utils/env';
+import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
+import { mapValuePromises } from '@blocksense/base-utils/array-iter';
 
 import { FeedsConfig } from '../../data-feeds-config';
 import { DeploymentConfigV1 } from '../../evm-contracts-deployment';
-import { configTypes, getConfigFilePath } from '../../read-write-config';
+import {
+  ConfigFileName,
+  configTypes,
+  getConfigFilePath,
+} from '../../read-write-config';
 import { SequencerConfigV1 } from '../../node-config/types';
 import { ChainlinkCompatibilityConfig } from '../../chainlink-compatibility/types';
 
@@ -47,46 +52,29 @@ export async function downloadAndDecodeFile<A, I>(
     throw new Error(`Unexpected response structure for ${filePath}`);
   }
 
-  console.info(`Start downloading: ${filePath}`);
-  const response = await fetch(fileData.download_url!);
-  console.info(`Downloaded       : ${filePath}`);
+  return await fetchAndDecodeJSON(schema, fileData.download_url!);
+}
 
-  const fileContent = await response.text();
-
-  return ParseResult.decodeUnknownSync(schema)(JSON.parse(fileContent));
+function fetchConfigFromDfcgRepo<Name extends ConfigFileName>(
+  configFileName: Name,
+) {
+  return downloadAndDecodeFile(
+    getConfigFilePath(configFileName, LEGACY_CONFIGS_DIR),
+    configTypes[configFileName] as S.Schema<any, any, never>,
+  );
 }
 
 export async function fetchRepoFiles(): Promise<Artifacts> {
-  const [sequencerData, feedsData, evmContractsData, chainlinkData] =
-    await Promise.all([
-      downloadAndDecodeFile(
-        getConfigFilePath('sequencer_config_v1', LEGACY_CONFIGS_DIR),
-        configTypes['sequencer_config_v1'],
-      ),
-      downloadAndDecodeFile(
-        getConfigFilePath('feeds_config_v1', LEGACY_CONFIGS_DIR),
-        configTypes['feeds_config_v1'],
-      ),
-      downloadAndDecodeFile(
-        getConfigFilePath('evm_contracts_deployment_v1', LEGACY_CONFIGS_DIR),
-        configTypes['evm_contracts_deployment_v1'],
-      ),
-      downloadAndDecodeFile(
-        getConfigFilePath('chainlink_compatibility_v1', LEGACY_CONFIGS_DIR),
-        configTypes['chainlink_compatibility_v1'],
-      ),
-    ]);
+  const legacyConfigFiles = {
+    sequencerDeploymentConfigV1: 'sequencer_config_v1',
+    feedsConfigV1: 'feeds_config_v1',
+    evmContractsDeploymentV1: 'evm_contracts_deployment_v1',
+    chainlinkDeploymentV1: 'chainlink_compatibility_v1',
+  } satisfies Record<string, ConfigFileName>;
 
-  return {
-    sequencerDeploymentConfigV1: {
-      providers: sequencerData.providers,
-    },
-    feedsConfigV1: {
-      feeds: feedsData.feeds,
-    },
-    evmContractsDeploymentV1: evmContractsData,
-    chainlinkDeploymentV1: chainlinkData,
-  };
+  return mapValuePromises(legacyConfigFiles, (key, cfgFileName) =>
+    fetchConfigFromDfcgRepo(cfgFileName),
+  );
 }
 
 export async function isTokenValid(): Promise<boolean> {
