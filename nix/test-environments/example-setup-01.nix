@@ -292,6 +292,12 @@ in
           "TWELVEDATA_API_KEY"
         ];
       };
+      chicken-farm = {
+        exec-interval = 10;
+        allowed-outbound-hosts = [
+          "http://localhost"
+        ];
+      };
     };
   };
 }

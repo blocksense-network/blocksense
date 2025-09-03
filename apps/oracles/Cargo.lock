@@ -1082,6 +1082,27 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9555578bc9e57714c812a1f84e4fc5b4d21fcb063490c624de019f7464c91268"
 
 [[package]]
+name = "chicken-farm"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "blocksense-data-providers-sdk",
+ "blocksense-sdk",
+ "chrono",
+ "chrono-tz",
+ "futures",
+ "itertools 0.14.0",
+ "prettytable-rs",
+ "serde",
+ "serde-this-or-that",
+ "serde_json",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+ "wit-bindgen",
+]
+
+[[package]]
 name = "chrono"
 version = "0.4.41"
 source = "registry+https://github.com/rust-lang/crates.io-index"

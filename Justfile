@@ -153,3 +153,21 @@ clean:
 [working-directory: 'libs/ts/contracts']
 deploy-evm-contracts network-name:
   yarn hardhat deploy --networks {{network-name}}
+
+[group('Aurora demo command')]
+[doc('Command to introduce new EVM network.')]
+introduce-network:
+  yarn workspace @blocksense/changelog-generator start add-deployment-config
+  just build-ts @blocksense/base-utils
+  direnv reload .
+
+[group('Aurora demo command')]
+[doc('Command to deploy EVM contracts to new network.')]
+deploy-to-network network-name:
+  yarn workspace @blocksense/contracts hardhat deploy --networks {{network-name}}
+
+[group('Aurora demo command')]
+[doc('Command to start blocksense')]
+start-blocksense:
+  git add config/evm_contracts_deployment_v2
+  just start-environment example-setup-04

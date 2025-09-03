@@ -1,0 +1,23 @@
+{
+  "name": "chicken-farm",
+  "version": "1.0.0",
+  "type": "module",
+  "packageManager": "yarn@4.9.1",
+  "scripts": {
+    "dev": "tsx src/main.ts",
+    "build": "tsc",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@effect/schema": "^0.75.5",
+    "@types/express": "^5.0.3",
+    "effect": "^3.17.9",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.0",
+    "tsx": "^4.20.5",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3"
+  }
+}

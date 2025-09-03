@@ -1,0 +1,8 @@
+{
+  "network-name": {
+    "chainId": 99999999999,
+    "isTestnet": false,
+    "explorers": [],
+    "currency": "ETH"
+  }
+}
