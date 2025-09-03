@@ -7,7 +7,7 @@ import {
   readEvmDeployment,
 } from '@blocksense/config-types';
 import { Command, Options } from '@effect/cli';
-import { Effect } from 'effect';
+import { Effect, Option } from 'effect';
 
 const availableNetworks = await listEvmNetworks();
 
@@ -23,8 +23,17 @@ export const listFeeds = Command.make(
     includeFeedRegistryInfo: Options.boolean('include-feed-registry-info').pipe(
       Options.withDefault(false),
     ),
+    category: Options.optional(Options.text('category')),
+    oracleId: Options.optional(Options.text('oracle-id')),
   },
-  ({ dir, displayMode, includeFeedRegistryInfo, network }) =>
+  ({
+    category,
+    dir,
+    displayMode,
+    includeFeedRegistryInfo,
+    network,
+    oracleId,
+  }) =>
     Effect.gen(function* () {
       const feedConfig = yield* Effect.tryPromise(() =>
         readConfig('feeds_config_v2', dir),
@@ -50,6 +59,18 @@ export const listFeeds = Command.make(
         [],
       );
 
+      let filteredFeeds = feeds;
+      if (Option.isSome(category)) {
+        filteredFeeds = filteredFeeds.filter(
+          ({ feed }) => feed.additional_feed_info.category === category.value,
+        );
+      }
+      if (Option.isSome(oracleId)) {
+        filteredFeeds = filteredFeeds.filter(
+          ({ feed }) => `${feed.oracle_id}` === oracleId.value,
+        );
+      }
+
       if (displayMode == 'table') {
         const baseHeaders = [
           'Feed Id',
@@ -69,7 +90,7 @@ export const listFeeds = Command.make(
             ]
           : baseHeaders;
 
-        const rows = feeds.map(({ cl, feed }) => {
+        const rows = filteredFeeds.map(({ cl, feed }) => {
           const baseRow = [
             `${feed.id}`,
             feed.full_name,
@@ -91,7 +112,7 @@ export const listFeeds = Command.make(
           }),
         );
       } else if (displayMode == 'markdown-list') {
-        const rows = feeds.map(({ cl, feed }) => {
+        const rows = filteredFeeds.map(({ cl, feed }) => {
           const addr = cl?.address ?? '';
           const addrLink = `[\`${addr}\`](${getAddressExplorerUrl(network, addr)})`;
           const docsLink = `https://docs.blocksense.network/docs/data-feeds/feed/${feed.id}#${network}`;
