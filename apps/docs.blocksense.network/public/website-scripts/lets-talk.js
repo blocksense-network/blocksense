@@ -1,3 +1,5 @@
+// <script src="https://docs.blocksense.network/website-scripts/lets-talk.js" defer></script>
+
 document.addEventListener('DOMContentLoaded', () => {
   const form = document.querySelector('.lets-talk_form');
   const nameInput = document.getElementById('Name');
