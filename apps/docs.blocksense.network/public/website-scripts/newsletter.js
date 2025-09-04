@@ -1,3 +1,5 @@
+// <script src="https://docs.blocksense.network/website-scripts/newsletter.js" data-interests="newsletter, ai" defer></script>
+
 const interests = (document.currentScript?.dataset?.interests || '')
   .split(',')
   .map(i => i.trim())
