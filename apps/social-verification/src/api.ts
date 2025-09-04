@@ -115,14 +115,16 @@ export const verifyApi = HttpApi.make('verify')
       .prefix('/newsletter'),
   )
   .add(
-    HttpApiGroup.make('letsTalk').add(
-      HttpApiEndpoint.post('sendEmail', '/sendEmail').setPayload(
-        S.Struct({
-          email: EmailSchema,
-          name: S.String,
-        }),
-      ),
-    ),
+    HttpApiGroup.make('letsTalk')
+      .add(
+        HttpApiEndpoint.post('sendEmail', '/sendEmail').setPayload(
+          S.Struct({
+            email: EmailSchema,
+            name: S.String,
+          }),
+        ),
+      )
+      .prefix('/letsTalk'),
   )
   .prefix('/verify')
   .middleware(Authorization);
