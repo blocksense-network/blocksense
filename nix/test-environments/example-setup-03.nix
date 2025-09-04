@@ -49,7 +49,7 @@ in
       ink-sepolia = {
         port = anvilInkSepoliaPort;
         chain-id = 99999999999;
-        fork-url = "wss://ws-gel-sepolia.inkonchain.com";
+        fork-url = "https://ink-sepolia.g.alchemy.com/v2";
       };
     };
 

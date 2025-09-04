@@ -7,6 +7,7 @@
 with lib;
 let
   inherit (self'.legacyPackages) foundry;
+  gitRoot = builtins.getEnv "GIT_ROOT";
 in
 {
   options = {
@@ -45,7 +46,7 @@ in
             --prune-history \
         ''
         + lib.optionalString (config.fork-url != null) ''
-          --fork-url ${config.fork-url}
+          --fork-url ${config.fork-url}/${builtins.readFile "${gitRoot}/nix/test-environments/test-keys/ALCHEMY_API_KEY"};
         '';
     };
   };
