@@ -41840,7 +41840,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -41872,7 +41872,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -41904,7 +41904,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -41936,7 +41936,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -41968,7 +41968,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42000,7 +42000,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42032,7 +42032,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42064,7 +42064,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42096,7 +42096,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42128,7 +42128,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42160,7 +42160,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42192,7 +42192,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42224,7 +42224,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42256,7 +42256,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42288,7 +42288,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42320,7 +42320,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42352,7 +42352,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42384,7 +42384,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42416,7 +42416,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42448,7 +42448,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42480,7 +42480,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42512,7 +42512,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42544,7 +42544,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42576,7 +42576,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42608,7 +42608,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42640,7 +42640,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42672,7 +42672,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42704,7 +42704,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42736,7 +42736,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42768,7 +42768,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42800,7 +42800,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42832,7 +42832,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42864,7 +42864,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42896,7 +42896,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42928,7 +42928,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42960,7 +42960,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -42992,7 +42992,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43024,7 +43024,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43056,7 +43056,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43088,7 +43088,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43120,7 +43120,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43152,7 +43152,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43184,7 +43184,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43216,7 +43216,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43248,7 +43248,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43280,7 +43280,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43312,7 +43312,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43344,7 +43344,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43376,7 +43376,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43408,7 +43408,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43440,7 +43440,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43472,7 +43472,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43504,7 +43504,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43536,7 +43536,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43568,7 +43568,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43600,7 +43600,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43632,7 +43632,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43664,7 +43664,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43696,7 +43696,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43728,7 +43728,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43760,7 +43760,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43792,7 +43792,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43824,7 +43824,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43856,7 +43856,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43888,7 +43888,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43920,7 +43920,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43952,7 +43952,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -43984,7 +43984,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44016,7 +44016,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44048,7 +44048,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44080,7 +44080,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44112,7 +44112,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44144,7 +44144,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44176,7 +44176,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44208,7 +44208,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44240,7 +44240,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44272,7 +44272,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44304,7 +44304,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44336,7 +44336,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44368,7 +44368,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44400,7 +44400,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44432,7 +44432,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44464,7 +44464,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44496,7 +44496,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44528,7 +44528,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44560,7 +44560,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44592,7 +44592,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44624,7 +44624,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44656,7 +44656,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44688,7 +44688,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44720,7 +44720,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44752,7 +44752,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44784,7 +44784,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44816,7 +44816,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44848,7 +44848,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44880,7 +44880,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44912,7 +44912,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44944,7 +44944,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -44976,7 +44976,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45008,7 +45008,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45040,7 +45040,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45072,7 +45072,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45104,7 +45104,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45136,7 +45136,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45168,7 +45168,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45200,7 +45200,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45232,7 +45232,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45264,7 +45264,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45296,7 +45296,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45328,7 +45328,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45360,7 +45360,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45392,7 +45392,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45424,7 +45424,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45456,7 +45456,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45488,7 +45488,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45520,7 +45520,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45552,7 +45552,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45584,7 +45584,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45616,7 +45616,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45648,7 +45648,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45680,7 +45680,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45712,7 +45712,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45744,7 +45744,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45776,7 +45776,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45808,7 +45808,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45840,7 +45840,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45872,7 +45872,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45904,7 +45904,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45936,7 +45936,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -45968,7 +45968,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -46000,7 +46000,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -46032,7 +46032,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -46064,7 +46064,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -46096,7 +46096,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -46128,7 +46128,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
@@ -46160,7 +46160,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage"]
+          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
         }
       }
     },
