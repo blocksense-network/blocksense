@@ -1,3 +1,8 @@
+const interests = (document.currentScript?.dataset?.interests || '')
+  .split(',')
+  .map(i => i.trim())
+  .filter(Boolean);
+
 document.addEventListener('DOMContentLoaded', () => {
   const emailInput = document.getElementById('newsletter-email');
   const button = document.getElementById('submit-button');
@@ -21,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
           },
           body: JSON.stringify({
             email,
-            interests: ['newsletter'],
+            interests,
           }),
         },
       );
