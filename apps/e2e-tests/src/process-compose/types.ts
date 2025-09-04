@@ -1,10 +1,6 @@
-import type { ParseResult } from 'effect';
 import { Context, Data, Effect, Layer, Schema as S } from 'effect';
 
-import {
-  fetchAndDecodeJSON,
-  fetchAndDecodeJSONEffect,
-} from '@blocksense/base-utils/http';
+import { fetchAndDecodeJSONEffect } from '@blocksense/base-utils/http';
 import {
   startEnvironment,
   stopEnvironment,
@@ -17,23 +13,18 @@ import { NewFeedsConfigSchema } from '@blocksense/config-types';
 import type { HttpClientError } from '@effect/platform/HttpClientError';
 import { ParseMetricsError, getMetrics } from '../utils/metrics';
 import { FetchHttpClient } from '@effect/platform';
-
-export class ProcessComposeFailedToStartError extends Data.TaggedError(
-  '@e2e-tests/ProcessComposeFailedToStartError',
-)<{
-  cause: unknown;
-}> {}
+import type { ParseError } from 'effect/ParseResult';
 
 export class ProcessCompose extends Context.Tag('@e2e-tests/ProcessCompose')<
   ProcessCompose,
   {
     readonly start: (
       name: string,
-    ) => Effect.Effect<void, ProcessComposeFailedToStartError, never>;
-    readonly stop: () => Effect.Effect<void, Error, never>;
+    ) => Effect.Effect<void, ProcessComposeError, never>;
+    readonly stop: () => Effect.Effect<void, ProcessComposeError, never>;
     readonly parseStatus: () => Effect.Effect<
       Record<string, { status: string; exit_code: number }>,
-      Error,
+      ProcessComposeError,
       never
     >;
   }
@@ -44,18 +35,26 @@ export class ProcessCompose extends Context.Tag('@e2e-tests/ProcessCompose')<
       start: (env: string = 'example-setup-03') =>
         Effect.tryPromise({
           try: () => startEnvironment(env),
-          catch: cause => new ProcessComposeFailedToStartError({ cause }),
+          catch: error =>
+            new ProcessComposeError({
+              message: `Failed to start environment: ${error}`,
+            }),
         }),
       stop: () =>
         Effect.tryPromise({
           try: () => stopEnvironment(),
-          catch: error => new Error(`Failed to stop environment: ${error}`),
+          catch: error =>
+            new ProcessComposeError({
+              message: `Failed to stop environment: ${error}`,
+            }),
         }),
       parseStatus: () =>
         Effect.tryPromise({
           try: () => parseProcessesStatus(),
           catch: error =>
-            new Error(`Failed to parse processes status: ${error}`),
+            new ProcessComposeError({
+              message: `Failed to parse processes status: ${error}`,
+            }),
         }),
     }),
   );
@@ -69,15 +68,23 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
     readonly configUrl: string;
     readonly feedsConfigUrl: string;
     readonly metricsUrl: string;
-    readonly getConfig: () => Effect.Effect<SequencerConfigV2, Error, never>;
-    readonly getFeedsConfig: () => Effect.Effect<NewFeedsConfig, Error, never>;
+    readonly getConfig: () => Effect.Effect<
+      SequencerConfigV2,
+      HttpClientError | ParseError,
+      never
+    >;
+    readonly getFeedsConfig: () => Effect.Effect<
+      NewFeedsConfig,
+      HttpClientError | ParseError,
+      never
+    >;
     readonly fetchUpdatesToNetworksMetric: () => Effect.Effect<
       UpdatesToNetwork,
-      ParseMetricsError | HttpClientError | ParseResult.ParseError
+      ParseMetricsError | HttpClientError | ParseError
     >;
     readonly fetchHistory: () => Effect.Effect<
       FeedAggregateHistory,
-      Error,
+      HttpClientError | ParseError,
       never
     >;
   }
@@ -101,15 +108,18 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
         feedsConfigUrl,
         metricsUrl,
         getConfig: () =>
-          Effect.tryPromise({
-            try: () => fetchAndDecodeJSON(SequencerConfigV2Schema, configUrl),
-            catch: error =>
-              new Error(`Failed to fetch sequencer config: ${error}`),
+          Effect.gen(function* () {
+            return yield* fetchAndDecodeJSONEffect(
+              SequencerConfigV2Schema,
+              configUrl,
+            ).pipe(Effect.provide(FetchHttpClient.layer));
           }),
         getFeedsConfig: () =>
-          Effect.tryPromise({
-            try: () => fetchAndDecodeJSON(NewFeedsConfigSchema, feedsConfigUrl),
-            catch: error => new Error(`Failed to fetch feeds config: ${error}`),
+          Effect.gen(function* () {
+            return yield* fetchAndDecodeJSONEffect(
+              NewFeedsConfigSchema,
+              feedsConfigUrl,
+            ).pipe(Effect.provide(FetchHttpClient.layer));
           }),
         fetchUpdatesToNetworksMetric: () => {
           return Effect.gen(function* () {
@@ -168,10 +178,11 @@ export class RGLogCheckerError extends Data.TaggedError(
   cause: unknown;
 }> {}
 
-// TODO: (danielstoyanov) Define custom error types for Services and Layers
-// class ExampleError extends Data.TaggedError('@e2e-tests/ExampleError')<{
-//   readonly message: string;
-// }> {}
+export class ProcessComposeError extends Data.TaggedError(
+  '@e2e-tests/ProcessComposeError',
+)<{
+  readonly message: string;
+}> {}
 
 export const UpdatesToNetworkMetric = S.Struct({
   name: S.Literal('updates_to_networks'),
