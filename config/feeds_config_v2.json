@@ -41827,7 +41827,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -41859,7 +41859,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -41891,7 +41891,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -41923,7 +41923,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -41955,7 +41955,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -41987,7 +41987,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42019,7 +42019,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42051,7 +42051,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42083,7 +42083,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42115,7 +42115,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42147,7 +42147,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42179,7 +42179,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42211,7 +42211,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42243,7 +42243,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42275,7 +42275,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42307,7 +42307,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42339,7 +42339,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42371,7 +42371,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42403,7 +42403,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42435,7 +42435,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42467,7 +42467,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42499,7 +42499,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42531,7 +42531,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42563,7 +42563,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42595,7 +42595,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42627,7 +42627,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42659,7 +42659,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42691,7 +42691,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42723,7 +42723,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42755,7 +42755,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42787,7 +42787,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42819,7 +42819,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42851,7 +42851,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42883,7 +42883,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42915,7 +42915,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42947,7 +42947,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -42979,7 +42979,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43011,7 +43011,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43043,7 +43043,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43075,7 +43075,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43107,7 +43107,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43139,7 +43139,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43171,7 +43171,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43203,7 +43203,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43235,7 +43235,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43267,7 +43267,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43299,7 +43299,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43331,7 +43331,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43363,7 +43363,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43395,7 +43395,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43427,7 +43427,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43459,7 +43459,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43491,7 +43491,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43523,7 +43523,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43555,7 +43555,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43587,7 +43587,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43619,7 +43619,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43651,7 +43651,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43683,7 +43683,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43715,7 +43715,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43747,7 +43747,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43779,7 +43779,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43811,7 +43811,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43843,7 +43843,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43875,7 +43875,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43907,7 +43907,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43939,7 +43939,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -43971,7 +43971,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44003,7 +44003,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44035,7 +44035,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44067,7 +44067,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44099,7 +44099,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44131,7 +44131,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44163,7 +44163,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44195,7 +44195,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44227,7 +44227,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44259,7 +44259,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44291,7 +44291,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44323,7 +44323,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44355,7 +44355,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44387,7 +44387,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44419,7 +44419,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44451,7 +44451,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44483,7 +44483,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44515,7 +44515,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44547,7 +44547,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44579,7 +44579,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44611,7 +44611,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44643,7 +44643,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44675,7 +44675,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44707,7 +44707,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44739,7 +44739,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44771,7 +44771,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44803,7 +44803,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44835,7 +44835,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44867,7 +44867,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44899,7 +44899,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44931,7 +44931,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44963,7 +44963,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -44995,7 +44995,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45027,7 +45027,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45059,7 +45059,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45091,7 +45091,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45123,7 +45123,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45155,7 +45155,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45187,7 +45187,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45219,7 +45219,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45251,7 +45251,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45283,7 +45283,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45315,7 +45315,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45347,7 +45347,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45379,7 +45379,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45411,7 +45411,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45443,7 +45443,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45475,7 +45475,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45507,7 +45507,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45539,7 +45539,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45571,7 +45571,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45603,7 +45603,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45635,7 +45635,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45667,7 +45667,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45699,7 +45699,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45731,7 +45731,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45763,7 +45763,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45795,7 +45795,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45827,7 +45827,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45859,7 +45859,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45891,7 +45891,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45923,7 +45923,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45955,7 +45955,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -45987,7 +45987,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -46019,7 +46019,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -46051,7 +46051,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -46083,7 +46083,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -46115,7 +46115,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
@@ -46147,7 +46147,7 @@
       "schedule": {
         "interval_ms": 60000,
         "heartbeat_ms": 7200000,
-        "deviation_percentage": 0.5,
+        "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
       },
       "additional_feed_info": {
