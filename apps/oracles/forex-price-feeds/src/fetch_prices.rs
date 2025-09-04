@@ -7,7 +7,7 @@ use blocksense_data_providers_sdk::price_data::{
         fetch::fetch_all_prices,
         forex::{
             alpha_vantage::AlphaVantagePriceFetcher, twelvedata::TwelveDataPriceFetcher,
-            yahoo_finance::YFPriceFetcher,
+            yahoo_finance::YFPriceFetcher, fmp::FMPPriceFetcher
         },
     },
     traits::prices_fetcher::{fetch, TradingPairSymbol},
@@ -22,6 +22,7 @@ pub struct SymbolsData {
     pub alpha_vantage: Vec<TradingPairSymbol>,
     pub twelvedata: Vec<TradingPairSymbol>,
     pub yahoo_finance: Vec<TradingPairSymbol>,
+    pub fmp: Vec<TradingPairSymbol>,
 }
 
 impl SymbolsData {
@@ -37,6 +38,10 @@ impl SymbolsData {
                 .unwrap_or_default(),
             yahoo_finance: providers_symbols
                 .get("YahooFinance")
+                .cloned()
+                .unwrap_or_default(),
+            fmp: providers_symbols
+                .get("FMP")
                 .cloned()
                 .unwrap_or_default(),
         })
@@ -64,6 +69,11 @@ pub async fn get_prices(
         fetch::<YFPriceFetcher>(
             &symbols.yahoo_finance,
             get_api_keys(capabilities, &["YAHOO_FINANCE_API_KEY"]),
+            timeout_secs,
+        ),
+        fetch::<FMPPriceFetcher>(
+            &symbols.fmp,
+            get_api_keys(capabilities, &["FMP_API_KEY"]),
             timeout_secs,
         ),
     ]);
