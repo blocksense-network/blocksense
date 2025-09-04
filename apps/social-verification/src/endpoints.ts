@@ -120,6 +120,11 @@ export const VerifyApiLive = HttpApiBuilder.api(verifyApi).pipe(
       handlers.handle('register', ({ payload }) => server.register(payload)),
     ),
   ),
+  Layer.provide(
+    HttpApiBuilder.group(verifyApi, 'letsTalk', handlers =>
+      handlers.handle('sendEmail', ({ payload }) => server.sendEmail(payload)),
+    ),
+  ),
 );
 
 export const server: ApiServer<Api> = {
@@ -543,4 +548,111 @@ export const server: ApiServer<Api> = {
         },
       }),
     ),
+
+  sendEmail: payload => {
+    return Effect.contextWithEffect(context => {
+      const SENDGRID_API_KEY = getEnv(context).SENDGRID_API_KEY;
+
+      return Effect.tryPromise({
+        try: async () => {
+          await fetch('https://api.sendgrid.com/v3/mail/send', {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${SENDGRID_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              from: { email: 'hi@blocksense.network' },
+              personalizations: [
+                {
+                  to: [{ email: payload.email }],
+                  subject: 'Welcome aboard the Blocksense ship ⚓',
+                },
+              ],
+              content: [
+                {
+                  type: 'text/html',
+                  value: `
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0;padding:0;width:100%;">
+                      <tr>
+                        <td>
+
+                          <div style="max-width:600px;margin:0 auto;background-color:#ffffff;border-radius:16px;padding:24px;color:#171717;">
+                            <h1 style="margin:0 0 12px 0;font-size:24px;">
+                              Welcome aboard the Blocksense ship 🏴‍☠️
+                            </h1>
+
+                            <p style="margin:0 0 12px 0;font-size:16px;">
+                              Hi ${payload.name},
+                            </p>
+
+                            <p style="margin:0 0 12px 0;font-size:16px;">
+                              Thanks for contacting us through our
+                              <a href="https://blocksense.network/lets-talk" target="_blank" rel="noopener noreferrer" style="color:#1A57FF;text-decoration:underline;">let's talk form</a>.
+                              We'll be in touch soon to learn more about your use case and how Blocksense can help.
+                            </p>
+
+                            <p style="margin:0 0 12px 0;font-size:16px;">
+                              In the meantime, the best way to stay in the loop is to join the crew:
+                            </p>
+
+                            <ul style="margin:0;padding:0 0 20px 20px;list-style:disc;list-style-position:outside;">
+                              <li style="margin:0 0 8px 0;">
+                                <a href="https://docs.blocksense.network" target="_blank" rel="noopener noreferrer" style="color:#1A57FF;text-decoration:underline;">Explore the Docs</a>
+                              </li>
+                              <li style="margin:0 0 8px 0;">
+                                <a href="https://blocksense.network/resources/litepaper" target="_blank" rel="noopener noreferrer" style="color:#1A57FF;text-decoration:underline;">Read the Litepaper</a>
+                              </li>
+                              <li style="margin:0 0 8px 0;">
+                                <a href="https://github.com/blocksense-network/BlocksenseOS" target="_blank" rel="noopener noreferrer" style="color:#1A57FF;text-decoration:underline;">Learn about BlocksenseOS</a>
+                              </li>
+                            </ul>
+
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+                              <tr>
+                                <td align="left" valign="top" width="50%" style="padding:0 8px 0 0;">
+                                  <a href="https://x.com/blocksense_" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;display:block;">
+                                    <div style="background-color:#2c2c2c;border-radius:16px;padding:12px;color:#ffffff">
+                                      <h2 style="margin:0;font-size:16px;color:#ffffff;">70K+</h2>
+                                      <p style="margin:0;font-size:12px;color:#F4F3F3;">FOLLOWERS ON X</p>
+                                      <p style="margin:6px 0 0 0;font-size:10px;color:#D2D2D2;">Follow us on X</p>
+                                    </div>
+                                  </a>
+                                </td>
+                                <td align="left" valign="top" width="50%" style="padding:0 0 0 8px;">
+                                  <a href="https://discord.com/invite/blocksense" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;display:block;">
+                                    <div style="background-color:#2c2c2c;border-radius:16px;padding:12px;color:#ffffff">
+                                      <h2 style="margin:0;font-size:16px;color:#ffffff;">80K+</h2>
+                                      <p style="margin:0;font-size:12px;color:#F4F3F3;">COMMUNITY MEMBERS</p>
+                                      <p style="margin:6px 0 0 0;font-size:10px;color:#D2D2D2;">Become a member</p>
+                                    </div>
+                                  </a>
+                                </td>
+                              </tr>
+                            </table>
+
+                            <p style="margin:16px 0 0 0;font-size:16px;">
+                              See you on board.
+                            </p>
+                            <p style="margin:2px 0 0 0;font-size:12px;color:#3A3A3A;">
+                              - The Blocksense Team
+                            </p>
+                          </div>
+
+                        </td>
+                      </tr>
+                    </table>
+                  `,
+                },
+              ],
+            }),
+          });
+        },
+        catch: error => {
+          console.error('Error sending email:', error);
+          throw new Error('Failed to send email');
+        },
+      });
+    });
+  },
 };
