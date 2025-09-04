@@ -1,9 +1,8 @@
 import { readdir } from 'fs/promises';
-import { Schema as S } from 'effect';
 
 import { describe, expect, it, test } from 'vitest';
 
-import { entriesOf, keysOf } from '@blocksense/base-utils/array-iter';
+import { keysOf } from '@blocksense/base-utils/array-iter';
 import { assertNotNull } from '@blocksense/base-utils/assert';
 import {
   parseNetworkName,
@@ -54,11 +53,8 @@ describe.skipIf(!tokenValid)(
 );
 
 describe('Configuration files decoding', async () => {
-  const configTypesWithoutLegacy = Object.fromEntries(
-    entriesOf(configTypes).filter(([key]) => !(key in legacyConfigTypes)),
-  ) satisfies Record<string, S.Schema<any>>;
-
-  for (const configType of keysOf(configTypesWithoutLegacy)) {
+  for (const configType of keysOf(configTypes)) {
+    if (configType in legacyConfigTypes) continue;
     it(`should decode '${configType}' config file successfully`, async () => {
       const dir =
         configType === 'sequencer_config_v2'
