@@ -45,19 +45,19 @@ allowed_outbound_hosts = [
 ]
 
 [[trigger.oracle.capabilities]]
-data = "4DIDDYTCVFDYDP27"
+data = "x"
 id = "ALPHAVANTAGE_API_KEY"
 
 [[trigger.oracle.capabilities]]
-data = "uLQo1q92aE9ttxGsNj0aO6bdGwXlf8oL8MG7OGma"
+data = "x"
 id = "YAHOO_FINANCE_API_KEY"
 
 [[trigger.oracle.capabilities]]
-data = "209306be327d49c6bdb0f8420288d36b"
+data = "x"
 id = "TWELVEDATA_API_KEY"
 
 [[trigger.oracle.capabilities]]
-data = "9uPKNVxmxKyIjUXhwgI6m3FIwBnsc2vA"
+data = "x"
 id = "FMP_API_KEY"
 
 [[trigger.oracle.capabilities]]
