@@ -22,7 +22,7 @@
     "@effect/vitest": "^0.25.1",
     "@types/node": "^24.3.1",
     "effect": "^3.17.13",
-    "execa": "^9.5.2",
+    "execa": "^9.6.0",
     "parse-prometheus-text-format": "^1.1.1",
     "tsx": "^4.17.0",
     "typescript": "^5.5.4",
