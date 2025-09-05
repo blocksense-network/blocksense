@@ -31,14 +31,6 @@
         {
           options.services.blocksense = import ./module-opts specialArgs;
 
-          config.services.blocksense = {
-            sequencer.providers = lib.mkIf (cfg.anvil != { }) (
-              lib.mapAttrs (_name: value: {
-                "url" = lib.mkDefault "http://127.0.0.1:${toString value.port}";
-              }) cfg.anvil
-            );
-          };
-
           imports = [
             ./assertions.nix
             (import backend specialArgs)

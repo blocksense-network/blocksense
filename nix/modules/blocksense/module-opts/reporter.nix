@@ -10,13 +10,13 @@ with lib;
 
     sequencer-url = mkOption {
       type = types.str;
-      default = "http://127.0.0.1:${toString cfg.sequencer.ports.main}";
+      default = "http://${toString cfg.sequencer.host}:${toString cfg.sequencer.ports.main}";
       description = "The url of the sequencer.";
     };
 
     registry-url = mkOption {
       type = types.str;
-      default = "http://127.0.0.1:${toString cfg.sequencer.ports.admin}";
+      default = "http://${toString cfg.sequencer.host}:${toString cfg.sequencer.ports.admin}";
       description = "The url of the registry.";
     };
 
