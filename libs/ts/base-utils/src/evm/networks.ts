@@ -63,7 +63,7 @@ const networks = [
   'hemi-sepolia',
   'horizen-gobi',
   'hyperevm-mainnet',
-  'hyperliquid-evm-testnet',
+  'hyperevm-testnet',
   'inevm-testnet',
   'ink-mainnet',
   'ink-sepolia',
@@ -892,7 +892,7 @@ export const networkMetadata = {
     ],
     currency: Currency.HYPE,
   },
-  'hyperliquid-evm-testnet': {
+  'hyperevm-testnet': {
     chainId: 998,
     isTestnet: true,
     explorers: [
