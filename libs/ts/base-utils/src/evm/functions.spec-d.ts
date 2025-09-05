@@ -19,13 +19,13 @@ describe('evm/functions', () => {
       perNetworkKind: {
         GAS_LIMIT: S.NumberFromString,
         USE_HW_WALLET: asVarSchema(S.BooleanFromString),
-        DEPLOYER: ethereumAddress,
+        DEPLOYER: asVarSchema(ethereumAddress),
         THRESHOLD: S.NumberFromString,
       },
       perNetworkName: {
         GAS_LIMIT: S.NumberFromString,
         USE_HW_WALLET: asVarSchema(S.BooleanFromString),
-        DEPLOYER: ethereumAddress,
+        DEPLOYER: asVarSchema(ethereumAddress),
         THRESHOLD: S.NumberFromString,
       },
     } satisfies DeploymentEnvSchema;
