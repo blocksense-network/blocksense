@@ -206,3 +206,120 @@ fn print_results(resources: &[ResourcePairData], results: &PairsToResults, paylo
     info!("\nResults:");
     table.printstd();
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use blocksense_sdk::oracle::DataFeedSetting;
+    use blocksense_data_providers_sdk::price_data::traits::prices_fetcher::PricePoint;
+
+    #[tokio::test]
+    async fn test_process_results_vwap_success() {
+        // Build a synthetic results map with two providers so VWAP can be computed
+        let mut results = PairsToResults::new();
+
+        let mut providers_data = std::collections::HashMap::new();
+        providers_data.insert(
+            "Binance".to_string(),
+            PricePoint {
+                price: 0.20,
+                volume: 100.0,
+            },
+        );
+        providers_data.insert(
+            "OKX".to_string(),
+            PricePoint {
+                price: 0.30,
+                volume: 300.0,
+            },
+        );
+
+        results.insert(
+            "733".to_string(),
+            blocksense_data_providers_sdk::price_data::types::DataFeedResult {
+                symbol: "WOJAK/USD".to_string(),
+                providers_data,
+            },
+        );
+
+        let payload = process_results(&results).unwrap();
+        assert_eq!(payload.values.len(), 1);
+        assert_eq!(payload.values[0].id, "733");
+
+        match &payload.values[0].value {
+            DataFeedResultValue::Numerical(val) => {
+                let expected = 0.275_f64; // (0.2*100 + 0.3*300) / 400
+                assert!((val - expected).abs() < 1e-12, "expected {expected}, got {val}");
+            }
+            other => panic!("Expected Numerical value, got {other:?}"),
+        }
+    }
+
+    #[tokio::test]
+    async fn test_get_resources_from_settings_wojak() {
+        let wojak_data = r#"{"pair":{"base":"WOJAK","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["WOJAKUSDT"]}}},"kind":"cex-price-feeds"}"#;
+
+        let settings = Settings::new(
+            vec![DataFeedSetting {
+                id: "733".to_string(),
+                data: wojak_data.to_string(),
+            }],
+            vec![],
+            60,
+        );
+
+        let resources = get_resources_from_settings(&settings).unwrap();
+        assert_eq!(resources.pairs.len(), 1);
+        assert_eq!(resources.pairs[0].id, "733");
+        assert_eq!(resources.pairs[0].pair.base, "WOJAK");
+        assert_eq!(resources.pairs[0].pair.quote, "USD");
+
+        assert!(resources.symbols.contains_key("Binance"));
+        assert!(!resources.symbols.contains_key("Coinbase"));
+    }
+
+    #[tokio::test]
+    async fn test_get_resources_from_invalid_settings() {
+        let settings = Settings::new(
+            vec![DataFeedSetting {
+                id: "733".to_string(),
+                data: "invalid json".to_string(),
+            }],
+            vec![],
+            60,
+        );
+
+        let result = get_resources_from_settings(&settings);
+        assert!(result.is_err());
+    }
+
+    #[tokio::test]
+    async fn test_multiple_feeds_processing() {
+        let btc_data = r#"{"pair":{"base":"BTC","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["BTCUSDT"]}}},"kind":"cex-price-feeds"}"#;
+        let wojak_data = r#"{"pair":{"base":"WOJAK","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["WOJAKUSDT"]}}},"kind":"cex-price-feeds"}"#;
+
+        let settings = Settings::new(
+            vec![
+                DataFeedSetting {
+                    id: "0".to_string(),
+                    data: btc_data.to_string(),
+                },
+                DataFeedSetting {
+                    id: "733".to_string(),
+                    data: wojak_data.to_string(),
+                },
+            ],
+            vec![],
+            60,
+        );
+
+        let resources = get_resources_from_settings(&settings).unwrap();
+        assert_eq!(resources.pairs.len(), 2);
+
+        let btc_pair = resources.pairs.iter().find(|p| p.id == "0").unwrap();
+        assert_eq!(btc_pair.pair.base, "BTC");
+
+        let wojak_pair = resources.pairs.iter().find(|p| p.id == "733").unwrap();
+        assert_eq!(wojak_pair.pair.base, "WOJAK");
+    }
+}
