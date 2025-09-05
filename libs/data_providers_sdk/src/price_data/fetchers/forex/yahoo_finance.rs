@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use anyhow::{Error, Result};
+use futures::future::try_join_all;
 use futures::{future::LocalBoxFuture, FutureExt};
 
 use serde::Deserialize;
@@ -54,27 +55,34 @@ impl<'a> PricesFetcher<'a> for YFPriceFetcher<'a> {
                 .and_then(|map| map.get("YAHOO_FINANCE_API_KEY"))
                 .ok_or_else(|| Error::msg("Missing YAHOO_FINANCE_API_KEY"))?;
 
-            let all_symbols = self
-                .symbols
-                .iter()
-                .map(|s| format!("{}=X", s.replace(':', "")))
-                .collect::<Vec<String>>()
-                .join(",");
+            let api_key_str = api_key.as_str();
+            let futures = self.symbols.chunks(10).map(|chunk| {
+                let symbols_param = chunk
+                    .iter()
+                    .map(|s| format!("{}=X", s.replace(':', "")))
+                    .collect::<Vec<String>>()
+                    .join(",");
 
-            let response = http_get_json::<YFResponse>(
-                "https://yfapi.net/v6/finance/quote",
-                Some(&[("symbols", all_symbols.as_str())]),
-                Some(&[("x-api-key", api_key)]),
-                Some(timeout_secs),
-            )
-            .await?;
+                async move {
+                    http_get_json::<YFResponse>(
+                        "https://yfapi.net/v6/finance/quote",
+                        Some(&[("symbols", symbols_param.as_str())]),
+                        Some(&[("x-api-key", api_key_str)]),
+                        Some(timeout_secs),
+                    )
+                    .await
+                }
+            });
 
-            let results = response
-                .quote_response
-                .ok_or_else(|| Error::msg("YahooFinance: No quote response"))?
-                .result
-                .into_iter()
-                .filter_map(|value| {
+            let responses = try_join_all(futures).await?;
+
+            let mut aggregated: PairPriceData = HashMap::new();
+            for response in responses.into_iter() {
+                let quote_response = response
+                    .quote_response
+                    .ok_or_else(|| Error::msg("YahooFinance: No quote response"))?;
+
+                for value in quote_response.result.into_iter() {
                     let price = value
                         .regular_market_price
                         .or(value.regular_market_previous_close);
@@ -82,7 +90,9 @@ impl<'a> PricesFetcher<'a> for YFPriceFetcher<'a> {
                     let volume = 1.0;
                     let symbol = value.symbol.replace("=X", "");
                     match price {
-                        Some(price) => Some((symbol, PricePoint { price, volume })),
+                        Some(price) => {
+                            aggregated.insert(symbol, PricePoint { price, volume });
+                        }
                         _ => {
                             print_missing_provider_price_data(
                                 "YahooFinance",
@@ -90,13 +100,12 @@ impl<'a> PricesFetcher<'a> for YFPriceFetcher<'a> {
                                 price,
                                 Some(volume),
                             );
-                            None
                         }
                     }
-                })
-                .collect();
+                }
+            }
 
-            Ok(results)
+            Ok(aggregated)
         }
         .boxed_local()
     }
