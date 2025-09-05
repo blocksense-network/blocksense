@@ -24,7 +24,7 @@
     "effect": "^3.17.13",
     "execa": "^9.6.0",
     "parse-prometheus-text-format": "^1.1.1",
-    "tsx": "^4.17.0",
+    "tsx": "^4.20.5",
     "typescript": "5.9.2",
     "vitest": "^3.2.4"
   },
