@@ -2,4 +2,4 @@ pub mod euler;
 pub mod hyperdrive;
 pub mod hyperlend;
 pub mod hypurrfi;
-pub mod onchain;
+pub mod pool_data_provider;

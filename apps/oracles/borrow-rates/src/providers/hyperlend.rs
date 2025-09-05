@@ -2,7 +2,7 @@ use alloy::primitives::{address, Address, Bytes, U256};
 use alloy::sol_types::SolCall;
 use anyhow::Result;
 
-use crate::providers::onchain::{MyProvider, ReserveLike, UiPool};
+use crate::providers::pool_data_provider::{MyProvider, ReserveLike, UiPool};
 
 pub const HYPERLAND_UI_POOL_DATA_PROVIDER: Address =
     address!("0x3Bb92CF81E38484183cc96a4Fb8fBd2d73535807");
