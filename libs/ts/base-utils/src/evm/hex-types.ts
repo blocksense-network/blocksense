@@ -11,9 +11,8 @@ import { hexDataString } from '../buffer-and-hex';
 
 // Ethereum address
 
-export const ethereumAddress = hexDataString.pipe(
+export const ethereumAddress = S.TemplateLiteral('0x', S.String).pipe(
   S.pattern(/^0x([0-9a-fA-F]{40})$/),
-  S.brand('EthereumAddress'),
   S.annotations({ identifier: 'EthereumAddress' }),
 );
 export type EthereumAddress = typeof ethereumAddress.Type;

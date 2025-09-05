@@ -1,23 +1,18 @@
-import {
-  createPublicClient,
-  http,
-  type PublicClient,
-  type Address,
-  Chain,
-} from 'viem';
+import { createPublicClient, http, type PublicClient, Chain } from 'viem';
 import * as viemChains from 'viem/chains';
 
 import {
   getRpcUrl,
   networkMetadata,
   NetworkName,
+  EthereumAddress,
 } from '@blocksense/base-utils/evm';
 
 import { valuesOf } from '@blocksense/base-utils';
 
 export abstract class ContractConsumerBase {
   public client: PublicClient;
-  public contractAddress: Address;
+  public contractAddress: EthereumAddress;
 
   /**
    * Initializes the consumer client with a Viem PublicClient.
@@ -25,7 +20,10 @@ export abstract class ContractConsumerBase {
    * @param contractAddress The address of the contract.
    * @param client The Viem PublicClient instance to use for interactions.
    */
-  protected constructor(contractAddress: Address, client: PublicClient) {
+  protected constructor(
+    contractAddress: EthereumAddress,
+    client: PublicClient,
+  ) {
     this.contractAddress = contractAddress;
     this.client = client;
   }
@@ -40,8 +38,8 @@ export abstract class ContractConsumerBase {
    * @returns A new instance of the consumer configured for the specified network.
    */
   public static createConsumerByNetworkName<T extends ContractConsumerBase>(
-    this: new (contractAddress: Address, client: PublicClient) => T,
-    contractAddress: Address,
+    this: new (contractAddress: EthereumAddress, client: PublicClient) => T,
+    contractAddress: EthereumAddress,
     networkName: NetworkName,
   ): T {
     const chain = getViemChain(networkName);
@@ -63,8 +61,8 @@ export abstract class ContractConsumerBase {
    * @returns A new instance of the consumer configured for the specified RPC URL.
    */
   public static createConsumerByRpcUrl<T extends ContractConsumerBase>(
-    this: new (contractAddress: Address, client: PublicClient) => T,
-    contractAddress: Address,
+    this: new (contractAddress: EthereumAddress, client: PublicClient) => T,
+    contractAddress: EthereumAddress,
     rpcUrl: string,
   ): T {
     const client = createPublicClient({
