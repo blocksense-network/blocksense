@@ -37,5 +37,9 @@
     "tailwindcss": "^4",
     "typescript": "5.8.3",
     "vite": "^7.0.0"
+  },
+  "dependencies": {
+    "@react-email/render": "^1.2.1",
+    "@react-email/tailwind": "^1.2.2"
   }
 }
