@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import chalk from 'chalk';
+import { color as c } from '@blocksense/base-utils/tty';
 import client from 'prom-client';
 
 import {
@@ -78,11 +78,9 @@ const main = async (): Promise<void> => {
   }
 
   console.log(
-    chalk.cyan(
-      `Using Ethereum address: ${address} (sequencer: ${
-        address === sequencerAddress
-      })\n`,
-    ),
+    c`{cyan Using Ethereum address: ${address} (sequencer: ${
+      address === sequencerAddress
+    })}\n`,
   );
 
   if (argv.rpc) {
@@ -105,7 +103,9 @@ const main = async (): Promise<void> => {
         const message = `${balance} (RPC: ${rpcUrl}) (NetworkName: ${networkName})`;
 
         console.log(
-          networkName === 'unknown' ? chalk.red(message) : chalk.green(message),
+          networkName === 'unknown'
+            ? c`{red ${message}}`
+            : c`{green ${message}}`,
         );
 
         if (balanceGauge) {
@@ -116,7 +116,7 @@ const main = async (): Promise<void> => {
         }
       } catch (error) {
         console.error(
-          chalk.red(`Failed to fetch balance from (RPC: ${rpcUrl})`),
+          c`{red Failed to fetch balance from (RPC: ${rpcUrl})}`,
           (error as Error).message,
         );
       }
@@ -130,9 +130,7 @@ const main = async (): Promise<void> => {
   for (const networkName of networks) {
     const rpcUrl = getOptionalRpcUrl(networkName);
     if (rpcUrl === '') {
-      console.log(
-        chalk.red(`No rpc url for network ${networkName}. Skipping.`),
-      );
+      console.log(c`{red No rpc url for network ${networkName}. Skipping.}`);
     }
     const web3 = new Web3(rpcUrl);
     try {
@@ -140,9 +138,8 @@ const main = async (): Promise<void> => {
       const balance = web3.utils.fromWei(balanceWei, 'ether');
       const { currency } = networkMetadata[networkName];
       console.log(
-        (balanceWei === 0n ? chalk.grey : chalk.green)(
-          `${networkName}: ${balance} ${currency}`,
-        ),
+        (balanceWei === 0n ? c`{grey` : c`{green`) +
+          ` ${networkName}: ${balance} ${currency}}`,
       );
       if (balanceGauge) {
         balanceGauge.set(
@@ -152,7 +149,7 @@ const main = async (): Promise<void> => {
       }
     } catch (error) {
       console.error(
-        chalk.red(`Failed to fetch balance for ${networkName}:`),
+        c`{red Failed to fetch balance for ${networkName}:}`,
         (error as Error).message,
       );
     }
@@ -160,5 +157,5 @@ const main = async (): Promise<void> => {
 };
 
 main().catch(error => {
-  console.error(chalk.red('Error running script:'), error.message);
+  console.error(c`{red Error running script:}`, error.message);
 });
