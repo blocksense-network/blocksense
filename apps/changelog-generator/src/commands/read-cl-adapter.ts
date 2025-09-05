@@ -59,10 +59,53 @@ export const readClAdapter = Command.make(
             network,
           );
 
-      // Fetch aggregated data in one shot
-      const data = yield* Effect.tryPromise<CLAggregatorAdapterData>(() =>
-        consumer.getCLAggregatorAdapterData(),
-      );
+      const data: CLAggregatorAdapterData | undefined =
+        yield* Effect.tryPromise<CLAggregatorAdapterData>(() =>
+          consumer.getCLAggregatorAdapterData(),
+        ).pipe(
+          Effect.catchAll(err => {
+            const message = (err as Error)?.message ?? String(err);
+            const cause = message.concat(` ${err.cause}`);
+            if (cause.includes('multicall3')) {
+              return Effect.tryPromise<CLAggregatorAdapterData>(async () => {
+                const [
+                  dataFeedStore,
+                  decimals,
+                  description,
+                  id,
+                  latestAnswer,
+                  latestRound,
+                  latestRoundData,
+                ] = await Promise.all([
+                  consumer.getDataFeedStore(),
+                  consumer.getDecimals(),
+                  consumer.getDescription(),
+                  consumer.getId(),
+                  consumer.getLatestAnswer(),
+                  consumer.getLatestRound(),
+                  consumer.getLatestRoundData(),
+                ]);
+                return {
+                  dataFeedStore,
+                  decimals,
+                  description,
+                  id,
+                  latestAnswer,
+                  latestRound,
+                  latestRoundData,
+                } satisfies CLAggregatorAdapterData;
+              }).pipe(
+                Effect.catchAll(() => {
+                  return Effect.succeed(undefined);
+                }),
+              );
+            }
+            return Effect.succeed(undefined);
+          }),
+        );
+
+      if (!data)
+        throw new Error('Failed to fetch data from CLAggregatorAdapter');
 
       const addrBranded = parseEthereumAddress(resolvedAddress);
       const rows: Array<[string, string]> = [
