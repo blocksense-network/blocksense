@@ -101,7 +101,7 @@ describe.sequential('E2E Tests with process-compose', () => {
           ),
         {
           schedule: Schedule.fixed(1000),
-          times: 30,
+          times: 90,
         },
       );
       // still validate the result
