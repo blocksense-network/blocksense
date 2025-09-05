@@ -9,7 +9,7 @@ use url::Url;
 use tracing::warn;
 
 use crate::domain::{BorrowRateInfo, FeedConfig, RatesPerFeed};
-use crate::providers::onchain::{MyProvider, ETHEREUM_MAINNET_RPC_URL};
+use crate::providers::pool_data_provider::{MyProvider, ETHEREUM_MAINNET_RPC_URL};
 use crate::utils::math::apr_continuous;
 use blocksense_sdk::eth_rpc::eth_call;
 

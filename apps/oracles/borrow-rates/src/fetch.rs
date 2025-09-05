@@ -15,7 +15,7 @@ use crate::{
             HyperLendUi, HYPERLAND_POOL_ADDRESSES_PROVIDER, HYPERLAND_UI_POOL_DATA_PROVIDER,
         },
         hypurrfi::{HypurrFiUi, HYPURRFI_POOL_ADDRESSES_PROVIDER, HYPURRFI_UI_POOL_DATA_PROVIDER},
-        onchain::{fetch_reserves, plan_for},
+        pool_data_provider::{fetch_reserves, plan_for},
     },
     utils::logging::print_marketplace_data,
 };
