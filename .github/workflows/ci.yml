@@ -28,6 +28,8 @@ env:
   TWELVEDATA_API_KEY: ${{ secrets.TWELVEDATA_API_KEY }}
   FMP_API_KEY: ${{ secrets.FMP_API_KEY }}
   SPOUT_RWA_API_KEY: ${{ secrets.SPOUT_RWA_API_KEY }}
+  RPC_URL_ETHEREUM_SEPOLIA: ${{ secrets.RPC_URL_ETHEREUM_SEPOLIA }}
+  RPC_URL_INK_SEPOLIA: ${{ secrets.RPC_URL_INK_SEPOLIA }}
 
 jobs:
   lint:
