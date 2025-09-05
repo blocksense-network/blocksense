@@ -1,6 +1,6 @@
 import express from 'express';
-import chalk from 'chalk';
 import client from 'prom-client';
+import { color } from '@blocksense/base-utils/tty';
 
 export const startPrometheusServer = (host: string, port: number): void => {
   const app = express();
@@ -10,9 +10,7 @@ export const startPrometheusServer = (host: string, port: number): void => {
   });
   app.listen(port, host, () => {
     console.log(
-      chalk.blue(
-        `Prometheus metrics exposed at http://${host}:${port}/metrics`,
-      ),
+      color`{blue Prometheus metrics exposed at http://${host}:${port}/metrics}`,
     );
   });
 };

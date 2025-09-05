@@ -1,8 +1,8 @@
-import chalk from 'chalk';
 import Web3 from 'web3';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import client from 'prom-client';
+import { color as c } from '@blocksense/base-utils/tty';
 
 import {
   getOptionalRpcUrl,
@@ -56,19 +56,15 @@ const main = async (): Promise<void> => {
   }
 
   console.log(
-    chalk.cyan(
-      `Using Ethereum address: ${address} (sequencer: ${
-        address === sequencerAddress
-      })\n`,
-    ),
+    c`{cyan Using Ethereum address: ${address} (sequencer: ${
+      address === sequencerAddress
+    })}\n`,
   );
 
   for (const networkName of deployedNetworks) {
     const rpcUrl = getOptionalRpcUrl(networkName);
     if (rpcUrl === '') {
-      console.log(
-        chalk.red(`No rpc url for network ${networkName}. Skipping.`),
-      );
+      console.log(c`{red No rpc url for network ${networkName}. Skipping.}`);
       continue;
     }
     try {
@@ -86,14 +82,12 @@ const main = async (): Promise<void> => {
       }
 
       if (nonceDifference) {
-        console.log(chalk.red(`Nonce difference found on ${networkName}:`));
+        console.log(c`{red Nonce difference found on ${networkName}:}`);
         console.log(
-          chalk.red(`  Latest: ${latestNonce}, Pending: ${pendingNonce}`),
+          c`{red   Latest: ${latestNonce}, Pending: ${pendingNonce}}`,
         );
       } else {
-        console.log(
-          chalk.green(`No Nonce difference found on ${networkName}:`),
-        );
+        console.log(c`{green No Nonce difference found on ${networkName}:}`);
       }
     } catch (error) {
       console.error(
@@ -105,5 +99,5 @@ const main = async (): Promise<void> => {
 };
 
 main().catch(error => {
-  console.error(chalk.red('Error running script:'), error.message);
+  console.error(c`{red Error running script:}`, error.message);
 });

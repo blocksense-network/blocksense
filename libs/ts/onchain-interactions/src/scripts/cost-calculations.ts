@@ -2,8 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import Web3 from 'web3';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import chalk from 'chalk';
-import chalkTemplate from 'chalk-template';
+import { color as c } from '@blocksense/base-utils/tty';
 import client from 'prom-client';
 
 import {
@@ -124,8 +123,7 @@ const logGasCosts = async (
   const { currency } = networkMetadata[networkName];
 
   try {
-    console.log(chalkTemplate`
-    {white ${networkName}: Processed ${transactionsCount} transactions sent by ${address} over ${hoursBetweenFirstLast} hours}
+    console.log(c`\n    {white ${networkName}: Processed ${transactionsCount} transactions sent by ${address} over ${hoursBetweenFirstLast} hours}
     {blue First transaction timestamp: ${firstTransactionTime}}
     {blue Last transaction timestamp: ${lastTransactionTime}}
     {yellow Average Gas Price: ${gasCosts.avgGasPriceGwei} Gwei}
@@ -136,16 +134,16 @@ const logGasCosts = async (
     `);
 
     if (balance == null) {
-      console.error(chalk.red(`Can't calculate balance for ${networkName}`));
+      console.error(c`{red Can't calculate balance for ${networkName}}`);
     } else {
       const daysBalanceWillLast = Number(balance) / (gasCosts.cost1h * 24);
       const balanceMsg = `  Balance of ${balance} ${currency} will last approximately ${daysBalanceWillLast.toFixed(2)} days based on 24-hour costs.`;
       if (daysBalanceWillLast < 10) {
-        console.log(chalk.bold.red(balanceMsg));
+        console.log(c`{bold red ${balanceMsg}}`);
       } else if (daysBalanceWillLast >= 10 && daysBalanceWillLast <= 30) {
-        console.log(chalk.bold.yellow(balanceMsg));
+        console.log(c`{bold yellow ${balanceMsg}}`);
       } else {
-        console.log(chalk.bold.green(balanceMsg));
+        console.log(c`{bold green ${balanceMsg}}`);
       }
 
       if (gauges) {
@@ -168,9 +166,11 @@ const logGasCosts = async (
     }
   } catch (error) {
     if (error instanceof Error) {
-      console.error(chalk.red(`Error logging gas costs: ${error.message}`));
+      console.error(
+        c`{red Error logging gas costs: ${(error as Error).message}}`,
+      );
     } else {
-      console.error(chalk.red(`Unexpected error: ${String(error)}`));
+      console.error(c`{red Unexpected error: ${String(error)}}`);
     }
   }
 };
@@ -192,14 +192,14 @@ const fetchTransactionsForNetwork = async (
 
   const apiKey = getOptionalApiKey(network);
   if (!apiUrl) {
-    console.log(chalk.red(`Skipping ${network}: Missing API configuration`));
+    console.log(c`{red Skipping ${network}: Missing API configuration}`);
     return { transactions: [], firstTxTime: '', lastTxTime: '' };
   }
 
   try {
     console.log('------------------------------------------------------------');
-    console.log(chalk.green(network.toUpperCase()));
-    console.log(chalk.blue(`Fetching transactions for ${network}...`));
+    console.log(c`{green ${network.toUpperCase()}}`);
+    console.log(c`{blue Fetching transactions for ${network}...}`);
     const rpcUrl = getOptionalRpcUrl(network);
     const web3 = new Web3(rpcUrl);
     const latestBlock = await web3.eth.getBlockNumber();
@@ -269,7 +269,7 @@ const fetchTransactionsForNetwork = async (
       });
 
       if (response.data.status !== '1') {
-        console.error(chalk.red(`${network} Error: ${response.data.message}`));
+        console.error(c`{red ${network} Error: ${response.data.message}}`);
         return { transactions: [], firstTxTime: '', lastTxTime: '' };
       }
       rawTransactions = response.data.result;
@@ -369,9 +369,7 @@ const fetchTransactionsForNetwork = async (
     }
 
     console.log(
-      chalk.green(
-        `${network}: Found ${transactions.length} transactions sent by the account to other addresses`,
-      ),
+      c`{green ${network}: Found ${transactions.length} transactions sent by the account to other addresses}`,
     );
     return {
       transactions,
@@ -380,7 +378,7 @@ const fetchTransactionsForNetwork = async (
     };
   } catch (error: any) {
     console.error(
-      chalk.red(`Error fetching transactions for ${network}: ${error.message}`),
+      c`{red Error fetching transactions for ${network}: ${error.message}}`,
     );
     return { transactions: [], firstTxTime: '', lastTxTime: '' };
   }
@@ -487,11 +485,9 @@ const main = async (): Promise<void> => {
   }
 
   console.log(
-    chalk.cyan(
-      `Using Ethereum address: ${address} (sequencer: ${
-        address === sequencerAddress
-      })\n`,
-    ),
+    c`{cyan Using Ethereum address: ${address} (sequencer: ${
+      address === sequencerAddress
+    })}\n`,
   );
 
   const networks =
@@ -513,20 +509,16 @@ const main = async (): Promise<void> => {
         gasCosts = calculateGasCosts(hoursBetweenFirstLastTx, transactions);
       } catch (error: any) {
         console.error(
-          chalk.red(
-            `Error calculating gas costs for ${network}: ${error.message}`,
-          ),
+          c`{red Error calculating gas costs for ${network}: ${error.message}}`,
         );
         continue;
       }
       const rpcUrl = getOptionalRpcUrl(network);
-      var balance: string;
+      let balance: string;
 
       if (rpcUrl === '') {
         console.log(
-          chalk.red(
-            `No rpc url for network ${network}. Can't get balance - will use 0.`,
-          ),
+          c`{red No rpc url for network ${network}. Can't get balance - will use 0.}`,
         );
         balance = '0';
       } else {
@@ -536,9 +528,7 @@ const main = async (): Promise<void> => {
           balance = web3.utils.fromWei(balanceWei, 'ether');
         } catch (error: any) {
           console.error(
-            chalk.red(
-              `Error fetching balance for ${network}: ${error.message}`,
-            ),
+            c`{red Error fetching balance for ${network}: ${error.message}}`,
           );
           balance = '0';
         }
@@ -560,14 +550,12 @@ const main = async (): Promise<void> => {
       }
     } else {
       console.log(
-        chalk.yellow(
-          `${network}: Less than 2 transactions found for the account.`,
-        ),
+        c`{yellow ${network}: Less than 2 transactions found for the account.}`,
       );
     }
   }
 };
 
 main().catch(error => {
-  console.error(chalk.red('Error running script:'), error.message);
+  console.error(c`{red Error running script:}`, error.message);
 });
