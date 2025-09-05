@@ -1,7 +1,6 @@
 import { Effect } from 'effect';
 
 import type { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
-import { isNetworkName } from '@blocksense/base-utils/evm';
 import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
 
 export type FeedsValueAndRound = Record<
@@ -27,15 +26,10 @@ export function getDataFeedsInfoFromNetwork(
   roundsInfo?: Record<string, number>,
 ): Effect.Effect<FeedsValueAndRound, Error, never> {
   return Effect.gen(function* () {
-    const ADFSConsumer = isNetworkName(provider)
-      ? AggregatedDataFeedStoreConsumer.createConsumerByNetworkName(
-          contractAddress,
-          provider,
-        )
-      : AggregatedDataFeedStoreConsumer.createConsumerByRpcUrl(
-          contractAddress,
-          provider!,
-        );
+    const ADFSConsumer = AggregatedDataFeedStoreConsumer.create(
+      contractAddress,
+      provider,
+    );
 
     const feedsInfo: FeedsValueAndRound = {};
     for (const feedId of feedIds) {

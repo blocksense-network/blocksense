@@ -6,6 +6,7 @@ import {
   networkMetadata,
   NetworkName,
   EthereumAddress,
+  isNetworkName,
 } from '@blocksense/base-utils/evm';
 
 import { valuesOf } from '@blocksense/base-utils';
@@ -26,6 +27,18 @@ export abstract class ContractConsumerBase {
   ) {
     this.contractAddress = contractAddress;
     this.client = client;
+  }
+
+  public static create<T extends ContractConsumerBase>(
+    this: new (contractAddress: EthereumAddress, client: PublicClient) => T,
+    contractAddress: EthereumAddress,
+    networkNameOrRpcUrl: NetworkName | string,
+  ): T {
+    const transport = isNetworkName(networkNameOrRpcUrl)
+      ? http(getRpcUrl(networkNameOrRpcUrl))
+      : http(networkNameOrRpcUrl);
+    const client = createPublicClient({ transport });
+    return new this(contractAddress, client);
   }
 
   /**
