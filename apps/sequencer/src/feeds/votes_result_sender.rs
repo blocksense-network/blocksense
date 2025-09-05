@@ -10,13 +10,10 @@ use alloy::hex::{self, ToHexExt};
 use alloy::providers::Provider;
 use alloy_primitives::map::HashMap;
 use alloy_primitives::{Address, Bytes, Uint, U256};
-use blocksense_config::{
-    ADFS_CONTRACT_NAME, GNOSIS_SAFE_CONTRACT_NAME, HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME,
-};
+use blocksense_config::{ADFS_CONTRACT_NAME, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{
     BatchedAggregatesToSend, EncodedBatchedAggregatesToSend, EncodedVotedFeedUpdate,
 };
-use blocksense_feed_registry::types::Repeatability::{self, Periodic};
 use blocksense_gnosis_safe::data_types::ConsensusSecondRoundBatch;
 use blocksense_gnosis_safe::utils::{create_safe_tx, generate_transaction_hash, SafeMultisig};
 use blocksense_utils::counter_unbounded_channel::CountedReceiver;
@@ -64,7 +61,7 @@ pub async fn votes_result_sender_loop(
                         info!("sending updates to contracts:");
                         let blocksense_block_height = updates.block_height;
                         debug!("Processing eth_batch_send_to_all_contracts{blocksense_block_height}_{batch_count}");
-                        match eth_batch_send_to_all_contracts(&sequencer_state, &updates, Periodic, Some(&providers_metrics)).await {
+                        match eth_batch_send_to_all_contracts(&sequencer_state, &updates, Some(&providers_metrics)).await {
                             Ok(()) => info!("Sending updates to relayers complete."),
                             Err(err) => error!("ERROR Sending updates to relayers: {err}"),
                         };
@@ -259,7 +256,6 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             &provider_settings,
             feeds_config,
             &mut feeds_rounds,
-            Repeatability::Periodic,
         )
         .await
         {
@@ -286,7 +282,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             let provider = provider.lock().await;
 
             let contract_address = provider
-                .get_contract_address(HISTORICAL_DATA_FEED_STORE_V2_CONTRACT_NAME)
+                .get_contract_address(ADFS_CONTRACT_NAME)
                 .unwrap_or(Address::default());
             let safe_address = provider
                 .get_contract_address(GNOSIS_SAFE_CONTRACT_NAME)
