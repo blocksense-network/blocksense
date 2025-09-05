@@ -2246,7 +2246,7 @@ __metadata:
     "@effect/sql": "npm:^0.44.2"
     "@effect/typeclass": "npm:^0.36.0"
     "@effect/vitest": "npm:0.25.1"
-    "@types/node": "npm:^24.0.4"
+    "@types/node": "npm:^24.3.1"
     "@vitest/coverage-v8": "npm:^3.2.4"
     effect: "npm:^3.17.13"
     ts-node: "npm:^10.9.2"
@@ -2268,7 +2268,7 @@ __metadata:
     "@aztec/builder": "npm:0.67.1"
     "@aztec/noir-contracts.js": "npm:0.67.1"
     "@babel/preset-typescript": "npm:^7.26.0"
-    "@types/node": "npm:^22.10.2"
+    "@types/node": "npm:^24.3.1"
     tslib: "npm:^2.8.1"
     typescript: "npm:5.8.3"
     vite: "npm:^6.0.7"
@@ -2282,7 +2282,7 @@ __metadata:
   dependencies:
     "@effect/platform": "npm:^0.90.7"
     "@effect/vitest": "npm:^0.25.1"
-    "@types/node": "npm:^22.10.2"
+    "@types/node": "npm:^24.3.1"
     "@vitest/coverage-v8": "npm:3.1.3"
     effect: "npm:^3.17.13"
     glob: "npm:^11.0.0"
@@ -2311,7 +2311,7 @@ __metadata:
     "@effect/sql": "npm:^0.44.2"
     "@effect/typeclass": "npm:^0.36.0"
     "@effect/vitest": "npm:0.25.1"
-    "@types/node": "npm:^22.5.2"
+    "@types/node": "npm:^24.3.1"
     "@vitest/coverage-v8": "npm:^3.2.4"
     effect: "npm:^3.17.13"
     tsup: "npm:^8.5.0"
@@ -2343,7 +2343,7 @@ __metadata:
     "@effect/sql": "npm:^0.44.2"
     "@effect/typeclass": "npm:^0.36.0"
     "@effect/vitest": "npm:0.25.1"
-    "@types/node": "npm:^22.5.2"
+    "@types/node": "npm:^24.3.1"
     "@vitest/coverage-v8": "npm:^3.2.4"
     effect: "npm:^3.17.13"
     tsup: "npm:^8.5.0"
@@ -2362,7 +2362,7 @@ __metadata:
     "@blocksense/base-utils": "workspace:*"
     "@octokit/request-error": "npm:^7.0.0"
     "@octokit/rest": "npm:21.1.1"
-    "@types/node": "npm:^22.10.2"
+    "@types/node": "npm:^24.3.1"
     "@vitest/coverage-v8": "npm:^3.2.4"
     effect: "npm:^3.17.13"
     glob: "npm:^11.0.0"
@@ -2401,7 +2401,7 @@ __metadata:
     "@types/chai": "npm:4"
     "@types/ejs": "npm:^3"
     "@types/mocha": "npm:^10.0.10"
-    "@types/node": "npm:^22.10.2"
+    "@types/node": "npm:^24.3.1"
     chai: "npm:4"
     dotenv: "npm:^16.4.7"
     effect: "npm:^3.17.13"
@@ -2439,7 +2439,7 @@ __metadata:
     "@effect/sql": "npm:^0.44.2"
     "@effect/typeclass": "npm:^0.36.0"
     "@octokit/rest": "npm:^21.1.1"
-    "@types/node": "npm:^22.10.2"
+    "@types/node": "npm:^24.3.1"
     "@vitest/coverage-v8": "npm:^3.2.4"
     effect: "npm:^3.17.13"
     glob: "npm:^11.0.0"
@@ -2502,7 +2502,7 @@ __metadata:
     "@effect/platform": "npm:^0.90.7"
     "@tailwindcss/postcss": "npm:^4.0.7"
     "@theguild/remark-mermaid": "npm:^0.1.3"
-    "@types/node": "npm:^22.10.2"
+    "@types/node": "npm:^24.3.1"
     "@types/react": "npm:^18.3.3"
     autoprefixer: "npm:^10.4.20"
     clsx: "npm:^2.1.1"
@@ -2544,7 +2544,7 @@ __metadata:
     "@effect/rpc": "npm:^0.69.2"
     "@effect/sql": "npm:^0.44.2"
     "@effect/vitest": "npm:^0.25.1"
-    "@types/node": "npm:^22.3.0"
+    "@types/node": "npm:^24.3.1"
     "@vitest/coverage-v8": "npm:^3.2.4"
     effect: "npm:^3.17.13"
     execa: "npm:^9.5.2"
@@ -2565,7 +2565,7 @@ __metadata:
     "@eslint/compat": "npm:1.3.0"
     "@eslint/eslintrc": "npm:3.3.1"
     "@eslint/js": "npm:9.28.0"
-    "@types/node": "npm:^22.14.1"
+    "@types/node": "npm:^24.3.1"
     "@typescript-eslint/eslint-plugin": "npm:^8.4.0"
     "@typescript-eslint/parser": "npm:^8.4.0"
     eslint: "npm:^9.28.0"
@@ -2635,7 +2635,7 @@ __metadata:
     "@effect/platform": "npm:^0.90.7"
     "@next/third-parties": "npm:^15.3.1"
     "@tailwindcss/postcss": "npm:^4.0.7"
-    "@types/node": "npm:^22.10.2"
+    "@types/node": "npm:^24.3.1"
     "@types/react": "npm:^18.3.3"
     clsx: "npm:^2.1.1"
     effect: "npm:^3.17.13"
@@ -2664,7 +2664,7 @@ __metadata:
     "@blocksense/base-utils": "workspace:*"
     "@blocksense/contracts": "workspace:*"
     "@types/express": "npm:^5"
-    "@types/node": "npm:^22.10.1"
+    "@types/node": "npm:^24.3.1"
     "@types/yargs": "npm:^17.0.33"
     "@vitest/coverage-v8": "npm:^3.2.4"
     axios: "npm:^1.7.9"
@@ -2727,7 +2727,7 @@ __metadata:
   dependencies:
     "@blocksense/base-utils": "workspace:*"
     "@types/mocha": "npm:^10.0.10"
-    "@types/node": "npm:^22.10.2"
+    "@types/node": "npm:^24.3.1"
     hardhat: "npm:^2.22.17"
     prettier: "npm:^3.4.2"
     prettier-plugin-solidity: "npm:^1.4.1"
@@ -2753,7 +2753,7 @@ __metadata:
     "@storybook/addon-docs": "npm:^9.0.14"
     "@storybook/nextjs-vite": "npm:^9.0.15"
     "@tailwindcss/postcss": "npm:^4"
-    "@types/node": "npm:^24"
+    "@types/node": "npm:^24.3.1"
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
     "@vitest/coverage-v8": "npm:^3.2.4"
@@ -12637,48 +12637,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^22.10.1, @types/node@npm:^22.10.2":
-  version: 22.10.2
-  resolution: "@types/node@npm:22.10.2"
+"@types/node@npm:^24.3.1":
+  version: 24.3.1
+  resolution: "@types/node@npm:24.3.1"
   dependencies:
-    undici-types: "npm:~6.20.0"
-  checksum: 10c0/2c7b71a040f1ef5320938eca8ebc946e6905caa9bbf3d5665d9b3774a8d15ea9fab1582b849a6d28c7fc80756a62c5666bc66b69f42f4d5dafd1ccb193cdb4ac
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^22.14.1, @types/node@npm:^22.3.0":
-  version: 22.14.1
-  resolution: "@types/node@npm:22.14.1"
-  dependencies:
-    undici-types: "npm:~6.21.0"
-  checksum: 10c0/d49c4d00403b1c2348cf0701b505fd636d80aabe18102105998dc62fdd36dcaf911e73c7a868c48c21c1022b825c67b475b65b1222d84b704d8244d152bb7f86
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^22.5.2":
-  version: 22.15.31
-  resolution: "@types/node@npm:22.15.31"
-  dependencies:
-    undici-types: "npm:~6.21.0"
-  checksum: 10c0/ef7d5dc890da41cfd554d35ab8998bc18be9e3a0caa642e720599ac4410a94a4879766e52b3c9cafa06c66b7b8aebdc51f322cf67df23a6489927890196a316d
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^24":
-  version: 24.0.10
-  resolution: "@types/node@npm:24.0.10"
-  dependencies:
-    undici-types: "npm:~7.8.0"
-  checksum: 10c0/11dbd869d3e12ee7b7818113588950e538783e45d227122174c763cb05977defbd1e01b44b5ccd4b8997e42c3df7f7b83c6ee05cfa43d924c8882886bc5f6582
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^24.0.4":
-  version: 24.0.4
-  resolution: "@types/node@npm:24.0.4"
-  dependencies:
-    undici-types: "npm:~7.8.0"
-  checksum: 10c0/590e8cb0ec59fb9cd566402120e690d87ecbdf57f1ee2b8493266121ed33aa4b25949a0c6156b84a6ffb9250baaf1f80e9af142da542ed603e6ee73fc4d1115f
+    undici-types: "npm:~7.10.0"
+  checksum: 10c0/99b86fc32294fcd61136ca1f771026443a1e370e9f284f75e243b29299dd878e18c193deba1ce29a374932db4e30eb80826e1049b9aad02d36f5c30b94b6f928
   languageName: node
   linkType: hard
 
@@ -18801,7 +18765,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "esbuild-react-compiler-plugin@workspace:libs/ts/esbuild-react-compiler-plugin"
   dependencies:
-    "@types/node": "npm:^22.10.2"
+    "@types/node": "npm:^24.3.1"
     babel-plugin-react-compiler: "npm:0.0.0-experimental-22c6e49-20241219"
     react-compiler-webpack: "npm:0.1.2"
     tsup: "npm:8.3.5"
@@ -33515,10 +33479,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:~7.8.0":
-  version: 7.8.0
-  resolution: "undici-types@npm:7.8.0"
-  checksum: 10c0/9d9d246d1dc32f318d46116efe3cfca5a72d4f16828febc1918d94e58f6ffcf39c158aa28bf5b4fc52f410446bc7858f35151367bd7a49f21746cab6497b709b
+"undici-types@npm:~7.10.0":
+  version: 7.10.0
+  resolution: "undici-types@npm:7.10.0"
+  checksum: 10c0/8b00ce50e235fe3cc601307f148b5e8fb427092ee3b23e8118ec0a5d7f68eca8cee468c8fc9f15cbb2cf2a3797945ebceb1cbd9732306a1d00e0a9b6afa0f635
   languageName: node
   linkType: hard
 
