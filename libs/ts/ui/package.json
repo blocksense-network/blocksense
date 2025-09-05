@@ -35,7 +35,7 @@
     "react-dom": "^19.0.0",
     "storybook": "^9.0.14",
     "tailwindcss": "^4",
-    "typescript": "5.8.3",
+    "typescript": "5.9.2",
     "vite": "^7.0.0"
   },
   "dependencies": {
