@@ -46553,7 +46553,8 @@
         "market_hours": "",
         "arguments": {
           "kind": "borrow-rates",
-          "marketplace": "HypurrFi"
+          "marketplace": "HypurrFi",
+          "network": "hyperliquid-mainnet"
         }
       }
     },

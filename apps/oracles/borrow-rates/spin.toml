@@ -22,31 +22,31 @@ capabilities = []
 id = "102001"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"WHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"HypurrFi"}}'
+data = '{"pair":{"base":"WHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"HypurrFi", "network": "hyperevm-mainnet"}}'
 
 [[trigger.oracle.data_feeds]]
 id = "102002"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"wstHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"HypurrFi"}}'
+data = '{"pair":{"base":"wstHYPE","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"HypurrFi", "network": "hyperevm-mainnet"}}'
 
 [[trigger.oracle.data_feeds]]
 id = "102003"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"UBTC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"HypurrFi"}}'
+data = '{"pair":{"base":"UBTC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"HypurrFi", "network": "hyperevm-mainnet"}}'
 
 [[trigger.oracle.data_feeds]]
 id = "102004"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"UETH","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"HypurrFi"}}'
+data = '{"pair":{"base":"UETH","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"HypurrFi", "network": "hyperevm-mainnet"}}'
 
 [[trigger.oracle.data_feeds]]
 id = "102005"
 stride = 0
 decimals = 18
-data = '{"pair":{"base":"USDe","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"HypurrFi"}}'
+data = '{"pair":{"base":"USDe","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"HypurrFi", "network": "hyperevm-mainnet"}}'
 
 [[trigger.oracle.data_feeds]]
 id = "102051"

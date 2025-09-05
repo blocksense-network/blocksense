@@ -1,7 +1,7 @@
 use anyhow::Result;
 use futures::{stream::FuturesUnordered, StreamExt};
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use crate::{
     domain::{
@@ -21,10 +21,71 @@ use crate::{
 };
 use tracing::warn;
 
+/// Validates feeds configuration and filters out invalid feeds
+fn validate_feeds_config(
+    marketplace: Marketplace,
+    feeds_config: Option<&[FeedConfig]>,
+) -> Vec<FeedConfig> {
+    if feeds_config.is_none() {
+        warn!(
+            "No feeds configuration provided for marketplace {:?}",
+            marketplace
+        );
+        return Vec::new();
+    }
+
+    let feeds = feeds_config.unwrap();
+    let mut valid_feeds = Vec::new();
+
+    for feed in feeds {
+        if feed.arguments.network.is_none() {
+            warn!(
+                "Feed with ID {} for marketplace {:?} has no network field, skipping",
+                feed.feed_id, marketplace
+            );
+            continue;
+        }
+
+        valid_feeds.push(feed.clone());
+    }
+
+    if valid_feeds.is_empty() {
+        warn!(
+            "No valid feeds found for marketplace {:?} after validation",
+            marketplace
+        );
+    }
+
+    valid_feeds
+}
+
+/// Extracts unique networks from validated feeds configuration
+fn extract_unique_networks(feeds_config: &[FeedConfig]) -> Vec<String> {
+    let mut networks: HashSet<String> = HashSet::new();
+
+    for feed in feeds_config {
+        if let Some(ref network) = feed.arguments.network {
+            networks.insert(network.clone());
+        }
+    }
+
+    networks.into_iter().collect()
+}
+
 async fn fetch_market<'a>(
     which: Marketplace,
     feeds_config: Option<&'a [FeedConfig]>,
 ) -> Result<(Marketplace, Result<RatesPerFeed>)> {
+    // Validate feeds configuration and extract unique networks
+    let validated_feeds_config = validate_feeds_config(which, feeds_config);
+    let unique_networks = extract_unique_networks(&validated_feeds_config);
+
+    tracing::info!(
+        "Marketplace {:?} will use networks: {:?}",
+        which,
+        unique_networks
+    );
+
     match which {
         Marketplace::HypurrFi => {
             let rates_info = fetch_reserves(plan_for::<HypurrFiUi>(
@@ -34,7 +95,7 @@ async fn fetch_market<'a>(
             .await?;
             Ok((
                 Marketplace::HypurrFi,
-                Ok(map_assets_to_feeds(rates_info, feeds_config.unwrap_or(&[]))),
+                Ok(map_assets_to_feeds(rates_info, &validated_feeds_config)),
             ))
         }
         Marketplace::HyperLend => {
@@ -45,10 +106,7 @@ async fn fetch_market<'a>(
             .await?;
             Ok((
                 Marketplace::HyperLend,
-                Ok(map_assets_to_feeds(
-                    rates_info,
-                    feeds_config.unwrap_or(&Vec::new()),
-                )),
+                Ok(map_assets_to_feeds(rates_info, &validated_feeds_config)),
             ))
         }
         Marketplace::HyperDrive => Ok((
@@ -58,7 +116,7 @@ async fn fetch_market<'a>(
 
         Marketplace::EulerFinance => Ok((
             Marketplace::EulerFinance,
-            fetch_borrow_rates_from_euler(feeds_config).await,
+            fetch_borrow_rates_from_euler(Some(&validated_feeds_config)).await,
         )),
     }
 }
