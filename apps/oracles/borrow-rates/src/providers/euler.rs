@@ -5,11 +5,11 @@ use alloy::providers::ProviderBuilder;
 use alloy::sol_types::SolCall;
 use anyhow::Result;
 use futures::{stream::FuturesUnordered, StreamExt};
-use url::Url;
 use tracing::warn;
+use url::Url;
 
 use crate::domain::{BorrowRateInfo, FeedConfig, RatesPerFeed};
-use crate::providers::pool_data_provider::{MyProvider, ETHEREUM_MAINNET_RPC_URL};
+use crate::providers::types::{MyProvider, RPC_URL_ETHEREUM_MAINNET};
 use crate::utils::math::apr_continuous;
 use blocksense_sdk::eth_rpc::eth_call;
 
@@ -33,7 +33,7 @@ async fn fetch_borrow_rate(
     let call = instance.getAPYs(vault_address);
     let calldata = call.calldata();
     let raw = eth_call(
-        ETHEREUM_MAINNET_RPC_URL,
+        RPC_URL_ETHEREUM_MAINNET,
         &format!("{:?}", lens_address),
         calldata,
     )
@@ -70,7 +70,7 @@ pub async fn fetch_borrow_rates_from_euler(
 async fn fetch_borrow_rates_on_ethereum_mainnet(feeds: &[FeedConfig]) -> Result<RatesPerFeed> {
     let mut borrow_rates: RatesPerFeed = RatesPerFeed::new();
 
-    let rpc_url = Url::parse(ETHEREUM_MAINNET_RPC_URL)?;
+    let rpc_url = Url::parse(RPC_URL_ETHEREUM_MAINNET)?;
     let provider = Arc::new(ProviderBuilder::new().connect_http(rpc_url.clone()));
 
     let mut futures = FuturesUnordered::new();

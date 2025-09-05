@@ -2,7 +2,8 @@ use alloy::primitives::{address, Address, Bytes, U256};
 use alloy::sol_types::SolCall;
 use anyhow::Result;
 
-use crate::providers::pool_data_provider::{MyProvider, ReserveLike, UiPool};
+use crate::providers::pool_data_provider::{ReserveLike, UiPool};
+use crate::providers::types::MyProvider;
 
 pub const HYPURRFI_UI_POOL_DATA_PROVIDER: Address =
     address!("0x7b883191011AEAe40581d3Fa1B112413808C9c00");
