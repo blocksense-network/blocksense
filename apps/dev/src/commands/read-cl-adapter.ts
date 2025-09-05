@@ -1,12 +1,12 @@
+import { Command, Options } from '@effect/cli';
+import { Effect, Option } from 'effect';
+
 import {
   getAddressExplorerUrl,
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
 import { renderTui, drawTable } from '@blocksense/base-utils/tty';
 import { listEvmNetworks, readEvmDeployment } from '@blocksense/config-types';
-import { Command, Options } from '@effect/cli';
-import { Effect, Option } from 'effect';
-
 import {
   CLAggregatorAdapterConsumer,
   type CLAggregatorAdapterData,
@@ -59,10 +59,55 @@ export const readClAdapter = Command.make(
             network,
           );
 
-      // Fetch aggregated data in one shot
-      const data = yield* Effect.tryPromise<CLAggregatorAdapterData>(() =>
-        consumer.getCLAggregatorAdapterData(),
-      );
+      const data: CLAggregatorAdapterData | undefined =
+        yield* Effect.tryPromise<CLAggregatorAdapterData>(() =>
+          consumer.getCLAggregatorAdapterData(),
+        ).pipe(
+          Effect.catchAll(err => {
+            const message = (err as Error)?.message ?? String(err);
+            const cause = message.concat(` ${err.cause}`);
+            if (cause.includes('multicall')) {
+              return Effect.all(
+                {
+                  dataFeedStore: Effect.tryPromise(() =>
+                    consumer.getDataFeedStore(),
+                  ),
+                  decimals: Effect.tryPromise(() => consumer.getDecimals()),
+                  description: Effect.tryPromise(() =>
+                    consumer.getDescription(),
+                  ),
+                  id: Effect.tryPromise(() => consumer.getId()),
+                  latestAnswer: Effect.tryPromise(() =>
+                    consumer.getLatestAnswer(),
+                  ),
+                  latestRound: Effect.tryPromise(() =>
+                    consumer.getLatestRound(),
+                  ),
+                  latestRoundData: Effect.tryPromise(() =>
+                    consumer.getLatestRoundData(),
+                  ),
+                },
+                { concurrency: 'unbounded' },
+              ).pipe(
+                Effect.mapError(
+                  e => new Error(String((e as any)?.message ?? e)),
+                ),
+                Effect.map(r =>
+                  (r satisfies CLAggregatorAdapterData)
+                    ? r
+                    : (r as CLAggregatorAdapterData),
+                ),
+                Effect.catchAll(() => Effect.succeed(undefined)),
+              );
+            }
+            throw new Error(
+              `Error fetching data:\nMessage: ${message}\nCause: ${cause}`,
+            );
+          }),
+        );
+
+      if (!data)
+        throw new Error('Failed to fetch data from CLAggregatorAdapter');
 
       const addrBranded = parseEthereumAddress(resolvedAddress);
       const rows: Array<[string, string]> = [
