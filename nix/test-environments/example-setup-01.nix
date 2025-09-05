@@ -32,12 +32,12 @@ in
       ethereum-sepolia = {
         port = 8546;
         chain-id = 99999999999;
-        fork-url = "wss://ethereum-sepolia-rpc.publicnode.com";
+        fork-url = "$RPC_URL_ETHEREUM_SEPOLIA";
       };
       ink-sepolia = {
         port = 8547;
         chain-id = 99999999999;
-        fork-url = "wss://ws-gel-sepolia.inkonchain.com";
+        fork-url = "$RPC_URL_INK_SEPOLIA";
       };
     };
 
