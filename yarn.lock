@@ -2368,7 +2368,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/contracts@workspace:*, @blocksense/contracts@workspace:libs/ts/contracts":
+"@blocksense/contracts@workspace:*, @blocksense/contracts@workspace:^, @blocksense/contracts@workspace:libs/ts/contracts":
   version: 0.0.0-use.local
   resolution: "@blocksense/contracts@workspace:libs/ts/contracts"
   dependencies:
@@ -2453,6 +2453,7 @@ __metadata:
   dependencies:
     "@blocksense/base-utils": "workspace:^"
     "@blocksense/config-types": "workspace:^"
+    "@blocksense/contracts": "workspace:^"
     "@changesets/changelog-github": "npm:^0.5.1"
     "@changesets/cli": "npm:^2.29.4"
     "@effect/cli": "npm:0.69.2"
