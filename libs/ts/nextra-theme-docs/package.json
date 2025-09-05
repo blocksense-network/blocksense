@@ -55,7 +55,7 @@
     "postcss": "^8.4.49",
     "react": "19.0.0",
     "tailwindcss": "^4.0.7",
-    "tsup": "8.3.5",
+    "tsup": "8.5.0",
     "typescript": "5.9.2",
     "vitest": "^3.2.4"
   },
