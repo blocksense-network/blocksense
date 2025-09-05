@@ -37,7 +37,7 @@
     "@changesets/cli": "^2.29.4",
     "@effect/language-service": "^0.38.1",
     "@effect/vitest": "0.25.1",
-    "@types/node": "^24.0.4",
+    "@types/node": "^24.3.1",
     "@vitest/coverage-v8": "^3.2.4",
     "ts-node": "^10.9.2",
     "tsup": "^8.5.0",

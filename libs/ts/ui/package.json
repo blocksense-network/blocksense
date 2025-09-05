@@ -23,7 +23,7 @@
     "@storybook/addon-docs": "^9.0.14",
     "@storybook/nextjs-vite": "^9.0.15",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^24",
+    "@types/node": "^24.3.1",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitest/coverage-v8": "^3.2.4",
