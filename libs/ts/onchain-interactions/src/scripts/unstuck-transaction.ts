@@ -2,7 +2,7 @@ import assert from 'node:assert';
 import yargs from 'yargs';
 import Web3 from 'web3';
 import { hideBin } from 'yargs/helpers';
-import chalk from 'chalk';
+import { color as c } from '@blocksense/base-utils/tty';
 import fs from 'fs/promises';
 
 import {
@@ -50,9 +50,9 @@ async function getWeb3(
     return { web3, account: parsedAccount, signer: accountFromKey };
   } catch (error) {
     if (error instanceof Error) {
-      throw new Error(chalk.red(`Error in getEthers: ${error.message}`));
+      throw new Error(c`{red Error in getEthers: ${(error as Error).message}}`);
     } else {
-      throw new Error(chalk.red('Unknown error occurred in getEthers.'));
+      throw new Error(c`{red Unknown error occurred in getEthers.}`);
     }
   }
 }
@@ -70,15 +70,15 @@ async function replaceTransaction(
   const nextNonce = await web3.eth.getTransactionCount(account, 'latest');
   const chainID = await web3.eth.getChainId();
 
-  console.log(chalk.blue(`Resetting nonce for account: '${account}'`));
-  console.log(chalk.blue(`On chainID: '${chainID}'`));
-  console.log(chalk.blue(`Latest nonce: ${nextNonce}`));
+  console.log(c`{blue Resetting nonce for account: '${account}'}`);
+  console.log(c`{blue On chainID: '${chainID}'}`);
+  console.log(c`{blue Latest nonce: ${nextNonce}}`);
 
   let currentGasPrice = await web3.eth.getGasPrice();
   let multiplier = 1.4;
 
   console.log(
-    chalk.magenta('Sending replacement transaction with higher priority...'),
+    c`{magenta Sending replacement transaction with higher priority...}`,
   );
 
   const txData = {
@@ -90,7 +90,7 @@ async function replaceTransaction(
     gasPrice: Math.floor(Number(currentGasPrice) * multiplier).toString(),
   };
 
-  console.log(chalk.magenta('Transaction data:'), txData);
+  console.log(c`{magenta Transaction data:}`, txData);
 
   while (multiplier <= 4) {
     try {
@@ -102,28 +102,26 @@ async function replaceTransaction(
         signedTx.rawTransaction,
       );
 
-      console.log(chalk.green('Tx hash:'), receipt.transactionHash);
-      console.log(chalk.green('Transaction confirmed'));
+      console.log(c`{green Tx hash:}`, receipt.transactionHash);
+      console.log(c`{green Transaction confirmed}`);
       break;
     } catch (error) {
       if (error instanceof Error && error.message.includes('underpriced')) {
       } else {
         console.error(
-          chalk.red(`Transaction failed at multiplier ${multiplier}:`),
+          c`{red Transaction failed at multiplier ${multiplier}:}`,
           error,
         );
       }
 
       multiplier += 0.2;
       if (multiplier > 4) {
-        console.error(chalk.red('Maximum multiplier reached, aborting.'));
+        console.error(c`{red Maximum multiplier reached, aborting.}`);
         break;
       }
 
       console.log(
-        chalk.yellow(
-          `Retrying with higher gas price (x${multiplier.toFixed(1)})...`,
-        ),
+        c`{yellow Retrying with higher gas price (x${multiplier.toFixed(1)})...}`,
       );
       txData.gasPrice = Math.floor(
         Number(currentGasPrice) * multiplier,
@@ -170,11 +168,9 @@ const main = async (): Promise<void> => {
   const address = parseEthereumAddress(rawAddress);
 
   console.log(
-    chalk.cyan(
-      `Using Ethereum address: ${address} (sequencer: ${
-        address === sequencerAddress
-      })\n`,
-    ),
+    c`{cyan Using Ethereum address: ${address} (sequencer: ${
+      address === sequencerAddress
+    })}\n`,
   );
 
   try {
@@ -184,7 +180,7 @@ const main = async (): Promise<void> => {
       privateKey,
     );
 
-    console.log(chalk.green('Successfully connected to Web3.'));
+    console.log(c`{green Successfully connected to Web3.}`);
 
     let pendingNonce = await web3.eth.getTransactionCount(account, 'pending');
     let latestNonce = await web3.eth.getTransactionCount(account, 'latest');
@@ -221,16 +217,16 @@ const main = async (): Promise<void> => {
     }
   } catch (error) {
     if (error instanceof Error) {
-      console.error(chalk.red(`Error in main: ${error.message}`));
+      console.error(c`{red Error in main: ${(error as Error).message}}`);
     } else {
-      console.error(chalk.red('Unknown error occurred in main.'));
+      console.error(c`{red Unknown error occurred in main.}`);
     }
   }
 };
 
 main().catch(err => {
   console.error(
-    chalk.red('Unhandled error:'),
+    c`{red Unhandled error:}`,
     err instanceof Error ? err.message : err,
   );
   process.exit(1);
