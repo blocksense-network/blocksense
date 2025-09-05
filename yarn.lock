@@ -2707,6 +2707,7 @@ __metadata:
   resolution: "@blocksense/social-verification@workspace:apps/social-verification"
   dependencies:
     "@blocksense/base-utils": "workspace:*"
+    "@blocksense/ui": "workspace:*"
     "@cloudflare/vitest-pool-workers": "npm:^0.7.5"
     "@cloudflare/workers-types": "npm:^4.20250423.0"
     "@effect/platform": "npm:^0.80.13"
