@@ -34,12 +34,12 @@ const deployerSchema = {
 
   perNetworkKind: {
     deployerAddressIsLedger: asVarSchema(S.BooleanFromString),
-    deployerAddress: ethereumAddress,
+    deployerAddress: asVarSchema(ethereumAddress),
   },
 
   perNetworkName: {
     deployerAddressIsLedger: asVarSchema(S.BooleanFromString),
-    deployerAddress: ethereumAddress,
+    deployerAddress: asVarSchema(ethereumAddress),
   },
 } satisfies DeploymentEnvSchema;
 

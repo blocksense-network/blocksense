@@ -7,6 +7,7 @@ import { hexlify, toUtf8Bytes } from 'ethers';
 
 import { NetworkConfig } from '../types';
 import { checkAddressExists } from '../utils';
+import { parseHexDataString } from '@blocksense/base-utils';
 
 type Params = {
   config: NetworkConfig;
@@ -67,7 +68,7 @@ export async function deployMultisig({ config, type }: Params): Promise<Safe> {
     const transactionHash = await config.deployer.sendTransaction({
       to: deploymentTransaction.to,
       value: BigInt(deploymentTransaction.value),
-      data: deploymentTransaction.data as `0x${string}`,
+      data: parseHexDataString(deploymentTransaction.data),
     });
 
     const transactionReceipt = await config.provider.waitForTransaction(

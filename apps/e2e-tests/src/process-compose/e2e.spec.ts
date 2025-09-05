@@ -2,7 +2,6 @@ import { Effect, Exit, Layer, pipe, Schedule } from 'effect';
 import { afterAll, beforeAll, describe, expect, it } from '@effect/vitest';
 import { deepStrictEqual } from 'assert';
 
-import { getProcessComposeLogsFiles } from '@blocksense/base-utils/env';
 import {
   entriesOf,
   fromEntries,
@@ -10,6 +9,11 @@ import {
   mapValues,
   valuesOf,
 } from '@blocksense/base-utils/array-iter';
+import { getProcessComposeLogsFiles } from '@blocksense/base-utils/env';
+import {
+  parseEthereumAddress,
+  type EthereumAddress,
+} from '@blocksense/base-utils/evm';
 import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
 import type { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 
@@ -33,7 +37,7 @@ describe.sequential('E2E Tests with process-compose', () => {
   const MAX_HISTORY_ELEMENTS_PER_FEED = 8192;
 
   let feedIdsFromConfig: Array<bigint>;
-  let contractAddressFromConfig: `0x${string}`;
+  let contractAddressFromConfig: EthereumAddress;
 
   let sequencer: SequencerService;
   let processCompose: ProcessComposeService;
@@ -43,7 +47,7 @@ describe.sequential('E2E Tests with process-compose', () => {
   let feedsConfig: NewFeedsConfig;
 
   let feedIds: Array<bigint>;
-  let contractAddress: `0x${string}`;
+  let contractAddress: EthereumAddress;
 
   let updatesToNetworks = {} as UpdatesToNetwork;
   let initialFeedsInfo: FeedsValueAndRound;
@@ -116,9 +120,11 @@ describe.sequential('E2E Tests with process-compose', () => {
       expect(sequencerConfig).toBeTypeOf('object');
       expect(feedsConfig).toBeTypeOf('object');
 
-      contractAddress = sequencerConfig.providers[network].contracts.find(
-        c => c.name === 'AggregatedDataFeedStore',
-      )!.address as `0x${string}`;
+      contractAddress = parseEthereumAddress(
+        sequencerConfig.providers[network].contracts.find(
+          c => c.name === 'AggregatedDataFeedStore',
+        )?.address,
+      );
 
       expect(contractAddress).toEqual(contractAddressFromConfig);
 

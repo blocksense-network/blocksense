@@ -25,20 +25,20 @@ import type { NetworkConfig } from '../types';
 
 const sharedPerNetworkKind = {
   deployerAddressIsLedger: asVarSchema(S.BooleanFromString),
-  deployerAddress: ethereumAddress,
+  deployerAddress: asVarSchema(ethereumAddress),
   deployerPrivateKey: hexDataString,
 
   adfsUpgradeableProxySalt: asVarSchema(hexDataString),
 
   adminMultisigThreshold: S.NumberFromString,
-  adminMultisigOwners: fromCommaSeparatedString(ethereumAddress),
+  adminMultisigOwners: fromCommaSeparatedString(asVarSchema(ethereumAddress)),
 
-  sequencerAddress: ethereumAddress,
+  sequencerAddress: asVarSchema(ethereumAddress),
 
   reporterMultisigEnable: asVarSchema(S.BooleanFromString),
   reporterMultisigThreshold: S.NumberFromString,
   reporterMultisigSigners: asVarSchema(
-    fromCommaSeparatedString(ethereumAddress),
+    fromCommaSeparatedString(asVarSchema(ethereumAddress)),
   ),
 
   isSafeOriginalDeployment: asVarSchema(S.BooleanFromString),

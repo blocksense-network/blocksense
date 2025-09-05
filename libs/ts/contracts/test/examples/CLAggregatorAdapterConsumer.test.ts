@@ -14,6 +14,7 @@ import {
 } from '../utils/wrappers';
 import { encodeDataAndTimestamp } from '../utils/helpers/common';
 import { CLAggregatorAdapterConsumer as CLAggregatorAdapterConsumerViem } from '../../lib/viem/CLAggregatorAdapter';
+import { parseEthereumAddress } from '@blocksense/base-utils';
 
 describe('Example: CLAggregatorAdapterConsumer', function () {
   let clAggregatorAdapter: CLAdapterWrapper;
@@ -48,7 +49,7 @@ describe('Example: CLAggregatorAdapterConsumer', function () {
 
     const viemPublicClient = await viem.getPublicClient();
     clAggregatorAdapterViem = new CLAggregatorAdapterConsumerViem(
-      clAggregatorAdapter.contract.target as `0x${string}`,
+      parseEthereumAddress(clAggregatorAdapter.contract.target),
       viemPublicClient,
     );
   });
