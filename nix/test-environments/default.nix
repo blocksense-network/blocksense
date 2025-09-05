@@ -1,10 +1,14 @@
-{ self, ... }:
+{
+  self,
+  lib,
+  ...
+}:
 {
   perSystem =
     {
       pkgs,
       config,
-      lib,
+      self',
       ...
     }:
     let
@@ -102,5 +106,58 @@
           ))
           lib.listToAttrs
         ];
+      packages = {
+        inherit (self'.legacyPackages.process-compose-environments.with-local-cargo-artifacts) all;
+      };
+
+      legacyPackages.nixosTests = {
+        # example-setup-03 is faster than example-setup-01, so we use it as the default test environment.
+        blocksense = pkgs.testers.runNixOSTest {
+          name = "blocksense";
+          enableOCR = true;
+          nodes.machine = {
+            imports = [
+              self.nixosModules.blocksense-systemd
+              ./test-setup.nix
+              self.nixosModules.example-setup-vm
+              {
+                virtualisation = {
+                  memorySize = 16 * 1024;
+                  cores = 4;
+                  forwardPorts = [
+                    {
+                      from = "host";
+                      host.port = 2000;
+                      guest.port = 22;
+                    }
+                  ];
+                };
+
+                services.openssh = {
+                  enable = true;
+                  settings = {
+                    PermitRootLogin = "yes";
+                    PermitEmptyPasswords = "yes";
+                  };
+                };
+
+                security.pam.services.sshd.allowNullPassword = true;
+                networking.nameservers = [ "8.8.8.8" ];
+                environment.systemPackages = [ pkgs.jq ];
+                # environment.variables =
+                #   builtins.readDir ./test-keys
+                #   |> builtins.attrNames
+                #   |> builtins.filter (x: x == lib.toUpper x)
+                #   |> builtins.map (x: {
+                #     name = x;
+                #     value = "x";
+                #   })
+                #   |> builtins.listToAttrs;
+              }
+            ];
+          };
+          testScript = builtins.readFile ./test-script.py;
+        };
+      };
     };
 }
