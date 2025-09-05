@@ -25,7 +25,7 @@ export const deployedNetworks = [
   'fraxtal-testnet',
   'harmony-testnet-shard0',
   'hemi-sepolia',
-  'hyperliquid-evm-testnet',
+  'hyperevm-testnet',
   'inevm-testnet',
   'ink-sepolia',
   'kava-testnet',

@@ -1,5 +1,5 @@
 {
-  "network": "hyperliquid-evm-testnet",
+  "network": "hyperevm-testnet",
   "chainId": "998",
   "contracts": {
     "coreContracts": {
