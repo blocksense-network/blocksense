@@ -2415,7 +2415,6 @@ __metadata:
     "@nomicfoundation/hardhat-toolbox": "npm:^5.0.0"
     "@nomicfoundation/hardhat-verify": "npm:^2.0.12"
     "@nomicfoundation/hardhat-viem": "npm:^2.0.6"
-    "@nomiclabs/hardhat-ethers": "npm:^2.2.3"
     "@openzeppelin/contracts": "npm:^5.1.0"
     "@safe-global/api-kit": "npm:^4.0.0"
     "@safe-global/protocol-kit": "npm:^6.1.0"
@@ -2437,8 +2436,6 @@ __metadata:
     hardhat: "npm:^2.22.17"
     hardhat-contract-sizer: "npm:^2.10.0"
     hardhat-gas-reporter: "npm:^2.2.1"
-    prettier: "npm:^3.4.1"
-    prettier-plugin-solidity: "npm:^1.4.1"
     solidity-coverage: "npm:^0.8.12"
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
@@ -2476,6 +2473,38 @@ __metadata:
     vitest: "npm:^3.2.4"
     web3: "npm:^4.16.0"
     yahoo-finance2: "npm:^2.13.2"
+  languageName: unknown
+  linkType: soft
+
+"@blocksense/decoders@workspace:libs/ts/decoders":
+  version: 0.0.0-use.local
+  resolution: "@blocksense/decoders@workspace:libs/ts/decoders"
+  dependencies:
+    "@blocksense/base-utils": "workspace:*"
+    "@blocksense/contracts": "workspace:*"
+    "@chainsafe/ssz": "npm:^1.0.2"
+    "@nomicfoundation/hardhat-chai-matchers": "npm:^2.0.8"
+    "@nomicfoundation/hardhat-ethers": "npm:^3.0.8"
+    "@nomicfoundation/hardhat-network-helpers": "npm:^1.0.12"
+    "@nomicfoundation/hardhat-toolbox": "npm:^5.0.0"
+    "@typechain/ethers-v6": "npm:^0.5.1"
+    "@typechain/hardhat": "npm:^9.1.0"
+    "@types/chai": "npm:4"
+    "@types/ejs": "npm:^3"
+    "@types/mocha": "npm:^10.0.10"
+    "@types/node": "npm:^22.10.2"
+    chai: "npm:4"
+    dotenv: "npm:^16.4.7"
+    ejs: "npm:^3.1.10"
+    ethers: "npm:^6.13.4"
+    hardhat: "npm:^2.22.17"
+    hardhat-dependency-compiler: "npm:^1.2.1"
+    prettier: "npm:^3.4.1"
+    prettier-plugin-solidity: "npm:^1.4.1"
+    ts-node: "npm:^10.9.2"
+    tslib: "npm:^2.8.1"
+    tsx: "npm:^4.19.2"
+    typechain: "npm:^8.3.2"
   languageName: unknown
   linkType: soft
 
@@ -2608,7 +2637,7 @@ __metadata:
     typescript: "npm:5.9.2"
     wrangler: "npm:^4.15.2"
   dependenciesMeta:
-    "@openzeppelin/contracts@5.0.2":
+    "@openzeppelin/contracts@5.1.0":
       unplugged: true
     next@14.2.5:
       unplugged: true
@@ -7130,16 +7159,6 @@ __metadata:
     "@nomicfoundation/solidity-analyzer-win32-x64-msvc":
       optional: true
   checksum: 10c0/1feee48a9506125d7736e3d1200d997cd07777f52ee6c71f7fad7d50b6705f7d3e028894968b449ca6e950991e726e9464ee5dc0c52d1066d127632be29667b4
-  languageName: node
-  linkType: hard
-
-"@nomiclabs/hardhat-ethers@npm:^2.2.3":
-  version: 2.2.3
-  resolution: "@nomiclabs/hardhat-ethers@npm:2.2.3"
-  peerDependencies:
-    ethers: ^5.0.0
-    hardhat: ^2.0.0
-  checksum: 10c0/cae46d1966108ab02b50fabe7945c8987fa1e9d5d0a7a06f79afc274ff1abc312e8a82375191a341b28571b897c22433d3a2826eb30077ed88d5983d01e381d0
   languageName: node
   linkType: hard
 
@@ -20609,6 +20628,15 @@ __metadata:
   peerDependencies:
     hardhat: ^2.0.0
   checksum: 10c0/c8bdb3e32c7e5a28bb6a00a2c786d768f471318dc6923c294e2775d69bb12f3c797af38545c8f8603109e293a137a6ba9b511964a35f7bc2356348225ffa2ff7
+  languageName: node
+  linkType: hard
+
+"hardhat-dependency-compiler@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "hardhat-dependency-compiler@npm:1.2.1"
+  peerDependencies:
+    hardhat: ^2.0.0
+  checksum: 10c0/d4373422849fe8851d06f1151f51fe17d00fb9f3425cc77cce53bd2d0c9f325d4f1520f2aa8eae305b3a0d012b9841b398d57c3f2d5e7a3d29b6dd4aaebc1f6e
   languageName: node
   linkType: hard
 

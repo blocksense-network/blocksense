@@ -8,10 +8,10 @@ export const generateDecoderStringBytes = (
   end: Offset,
   counter?: string,
 ) => {
-  const fieldName = schema.fieldName;
+  let fieldName = '_' + schema.fieldName;
 
   return `
-    // String/Bytes for ${fieldName}
+    // String/Bytes for ${schema.fieldName}
     {
       let ${fieldName}_size := sub(${end}, ${start})
       let ${fieldName} := mload(0x40)
@@ -25,10 +25,19 @@ export const generateDecoderStringBytes = (
       mstore(0x40, add(${fieldName}, and(add(${fieldName}_size, 64), 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFe0)))
       mstore(${fieldName}, ${fieldName}_size)
 
-      mcopy(
-        add(${fieldName}, 32),
-        add(data, ${start}),
-        ${fieldName}_size
+      let ${fieldName}_i := 32
+      for {
+      } lt(${fieldName}_i, ${fieldName}_size) {
+        ${fieldName}_i := add(${fieldName}_i, 32)
+      } {
+        mstore(
+          add(${fieldName}, ${fieldName}_i),
+          mload(add(data, add(${start}, sub(${fieldName}_i, 32))))
+        )
+      }
+      mstore(
+        add(${fieldName}, ${fieldName}_i),
+        mload(add(data, add(${start}, sub(${fieldName}_i, 32))))
       )
     }
   `;
