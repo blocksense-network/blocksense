@@ -49,13 +49,21 @@ export const readClAdapter = Command.make(
         resolvedAddress = entry.address;
       }
 
+      const contractAddress = yield* Effect.try({
+        try: () => parseEthereumAddress(resolvedAddress!),
+        catch: e =>
+          new Error(
+            `Invalid Ethereum address ${resolvedAddress}: ${(e as Error)?.message}`,
+          ),
+      });
+
       const consumer = Option.isSome(rpcUrl)
         ? CLAggregatorAdapterConsumer.createConsumerByRpcUrl(
-            resolvedAddress as `0x${string}`,
+            contractAddress,
             rpcUrl.value,
           )
         : CLAggregatorAdapterConsumer.createConsumerByNetworkName(
-            resolvedAddress as `0x${string}`,
+            contractAddress,
             network,
           );
 
@@ -109,11 +117,10 @@ export const readClAdapter = Command.make(
       if (!data)
         throw new Error('Failed to fetch data from CLAggregatorAdapter');
 
-      const addrBranded = parseEthereumAddress(resolvedAddress);
       const rows: Array<[string, string]> = [
         ['Network', network],
-        ['Address', resolvedAddress],
-        ['Explorer', getAddressExplorerUrl(network, addrBranded)],
+        ['Address', contractAddress],
+        ['Explorer', getAddressExplorerUrl(network, contractAddress)],
         ['Id', data.id.toString()],
         ['Description', data.description],
         ['Decimals', data.decimals.toString()],
