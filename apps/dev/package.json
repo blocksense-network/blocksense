@@ -1,9 +1,9 @@
 {
-  "name": "@blocksense/changelog-generator",
+  "name": "@blocksense/dev",
   "version": "0.1.0",
   "type": "module",
   "license": "MIT",
-  "description": "Blocksense Changelog Generator",
+  "description": "Blocksense Dev",
   "bin": "./dist/bin.cjs",
   "scripts": {
     "build": "tsup --dts --format esm && yarn copy-package-json",
