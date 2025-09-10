@@ -18,6 +18,7 @@ component = "borrow-rates"
 interval_time_in_seconds = 3
 capabilities = []
 
+
 [[trigger.oracle.data_feeds]]
 id = "102001"
 stride = 0
@@ -119,6 +120,36 @@ id = "102153"
 stride = 0
 decimals = 18
 data = '{"pair":{"base":"WETH","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"EulerFinance","network":"ethereum-mainnet","utils_lens_address":"0xB8cac3e5CaaC2042B79938aFe7FEA3f44e5afcC1","vault_address":"0xD8b27CF359b7D15710a5BE299AF6e7Bf904984C2"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102201"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"WETH","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"Aave","network":"ethereum-mainnet"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102202"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"weETH","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"Aave","network":"ethereum-mainnet"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102203"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"USDT","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"Aave","network":"ethereum-mainnet"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102204"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"wstETH","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"Aave","network":"ethereum-mainnet"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102205"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"USDC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"Aave","network":"ethereum-mainnet"}}'
 
 [component.borrow-rates]
 source = "../target/wasm32-wasip1/release/borrow_rates.wasm"
