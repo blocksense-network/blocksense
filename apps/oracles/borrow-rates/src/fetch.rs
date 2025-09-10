@@ -21,6 +21,7 @@ fn extract_unique_networks_from_feeds(feeds_config: &[FeedConfig]) -> Vec<Suppor
     feeds_config
         .iter()
         .filter_map(|feed| match &feed.arguments {
+            Marketplace::Aave(args) => Some(args.network),
             Marketplace::HypurrFi(args) => Some(args.network),
             Marketplace::HyperLend(args) => Some(args.network),
             Marketplace::EulerFinance(args) => Some(args.network),
@@ -36,7 +37,7 @@ async fn fetch_market<'a>(
     feeds_config: &'a [FeedConfig],
 ) -> Result<(MarketplaceType, Result<RatesPerFeed>)> {
     match marketplace_type {
-        MarketplaceType::HypurrFi | MarketplaceType::HyperLend => {
+        MarketplaceType::HypurrFi | MarketplaceType::HyperLend | MarketplaceType::Aave => {
             let mut result = (marketplace_type, Ok(RatesPerFeed::new()));
 
             let networks = extract_unique_networks_from_feeds(feeds_config);
@@ -63,7 +64,7 @@ async fn fetch_market<'a>(
 }
 
 pub async fn collect_borrow_rates(feeds_config: &Vec<FeedConfig>) -> Result<RatesPerFeed> {
-    let mut borrow_rates_per_marketplace:RatesPerFeedPerMarket = HashMap::new();
+    let mut borrow_rates_per_marketplace: RatesPerFeedPerMarket = HashMap::new();
 
     let grouped_feeds = group_feeds_by_marketplace_type(feeds_config);
 
