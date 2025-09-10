@@ -1,5 +1,18 @@
-pub const RPC_URL_HYPERLIQUID_MAINNET: &str = "https://rpc.hyperliquid.xyz/evm";
+use crate::domain::SupportedNetworks;
+use anyhow::Result;
+use url::Url;
+
+pub const RPC_URL_HYPEREVM_MAINNET: &str = "https://rpc.hyperliquid.xyz/evm";
 pub const RPC_URL_ETHEREUM_MAINNET: &str = "https://eth.llamarpc.com";
+
+pub fn get_rpc_url(network: &SupportedNetworks) -> Result<Url> {
+    match network {
+        SupportedNetworks::HyperevmMainnet => Url::parse(RPC_URL_HYPEREVM_MAINNET)
+            .map_err(|e| anyhow::Error::msg(format!("Invalid HyperevmMainnet RPC URL: {}", e))),
+        SupportedNetworks::EthereumMainnet => Url::parse(RPC_URL_ETHEREUM_MAINNET)
+            .map_err(|e| anyhow::Error::msg(format!("Invalid EthereumMainnet RPC URL: {}", e))),
+    }
+}
 
 pub type MyProvider = alloy::providers::fillers::FillProvider<
     alloy::providers::fillers::JoinFill<

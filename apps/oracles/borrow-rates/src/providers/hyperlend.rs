@@ -23,10 +23,14 @@ pub mod hyperlend {
 pub struct HyperLendUi;
 
 impl UiPool for HyperLendUi {
-    fn calldata(provider: MyProvider, ui: Address, addresses_provider: Address) -> Bytes {
-        let instance = hyperlend::HyperLandUiPoolDataProvider::new(ui, provider);
+    const UI_POOL_DATA_PROVIDER: Address = HYPERLAND_UI_POOL_DATA_PROVIDER;
+    const POOL_ADDRESSES_PROVIDER: Address = HYPERLAND_POOL_ADDRESSES_PROVIDER;
+
+    fn calldata(provider: MyProvider) -> Bytes {
+        let instance =
+            hyperlend::HyperLandUiPoolDataProvider::new(Self::UI_POOL_DATA_PROVIDER, provider);
         instance
-            .getReservesData(addresses_provider)
+            .getReservesData(Self::POOL_ADDRESSES_PROVIDER)
             .calldata()
             .clone()
     }

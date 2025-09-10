@@ -61,8 +61,9 @@ pub fn print_payload(payload: &Payload, resources: &[FeedConfig]) {
             Cell::new(feed.feed_id.to_string().as_str()),
             Cell::new(
                 format!(
-                    "{} Borrow Rate on {}",
-                    feed.pair.base, feed.arguments.marketplace
+                    "{} Borrow Rate on {:?}",
+                    feed.pair.base,
+                    feed.arguments.as_ref()
                 )
                 .as_str(),
             ),
