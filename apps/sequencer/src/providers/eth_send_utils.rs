@@ -7,7 +7,7 @@ use alloy::{
     providers::{Provider, ProviderBuilder},
     rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
-use alloy_primitives::{keccak256, U256};
+use alloy_primitives::{keccak256, B256, U256};
 use blocksense_config::{FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
@@ -302,6 +302,9 @@ pub async fn create_per_network_reorg_trackers(
 pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: SharedRpcProviders) {
     tracing::info!("Starting tracker for reorgs in network {net} loop...");
 
+    // Track last observed head to detect non-linear history
+    let mut last_head: Option<(B256, u64)> = None;
+
     loop {
         // Scope the lock on providers so we don't hold it across awaits/sleeps
         {
@@ -310,8 +313,174 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                 // Gather data and perform minimal work while holding the provider lock
                 let mut need_resync_indices = false;
                 let finalized_block_opt = {
-                    let provider = provider_mutex.lock().await;
-                    let rpc_handle = &provider.provider;
+                    let rpc_handle = {
+                        let provider = provider_mutex.lock().await;
+                        provider.provider.clone()
+                    };
+
+                    // Observe latest head and check continuity with previous head
+                    let latest_head_info = match rpc_handle
+                        .get_block_by_number(BlockNumberOrTag::Latest)
+                        .await
+                    {
+                        Ok(Some(b)) => {
+                            let h = b.header.hash;
+                            let parent_hash = b.header.inner.parent_hash;
+                            let n = b.header.inner.number;
+                            Some((h, parent_hash, n))
+                        }
+                        Ok(None) => None,
+                        Err(e) => {
+                            warn!("Failed to get latest block in `{net}`: {e:?}");
+                            None
+                        }
+                    };
+
+                    if let Some((latest_hash, latest_parent_hash, latest_number)) = latest_head_info
+                    {
+                        match last_head {
+                            None => {
+                                last_head = Some((latest_hash, latest_number));
+                            }
+                            Some((prev_hash, prev_number)) => {
+                                if latest_hash == prev_hash {
+                                    // unchanged head
+                                } else if latest_parent_hash == prev_hash
+                                    && latest_number == prev_number + 1
+                                {
+                                    // normal extension
+                                    last_head = Some((latest_hash, latest_number));
+                                } else {
+                                    // Potential reorg: find common ancestor and report
+                                    let mut new_hash = latest_hash;
+                                    let mut new_num = latest_number;
+                                    let mut old_hash = prev_hash;
+                                    let mut old_num = prev_number;
+
+                                    let mut new_path: Vec<(u64, B256)> = vec![(new_num, new_hash)];
+                                    let mut old_path: Vec<(u64, B256)> = vec![(old_num, old_hash)];
+
+                                    // Walk up to the same height
+                                    while new_num > old_num {
+                                        match rpc_handle
+                                            .get_block_by_hash(new_hash)
+                                            .await
+                                        {
+                                            Ok(Some(b)) => {
+                                                new_hash = b.header.inner.parent_hash;
+                                                new_num = b.header.inner.number;
+                                                new_path.push((new_num, new_hash));
+                                            }
+                                            Ok(None) => {
+                                                warn!("get_block_by_hash returned None for hash {} in `{net}`", hex::encode(new_hash));
+                                                break;
+                                            }
+                                            Err(e) => {
+                                                warn!("Error get_block_by_hash for new chain in `{net}`: {e:?}");
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    while old_num > new_num {
+                                        match rpc_handle
+                                            .get_block_by_hash(old_hash)
+                                            .await
+                                        {
+                                            Ok(Some(b)) => {
+                                                old_hash = b.header.inner.parent_hash;
+                                                old_num = b.header.inner.number;
+                                                old_path.push((old_num, old_hash));
+                                            }
+                                            Ok(None) => {
+                                                warn!("get_block_by_hash returned None for hash {} in `{net}`", hex::encode(old_hash));
+                                                break;
+                                            }
+                                            Err(e) => {
+                                                warn!("Error get_block_by_hash for old chain in `{net}`: {e:?}");
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    // Ascend in lockstep to find common ancestor
+                                    let mut ancestor: Option<(u64, B256)> = None;
+                                    let mut a_hash = new_hash;
+                                    let mut b_hash = old_hash;
+                                    let mut a_num = new_num;
+                                    let mut b_num = old_num;
+                                    while a_hash != b_hash {
+                                        // step new
+                                        match rpc_handle
+                                            .get_block_by_hash(a_hash)
+                                            .await
+                                        {
+                                            Ok(Some(b)) => {
+                                                a_hash = b.header.inner.parent_hash;
+                                                a_num = b.header.inner.number;
+                                                new_path.push((a_num, a_hash));
+                                            }
+                                            _ => break,
+                                        }
+
+                                        // step old
+                                        match rpc_handle
+                                            .get_block_by_hash(b_hash)
+                                            .await
+                                        {
+                                            Ok(Some(b)) => {
+                                                b_hash = b.header.inner.parent_hash;
+                                                b_num = b.header.inner.number;
+                                                old_path.push((b_num, b_hash));
+                                            }
+                                            _ => break,
+                                        }
+
+                                        if a_hash == b_hash {
+                                            ancestor = Some((a_num.min(b_num), a_hash));
+                                            break;
+                                        }
+                                    }
+
+                                    // Prepare logs
+                                    if let Some((anc_num, anc_hash)) = ancestor {
+                                        // Blocks that got orphaned are those on old_path until anc_hash (exclusive)
+                                        let diverted: Vec<String> = old_path
+                                            .iter()
+                                            .take_while(|(_, h)| *h != anc_hash)
+                                            .map(|(n, h)| format!("{}@{}", hex::encode(h), n))
+                                            .collect();
+                                        // New chain blocks (from ancestor exclusive to new head)
+                                        let new_branch: Vec<String> = new_path
+                                            .iter()
+                                            .take_while(|(_, h)| *h != anc_hash)
+                                            .map(|(n, h)| format!("{}@{}", hex::encode(h), n))
+                                            .collect();
+
+                                        warn!(
+                                            "Reorg detected in `{net}`: prev_head {}@{}, new_head {}@{}; common_ancestor {}@{}; old_diverted [{}]; new_branch [{}]",
+                                            hex::encode(prev_hash), prev_number,
+                                            hex::encode(latest_hash), latest_number,
+                                            hex::encode(anc_hash), anc_num,
+                                            diverted.join(", "),
+                                            new_branch.join(", ")
+                                        );
+                                    } else {
+                                        warn!(
+                                            "Potential reorg detected in `{net}` but failed to locate common ancestor. prev_head {}@{}, new_head {}@{}",
+                                            hex::encode(prev_hash), prev_number,
+                                            hex::encode(latest_hash), latest_number
+                                        );
+                                    }
+
+                                    // Advance observed head to latest regardless
+                                    last_head = Some((latest_hash, latest_number));
+                                    // We will also refresh indices and contract root below
+                                    need_resync_indices = true;
+                                }
+                            }
+                        }
+                    }
 
                     // 1) Observe latest finalized block for logging/visibility
                     let finalized_block_opt = match rpc_handle
@@ -333,34 +502,38 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
 
                     // 2) Check the on-chain ADFS root; if it differs from our local view,
                     //    set it so subsequent txs use the correct prev-root and flag resync of indices.
-                    if let Some(contract) = provider.get_latest_contract() {
-                        if let Some(contract_address) = contract.address {
-                            match rpc_handle
-                                .get_storage_at(contract_address, U256::from(0))
-                                .await
-                            {
-                                Ok(chain_root) => {
-                                    let chain_root_h = HashValue(chain_root.into());
-                                    let local_frontier_root =
-                                        provider.calldata_merkle_tree_frontier.root();
-                                    let tracked_contract_root =
-                                        provider.merkle_root_in_contract.clone();
+                    {
+                        let mut provider = provider_mutex.lock().await;
+                        if let Some(contract) = provider.get_latest_contract() {
+                            if let Some(contract_address) = contract.address {
+                                match rpc_handle
+                                    .get_storage_at(contract_address, U256::from(0))
+                                    .await
+                                {
+                                    Ok(chain_root) => {
+                                        let chain_root_h = HashValue(chain_root.into());
+                                        let local_frontier_root =
+                                            provider.calldata_merkle_tree_frontier.root();
+                                        let tracked_contract_root =
+                                            provider.merkle_root_in_contract.clone();
 
-                                    let differs_from_local =
-                                        local_frontier_root.0 != chain_root_h.0;
+                                        let differs_from_local =
+                                            local_frontier_root.0 != chain_root_h.0;
 
-                                    if differs_from_local {
-                                        info!("Detected state change on-chain for `{net}`. Updating tracked contract root from {:?} / local {:?} to {:?}", tracked_contract_root, local_frontier_root, chain_root_h);
-                                        // Update the tracked root so next tx uses correct prev-root
-                                        // and mark that we should resync indices below.
-                                        drop(provider);
-                                        let mut provider = provider_mutex.lock().await;
-                                        provider.merkle_root_in_contract = Some(chain_root_h);
-                                        need_resync_indices = true;
+                                        if differs_from_local {
+                                            info!(
+                                                "Detected state change on-chain for `{net}`. Updating tracked contract root from {:?} / local {:?} to {:?}",
+                                                tracked_contract_root, local_frontier_root, chain_root_h
+                                            );
+                                            provider.merkle_root_in_contract = Some(chain_root_h);
+                                            need_resync_indices = true;
+                                        }
                                     }
-                                }
-                                Err(e) => {
-                                    warn!("Failed to read ADFS root from network `{net}`: {e:?}");
+                                    Err(e) => {
+                                        warn!(
+                                            "Failed to read ADFS root from network `{net}`: {e:?}"
+                                        );
+                                    }
                                 }
                             }
                         }
@@ -403,7 +576,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
         }
 
         // Sleep between polls
-        await_time(5000).await;
+        await_time(6000).await;
     }
 }
 
