@@ -4,6 +4,7 @@ import { ethers } from 'ethers';
 import type { PrimitiveField, TupleField } from '../../utils';
 import { checkPrimitiveField } from '../../utils';
 
+import { toLowerFirstLetter } from './helpers';
 import type { Schema } from './types';
 
 const BYTES_LIMIT = 8192;
@@ -69,6 +70,10 @@ export const createSchema = async (
     return type.includes('int') || type.includes('bool');
   }
 
+  function isUnionType(type: string) {
+    return type === 'union';
+  }
+
   /**
    * Recursively constructs an SSZ type from a TupleField definition, handling arrays.
    */
@@ -112,16 +117,27 @@ export const createSchema = async (
         : new ssz.VectorCompositeType(elementType, lastDimension);
     }
 
-    if (field.type.startsWith('tuple')) {
+    if (
+      'components' in field &&
+      (field.type.startsWith('tuple') || isUnionType(field.type))
+    ) {
       const components: Record<string, any> = {};
-      (field as TupleField).components.forEach(comp => {
+      field.components.forEach(comp => {
         components[comp.name] = createSSZType(comp);
       });
+
+      if (isUnionType(field.type)) {
+        return new ssz.UnionType(Object.values(components), {
+          typeName: field.name,
+        });
+      }
       return new ssz.ContainerType(components);
     }
 
     // Handle primitive types
     switch (field.type) {
+      case 'none':
+        return new ssz.NoneType();
       case 'address':
         return new ssz.ByteVectorType(20);
       case 'bool':
@@ -179,6 +195,11 @@ export const encodeSSZData = async (
         index++;
       }
       return data;
+    } else if (schema instanceof ssz.UnionType) {
+      return {
+        selector: values.selector,
+        value: populateInputData(schema.types[values.selector], values.value),
+      };
     } else if (
       schema instanceof ssz.ListCompositeType ||
       schema instanceof ssz.ListBasicType ||
@@ -225,25 +246,29 @@ export const encodeSSZData = async (
 
 export const sszSchema = async (
   fields: PrimitiveField | TupleField,
-): Promise<Schema[]> => {
+): Promise<{ schema: Schema[]; unionTypes: Schema[] }> => {
   const ssz = await import('@chainsafe/ssz');
+
+  const unionTypes: Schema[] = [];
 
   const extractFieldsFromSchema = (
     fields: Record<string, any> | any[],
     inputFields: PrimitiveField | TupleField,
     extraData?: {
-      fieldName: string;
-      type: string;
-      isNested: boolean;
-      prevType: {
+      fieldName?: string;
+      type?: string;
+      isNested?: boolean;
+      prevType?: {
         type: string;
         length?: number;
       };
+      upperLevelStructNames?: string[];
     },
   ) => {
     const result: any[] = [];
 
-    for (const field of Object.values(fields)) {
+    const fieldValues = Array.isArray(fields) ? fields : Object.values(fields);
+    for (const field of fieldValues) {
       const types = parseTypeName(field.typeName);
 
       const data: Schema = {
@@ -268,7 +293,12 @@ export const sszSchema = async (
               findFieldTypeByName(inputFields, f.fieldName) ?? field.type;
           },
         );
-        data.fields = extractFieldsFromSchema(field.fields, inputFields);
+        data.fields = extractFieldsFromSchema(field.fields, inputFields, {
+          upperLevelStructNames: [
+            ...(extraData?.upperLevelStructNames || []),
+            data.fieldName || '',
+          ],
+        });
         data.isFixedLen = field.isFixedLen;
         data.fieldRangesFixedLen = field.fieldRangesFixedLen;
         data.variableOffsetsPosition = field.variableOffsetsPosition;
@@ -324,6 +354,9 @@ export const sszSchema = async (
             type,
             isNested: data.isNested,
             prevType: data.types[0],
+            upperLevelStructNames: [
+              ...(extraData?.upperLevelStructNames || []),
+            ],
           },
         );
 
@@ -339,7 +372,12 @@ export const sszSchema = async (
         data.isFixedLen = tuple.isFixedLen;
         data.fieldRangesFixedLen = tuple.fieldRangesFixedLen;
         data.variableOffsetsPosition = tuple.variableOffsetsPosition;
-        data.fields = extractFieldsFromSchema(tuple.fields, inputFields);
+        data.fields = extractFieldsFromSchema(tuple.fields, inputFields, {
+          upperLevelStructNames: [
+            ...(extraData?.upperLevelStructNames || []),
+            data.fieldName || '',
+          ],
+        });
         if (!data.fixedSize) {
           let size = 0;
           data.fields.forEach((f: Schema, i: number) => {
@@ -371,6 +409,25 @@ export const sszSchema = async (
 
         data.type = type;
       }
+
+      if (field instanceof ssz.UnionType) {
+        const union = {
+          ...data,
+          structNames: extraData?.upperLevelStructNames,
+          fields: extractFieldsFromSchema(field.types, inputFields, {
+            upperLevelStructNames: [
+              ...(extraData?.upperLevelStructNames || []),
+              data.fieldName || '',
+            ],
+          }),
+        };
+        union.fields.forEach((f: Schema, i: number) => {
+          f.fieldName = findUnionNames(inputFields, union.typeName, i);
+          f.type = findFieldTypeByName(inputFields, f.fieldName);
+        });
+        unionTypes.push(union);
+      }
+
       result.push(data);
     }
 
@@ -384,10 +441,52 @@ export const sszSchema = async (
     fields,
   );
 
+  // Remove duplicates from unionTypes by `fieldName`
+  const seen = new Set<string>();
+  const uniqueUnionTypes: Schema[] = [];
+  for (const ut of unionTypes) {
+    const key = ut.fieldName!;
+    if (!seen.has(key)) {
+      seen.add(key);
+      uniqueUnionTypes.push(ut);
+    }
+  }
+  unionTypes.length = 0;
+  unionTypes.push(...uniqueUnionTypes);
+
   // needed when decoded data is a dynamic array of the main tuple
   schema[0].isFirst = true;
 
-  return schema;
+  return { schema, unionTypes };
+};
+
+const findUnionNames = (
+  fields: PrimitiveField | TupleField,
+  name: string,
+  selector: number,
+): string => {
+  if ('components' in fields) {
+    if (fields.name.includes(name)) {
+      return fields.components[selector].name;
+    }
+    for (const component of fields.components) {
+      const found = findUnionNames(component, name, selector);
+      if (found) {
+        return found;
+      }
+    }
+  } else if (Array.isArray(fields)) {
+    for (const field of fields) {
+      const found = findUnionNames(field, name, selector);
+      if (found) {
+        return found;
+      }
+    }
+  } else if (fields.name === name) {
+    return (fields as TupleField).components[selector].name;
+  }
+
+  return '';
 };
 
 const findFieldTypeByName = (
@@ -461,9 +560,4 @@ const parseTypeName = (typeName: string) => {
 
   parse(typeName);
   return result;
-};
-
-const toLowerFirstLetter = (fieldName: string): string => {
-  if (!fieldName) return '';
-  return fieldName.charAt(0).toLowerCase() + fieldName.slice(1);
 };
