@@ -1,4 +1,5 @@
 export type Schema = {
+  structNames?: string[];
   isNested: boolean;
   type: string;
   typeName: string;
@@ -31,7 +32,10 @@ export type BytesRange = {
 export const hasFields = (
   schema: Schema,
 ): schema is Schema & { fields: Schema[] } => {
-  return (schema as Schema & { fields: Schema[] }).fields !== undefined;
+  return (
+    (schema as Schema & { fields: Schema[] }).fields !== undefined &&
+    schema.type !== 'union'
+  );
 };
 
 /**
@@ -41,6 +45,12 @@ export const isVector = (
   schema: Schema,
 ): schema is Schema & { length: number } => {
   return schema.typeName.startsWith('Vector') && schema.length !== undefined;
+};
+
+export const isUnion = (
+  schema: Schema,
+): schema is Schema & { type: 'union' } => {
+  return schema.type === 'union';
 };
 
 export type DecoderPrimitiveLines = (

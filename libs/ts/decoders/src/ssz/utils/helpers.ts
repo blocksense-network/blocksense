@@ -26,3 +26,13 @@ const decoderImplementationsMap: Record<string, DecoderImplementations> = {
 export function getDecoderImplementations(key: string): DecoderImplementations {
   return decoderImplementationsMap[key] ?? decoderImplementationsMap.default;
 }
+
+export const toLowerFirstLetter = (name: string): string => {
+  if (!name) return '';
+  return name.charAt(0).toLowerCase() + name.slice(1);
+};
+
+export const toUpperFirstLetter = (name: string) => {
+  if (!name) return '';
+  return name.charAt(0).toUpperCase() + name.slice(1);
+};

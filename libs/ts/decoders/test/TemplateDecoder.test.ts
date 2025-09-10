@@ -53,7 +53,7 @@ describe('Template Decoder', function () {
     );
     await fs.writeFile(
       ssz.tempFilePath,
-      await generateSSZDecoder(templateSSZ, fields, evmVersion),
+      await generateSSZDecoder(templateSSZ, '', fields, evmVersion),
       'utf-8',
     );
 
