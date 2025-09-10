@@ -1,23 +1,14 @@
-use std::{collections::HashMap, str::FromStr};
-
 use alloy::primitives::Address;
 use anyhow::Result;
 use blocksense_sdk::oracle::Settings;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use std::{collections::HashMap, str::FromStr};
+use strum_macros::AsRefStr;
 use tracing::warn;
 
 use blocksense_data_providers_sdk::price_data::types::PricePair;
 
 pub type FeedId = u128;
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct OracleArgs {
-    pub marketplace: String,
-    pub market_id: Option<String>,
-    pub network: Option<String>,
-    pub utils_lens_address: Option<Address>,
-    pub vault_address: Option<Address>,
-}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct FeedConfig {
@@ -30,7 +21,7 @@ pub struct FeedConfig {
     pub category: String,
     #[serde(default)]
     pub market_hours: String,
-    pub arguments: OracleArgs,
+    pub arguments: Marketplace,
 }
 
 #[derive(Debug, Clone)]
@@ -42,42 +33,110 @@ pub struct BorrowRateInfo {
 
 pub type RatesPerFeed = HashMap<FeedId, BorrowRateInfo>;
 
-pub type RatesPerFeedPerMarket = HashMap<Marketplace, RatesPerFeed>;
+pub type RatesPerFeedPerMarket = HashMap<MarketplaceType, RatesPerFeed>;
+
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash, Clone, AsRefStr)]
+#[serde(tag = "marketplace")]
+pub enum Marketplace {
+    HypurrFi(HypurrFiArgs),
+    HyperLend(HyperLendArgs),
+    HyperDrive(HyperDriveArgs),
+    EulerFinance(EulerFinanceArgs),
+}
+
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash, Clone)]
+pub struct HypurrFiArgs {
+    pub network: SupportedNetworks,
+}
+
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash, Clone)]
+pub struct HyperLendArgs {
+    pub network: SupportedNetworks,
+}
+
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash, Clone)]
+pub struct HyperDriveArgs {
+    pub market_id: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash, Clone)]
+pub struct EulerFinanceArgs {
+    pub network: SupportedNetworks,
+    pub utils_lens_address: Address,
+    pub vault_address: Address,
+}
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
-pub enum Marketplace {
+pub enum SupportedNetworks {
+    HyperevmMainnet,
+    EthereumMainnet,
+}
+
+impl FromStr for SupportedNetworks {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s {
+            "hyperevm-mainnet" => SupportedNetworks::HyperevmMainnet,
+            "ethereum-mainnet" => SupportedNetworks::EthereumMainnet,
+            _ => anyhow::bail!("Unsupported network: {}", s),
+        })
+    }
+}
+
+impl Serialize for SupportedNetworks {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let s = match self {
+            SupportedNetworks::HyperevmMainnet => "hyperevm-mainnet",
+            SupportedNetworks::EthereumMainnet => "ethereum-mainnet",
+        };
+        serializer.serialize_str(s)
+    }
+}
+
+impl<'de> Deserialize<'de> for SupportedNetworks {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        SupportedNetworks::from_str(&s).map_err(serde::de::Error::custom)
+    }
+}
+
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
+pub enum MarketplaceType {
     HypurrFi,
     HyperLend,
     HyperDrive,
     EulerFinance,
 }
 
-impl FromStr for Marketplace {
-    type Err = anyhow::Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(match s {
-            "HypurrFi" => Marketplace::HypurrFi,
-            "HyperLend" => Marketplace::HyperLend,
-            "HyperDrive" => Marketplace::HyperDrive,
-            "EulerFinance" => Marketplace::EulerFinance,
-            _ => anyhow::bail!("Unknown marketplace: {}", s),
-        })
+impl From<&Marketplace> for MarketplaceType {
+    fn from(marketplace: &Marketplace) -> Self {
+        match marketplace {
+            Marketplace::HypurrFi(_) => MarketplaceType::HypurrFi,
+            Marketplace::HyperLend(_) => MarketplaceType::HyperLend,
+            Marketplace::HyperDrive(_) => MarketplaceType::HyperDrive,
+            Marketplace::EulerFinance(_) => MarketplaceType::EulerFinance,
+        }
     }
 }
 
-pub fn group_feeds_by_marketplace(
+pub fn group_feeds_by_marketplace_type(
     feeds_config: &[FeedConfig],
-) -> HashMap<Marketplace, Vec<FeedConfig>> {
-    let mut grouped: HashMap<Marketplace, Vec<FeedConfig>> = HashMap::new();
+) -> HashMap<MarketplaceType, Vec<FeedConfig>> {
+    let mut grouped: HashMap<MarketplaceType, Vec<FeedConfig>> = HashMap::new();
 
     for feed in feeds_config {
-        match Marketplace::from_str(feed.arguments.marketplace.as_str()) {
-            Ok(market) => grouped.entry(market).or_default().push(feed.clone()),
-            Err(_) => {
-                warn!("Unknown marketplace: {}", feed.arguments.marketplace);
-            }
-        }
+        let marketplace_type = MarketplaceType::from(&feed.arguments);
+        grouped
+            .entry(marketplace_type)
+            .or_default()
+            .push(feed.clone())
     }
 
     grouped
@@ -86,9 +145,25 @@ pub fn group_feeds_by_marketplace(
 pub fn map_assets_to_feeds(
     rates: Vec<BorrowRateInfo>,
     feeds_config: &[FeedConfig],
+    network: Option<SupportedNetworks>,
 ) -> RatesPerFeed {
     let rates_map: HashMap<_, _> = rates.into_iter().map(|r| (r.asset.clone(), r)).collect();
 
+    let feeds_config: Vec<FeedConfig> = match network {
+        Some(net) => feeds_config
+            .iter()
+            .filter(|f| {
+                match &f.arguments {
+                    Marketplace::HypurrFi(args) => args.network == net,
+                    Marketplace::HyperLend(args) => args.network == net,
+                    Marketplace::EulerFinance(args) => args.network == net,
+                    Marketplace::HyperDrive(_) => true, // HyperDrive doesn't have network filtering
+                }
+            })
+            .cloned()
+            .collect(),
+        None => feeds_config.to_vec(),
+    };
     feeds_config
         .iter()
         .map(|feed| {
