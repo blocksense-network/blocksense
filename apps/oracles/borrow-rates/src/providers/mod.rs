@@ -1,3 +1,4 @@
+pub mod aave;
 pub mod euler;
 pub mod hyperdrive;
 pub mod hyperlend;
