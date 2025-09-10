@@ -209,17 +209,7 @@ pub async fn loop_processing_batch_of_updates(
                 let block_height = cmd.updates.block_height;
                 tracing::info!("Processing updates for network {relayer_name}, block_height {block_height}, messages in queue = {msgs_in_queue}");
                 let provider = cmd.provider.clone();
-                let result = eth_batch_send_to_contract(
-                    cmd.net,
-                    cmd.provider,
-                    cmd.provider_settings,
-                    cmd.updates,
-                    cmd.feeds_config,
-                    cmd.transaction_retry_timeout_secs,
-                    cmd.transaction_retries_count_limit,
-                    cmd.retry_fee_increment_fraction,
-                )
-                .await;
+                let result = eth_batch_send_to_contract(cmd).await;
 
                 let provider_metrics = provider.lock().await.provider_metrics.clone();
                 dec_metric!(provider_metrics, net, num_transactions_in_queue);
@@ -537,6 +527,15 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                     finalized_block_opt
                 };
                 info!("Last finalized block in network {net} = {finalized_block_opt:?}");
+                // Prune non-finalized updates up to finalized height
+                if let Some(ref fb) = finalized_block_opt {
+                    let finalized_height = fb.header.inner.number;
+                    let mut provider = provider_mutex.lock().await;
+                    let removed = provider.prune_non_finalized_up_to(finalized_height);
+                    if removed > 0 {
+                        info!("Pruned {removed} non-finalized updates up to finalized height {finalized_height} in `{net}`");
+                    }
+                }
 
                 // 3) If we detected divergence, resync round-buffer indices from chain
                 if need_resync_indices {
@@ -577,15 +576,16 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
 
 #[allow(clippy::too_many_arguments)]
 pub async fn eth_batch_send_to_contract(
-    net: String,
-    provider_mutex: Arc<Mutex<RpcProvider>>,
-    provider_settings: blocksense_config::Provider,
-    mut updates: BatchedAggregatesToSend,
-    feeds_config: Arc<RwLock<HashMap<EncodedFeedId, FeedConfig>>>,
-    transaction_retry_timeout_secs: u64,
-    transaction_retries_count_limit: u64,
-    retry_fee_increment_fraction: f64,
+    cmd: BatchOfUpdatesToProcess,
 ) -> Result<(String, Vec<EncodedFeedId>)> {
+    let net = cmd.net.clone();
+    let provider_mutex = cmd.provider.clone();
+    let provider_settings = cmd.provider_settings.clone();
+    let feeds_config = cmd.feeds_config.clone();
+    let transaction_retry_timeout_secs = cmd.transaction_retry_timeout_secs;
+    let transaction_retries_count_limit = cmd.transaction_retries_count_limit;
+    let retry_fee_increment_fraction = cmd.retry_fee_increment_fraction;
+    let mut updates = cmd.updates.clone();
     let mut feeds_rb_indices = HashMap::new();
     let serialized_updates = get_serialized_updates_for_network(
         net.as_str(),
@@ -659,7 +659,7 @@ pub async fn eth_batch_send_to_contract(
     };
     let next_calldata_merkle_tree_root = next_calldata_merkle_tree.root();
 
-    // Merkle tree over all call data management for ADFS contracts (version 0 is legacy).
+    // Merkle tree over all call data management for ADFS contracts.
     let serialized_updates = [
         vec![1],
         prev_calldata_merkle_tree_root.0.to_vec(),
@@ -725,6 +725,8 @@ pub async fn eth_batch_send_to_contract(
         };
         break nonce;
     };
+
+    let mut inclusion_block = None;
 
     loop {
         debug!("loop begin; transaction_retries_count={transaction_retries_count} in network `{net}` block height {block_height} with transaction_retries_count_limit = {transaction_retries_count_limit} and transaction_retry_timeout_secs = {transaction_retry_timeout_secs}");
@@ -1023,6 +1025,7 @@ pub async fn eth_batch_send_to_contract(
 
         if let Some(eth_block_number) = tx_receipt.block_number {
             info!("Transaction was included in block #{}", eth_block_number);
+            inclusion_block = Some(eth_block_number);
         } else {
             error!("Receipt has no block number!");
         }
@@ -1043,6 +1046,9 @@ pub async fn eth_batch_send_to_contract(
 
     log_gas_used(&net, &receipt, transaction_time, provider_metrics).await;
 
+    if let Some(b) = inclusion_block {
+        provider.insert_non_finalized_update(b, cmd);
+    }
     provider.update_history(&updates.updates);
     let result = receipt.status().to_string();
     if result == "true" {

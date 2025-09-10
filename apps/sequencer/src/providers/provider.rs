@@ -44,7 +44,9 @@ use tokio::time::error::Elapsed;
 use tokio::time::Duration;
 use tracing::{debug, error, info, warn};
 
-use crate::providers::eth_send_utils::{get_gas_limit, get_tx_retry_params, GasFees};
+use crate::providers::eth_send_utils::{
+    get_gas_limit, get_tx_retry_params, BatchOfUpdatesToProcess, GasFees,
+};
 use std::time::Instant;
 
 pub type ProviderType =
@@ -122,6 +124,7 @@ pub struct RpcProvider {
     pub rpc_url: Url,
     pub rb_indices: RoundBufferIndices,
     num_tx_in_progress: u32,
+    non_finalized_updates: HashMap<u64, BatchOfUpdatesToProcess>,
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -354,6 +357,7 @@ impl RpcProvider {
             rpc_url,
             rb_indices: RoundBufferIndices::new(),
             num_tx_in_progress: 0,
+            non_finalized_updates: HashMap::new(),
         }
     }
 
@@ -845,6 +849,24 @@ impl RpcProvider {
 
     pub fn get_num_tx_in_progress(&self) -> u32 {
         self.num_tx_in_progress
+    }
+
+    pub fn insert_non_finalized_update(&mut self, block_height: u64, cmd: BatchOfUpdatesToProcess) {
+        self.non_finalized_updates.insert(block_height, cmd);
+    }
+
+    pub fn prune_non_finalized_up_to(&mut self, finalized_block: u64) -> usize {
+        let keys_to_remove: Vec<u64> = self
+            .non_finalized_updates
+            .keys()
+            .cloned()
+            .filter(|k| *k <= finalized_block)
+            .collect();
+        let removed = keys_to_remove.len();
+        for k in keys_to_remove {
+            self.non_finalized_updates.remove(&k);
+        }
+        removed
     }
 }
 
