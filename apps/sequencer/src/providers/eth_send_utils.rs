@@ -362,10 +362,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
 
                                     // Walk up to the same height
                                     while new_num > old_num {
-                                        match rpc_handle
-                                            .get_block_by_hash(new_hash)
-                                            .await
-                                        {
+                                        match rpc_handle.get_block_by_hash(new_hash).await {
                                             Ok(Some(b)) => {
                                                 new_hash = b.header.inner.parent_hash;
                                                 new_num = b.header.inner.number;
@@ -383,10 +380,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                     }
 
                                     while old_num > new_num {
-                                        match rpc_handle
-                                            .get_block_by_hash(old_hash)
-                                            .await
-                                        {
+                                        match rpc_handle.get_block_by_hash(old_hash).await {
                                             Ok(Some(b)) => {
                                                 old_hash = b.header.inner.parent_hash;
                                                 old_num = b.header.inner.number;
@@ -407,38 +401,39 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                     let mut ancestor: Option<(u64, B256)> = None;
                                     let mut a_hash = new_hash;
                                     let mut b_hash = old_hash;
-                                    let mut a_num = new_num;
-                                    let mut b_num = old_num;
-                                    while a_hash != b_hash {
-                                        // step new
-                                        match rpc_handle
-                                            .get_block_by_hash(a_hash)
-                                            .await
-                                        {
-                                            Ok(Some(b)) => {
-                                                a_hash = b.header.inner.parent_hash;
-                                                a_num = b.header.inner.number;
-                                                new_path.push((a_num, a_hash));
-                                            }
-                                            _ => break,
-                                        }
+                                    if a_hash == b_hash {
+                                        ancestor = Some((new_num.min(old_num), a_hash));
+                                    } else {
+                                        loop {
+                                            // step new
+                                            let (next_a_hash, next_a_num) =
+                                                match rpc_handle.get_block_by_hash(a_hash).await {
+                                                    Ok(Some(b)) => (
+                                                        b.header.inner.parent_hash,
+                                                        b.header.inner.number,
+                                                    ),
+                                                    _ => break,
+                                                };
+                                            a_hash = next_a_hash;
+                                            new_path.push((next_a_num, a_hash));
 
-                                        // step old
-                                        match rpc_handle
-                                            .get_block_by_hash(b_hash)
-                                            .await
-                                        {
-                                            Ok(Some(b)) => {
-                                                b_hash = b.header.inner.parent_hash;
-                                                b_num = b.header.inner.number;
-                                                old_path.push((b_num, b_hash));
-                                            }
-                                            _ => break,
-                                        }
+                                            // step old
+                                            let (next_b_hash, next_b_num) =
+                                                match rpc_handle.get_block_by_hash(b_hash).await {
+                                                    Ok(Some(b)) => (
+                                                        b.header.inner.parent_hash,
+                                                        b.header.inner.number,
+                                                    ),
+                                                    _ => break,
+                                                };
+                                            b_hash = next_b_hash;
+                                            old_path.push((next_b_num, b_hash));
 
-                                        if a_hash == b_hash {
-                                            ancestor = Some((a_num.min(b_num), a_hash));
-                                            break;
+                                            if a_hash == b_hash {
+                                                ancestor =
+                                                    Some((next_a_num.min(next_b_num), a_hash));
+                                                break;
+                                            }
                                         }
                                     }
 
