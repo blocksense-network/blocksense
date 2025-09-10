@@ -47125,6 +47125,171 @@
       }
     },
     {
+      "id": "102201",
+      "full_name": "WETH Aave Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time Wrapped Ether (WETH) borrow rate (APR) from Aave on Ethereum Mainnet Market. ref: https://aavescan.com/ethereum-v3/weth",
+      "type": "price-feed",
+      "oracle_id": "borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "WETH",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "borrow-rates",
+          "marketplace": "Aave",
+          "network": "ethereum-mainnet"
+        }
+      }
+    },
+    {
+      "id": "102202",
+      "full_name": "weETH Aave Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time Wrapped eETH (weETH) borrow rate (APR) from Aave on Ethereum Mainnet Market. ref: https://aavescan.com/ethereum-v3/weeth",
+      "type": "price-feed",
+      "oracle_id": "borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "weETH",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "borrow-rates",
+          "marketplace": "Aave",
+          "network": "ethereum-mainnet"
+        }
+      }
+    },
+    {
+      "id": "102203",
+      "full_name": "USDT Aave Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time Tether USD (USDT) borrow rate (APR) from Aave on Ethereum Mainnet Market. ref: https://aavescan.com/ethereum-v3/usdt",
+      "type": "price-feed",
+      "oracle_id": "borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "USDT",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "borrow-rates",
+          "marketplace": "Aave",
+          "network": "ethereum-mainnet"
+        }
+      }
+    },
+    {
+      "id": "102204",
+      "full_name": "wstETH Aave Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time Wrapped liquid staked Ether 2.0 (wstETH) borrow rate (APR) from Aave on Ethereum Mainnet Market. ref: https://aavescan.com/ethereum-v3/wsteth",
+      "type": "price-feed",
+      "oracle_id": "borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "wstETH",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "borrow-rates",
+          "marketplace": "Aave",
+          "network": "ethereum-mainnet"
+        }
+      }
+    },
+    {
+      "id": "102205",
+      "full_name": "USDC Aave Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time USD Coin (USDC) borrow rate (APR) from Aave on Ethereum Mainnet Market. ref: https://aavescan.com/ethereum-v3/usdc",
+      "type": "price-feed",
+      "oracle_id": "borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "USDC",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "borrow-rates",
+          "marketplace": "Aave",
+          "network": "ethereum-mainnet"
+        }
+      }
+    },
+    {
       "id": "1000000",
       "full_name": "WMON / USD",
       "description": "Price of Wrapped Monad in USD on Monad Testnet",
