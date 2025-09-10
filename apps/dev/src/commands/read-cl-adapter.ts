@@ -20,9 +20,10 @@ export const readClAdapter = Command.make(
     network: Options.choice('network', availableNetworks),
     address: Options.optional(Options.text('address')),
     feedId: Options.optional(Options.integer('feed-id')),
+    round: Options.optional(Options.integer('round')),
     rpcUrl: Options.optional(Options.text('rpc-url')),
   },
-  ({ address, feedId, network, rpcUrl }) =>
+  ({ address, feedId, network, round, rpcUrl }) =>
     Effect.gen(function* () {
       let resolvedAddress: string | undefined = Option.isSome(address)
         ? address.value
@@ -66,6 +67,47 @@ export const readClAdapter = Command.make(
             contractAddress,
             network,
           );
+
+      if (Option.isSome(round)) {
+        const requestedRound = BigInt(round.value);
+
+        const { id, roundData } = yield* Effect.all(
+          {
+            id: Effect.tryPromise(() => consumer.getId()),
+            roundData: Effect.tryPromise(() =>
+              consumer.getRoundData(requestedRound),
+            ),
+          },
+          { concurrency: 'unbounded' },
+        ).pipe(
+          Effect.mapError(
+            e =>
+              new Error(
+                `Failed to fetch data for round ${round.value}: ${String((e as any)?.message ?? e)}`,
+              ),
+          ),
+        );
+
+        const rows: Array<[string, string]> = [
+          ['Network', network],
+          ['Address', contractAddress],
+          ['Explorer', getAddressExplorerUrl(network, contractAddress)],
+          ['Id', id.toString()],
+          ['Round', requestedRound.toString()],
+          ['Answer', roundData.answer.toString()],
+        ];
+
+        renderTui(
+          drawTable(
+            rows.map(([k, v]) => [k, v]),
+            {
+              headers: ['Field', 'Value'],
+            },
+          ),
+        );
+
+        return;
+      }
 
       const data: CLAggregatorAdapterData | undefined =
         yield* Effect.tryPromise<CLAggregatorAdapterData>(() =>
