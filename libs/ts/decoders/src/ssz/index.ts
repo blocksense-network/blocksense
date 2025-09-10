@@ -8,24 +8,34 @@ import type { EvmVersion, TupleField } from '../utils';
 import { organizeFieldsIntoStructs } from '../utils';
 
 import { generateDecoderLines } from './helpers';
-import type { Schema } from './utils';
-import { sszSchema } from './utils';
+import { sszSchema, toUpperFirstLetter } from './utils';
 
 export const generateDecoder = async (
   template: string,
+  subTemplate: string,
   fields: TupleField,
   evmVersion: EvmVersion = 'cancun',
   start: number = 0,
-) => {
-  const schema: Schema[] = await sszSchema(fields);
+): Promise<string | string[]> => {
+  const { schema, unionTypes } = await sszSchema(fields);
 
-  const structs = organizeFieldsIntoStructs(fields);
+  const { structs, unionStructs } = organizeFieldsIntoStructs(fields);
   const mainStructName =
     '_' + fields.name.charAt(0).toLowerCase() + fields.name.slice(1);
   const isMainStructDynamic = fields.type.endsWith('[]');
   const returnType =
     fields.name + (fields.type.match(/\[(\d*)\]/g) || []).join('');
-  const generatedLines = generateDecoderLines(
+
+  unionTypes.forEach(type => {
+    if (!type.structNames) {
+      type.structNames = [mainStructName];
+    }
+    if (type.structNames[0] === '') {
+      type.structNames[0] = mainStructName;
+    }
+  });
+
+  const mainGeneratedLines = generateDecoderLines(
     schema[0],
     mainStructName,
     evmVersion,
@@ -35,17 +45,53 @@ export const generateDecoder = async (
   const generatedCode = ejs.render(
     template,
     {
-      lines: generatedLines,
+      lines: mainGeneratedLines,
       structs,
       mainStructName,
       isMainStructDynamic,
       returnType,
+      unionTypes,
     },
     {
       root: (await fs.realpath(__dirname)) + '/',
     },
   );
 
+  const mainCode = await formatCode(generatedCode);
+  if (!unionTypes.length) {
+    return mainCode;
+  }
+
+  // Multidecoder
+
+  const code: string[] = [mainCode];
+  for (const ut of unionTypes) {
+    const utfLines: string[][] = [];
+    for (const utf of ut.fields || []) {
+      utfLines.push(generateDecoderLines(utf, utf.fieldName!, evmVersion, 1));
+    }
+    const unionType = ejs.render(
+      subTemplate,
+      {
+        lines: utfLines,
+        structs: unionStructs,
+        isMainStructDynamic: false,
+        unionName: ut.fieldName,
+        unionTypes: ut.fields,
+        toUpperFirstLetter,
+      },
+      {
+        root: (await fs.realpath(__dirname)) + '/',
+      },
+    );
+
+    code.push(await formatCode(unionType));
+  }
+
+  return code;
+};
+
+const formatCode = async (generatedCode: string) => {
   const formattedCode = await prettier.format(generatedCode, {
     parser: 'solidity-parse',
     plugins: [solidityPlugin],
