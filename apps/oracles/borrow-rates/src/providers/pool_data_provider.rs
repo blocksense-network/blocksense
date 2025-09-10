@@ -5,11 +5,14 @@ use alloy::{
 use anyhow::Result;
 
 use blocksense_sdk::eth_rpc::eth_call;
-use url::Url;
 
 use crate::{
-    domain::BorrowRateInfo,
-    providers::types::{MyProvider, RPC_URL_HYPERLIQUID_MAINNET},
+    domain::{BorrowRateInfo, Marketplace, SupportedNetworks},
+    providers::{
+        hyperlend::HyperLendUi,
+        hypurrfi::HypurrFiUi,
+        types::{get_rpc_url, MyProvider},
+    },
     utils::math::ray_to_apr,
 };
 
@@ -27,33 +30,44 @@ pub struct Plan {
 }
 
 pub trait UiPool {
-    /// Build calldata for `getReservesData(addresses_provider)`.
-    fn calldata(provider: MyProvider, ui: Address, addresses_provider: Address) -> Bytes;
+    const UI_POOL_DATA_PROVIDER: Address;
+    const POOL_ADDRESSES_PROVIDER: Address;
 
-    /// Decode raw return bytes into domain objects.
+    fn calldata(provider: MyProvider) -> Bytes;
     fn decode(raw: &Bytes) -> Result<Vec<ReserveLike>>;
+    fn plan_for(network: SupportedNetworks) -> Result<Plan> {
+        let rpc_url = get_rpc_url(&network)?;
+        let provider = ProviderBuilder::new().connect_http(rpc_url.clone());
+        let calldata = Self::calldata(provider);
+        Ok(Plan {
+            to: Self::UI_POOL_DATA_PROVIDER,
+            calldata,
+            decode: |b| Self::decode(b),
+        })
+    }
 }
 
-/// One generic constructor used everywhere.
-pub fn plan_for<P: UiPool>(ui: Address, addresses_provider: Address) -> Result<Plan> {
-    let rpc_url = Url::parse(RPC_URL_HYPERLIQUID_MAINNET)?;
-    let provider = ProviderBuilder::new().connect_http(rpc_url.clone());
-    let calldata = P::calldata(provider, ui, addresses_provider);
-    Ok(Plan {
-        to: ui,
-        calldata,
-        decode: |b| P::decode(b),
-    })
-}
+pub async fn fetch_reserves(
+    marketplace: Marketplace,
+    network: SupportedNetworks,
+) -> Result<Vec<BorrowRateInfo>> {
+    let plan = match marketplace {
+        Marketplace::HypurrFi(_) => HypurrFiUi::plan_for(network)?,
+        Marketplace::HyperLend(_) => HyperLendUi::plan_for(network)?,
+        Marketplace::HyperDrive(_) | Marketplace::EulerFinance(_) => {
+            unreachable!(
+                "Pool data provider not supported for this marketplace {:?}",
+                marketplace
+            );
+        }
+    };
 
-pub async fn fetch_reserves(plan: Plan) -> Result<Vec<BorrowRateInfo>> {
-    let raw = eth_call(
-        RPC_URL_HYPERLIQUID_MAINNET,
-        &format!("{:?}", plan.to),
-        &plan.calldata,
-    )
-    .await
-    .map_err(|e| anyhow::Error::msg(format!("{:?}", e)))?;
+    let rpc_url_val = get_rpc_url(&network)?;
+    let rpc_url = rpc_url_val.as_str();
+
+    let raw = eth_call(rpc_url, &format!("{:?}", plan.to), &plan.calldata)
+        .await
+        .map_err(|e| anyhow::Error::msg(format!("{:?}", e)))?;
     let reserves = (plan.decode)(&raw)?;
     let mut out = Vec::with_capacity(reserves.len());
     for r in reserves {

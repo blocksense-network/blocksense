@@ -1,4 +1,4 @@
-use std::{collections::HashMap, str::FromStr, sync::Arc};
+use std::{collections::HashMap, sync::Arc};
 
 use alloy::primitives::{Address, U256};
 use alloy::providers::ProviderBuilder;
@@ -8,7 +8,7 @@ use futures::{stream::FuturesUnordered, StreamExt};
 use tracing::warn;
 use url::Url;
 
-use crate::domain::{BorrowRateInfo, FeedConfig, RatesPerFeed};
+use crate::domain::{BorrowRateInfo, FeedConfig, Marketplace, RatesPerFeed, SupportedNetworks};
 use crate::providers::types::{MyProvider, RPC_URL_ETHEREUM_MAINNET};
 use crate::utils::math::apr_continuous;
 use blocksense_sdk::eth_rpc::eth_call;
@@ -76,8 +76,10 @@ async fn fetch_borrow_rates_on_ethereum_mainnet(feeds: &[FeedConfig]) -> Result<
     let mut futures = FuturesUnordered::new();
 
     for feed in feeds {
-        let utils_lens_address = feed.arguments.utils_lens_address.clone().unwrap();
-        let vault_address = feed.arguments.vault_address.clone().unwrap();
+        let (utils_lens_address, vault_address) = match &feed.arguments {
+            Marketplace::EulerFinance(args) => (args.utils_lens_address, args.vault_address),
+            _ => continue,
+        };
 
         let feed_id = feed.feed_id.clone();
         let asset = feed.pair.base.clone();
@@ -117,43 +119,13 @@ pub fn group_feeds_by_network(
     let mut grouped: HashMap<SupportedNetworks, Vec<FeedConfig>> = HashMap::new();
 
     for feed in feeds_config {
-        // check that addresses are in config
-        if feed.arguments.network.is_none()
-            || feed.arguments.utils_lens_address.is_none()
-            || feed.arguments.vault_address.is_none()
-        {
-            warn!(
-                "Feed {} missing network or required addresses. Skipping.",
-                feed.feed_id
-            );
-            continue;
-        }
+        let network = match &feed.arguments {
+            Marketplace::EulerFinance(args) => args.network,
+            _ => continue,
+        };
 
-        let network = feed.arguments.network.clone().unwrap();
-
-        match SupportedNetworks::from_str(network.as_str()) {
-            Ok(network) => grouped.entry(network).or_default().push(feed.clone()),
-            Err(_) => {
-                warn!("Unknown network: {}", network);
-            }
-        }
+        grouped.entry(network).or_default().push(feed.clone());
     }
 
     grouped
-}
-
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
-pub enum SupportedNetworks {
-    EthereumMainnet,
-}
-
-impl FromStr for SupportedNetworks {
-    type Err = anyhow::Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Ok(match s {
-            "ethereum-mainnet" => SupportedNetworks::EthereumMainnet,
-            _ => anyhow::bail!("Unsupported network: {}", s),
-        })
-    }
 }

@@ -46553,7 +46553,8 @@
         "market_hours": "",
         "arguments": {
           "kind": "borrow-rates",
-          "marketplace": "HypurrFi"
+          "marketplace": "HypurrFi",
+          "network": "hyperevm-mainnet"
         }
       }
     },
@@ -46585,7 +46586,8 @@
         "market_hours": "",
         "arguments": {
           "kind": "borrow-rates",
-          "marketplace": "HypurrFi"
+          "marketplace": "HypurrFi",
+          "network": "hyperevm-mainnet"
         }
       }
     },
@@ -46617,7 +46619,8 @@
         "market_hours": "",
         "arguments": {
           "kind": "borrow-rates",
-          "marketplace": "HypurrFi"
+          "marketplace": "HypurrFi",
+          "network": "hyperevm-mainnet"
         }
       }
     },
@@ -46649,7 +46652,8 @@
         "market_hours": "",
         "arguments": {
           "kind": "borrow-rates",
-          "marketplace": "HypurrFi"
+          "marketplace": "HypurrFi",
+          "network": "hyperevm-mainnet"
         }
       }
     },
@@ -46681,7 +46685,8 @@
         "market_hours": "",
         "arguments": {
           "kind": "borrow-rates",
-          "marketplace": "HypurrFi"
+          "marketplace": "HypurrFi",
+          "network": "hyperevm-mainnet"
         }
       }
     },
@@ -46713,7 +46718,8 @@
         "market_hours": "",
         "arguments": {
           "kind": "borrow-rates",
-          "marketplace": "HyperLend"
+          "marketplace": "HyperLend",
+          "network": "hyperevm-mainnet"
         }
       }
     },
@@ -46745,7 +46751,8 @@
         "market_hours": "",
         "arguments": {
           "kind": "borrow-rates",
-          "marketplace": "HyperLend"
+          "marketplace": "HyperLend",
+          "network": "hyperevm-mainnet"
         }
       }
     },
@@ -46777,7 +46784,8 @@
         "market_hours": "",
         "arguments": {
           "kind": "borrow-rates",
-          "marketplace": "HyperLend"
+          "marketplace": "HyperLend",
+          "network": "hyperevm-mainnet"
         }
       }
     },
@@ -46809,7 +46817,8 @@
         "market_hours": "",
         "arguments": {
           "kind": "borrow-rates",
-          "marketplace": "HyperLend"
+          "marketplace": "HyperLend",
+          "network": "hyperevm-mainnet"
         }
       }
     },
@@ -46841,7 +46850,8 @@
         "market_hours": "",
         "arguments": {
           "kind": "borrow-rates",
-          "marketplace": "HyperLend"
+          "marketplace": "HyperLend",
+          "network": "hyperevm-mainnet"
         }
       }
     },

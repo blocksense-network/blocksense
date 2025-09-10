@@ -23,10 +23,14 @@ pub mod hypurrfi {
 pub struct HypurrFiUi;
 
 impl UiPool for HypurrFiUi {
-    fn calldata(provider: MyProvider, ui: Address, addresses_provider: Address) -> Bytes {
-        let instance = hypurrfi::HypurrFiUiPoolDataProvider::new(ui, provider);
+    const UI_POOL_DATA_PROVIDER: Address = HYPURRFI_UI_POOL_DATA_PROVIDER;
+    const POOL_ADDRESSES_PROVIDER: Address = HYPURRFI_POOL_ADDRESSES_PROVIDER;
+
+    fn calldata(provider: MyProvider) -> Bytes {
+        let instance =
+            hypurrfi::HypurrFiUiPoolDataProvider::new(Self::UI_POOL_DATA_PROVIDER, provider);
         instance
-            .getReservesData(addresses_provider)
+            .getReservesData(Self::POOL_ADDRESSES_PROVIDER)
             .calldata()
             .clone()
     }
