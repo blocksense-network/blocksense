@@ -277,6 +277,7 @@ in
           "https://rpc.hyperliquid.xyz"
           "https://api.hyperdrive.fi"
           "https://eth.llamarpc.com"
+          "https://eth.blockrazor.xyz"
         ];
       };
       forex-price-feeds = {

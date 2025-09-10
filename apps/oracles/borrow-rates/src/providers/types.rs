@@ -3,7 +3,7 @@ use anyhow::Result;
 use url::Url;
 
 pub const RPC_URL_HYPEREVM_MAINNET: &str = "https://rpc.hyperliquid.xyz/evm";
-pub const RPC_URL_ETHEREUM_MAINNET: &str = "https://eth.llamarpc.com";
+pub const RPC_URL_ETHEREUM_MAINNET: &str = "https://eth.blockrazor.xyz";
 
 pub fn get_rpc_url(network: &SupportedNetworks) -> Result<Url> {
     match network {
