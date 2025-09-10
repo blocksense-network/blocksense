@@ -9,9 +9,7 @@ use blocksense_sdk::eth_rpc::eth_call;
 use crate::{
     domain::{BorrowRateInfo, Marketplace, SupportedNetworks},
     providers::{
-        hyperlend::HyperLendUi,
-        hypurrfi::HypurrFiUi,
-        types::{get_rpc_url, MyProvider},
+        aave::AaveUi, hyperlend::HyperLendUi, hypurrfi::HypurrFiUi, types::{get_rpc_url, MyProvider}
     },
     utils::math::ray_to_apr,
 };
@@ -54,6 +52,7 @@ pub async fn fetch_reserves(
     let plan = match marketplace {
         Marketplace::HypurrFi(_) => HypurrFiUi::plan_for(network)?,
         Marketplace::HyperLend(_) => HyperLendUi::plan_for(network)?,
+        Marketplace::Aave(_) => AaveUi::plan_for(network)?,
         Marketplace::HyperDrive(_) | Marketplace::EulerFinance(_) => {
             unreachable!(
                 "Pool data provider not supported for this marketplace {:?}",

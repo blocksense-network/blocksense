@@ -38,10 +38,16 @@ pub type RatesPerFeedPerMarket = HashMap<MarketplaceType, RatesPerFeed>;
 #[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash, Clone, AsRefStr)]
 #[serde(tag = "marketplace")]
 pub enum Marketplace {
+    Aave(AaveArgs),
     HypurrFi(HypurrFiArgs),
     HyperLend(HyperLendArgs),
     HyperDrive(HyperDriveArgs),
     EulerFinance(EulerFinanceArgs),
+}
+
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash, Clone)]
+pub struct AaveArgs {
+    pub network: SupportedNetworks,
 }
 
 #[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash, Clone)]
@@ -109,6 +115,7 @@ impl<'de> Deserialize<'de> for SupportedNetworks {
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 pub enum MarketplaceType {
+    Aave,
     HypurrFi,
     HyperLend,
     HyperDrive,
@@ -118,6 +125,7 @@ pub enum MarketplaceType {
 impl From<&Marketplace> for MarketplaceType {
     fn from(marketplace: &Marketplace) -> Self {
         match marketplace {
+            Marketplace::Aave(_) => MarketplaceType::Aave,
             Marketplace::HypurrFi(_) => MarketplaceType::HypurrFi,
             Marketplace::HyperLend(_) => MarketplaceType::HyperLend,
             Marketplace::HyperDrive(_) => MarketplaceType::HyperDrive,
@@ -154,6 +162,7 @@ pub fn map_assets_to_feeds(
             .iter()
             .filter(|f| {
                 match &f.arguments {
+                    Marketplace::Aave(args) => args.network == net,
                     Marketplace::HypurrFi(args) => args.network == net,
                     Marketplace::HyperLend(args) => args.network == net,
                     Marketplace::EulerFinance(args) => args.network == net,
