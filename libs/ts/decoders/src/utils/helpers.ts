@@ -15,8 +15,6 @@ export const expandJsonFields = (
   mainStructName: string,
   inputData: Record<string, Types.TupleField>,
 ) => {
-  const unionTypes: Types.TupleField[] = [];
-
   const expandJsonFields = (data: Types.TupleField | Types.PrimitiveField) => {
     if ('components' in data) {
       for (const key in data.components) {
@@ -25,9 +23,6 @@ export const expandJsonFields = (
     }
 
     if (isFieldType(data.type)) {
-      if (data.type === 'union' && 'components' in data) {
-        unionTypes.push(data);
-      }
       return data;
     } else {
       let bracketIndex = data.type.indexOf('[');
@@ -47,19 +42,15 @@ export const expandJsonFields = (
     inputData[key] = expandJsonFields(inputData[key]) as Types.TupleField;
   }
 
-  const unionRequirements = unionTypes.flatMap(type =>
-    type.components.map(comp => comp.name),
-  );
-
   for (const key in inputData) {
-    if (key === mainStructName || unionRequirements.includes(key)) {
+    if (key === mainStructName) {
       continue;
     }
 
     delete inputData[key];
   }
 
-  return { inputData, unionTypes };
+  return inputData;
 };
 
 const isFieldType = (type: string): type is Types.FieldType => {
