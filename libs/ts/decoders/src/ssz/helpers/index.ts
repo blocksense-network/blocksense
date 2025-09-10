@@ -10,6 +10,7 @@ export const generateDecoderLines = (
   name: string,
   evmVersion: string,
   start: number = 0,
+  paddedLen: boolean = false,
 ): string[] => {
   const { generateDecoderPrimitiveLines, generateDecoderStringBytes } =
     getDecoderImplementations(evmVersion);
@@ -72,6 +73,8 @@ export const generateDecoderLines = (
           // main container which is not a Vector or List
           innerName = location;
         }
+
+        let idx = 0;
         schema.fields.forEach((subSchema, i) => {
           let newStart = ranges[i].start.value;
           if (!ranges[i].start.isGenerated) {
@@ -106,18 +109,24 @@ export const generateDecoderLines = (
             ...generateDecoderLines(
               subSchema,
               innerName,
-              i,
+              idx,
               newStart,
               newEnd,
               schema.sszFixedSize,
             ),
           );
+          if (subSchema.typeName !== 'none') {
+            // skip none type
+            idx++;
+          }
         });
         lines.push('}\n');
       } else if (schema.typeName.startsWith('List')) {
         if (
           schema.types[1] &&
-          !['Vector', 'List', 'ByteList'].includes(schema.types[1].type)
+          !['Vector', 'List', 'ByteList', 'union'].includes(
+            schema.types[1].type,
+          )
         ) {
           // list basic
           const isBytesNum =
@@ -209,7 +218,7 @@ export const generateDecoderLines = (
             `);
         }
       }
-    } else if (schema.sszFixedSize) {
+    } else if (typeof schema.sszFixedSize === 'number') {
       // primitive here
       if (
         schema.typeName.startsWith('ByteVector') &&
@@ -222,6 +231,8 @@ export const generateDecoderLines = (
         mstore(${index ? `add(${location}, ${index * 0x20})` : location},
         mload(add(data, ${start})))
         `);
+      } else if (schema.typeName === 'none') {
+        lines.push('// `none` type, do nothing');
       } else {
         // shift to right
         lines.push(`
@@ -287,7 +298,7 @@ export const generateDecoderLines = (
 
   const lines: string[] = [];
   let length = 'mload(data)'; // default length location
-  if (start) {
+  if (paddedLen) {
     lines.push(
       `let data_length := shr(${256 - start * 8}, mload(add(data, 32)))`,
     );
