@@ -1,0 +1,46 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.28;
+
+/// @notice Decoder for stored packed tuple data
+library <%= unionName %>SSZSubDecoder {
+  /// @notice User defined struct
+  /// @dev Using structs avoids hitting the EVM stack limit
+<%= structs.map((struct) => {
+  return `  struct ${struct.name} {
+  ${struct.fields.map((fields) => `  ${fields.type} ${fields.name};`).join('\n  ')}
+  }`
+}).join('\n\n') %>
+
+  <%=
+  unionTypes.map((ut, i) =>
+    `function is${toUpperFirstLetter(ut.type)}(uint8 selector) external pure returns (bool) {
+        return selector == ${i};
+    }`
+  ).join('\n\n')
+  %>
+
+  <%-
+  unionTypes.map((ut, i) => {
+    if (ut.typeName === 'none'){
+      // Skip none
+      return '';
+    }
+
+    let type = ut.type
+    if(ut.type.includes('tuple'))
+    {
+      type = toUpperFirstLetter(ut.fieldName) + (ut.type.match(/\[(\d*)\]/g) || []).join('');
+    }
+
+    return `
+      function decode${toUpperFirstLetter(ut.type)} (
+        bytes memory data
+      ) external pure returns (${type} ${ut.sszFixedSize === null ? 'memory' : ''} ${ut.fieldName}) {
+        assembly (\'memory-safe\') {
+          ${lines[i].join('\n')}
+        }
+      }`
+  }).join('\n\n')
+  %>
+
+}
