@@ -537,6 +537,51 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                     }
                 }
 
+                // Capture block hashes for non-finalized range: latest head down to finalized
+                if let Some(ref fb) = finalized_block_opt {
+                    let finalized_height = fb.header.inner.number;
+                    // Clone provider handle and fetch current latest head
+                    let rpc_handle = {
+                        let provider = provider_mutex.lock().await;
+                        provider.provider.clone()
+                    };
+                    if let Ok(Some(b)) = rpc_handle
+                        .get_block_by_number(BlockNumberOrTag::Latest)
+                        .await
+                    {
+                        let latest_hash = b.header.hash;
+                        let latest_number = b.header.inner.number;
+                        if latest_number >= finalized_height {
+                            let mut cur_hash = latest_hash;
+                            let mut cur_num = latest_number;
+                            // Limit walk to avoid excessive RPCs in extreme cases
+                            let max_steps = 2048_u64;
+                            let mut steps = 0_u64;
+                            while cur_num >= finalized_height && steps < max_steps {
+                                // Insert current hash into provider cache
+                                {
+                                    let mut provider = provider_mutex.lock().await;
+                                    provider.insert_non_finalized_block_hash(cur_num, cur_hash);
+                                }
+                                // step to parent
+                                match rpc_handle.get_block_by_hash(cur_hash).await {
+                                    Ok(Some(b)) => {
+                                        let next_hash = b.header.inner.parent_hash;
+                                        let next_num = b.header.inner.number;
+                                        if next_num >= cur_num {
+                                            break;
+                                        }
+                                        cur_hash = next_hash;
+                                        cur_num = next_num;
+                                    }
+                                    _ => break,
+                                }
+                                steps += 1;
+                            }
+                        }
+                    }
+                }
+
                 // 3) If we detected divergence, resync round-buffer indices from chain
                 if need_resync_indices {
                     let mut provider = provider_mutex.lock().await;
@@ -727,6 +772,7 @@ pub async fn eth_batch_send_to_contract(
     };
 
     let mut inclusion_block = None;
+    let mut inclusion_block_hash: Option<B256> = None;
 
     loop {
         debug!("loop begin; transaction_retries_count={transaction_retries_count} in network `{net}` block height {block_height} with transaction_retries_count_limit = {transaction_retries_count_limit} and transaction_retry_timeout_secs = {transaction_retry_timeout_secs}");
@@ -1026,6 +1072,9 @@ pub async fn eth_batch_send_to_contract(
         if let Some(eth_block_number) = tx_receipt.block_number {
             info!("Transaction was included in block #{}", eth_block_number);
             inclusion_block = Some(eth_block_number);
+            if let Some(h) = tx_receipt.block_hash {
+                inclusion_block_hash = Some(h);
+            }
         } else {
             error!("Receipt has no block number!");
         }
@@ -1048,6 +1097,9 @@ pub async fn eth_batch_send_to_contract(
 
     if let Some(b) = inclusion_block {
         provider.insert_non_finalized_update(b, cmd);
+        if let Some(h) = inclusion_block_hash {
+            provider.insert_non_finalized_block_hash(b, h);
+        }
     }
     provider.update_history(&updates.updates);
     let result = receipt.status().to_string();

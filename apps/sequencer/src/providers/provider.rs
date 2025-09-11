@@ -125,6 +125,7 @@ pub struct RpcProvider {
     pub rb_indices: RoundBufferIndices,
     num_tx_in_progress: u32,
     non_finalized_updates: HashMap<u64, BatchOfUpdatesToProcess>,
+    pub non_finalized_block_hashes: HashMap<u64, B256>,
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -358,6 +359,7 @@ impl RpcProvider {
             rb_indices: RoundBufferIndices::new(),
             num_tx_in_progress: 0,
             non_finalized_updates: HashMap::new(),
+            non_finalized_block_hashes: HashMap::new(),
         }
     }
 
@@ -856,6 +858,7 @@ impl RpcProvider {
     }
 
     pub fn prune_non_finalized_up_to(&mut self, finalized_block: u64) -> usize {
+        // Prune cached updates up to finalized
         let keys_to_remove: Vec<u64> = self
             .non_finalized_updates
             .keys()
@@ -866,7 +869,21 @@ impl RpcProvider {
         for k in keys_to_remove {
             self.non_finalized_updates.remove(&k);
         }
+        // Also prune cached block hashes up to finalized
+        let hash_keys_to_remove: Vec<u64> = self
+            .non_finalized_block_hashes
+            .keys()
+            .cloned()
+            .filter(|k| *k <= finalized_block)
+            .collect();
+        for k in hash_keys_to_remove {
+            self.non_finalized_block_hashes.remove(&k);
+        }
         removed
+    }
+
+    pub fn insert_non_finalized_block_hash(&mut self, block_height: u64, hash: B256) {
+        self.non_finalized_block_hashes.insert(block_height, hash);
     }
 }
 
