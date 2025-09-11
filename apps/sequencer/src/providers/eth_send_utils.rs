@@ -292,8 +292,7 @@ pub async fn create_per_network_reorg_trackers(
 pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: SharedRpcProviders) {
     tracing::info!("Starting tracker for reorgs in network {net} loop...");
 
-    // Track last observed head to detect non-linear history
-    let mut _last_head: Option<(B256, u64)> = None;
+    let mut finalized_height = 0;
 
     loop {
         // Scope the lock on providers so we don't hold it across awaits/sleeps
@@ -302,54 +301,72 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
             if let Some(provider_mutex) = providers.get(net.as_str()) {
                 // Gather data and perform minimal work while holding the provider lock
                 let mut need_resync_indices = false;
-                let finalized_block_opt = {
+                {
                     let rpc_handle = {
                         let provider = provider_mutex.lock().await;
                         provider.provider.clone()
                     };
 
-                    // Observe latest head and check continuity with previous head
-                    let latest_head_info = match rpc_handle
-                        .get_block_by_number(BlockNumberOrTag::Latest)
-                        .await
-                    {
-                        Ok(Some(b)) => {
-                            let h = b.header.hash;
-                            let parent_hash = b.header.inner.parent_hash;
-                            let n = b.header.inner.number;
-                            Some((h, parent_hash, n))
-                        }
-                        Ok(None) => None,
-                        Err(e) => {
-                            warn!("Failed to get latest block in `{net}`: {e:?}");
-                            None
-                        }
-                    };
-
-                    if let Some((latest_hash, _latest_parent_hash, latest_number)) =
-                        latest_head_info
-                    {
-                        // Record latest head; reorg detection handled via cached chain below
-                        _last_head = Some((latest_hash, latest_number));
-                    }
-
                     // 1) Observe latest finalized block for logging/visibility
-                    let finalized_block_opt = match rpc_handle
+                    match rpc_handle
                         .get_block_by_number(BlockNumberOrTag::Finalized)
                         .await
                     {
                         Ok(res) => match res {
-                            Some(eth_finalized_block) => Some(eth_finalized_block),
+                            Some(eth_finalized_block) => {
+                                info!("Last finalized block in network {net} = {eth_finalized_block:?}");
+                                // Prune non-finalized updates up to finalized height
+                                finalized_height = eth_finalized_block.header.inner.number;
+                                let mut provider = provider_mutex.lock().await;
+                                let removed = provider.prune_non_finalized_up_to(finalized_height);
+                                if removed > 0 {
+                                    info!("Pruned {removed} non-finalized updates up to finalized height {finalized_height} in `{net}`");
+                                }
+                            }
                             None => {
                                 warn!("Could not get finalized block in network {net}, got None!");
-                                None
                             }
                         },
                         Err(e) => {
                             warn!("Could not get finalized block in network {net}: {e:?}!");
-                            None
                         }
                     };
+
+                    if let Ok(Some(b)) = rpc_handle
+                        .get_block_by_number(BlockNumberOrTag::Latest)
+                        .await
+                    {
+                        let latest_hash = b.header.hash;
+                        let latest_number = b.header.inner.number;
+                        if latest_number >= finalized_height {
+                            let mut cur_hash = latest_hash;
+                            let mut cur_num = latest_number;
+                            // Limit walk to avoid excessive RPCs in extreme cases
+                            let max_steps = 2048_u64;
+                            let mut steps = 0_u64;
+                            let mut provider = provider_mutex.lock().await;
+
+                            while cur_num >= finalized_height && steps < max_steps {
+                                // Insert current hash into provider cache
+                                provider.insert_non_finalized_block_hash(cur_num, cur_hash);
+
+                                // step to parent
+                                match rpc_handle.get_block_by_hash(cur_hash).await {
+                                    Ok(Some(b)) => {
+                                        let next_hash = b.header.inner.parent_hash;
+                                        let next_num = b.header.inner.number;
+                                        if next_num >= cur_num {
+                                            break;
+                                        }
+                                        cur_hash = next_hash;
+                                        cur_num = next_num;
+                                    }
+                                    _ => break,
+                                }
+                                steps += 1;
+                            }
+                        }
+                    }
 
                     // 2) Check the on-chain ADFS root; if it differs from our local view,
                     //    set it so subsequent txs use the correct prev-root and flag resync of indices.
@@ -389,64 +406,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                             }
                         }
                     }
-
-                    finalized_block_opt
                 };
-                info!("Last finalized block in network {net} = {finalized_block_opt:?}");
-                // Prune non-finalized updates up to finalized height
-                if let Some(ref fb) = finalized_block_opt {
-                    let finalized_height = fb.header.inner.number;
-                    let mut provider = provider_mutex.lock().await;
-                    let removed = provider.prune_non_finalized_up_to(finalized_height);
-                    if removed > 0 {
-                        info!("Pruned {removed} non-finalized updates up to finalized height {finalized_height} in `{net}`");
-                    }
-                }
-
-                // Capture block hashes for non-finalized range: latest head down to finalized
-                if let Some(ref fb) = finalized_block_opt {
-                    let finalized_height = fb.header.inner.number;
-                    // Clone provider handle and fetch current latest head
-                    let rpc_handle = {
-                        let provider = provider_mutex.lock().await;
-                        provider.provider.clone()
-                    };
-                    if let Ok(Some(b)) = rpc_handle
-                        .get_block_by_number(BlockNumberOrTag::Latest)
-                        .await
-                    {
-                        let latest_hash = b.header.hash;
-                        let latest_number = b.header.inner.number;
-                        if latest_number >= finalized_height {
-                            let mut cur_hash = latest_hash;
-                            let mut cur_num = latest_number;
-                            // Limit walk to avoid excessive RPCs in extreme cases
-                            let max_steps = 2048_u64;
-                            let mut steps = 0_u64;
-                            while cur_num >= finalized_height && steps < max_steps {
-                                // Insert current hash into provider cache
-                                {
-                                    let mut provider = provider_mutex.lock().await;
-                                    provider.insert_non_finalized_block_hash(cur_num, cur_hash);
-                                }
-                                // step to parent
-                                match rpc_handle.get_block_by_hash(cur_hash).await {
-                                    Ok(Some(b)) => {
-                                        let next_hash = b.header.inner.parent_hash;
-                                        let next_num = b.header.inner.number;
-                                        if next_num >= cur_num {
-                                            break;
-                                        }
-                                        cur_hash = next_hash;
-                                        cur_num = next_num;
-                                    }
-                                    _ => break,
-                                }
-                                steps += 1;
-                            }
-                        }
-                    }
-                }
 
                 // 3) If we detected divergence, resync round-buffer indices from chain
                 if need_resync_indices {
