@@ -1,4 +1,11 @@
-lib: with lib; {
+{
+  lib,
+  cfg,
+  name,
+  ...
+}:
+with lib;
+{
   options = {
     is-enabled = mkOption {
       type = types.bool;
@@ -81,5 +88,11 @@ lib: with lib; {
       default = [ ];
       description = mdDoc "List of contracts of various types";
     };
+  };
+
+  config = {
+    url = lib.mkIf (cfg.anvil ? ${name}) (
+      lib.mkDefault "http://${cfg.anvil.${name}.host}:${toString cfg.anvil.${name}.port}"
+    );
   };
 }

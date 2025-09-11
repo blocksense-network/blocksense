@@ -1,0 +1,94 @@
+networks:
+  blocksense: {}
+  observability: {}
+
+configs:
+  blocksense-feeds:
+    file: ../../feeds_config_v2.json
+  blocksense-sequencer:
+    file: ../../generated/process-compose/docker-compose/sequencer_config.json
+  blocksense-reporter:
+    file: ../../generated/process-compose/docker-compose/reporter_config_a.json
+
+secrets:
+  blocksense-sequencer-evm-priv-key:
+    file: ../../../nix/test-environments/test-keys/reporter_second_consensus_secret_key
+
+  blocksense-reporter-bls-priv-key:
+    file: ../../../nix/test-environments/test-keys/reporter_secret_key
+  blocksense-reporter-evm-priv-key:
+    file: ../../../nix/test-environments/test-keys/reporter_second_consensus_secret_key
+  blocksense-reporter-alphavantage-api-key:
+    file: ../../../nix/test-environments/test-keys/ALPHAVANTAGE_API_KEY
+  blocksense-reporter-apca-api-key-id:
+    file: ../../../nix/test-environments/test-keys/APCA_API_KEY_ID
+  blocksense-reporter-apca-api-secret-key:
+    file: ../../../nix/test-environments/test-keys/APCA_API_SECRET_KEY
+  blocksense-reporter-fmp-api-key:
+    file: ../../../nix/test-environments/test-keys/FMP_API_KEY
+  blocksense-reporter-spout-rwa-api-key:
+    file: ../../../nix/test-environments/test-keys/SPOUT_RWA_API_KEY
+  blocksense-reporter-twelvedata-api-key:
+    file: ../../../nix/test-environments/test-keys/TWELVEDATA_API_KEY
+  blocksense-reporter-yahoo-finance-api-key:
+    file: ../../../nix/test-environments/test-keys/YAHOO_FINANCE_API_KEY
+
+services:
+  anvil-ink-sepolia:
+    image: ghcr.io/foundry-rs/foundry:latest
+    entrypoint: >
+      /usr/local/bin/anvil
+      --host 0.0.0.0
+      --port 8544
+      --chain-id 99999999999
+      --fork-url wss://ws-gel-sepolia.inkonchain.com
+    networks:
+      - blocksense
+    ports:
+      - '8544:8544' # ETH EL JSON RPC port
+
+  blocksense-sequencer:
+    image: blocksense/sequencer:dev
+    stop_grace_period: 0s
+    networks:
+      - blocksense
+    ports:
+      - '9856:9856' # main-port
+      - '5553:5553' # admin-port
+      - '5551:5551' # metrics-port
+    environment:
+      - 'SEQUENCER_LOG_LEVEL=DEBUG'
+      - 'SEQUENCER_CONFIG_DIR=/etc/blocksense'
+      - 'FEEDS_CONFIG_DIR=/etc/blocksense'
+    secrets:
+      - blocksense-sequencer-evm-priv-key
+    configs:
+      - source: blocksense-sequencer
+        target: /etc/blocksense/sequencer_config.json
+      - source: blocksense-feeds
+        target: /etc/blocksense/feeds_config_v2.json
+
+  blocksense-reporter-a:
+    stop_grace_period: 0s
+    depends_on:
+      - blocksense-sequencer
+    image: blocksense/reporter:dev
+    working_dir: /tmp
+    networks:
+      - blocksense
+    configs:
+      - source: blocksense-reporter
+        target: /etc/blocksense/reporter_config_a.json
+    environment:
+      - RUST_BACKTRACE=full
+      - RUST_LOG=trigger=trace,feeds_processing=info
+    secrets:
+      - blocksense-reporter-bls-priv-key
+      - blocksense-reporter-evm-priv-key
+      - blocksense-reporter-alphavantage-api-key
+      - blocksense-reporter-apca-api-key-id
+      - blocksense-reporter-apca-api-secret-key
+      - blocksense-reporter-fmp-api-key
+      - blocksense-reporter-spout-rwa-api-key
+      - blocksense-reporter-twelvedata-api-key
+      - blocksense-reporter-yahoo-finance-api-key

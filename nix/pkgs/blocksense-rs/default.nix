@@ -54,6 +54,7 @@ let
 
     env = {
       ZSTD_SYS_USE_PKG_CONFIG = true;
+      CARGO_PROFILE = "dev";
     };
 
     doCheck = false;

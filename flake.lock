@@ -40,11 +40,11 @@
     "blama": {
       "flake": false,
       "locked": {
-        "lastModified": 1751530694,
-        "narHash": "sha256-4JXxOIMXHffOzQrNcHyy2YnuYUhUaAbyoV6MW+8pehs=",
+        "lastModified": 1756475603,
+        "narHash": "sha256-+vsPlM7oR6b+KbUAaGQ+x96du0j2GUkxAI0lyUkk5HM=",
         "owner": "blocksense-network",
         "repo": "blama",
-        "rev": "133ca6892368781c41bfad0cc388feb2d1665d85",
+        "rev": "c094698f5c702c60391fb172e25660e234c8abe1",
         "type": "github"
       },
       "original": {
