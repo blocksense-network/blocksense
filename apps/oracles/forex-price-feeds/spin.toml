@@ -832,6 +832,12 @@ stride = 0
 decimals = 8
 data = '{"pair":{"base":"ZAC","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage","FMP"]}}'
 
+[[trigger.oracle.data_feeds]]
+id = "20000"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"LME-XCU","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["MetalsAPI"]}}'
+
 [[trigger.oracle.capabilities]]
 data = "x"
 id = "ALPHAVANTAGE_API_KEY"
