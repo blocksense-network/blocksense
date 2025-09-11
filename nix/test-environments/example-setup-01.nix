@@ -188,6 +188,7 @@ in
           TWELVEDATA_API_KEY = "${apiKeysDir}/TWELVEDATA_API_KEY";
           FMP_API_KEY = "${apiKeysDir}/FMP_API_KEY";
           SPOUT_RWA_API_KEY = "${apiKeysDir}/SPOUT_RWA_API_KEY";
+          METALS_API_KEY = "${apiKeysDir}/METALS_API_KEY";
         };
       };
     };
@@ -286,12 +287,14 @@ in
           "https://yfapi.net"
           "https://api.twelvedata.com"
           "https://financialmodelingprep.com"
+          "https://metals-api.com"
         ];
         api-keys = [
           "ALPHAVANTAGE_API_KEY"
           "YAHOO_FINANCE_API_KEY"
           "TWELVEDATA_API_KEY"
           "FMP_API_KEY"
+          "METALS_API_KEY"
         ];
       };
     };
