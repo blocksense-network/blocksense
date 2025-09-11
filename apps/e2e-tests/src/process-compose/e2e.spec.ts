@@ -27,8 +27,10 @@ import type {
   ProcessComposeService,
   SequencerService,
   UpdatesToNetwork,
+  ReportData,
 } from './types';
 import { ProcessCompose, Sequencer } from './types';
+import type { FeedResult } from './generate-signature';
 import type { FeedsValueAndRound } from '../utils/onchain';
 import { getDataFeedsInfoFromNetwork } from '../utils/onchain';
 
@@ -257,6 +259,49 @@ describe.sequential('E2E Tests with process-compose', () => {
       }
     }),
   );
+
+  describe.sequential('Reports results are correctly updated', () => {
+    it.live('Posts reports and observes a network update', () =>
+      Effect.gen(function* () {
+        const feed_id = feedIds[0].toString();
+
+        const numericalResult: FeedResult = { Ok: { Numerical: 3.14159 } }; // Ok → Numerical
+        const textResult: FeedResult = { Ok: { Text: 'sensor online' } }; // Ok → Text
+        const bytesResult: FeedResult = {
+          Ok: { Bytes: [72, 101, 108, 108, 111] },
+        }; // Ok → Bytes
+        const apiErrorResult: FeedResult = {
+          Err: { APIError: 'Rate limit exceeded' },
+        }; // Err → APIError
+
+        const reports: Array<ReportData> = [
+          { feed_id, value: numericalResult },
+          { feed_id, value: textResult },
+          { feed_id, value: bytesResult },
+          { feed_id, value: apiErrorResult },
+        ];
+
+        const baselineUpdates = yield* sequencer
+          .fetchUpdatesToNetworksMetric()
+          .pipe(Effect.map(m => m[network]?.[feed_id] ?? 0));
+
+        for (const report of reports) {
+          const response = yield* sequencer.postReportsBatch([report]);
+          expect(response.status).toEqual(200);
+        }
+
+        const finalCount = yield* Effect.retry(
+          sequencer.fetchUpdatesToNetworksMetric().pipe(
+            Effect.map(m => m[network]?.[feed_id] ?? 0),
+            Effect.filterOrFail(count => count >= baselineUpdates + 1),
+          ),
+          { schedule: Schedule.fixed(2000), times: 30 },
+        );
+
+        expect(finalCount).toBeGreaterThanOrEqual(baselineUpdates + 1);
+      }),
+    );
+  });
 
   describe.sequential('Reporter behavior based on logs', () => {
     const reporterLogsFile =
