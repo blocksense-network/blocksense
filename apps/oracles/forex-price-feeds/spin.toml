@@ -848,13 +848,18 @@ id = "YAHOO_FINANCE_API_KEY"
 data = "x"
 id = "FMP_API_KEY"
 
+[[trigger.oracle.capabilities]]
+data = "x"
+id = "METALS_API_KEY"
+
 [component.forex-price-feeds]
 source = "../target/wasm32-wasip1/release/forex_price_feeds.wasm"
 allowed_outbound_hosts = [
   "https://yfapi.net",
   "https://www.alphavantage.co",
   "https://api.twelvedata.com",
-  "https://financialmodelingprep.com"
+  "https://financialmodelingprep.com",
+  "https://metals-api.com"
 ]
 
 [component.forex-price-feeds.build]
