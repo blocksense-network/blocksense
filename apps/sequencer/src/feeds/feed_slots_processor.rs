@@ -463,6 +463,7 @@ pub mod tests {
             first_report_start_time,
             "numerical".to_string(),
             "average".to_string(),
+            "the_oracle".to_string(),
             None,
         );
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
@@ -655,6 +656,7 @@ pub mod tests {
             first_report_start_time,
             "numerical".to_string(),
             "average".to_string(),
+            "the_oracle".to_string(),
             None,
         );
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
@@ -758,6 +760,7 @@ pub mod tests {
             first_report_start_time,
             "numerical".to_string(),
             "average".to_string(),
+            "the_oracle".to_string(),
             None,
         );
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
@@ -866,6 +869,7 @@ pub mod tests {
             first_report_start_time,
             "numerical".to_string(),
             "average".to_string(),
+            "the_oracle".to_string(),
             None,
         );
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
@@ -972,6 +976,7 @@ pub mod tests {
             first_report_start_time,
             "numerical".to_string(),
             "average".to_string(),
+            "the_oracle".to_string(),
             None,
         );
         let feed_metadata_arc = Arc::new(RwLock::new(feed_metadata));
