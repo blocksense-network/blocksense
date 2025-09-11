@@ -5,7 +5,8 @@
   "exports": {
     "./Logo": "./src/components/Logo/Logo.tsx",
     "./website/LetsTalkEmail": "./src/components/website/LetsTalkEmail.tsx",
-    "./links": "./src/constants/links.ts"
+    "./links": "./src/constants/links.ts",
+    "./utils/renderEmail": "./src/utils/renderEmail.tsx"
   },
   "scripts": {
     "storybook": "storybook dev -p 6006",
