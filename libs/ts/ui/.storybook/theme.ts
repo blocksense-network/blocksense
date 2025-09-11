@@ -1,5 +1,7 @@
 import { create } from 'storybook/theming';
 
+import { links } from '../src/constants/links';
+
 export default create({
   base: 'dark',
 
@@ -9,7 +11,7 @@ export default create({
 
   // Brand
   brandTitle: 'Blocksense Network',
-  brandUrl: 'https://blocksense.network',
+  brandUrl: links.website.home,
   brandImage: '/brand.svg',
   brandTarget: '_target',
 
