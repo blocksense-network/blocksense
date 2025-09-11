@@ -9,6 +9,7 @@ use blocksense_data_providers_sdk::price_data::{
             alpha_vantage::AlphaVantagePriceFetcher, twelvedata::TwelveDataPriceFetcher,
             yahoo_finance::YFPriceFetcher, fmp::FMPPriceFetcher
         },
+        metals::metals_api::MetalsApiPriceFetcher
     },
     traits::prices_fetcher::{fetch, TradingPairSymbol},
     types::{PairsToResults, ProviderPriceData, ProvidersSymbols},
@@ -23,6 +24,7 @@ pub struct SymbolsData {
     pub twelvedata: Vec<TradingPairSymbol>,
     pub yahoo_finance: Vec<TradingPairSymbol>,
     pub fmp: Vec<TradingPairSymbol>,
+    pub metals_api: Vec<TradingPairSymbol>,
 }
 
 impl SymbolsData {
@@ -42,6 +44,10 @@ impl SymbolsData {
                 .unwrap_or_default(),
             fmp: providers_symbols
                 .get("FMP")
+                .cloned()
+                .unwrap_or_default(),
+            metals_api: providers_symbols
+                .get("MetalsAPI")
                 .cloned()
                 .unwrap_or_default(),
         })
@@ -74,6 +80,11 @@ pub async fn get_prices(
         fetch::<FMPPriceFetcher>(
             &symbols.fmp,
             get_api_keys(capabilities, &["FMP_API_KEY"]),
+            timeout_secs,
+        ),
+        fetch::<MetalsApiPriceFetcher>(
+            &symbols.metals_api,
+            get_api_keys(capabilities, &["METALS_API_KEY"]),
             timeout_secs,
         ),
     ]);
