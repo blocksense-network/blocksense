@@ -1,9 +1,8 @@
 import * as React from 'react';
 import { ReactNode } from 'react';
-import { Tailwind } from '@react-email/tailwind';
-import { render } from '@react-email/render';
 
 import { links } from '../../constants/links';
+import { renderEmail } from '../../utils/renderEmail';
 
 type ResourceLinkProps = {
   href: string;
@@ -53,108 +52,106 @@ export type LetsTalkEmailProps = {
 
 export const LetsTalkEmail = ({ name }: LetsTalkEmailProps) => {
   return (
-    <Tailwind>
-      <table
-        role="presentation"
-        width="100%"
-        cellPadding={0}
-        cellSpacing={0}
-        border={0}
-        className="w-full m-0 p-0"
-      >
-        <tbody>
-          <tr>
-            <td>
-              <div className="max-w-[600px] mx-auto bg-[#ffffff] rounded-[16px] p-[24px] text-[#171717]">
-                <h1 className="m-0 mb-[12px] text-[24px]">
-                  Welcome aboard the Blocksense ship 🏴‍☠️
-                </h1>
+    <table
+      role="presentation"
+      width="100%"
+      cellPadding={0}
+      cellSpacing={0}
+      border={0}
+      className="w-full m-0 p-0"
+    >
+      <tbody>
+        <tr>
+          <td>
+            <div className="max-w-[600px] mx-auto bg-[#ffffff] rounded-[16px] p-[24px] text-[#171717]">
+              <h1 className="m-0 mb-[12px] text-[24px]">
+                Welcome aboard the Blocksense ship 🏴‍☠️
+              </h1>
 
-                <p className="m-0 mb-[12px] text-[16px]">Hi {name},</p>
+              <p className="m-0 mb-[12px] text-[16px]">Hi {name},</p>
 
-                <p className="m-0 mb-[12px] text-[16px]">
-                  Thanks for contacting us through our{' '}
-                  <a
-                    href={links.website.letsTalk}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#1A57FF] underline"
-                  >
-                    let's talk form
-                  </a>
-                  . We'll be in touch soon to learn more about your use case and
-                  how Blocksense can help.
-                </p>
-
-                <p className="m-0 mb-[12px] text-[16px]">
-                  In the meantime, the best way to stay in the loop is to join
-                  the crew:
-                </p>
-
-                <ul className="m-0 pl-[20px] list-disc list-outside pb-[20px]">
-                  <ResourceLink href={links.docs.home}>
-                    Explore the Docs
-                  </ResourceLink>
-                  <ResourceLink href={links.website.litepaper}>
-                    Read the Litepaper
-                  </ResourceLink>
-                  <ResourceLink href={links.repos.blocksenseOS}>
-                    Learn about BlocksenseOS
-                  </ResourceLink>
-                </ul>
-
-                <table
-                  role="presentation"
-                  width="100%"
-                  cellPadding={0}
-                  cellSpacing={0}
-                  border={0}
+              <p className="m-0 mb-[12px] text-[16px]">
+                Thanks for contacting us through our{' '}
+                <a
+                  href={links.website.letsTalk}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#1A57FF] underline"
                 >
-                  <tbody>
-                    <tr>
-                      <td
-                        align="left"
-                        valign="top"
-                        width="50%"
-                        className="pr-[8px]"
-                      >
-                        <SocialCard
-                          href={links.social.x}
-                          stat="70K+"
-                          label="FOLLOWERS ON X"
-                          cta="Follow us on X"
-                        />
-                      </td>
-                      <td
-                        align="left"
-                        valign="top"
-                        width="50%"
-                        className="pl-[8px]"
-                      >
-                        <SocialCard
-                          href={links.social.discord}
-                          stat="80K+"
-                          label="COMMUNITY MEMBERS"
-                          cta="Become a member"
-                        />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                  let's talk form
+                </a>
+                . We'll be in touch soon to learn more about your use case and
+                how Blocksense can help.
+              </p>
 
-                <p className="text-[16px] mt-[16px]">See you on board.</p>
-                <p className="m-0 mt-[2px] text-[12px] text-[#3A3A3A]">
-                  - The Blocksense Team
-                </p>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </Tailwind>
+              <p className="m-0 mb-[12px] text-[16px]">
+                In the meantime, the best way to stay in the loop is to join the
+                crew:
+              </p>
+
+              <ul className="m-0 pl-[20px] list-disc list-outside pb-[20px]">
+                <ResourceLink href={links.docs.home}>
+                  Explore the Docs
+                </ResourceLink>
+                <ResourceLink href={links.website.litepaper}>
+                  Read the Litepaper
+                </ResourceLink>
+                <ResourceLink href={links.repos.blocksenseOS}>
+                  Learn about BlocksenseOS
+                </ResourceLink>
+              </ul>
+
+              <table
+                role="presentation"
+                width="100%"
+                cellPadding={0}
+                cellSpacing={0}
+                border={0}
+              >
+                <tbody>
+                  <tr>
+                    <td
+                      align="left"
+                      valign="top"
+                      width="50%"
+                      className="pr-[8px]"
+                    >
+                      <SocialCard
+                        href={links.social.x}
+                        stat="70K+"
+                        label="FOLLOWERS ON X"
+                        cta="Follow us on X"
+                      />
+                    </td>
+                    <td
+                      align="left"
+                      valign="top"
+                      width="50%"
+                      className="pl-[8px]"
+                    >
+                      <SocialCard
+                        href={links.social.discord}
+                        stat="80K+"
+                        label="COMMUNITY MEMBERS"
+                        cta="Become a member"
+                      />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <p className="text-[16px] mt-[16px]">See you on board.</p>
+              <p className="m-0 mt-[2px] text-[12px] text-[#3A3A3A]">
+                - The Blocksense Team
+              </p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   );
 };
 
 export function renderLetsTalkEmail(name: string) {
-  return render(<LetsTalkEmail name={name} />);
+  return renderEmail(<LetsTalkEmail name={name} />);
 }
