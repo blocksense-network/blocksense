@@ -96,8 +96,8 @@ function DataTableContent({
                       <TableCell key={col.id} className="px-2 py-2.5">
                         {typeof col.cell === 'function'
                           ? col.cell({ row })
-                          : cellHaveContent(row[col.id])
-                            ? row[col.id]
+                          : cellHaveContent(col.accessor(row))
+                            ? col.accessor(row)
                             : noCellData}
                       </TableCell>
                     ),

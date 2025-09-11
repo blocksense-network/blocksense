@@ -75,7 +75,7 @@ export function DataTableFacetedFilter({
                       checked={selectedValues.includes(option)}
                       onChange={() => handleCheckboxChange(option)}
                     >
-                      {option}
+                      {option || '-'}
                     </Checkbox>
                   </CommandItem>
                 );

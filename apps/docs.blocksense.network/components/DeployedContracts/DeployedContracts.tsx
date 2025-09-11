@@ -154,6 +154,7 @@ export const DeployedContracts = ({
                     header: ({ column }) => (
                       <DataTableColumnHeader title={column.title} />
                     ),
+                    accessor: row => row.feedId,
                     cell: ({ row }) => (
                       <DataTableBadge>{row.feedId}</DataTableBadge>
                     ),
@@ -164,6 +165,7 @@ export const DeployedContracts = ({
                     header: ({ column }) => (
                       <DataTableColumnHeader title={column.title} />
                     ),
+                    accessor: row => row.name,
                     cell: ({ row }) => (
                       <DataTableBadge>{row.name}</DataTableBadge>
                     ),
@@ -174,6 +176,7 @@ export const DeployedContracts = ({
                     header: ({ column }) => (
                       <DataTableColumnHeader title={column.title} />
                     ),
+                    accessor: row => row.address,
                     cell: ({ row }) => (
                       <ContractAddress
                         network={selectedNetwork}
