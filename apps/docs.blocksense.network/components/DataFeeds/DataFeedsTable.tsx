@@ -71,6 +71,7 @@ export const DataFeedsTable = ({ feeds }: { feeds: FeedsConfig['feeds'] }) => {
               {row.additional_feed_info.pair.quote}
             </DataTableBadge>
           ),
+          facetedFilter: true,
         },
         {
           id: 'decimals',
@@ -93,6 +94,7 @@ export const DataFeedsTable = ({ feeds }: { feeds: FeedsConfig['feeds'] }) => {
           cell: ({ row }) => (
             <DataTableBadge>{row.additional_feed_info.category}</DataTableBadge>
           ),
+          facetedFilter: true,
         },
         {
           id: 'oracle_id',
