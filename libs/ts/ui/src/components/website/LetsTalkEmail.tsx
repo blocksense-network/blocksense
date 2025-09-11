@@ -3,6 +3,8 @@ import { ReactNode } from 'react';
 import { Tailwind } from '@react-email/tailwind';
 import { render } from '@react-email/render';
 
+import { links } from '../../constants/links';
+
 type ResourceLinkProps = {
   href: string;
   children: ReactNode;
@@ -73,7 +75,7 @@ export const LetsTalkEmail = ({ name }: LetsTalkEmailProps) => {
                 <p className="m-0 mb-[12px] text-[16px]">
                   Thanks for contacting us through our{' '}
                   <a
-                    href="https://blocksense.network/lets-talk"
+                    href={links.website.letsTalk}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[#1A57FF] underline"
@@ -90,13 +92,13 @@ export const LetsTalkEmail = ({ name }: LetsTalkEmailProps) => {
                 </p>
 
                 <ul className="m-0 pl-[20px] list-disc list-outside pb-[20px]">
-                  <ResourceLink href="https://docs.blocksense.network">
+                  <ResourceLink href={links.docs.home}>
                     Explore the Docs
                   </ResourceLink>
-                  <ResourceLink href="https://blocksense.network/resources/litepaper">
+                  <ResourceLink href={links.website.litepaper}>
                     Read the Litepaper
                   </ResourceLink>
-                  <ResourceLink href="https://github.com/blocksense-network/BlocksenseOS">
+                  <ResourceLink href={links.repos.blocksenseOS}>
                     Learn about BlocksenseOS
                   </ResourceLink>
                 </ul>
@@ -117,7 +119,7 @@ export const LetsTalkEmail = ({ name }: LetsTalkEmailProps) => {
                         className="pr-[8px]"
                       >
                         <SocialCard
-                          href="https://x.com/blocksense_"
+                          href={links.social.x}
                           stat="70K+"
                           label="FOLLOWERS ON X"
                           cta="Follow us on X"
@@ -130,7 +132,7 @@ export const LetsTalkEmail = ({ name }: LetsTalkEmailProps) => {
                         className="pl-[8px]"
                       >
                         <SocialCard
-                          href="https://discord.com/invite/blocksense"
+                          href={links.social.discord}
                           stat="80K+"
                           label="COMMUNITY MEMBERS"
                           cta="Become a member"
