@@ -273,12 +273,16 @@ describe.sequential('E2E Tests with process-compose', () => {
         const apiErrorResult: FeedResult = {
           Err: { APIError: 'Rate limit exceeded' },
         }; // Err → APIError
+        const undefinedErrorResult: FeedResult = {
+          Err: { UndefinedError: {} },
+        }; // Err → UndefinedError
 
         const reports: Array<ReportData> = [
           { feed_id, value: numericalResult },
           { feed_id, value: textResult },
           { feed_id, value: bytesResult },
           { feed_id, value: apiErrorResult },
+          { feed_id, value: undefinedErrorResult },
         ];
 
         const baselineUpdates = yield* sequencer
