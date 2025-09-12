@@ -430,13 +430,46 @@ pub struct PostRegisterOracle {
     pub oracle_script_wasm: String,
 }
 
-#[derive(PartialEq, Debug, Error, Clone, Serialize, Deserialize)]
+#[derive(PartialEq, Debug, Error, Clone, Serialize)]
 pub enum FeedError {
     #[error("API error ocurred: {0}")]
     APIError(String),
 
     #[error("Undefined error ocurred")]
     UndefinedError,
+}
+
+impl<'de> serde::Deserialize<'de> for FeedError {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        #[derive(serde::Deserialize)]
+        #[serde(untagged)]
+        enum FeedErrorWire {
+            Api {
+                #[serde(rename = "APIError")]
+                api_error: String,
+            },
+            UndefinedObj {
+                #[serde(rename = "UndefinedError")]
+                _ignored: serde::de::IgnoredAny,
+            },
+            UndefinedStr(String),
+        }
+
+        match FeedErrorWire::deserialize(deserializer)? {
+            FeedErrorWire::Api { api_error } => Ok(FeedError::APIError(api_error)),
+            FeedErrorWire::UndefinedObj { .. } => Ok(FeedError::UndefinedError),
+            FeedErrorWire::UndefinedStr(s) => {
+                if s == "UndefinedError" {
+                    Ok(FeedError::UndefinedError)
+                } else {
+                    Err(serde::de::Error::unknown_variant(&s, &["UndefinedError"]))
+                }
+            }
+        }
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
