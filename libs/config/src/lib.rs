@@ -155,7 +155,7 @@ impl Validated for ReporterConfig {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct PublishCriteria {
-    #[serde(deserialize_with = "encoded_feed_id_from_str")]
+    #[serde(deserialize_with = "encoded_feed_id_from_str_or_int")]
     pub encoded_feed_id: EncodedFeedId,
     #[serde(default)]
     pub skip_publish_if_less_then_percentage: f64,
@@ -167,12 +167,28 @@ pub struct PublishCriteria {
     pub peg_tolerance_percentage: f64,
 }
 
-fn encoded_feed_id_from_str<'de, D>(deserializer: D) -> Result<EncodedFeedId, D::Error>
+fn encoded_feed_id_from_str_or_int<'de, D>(deserializer: D) -> Result<EncodedFeedId, D::Error>
 where
     D: Deserializer<'de>,
 {
-    let s = String::deserialize(deserializer)?;
-    EncodedFeedId::from_str(&s).map_err(serde::de::Error::custom)
+    let v = serde_json::Value::deserialize(deserializer)?;
+    match v {
+        serde_json::Value::String(s) => {
+            EncodedFeedId::from_str(&s).map_err(serde::de::Error::custom)
+        }
+        serde_json::Value::Number(n) => {
+            if let Some(u) = n.as_u128() {
+                Ok(EncodedFeedId::from(u))
+            } else {
+                Err(serde::de::Error::custom(
+                    "encoded_feed_id number must be unsigned (fits in u128)",
+                ))
+            }
+        }
+        other => Err(serde::de::Error::custom(format!(
+            "encoded_feed_id must be a string 'stride:id' or a number, got {other:?}"
+        ))),
+    }
 }
 
 impl PublishCriteria {
@@ -253,18 +269,51 @@ fn deserialize_optional_encoded_feed_id_vec<'de, D>(
 where
     D: Deserializer<'de>,
 {
-    let raw: Vec<String> = Vec::<String>::deserialize(deserializer)?;
+    // Accept: missing/null -> None; [] -> None; ["stride:id", ...] or [number, ...]
+    let value_opt = Option::<serde_json::Value>::deserialize(deserializer)?;
+    let Some(value) = value_opt else {
+        return Ok(None);
+    };
 
-    if raw.is_empty() {
+    let arr = match value {
+        serde_json::Value::Null => return Ok(None),
+        serde_json::Value::Array(a) => a,
+        other => {
+            return Err(serde::de::Error::custom(format!(
+                "allow_feeds must be array of strings or numbers, got {other:?}"
+            )))
+        }
+    };
+
+    if arr.is_empty() {
         return Ok(None);
     }
 
-    let feeds: Vec<EncodedFeedId> = raw
-        .into_iter()
-        .map(|s| EncodedFeedId::from_str(&s).map_err(serde::de::Error::custom))
-        .collect::<Result<Vec<_>, _>>()?;
+    let mut out = Vec::with_capacity(arr.len());
+    for item in arr {
+        match item {
+            serde_json::Value::String(s) => {
+                let id = EncodedFeedId::from_str(&s).map_err(serde::de::Error::custom)?;
+                out.push(id);
+            }
+            serde_json::Value::Number(n) => {
+                if let Some(u) = n.as_u128() {
+                    out.push(EncodedFeedId::from(u));
+                } else {
+                    return Err(serde::de::Error::custom(
+                        "allow_feeds number must be unsigned (fits in u128)",
+                    ));
+                }
+            }
+            other => {
+                return Err(serde::de::Error::custom(format!(
+                    "allow_feeds must contain only strings or numbers, got {other:?}"
+                )))
+            }
+        }
+    }
 
-    Ok(Some(feeds))
+    Ok(Some(out))
 }
 
 impl Validated for Provider {
@@ -813,6 +862,102 @@ mod tests {
             assert_eq!(c.peg_to_value, Some(5.0f64));
             assert_eq!(c.peg_tolerance_percentage, 1.3f64);
         }
+    }
+
+    #[test]
+    fn provider_allow_feeds_as_strings() {
+        let json = r#"
+        {
+            "private_key_path": "/tmp/priv_key_test",
+            "url": "http://127.0.0.1:8546",
+            "transaction_retries_count_limit": 42,
+            "transaction_retry_timeout_secs": 20,
+            "retry_fee_increment_fraction": 0.1,
+            "transaction_gas_limit": 7500000,
+            "allow_feeds": ["0:13", "0:47"]
+        }
+        "#;
+
+        let p: Provider = serde_json::from_str(json).unwrap();
+        assert_eq!(
+            p.allow_feeds,
+            Some(vec![EncodedFeedId::new(13, 0), EncodedFeedId::new(47, 0)])
+        );
+    }
+
+    #[test]
+    fn provider_allow_feeds_as_numbers() {
+        let json = r#"
+        {
+            "private_key_path": "/tmp/priv_key_test",
+            "url": "http://127.0.0.1:8546",
+            "transaction_retries_count_limit": 42,
+            "transaction_retry_timeout_secs": 20,
+            "retry_fee_increment_fraction": 0.1,
+            "transaction_gas_limit": 7500000,
+            "allow_feeds": [13, 47]
+        }
+        "#;
+
+        let p: Provider = serde_json::from_str(json).unwrap();
+        assert_eq!(
+            p.allow_feeds,
+            Some(vec![EncodedFeedId::new(13, 0), EncodedFeedId::new(47, 0)])
+        );
+    }
+
+    #[test]
+    fn provider_allow_feeds_empty_is_none() {
+        let json = r#"
+        {
+            "private_key_path": "/tmp/priv_key_test",
+            "url": "http://127.0.0.1:8546",
+            "transaction_retries_count_limit": 42,
+            "transaction_retry_timeout_secs": 20,
+            "retry_fee_increment_fraction": 0.1,
+            "transaction_gas_limit": 7500000,
+            "allow_feeds": []
+        }
+        "#;
+
+        let p: Provider = serde_json::from_str(json).unwrap();
+        assert_eq!(p.allow_feeds, None);
+    }
+
+    #[test]
+    fn provider_allow_feeds_null_is_none() {
+        let json = r#"
+        {
+            "private_key_path": "/tmp/priv_key_test",
+            "url": "http://127.0.0.1:8546",
+            "transaction_retries_count_limit": 42,
+            "transaction_retry_timeout_secs": 20,
+            "retry_fee_increment_fraction": 0.1,
+            "transaction_gas_limit": 7500000,
+            "allow_feeds": null
+        }
+        "#;
+
+        let p: Provider = serde_json::from_str(json).unwrap();
+        assert_eq!(p.allow_feeds, None);
+    }
+
+    #[test]
+    fn provider_allow_feeds_missing_is_none() {
+        // Field omitted entirely should default to None
+        let json = r#"
+        {
+            "private_key_path": "/tmp/priv_key_test",
+            "url": "http://127.0.0.1:8546",
+            "transaction_retries_count_limit": 42,
+            "transaction_retry_timeout_secs": 20,
+            "retry_fee_increment_fraction": 0.1,
+            "transaction_gas_limit": 7500000
+        }
+        "#;
+
+        let p: Provider = serde_json::from_str(json).unwrap();
+        assert_eq!(p.allow_feeds, None);
     }
 
     #[test]
