@@ -3,7 +3,7 @@ use alloy_primitives::U256;
 use anyhow::Result;
 use blocksense_config::FeedStrideAndDecimals;
 use blocksense_data_feeds::feeds_processing::BatchedAggregatesToSend;
-use blocksense_utils::{from_hex_string, to_hex_string, FeedId};
+use blocksense_utils::{from_hex_string, to_hex_string, EncodedFeedId, FeedId, Stride};
 use std::cmp::max;
 use std::collections::{BTreeMap, HashMap, HashSet};
 
@@ -14,7 +14,7 @@ use once_cell::sync::Lazy;
 pub const MAX_HISTORY_ELEMENTS_PER_FEED: u64 = 8192;
 pub const NUM_FEED_IDS_IN_RB_INDEX_RECORD: u128 = 16;
 
-pub type RoundBufferIndices = HashMap<FeedId, u64>; // for each key (feed_id) we store its round buffer index
+pub type RoundBufferIndices = HashMap<EncodedFeedId, u64>; // for each key (feed_id) we store its round buffer index
 
 static STRIDES_SIZES: Lazy<HashMap<u8, u32>> = Lazy::new(|| {
     let mut map = HashMap::new(); // TODO: confirm the correct values for the strides we will support
@@ -58,16 +58,21 @@ fn encode_packed(items: &[&[u8]]) -> (Vec<u8>, String) {
     (res, hexed)
 }
 
+pub fn calc_row_index(feed_id: FeedId, stride: Stride) -> alloy_primitives::Uint<256, 4> {
+    (U256::from(2).pow(U256::from(115)) * U256::from(stride) + U256::from(feed_id))
+        / U256::from(NUM_FEED_IDS_IN_RB_INDEX_RECORD)
+}
+
 /// Serializes the `updates` hash map into a string.
 pub async fn adfs_serialize_updates(
     net: &str,
     feed_updates: &BatchedAggregatesToSend,
     rb_indices: Option<&RoundBufferIndices>,
-    strides_and_decimals: HashMap<FeedId, FeedStrideAndDecimals>,
-    feeds_rb_indexes: &mut HashMap<FeedId, u64>, /* The round buffer indices table for the relevant feeds. If the rb_indices are provided,
-                                                 this map will be filled with the update count for each feed from it. If the
-                                                 rb_indices is None, feeds_rb_indexes will be used as the source of the updates
-                                                 count. */
+    strides_and_decimals: HashMap<EncodedFeedId, FeedStrideAndDecimals>,
+    feeds_rb_indexes: &mut HashMap<EncodedFeedId, u64>, /* The round buffer indices table for the relevant feeds. If the rb_indices are provided,
+                                                        this map will be filled with the update count for each feed from it. If the
+                                                        rb_indices is None, feeds_rb_indexes will be used as the source of the updates
+                                                        count. */
 ) -> Result<Vec<u8>> {
     let mut result = Vec::<u8>::new();
     let updates = &feed_updates.updates;
@@ -80,10 +85,10 @@ pub async fn adfs_serialize_updates(
 
     // Fill the value updates:
     for update in updates.iter() {
-        let feed_id = update.feed_id;
-        feeds_ids_with_value_updates.insert(feed_id);
+        let encoded_feed_id = update.encoded_feed_id;
+        feeds_ids_with_value_updates.insert(encoded_feed_id);
 
-        let (stride, digits_in_fraction) = match &strides_and_decimals.get(&feed_id) {
+        let (stride, digits_in_fraction) = match &strides_and_decimals.get(&encoded_feed_id) {
             Some(f) => (f.stride, f.decimals),
             None => {
                 error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimal default to 18");
@@ -95,7 +100,7 @@ pub async fn adfs_serialize_updates(
             Some(rc) => {
                 let mut updated_feed_id_rb_index: u64 = 0;
                 // Add the feed id-s that are part of each record that will be updated
-                for additional_feed_id in get_neighbour_feed_ids(update.feed_id) {
+                for additional_feed_id in get_neighbour_feed_ids(update.encoded_feed_id) {
                     let rb_index = rc.get(&additional_feed_id).cloned().unwrap_or(0);
 
 
@@ -109,14 +114,14 @@ pub async fn adfs_serialize_updates(
                         }
                     };
                     feeds_info.insert(additional_feed_id, (stride, rb_index));
-                    if additional_feed_id == update.feed_id {
+                    if additional_feed_id == update.encoded_feed_id {
                         updated_feed_id_rb_index = rb_index;
                     }
                 }
                 updated_feed_id_rb_index
             }
-            None => *feeds_rb_indexes.get(&feed_id).unwrap_or_else(|| {
-                error!("feeds_rb_indexes does not contain updates count for feed_id {feed_id}. Rolling back to 0!");
+            None => *feeds_rb_indexes.get(&encoded_feed_id).unwrap_or_else(|| {
+                error!("feeds_rb_indexes does not contain updates count for feed_id {encoded_feed_id}. Rolling back to 0!");
                 &0
             }),
         };
@@ -132,13 +137,13 @@ pub async fn adfs_serialize_updates(
             Err(e) => {
                 error!(
                     "Got an error trying to encode value of feed ID {}: {}",
-                    update.feed_id, e
+                    update.encoded_feed_id, e
                 );
                 continue;
             }
         }; // Key is not needed. It is the bytes of the feed_id
 
-        let id = U256::from(update.feed_id);
+        let id = U256::from(update.encoded_feed_id.get_id());
         let rb_index = U256::from(rb_index);
         let index = (id * U256::from(2).pow(U256::from(13u32)) + rb_index)
             * U256::from(2).pow(U256::from(stride));
@@ -189,15 +194,14 @@ pub async fn adfs_serialize_updates(
     // Fill the rb_index tables:
     let mut batch_feeds = BTreeMap::new();
 
-    for (feed_id, (stride, mut rb_index)) in feeds_info.iter() {
-        feeds_rb_indexes.insert(*feed_id, rb_index);
-        if !feeds_ids_with_value_updates.contains(feed_id) && rb_index > 0 {
+    for (encoded_feed_id, (stride, mut rb_index)) in feeds_info.iter() {
+        feeds_rb_indexes.insert(*encoded_feed_id, rb_index);
+        if !feeds_ids_with_value_updates.contains(encoded_feed_id) && rb_index > 0 {
             rb_index -= 1; // Get the index of the last updated value
         }
+        let feed_id = encoded_feed_id.get_id();
         let rb_index = U256::from(rb_index);
-        let row_index = (U256::from(2).pow(U256::from(115)) * U256::from(*stride)
-            + U256::from(*feed_id))
-            / U256::from(NUM_FEED_IDS_IN_RB_INDEX_RECORD);
+        let row_index = calc_row_index(feed_id, *stride);
         let slot_position = feed_id % NUM_FEED_IDS_IN_RB_INDEX_RECORD;
 
         batch_feeds.entry(row_index).or_insert_with(|| {
@@ -247,11 +251,15 @@ pub async fn adfs_serialize_updates(
     Ok(result)
 }
 
-pub fn get_neighbour_feed_ids(feed_id: FeedId) -> Vec<FeedId> {
+pub fn get_neighbour_feed_ids(encoded_feed_id: EncodedFeedId) -> Vec<EncodedFeedId> {
+    let feed_id = encoded_feed_id.get_id();
+    let stride = encoded_feed_id.get_stride();
     let additional_feeds_begin: FeedId = feed_id - (feed_id % NUM_FEED_IDS_IN_RB_INDEX_RECORD);
     let additional_feeds_end: FeedId = additional_feeds_begin + NUM_FEED_IDS_IN_RB_INDEX_RECORD;
 
-    (additional_feeds_begin..additional_feeds_end).collect()
+    (additional_feeds_begin..additional_feeds_end)
+        .map(|fid| EncodedFeedId::new(fid, stride))
+        .collect()
 }
 
 #[cfg(test)]
@@ -265,7 +273,7 @@ pub mod tests {
     fn create_voted_feed_update(feed_id: FeedId, value: &str) -> VotedFeedUpdate {
         let bytes = from_hex_string(value).unwrap();
         VotedFeedUpdate {
-            feed_id,
+            encoded_feed_id: EncodedFeedId::new(feed_id, 0),
             value: FeedType::from_bytes(bytes, FeedType::Bytes(Vec::new()), 18).unwrap(),
             end_slot_timestamp: 0,
         }
@@ -274,7 +282,7 @@ pub mod tests {
     fn setup_updates_rb_indexes_and_config() -> (
         BatchedAggregatesToSend,
         RoundBufferIndices,
-        HashMap<FeedId, FeedStrideAndDecimals>,
+        HashMap<EncodedFeedId, FeedStrideAndDecimals>,
     ) {
         let updates = BatchedAggregatesToSend {
             block_height: 1234567890,
@@ -288,17 +296,17 @@ pub mod tests {
         };
 
         let mut rb_indices = RoundBufferIndices::new();
-        rb_indices.insert(1, 6);
-        rb_indices.insert(2, 5);
-        rb_indices.insert(3, 4);
-        rb_indices.insert(4, 3);
-        rb_indices.insert(5, 2);
+        rb_indices.insert(EncodedFeedId::new(1, 0), 6);
+        rb_indices.insert(EncodedFeedId::new(2, 0), 5);
+        rb_indices.insert(EncodedFeedId::new(3, 0), 4);
+        rb_indices.insert(EncodedFeedId::new(4, 0), 3);
+        rb_indices.insert(EncodedFeedId::new(5, 0), 2);
 
         let mut config = HashMap::new();
 
         for feed_id in 0..16 {
             config.insert(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedStrideAndDecimals {
                     stride: 0,
                     decimals: 18,
@@ -306,7 +314,7 @@ pub mod tests {
             );
         }
         config.insert(
-            1,
+            EncodedFeedId::new(1, 0),
             FeedStrideAndDecimals {
                 stride: 1,
                 decimals: 18,
@@ -357,7 +365,7 @@ pub mod tests {
         let net = "ETH";
 
         let (updates, mut rb_indices, config) = setup_updates_rb_indexes_and_config();
-        rb_indices.insert(6, 5);
+        rb_indices.insert(EncodedFeedId::new(6, 0), 5);
 
         let expected_result = "000000050102400c0107123432676435730002400501022456000260040102367800028003010248900002a00201025abc010000000000000500040003000200040000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
 

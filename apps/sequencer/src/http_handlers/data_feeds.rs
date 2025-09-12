@@ -2,7 +2,7 @@ use actix_web::http::StatusCode;
 use alloy_primitives::{FixedBytes, Signature};
 use blocksense_gnosis_safe::utils::SignatureWithAddress;
 use blocksense_utils::time::current_unix_time;
-use blocksense_utils::FeedId;
+use blocksense_utils::EncodedFeedId;
 use eyre::Result;
 use std::str::FromStr;
 
@@ -43,7 +43,7 @@ async fn process_report(
     let signature = &data_feed.payload_metadata.signature;
     let msg_timestamp = data_feed.payload_metadata.timestamp;
 
-    let feed_id: FeedId;
+    let encoded_feed_id: EncodedFeedId;
     let reporter = {
         let reporters = sequencer_state.reporters.read().await;
         let reporter = reporters.get_key_value(&reporter_id);
@@ -51,7 +51,8 @@ async fn process_report(
             Some(x) => {
                 let reporter = x.1;
                 let reporter_metrics = reporter.read().await.reporter_metrics.clone();
-                feed_id = match data_feed.payload_metadata.feed_id.parse::<FeedId>() {
+                encoded_feed_id = match data_feed.payload_metadata.feed_id.parse::<EncodedFeedId>()
+                {
                     Ok(val) => val,
                     Err(e) => {
                         inc_metric!(reporter_metrics, reporter_id, non_valid_feed_id_reports);
@@ -70,8 +71,8 @@ async fn process_report(
                     ) {
                         drop(rlocked_reporter);
                         warn!(
-                            "Signature check failed for feed_id: {} from reporter_id: {} data_feed: {:?}",
-                            feed_id, reporter_id, data_feed
+                            "Signature check failed for encoded_feed_id: {} from reporter_id: {} data_feed: {:?}",
+                            encoded_feed_id, reporter_id, data_feed
                         );
                         inc_metric!(reporter_metrics, reporter_id, non_valid_signature);
                         return HttpResponse::Unauthorized().into();
@@ -93,14 +94,14 @@ async fn process_report(
     match &data_feed.result {
         Ok(result) => {
             debug!(
-                "Recvd result from reporter[{}]: {:?} for feed_id {}",
-                reporter_id, result, feed_id
+                "Recvd result from reporter[{}]: {:?} for encoded_feed_id {}",
+                reporter_id, result, encoded_feed_id
             );
         }
         Err(error) => {
             warn!(
-                "Reported error from reporter[{}]: {} for feed_id {}",
-                reporter_id, error, feed_id
+                "Reported error from reporter[{}]: {} for encoded_feed_id {}",
+                reporter_id, error, encoded_feed_id
             );
             inc_metric!(reporter_metrics, reporter_id, errors_reported_for_feed);
         }
@@ -109,8 +110,8 @@ async fn process_report(
     debug!("data_feed = {:?}", data_feed,);
     let feed = {
         let reg = sequencer_state.registry.read().await;
-        debug!("getting feed_id = {}", &feed_id);
-        match reg.get(feed_id) {
+        debug!("getting encoded_feed_id = {}", &encoded_feed_id);
+        match reg.get(&encoded_feed_id) {
             Some(x) => x,
             None => {
                 drop(reg);
@@ -135,31 +136,31 @@ async fn process_report(
     match report_relevance {
         ReportRelevance::Relevant => {
             let mut reports = sequencer_state.reports.write().await;
-            match reports.push(feed_id, reporter_id, data_feed).await {
+            match reports.push(encoded_feed_id, reporter_id, data_feed).await {
                 VoteStatus::FirstVoteForSlot => {
                     debug!(
-                        "Recvd timely vote (result/error) from reporter_id = {} for feed_id = {}, feed_name = {feed_name}",
-                        reporter_id, feed_id
+                        "Recvd timely vote (result/error) from reporter_id = {} for encoded_feed_id = {}, feed_name = {feed_name}",
+                        reporter_id, encoded_feed_id
                     );
                     inc_vec_metric!(
                         reporter_metrics,
                         timely_reports_per_feed,
                         reporter_id,
-                        feed_id,
+                        encoded_feed_id.to_string(),
                         feed_name,
                         always_publish_heartbeat_ms
                     );
                 }
                 VoteStatus::RevoteForSlot(prev_vote) => {
                     debug!(
-                        "Recvd revote from reporter_id = {} for feed_id = {}, feed_name = {feed_name}, prev_vote = {:?}",
-                        reporter_id, feed_id, prev_vote
+                        "Recvd revote from reporter_id = {} for encoded_feed_id = {}, feed_name = {feed_name}, prev_vote = {:?}",
+                        reporter_id, encoded_feed_id, prev_vote
                     );
                     inc_vec_metric!(
                         reporter_metrics,
                         total_revotes_for_same_slot_per_feed,
                         reporter_id,
-                        feed_id,
+                        encoded_feed_id.to_string(),
                         feed_name,
                         always_publish_heartbeat_ms
                     );
@@ -169,28 +170,28 @@ async fn process_report(
         }
         ReportRelevance::NonRelevantOld => {
             debug!(
-                "Recvd late vote from reporter_id = {} for feed_id = {}, feed_name = {feed_name}",
-                reporter_id, feed_id
+                "Recvd late vote from reporter_id = {} for encoded_feed_id = {}, feed_name = {feed_name}",
+                reporter_id, encoded_feed_id
             );
             inc_vec_metric!(
                 reporter_metrics,
                 late_reports_per_feed,
                 reporter_id,
-                feed_id,
+                encoded_feed_id.to_string(),
                 feed_name,
                 always_publish_heartbeat_ms
             );
         }
         ReportRelevance::NonRelevantInFuture => {
             debug!(
-                "Recvd vote for future slot from reporter_id = {} for feed_id = {}, feed_name = {feed_name}",
-                reporter_id, feed_id
+                "Recvd vote for future slot from reporter_id = {} for encoded_feed_id = {}, feed_name = {feed_name}",
+                reporter_id, encoded_feed_id
             );
             inc_vec_metric!(
                 reporter_metrics,
                 in_future_reports_per_feed,
                 reporter_id,
-                feed_id,
+                encoded_feed_id.to_string(),
                 feed_name,
                 always_publish_heartbeat_ms
             );
@@ -240,7 +241,7 @@ pub async fn get_last_published_value_and_time(
     let history = sequencer_state.feed_aggregate_history.read().await;
     let mut results: Vec<LastPublishedValue> = vec![];
     for r in requested_data_feeds {
-        let v = match r.feed_id.parse::<FeedId>() {
+        let v = match r.feed_id.parse::<EncodedFeedId>() {
             Ok(feed_id) => {
                 if history.is_registered_feed(feed_id) {
                     if let Some(last) = history.last(feed_id) {
@@ -465,6 +466,7 @@ pub mod tests {
     use actix_web::{test, App};
     use blocksense_config::AllFeedsConfig;
     use blocksense_config::{get_test_config_with_no_providers, test_feed_config};
+    use blocksense_utils::FeedId;
 
     use crate::sequencer_state::create_sequencer_state_from_sequencer_config;
     use blocksense_config::SequencerConfig;
@@ -660,7 +662,7 @@ pub mod tests {
 
         let get_last_published_value_and_time_request: Vec<GetLastPublishedRequestData> =
             vec![GetLastPublishedRequestData {
-                feed_id: "1".to_string(),
+                feed_id: "0:1".to_string(),
             }];
 
         // Send the request
@@ -681,7 +683,7 @@ pub mod tests {
         let last_values: Vec<LastPublishedValue> =
             serde_json::from_value(v).expect("Can't parse repsonse");
         assert_eq!(last_values.len(), 1);
-        assert_eq!(last_values[0].feed_id, "1".to_string());
+        assert_eq!(last_values[0].feed_id, "0:1".to_string());
         assert_eq!(last_values[0].value, None);
         // TODO, maybe we can expect error, that the feed is not registered !?
         assert!(last_values[0].error.is_some());
@@ -706,7 +708,7 @@ pub mod tests {
         .await;
         {
             let mut history = sequencer_state.feed_aggregate_history.write().await;
-            history.register_feed(1, 100);
+            history.register_feed(EncodedFeedId::new(1, 0), 100);
         }
 
         // Initialize the service
@@ -719,7 +721,7 @@ pub mod tests {
 
         let get_last_published_value_and_time_request: Vec<GetLastPublishedRequestData> =
             vec![GetLastPublishedRequestData {
-                feed_id: "1".to_string(),
+                feed_id: "0:1".to_string(),
             }];
 
         // Send the request
@@ -740,7 +742,7 @@ pub mod tests {
         let last_values: Vec<LastPublishedValue> =
             serde_json::from_value(v).expect("Can't parse repsonse");
         assert_eq!(last_values.len(), 1);
-        assert_eq!(last_values[0].feed_id, "1".to_string());
+        assert_eq!(last_values[0].feed_id, "0:1".to_string());
         assert_eq!(last_values[0].value, None);
         assert!(last_values[0].error.is_none())
     }
@@ -763,14 +765,18 @@ pub mod tests {
         {
             let mut history = sequencer_state.feed_aggregate_history.write().await;
             let feed_id = 1 as FeedId;
-            history.register_feed(feed_id, 100);
+            history.register_feed(EncodedFeedId::new(feed_id, 0), 100);
             let feed_value = FeedType::Numerical(102754.0f64);
             let end_slot_timestamp = first_report_start_time
                 .duration_since(UNIX_EPOCH)
                 .expect("Unknown error")
                 .as_millis()
                 + 300_u128 * 10_u128;
-            history.push_next(feed_id, feed_value, end_slot_timestamp);
+            history.push_next(
+                EncodedFeedId::new(feed_id, 0),
+                feed_value,
+                end_slot_timestamp,
+            );
         }
 
         // Initialize the service
@@ -783,7 +789,7 @@ pub mod tests {
 
         let get_last_published_value_and_time_request: Vec<GetLastPublishedRequestData> =
             vec![GetLastPublishedRequestData {
-                feed_id: "1".to_string(),
+                feed_id: "0:1".to_string(),
             }];
 
         // Send the request
@@ -804,7 +810,7 @@ pub mod tests {
         let last_values: Vec<LastPublishedValue> =
             serde_json::from_value(v).expect("Can't parse repsonse");
         assert_eq!(last_values.len(), 1);
-        assert_eq!(last_values[0].feed_id, "1".to_string());
+        assert_eq!(last_values[0].feed_id, "0:1".to_string());
         assert_eq!(last_values[0].value, Some(FeedType::Numerical(102754.0)));
         assert_eq!(last_values[0].timeslot_end, 1524885325000);
         assert!(last_values[0].error.is_none())
@@ -833,30 +839,30 @@ pub mod tests {
         {
             let mut history = sequencer_state.feed_aggregate_history.write().await;
             let feed_id = 1 as FeedId;
-            history.register_feed(feed_id, 3);
+            history.register_feed(EncodedFeedId::new(feed_id, 0), 3);
 
             history.push_next(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedType::Numerical(102754.2f64),
                 end_slot_timestamp, /* + 300_u128 * 0*/
             );
             history.push_next(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedType::Numerical(122756.7f64),
                 end_slot_timestamp + 300_u128, /* * 1*/
             );
             history.push_next(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedType::Numerical(102753.0f64),
                 end_slot_timestamp + 300_u128 * 2,
             );
             history.push_next(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedType::Numerical(102244.3f64),
                 end_slot_timestamp + 300_u128 * 3,
             );
             history.push_next(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedType::Numerical(112754.2f64),
                 end_slot_timestamp + 300_u128 * 4,
             );
@@ -872,7 +878,7 @@ pub mod tests {
 
         let get_last_published_value_and_time_request: Vec<GetLastPublishedRequestData> =
             vec![GetLastPublishedRequestData {
-                feed_id: "1".to_string(),
+                feed_id: "0:1".to_string(),
             }];
 
         // Send the request
@@ -893,7 +899,7 @@ pub mod tests {
         let last_values: Vec<LastPublishedValue> =
             serde_json::from_value(v).expect("Can't parse repsonse");
         assert_eq!(last_values.len(), 1);
-        assert_eq!(last_values[0].feed_id, "1".to_string());
+        assert_eq!(last_values[0].feed_id, "0:1".to_string());
         assert_eq!(last_values[0].value, Some(FeedType::Numerical(112754.2f64)));
         assert_eq!(
             last_values[0].timeslot_end,
