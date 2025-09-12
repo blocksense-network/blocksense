@@ -30,6 +30,7 @@ env:
   SPOUT_RWA_API_KEY: ${{ secrets.SPOUT_RWA_API_KEY }}
   RPC_URL_ETHEREUM_SEPOLIA: ${{ secrets.RPC_URL_ETHEREUM_SEPOLIA }}
   RPC_URL_INK_SEPOLIA: ${{ secrets.RPC_URL_INK_SEPOLIA }}
+  X: ${{ secrets.X }}
 
 jobs:
   lint:
