@@ -1,5 +1,5 @@
 import { Command, Options } from '@effect/cli';
-import { Effect, Option } from 'effect';
+import { Data, Effect, Option } from 'effect';
 
 import {
   getAddressExplorerUrl,
@@ -82,9 +82,9 @@ export const readClAdapter = Command.make(
         ).pipe(
           Effect.mapError(
             e =>
-              new Error(
-                `Failed to fetch data for round ${round.value}: ${String((e as any)?.message ?? e)}`,
-              ),
+              new FetchError({
+                message: `Failed to fetch data for round ${round.value}: ${String((e as any)?.message ?? e)}`,
+              }),
           ),
         );
 
@@ -109,55 +109,46 @@ export const readClAdapter = Command.make(
         return;
       }
 
-      const data: CLAggregatorAdapterData | undefined =
-        yield* Effect.tryPromise<CLAggregatorAdapterData>(() =>
-          consumer.getCLAggregatorAdapterData(),
-        ).pipe(
-          Effect.catchAll(err => {
-            const message = (err as Error)?.message ?? String(err);
-            const cause = message.concat(` ${err.cause}`);
-            if (cause.includes('multicall')) {
-              return Effect.all(
-                {
-                  dataFeedStore: Effect.tryPromise(() =>
-                    consumer.getDataFeedStore(),
-                  ),
-                  decimals: Effect.tryPromise(() => consumer.getDecimals()),
-                  description: Effect.tryPromise(() =>
-                    consumer.getDescription(),
-                  ),
-                  id: Effect.tryPromise(() => consumer.getId()),
-                  latestAnswer: Effect.tryPromise(() =>
-                    consumer.getLatestAnswer(),
-                  ),
-                  latestRound: Effect.tryPromise(() =>
-                    consumer.getLatestRound(),
-                  ),
-                  latestRoundData: Effect.tryPromise(() =>
-                    consumer.getLatestRoundData(),
-                  ),
-                },
-                { concurrency: 'unbounded' },
-              ).pipe(
-                Effect.mapError(
-                  e => new Error(String((e as any)?.message ?? e)),
+      const data: CLAggregatorAdapterData = yield* Effect.tryPromise(() =>
+        consumer.getCLAggregatorAdapterData(),
+      ).pipe(
+        Effect.catchAll(err => {
+          const message = (err as Error)?.message ?? String(err);
+          const cause = message.concat(` ${err.cause}`);
+          if (cause.includes('multicall')) {
+            return Effect.all(
+              {
+                dataFeedStore: Effect.tryPromise(() =>
+                  consumer.getDataFeedStore(),
                 ),
-                Effect.map(r =>
-                  (r satisfies CLAggregatorAdapterData)
-                    ? r
-                    : (r as CLAggregatorAdapterData),
+                decimals: Effect.tryPromise(() => consumer.getDecimals()),
+                description: Effect.tryPromise(() => consumer.getDescription()),
+                id: Effect.tryPromise(() => consumer.getId()),
+                latestAnswer: Effect.tryPromise(() =>
+                  consumer.getLatestAnswer(),
                 ),
-                Effect.catchAll(() => Effect.succeed(undefined)),
-              );
-            }
-            throw new Error(
-              `Error fetching data:\nMessage: ${message}\nCause: ${cause}`,
+                latestRound: Effect.tryPromise(() => consumer.getLatestRound()),
+                latestRoundData: Effect.tryPromise(() =>
+                  consumer.getLatestRoundData(),
+                ),
+              },
+              { concurrency: 'unbounded' },
+            ).pipe(
+              Effect.mapError(
+                e =>
+                  new FetchError({
+                    message: String(e),
+                  }),
+              ),
             );
-          }),
-        );
-
-      if (!data)
-        throw new Error('Failed to fetch data from CLAggregatorAdapter');
+          }
+          return Effect.fail(
+            new FetchError({
+              message: `Error fetching data:\nMessage: ${message}\nCause: ${cause}`,
+            }),
+          );
+        }),
+      );
 
       const rows: Array<[string, string]> = [
         ['Network', network],
@@ -195,3 +186,7 @@ export const readClAdapter = Command.make(
       );
     }),
 );
+
+export class FetchError extends Data.TaggedError('@dev/FetchError')<{
+  readonly message: string;
+}> {}
