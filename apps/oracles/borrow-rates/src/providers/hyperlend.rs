@@ -2,7 +2,8 @@ use alloy::primitives::{address, Address, Bytes, U256};
 use alloy::sol_types::SolCall;
 use anyhow::Result;
 
-use crate::providers::onchain::{MyProvider, ReserveLike, UiPool};
+use crate::providers::pool_data_provider::{ReserveLike, UiPool};
+use crate::providers::types::MyProvider;
 
 pub const HYPERLAND_UI_POOL_DATA_PROVIDER: Address =
     address!("0x3Bb92CF81E38484183cc96a4Fb8fBd2d73535807");
@@ -22,10 +23,14 @@ pub mod hyperlend {
 pub struct HyperLendUi;
 
 impl UiPool for HyperLendUi {
-    fn calldata(provider: MyProvider, ui: Address, addresses_provider: Address) -> Bytes {
-        let instance = hyperlend::HyperLandUiPoolDataProvider::new(ui, provider);
+    const UI_POOL_DATA_PROVIDER: Address = HYPERLAND_UI_POOL_DATA_PROVIDER;
+    const POOL_ADDRESSES_PROVIDER: Address = HYPERLAND_POOL_ADDRESSES_PROVIDER;
+
+    fn calldata(provider: MyProvider) -> Bytes {
+        let instance =
+            hyperlend::HyperLandUiPoolDataProvider::new(Self::UI_POOL_DATA_PROVIDER, provider);
         instance
-            .getReservesData(addresses_provider)
+            .getReservesData(Self::POOL_ADDRESSES_PROVIDER)
             .calldata()
             .clone()
     }
