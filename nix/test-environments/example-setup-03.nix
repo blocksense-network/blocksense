@@ -67,12 +67,12 @@ in
           impersonated-anvil-account = impersonationAddress;
           publishing-criteria = [
             {
-              feed-id = 50000; # USDT / USD Pegged
+              encoded-feed-id = 50000; # USDT / USD Pegged
               peg-to-value = 1.00;
               peg-tolerance-percentage = 10.0; # 10% tolerance assures that the price will be pegged
             }
             {
-              feed-id = 50001; # USDC / USD Pegged
+              encoded-feed-id = 50001; # USDC / USD Pegged
               peg-to-value = 1.00;
               peg-tolerance-percentage = 0.000001; # 0.000001% tolerance assures that the price will not be pegged
             }

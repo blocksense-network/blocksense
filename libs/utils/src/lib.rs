@@ -114,6 +114,54 @@ impl FromStr for EncodedFeedId {
     }
 }
 
+/// Construct from an integer `feed_id` with stride = 0.
+impl From<FeedId> for EncodedFeedId {
+    #[inline]
+    fn from(feed_id: FeedId) -> Self {
+        EncodedFeedId::new(feed_id, 0)
+    }
+}
+
+/// Construct from a `u64` `feed_id` with stride = 0.
+impl From<u64> for EncodedFeedId {
+    #[inline]
+    fn from(feed_id: u64) -> Self {
+        EncodedFeedId::new(feed_id as u128, 0)
+    }
+}
+
+/// Construct from a `usize` `feed_id` with stride = 0.
+impl From<usize> for EncodedFeedId {
+    #[inline]
+    fn from(feed_id: usize) -> Self {
+        EncodedFeedId::new(feed_id as u128, 0)
+    }
+}
+
+/// Construct from a `u32` `feed_id` with stride = 0.
+impl From<u32> for EncodedFeedId {
+    #[inline]
+    fn from(feed_id: u32) -> Self {
+        EncodedFeedId::new(feed_id as u128, 0)
+    }
+}
+
+/// Construct from a `u16` `feed_id` with stride = 0.
+impl From<u16> for EncodedFeedId {
+    #[inline]
+    fn from(feed_id: u16) -> Self {
+        EncodedFeedId::new(feed_id as u128, 0)
+    }
+}
+
+/// Construct from a `u8` `feed_id` with stride = 0.
+impl From<u8> for EncodedFeedId {
+    #[inline]
+    fn from(feed_id: u8) -> Self {
+        EncodedFeedId::new(feed_id as u128, 0)
+    }
+}
+
 use std::num::ParseIntError;
 use std::{
     env,
