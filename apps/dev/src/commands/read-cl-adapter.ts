@@ -14,6 +14,17 @@ import {
 
 const availableNetworks = await listEvmNetworks();
 
+const formatTimestamp = (timestamp: bigint | number | string): string => {
+  const seconds = Number(timestamp);
+  const date = new Date(seconds * 1000);
+  const padToTwoDigits = (n: number) => String(n).padStart(2, '0');
+  const formattedTimestamp =
+    `${padToTwoDigits(date.getHours())}:${padToTwoDigits(date.getMinutes())}:${padToTwoDigits(date.getSeconds())}` +
+    ` ${padToTwoDigits(date.getDate())}-${padToTwoDigits(date.getMonth() + 1)}-${date.getFullYear()}` +
+    ` (${timestamp})`;
+  return formattedTimestamp;
+};
+
 export const readClAdapter = Command.make(
   'read-cl-adapter',
   {
@@ -95,6 +106,8 @@ export const readClAdapter = Command.make(
           ['Id', id.toString()],
           ['Round', requestedRound.toString()],
           ['Answer', roundData.answer.toString()],
+          ['LatestRoundData.startedAt', formatTimestamp(roundData.startedAt)],
+          ['LatestRoundData.updatedAt', formatTimestamp(roundData.updatedAt)],
         ];
 
         renderTui(
@@ -164,11 +177,11 @@ export const readClAdapter = Command.make(
         ['LatestRoundData.answer', data.latestRoundData.answer.toString()],
         [
           'LatestRoundData.startedAt',
-          data.latestRoundData.startedAt.toString(),
+          formatTimestamp(data.latestRoundData.startedAt),
         ],
         [
           'LatestRoundData.updatedAt',
-          data.latestRoundData.updatedAt.toString(),
+          formatTimestamp(data.latestRoundData.updatedAt),
         ],
         [
           'LatestRoundData.answeredInRound',
