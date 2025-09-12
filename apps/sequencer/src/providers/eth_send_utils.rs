@@ -293,8 +293,12 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
     tracing::info!("Starting tracker for reorgs in network {net} loop...");
 
     let mut finalized_height = 0;
+    let mut observed_latest_height = 0;
 
     loop {
+        // Sleep between polls
+        await_time(100).await;
+        info!("DEBUG: loop_tracking_for_reorg_in_network {net} tick!");
         // Scope the lock on providers so we don't hold it across awaits/sleeps
         {
             let providers = providers_mutex.read().await;
@@ -302,9 +306,12 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                 // Gather data and perform minimal work while holding the provider lock
                 let mut need_resync_indices = false;
                 {
-                    let rpc_handle = {
+                    let (rpc_handle, non_finalized_block_hashes) = {
                         let provider = provider_mutex.lock().await;
-                        provider.provider.clone()
+                        (
+                            provider.provider.clone(),
+                            provider.non_finalized_block_hashes.clone(),
+                        )
                     };
 
                     // 1) Observe latest finalized block for logging/visibility
@@ -315,12 +322,26 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                         Ok(res) => match res {
                             Some(eth_finalized_block) => {
                                 info!("Last finalized block in network {net} = {eth_finalized_block:?}");
-                                // Prune non-finalized updates up to finalized height
-                                finalized_height = eth_finalized_block.header.inner.number;
                                 let mut provider = provider_mutex.lock().await;
-                                let removed = provider.prune_non_finalized_up_to(finalized_height);
-                                if removed > 0 {
-                                    info!("Pruned {removed} non-finalized updates up to finalized height {finalized_height} in `{net}`");
+
+                                // Prune non-finalized updates up to finalized height
+                                if finalized_height < eth_finalized_block.header.inner.number {
+                                    finalized_height = eth_finalized_block.header.inner.number;
+                                    let removed =
+                                        provider.prune_non_finalized_up_to(finalized_height);
+                                    if removed > 0 {
+                                        info!("Pruned {removed} non-finalized updates up to finalized height {finalized_height} in `{net}`");
+                                    }
+                                }
+                                if observed_latest_height < finalized_height {
+                                    warn!("Lost track of chain in network {net} beyond a finalized checkpoint: {finalized_height}, last observed block at height: {observed_latest_height}");
+                                    observed_latest_height = finalized_height;
+                                    // Insert current hash into provider cache
+                                    provider.insert_non_finalized_block_hash(
+                                        observed_latest_height,
+                                        eth_finalized_block.header.hash,
+                                    );
+                                    continue;
                                 }
                             }
                             None => {
@@ -337,33 +358,83 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                         .await
                     {
                         let latest_hash = b.header.hash;
-                        let latest_number = b.header.inner.number;
-                        if latest_number >= finalized_height {
-                            let mut cur_hash = latest_hash;
-                            let mut cur_num = latest_number;
-                            // Limit walk to avoid excessive RPCs in extreme cases
-                            let max_steps = 2048_u64;
-                            let mut steps = 0_u64;
-                            let mut provider = provider_mutex.lock().await;
+                        let latest_height = b.header.inner.number;
+                        if latest_height > observed_latest_height {
+                            // let mut cur_hash = latest_hash;
+                            // let mut cur_num = latest_height;
+                            // // Limit walk to avoid excessive RPCs in extreme cases
+                            // let max_steps = 2048_u64;
+                            // let mut steps = 0_u64;
+                            // let mut provider = provider_mutex.lock().await;
 
-                            while cur_num >= finalized_height && steps < max_steps {
-                                // Insert current hash into provider cache
-                                provider.insert_non_finalized_block_hash(cur_num, cur_hash);
+                            // while cur_num >= observed_latest_height && steps < max_steps {
+                            //     // Insert current hash into provider cache
+                            //     provider.insert_non_finalized_block_hash(cur_num, cur_hash);
 
-                                // step to parent
-                                match rpc_handle.get_block_by_hash(cur_hash).await {
-                                    Ok(Some(b)) => {
-                                        let next_hash = b.header.inner.parent_hash;
-                                        let next_num = b.header.inner.number;
-                                        if next_num >= cur_num {
-                                            break;
+                            //     // step to parent
+                            //     match rpc_handle.get_block_by_hash(cur_hash).await {
+                            //         Ok(Some(b)) => {
+                            //             let next_hash = b.header.inner.parent_hash;
+                            //             let next_num = b.header.inner.number;
+                            //             if next_num >= cur_num {
+                            //                 break;
+                            //             }
+                            //             cur_hash = next_hash;
+                            //             cur_num = next_num;
+                            //         }
+                            //         _ => break,
+                            //     }
+                            //     steps += 1;
+                            // }
+
+                            // Check for reorg:
+                            let first_new_block_height = observed_latest_height + 1;
+                            if let Ok(Some(first_new_block)) = rpc_handle
+                                .get_block_by_number(BlockNumberOrTag::Number(
+                                    first_new_block_height,
+                                ))
+                                .await
+                            {
+                                if let Some(observed_latest_block_hash) =
+                                    non_finalized_block_hashes.get(&observed_latest_height)
+                                {
+                                    if first_new_block.header.parent_hash
+                                        != *observed_latest_block_hash
+                                    {
+                                        warn!("Reorg detected in network {net}");
+                                    } else {
+                                        info!(
+                                            "Chain goes on ... need to add {} new blocks",
+                                            latest_height - observed_latest_height
+                                        );
+                                        let mut provider = provider_mutex.lock().await;
+                                        info!("DEBUG: Adding block with height {first_new_block_height}");
+                                        provider.insert_non_finalized_block_hash(
+                                            first_new_block_height,
+                                            first_new_block.header.hash,
+                                        );
+                                        for block_height in
+                                            first_new_block_height + 1..latest_height
+                                        {
+                                            if let Ok(Some(new_block)) = rpc_handle
+                                                .get_block_by_number(BlockNumberOrTag::Number(
+                                                    first_new_block_height,
+                                                ))
+                                                .await
+                                            {
+                                                info!("DEBUG: Further adding block with height {block_height}");
+                                                provider.insert_non_finalized_block_hash(
+                                                    block_height,
+                                                    new_block.header.hash,
+                                                );
+                                            } else {
+                                                warn!("DEBUG: Could not get block {block_height}");
+                                            }
                                         }
-                                        cur_hash = next_hash;
-                                        cur_num = next_num;
                                     }
-                                    _ => break,
                                 }
-                                steps += 1;
+                            } else {
+                                warn!("DEBUG: Could not get block {first_new_block_height}");
                             }
                         }
                     }
@@ -439,9 +510,6 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                 break;
             }
         }
-
-        // Sleep between polls
-        await_time(6000).await;
     }
 }
 
