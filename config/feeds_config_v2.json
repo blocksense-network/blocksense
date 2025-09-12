@@ -46169,7 +46169,7 @@
       "full_name": "LME-XCU price in USD per troy ounce",
       "description": "Price of LME Copper in US Dollar per troy ounce",
       "type": "price-feed",
-      "oracle_id": "forex-price-feeds",
+      "oracle_id": "metals-price-feeds",
       "value_type": "numerical",
       "stride": 0,
       "quorum": {
