@@ -2403,6 +2403,25 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32a282da65faaf38286cf3be983213fcf1d2e2a58700e808f83f4ea9a4804bc0"
 
 [[package]]
+name = "metals-price-feeds"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "blocksense-data-providers-sdk",
+ "blocksense-sdk",
+ "futures",
+ "itertools 0.14.0",
+ "prettytable-rs",
+ "serde",
+ "serde-this-or-that",
+ "serde_json",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+ "wit-bindgen",
+]
+
+[[package]]
 name = "mime"
 version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"

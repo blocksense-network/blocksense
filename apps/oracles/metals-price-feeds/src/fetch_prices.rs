@@ -5,10 +5,7 @@ use serde::{Deserialize, Serialize};
 use blocksense_data_providers_sdk::price_data::{
     fetchers::{
         fetch::fetch_all_prices,
-        forex::{
-            alpha_vantage::AlphaVantagePriceFetcher, fmp::FMPPriceFetcher,
-            twelvedata::TwelveDataPriceFetcher, yahoo_finance::YFPriceFetcher,
-        },
+        metals::metals_api::MetalsApiPriceFetcher,
     },
     traits::prices_fetcher::{fetch, TradingPairSymbol},
     types::{PairsToResults, ProviderPriceData, ProvidersSymbols},
@@ -19,28 +16,16 @@ use crate::domain::{get_api_keys, Capabilities, ResourceData, ResourcePairData};
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SymbolsData {
-    pub alpha_vantage: Vec<TradingPairSymbol>,
-    pub twelvedata: Vec<TradingPairSymbol>,
-    pub yahoo_finance: Vec<TradingPairSymbol>,
-    pub fmp: Vec<TradingPairSymbol>,
+    pub metals_api: Vec<TradingPairSymbol>,
 }
 
 impl SymbolsData {
     pub fn from_resources(providers_symbols: &ProvidersSymbols) -> Result<Self> {
         Ok(Self {
-            alpha_vantage: providers_symbols
-                .get("AlphaVantage")
+            metals_api: providers_symbols
+                .get("MetalsAPI")
                 .cloned()
                 .unwrap_or_default(),
-            twelvedata: providers_symbols
-                .get("twelvedata")
-                .cloned()
-                .unwrap_or_default(),
-            yahoo_finance: providers_symbols
-                .get("YahooFinance")
-                .cloned()
-                .unwrap_or_default(),
-            fmp: providers_symbols.get("FMP").cloned().unwrap_or_default(),
         })
     }
 }
@@ -53,24 +38,9 @@ pub async fn get_prices(
     let symbols = SymbolsData::from_resources(&resources.symbols)?;
 
     let futures_set = FuturesUnordered::from_iter([
-        fetch::<AlphaVantagePriceFetcher>(
-            &symbols.alpha_vantage,
-            get_api_keys(capabilities, &["ALPHAVANTAGE_API_KEY"]),
-            timeout_secs,
-        ),
-        fetch::<TwelveDataPriceFetcher>(
-            &symbols.twelvedata,
-            get_api_keys(capabilities, &["TWELVEDATA_API_KEY"]),
-            timeout_secs,
-        ),
-        fetch::<YFPriceFetcher>(
-            &symbols.yahoo_finance,
-            get_api_keys(capabilities, &["YAHOO_FINANCE_API_KEY"]),
-            timeout_secs,
-        ),
-        fetch::<FMPPriceFetcher>(
-            &symbols.fmp,
-            get_api_keys(capabilities, &["FMP_API_KEY"]),
+        fetch::<MetalsApiPriceFetcher>(
+            &symbols.metals_api,
+            get_api_keys(capabilities, &["METALS_API_KEY"]),
             timeout_secs,
         ),
     ]);
