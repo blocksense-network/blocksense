@@ -287,13 +287,20 @@ in
           "https://yfapi.net"
           "https://api.twelvedata.com"
           "https://financialmodelingprep.com"
-          "https://metals-api.com"
         ];
         api-keys = [
           "ALPHAVANTAGE_API_KEY"
           "YAHOO_FINANCE_API_KEY"
           "TWELVEDATA_API_KEY"
           "FMP_API_KEY"
+        ];
+      };
+      commodities-price-feeds = {
+        exec-interval = 60;
+        allowed-outbound-hosts = [
+          "https://metals-api.com"
+        ];
+        api-keys = [
           "METALS_API_KEY"
         ];
       };
