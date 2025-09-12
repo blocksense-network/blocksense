@@ -16,6 +16,12 @@ reporter_id = 0
 [[trigger.oracle]]
 component = "commodities-price-feeds"
 
+[[trigger.oracle.data_feeds]]
+id = "20000"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"LME-XCU","quote":"USD"},"decimals":8,"category":"Commodities","market_hours":"Commodities","arguments":{"kind":"commodities-price-feeds","providers":["MetalsAPI"]}}'
+
 [[trigger.oracle.capabilities]]
 data = "x"
 id = "METALS_API_KEY"
