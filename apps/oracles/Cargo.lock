@@ -1119,6 +1119,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "commodities-price-feeds"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "blocksense-data-providers-sdk",
+ "blocksense-sdk",
+ "futures",
+ "itertools 0.14.0",
+ "prettytable-rs",
+ "serde",
+ "serde-this-or-that",
+ "serde_json",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+ "wit-bindgen",
+]
+
+[[package]]
 name = "const-hex"
 version = "1.14.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
