@@ -90,24 +90,24 @@ in
           ];
           publishing-criteria = [
             {
-              feed-id = 0;
+              encoded-feed-id = 0;
               skip-publish-if-less-then-percentage = 0.001;
               always-publish-heartbeat-ms = 50000; # This might be ignored in favor of the value from the feed config
             }
             {
-              feed-id = 3;
+              encoded-feed-id = 3;
               skip-publish-if-less-then-percentage = 0.1;
               always-publish-heartbeat-ms = 360000;
             }
             {
-              feed-id = 50000;
+              encoded-feed-id = 50000;
               skip-publish-if-less-then-percentage = 0.5;
               always-publish-heartbeat-ms = 360000;
               peg-to-value = 1.00;
               peg-tolerance-percentage = 0.1;
             }
             {
-              feed-id = 50001;
+              encoded-feed-id = 50001;
               skip-publish-if-less-then-percentage = 0.1;
               always-publish-heartbeat-ms = 360000;
               peg-to-value = 1.00;
