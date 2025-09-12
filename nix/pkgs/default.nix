@@ -73,6 +73,7 @@
           eth-rpc = mkOracleScript "eth-rpc";
           stock-price-feeds = mkOracleScript "stock-price-feeds";
           forex-price-feeds = mkOracleScript "forex-price-feeds";
+          metals-price-feeds = mkOracleScript "metals-price-feeds";
           spout-rwa = mkOracleScript "spout-rwa";
         };
 
