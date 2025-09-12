@@ -46177,7 +46177,7 @@
         "aggregation": "median"
       },
       "schedule": {
-        "interval_ms": 60000,
+        "interval_ms": 600000,
         "heartbeat_ms": 7200000,
         "deviation_percentage": 0.1,
         "first_report_start_unix_time_ms": 0
