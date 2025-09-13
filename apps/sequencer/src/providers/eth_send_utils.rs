@@ -12,6 +12,7 @@ use blocksense_config::{FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
 use blocksense_utils::{await_time, counter_unbounded_channel::CountedReceiver, EncodedFeedId};
+use chrono::Local;
 use eyre::{bail, eyre, Result};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
 use tokio::{
@@ -294,11 +295,17 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
 
     let mut finalized_height = 0;
     let mut observed_latest_height = 0;
+    let mut loop_count: u64 = 0;
 
     loop {
         // Sleep between polls
-        await_time(100).await;
-        info!("DEBUG: loop_tracking_for_reorg_in_network {net} tick!");
+        await_time(3000).await;
+
+        loop_count += 1;
+        {
+            let now = Local::now();
+            info!("DEBUG: BEGIN loop_tracking_for_reorg_in_network for {net} loop_count: {loop_count}: {}!", now.format("%Y-%m-%d %H:%M:%S%.3f"));
+        }
         // Scope the lock on providers so we don't hold it across awaits/sleeps
         {
             let providers = providers_mutex.read().await;
@@ -321,11 +328,12 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                     {
                         Ok(res) => match res {
                             Some(eth_finalized_block) => {
-                                info!("Last finalized block in network {net} = {eth_finalized_block:?}");
                                 let mut provider = provider_mutex.lock().await;
 
                                 // Prune non-finalized updates up to finalized height
                                 if finalized_height < eth_finalized_block.header.inner.number {
+                                    info!("Last finalized block in network {net} = {eth_finalized_block:?}");
+
                                     finalized_height = eth_finalized_block.header.inner.number;
                                     let removed =
                                         provider.prune_non_finalized_up_to(finalized_height);
@@ -357,9 +365,10 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                         .get_block_by_number(BlockNumberOrTag::Latest)
                         .await
                     {
-                        let latest_hash = b.header.hash;
+                        let _latest_hash = b.header.hash;
                         let latest_height = b.header.inner.number;
                         if latest_height > observed_latest_height {
+                            info!("Found new blocks in {net} loop_count = {loop_count} latest_height = {latest_height} {}", latest_height - observed_latest_height);
                             // let mut cur_hash = latest_hash;
                             // let mut cur_num = latest_height;
                             // // Limit walk to avoid excessive RPCs in extreme cases
@@ -404,7 +413,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                         warn!("Reorg detected in network {net}");
                                     } else {
                                         info!(
-                                            "Chain goes on ... need to add {} new blocks",
+                                            "Chain goes on in {net}, loop {loop_count} ... need to add {} new blocks",
                                             latest_height - observed_latest_height
                                         );
                                         let mut provider = provider_mutex.lock().await;
@@ -418,7 +427,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                         {
                                             if let Ok(Some(new_block)) = rpc_handle
                                                 .get_block_by_number(BlockNumberOrTag::Number(
-                                                    first_new_block_height,
+                                                    block_height,
                                                 ))
                                                 .await
                                             {
@@ -436,6 +445,9 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                             } else {
                                 warn!("DEBUG: Could not get block {first_new_block_height}");
                             }
+                            observed_latest_height = latest_height;
+                        } else {
+                            info!("No new blocks in {net} loop_count = {loop_count} latest_height = {latest_height}");
                         }
                     }
 
@@ -508,6 +520,10 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
             } else {
                 info!("Terminating reorg tracker for network {net} since it no longer has an active provider!");
                 break;
+            }
+            {
+                let now = Local::now();
+                info!("DEBUG: END loop_tracking_for_reorg_in_network for {net} loop_count: {loop_count}: {}!", now.format("%Y-%m-%d %H:%M:%S%.3f"));
             }
         }
     }
