@@ -4,9 +4,13 @@ export const organizeFieldsIntoStructs = (fields: TupleField) => {
   let structs: Struct[] = [];
   const mainStruct = { name: fields.name, fields: [] };
   let isInUnion = false;
-  let unionStructs: Struct[] = [];
+  const unionStructs: Record<string, Struct[]> = {};
 
-  const processField = (field: ComponentField[number], parentStruct: any) => {
+  const processField = (
+    field: ComponentField[number],
+    parentStruct: any,
+    structNames: string[],
+  ) => {
     const structs: Struct[] = [];
     if (field.type.includes('tuple')) {
       const newStruct: Struct = {
@@ -16,15 +20,24 @@ export const organizeFieldsIntoStructs = (fields: TupleField) => {
       if ('components' in field) {
         field.components.forEach(component => {
           if (isInUnion) {
-            unionStructs.push(...processField(component, newStruct));
+            unionStructs[structNames.join('_')] = processField(
+              component,
+              newStruct,
+              [...structNames, field.name],
+            );
           } else {
-            structs.push(...processField(component, newStruct));
+            structs.push(
+              ...processField(component, newStruct, [
+                ...structNames,
+                field.name,
+              ]),
+            );
           }
         });
       }
 
       if (isInUnion) {
-        unionStructs.push(newStruct);
+        unionStructs[structNames.join('_')] = [newStruct];
       } else {
         structs.push(newStruct);
       }
@@ -41,10 +54,18 @@ export const organizeFieldsIntoStructs = (fields: TupleField) => {
     } else if (field.type === 'none') {
       // skip none type
     } else if (field.type.includes('union')) {
-      parentStruct.fields.push({ name: field.name, type: 'bytes' });
+      const arrayDimensions = field.type.match(/(\[\d*\])+$/);
+      if (arrayDimensions) {
+        parentStruct.fields.push({
+          name: field.name,
+          type: `bytes${arrayDimensions[0]}`,
+        });
+      } else {
+        parentStruct.fields.push({ name: field.name, type: 'bytes' });
+      }
       isInUnion = true;
       (field as TupleField).components.forEach(component => {
-        unionStructs.push(...processField(component, { fields: [] }));
+        processField(component, { fields: [] }, [...structNames, field.name]);
       });
       isInUnion = false;
     } else {
@@ -55,7 +76,7 @@ export const organizeFieldsIntoStructs = (fields: TupleField) => {
   };
 
   fields.components.forEach(field => {
-    structs.push(...processField(field, mainStruct));
+    structs.push(...processField(field, mainStruct, []));
   });
 
   // order structs in order of declaration
@@ -65,13 +86,6 @@ export const organizeFieldsIntoStructs = (fields: TupleField) => {
 
   // Remove duplicate structs (identified by name).
   structs = structs.reduce((acc: Struct[], struct) => {
-    if (!acc.some(s => s.name === struct.name)) {
-      acc.push(struct);
-    }
-    return acc;
-  }, []);
-
-  unionStructs = unionStructs.reduce((acc: Struct[], struct) => {
     if (!acc.some(s => s.name === struct.name)) {
       acc.push(struct);
     }

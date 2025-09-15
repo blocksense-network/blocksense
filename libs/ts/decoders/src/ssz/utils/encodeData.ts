@@ -211,16 +211,24 @@ export const encodeSSZData = async (
       );
     } else if (schema instanceof ssz.UintBigintType) {
       return convertNumberEndianness(values, schema.byteLength);
-    } else if (schema instanceof ssz.ByteVectorType) {
-      return ethers.isHexString(values)
-        ? ethers.toBeArray(values)
-        : // for uint/int when not power ot 2, e.g. uint48
-          convertNumberEndianness(values, schema.lengthBytes, false);
-    } else if (schema instanceof ssz.ByteListType) {
+    } else if (
+      schema instanceof ssz.ByteVectorType ||
+      schema instanceof ssz.ByteListType
+    ) {
       if (ethers.isHexString(values)) {
-        return ethers.toBeArray(values);
+        values = values.slice(2);
+        const result = new Uint8Array(values.length / 2);
+        for (let i = 0; i < result.length; i++) {
+          const offset = i * 2;
+          result[i] = parseInt(values.substring(offset, offset + 2), 16);
+        }
+        return result;
       }
-      return ethers.toUtf8Bytes(values);
+
+      if (schema instanceof ssz.ByteListType) {
+        return ethers.toUtf8Bytes(values);
+      }
+      return convertNumberEndianness(values, schema.lengthBytes, false);
     }
     return values;
   }
@@ -411,21 +419,37 @@ export const sszSchema = async (
       }
 
       if (field instanceof ssz.UnionType) {
-        const union = {
-          ...data,
-          structNames: extraData?.upperLevelStructNames,
-          fields: extractFieldsFromSchema(field.types, inputFields, {
-            upperLevelStructNames: [
-              ...(extraData?.upperLevelStructNames || []),
-              data.fieldName || '',
-            ],
-          }),
-        };
-        union.fields.forEach((f: Schema, i: number) => {
-          f.fieldName = findUnionNames(inputFields, union.typeName, i);
-          f.type = findFieldTypeByName(inputFields, f.fieldName);
+        data.fieldName = data.typeName;
+        data.structNames = [
+          ...(extraData?.upperLevelStructNames || []),
+          data.fieldName,
+        ];
+        const unionType = findUnionNames(
+          inputFields as TupleField,
+          data.structNames!,
+        );
+        data.typeName = 'union';
+        data.type = 'union';
+        data.actualType = unionType.type;
+
+        field.types.forEach((ft: any, i: number) => {
+          ft.fieldName = unionType.components[i].name;
+          ft.type = unionType.components[i].type;
         });
-        unionTypes.push(union);
+        data.fields = extractFieldsFromSchema(field.types, inputFields, {
+          upperLevelStructNames: [
+            ...(extraData?.upperLevelStructNames || []),
+            data.fieldName,
+          ],
+        });
+
+        data.contractName = data.structNames.filter(w => w !== '').join('_');
+
+        data.fields.forEach((f: Schema) => {
+          f.isFirst = true;
+        });
+
+        unionTypes.push(structuredClone(data));
       }
 
       result.push(data);
@@ -434,9 +458,10 @@ export const sszSchema = async (
     return result;
   };
 
+  const schemaData = await createSchema(fields);
   const schema = extractFieldsFromSchema(
     {
-      data: await createSchema(fields),
+      data: schemaData,
     },
     fields,
   );
@@ -445,7 +470,7 @@ export const sszSchema = async (
   const seen = new Set<string>();
   const uniqueUnionTypes: Schema[] = [];
   for (const ut of unionTypes) {
-    const key = ut.fieldName!;
+    const key = ut.contractName!;
     if (!seen.has(key)) {
       seen.add(key);
       uniqueUnionTypes.push(ut);
@@ -460,33 +485,19 @@ export const sszSchema = async (
   return { schema, unionTypes };
 };
 
-const findUnionNames = (
-  fields: PrimitiveField | TupleField,
-  name: string,
-  selector: number,
-): string => {
-  if ('components' in fields) {
-    if (fields.name.includes(name)) {
-      return fields.components[selector].name;
+export const findUnionNames = (
+  fields: TupleField,
+  structNames: string[],
+): TupleField => {
+  let temp = fields;
+  for (const structName of structNames) {
+    if (structName === '') {
+      continue;
     }
-    for (const component of fields.components) {
-      const found = findUnionNames(component, name, selector);
-      if (found) {
-        return found;
-      }
-    }
-  } else if (Array.isArray(fields)) {
-    for (const field of fields) {
-      const found = findUnionNames(field, name, selector);
-      if (found) {
-        return found;
-      }
-    }
-  } else if (fields.name === name) {
-    return (fields as TupleField).components[selector].name;
+    temp = temp.components.find(c => c.name === structName) as TupleField;
   }
 
-  return '';
+  return temp;
 };
 
 const findFieldTypeByName = (
