@@ -200,7 +200,7 @@ pub async fn adfs_serialize_updates(
             rb_index -= 1; // Get the index of the last updated value
         }
         let feed_id = encoded_feed_id.get_id();
-        let rb_index = U256::from(rb_index);
+        let rb_index = U256::from(rb_index % MAX_HISTORY_ELEMENTS_PER_FEED);
         let row_index = calc_row_index(feed_id, *stride);
         let slot_position = feed_id % NUM_FEED_IDS_IN_RB_INDEX_RECORD;
 
@@ -270,40 +270,17 @@ pub mod tests {
     use super::*;
 
     // Helper function to create VotedFeedUpdate
-    fn create_voted_feed_update(feed_id: FeedId, value: &str) -> VotedFeedUpdate {
+    fn create_voted_feed_update(encoded_feed_id: EncodedFeedId, value: &str) -> VotedFeedUpdate {
         let bytes = from_hex_string(value).unwrap();
         VotedFeedUpdate {
-            encoded_feed_id: EncodedFeedId::new(feed_id, 0),
+            encoded_feed_id,
             value: FeedType::from_bytes(bytes, FeedType::Bytes(Vec::new()), 18).unwrap(),
             end_slot_timestamp: 0,
         }
     }
 
-    fn setup_updates_rb_indexes_and_config() -> (
-        BatchedAggregatesToSend,
-        RoundBufferIndices,
-        HashMap<EncodedFeedId, FeedStrideAndDecimals>,
-    ) {
-        let updates = BatchedAggregatesToSend {
-            block_height: 1234567890,
-            updates: vec![
-                create_voted_feed_update(1, "12343267643573"),
-                create_voted_feed_update(2, "2456"),
-                create_voted_feed_update(3, "3678"),
-                create_voted_feed_update(4, "4890"),
-                create_voted_feed_update(5, "5abc"),
-            ],
-        };
-
-        let mut rb_indices = RoundBufferIndices::new();
-        rb_indices.insert(EncodedFeedId::new(1, 0), 6);
-        rb_indices.insert(EncodedFeedId::new(2, 0), 5);
-        rb_indices.insert(EncodedFeedId::new(3, 0), 4);
-        rb_indices.insert(EncodedFeedId::new(4, 0), 3);
-        rb_indices.insert(EncodedFeedId::new(5, 0), 2);
-
+    fn default_config() -> HashMap<EncodedFeedId, FeedStrideAndDecimals> {
         let mut config = HashMap::new();
-
         for feed_id in 0..16 {
             config.insert(
                 EncodedFeedId::new(feed_id, 0),
@@ -320,14 +297,60 @@ pub mod tests {
                 decimals: 18,
             },
         );
-        (updates, rb_indices, config)
+        config
+    }
+
+    fn setup_updates_rb_indices_and_config(
+        updates_init: &[(EncodedFeedId, &str)],
+        rb_indices_init: &[(EncodedFeedId, u64)],
+        config_init: HashMap<EncodedFeedId, FeedStrideAndDecimals>,
+    ) -> (
+        BatchedAggregatesToSend,
+        RoundBufferIndices,
+        HashMap<EncodedFeedId, FeedStrideAndDecimals>,
+    ) {
+        let updates = BatchedAggregatesToSend {
+            block_height: 1234567890,
+            updates: updates_init
+                .iter()
+                .map(|(feed_id, value)| create_voted_feed_update(*feed_id, value))
+                .collect(),
+        };
+
+        let mut rb_indices = RoundBufferIndices::new();
+        for (feed_id, round) in rb_indices_init.iter() {
+            rb_indices.insert(*feed_id, *round);
+        }
+
+        (updates, rb_indices, config_init)
+    }
+
+    fn encoded_feed_id_for_stride_zero(feed_id: FeedId) -> EncodedFeedId {
+        EncodedFeedId::new(feed_id, 0)
     }
 
     #[tokio::test]
     async fn test_adfs_serialize() {
         let net = "ETH";
 
-        let (updates, rb_indices, config) = setup_updates_rb_indexes_and_config();
+        let updates_init = vec![
+            (encoded_feed_id_for_stride_zero(1), "12343267643573"),
+            (encoded_feed_id_for_stride_zero(2), "2456"),
+            (encoded_feed_id_for_stride_zero(3), "3678"),
+            (encoded_feed_id_for_stride_zero(4), "4890"),
+            (encoded_feed_id_for_stride_zero(5), "5abc"),
+        ];
+        let round_counters_init = vec![
+            (encoded_feed_id_for_stride_zero(1), 6),
+            (encoded_feed_id_for_stride_zero(2), 5),
+            (encoded_feed_id_for_stride_zero(3), 4),
+            (encoded_feed_id_for_stride_zero(4), 3),
+            (encoded_feed_id_for_stride_zero(5), 2)
+        ];
+
+        let config_init = default_config();
+        let (updates, rb_indices, config) =
+            setup_updates_rb_indices_and_config(&updates_init, &round_counters_init, config_init);
 
         let expected_result = "000000050102400c0107123432676435730002400501022456000260040102367800028003010248900002a00201025abc010000000000000500040003000200000000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
 
@@ -364,8 +387,25 @@ pub mod tests {
     async fn test_adfs_serialize_with_non_zero_counter_in_neighbour() {
         let net = "ETH";
 
-        let (updates, mut rb_indices, config) = setup_updates_rb_indexes_and_config();
-        rb_indices.insert(EncodedFeedId::new(6, 0), 5);
+        let updates_init = vec![
+            (encoded_feed_id_for_stride_zero(1), "12343267643573"),
+            (encoded_feed_id_for_stride_zero(2), "2456"),
+            (encoded_feed_id_for_stride_zero(3), "3678"),
+            (encoded_feed_id_for_stride_zero(4), "4890"),
+            (encoded_feed_id_for_stride_zero(5), "5abc"),
+        ];
+        let round_counters_init = vec![
+            (encoded_feed_id_for_stride_zero(1), 6),
+            (encoded_feed_id_for_stride_zero(2), 5),
+            (encoded_feed_id_for_stride_zero(3), 4),
+            (encoded_feed_id_for_stride_zero(4), 3),
+            (encoded_feed_id_for_stride_zero(5), 2)
+        ];
+
+        let config_init = default_config();
+        let (updates, mut rb_indices, config) =
+            setup_updates_rb_indices_and_config(&updates_init, &round_counters_init, config_init);
+        rb_indices.insert(encoded_feed_id_for_stride_zero(6), 5);
 
         let expected_result = "000000050102400c0107123432676435730002400501022456000260040102367800028003010248900002a00201025abc010000000000000500040003000200040000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
 
@@ -392,6 +432,61 @@ pub mod tests {
             expected_result,
             hex::encode(
                 adfs_serialize_updates(net, &updates, None, config, &mut feeds_rb_indexes,)
+                    .await
+                    .unwrap()
+            )
+        );
+    }
+
+    #[tokio::test]
+    async fn test_adfs_serialize_with_wrap_around_index() {
+        let net = "ETH";
+
+        let updates_init = vec![
+            (encoded_feed_id_for_stride_zero(1), "12343267643573"),
+            (encoded_feed_id_for_stride_zero(2), "2456"),
+            (encoded_feed_id_for_stride_zero(3), "3678"),
+            (encoded_feed_id_for_stride_zero(4), "4890"),
+            (encoded_feed_id_for_stride_zero(5), "5abc"),
+        ];
+        let round_counters_init = vec![
+            (encoded_feed_id_for_stride_zero(1), 6),
+            (encoded_feed_id_for_stride_zero(2), 5),
+            (encoded_feed_id_for_stride_zero(3), 4),
+            (encoded_feed_id_for_stride_zero(4), 9000),
+            (encoded_feed_id_for_stride_zero(5), 2)
+        ];
+
+        let config_init = default_config();
+        let (updates, mut round_counters, config) =
+            setup_updates_rb_indices_and_config(&updates_init, &round_counters_init, config_init);
+        round_counters.insert(encoded_feed_id_for_stride_zero(6), 5);
+
+        let expected_result = "000000050102400c0107123432676435730002400501022456000260040102367800028328010248900002a00201025abc010000000000000500040328000200040000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
+
+        let mut feeds_rounds = HashMap::new();
+
+        // Call as it will be in the sequencer
+        assert_eq!(
+            expected_result,
+            hex::encode(
+                adfs_serialize_updates(
+                    net,
+                    &updates,
+                    Some(&round_counters),
+                    config.clone(),
+                    &mut feeds_rounds,
+                )
+                .await
+                .unwrap()
+            )
+        );
+
+        // Call as it will be in the reporter (feeds_rounds provided by the sequencer)
+        assert_eq!(
+            expected_result,
+            hex::encode(
+                adfs_serialize_updates(net, &updates, None, config, &mut feeds_rounds,)
                     .await
                     .unwrap()
             )
