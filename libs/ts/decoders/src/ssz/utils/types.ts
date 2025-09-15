@@ -1,5 +1,7 @@
 export type Schema = {
   structNames?: string[];
+  contractName?: string;
+  actualType?: string;
   isNested: boolean;
   type: string;
   typeName: string;
@@ -60,6 +62,7 @@ export type DecoderPrimitiveLines = (
   isBytes: boolean,
   start: Offset,
   end: Offset,
+  isMainSchemaContainer: boolean,
   counter?: string,
 ) => string;
 
@@ -69,6 +72,7 @@ export type DecoderStringBytes = (
   index: number,
   start: Offset,
   end: Offset,
+  isMainSchemaContainer: boolean,
   counter?: string,
 ) => string;
 
