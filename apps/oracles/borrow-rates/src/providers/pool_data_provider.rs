@@ -7,9 +7,12 @@ use anyhow::Result;
 use blocksense_sdk::eth_rpc::eth_call;
 
 use crate::{
-    domain::{BorrowRateInfo, Marketplace, SupportedNetworks},
+    domain::{BorrowRateInfo, SupportedNetworks, UIPoolMarketplaceType},
     providers::{
-        aave::AaveUi, hyperlend::HyperLendUi, hypurrfi::HypurrFiUi, types::{get_rpc_url, MyProvider}
+        aave::AaveUi,
+        hyperlend::HyperLendUi,
+        hypurrfi::HypurrFiUi,
+        types::{get_rpc_url, MyProvider},
     },
     utils::math::ray_to_apr,
 };
@@ -46,19 +49,13 @@ pub trait UiPool {
 }
 
 pub async fn fetch_reserves(
-    marketplace: Marketplace,
+    marketplace: UIPoolMarketplaceType,
     network: SupportedNetworks,
 ) -> Result<Vec<BorrowRateInfo>> {
     let plan = match marketplace {
-        Marketplace::HypurrFi(_) => HypurrFiUi::plan_for(network)?,
-        Marketplace::HyperLend(_) => HyperLendUi::plan_for(network)?,
-        Marketplace::Aave(_) => AaveUi::plan_for(network)?,
-        Marketplace::HyperDrive(_) | Marketplace::EulerFinance(_) => {
-            unreachable!(
-                "Pool data provider not supported for this marketplace {:?}",
-                marketplace
-            );
-        }
+        UIPoolMarketplaceType::HypurrFi => HypurrFiUi::plan_for(network)?,
+        UIPoolMarketplaceType::HyperLend => HyperLendUi::plan_for(network)?,
+        UIPoolMarketplaceType::Aave => AaveUi::plan_for(network)?,
     };
 
     let rpc_url_val = get_rpc_url(&network)?;
