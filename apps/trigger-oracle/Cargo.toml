@@ -32,7 +32,7 @@ spin-outbound-networking = { workspace = true }
 terminal = { workspace = true }
 outbound-http = { workspace = true }
 
-rdkafka = { version = "0.37.0", features = ["dynamic-linking"] }
+rdkafka = { version = "0.38.0", features = ["dynamic-linking"] }
 futures-util = "0.3.30"
 tokio-stream = "0.1.16"
 
