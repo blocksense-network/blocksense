@@ -2,45 +2,74 @@
 pragma solidity ^0.8.28;
 
 /// @notice Decoder for stored packed tuple data
-library <%= unionName %>SSZSubDecoder {
+library <%= unionName %>SSZDecoder {
   /// @notice User defined struct
   /// @dev Using structs avoids hitting the EVM stack limit
-<%= structs.map((struct) => {
-  return `  struct ${struct.name} {
-  ${struct.fields.map((fields) => `  ${fields.type} ${fields.name};`).join('\n  ')}
-  }`
-}).join('\n\n') %>
+  <%= structs.map((struct) => {
+    return `  struct ${struct.name} {
+      ${struct.fields.map((fields) => `  ${fields.type} ${fields.name};`).join('\n  ')}
+    }`
+  }).join('\n\n') %>
+
+  <%
+    function removeBrackets(type) {
+      let arrayDimensions = type.match(/(\[\d*\])+$/);
+      if (!arrayDimensions) {
+        return type;
+      }
+      return type.replace(arrayDimensions[0], '');
+    }
+  %>
+
 
   <%=
-  unionTypes.map((ut, i) =>
-    `function is${toUpperFirstLetter(ut.type)}(uint8 selector) external pure returns (bool) {
-        return selector == ${i};
-    }`
+  unionTypes.map((ut, i) => {
+    let type = ut.type
+    if(type.includes('tuple')) {
+      type = toUpperFirstLetter(ut.fieldName) + (type.match(/\[(\d*)\]/g) || []).join('');
+    } else if (type.includes('union')) {
+      type = type.replace('union', 'bytes');
+    }
+
+    if (ut.typeName.includes('none')) {
+      return `event ${toUpperFirstLetter(removeBrackets(ut.type))}();`
+    }
+    return `event ${toUpperFirstLetter(removeBrackets(ut.type))}(${type} ${ut.fieldName});`
+    }
   ).join('\n\n')
   %>
 
-  <%-
-  unionTypes.map((ut, i) => {
-    if (ut.typeName === 'none'){
-      // Skip none
-      return '';
-    }
-
-    let type = ut.type
-    if(ut.type.includes('tuple'))
-    {
-      type = toUpperFirstLetter(ut.fieldName) + (ut.type.match(/\[(\d*)\]/g) || []).join('');
-    }
-
-    return `
-      function decode${toUpperFirstLetter(ut.type)} (
-        bytes memory data
-      ) external pure returns (${type} ${ut.sszFixedSize === null ? 'memory' : ''} ${ut.fieldName}) {
-        assembly (\'memory-safe\') {
-          ${lines[i].join('\n')}
-        }
+  <%=
+    unionTypes.map((ut, i) =>
+      `function is${toUpperFirstLetter(removeBrackets(ut.type))}(uint8 selector) internal pure returns (bool) {
+          return selector == ${i};
       }`
-  }).join('\n\n')
+    ).join('\n\n')
+  %>
+
+  <%-
+    unionTypes.map((ut, i) => {
+      if (ut.typeName.includes('none')){
+        // Skip none
+        return '';
+      }
+
+      let type = ut.type
+      if(type.includes('tuple')) {
+        type = toUpperFirstLetter(ut.fieldName) + (type.match(/\[(\d*)\]/g) || []).join('');
+      } else if (type.includes('union')) {
+        type = type.replace('union', 'bytes');
+      }
+
+      return `
+        function decode${toUpperFirstLetter(removeBrackets(ut.type))} (
+          bytes memory data
+        ) internal pure returns (${type} ${ut.typeName.includes('Container') || ut.sszFixedSize === null ? 'memory' : ''} ${ut.fieldName}) {
+          assembly (\'memory-safe\') {
+            ${lines[i].join('\n')}
+          }
+        }`
+    }).join('\n\n')
   %>
 
 }

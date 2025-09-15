@@ -1,6 +1,6 @@
 import { addOffsets } from './addOffsets';
 import { handleFieldRanges } from './container';
-import { encodeSSZData, sszSchema } from './encodeData';
+import { encodeSSZData, findUnionNames, sszSchema } from './encodeData';
 import {
   getDecoderImplementations,
   toLowerFirstLetter,
@@ -19,6 +19,7 @@ export {
   // encode data
   encodeSSZData,
   sszSchema,
+  findUnionNames,
 
   // types
   Schema,
