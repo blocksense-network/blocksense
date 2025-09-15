@@ -48,7 +48,7 @@ const isOkResult = (result: FeedResult): result is { Ok: FeedType } =>
 const isErrResult = (result: FeedResult): result is { Err: FeedError } =>
   'Err' in result;
 
-function asBytes(
+export function asBytes(
   feed: FeedType,
   timestamp: bigint,
   digitsInFraction: number,
