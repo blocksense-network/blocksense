@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use serde::{Deserialize, Serialize};
 
 use blocksense_data_providers_sdk::price_data::types::{PricePair, ProvidersSymbols};
@@ -31,6 +29,5 @@ pub struct ResourceData {
     pub symbols: ProvidersSymbols,
 }
 
-pub type Capabilities = HashMap<String, String>;
 
 /* Oracle results related types */

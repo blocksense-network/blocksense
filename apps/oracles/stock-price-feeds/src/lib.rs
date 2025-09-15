@@ -12,13 +12,13 @@ use tracing::{info, warn};
 use blocksense_data_providers_sdk::price_data::types::{PairsToResults, ProvidersSymbols};
 use blocksense_data_providers_sdk::price_data::wap::vwap::compute_vwap;
 use blocksense_sdk::{
-    oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
+    oracle::{get_capabilities_from_settings, DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
 };
 use chrono::Utc;
 use chrono_tz::US::Eastern;
 
-use types::{Capabilities, FeedConfigData, ResourceData, ResourcePairData};
+use types::{FeedConfigData, ResourceData, ResourcePairData};
 
 use crate::fetch_prices::get_prices;
 use crate::utils::markets_are_closed;
@@ -65,14 +65,6 @@ fn process_results(results: &PairsToResults) -> Result<Payload> {
     }
 
     Ok(payload)
-}
-
-fn get_capabilities_from_settings(settings: &Settings) -> Capabilities {
-    settings
-        .capabilities
-        .iter()
-        .map(|cap| (cap.id.to_string(), cap.data.to_string()))
-        .collect()
 }
 
 fn get_resources_from_settings(settings: &Settings) -> Result<ResourceData> {
