@@ -1,4 +1,4 @@
-import { encodeSSZData, sszSchema } from './encodeData';
+import { encodeSSZData, sszSchema, findUnionNames } from './encodeData';
 import {
   Schema,
   BytesRange,
@@ -19,6 +19,7 @@ export {
   // encode data
   encodeSSZData,
   sszSchema,
+  findUnionNames,
 
   // types
   Schema,

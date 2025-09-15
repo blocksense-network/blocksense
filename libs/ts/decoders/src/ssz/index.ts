@@ -3,7 +3,7 @@ import ejs from 'ejs';
 import * as prettier from 'prettier/standalone';
 import solidityPlugin from 'prettier-plugin-solidity';
 
-import { sszSchema, toUpperFirstLetter } from './utils';
+import { sszSchema, toLowerFirstLetter, toUpperFirstLetter } from './utils';
 import { TupleField, organizeFieldsIntoStructs } from '../utils';
 import { generateDecoderLines } from './helpers';
 
@@ -13,12 +13,11 @@ export const generateDecoder = async (
   fields: TupleField,
   evmVersion: string = 'cancun',
   start: number = 0,
-): Promise<string | string[]> => {
+): Promise<string | Record<string, string>> => {
   const { schema, unionTypes } = await sszSchema(fields);
 
   const { structs, unionStructs } = organizeFieldsIntoStructs(fields);
-  const mainStructName =
-    '_' + fields.name.charAt(0).toLowerCase() + fields.name.slice(1);
+  const mainStructName = '_' + toLowerFirstLetter(fields.name);
   const isMainStructDynamic = fields.type.endsWith('[]');
   const returnType =
     fields.name + (fields.type.match(/\[(\d*)\]/g) || []).join('');
@@ -48,6 +47,7 @@ export const generateDecoder = async (
       isMainStructDynamic,
       returnType,
       unionTypes,
+      toUpperFirstLetter,
     },
     {
       root: (await fs.realpath(__dirname)) + '/',
@@ -60,20 +60,24 @@ export const generateDecoder = async (
   }
 
   // Multidecoder
+  const code: Record<string, string> = {
+    [toUpperFirstLetter(fields.name)]: mainCode,
+  };
 
-  const code: string[] = [mainCode];
   for (const ut of unionTypes) {
     const utfLines: string[][] = [];
     for (const utf of ut.fields || []) {
       utfLines.push(generateDecoderLines(utf, utf.fieldName!, evmVersion, 1));
     }
+    const filteredUnionStructs = unionStructs[ut.contractName!] || [];
+    const unionName = 'SSZ' + '_' + ut.contractName!;
     const unionType = ejs.render(
       subTemplate,
       {
         lines: utfLines,
-        structs: unionStructs,
+        structs: filteredUnionStructs,
         isMainStructDynamic: false,
-        unionName: ut.fieldName,
+        unionName,
         unionTypes: ut.fields,
         toUpperFirstLetter,
       },
@@ -82,7 +86,7 @@ export const generateDecoder = async (
       },
     );
 
-    code.push(await formatCode(unionType));
+    code[unionName] = await formatCode(unionType);
   }
 
   return code;
