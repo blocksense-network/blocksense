@@ -51,7 +51,7 @@ describe('Template Decoder', function () {
     );
     await fs.writeFile(
       ssz.tempFilePath,
-      await generateSSZDecoder(templateSSZ, '', fields, evmVersion),
+      (await generateSSZDecoder(templateSSZ, '', fields, evmVersion)) as string,
       'utf-8',
     );
 
@@ -878,7 +878,7 @@ describe('Template Decoder', function () {
             ],
           ],
         ],
-        ethers.hexlify(ethers.randomBytes(16)), // Random 16 bytes
+        '0x0080c6f9c38f2d7e6fb70689fbbc9c26',
       ];
       await testDecoder(fields, values);
     });
