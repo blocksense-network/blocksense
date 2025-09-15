@@ -196,7 +196,7 @@ pub async fn adfs_serialize_updates(
         if !feeds_ids_with_value_updates.contains(feed_id) && round > 0 {
             round -= 1; // Get the index of the last updated value
         }
-        let round = U256::from(round);
+        let round = U256::from(round % MAX_HISTORY_ELEMENTS_PER_FEED);
         let row_index = (U256::from(2).pow(U256::from(115)) * U256::from(*stride)
             + U256::from(*feed_id))
             / U256::from(NUM_FEED_IDS_IN_ROUND_RECORD);
@@ -273,31 +273,8 @@ pub mod tests {
         }
     }
 
-    fn setup_updates_rounds_and_config() -> (
-        BatchedAggregatesToSend,
-        RoundCounters,
-        HashMap<FeedId, FeedStrideAndDecimals>,
-    ) {
-        let updates = BatchedAggregatesToSend {
-            block_height: 1234567890,
-            updates: vec![
-                create_voted_feed_update(1, "12343267643573"),
-                create_voted_feed_update(2, "2456"),
-                create_voted_feed_update(3, "3678"),
-                create_voted_feed_update(4, "4890"),
-                create_voted_feed_update(5, "5abc"),
-            ],
-        };
-
-        let mut round_counters = RoundCounters::new();
-        round_counters.insert(1, 6);
-        round_counters.insert(2, 5);
-        round_counters.insert(3, 4);
-        round_counters.insert(4, 3);
-        round_counters.insert(5, 2);
-
+    fn default_config() -> HashMap<FeedId, FeedStrideAndDecimals> {
         let mut config = HashMap::new();
-
         for feed_id in 0..16 {
             config.insert(
                 feed_id,
@@ -314,14 +291,50 @@ pub mod tests {
                 decimals: 18,
             },
         );
-        (updates, round_counters, config)
+        config
+    }
+
+    fn setup_updates_rounds_and_config(
+        updates_init: &[(FeedId, &str)],
+        round_counters_init: &[(FeedId, u64)],
+        config_init: HashMap<FeedId, FeedStrideAndDecimals>,
+    ) -> (
+        BatchedAggregatesToSend,
+        RoundCounters,
+        HashMap<FeedId, FeedStrideAndDecimals>,
+    ) {
+        let updates = BatchedAggregatesToSend {
+            block_height: 1234567890,
+            updates: updates_init
+                .iter()
+                .map(|(feed_id, value)| create_voted_feed_update(*feed_id, value))
+                .collect(),
+        };
+
+        let mut round_counters = RoundCounters::new();
+        for (feed_id, round) in round_counters_init.iter() {
+            round_counters.insert(*feed_id, *round);
+        }
+
+        (updates, round_counters, config_init)
     }
 
     #[tokio::test]
     async fn test_adfs_serialize() {
         let net = "ETH";
 
-        let (updates, round_counters, config) = setup_updates_rounds_and_config();
+        let updates_init = vec![
+            (1, "12343267643573"),
+            (2, "2456"),
+            (3, "3678"),
+            (4, "4890"),
+            (5, "5abc"),
+        ];
+        let round_counters_init = vec![(1, 6), (2, 5), (3, 4), (4, 3), (5, 2)];
+
+        let config_init = default_config();
+        let (updates, round_counters, config) =
+            setup_updates_rounds_and_config(&updates_init, &round_counters_init, config_init);
 
         let expected_result = "0100000000499602d2000000050102400c0107123432676435730002400501022456000260040102367800028003010248900002a00201025abc010000000000000500040003000200000000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
 
@@ -358,10 +371,70 @@ pub mod tests {
     async fn test_adfs_serialize_with_non_zero_counter_in_neighbour() {
         let net = "ETH";
 
-        let (updates, mut round_counters, config) = setup_updates_rounds_and_config();
+        let updates_init = vec![
+            (1, "12343267643573"),
+            (2, "2456"),
+            (3, "3678"),
+            (4, "4890"),
+            (5, "5abc"),
+        ];
+        let round_counters_init = vec![(1, 6), (2, 5), (3, 4), (4, 3), (5, 2)];
+
+        let config_init = default_config();
+        let (updates, mut round_counters, config) =
+            setup_updates_rounds_and_config(&updates_init, &round_counters_init, config_init);
         round_counters.insert(6, 5);
 
         let expected_result = "0100000000499602d2000000050102400c0107123432676435730002400501022456000260040102367800028003010248900002a00201025abc010000000000000500040003000200040000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
+
+        let mut feeds_rounds = HashMap::new();
+
+        // Call as it will be in the sequencer
+        assert_eq!(
+            expected_result,
+            hex::encode(
+                adfs_serialize_updates(
+                    net,
+                    &updates,
+                    Some(&round_counters),
+                    config.clone(),
+                    &mut feeds_rounds,
+                )
+                .await
+                .unwrap()
+            )
+        );
+
+        // Call as it will be in the reporter (feeds_rounds provided by the sequencer)
+        assert_eq!(
+            expected_result,
+            hex::encode(
+                adfs_serialize_updates(net, &updates, None, config, &mut feeds_rounds,)
+                    .await
+                    .unwrap()
+            )
+        );
+    }
+
+    #[tokio::test]
+    async fn test_adfs_serialize_with_wrap_around_index() {
+        let net = "ETH";
+
+        let updates_init = vec![
+            (1, "12343267643573"),
+            (2, "2456"),
+            (3, "3678"),
+            (4, "4890"),
+            (5, "5abc"),
+        ];
+        let round_counters_init = vec![(1, 6), (2, 5), (3, 4), (4, 9000), (5, 2)];
+
+        let config_init = default_config();
+        let (updates, mut round_counters, config) =
+            setup_updates_rounds_and_config(&updates_init, &round_counters_init, config_init);
+        round_counters.insert(6, 5);
+
+        let expected_result = "0100000000499602d2000000050102400c0107123432676435730002400501022456000260040102367800028328010248900002a00201025abc010000000000000500040328000200040000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
 
         let mut feeds_rounds = HashMap::new();
 
