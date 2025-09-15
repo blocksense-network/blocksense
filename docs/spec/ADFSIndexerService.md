@@ -31,7 +31,7 @@ Below is a complete, implementation‑ready **software specification** for your 
 
 ### 1.2 Events & decoding
 
-- **Event topic**: configured as `topicHash` (no indexed params).
+- **Event topic**: configured as `topicName` (raw event signature, e.g., "DataFeedsUpdated(uint256)"). The service derives `topic0 = keccak256(topicName)` internally for filters.
 - **Tx input**: fetch for each matched log; decode using `decodeADFSCalldata(calldata, hasBlockNumber)`:
 
   - The service decides `hasBlockNumber` **by contract version**, not config.
@@ -114,7 +114,7 @@ Below is a complete, implementation‑ready **software specification** for your 
 
 ### 3.2 RPC usage (viem)
 
-- **WS**: subscribe to `topicHash` logs for the proxy/contract (live tail).
+- **WS**: subscribe using `topic0 = keccak256(topicName)` for the proxy/contract (live tail).
 - **HTTP**: backfill ranges + `getTransaction` for calldata; `getBlock` for timestamp/hash.
 - **Proxy upgrade**: watch **TransparentUpgradeableProxy** `Upgraded(address)` logs from the proxy address and bump `version`.
 
@@ -152,7 +152,7 @@ CREATE TABLE contracts (
   chain_id        INTEGER REFERENCES chains(chain_id),
   proxy_address   BYTEA NOT NULL,             -- 20 bytes
   contract_address BYTEA NOT NULL,            -- current impl (optional if desired)
-  topic_hash      BYTEA NOT NULL,             -- 32 bytes
+  topic_hash      BYTEA NOT NULL,             -- 32 bytes; keccak256(topicName) stored in DB
   start_block     BIGINT NOT NULL,
   UNIQUE (chain_id)
 );
@@ -173,7 +173,7 @@ CREATE TABLE adfs_events (
   block_timestamp TIMESTAMPTZ NOT NULL,
   tx_hash         BYTEA   NOT NULL,           -- 32 bytes
   log_index       INTEGER NOT NULL,
-  topic_hash      BYTEA   NOT NULL,           -- redundancy for audit
+  topic_hash      BYTEA   NOT NULL,           -- topic0; derived from `topicName` (redundancy for audit)
   status          TEXT    NOT NULL CHECK (status IN ('pending','confirmed','dropped')),
   version         INTEGER NOT NULL,           -- per proxy version at emission
   calldata        BYTEA   NOT NULL,           -- raw tx input
@@ -371,7 +371,7 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
       "rpcWs": "wss://.../",
       "finality": 12,
       "contractAddress": "0xProxyAddress", // proxy
-      "topicHash": "0x...", // DataFeedsUpdated...
+      "topicName": "DataFeedsUpdated(uint256)",
       "startBlock": 12345678
     }
     // more chains...
@@ -381,6 +381,7 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
 
 > `hasBlockNumber` **not** in config (derived by version).
 > **Rate limits** and **max queue size** are optional config knobs; defaults provided.
+> `topicName` is a config‑only field; the database persists only the computed hash (`topic0`) as `BYTEA` (e.g., `chains.topic_hash`, `contracts.topic_hash`, `events_adfs.topic0`).
 
 **Env variables**:
 
@@ -415,7 +416,7 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
 
 # 10) Event processing flow
 
-1. **Detect** matching log (topic = `topicHash`, address = proxy/contract).
+1. **Detect** matching log (`topic0 = keccak256(topicName)`, address = proxy/contract).
 2. **Look up version** active at `block_number` (`proxy_versions`).
 3. **Fetch** tx calldata (`getTransaction(txHash)`).
 4. **Decode** via `decodeADFSCalldata(calldata, VersionMode[version].hasBlockNumber)`.
@@ -662,7 +663,7 @@ interface InsertEvent {
   blockTimestamp: Date;
   txHash: `0x${string}`;
   logIndex: number;
-  topicHash: `0x${string}`;
+  topic0: `0x${string}`; // keccak256(topicName)
   status: Status;
   version: number;
   calldata: `0x${string}`;
@@ -749,7 +750,7 @@ Build a multichain indexer that listens to a single proxy‑fronted ADFS contrac
 - **Backfill**: Yes, from deployment block.
 - **Finality**: Per‑chain confirmations from config; state: `pending | confirmed | dropped`.
 - **Contracts**: One proxy‑fronted ADFS per chain; **monitor the proxy** address.
-- **Event meta**: `topicHash` in config (DataFeedsUpdated topic).
+  -- **Event meta**: `topicName` in config (e.g., "DataFeedsUpdated(uint256)"); the service derives `topic0` via `keccak256(topicName)`.
 - **Versioning**:
 
   - Detect proxy **Upgraded(address)** events; increment **`version`** per chain.
@@ -811,7 +812,7 @@ Build a multichain indexer that listens to a single proxy‑fronted ADFS contrac
 
 - **LogIngestor (live)**:
 
-  - WS filter on proxy `contractAddress` + `topicHash` (DataFeedsUpdated).
+  - WS filter on proxy `contractAddress` + `topic0 = keccak256(topicName)` (DataFeedsUpdated).
   - Collects `(blockNumber, logIndex, txHash)`, fetches `tx` and `receipt`, decodes calldata using `VersionManager` → `ParsedCalldata`.
   - Emits **ordered** per‑block batches to the per‑chain queue.
 
@@ -913,7 +914,7 @@ CREATE TABLE events_adfs (
   block_timestamp TIMESTAMPTZ NOT NULL,
   tx_hash         BYTEA   NOT NULL,
   log_index       INTEGER NOT NULL,
-  topic0          BYTEA   NOT NULL,      -- topicHash
+  topic0          BYTEA   NOT NULL,      -- keccak256(topicName)
   data            BYTEA   NOT NULL,      -- event data blob
   version         INTEGER NOT NULL,      -- from VersionManager at processing time
   state           adfs_state NOT NULL,   -- pending/confirmed/dropped
@@ -1069,7 +1070,7 @@ CREATE TABLE processing_state (
 
 ### 5.2 Backfill (per chain; fiber)
 
-- Range scan with `getLogs` (proxy address + `topicHash`) from `processing_state.backfill_cursor` up to `head − finality`.
+- Range scan with `getLogs` (proxy address + `topic0 = keccak256(topicName)`) from `processing_state.backfill_cursor` up to `head − finality`.
 - Adaptive step sizing (e.g., start 2,000 blocks; shrink on errors/timeouts).
 - For each log:
 
@@ -1085,7 +1086,7 @@ CREATE TABLE processing_state (
 
 ### 5.3 Live Tail (per chain; fiber)
 
-- WS subscription on `(address=proxy, topics=[topicHash])`.
+- WS subscription on `(address=proxy, topics=[keccak256(topicName)])`.
 - Buffer out‑of‑order logs until contiguous `(block_number, log_index)` order is achievable.
 - For each log, fetch tx + header, decode, enqueue.
 
@@ -1123,7 +1124,7 @@ For an ordered batch belonging to one **block**:
       "rpcHttp": "https://provider.example/http",
       "rpcWs": "wss://provider.example/ws",
       "contractAddress": "0xProxyAddress",
-      "topicHash": "0x<keccak256_of_DataFeedsUpdated_signature>",
+      "topicName": "DataFeedsUpdated(uint256)",
       "startBlock": 19000000,
       "finality": 15,
       "rateLimits": { "rps": 20 },
@@ -1417,7 +1418,7 @@ For an ordered batch belonging to one **block**:
 ## 20) Assumptions & Defaults
 
 - Proxy conforms to ERC‑1967 `Upgraded(address)`; if a chain uses a non‑standard upgrade event, a code override can register an alternate topic hash.
-- Event signature for **DataFeedsUpdated** is stable across versions; if it changes, add another `topicHash` in config for that chain (multiple topics supported internally).
+- Event signature for **DataFeedsUpdated** is stable across versions; if it changes, update `topicName` in config (multiple topics supported internally by deriving `topic0` per signature).
 - `stride` non‑negative; `u16` indices never exceed 65535.
 - Consumers use read‑only DB credentials.
 
