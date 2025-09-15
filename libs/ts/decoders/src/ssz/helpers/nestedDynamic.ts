@@ -69,6 +69,7 @@ export const generateNestedDynamic = (
     `;
   }
 
+  const newPos = `${name}_pos`;
   return `
     // Composite Array Variable Length for ${fieldName}
     {
@@ -108,11 +109,11 @@ export const generateNestedDynamic = (
             : `mstore(${index ? `add(${location}, ${index * 32})` : location}, ${name})`
       }
 
-      let ${location}_pos := mload(0x40)
-      mstore(0x40, add(${location}_pos, mul(add(${size}, 1), 0x20)))
+      let ${newPos} := mload(0x40)
+      mstore(0x40, add(${newPos}, mul(add(${size}, 1), 0x20)))
 
       // Store first array pos
-      mstore(${location}_pos, ${firstArrayName})
+      mstore(${newPos}, ${firstArrayName})
       for {
         let ${name}_i := 1
       } lt(${name}_i, ${size}) {
@@ -126,18 +127,18 @@ export const generateNestedDynamic = (
 
         innerArrayPos := add(innerArrayPos, ${start})
 
-        mstore(add(${location}_pos, mul(${name}_i, 0x20)), innerArrayPos)
+        mstore(add(${newPos}, mul(${name}_i, 0x20)), innerArrayPos)
       }
       // Store end array pos
-      mstore(add(${location}_pos, mul(${size}, 0x20)), ${end})
+      mstore(add(${newPos}, mul(${size}, 0x20)), ${end})
 
       for {
         let ${name}_i := 0
       } lt(${name}_i, ${size}) {
         ${name}_i := add(${name}_i, 1)
       } {
-        let ${newStart} := mload(add(${location}_pos, mul(${name}_i, 0x20)))
-        let ${newEnd} := mload(add(${location}_pos, mul(add(${name}_i, 1), 0x20)))
+        let ${newStart} := mload(add(${newPos}, mul(${name}_i, 0x20)))
+        let ${newEnd} := mload(add(${newPos}, mul(add(${name}_i, 1), 0x20)))
         ${generateLines(
           newStart,
           newEnd,
