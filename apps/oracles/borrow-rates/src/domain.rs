@@ -45,6 +45,18 @@ pub enum Marketplace {
     EulerFinance(EulerFinanceArgs),
 }
 
+impl Marketplace {
+    pub fn get_marketplace_network(&self) -> Option<SupportedNetworks> {
+        match self {
+            Marketplace::Aave(args) => Some(args.network),
+            Marketplace::HypurrFi(args) => Some(args.network),
+            Marketplace::HyperLend(args) => Some(args.network),
+            Marketplace::EulerFinance(args) => Some(args.network),
+            Marketplace::HyperDrive(_) => None,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash, Clone)]
 pub struct AaveArgs {
     pub network: SupportedNetworks,
@@ -114,10 +126,15 @@ impl<'de> Deserialize<'de> for SupportedNetworks {
 }
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
-pub enum MarketplaceType {
+pub enum UIPoolMarketplaceType {
     Aave,
     HypurrFi,
     HyperLend,
+}
+
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
+pub enum MarketplaceType {
+    UIPoolMarketplace(UIPoolMarketplaceType),
     HyperDrive,
     EulerFinance,
 }
@@ -125,9 +142,13 @@ pub enum MarketplaceType {
 impl From<&Marketplace> for MarketplaceType {
     fn from(marketplace: &Marketplace) -> Self {
         match marketplace {
-            Marketplace::Aave(_) => MarketplaceType::Aave,
-            Marketplace::HypurrFi(_) => MarketplaceType::HypurrFi,
-            Marketplace::HyperLend(_) => MarketplaceType::HyperLend,
+            Marketplace::Aave(_) => MarketplaceType::UIPoolMarketplace(UIPoolMarketplaceType::Aave),
+            Marketplace::HypurrFi(_) => {
+                MarketplaceType::UIPoolMarketplace(UIPoolMarketplaceType::HypurrFi)
+            }
+            Marketplace::HyperLend(_) => {
+                MarketplaceType::UIPoolMarketplace(UIPoolMarketplaceType::HyperLend)
+            }
             Marketplace::HyperDrive(_) => MarketplaceType::HyperDrive,
             Marketplace::EulerFinance(_) => MarketplaceType::EulerFinance,
         }
@@ -161,13 +182,10 @@ pub fn map_assets_to_feeds(
         Some(net) => feeds_config
             .iter()
             .filter(|f| {
-                match &f.arguments {
-                    Marketplace::Aave(args) => args.network == net,
-                    Marketplace::HypurrFi(args) => args.network == net,
-                    Marketplace::HyperLend(args) => args.network == net,
-                    Marketplace::EulerFinance(args) => args.network == net,
-                    Marketplace::HyperDrive(_) => true, // HyperDrive doesn't have network filtering
-                }
+                f.arguments
+                    .get_marketplace_network()
+                    .map(|n| n == net)
+                    .unwrap_or(true)
             })
             .cloned()
             .collect(),

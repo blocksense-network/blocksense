@@ -20,37 +20,27 @@ use tracing::warn;
 fn extract_unique_networks_from_feeds(feeds_config: &[FeedConfig]) -> Vec<SupportedNetworks> {
     feeds_config
         .iter()
-        .filter_map(|feed| match &feed.arguments {
-            Marketplace::Aave(args) => Some(args.network),
-            Marketplace::HypurrFi(args) => Some(args.network),
-            Marketplace::HyperLend(args) => Some(args.network),
-            Marketplace::EulerFinance(args) => Some(args.network),
-            Marketplace::HyperDrive(_) => None,
-        })
+        .filter_map(|feed| feed.arguments.get_marketplace_network())
         .collect::<HashSet<_>>()
         .into_iter()
         .collect()
 }
 
-async fn fetch_market<'a>(
+async fn fetch_market(
     marketplace_type: MarketplaceType,
-    feeds_config: &'a [FeedConfig],
+    feeds_config: &[FeedConfig],
 ) -> Result<(MarketplaceType, Result<RatesPerFeed>)> {
     match marketplace_type {
-        MarketplaceType::HypurrFi | MarketplaceType::HyperLend | MarketplaceType::Aave => {
-            let mut result = (marketplace_type, Ok(RatesPerFeed::new()));
+        MarketplaceType::UIPoolMarketplace(ui_pool_marketplace) => {
+            let mut result = RatesPerFeed::new();
 
             let networks = extract_unique_networks_from_feeds(feeds_config);
             for network in networks {
-                // Create a marketplace instance for the API call - we can use the first feed's marketplace
-                let marketplace = feeds_config[0].arguments.clone();
-                let rates_info = fetch_reserves(marketplace, network).await?;
+                let rates_info = fetch_reserves(ui_pool_marketplace, network).await?;
                 let feeds_results = map_assets_to_feeds(rates_info, feeds_config, Some(network));
-                if let Ok(ref mut map) = result.1 {
-                    map.extend(feeds_results);
-                }
+                result.extend(feeds_results);
             }
-            Ok(result)
+            Ok((marketplace_type, Ok(result)))
         }
         MarketplaceType::HyperDrive => Ok((
             marketplace_type,
