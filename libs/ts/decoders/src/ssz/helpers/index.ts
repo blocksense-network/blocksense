@@ -16,6 +16,8 @@ export const generateDecoderLines = (
   const { generateDecoderPrimitiveLines, generateDecoderStringBytes } =
     getDecoderImplementations(evmVersion);
 
+  const isMainSchemaContainer = schema.typeName.includes('Container');
+
   const generateDecoderLines = (
     schema: Schema,
     location: string,
@@ -143,6 +145,7 @@ export const generateDecoderLines = (
               isBytesNum,
               start,
               end,
+              isMainSchemaContainer,
               counter,
             ),
           );
@@ -229,8 +232,11 @@ export const generateDecoderLines = (
         // shift to left
         lines.push(`
         // Store ${schema.sszFixedSize * 8} bits of data at slot ${index} of ${location} ${schema.fieldName ? `for ${schema.fieldName}` : ''}
-        mstore(${index ? `add(${location}, ${index * 0x20})` : location},
-        mload(add(data, ${start})))
+        ${
+          isMainSchemaContainer
+            ? `mstore(${index ? `add(${location}, ${index * 0x20})` : location}, mload(add(data, ${start})))`
+            : `${location} := mload(add(data, ${start}))`
+        }
         `);
       } else if (schema.typeName === 'none') {
         lines.push('// `none` type, do nothing');
@@ -238,13 +244,13 @@ export const generateDecoderLines = (
         // shift to right
         lines.push(`
               // Store ${schema.sszFixedSize * 8} bits of data at slot ${index} of ${location} ${schema.fieldName ? `for ${schema.fieldName}` : ''}
-              mstore(${index ? `add(${location}, ${index * 0x20})` : location},
+              ${isMainSchemaContainer ? `mstore(${index ? `add(${location}, ${index * 0x20})` : location},` : `${location} := `}
                 ${
                   schema.sszFixedSize < 32
                     ? `shr(${256 - schema.sszFixedSize * 8}, mload(add(data, ${start})))`
                     : `mload(add(data, ${start}))`
                 }
-              )
+              ${isMainSchemaContainer ? ')' : ''}
             `);
       }
     } else {
@@ -256,6 +262,7 @@ export const generateDecoderLines = (
           index,
           start,
           end,
+          isMainSchemaContainer,
           counter,
         ),
       );

@@ -6,15 +6,17 @@ export const generateDecoderStringBytes = (
   index: number,
   start: Offset,
   end: Offset,
+  isMainSchemaContainer: boolean,
   counter?: string,
 ) => {
-  const fieldName = '_' + schema.fieldName;
+  const fieldName =
+    (isMainSchemaContainer || schema.isNested ? '_' : '') + schema.fieldName;
 
   return `
     // String/Bytes for ${schema.fieldName}
     {
       let ${fieldName}_size := sub(${end}, ${start})
-      let ${fieldName} := mload(0x40)
+      ${isMainSchemaContainer || schema.isNested ? 'let' : ''} ${fieldName} := mload(0x40)
       ${
         counter
           ? `mstore(add(${location}, mul(${schema.prevType?.type === 'Vector' ? counter : `add(${counter}, 1)`}, 0x20)), ${fieldName})`
