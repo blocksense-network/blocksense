@@ -9,7 +9,7 @@ Below is a complete, implementation‑ready **software specification** for your 
 - fetch the **transaction input data**,
 - **decode** it via `decodeADFSCalldata()`,
 - persist raw + normalized records into **Postgres**,
-- maintain **latest-per-(chainId, feedId, stride)** materialization,
+- maintain **latest-per-(chainId, feedId, stride)** materialization, with an option to show only feeds updated in the past X days,
 - support **historical backfill** from each contract’s deployment block,
 - handle **finality/reorgs** with a `pending → confirmed` state machine and soft deletes,
 - support **contract versioning** with a `version` column and an `extra` JSONB column.
@@ -50,6 +50,7 @@ Below is a complete, implementation‑ready **software specification** for your 
 - Get **all updates** for `(chainId, feedId)` in **block range** `[A, B]`.
 - Random access: lookup **ring buffer slot contents** by `(chainId, feedId, index, stride)` (see §4.4 on mapping).
 - Only **confirmed** rows appear in the latest view/table.
+- List **active feeds**: latest entries where `block_timestamp ≥ now() - interval 'X days'` for a given `chainId` (optional filter).
 
 ---
 
@@ -233,6 +234,7 @@ CREATE TABLE feed_latest (
   feed_id         BIT(128) NOT NULL,
   stride          SMALLINT NOT NULL,
   block_number    BIGINT  NOT NULL,
+  block_timestamp TIMESTAMPTZ NOT NULL,
   block_hash      BYTEA   NOT NULL,
   tx_hash         BYTEA   NOT NULL,
   log_index       INTEGER NOT NULL,
@@ -240,6 +242,10 @@ CREATE TABLE feed_latest (
   version         INTEGER NOT NULL,
   PRIMARY KEY (chain_id, feed_id, stride)
 );
+
+-- Optional index to support "active since X days" queries
+CREATE INDEX feed_latest_active_since_idx
+  ON feed_latest (chain_id, block_timestamp DESC);
 
 -- PROCESSING CURSORS ---------------------------------------------------
 CREATE TABLE processing_state (
@@ -263,7 +269,8 @@ CREATE TABLE processing_state (
 ### 4.3 Latest maintenance
 
 - On **confirm** of a `feed_updates` row, perform an **UPSERT** into `feed_latest` keyed by `(chain_id, feed_id, stride)`, choosing the max `(block_number, log_index)` if there’s contention.
-- `feed_latest` contains **confirmed rows only**.
+- `feed_latest` contains **confirmed rows only** and stores the last `block_timestamp` for recency filters.
+- Consumers may apply an optional "active since X days" filter using `block_timestamp ≥ now() - interval 'X days'`.
 
 ### 4.4 Ring buffer addressing (for random reads)
 
@@ -442,11 +449,12 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
 
 ```sql
 INSERT INTO feed_latest AS fl
-(chain_id, feed_id, stride, block_number, block_hash, tx_hash, log_index, data, version)
-VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+(chain_id, feed_id, stride, block_number, block_timestamp, block_hash, tx_hash, log_index, data, version)
+VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
 ON CONFLICT (chain_id, feed_id, stride)
 DO UPDATE SET
   block_number = EXCLUDED.block_number,
+  block_timestamp = EXCLUDED.block_timestamp,
   block_hash   = EXCLUDED.block_hash,
   tx_hash      = EXCLUDED.tx_hash,
   log_index    = EXCLUDED.log_index,
@@ -720,7 +728,7 @@ Build a multichain indexer that listens to a single proxy‑fronted ADFS contrac
 
   - **Raw** tx input (BYTEA) and **decoded JSON**.
   - **Normalized** feed updates and ring‑buffer table updates.
-  - **Latest** confirmed value per `(chain_id, feed_id, stride)`.
+  - **Latest** confirmed value per `(chain_id, feed_id, stride)`, with optional "active since X days" filter.
 
 - Reorg policy with per‑chain **pending → confirmed** or **pending → dropped** state.
 - Separate Postgres DBs for **devnet**, **testnet**, **mainnet**.
@@ -749,7 +757,7 @@ Build a multichain indexer that listens to a single proxy‑fronted ADFS contrac
   - DB rows carry `version`; version‑specific payloads go in `extra JSONB`.
 
 - **Decoder**: always yields `feedId` (u128) and ring buffer `index` (u16).
-- **Latest view key**: `(chain_id, feed_id, stride)`.
+- **Latest view key**: `(chain_id, feed_id, stride)`; expose recency via `block_timestamp` for "active since X days" filtering.
 - **Types**:
 
   - `feed_id`: **BIT(128)**.
@@ -760,7 +768,7 @@ Build a multichain indexer that listens to a single proxy‑fronted ADFS contrac
 - **Uniqueness**: `(chain_id, tx_hash, log_index)`; use **UPSERT** (idempotent).
 - **Consumers**:
 
-  - Queries: latest value; updates in block range; ring buffer head.
+  - Queries: latest value; updates in block range; ring buffer head; active feeds since X days.
   - Per‑chain consistency is sufficient.
   - Include `block_timestamp` on rows (fetch headers).
 
@@ -1221,6 +1229,15 @@ For an ordered batch belonging to one **block**:
     AND table_index = $2
     AND state = 'confirmed'
   ORDER BY block_number, log_index;
+  ```
+
+- **Active feeds since X days** (filter latest by recency):
+
+  ```sql
+  SELECT feed_id, stride, data, block_number, block_timestamp, version
+  FROM feed_latest
+  WHERE chain_id = $1
+    AND block_timestamp >= now() - ($2 || ' days')::interval; -- $2 = X
   ```
 
 > **Note on BIT(128)**: bind `feed_id` using Postgres bit literals or cast from hex via a helper SQL function provided in migrations (e.g., `hex_to_bit128('0x...')`).
