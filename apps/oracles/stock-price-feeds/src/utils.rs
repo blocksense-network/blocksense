@@ -1,20 +1,7 @@
 #![allow(unused_imports)]
-use std::collections::HashMap;
-
 use chrono::{Datelike, NaiveTime, TimeZone};
 use chrono_tz::US::Eastern;
-
-use crate::types::Capabilities;
-
-pub fn get_api_keys(capabilities: &Capabilities, keys: &[&str]) -> Option<HashMap<String, String>> {
-    keys.iter()
-        .map(|&key| {
-            capabilities
-                .get(key)
-                .map(|value| (key.to_string(), value.clone()))
-        })
-        .collect()
-}
+use blocksense_sdk::oracle::Capabilities;
 
 pub fn markets_are_closed(now_et: chrono::DateTime<chrono_tz::Tz>) -> bool {
     let weekday = now_et.weekday();
@@ -27,28 +14,6 @@ pub fn markets_are_closed(now_et: chrono::DateTime<chrono_tz::Tz>) -> bool {
     let is_outside_market_hours = current_time < start_time || current_time > end_time;
 
     is_weekend || is_outside_market_hours
-}
-
-#[test]
-fn test_get_api_keys() {
-    let mut capabilities = Capabilities::new();
-    capabilities.insert("API_KEY".to_string(), "test_key".to_string());
-
-    let result = get_api_keys(&capabilities, &["API_KEY"]);
-    assert_eq!(
-        result,
-        Some(HashMap::from([(
-            "API_KEY".to_string(),
-            "test_key".to_string()
-        )]))
-    );
-
-    let result = get_api_keys(&capabilities, &["NON_EXISTENT_KEY"]);
-    assert_eq!(result, None);
-
-    let empty_capabilities = Capabilities::new();
-    let result = get_api_keys(&empty_capabilities, &["API_KEY"]);
-    assert_eq!(result, None);
 }
 
 #[test]
