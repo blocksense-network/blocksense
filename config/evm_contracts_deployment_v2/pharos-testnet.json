@@ -9563,6 +9563,1800 @@
         "base": null,
         "quote": null
       },
+      "733": {
+        "address": "0x4384b7F222C7F7A1114c7EBf364b8BcfB5cBEaC3",
+        "constructorArgs": [
+          "SOMI / USD",
+          18,
+          "733",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "733",
+        "base": null,
+        "quote": null
+      },
+      "10000": {
+        "address": "0x25248Dd5367E26bd2F92c3c50Bf98810e5E30C0d",
+        "constructorArgs": [
+          "GBP / USD",
+          8,
+          "10000",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10000",
+        "base": null,
+        "quote": null
+      },
+      "10001": {
+        "address": "0xe524a73936ce1e2820A4c90D41940a38Af03C2bA",
+        "constructorArgs": [
+          "EUR / USD",
+          8,
+          "10001",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10001",
+        "base": null,
+        "quote": null
+      },
+      "10002": {
+        "address": "0x051e35faE0e6086951bA2DEAd85FC258A77bA790",
+        "constructorArgs": [
+          "XAU / USD",
+          8,
+          "10002",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10002",
+        "base": null,
+        "quote": null
+      },
+      "10003": {
+        "address": "0x66b83a8aaF7C837B4b6E53E1cf0A1831AE1Cb4d1",
+        "constructorArgs": [
+          "AUD / USD",
+          8,
+          "10003",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10003",
+        "base": null,
+        "quote": null
+      },
+      "10004": {
+        "address": "0xCdFafFa471701161f93D33c7E007587ca7181757",
+        "constructorArgs": [
+          "XAG / USD",
+          8,
+          "10004",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10004",
+        "base": null,
+        "quote": null
+      },
+      "10005": {
+        "address": "0x2E61320738546fcCe227f470339090E073fA4B9d",
+        "constructorArgs": [
+          "GEL / USD",
+          8,
+          "10005",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10005",
+        "base": null,
+        "quote": null
+      },
+      "10006": {
+        "address": "0x2D7D548223E599b0d93621F6f1f5930eB826fe01",
+        "constructorArgs": [
+          "NZD / USD",
+          8,
+          "10006",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10006",
+        "base": null,
+        "quote": null
+      },
+      "10007": {
+        "address": "0x30eCaf31cA976A0d3B6AE303c4F38dB8a40aB906",
+        "constructorArgs": [
+          "CNH / USD",
+          8,
+          "10007",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10007",
+        "base": null,
+        "quote": null
+      },
+      "10008": {
+        "address": "0x28D0f1199bAb7ca8077C4680032f6Fa6E056afD5",
+        "constructorArgs": [
+          "CHF / USD",
+          8,
+          "10008",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10008",
+        "base": null,
+        "quote": null
+      },
+      "10009": {
+        "address": "0xf84A1f31fD50B388E2133Edd2de0708d4C37050a",
+        "constructorArgs": [
+          "ZAR / USD",
+          8,
+          "10009",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10009",
+        "base": null,
+        "quote": null
+      },
+      "10010": {
+        "address": "0x2637B33D6749C774a459d31CF59d7fE656dB74d4",
+        "constructorArgs": [
+          "SEK / USD",
+          8,
+          "10010",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10010",
+        "base": null,
+        "quote": null
+      },
+      "10011": {
+        "address": "0x55efE42a24E622DAD3DE4b42d8802c4e7B6e4642",
+        "constructorArgs": [
+          "SGD / USD",
+          8,
+          "10011",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10011",
+        "base": null,
+        "quote": null
+      },
+      "10012": {
+        "address": "0xa1540735783a849dB2e5F0b4Ce18100Fe76D2854",
+        "constructorArgs": [
+          "PLN / USD",
+          8,
+          "10012",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10012",
+        "base": null,
+        "quote": null
+      },
+      "10013": {
+        "address": "0x04E9F62222d81ddE2B0953f979Ac9bA126543a73",
+        "constructorArgs": [
+          "KRW / USD",
+          8,
+          "10013",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10013",
+        "base": null,
+        "quote": null
+      },
+      "10014": {
+        "address": "0x697CD3F055D609A2cd9bB8062E77B9610cad3791",
+        "constructorArgs": [
+          "HUF / USD",
+          8,
+          "10014",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10014",
+        "base": null,
+        "quote": null
+      },
+      "10015": {
+        "address": "0xFcA35CeD6E400F1031Ab634A1c35B9D9f4F3F89f",
+        "constructorArgs": [
+          "DKK / USD",
+          8,
+          "10015",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10015",
+        "base": null,
+        "quote": null
+      },
+      "10016": {
+        "address": "0xAc3A29Ec0425cE157221b23986f1fb34bb73ffe9",
+        "constructorArgs": [
+          "MXN / USD",
+          8,
+          "10016",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10016",
+        "base": null,
+        "quote": null
+      },
+      "10017": {
+        "address": "0x323cCEBc6A7eC9B56B0573151A183e3769062942",
+        "constructorArgs": [
+          "CZK / USD",
+          8,
+          "10017",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10017",
+        "base": null,
+        "quote": null
+      },
+      "10018": {
+        "address": "0x5bE0aD64a3F43334B8BDf6F997701097b5129E92",
+        "constructorArgs": [
+          "NOK / USD",
+          8,
+          "10018",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10018",
+        "base": null,
+        "quote": null
+      },
+      "10019": {
+        "address": "0xAb79459D63d562d78Cb39D62d1468eb695161526",
+        "constructorArgs": [
+          "HKD / USD",
+          8,
+          "10019",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10019",
+        "base": null,
+        "quote": null
+      },
+      "10020": {
+        "address": "0x166341511094888CE125Cf7262C48DC1B4fC7d32",
+        "constructorArgs": [
+          "TWD / USD",
+          8,
+          "10020",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10020",
+        "base": null,
+        "quote": null
+      },
+      "10021": {
+        "address": "0xCda5247B53CA6B54b03Ad362132e05Eb79338943",
+        "constructorArgs": [
+          "INR / USD",
+          8,
+          "10021",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10021",
+        "base": null,
+        "quote": null
+      },
+      "10022": {
+        "address": "0x406f92495738E53f28b33C45B4c20747FbFE2978",
+        "constructorArgs": [
+          "TRY / USD",
+          8,
+          "10022",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10022",
+        "base": null,
+        "quote": null
+      },
+      "10023": {
+        "address": "0x006225E144948014756C24563743bFD84979e59E",
+        "constructorArgs": [
+          "IDR / USD",
+          8,
+          "10023",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10023",
+        "base": null,
+        "quote": null
+      },
+      "10024": {
+        "address": "0xAa74F85FF1e4A853dC7cE1c1c708b18cf7620c00",
+        "constructorArgs": [
+          "PHP / USD",
+          8,
+          "10024",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10024",
+        "base": null,
+        "quote": null
+      },
+      "10025": {
+        "address": "0x5313C7E6AeAF60589C6B9326D705f2103dC50fD3",
+        "constructorArgs": [
+          "BRL / USD",
+          8,
+          "10025",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10025",
+        "base": null,
+        "quote": null
+      },
+      "10026": {
+        "address": "0xe6FB27cE8D3f9D20CfF7eE982BDc65D94E107429",
+        "constructorArgs": [
+          "RON / USD",
+          8,
+          "10026",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10026",
+        "base": null,
+        "quote": null
+      },
+      "10027": {
+        "address": "0xcd6f2626B637a2909B6a7c9b1E268C014979E3A9",
+        "constructorArgs": [
+          "JPY / USD",
+          8,
+          "10027",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10027",
+        "base": null,
+        "quote": null
+      },
+      "10028": {
+        "address": "0xF945B028F867404B9b16e4E61f3Da7c643Cf7782",
+        "constructorArgs": [
+          "RUB / USD",
+          8,
+          "10028",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10028",
+        "base": null,
+        "quote": null
+      },
+      "10029": {
+        "address": "0x7d9C0E6f73D614e86d6b8f763665717a64ce68BD",
+        "constructorArgs": [
+          "ARS / USD",
+          8,
+          "10029",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10029",
+        "base": null,
+        "quote": null
+      },
+      "10030": {
+        "address": "0x279B9001971ACcF9CB1e7E14AAd383d1c896ac04",
+        "constructorArgs": [
+          "COP / USD",
+          8,
+          "10030",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10030",
+        "base": null,
+        "quote": null
+      },
+      "10031": {
+        "address": "0xd136de414207cDF3910059f20d0C0A0BA8e1c9Ca",
+        "constructorArgs": [
+          "THB / USD",
+          8,
+          "10031",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10031",
+        "base": null,
+        "quote": null
+      },
+      "10032": {
+        "address": "0x6C6f2478522e6F754C14788467768BF81986109c",
+        "constructorArgs": [
+          "ISK / USD",
+          8,
+          "10032",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10032",
+        "base": null,
+        "quote": null
+      },
+      "10033": {
+        "address": "0x8ea5EfE471e0A83e2116E571c9BDb5D80d0c749a",
+        "constructorArgs": [
+          "ILS / USD",
+          8,
+          "10033",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10033",
+        "base": null,
+        "quote": null
+      },
+      "10034": {
+        "address": "0x7CCB1981f609F4eeB30fCeDD2dB02A60E42C9B8a",
+        "constructorArgs": [
+          "EGP / USD",
+          8,
+          "10034",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10034",
+        "base": null,
+        "quote": null
+      },
+      "10035": {
+        "address": "0x15d92a4956a1C439624657DD95667dD1268b43DF",
+        "constructorArgs": [
+          "FJD / USD",
+          8,
+          "10035",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10035",
+        "base": null,
+        "quote": null
+      },
+      "10036": {
+        "address": "0xe4974f2dC53044374141761274d3845B0C1D4a2d",
+        "constructorArgs": [
+          "CNY / USD",
+          8,
+          "10036",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10036",
+        "base": null,
+        "quote": null
+      },
+      "10037": {
+        "address": "0xbF2A8cD97fC58d646Fc1730BbDeEBe1ca27e4c1D",
+        "constructorArgs": [
+          "SAR / USD",
+          8,
+          "10037",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10037",
+        "base": null,
+        "quote": null
+      },
+      "10038": {
+        "address": "0x33E06752691034Db32C430141Bb1a3Fa3024f4bB",
+        "constructorArgs": [
+          "MYR / USD",
+          8,
+          "10038",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10038",
+        "base": null,
+        "quote": null
+      },
+      "10039": {
+        "address": "0x758593266dBa8Ad257C7A5d964872D46E8Bd189c",
+        "constructorArgs": [
+          "OMR / USD",
+          8,
+          "10039",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10039",
+        "base": null,
+        "quote": null
+      },
+      "10040": {
+        "address": "0xc2B5ed38d3b70Be6873De8c9962a4e68B25c4b7c",
+        "constructorArgs": [
+          "MKD / USD",
+          8,
+          "10040",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10040",
+        "base": null,
+        "quote": null
+      },
+      "10041": {
+        "address": "0x34FEc3b11425433956C0A4dD1cD146A39e3498FB",
+        "constructorArgs": [
+          "KWD / USD",
+          8,
+          "10041",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10041",
+        "base": null,
+        "quote": null
+      },
+      "10042": {
+        "address": "0xFf033B1f2509Ce141A5c5C8D93427b1096107831",
+        "constructorArgs": [
+          "SCR / USD",
+          8,
+          "10042",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10042",
+        "base": null,
+        "quote": null
+      },
+      "10043": {
+        "address": "0x2d30163E8Af85d58cfCa9ce89B14480F4e33578F",
+        "constructorArgs": [
+          "RSD / USD",
+          8,
+          "10043",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10043",
+        "base": null,
+        "quote": null
+      },
+      "10044": {
+        "address": "0x2743A15129dab744400496d7bb2d9e015F08781e",
+        "constructorArgs": [
+          "BHD / USD",
+          8,
+          "10044",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10044",
+        "base": null,
+        "quote": null
+      },
+      "10045": {
+        "address": "0xc74eF25433ea4A0543b7D06B78750D49d0B0944D",
+        "constructorArgs": [
+          "AED / USD",
+          8,
+          "10045",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10045",
+        "base": null,
+        "quote": null
+      },
+      "10046": {
+        "address": "0x3Db75D6Ae6175b314B1c10193D2c88371fADAd2c",
+        "constructorArgs": [
+          "DZD / USD",
+          8,
+          "10046",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10046",
+        "base": null,
+        "quote": null
+      },
+      "10047": {
+        "address": "0xc2cDC31cceb8E4F52D03c1cb0429f004452849D8",
+        "constructorArgs": [
+          "BGN / USD",
+          8,
+          "10047",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10047",
+        "base": null,
+        "quote": null
+      },
+      "10048": {
+        "address": "0x142ccb4bc9192AC879579A677765A276E6D91D4F",
+        "constructorArgs": [
+          "VND / USD",
+          8,
+          "10048",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10048",
+        "base": null,
+        "quote": null
+      },
+      "10049": {
+        "address": "0xF4158E1A6e083B6b229ebBeFb096B6C2eb35776f",
+        "constructorArgs": [
+          "MDL / USD",
+          8,
+          "10049",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10049",
+        "base": null,
+        "quote": null
+      },
+      "10050": {
+        "address": "0x5dE93cA02A6AF9D3F66c02a8900F8C4EA0EB01f3",
+        "constructorArgs": [
+          "MUR / USD",
+          8,
+          "10050",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10050",
+        "base": null,
+        "quote": null
+      },
+      "10051": {
+        "address": "0x1FCC2f91183882821DC5aE0CF51b71dEe81f80a5",
+        "constructorArgs": [
+          "CDF / USD",
+          8,
+          "10051",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10051",
+        "base": null,
+        "quote": null
+      },
+      "10052": {
+        "address": "0xcf84166a824a04c1D62daeB503F7a330c1b7c901",
+        "constructorArgs": [
+          "UZS / USD",
+          8,
+          "10052",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10052",
+        "base": null,
+        "quote": null
+      },
+      "10053": {
+        "address": "0x46592f46F9ba1952D7B8E55D4A017E8462d48766",
+        "constructorArgs": [
+          "LYD / USD",
+          8,
+          "10053",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10053",
+        "base": null,
+        "quote": null
+      },
+      "10054": {
+        "address": "0x68C14D2233E00edEfd48EaEf04181EC4a54C6Be5",
+        "constructorArgs": [
+          "TJS / USD",
+          8,
+          "10054",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10054",
+        "base": null,
+        "quote": null
+      },
+      "10055": {
+        "address": "0xb21aC5f55f3D41A3AAF87aC6ac7a84f695583268",
+        "constructorArgs": [
+          "BAM / USD",
+          8,
+          "10055",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10055",
+        "base": null,
+        "quote": null
+      },
+      "10056": {
+        "address": "0x3465FE4623146D219b2e353e205dcD97e8A8928C",
+        "constructorArgs": [
+          "AWG / USD",
+          8,
+          "10056",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10056",
+        "base": null,
+        "quote": null
+      },
+      "10057": {
+        "address": "0xAD0f54bc22591E183209217B7D1e98Be156D045d",
+        "constructorArgs": [
+          "XPF / USD",
+          8,
+          "10057",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10057",
+        "base": null,
+        "quote": null
+      },
+      "10058": {
+        "address": "0x5beC29CD6D1375eB733e0bBAf698fDBa9B66383d",
+        "constructorArgs": [
+          "KMF / USD",
+          8,
+          "10058",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10058",
+        "base": null,
+        "quote": null
+      },
+      "10059": {
+        "address": "0x5F70c050e1CF73528DD107AF589bE9675bB97Ef1",
+        "constructorArgs": [
+          "YER / USD",
+          8,
+          "10059",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10059",
+        "base": null,
+        "quote": null
+      },
+      "10060": {
+        "address": "0x2678f5081f0A565E6F0397B4906d8C147CB62042",
+        "constructorArgs": [
+          "SHP / USD",
+          8,
+          "10060",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10060",
+        "base": null,
+        "quote": null
+      },
+      "10061": {
+        "address": "0xd6B2B6dcea667Bdf421da11fc73e38aDF7D872Af",
+        "constructorArgs": [
+          "MVR / USD",
+          8,
+          "10061",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10061",
+        "base": null,
+        "quote": null
+      },
+      "10062": {
+        "address": "0x1B7c2F366F4ce1A489d4cac24ea8E7e270d92431",
+        "constructorArgs": [
+          "MZN / USD",
+          8,
+          "10062",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10062",
+        "base": null,
+        "quote": null
+      },
+      "10063": {
+        "address": "0xf2b5A69c697Ed8A00050CEF35f91a41CD2be5F4e",
+        "constructorArgs": [
+          "UYU / USD",
+          8,
+          "10063",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10063",
+        "base": null,
+        "quote": null
+      },
+      "10064": {
+        "address": "0xa842428f028fC2D4172eea78D4E0B3861268fd01",
+        "constructorArgs": [
+          "CLP / USD",
+          8,
+          "10064",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10064",
+        "base": null,
+        "quote": null
+      },
+      "10065": {
+        "address": "0xA8e3F715CB06F7919646996FefD0d88cCcb01561",
+        "constructorArgs": [
+          "KES / USD",
+          8,
+          "10065",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10065",
+        "base": null,
+        "quote": null
+      },
+      "10066": {
+        "address": "0xFA3bC6f88fD8151958A23Fddb961A6fBfD423836",
+        "constructorArgs": [
+          "TMT / USD",
+          8,
+          "10066",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10066",
+        "base": null,
+        "quote": null
+      },
+      "10067": {
+        "address": "0x044510D4fa94493Be6197Ffe92E3bbFF321F38BD",
+        "constructorArgs": [
+          "LKR / USD",
+          8,
+          "10067",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10067",
+        "base": null,
+        "quote": null
+      },
+      "10068": {
+        "address": "0x83bd044aD26656FE95c444bed03AA8A54B8AA6EF",
+        "constructorArgs": [
+          "BBD / USD",
+          8,
+          "10068",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10068",
+        "base": null,
+        "quote": null
+      },
+      "10069": {
+        "address": "0x5E97bEe19319362baFF3186f9c54adD4892D1A6c",
+        "constructorArgs": [
+          "HNL / USD",
+          8,
+          "10069",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10069",
+        "base": null,
+        "quote": null
+      },
+      "10070": {
+        "address": "0x6dC56b6c418819F14a6740E3ec541750Ca6950Fd",
+        "constructorArgs": [
+          "NPR / USD",
+          8,
+          "10070",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10070",
+        "base": null,
+        "quote": null
+      },
+      "10071": {
+        "address": "0x159B2e60Cd78119156B869Ac286E2F520d83F0F8",
+        "constructorArgs": [
+          "LSL / USD",
+          8,
+          "10071",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10071",
+        "base": null,
+        "quote": null
+      },
+      "10072": {
+        "address": "0x26Ce3A6427115A6c2621DCa26F8c8B906BA08831",
+        "constructorArgs": [
+          "ALL / USD",
+          8,
+          "10072",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10072",
+        "base": null,
+        "quote": null
+      },
+      "10073": {
+        "address": "0x0192dce9BeE7Ab3B3ABEbdBD37a6582e673807B9",
+        "constructorArgs": [
+          "PGK / USD",
+          8,
+          "10073",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10073",
+        "base": null,
+        "quote": null
+      },
+      "10074": {
+        "address": "0xCcB4F516fb69DF7e9b4cFdA3ba13622622901df1",
+        "constructorArgs": [
+          "SVC / USD",
+          8,
+          "10074",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10074",
+        "base": null,
+        "quote": null
+      },
+      "10075": {
+        "address": "0xbF3Da9247c73Cb1590b31fEB91A06E1796748fF1",
+        "constructorArgs": [
+          "SOS / USD",
+          8,
+          "10075",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10075",
+        "base": null,
+        "quote": null
+      },
+      "10076": {
+        "address": "0x4f24E5A2943A9395535ffb3C506E8aA81b4d2241",
+        "constructorArgs": [
+          "TZS / USD",
+          8,
+          "10076",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10076",
+        "base": null,
+        "quote": null
+      },
+      "10077": {
+        "address": "0x864D840aeaD18D61F4D301AB3Bd916E03891B11D",
+        "constructorArgs": [
+          "ETB / USD",
+          8,
+          "10077",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10077",
+        "base": null,
+        "quote": null
+      },
+      "10078": {
+        "address": "0x5432089ED7a8a55a019E1c480E5c91bA9146e0e8",
+        "constructorArgs": [
+          "GYD / USD",
+          8,
+          "10078",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10078",
+        "base": null,
+        "quote": null
+      },
+      "10079": {
+        "address": "0x747590474AaCBfFbdAB3f7aa10B26B7b8CFb343d",
+        "constructorArgs": [
+          "MOP / USD",
+          8,
+          "10079",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10079",
+        "base": null,
+        "quote": null
+      },
+      "10080": {
+        "address": "0x4af8d4Dcf6348226b699e25Df3B08C254ba05881",
+        "constructorArgs": [
+          "IQD / USD",
+          8,
+          "10080",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10080",
+        "base": null,
+        "quote": null
+      },
+      "10081": {
+        "address": "0x7595BE404D30B83d1f4923d6619E81f6C8eA883f",
+        "constructorArgs": [
+          "MAD / USD",
+          8,
+          "10081",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10081",
+        "base": null,
+        "quote": null
+      },
+      "10082": {
+        "address": "0x695Aa477Dc3EAF3a9979CbEB4400b77d00733C09",
+        "constructorArgs": [
+          "NIO / USD",
+          8,
+          "10082",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10082",
+        "base": null,
+        "quote": null
+      },
+      "10083": {
+        "address": "0xb6726fe22d6F59e8f3F7E5212880ef759CB94667",
+        "constructorArgs": [
+          "BIF / USD",
+          8,
+          "10083",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10083",
+        "base": null,
+        "quote": null
+      },
+      "10084": {
+        "address": "0xE72dC8F7fa38d763e8C173B46FFDF34AE7A86991",
+        "constructorArgs": [
+          "CVE / USD",
+          8,
+          "10084",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10084",
+        "base": null,
+        "quote": null
+      },
+      "10085": {
+        "address": "0x42EcFc7e88D3F80b3a574D42fE3c4fF69805c763",
+        "constructorArgs": [
+          "KZT / USD",
+          8,
+          "10085",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10085",
+        "base": null,
+        "quote": null
+      },
+      "10086": {
+        "address": "0x658C42eeF4B52Fbb863954be38Ef589b7dd20ecc",
+        "constructorArgs": [
+          "PKR / USD",
+          8,
+          "10086",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10086",
+        "base": null,
+        "quote": null
+      },
+      "10087": {
+        "address": "0xdACa99703d48aD03f57ae9D7972fDEB1FeAAe97e",
+        "constructorArgs": [
+          "PAB / USD",
+          8,
+          "10087",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10087",
+        "base": null,
+        "quote": null
+      },
+      "10088": {
+        "address": "0x6a289f72c7Dbb0399e577725536Ec5C3Fe2AAc62",
+        "constructorArgs": [
+          "PEN / USD",
+          8,
+          "10088",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10088",
+        "base": null,
+        "quote": null
+      },
+      "10089": {
+        "address": "0x21d3d0b736283b562904f9CeeE9434b8f7E7811B",
+        "constructorArgs": [
+          "GTQ / USD",
+          8,
+          "10089",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10089",
+        "base": null,
+        "quote": null
+      },
+      "10090": {
+        "address": "0x383E8e3FA6121D8db4a5410959418C9606d5fAAe",
+        "constructorArgs": [
+          "BWP / USD",
+          8,
+          "10090",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10090",
+        "base": null,
+        "quote": null
+      },
+      "10091": {
+        "address": "0xF00194fAf18325F34d9E08059bBA355732e74899",
+        "constructorArgs": [
+          "KHR / USD",
+          8,
+          "10091",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10091",
+        "base": null,
+        "quote": null
+      },
+      "10092": {
+        "address": "0xDC634beA92E2808170bdf9ed057C85596894Ac51",
+        "constructorArgs": [
+          "BSD / USD",
+          8,
+          "10092",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10092",
+        "base": null,
+        "quote": null
+      },
+      "10093": {
+        "address": "0x91cfbbE3AFE8FC67c238809b9Ec6c974EA1a49B6",
+        "constructorArgs": [
+          "BZD / USD",
+          8,
+          "10093",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10093",
+        "base": null,
+        "quote": null
+      },
+      "10094": {
+        "address": "0x2B97972dA33E49c0423C000C6aBd625354A0C393",
+        "constructorArgs": [
+          "KYD / USD",
+          8,
+          "10094",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10094",
+        "base": null,
+        "quote": null
+      },
+      "10095": {
+        "address": "0x4E4E302286ef93CcA8f8c47f591aA1a567a89833",
+        "constructorArgs": [
+          "LAK / USD",
+          8,
+          "10095",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10095",
+        "base": null,
+        "quote": null
+      },
+      "10096": {
+        "address": "0x4A14D81A412Aa678b40ad160933E5a524AEd91ef",
+        "constructorArgs": [
+          "TND / USD",
+          8,
+          "10096",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10096",
+        "base": null,
+        "quote": null
+      },
+      "10097": {
+        "address": "0x8D33396F44Bd5A416cFF589b2A66188d640091ac",
+        "constructorArgs": [
+          "RWF / USD",
+          8,
+          "10097",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10097",
+        "base": null,
+        "quote": null
+      },
+      "10098": {
+        "address": "0x3ebd3e01d569DFD567a950a03f80f446f9c0B636",
+        "constructorArgs": [
+          "CUP / USD",
+          8,
+          "10098",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10098",
+        "base": null,
+        "quote": null
+      },
+      "10099": {
+        "address": "0xcF806005473A361b7c6302041E29fCD86edB1E6D",
+        "constructorArgs": [
+          "HTG / USD",
+          8,
+          "10099",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10099",
+        "base": null,
+        "quote": null
+      },
+      "10100": {
+        "address": "0xf7F4586A7b1D13AF0748C6511EC1303906EBccb2",
+        "constructorArgs": [
+          "SZL / USD",
+          8,
+          "10100",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10100",
+        "base": null,
+        "quote": null
+      },
+      "10101": {
+        "address": "0x3FB067Ca706B8178aeA52cA80d3a735a66F1541d",
+        "constructorArgs": [
+          "BDT / USD",
+          8,
+          "10101",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10101",
+        "base": null,
+        "quote": null
+      },
+      "10102": {
+        "address": "0x8C555345593a65F38e422C0b59433849E6bb87Bc",
+        "constructorArgs": [
+          "CRC / USD",
+          8,
+          "10102",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10102",
+        "base": null,
+        "quote": null
+      },
+      "10103": {
+        "address": "0x8b6efFcD7ef4C3022A62D3860822e770fCDfef2e",
+        "constructorArgs": [
+          "JOD / USD",
+          8,
+          "10103",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10103",
+        "base": null,
+        "quote": null
+      },
+      "10104": {
+        "address": "0xA7078Cf5fB70C6c59dB32d438D1b35121Ca31337",
+        "constructorArgs": [
+          "NGN / USD",
+          8,
+          "10104",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10104",
+        "base": null,
+        "quote": null
+      },
+      "10105": {
+        "address": "0x5f2183b1d17AAbbf4830Cac4bDc66e8070FdE861",
+        "constructorArgs": [
+          "ZMW / USD",
+          8,
+          "10105",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10105",
+        "base": null,
+        "quote": null
+      },
+      "10106": {
+        "address": "0xC12C06d40BD7D5Ff7Da0726EA29ce6A58dF3496d",
+        "constructorArgs": [
+          "MGA / USD",
+          8,
+          "10106",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10106",
+        "base": null,
+        "quote": null
+      },
+      "10107": {
+        "address": "0x190d5562364381870ed550f47D004687d12146D5",
+        "constructorArgs": [
+          "JMD / USD",
+          8,
+          "10107",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10107",
+        "base": null,
+        "quote": null
+      },
+      "10108": {
+        "address": "0x6041E04840e63e2E4dA685f7372d9ad678B5eCD8",
+        "constructorArgs": [
+          "GNF / USD",
+          8,
+          "10108",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10108",
+        "base": null,
+        "quote": null
+      },
+      "10109": {
+        "address": "0x7863664947B1721cB11D11384b4fF08e13D6830A",
+        "constructorArgs": [
+          "BND / USD",
+          8,
+          "10109",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10109",
+        "base": null,
+        "quote": null
+      },
+      "10110": {
+        "address": "0x92B5573dDF97Ce9C3fB350C33B589f9D489316A5",
+        "constructorArgs": [
+          "QAR / USD",
+          8,
+          "10110",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10110",
+        "base": null,
+        "quote": null
+      },
+      "10111": {
+        "address": "0xBBA20aFC7f7BA617f50C2227B07AAb0853EDB4E7",
+        "constructorArgs": [
+          "GHS / USD",
+          8,
+          "10111",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10111",
+        "base": null,
+        "quote": null
+      },
+      "10112": {
+        "address": "0x0B60Daf33dB29B158bFeC392150763DD5b1dB5Be",
+        "constructorArgs": [
+          "SDG / USD",
+          8,
+          "10112",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10112",
+        "base": null,
+        "quote": null
+      },
+      "10113": {
+        "address": "0x944b62dd8220bCBD17606fa101603255A0298721",
+        "constructorArgs": [
+          "BOB / USD",
+          8,
+          "10113",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10113",
+        "base": null,
+        "quote": null
+      },
+      "10114": {
+        "address": "0x59fA9e2083F19E35209180401AC8d8818b4edd20",
+        "constructorArgs": [
+          "UAH / USD",
+          8,
+          "10114",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10114",
+        "base": null,
+        "quote": null
+      },
+      "10115": {
+        "address": "0xE1322db6fa17647f8a2a368ad636735d0E73332a",
+        "constructorArgs": [
+          "LRD / USD",
+          8,
+          "10115",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10115",
+        "base": null,
+        "quote": null
+      },
+      "10116": {
+        "address": "0x08738fD1B67Ae66c03a3d25e7897f1Ca8054856e",
+        "constructorArgs": [
+          "PYG / USD",
+          8,
+          "10116",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10116",
+        "base": null,
+        "quote": null
+      },
+      "10117": {
+        "address": "0xc1eB56312316C02e02be15967A52F97484e85f32",
+        "constructorArgs": [
+          "LBP / USD",
+          8,
+          "10117",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10117",
+        "base": null,
+        "quote": null
+      },
+      "10118": {
+        "address": "0xc617195A510A8b112CDe9E877311Bdc47FeBae3e",
+        "constructorArgs": [
+          "TTD / USD",
+          8,
+          "10118",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10118",
+        "base": null,
+        "quote": null
+      },
+      "10119": {
+        "address": "0x2aeAC6445D65e4CCc1a9e2B04ad3977D829B7E68",
+        "constructorArgs": [
+          "UGX / USD",
+          8,
+          "10119",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10119",
+        "base": null,
+        "quote": null
+      },
+      "10120": {
+        "address": "0x67889bd62e5138FFCc5Fb40488fc451EEd25cfCf",
+        "constructorArgs": [
+          "DJF / USD",
+          8,
+          "10120",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10120",
+        "base": null,
+        "quote": null
+      },
+      "10121": {
+        "address": "0x4B670486F08933e93Ff12d892f8B0661D04C3FCb",
+        "constructorArgs": [
+          "DOP / USD",
+          8,
+          "10121",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10121",
+        "base": null,
+        "quote": null
+      },
+      "10122": {
+        "address": "0xeA1Bb9242b196AC81A95f675a4D2Fe6e1dc58bEd",
+        "constructorArgs": [
+          "NAD / USD",
+          8,
+          "10122",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10122",
+        "base": null,
+        "quote": null
+      },
+      "10123": {
+        "address": "0x0cc013f8635540c251E1704A70bF5a99ca151cDF",
+        "constructorArgs": [
+          "GMD / USD",
+          8,
+          "10123",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10123",
+        "base": null,
+        "quote": null
+      },
+      "10124": {
+        "address": "0xe74aa7806797B09d0D5C2f20aaa46686Cc9B677F",
+        "constructorArgs": [
+          "MWK / USD",
+          8,
+          "10124",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10124",
+        "base": null,
+        "quote": null
+      },
+      "10125": {
+        "address": "0xD89623Fc82072940E7aFd883105790912D60360A",
+        "constructorArgs": [
+          "AFN / USD",
+          8,
+          "10125",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10125",
+        "base": null,
+        "quote": null
+      },
+      "10126": {
+        "address": "0xeE33139365444DA2335C6fc818444160416aa75b",
+        "constructorArgs": [
+          "AMD / USD",
+          8,
+          "10126",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10126",
+        "base": null,
+        "quote": null
+      },
+      "10127": {
+        "address": "0xA775DCf1bf4D55561193379510DbA9cE93671934",
+        "constructorArgs": [
+          "BMD / USD",
+          8,
+          "10127",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10127",
+        "base": null,
+        "quote": null
+      },
+      "10128": {
+        "address": "0x0eDA8e7677A18a11A1dBB9dbA29e9362E9C5d385",
+        "constructorArgs": [
+          "CAD / USD",
+          8,
+          "10128",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10128",
+        "base": null,
+        "quote": null
+      },
+      "10129": {
+        "address": "0xFB05e9D90407Aae9d7E8659d803C42C0bE2C12e2",
+        "constructorArgs": [
+          "MMK / USD",
+          8,
+          "10129",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10129",
+        "base": null,
+        "quote": null
+      },
+      "10130": {
+        "address": "0x1EF2F2b7F6e91FAb0b2aEb726285dc7131fAA6D2",
+        "constructorArgs": [
+          "MXV / USD",
+          8,
+          "10130",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10130",
+        "base": null,
+        "quote": null
+      },
+      "10131": {
+        "address": "0x73B2421D0d1C001520AFF8e1AC5A873743EC1714",
+        "constructorArgs": [
+          "SLL / USD",
+          8,
+          "10131",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10131",
+        "base": null,
+        "quote": null
+      },
+      "10132": {
+        "address": "0xF0Fe671F4825A467B9ee604667bC100737fb6e78",
+        "constructorArgs": [
+          "XAF / USD",
+          8,
+          "10132",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10132",
+        "base": null,
+        "quote": null
+      },
+      "10133": {
+        "address": "0x43BE1920948Bf9C179A2365A0B752EA5eb733Ff4",
+        "constructorArgs": [
+          "XDR / USD",
+          8,
+          "10133",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10133",
+        "base": null,
+        "quote": null
+      },
+      "10134": {
+        "address": "0xd3D307A8F9F3f5274FDE6AE2A30cbfdf1F4AD208",
+        "constructorArgs": [
+          "XOF / USD",
+          8,
+          "10134",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10134",
+        "base": null,
+        "quote": null
+      },
+      "10135": {
+        "address": "0x9161FBb70ED476ddC355aCc105eB9b4be1347Efb",
+        "constructorArgs": [
+          "ZAC / USD",
+          8,
+          "10135",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "10135",
+        "base": null,
+        "quote": null
+      },
+      "20000": {
+        "address": "0xedfa3ccA6C4A223f43c8781E29ad30f65C6A2D5D",
+        "constructorArgs": [
+          "LME-XCU price in USD per troy ounce",
+          8,
+          "20000",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "20000",
+        "base": null,
+        "quote": null
+      },
       "50000": {
         "address": "0xcDE309A9b3C5C6A23952089e1CEa71510EE3735D",
         "constructorArgs": [
@@ -9664,6 +11458,227 @@
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "101001",
+        "base": null,
+        "quote": null
+      },
+      "102001": {
+        "address": "0x514f8B9E789f17e7a7038e8f61D70BD92DFa7843",
+        "constructorArgs": [
+          "WHYPE HypurrFi Borrow Rate",
+          18,
+          "102001",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102001",
+        "base": null,
+        "quote": null
+      },
+      "102002": {
+        "address": "0xD4e434Bb2abeB65A4FC7092b9aC4e1B583c4b024",
+        "constructorArgs": [
+          "wstHYPE HypurrFi Borrow Rate",
+          18,
+          "102002",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102002",
+        "base": null,
+        "quote": null
+      },
+      "102003": {
+        "address": "0xA09116027dE4f9F8A962D2dabEA07BC29bF77fE0",
+        "constructorArgs": [
+          "UBTC HypurrFi Borrow Rate",
+          18,
+          "102003",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102003",
+        "base": null,
+        "quote": null
+      },
+      "102004": {
+        "address": "0xd53282FF674B2E59Ca1E9235b58F0E9b46A34caf",
+        "constructorArgs": [
+          "UETH HypurrFi Borrow Rate",
+          18,
+          "102004",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102004",
+        "base": null,
+        "quote": null
+      },
+      "102005": {
+        "address": "0x3Ae156BdC80781db50CeED7051b20755525D3c0d",
+        "constructorArgs": [
+          "USDe HypurrFi Borrow Rate",
+          18,
+          "102005",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102005",
+        "base": null,
+        "quote": null
+      },
+      "102051": {
+        "address": "0x142a31fA2d9D8a314793aFD290780d54c8155920",
+        "constructorArgs": [
+          "WHYPE HyperLend Borrow Rate",
+          18,
+          "102051",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102051",
+        "base": null,
+        "quote": null
+      },
+      "102052": {
+        "address": "0x1a77CfeB5c36A05404F567080a2528dE2B40c338",
+        "constructorArgs": [
+          "wstHYPE HyperLend Borrow Rate",
+          18,
+          "102052",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102052",
+        "base": null,
+        "quote": null
+      },
+      "102053": {
+        "address": "0xfCFE411547f23D4fF3335F7c7ed127bC016Ce174",
+        "constructorArgs": [
+          "UBTC HyperLend Borrow Rate",
+          18,
+          "102053",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102053",
+        "base": null,
+        "quote": null
+      },
+      "102054": {
+        "address": "0x086393f6E0E067D0EeB1ce79DcF0BDa5265d1B1f",
+        "constructorArgs": [
+          "UETH HyperLend Borrow Rate",
+          18,
+          "102054",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102054",
+        "base": null,
+        "quote": null
+      },
+      "102055": {
+        "address": "0xf7663031C4b0bD1169dfA8fFA0879c89a1d32147",
+        "constructorArgs": [
+          "USDe HyperLend Borrow Rate",
+          18,
+          "102055",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102055",
+        "base": null,
+        "quote": null
+      },
+      "102101": {
+        "address": "0x74a509E3343d35474618CC5cDB32D38887E5e896",
+        "constructorArgs": [
+          "HYPE HyperDrive Borrow Rate",
+          18,
+          "102101",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102101",
+        "base": null,
+        "quote": null
+      },
+      "102102": {
+        "address": "0xcc58B8A9F74A2446EFF6A5d1eF19B44096b195D7",
+        "constructorArgs": [
+          "USDe HyperDrive Borrow Rate",
+          18,
+          "102102",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102102",
+        "base": null,
+        "quote": null
+      },
+      "102103": {
+        "address": "0x0288F12C585346F45CaE308cA19Ade7f73Ffb964",
+        "constructorArgs": [
+          "USD₮0 HyperDrive Borrow Rate",
+          18,
+          "102103",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102103",
+        "base": null,
+        "quote": null
+      },
+      "102104": {
+        "address": "0xD295F54A0481ab4989023b42aB3753fE879F1E20",
+        "constructorArgs": [
+          "USDhl HyperDrive Borrow Rate",
+          18,
+          "102104",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102104",
+        "base": null,
+        "quote": null
+      },
+      "102151": {
+        "address": "0xB3E76431774934b1a0632Afe068f48c3a5C43d2e",
+        "constructorArgs": [
+          "USDC Euler Yield Borrow Rate on Ethereum Mainnet",
+          18,
+          "102151",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102151",
+        "base": null,
+        "quote": null
+      },
+      "102152": {
+        "address": "0x00D59cC853E3C71B3eB1C983B1389B0B4a163A32",
+        "constructorArgs": [
+          "USDT Euler Yield Borrow Rate on Ethereum Mainnet",
+          18,
+          "102152",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102152",
+        "base": null,
+        "quote": null
+      },
+      "102153": {
+        "address": "0xBD1A414D0B7Fb3fc315FFFAEbFDeB66cAbD0Fe87",
+        "constructorArgs": [
+          "WETH Euler Prime Borrow Rate on Ethereum Mainnet",
+          18,
+          "102153",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102153",
         "base": null,
         "quote": null
       },

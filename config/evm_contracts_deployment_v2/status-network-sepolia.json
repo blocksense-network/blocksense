@@ -11344,6 +11344,19 @@
         "base": null,
         "quote": null
       },
+      "20000": {
+        "address": "0x7B4e463Ce505d085317BFB753d3ba43B86202315",
+        "constructorArgs": [
+          "LME-XCU price in USD per troy ounce",
+          8,
+          "20000",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "20000",
+        "base": null,
+        "quote": null
+      },
       "50000": {
         "address": "0xF09ed8aA3bEfb227bE06d133FCE8b650f3708130",
         "constructorArgs": [
