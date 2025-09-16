@@ -25,8 +25,8 @@ const formatTimestamp = (timestamp: bigint | number | string): string => {
   return formattedTimestamp;
 };
 
-export const readClAdapter = Command.make(
-  'read-cl-adapter',
+export const clAdapter = Command.make(
+  'cl-adapter',
   {
     network: Options.choice('network', availableNetworks),
     address: Options.optional(Options.text('address')),
