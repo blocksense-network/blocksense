@@ -32,12 +32,12 @@ in
       ethereum-sepolia = {
         port = 8546;
         chain-id = 99999999999;
-        fork-url = "wss://ethereum-sepolia-rpc.publicnode.com";
+        fork-url = "$RPC_URL_ETHEREUM_SEPOLIA";
       };
       ink-sepolia = {
         port = 8547;
         chain-id = 99999999999;
-        fork-url = "wss://ws-gel-sepolia.inkonchain.com";
+        fork-url = "$RPC_URL_INK_SEPOLIA";
       };
     };
 
@@ -188,6 +188,7 @@ in
           TWELVEDATA_API_KEY = "${apiKeysDir}/TWELVEDATA_API_KEY";
           FMP_API_KEY = "${apiKeysDir}/FMP_API_KEY";
           SPOUT_RWA_API_KEY = "${apiKeysDir}/SPOUT_RWA_API_KEY";
+          METALS_API_KEY = "${apiKeysDir}/METALS_API_KEY";
         };
       };
     };
@@ -292,6 +293,15 @@ in
           "YAHOO_FINANCE_API_KEY"
           "TWELVEDATA_API_KEY"
           "FMP_API_KEY"
+        ];
+      };
+      commodities-price-feeds = {
+        exec-interval = 60;
+        allowed-outbound-hosts = [
+          "https://metals-api.com"
+        ];
+        api-keys = [
+          "METALS_API_KEY"
         ];
       };
     };

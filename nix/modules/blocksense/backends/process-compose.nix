@@ -53,6 +53,7 @@ let
           initial_delay_seconds = 0;
           period_seconds = 1;
           timeout_seconds = 30;
+          failure_threshold = 10;
         };
         log_configuration = logsConfig;
         log_location = "${cfg.logsDir}/anvil-${name}.log";

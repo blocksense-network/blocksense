@@ -8,5 +8,6 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "rust-analyzer.cargo.extraEnv": {
     "PATH": "${workspaceFolder}/.devenv/profile/bin"
-  }
+  },
+  "eslint.nodePath": ".yarn/sdks"
 }

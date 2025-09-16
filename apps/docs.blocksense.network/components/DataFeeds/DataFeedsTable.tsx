@@ -28,6 +28,7 @@ export const DataFeedsTable = ({ feeds }: { feeds: FeedsConfig['feeds'] }) => {
           header: ({ column }) => (
             <DataTableColumnHeader title={column.title} />
           ),
+          accessor: row => row.id,
           cell: ({ row }) => <DataTableBadge>{row.id}</DataTableBadge>,
           facetedFilter: true,
         },
@@ -37,6 +38,7 @@ export const DataFeedsTable = ({ feeds }: { feeds: FeedsConfig['feeds'] }) => {
           header: ({ column }) => (
             <DataTableColumnHeader title={column.title} />
           ),
+          accessor: row => row.full_name,
           cell: ({ row }) => (
             <Tooltip position="right">
               <Tooltip.Content>{row.description}</Tooltip.Content>
@@ -50,6 +52,7 @@ export const DataFeedsTable = ({ feeds }: { feeds: FeedsConfig['feeds'] }) => {
           header: ({ column }) => (
             <DataTableColumnHeader title={column.title} />
           ),
+          accessor: row => row.additional_feed_info.pair.base,
           cell: ({ row }) => (
             <DataTableBadge>
               {row.additional_feed_info.pair.base}
@@ -62,11 +65,13 @@ export const DataFeedsTable = ({ feeds }: { feeds: FeedsConfig['feeds'] }) => {
           header: ({ column }) => (
             <DataTableColumnHeader title={column.title} />
           ),
+          accessor: row => row.additional_feed_info.pair.quote,
           cell: ({ row }) => (
             <DataTableBadge>
               {row.additional_feed_info.pair.quote}
             </DataTableBadge>
           ),
+          facetedFilter: true,
         },
         {
           id: 'decimals',
@@ -74,6 +79,7 @@ export const DataFeedsTable = ({ feeds }: { feeds: FeedsConfig['feeds'] }) => {
           header: ({ column }) => (
             <DataTableColumnHeader title={column.title} />
           ),
+          accessor: row => row.additional_feed_info.decimals,
           cell: ({ row }) => (
             <DataTableBadge>{row.additional_feed_info.decimals}</DataTableBadge>
           ),
@@ -84,9 +90,11 @@ export const DataFeedsTable = ({ feeds }: { feeds: FeedsConfig['feeds'] }) => {
           header: ({ column }) => (
             <DataTableColumnHeader title={column.title} />
           ),
+          accessor: row => row.additional_feed_info.category,
           cell: ({ row }) => (
             <DataTableBadge>{row.additional_feed_info.category}</DataTableBadge>
           ),
+          facetedFilter: true,
         },
         {
           id: 'oracle_id',
@@ -94,6 +102,7 @@ export const DataFeedsTable = ({ feeds }: { feeds: FeedsConfig['feeds'] }) => {
           header: ({ column }) => (
             <DataTableColumnHeader title={column.title} />
           ),
+          accessor: row => row.oracle_id,
           cell: ({ row }) => <DataTableBadge>{row.oracle_id}</DataTableBadge>,
           facetedFilter: true,
         },

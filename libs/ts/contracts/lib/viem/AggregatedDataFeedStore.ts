@@ -1,5 +1,6 @@
-import { PublicClient, Hex, encodePacked, Address } from 'viem';
+import { PublicClient, Hex, encodePacked } from 'viem';
 import { ContractConsumerBase } from './ContractConsumerBase';
+import { EthereumAddress } from '@blocksense/base-utils/evm';
 
 type DataAndIndex = { data: Hex | Hex[]; index: number };
 
@@ -19,7 +20,7 @@ export class AggregatedDataFeedStoreConsumer extends ContractConsumerBase {
    * @param contractAddress The address of the UpgradeableProxyADFS contract.
    * @param client The Viem PublicClient instance to use.
    */
-  constructor(contractAddress: Address, client: PublicClient) {
+  constructor(contractAddress: EthereumAddress, client: PublicClient) {
     super(contractAddress, client);
   }
 

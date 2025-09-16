@@ -24,15 +24,16 @@
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.7.5",
     "@cloudflare/workers-types": "^4.20250423.0",
-    "tsx": "^4.19.3",
-    "typescript": "5.8.3",
-    "vitest": "~3.0.7",
+    "tsx": "^4.20.5",
+    "typescript": "5.9.2",
+    "vitest": "^3.2.4",
     "wrangler": "^4.15.2"
   },
   "dependencies": {
     "@blocksense/base-utils": "workspace:*",
-    "@effect/platform": "^0.80.13",
-    "effect": "^3.15.1",
+    "@blocksense/ui": "workspace:*",
+    "@effect/platform": "^0.90.7",
+    "effect": "^3.17.13",
     "thirdweb": "^5.95.3",
     "web3": "^4.16.0"
   }

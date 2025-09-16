@@ -70,8 +70,17 @@ export function DataTableProvider({
     setPagination(state => ({ ...state, pageIndex: 0 }));
   }, [searchValue]);
 
-  const filteredData = filterDataFromSearch(data, filterCell, searchValue);
-  const facetedFiltersData = applyFacetedFilters(filteredData, facetedFilters);
+  const filteredData = filterDataFromSearch(
+    data,
+    columns,
+    filterCell,
+    searchValue,
+  );
+  const facetedFiltersData = applyFacetedFilters(
+    filteredData,
+    facetedFilters,
+    columns,
+  );
   const sortedData = sortData(facetedFiltersData, columns, sorting);
 
   useEffect(() => {

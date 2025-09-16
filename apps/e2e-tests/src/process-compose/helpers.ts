@@ -5,7 +5,7 @@ import { $, execa } from 'execa';
 
 import { arrayToObject } from '@blocksense/base-utils/array-iter';
 import { rootDir } from '@blocksense/base-utils/env';
-import type { NetworkName } from '@blocksense/base-utils/evm/networks';
+import type { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 import { readConfig, readEvmDeployment } from '@blocksense/config-types';
 
 import { RGLogCheckerError } from './types';
@@ -123,7 +123,7 @@ export function getInitialFeedsInfoFromNetwork(
 ): Effect.Effect<
   {
     feedIds: Array<bigint>;
-    address: `0x${string}`;
+    address: EthereumAddress;
     initialFeedsInfo: FeedsValueAndRound;
   },
   Error,
@@ -136,10 +136,10 @@ export function getInitialFeedsInfoFromNetwork(
     const feedIds = feedConfig.feeds.map(feed => BigInt(feed.id));
 
     const deploymentConfig = yield* Effect.tryPromise(() =>
-      readEvmDeployment(network),
+      readEvmDeployment(network, true),
     );
-    const address = deploymentConfig?.contracts.coreContracts
-      .UpgradeableProxyADFS.address as `0x${string}`;
+    const { address } =
+      deploymentConfig.contracts.coreContracts.UpgradeableProxyADFS;
 
     const initialFeedsInfo = yield* getDataFeedsInfoFromNetwork(
       feedIds,
