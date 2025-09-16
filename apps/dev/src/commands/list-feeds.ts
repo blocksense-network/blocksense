@@ -25,11 +25,15 @@ export const listFeeds = Command.make(
     ),
     category: Options.optional(Options.text('category')),
     oracleId: Options.optional(Options.text('oracle-id')),
+    feedId: Options.optional(Options.text('feed-id')),
+    feedName: Options.optional(Options.text('feed-name')),
   },
   ({
     category,
     dir,
     displayMode,
+    feedId,
+    feedName,
     includeFeedRegistryInfo,
     network,
     oracleId,
@@ -60,16 +64,27 @@ export const listFeeds = Command.make(
       );
 
       let filteredFeeds = feeds;
-      if (Option.isSome(category)) {
-        filteredFeeds = filteredFeeds.filter(
-          ({ feed }) => feed.additional_feed_info.category === category.value,
-        );
-      }
-      if (Option.isSome(oracleId)) {
-        filteredFeeds = filteredFeeds.filter(
-          ({ feed }) => `${feed.oracle_id}` === oracleId.value,
-        );
-      }
+
+      filteredFeeds = filterBy(
+        filteredFeeds,
+        category,
+        ({ feed }) => feed.additional_feed_info.category,
+      );
+      filteredFeeds = filterBy(
+        filteredFeeds,
+        oracleId,
+        ({ feed }) => `${feed.oracle_id}`,
+      );
+      filteredFeeds = filterBy(
+        filteredFeeds,
+        feedId,
+        ({ feed }) => `${feed.id}`,
+      );
+      filteredFeeds = filterBy(
+        filteredFeeds,
+        feedName,
+        ({ feed }) => feed.full_name,
+      );
 
       if (displayMode == 'table') {
         const baseHeaders = [
@@ -126,3 +141,24 @@ export const listFeeds = Command.make(
       }
     }),
 );
+
+function matchesRegex(value: unknown, pattern: string, flags = 'i') {
+  let regex: RegExp;
+  try {
+    regex = new RegExp(pattern, flags);
+  } catch (e) {
+    throw new Error(`Invalid regex: ${pattern}\n${String(e)}`);
+  }
+  return regex.test(String(value ?? ''));
+}
+
+const filterBy = <T>(
+  arr: Array<T>,
+  opt: Option.Option<string>,
+  getValue: (item: T) => unknown,
+): Array<T> => {
+  if (Option.isSome(opt)) {
+    return arr.filter(item => matchesRegex(getValue(item), opt.value));
+  }
+  return arr;
+};

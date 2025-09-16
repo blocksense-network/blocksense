@@ -2,39 +2,29 @@ use std::collections::{BTreeMap, HashMap};
 
 use anyhow::Result;
 use blocksense_sdk::http::http_get_json;
-use futures::{future::join_all};
+use futures::future::join_all;
 use serde::Deserialize;
 use serde_this_or_that::as_f64;
 use tracing::warn;
 
-use crate::domain::{BorrowRateInfo, FeedConfig, RatesPerFeed};
+use crate::domain::{BorrowRateInfo, FeedConfig, Marketplace, RatesPerFeed};
 
 pub async fn fetch_borrow_rates_from_hyperdrive(
-    hyperdrive_feeds: Option<&[FeedConfig]>,
+    hyperdrive_feeds: &[FeedConfig],
 ) -> Result<RatesPerFeed> {
     let mut borrow_rates: RatesPerFeed = HashMap::new();
 
-    let Some(feeds) = hyperdrive_feeds else {
-        return Ok(borrow_rates);
-    };
-
     let mut by_market: BTreeMap<String, Vec<(String, u128)>> = BTreeMap::new();
 
-    for feed in feeds {
-        match &feed.arguments.market_id {
-            Some(mid) if !mid.is_empty() => {
-                by_market
-                    .entry(mid.clone())
-                    .or_default()
-                    .push((feed.pair.base.clone(), feed.feed_id));
-            }
-            _ => {
-                warn!(
-                    "Feed {} missing required HyperDrive market_id. Skipping.",
-                    feed.feed_id
-                );
-            }
-        }
+    for feed in hyperdrive_feeds {
+        let market_id = match &feed.arguments {
+            Marketplace::HyperDrive(args) => &args.market_id,
+            _ => continue,
+        };
+        by_market
+            .entry(market_id.clone())
+            .or_default()
+            .push((feed.pair.base.clone(), feed.feed_id));
     }
 
     let fetches = by_market
