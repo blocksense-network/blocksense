@@ -5,30 +5,29 @@ use anyhow::Result;
 use crate::providers::pool_data_provider::{ReserveLike, UiPool};
 use crate::providers::types::MyProvider;
 
-pub const HYPURRFI_UI_POOL_DATA_PROVIDER: Address =
-    address!("0x7b883191011AEAe40581d3Fa1B112413808C9c00");
-pub const HYPURRFI_POOL_ADDRESSES_PROVIDER: Address =
-    address!("0xA73ff12D177D8F1Ec938c3ba0e87D33524dD5594");
+pub const AAVE_UI_POOL_DATA_PROVIDER: Address =
+    address!("0x3F78BBD206e4D3c504Eb854232EdA7e47E9Fd8FC");
+pub const AAVE_POOL_ADDRESSES_PROVIDER: Address =
+    address!("0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e");
 
-pub mod hypurrfi {
+pub mod aave {
     alloy::sol! {
         #[allow(missing_docs)]
         #[allow(clippy::too_many_arguments)]
         #[sol(rpc)]
-        HypurrFiUiPoolDataProvider,
-        "src/abi/HypurrFi/UiPoolDataProvider.json"
+        AaveFiUiPoolDataProvider,
+        "src/abi/Aave/UiPoolDataProvider.json"
     }
 }
 
-pub struct HypurrFiUi;
+pub struct AaveUi;
 
-impl UiPool for HypurrFiUi {
-    const UI_POOL_DATA_PROVIDER: Address = HYPURRFI_UI_POOL_DATA_PROVIDER;
-    const POOL_ADDRESSES_PROVIDER: Address = HYPURRFI_POOL_ADDRESSES_PROVIDER;
+impl UiPool for AaveUi {
+    const UI_POOL_DATA_PROVIDER: Address = AAVE_UI_POOL_DATA_PROVIDER;
+    const POOL_ADDRESSES_PROVIDER: Address = AAVE_POOL_ADDRESSES_PROVIDER;
 
     fn calldata(provider: MyProvider) -> Bytes {
-        let instance =
-            hypurrfi::HypurrFiUiPoolDataProvider::new(Self::UI_POOL_DATA_PROVIDER, provider);
+        let instance = aave::AaveFiUiPoolDataProvider::new(Self::UI_POOL_DATA_PROVIDER, provider);
         instance
             .getReservesData(Self::POOL_ADDRESSES_PROVIDER)
             .calldata()
@@ -36,11 +35,8 @@ impl UiPool for HypurrFiUi {
     }
 
     fn decode(raw: &Bytes) -> Result<Vec<ReserveLike>> {
-        // Adjust the path if your generator differs:
-        let ret =
-            hypurrfi::HypurrFiUiPoolDataProvider::getReservesDataCall::abi_decode_returns(raw)?;
+        let ret = aave::AaveFiUiPoolDataProvider::getReservesDataCall::abi_decode_returns(raw)?;
 
-        // Map ABI return -> Vec<ReserveLike>
         Ok(ret
             ._0
             .into_iter()

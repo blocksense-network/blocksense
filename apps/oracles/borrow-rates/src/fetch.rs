@@ -1,64 +1,54 @@
 use anyhow::Result;
 use futures::{stream::FuturesUnordered, StreamExt};
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use crate::{
     domain::{
-        group_feeds_by_marketplace, map_assets_to_feeds, FeedConfig, Marketplace, RatesPerFeed,
-        RatesPerFeedPerMarket,
+        group_feeds_by_marketplace_type, map_assets_to_feeds, FeedConfig, Marketplace,
+        MarketplaceType, RatesPerFeed, RatesPerFeedPerMarket, SupportedNetworks,
     },
     providers::{
-        euler::fetch_borrow_rates_from_euler,
-        hyperdrive::fetch_borrow_rates_from_hyperdrive,
-        hyperlend::{
-            HyperLendUi, HYPERLAND_POOL_ADDRESSES_PROVIDER, HYPERLAND_UI_POOL_DATA_PROVIDER,
-        },
-        hypurrfi::{HypurrFiUi, HYPURRFI_POOL_ADDRESSES_PROVIDER, HYPURRFI_UI_POOL_DATA_PROVIDER},
-        onchain::{fetch_reserves, plan_for},
+        euler::fetch_borrow_rates_from_euler, hyperdrive::fetch_borrow_rates_from_hyperdrive,
+        pool_data_provider::fetch_reserves,
     },
     utils::logging::print_marketplace_data,
 };
 use tracing::warn;
 
-async fn fetch_market<'a>(
-    which: Marketplace,
-    feeds_config: Option<&'a [FeedConfig]>,
-) -> Result<(Marketplace, Result<RatesPerFeed>)> {
-    match which {
-        Marketplace::HypurrFi => {
-            let rates_info = fetch_reserves(plan_for::<HypurrFiUi>(
-                HYPURRFI_UI_POOL_DATA_PROVIDER,
-                HYPURRFI_POOL_ADDRESSES_PROVIDER,
-            )?)
-            .await?;
-            Ok((
-                Marketplace::HypurrFi,
-                Ok(map_assets_to_feeds(rates_info, feeds_config.unwrap_or(&[]))),
-            ))
+/// Extracts unique networks from feeds configuration for network-based marketplaces
+fn extract_unique_networks_from_feeds(feeds_config: &[FeedConfig]) -> Vec<SupportedNetworks> {
+    feeds_config
+        .iter()
+        .filter_map(|feed| feed.arguments.get_marketplace_network())
+        .collect::<HashSet<_>>()
+        .into_iter()
+        .collect()
+}
+
+async fn fetch_market(
+    marketplace_type: MarketplaceType,
+    feeds_config: &[FeedConfig],
+) -> Result<(MarketplaceType, Result<RatesPerFeed>)> {
+    match marketplace_type {
+        MarketplaceType::UIPoolMarketplace(ui_pool_marketplace) => {
+            let mut result = RatesPerFeed::new();
+
+            let networks = extract_unique_networks_from_feeds(feeds_config);
+            for network in networks {
+                let rates_info = fetch_reserves(ui_pool_marketplace, network).await?;
+                let feeds_results = map_assets_to_feeds(rates_info, feeds_config, Some(network));
+                result.extend(feeds_results);
+            }
+            Ok((marketplace_type, Ok(result)))
         }
-        Marketplace::HyperLend => {
-            let rates_info = fetch_reserves(plan_for::<HyperLendUi>(
-                HYPERLAND_UI_POOL_DATA_PROVIDER,
-                HYPERLAND_POOL_ADDRESSES_PROVIDER,
-            )?)
-            .await?;
-            Ok((
-                Marketplace::HyperLend,
-                Ok(map_assets_to_feeds(
-                    rates_info,
-                    feeds_config.unwrap_or(&Vec::new()),
-                )),
-            ))
-        }
-        Marketplace::HyperDrive => Ok((
-            Marketplace::HyperDrive,
+        MarketplaceType::HyperDrive => Ok((
+            marketplace_type,
             fetch_borrow_rates_from_hyperdrive(feeds_config).await,
         )),
-
-        Marketplace::EulerFinance => Ok((
-            Marketplace::EulerFinance,
-            fetch_borrow_rates_from_euler(feeds_config).await,
+        MarketplaceType::EulerFinance => Ok((
+            marketplace_type,
+            fetch_borrow_rates_from_euler(Some(&feeds_config)).await,
         )),
     }
 }
@@ -66,22 +56,12 @@ async fn fetch_market<'a>(
 pub async fn collect_borrow_rates(feeds_config: &Vec<FeedConfig>) -> Result<RatesPerFeed> {
     let mut borrow_rates_per_marketplace: RatesPerFeedPerMarket = HashMap::new();
 
-    let grouped_feeds = group_feeds_by_marketplace(feeds_config);
+    let grouped_feeds = group_feeds_by_marketplace_type(feeds_config);
 
-    let mut futures: FuturesUnordered<_> = [
-        Marketplace::HypurrFi,
-        Marketplace::HyperLend,
-        Marketplace::HyperDrive,
-        Marketplace::EulerFinance,
-    ]
-    .into_iter()
-    .map(|marketplace| {
-        fetch_market(
-            marketplace,
-            grouped_feeds.get(&marketplace).map(|v| v.as_slice()),
-        )
-    })
-    .collect();
+    let mut futures: FuturesUnordered<_> = grouped_feeds
+        .iter()
+        .map(|(marketplace_type, feeds)| fetch_market(*marketplace_type, feeds.as_slice()))
+        .collect();
 
     while let Some(result) = futures.next().await {
         match result {
