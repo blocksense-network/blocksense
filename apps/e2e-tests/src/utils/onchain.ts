@@ -1,7 +1,6 @@
 import { Effect } from 'effect';
 
-import type { NetworkName } from '@blocksense/base-utils/evm';
-import { isNetworkName } from '@blocksense/base-utils/evm';
+import type { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
 
 export type FeedsValueAndRound = Record<
@@ -16,26 +15,21 @@ export type FeedsValueAndRound = Record<
  * Otherwise, it fetches the latest data and round index for each feed.
  *
  * @param {Array<bigint>} feedIds - List of feed IDs to query.
- * @param {`0x${string}`} contractAddress - Address of the AggregatedDataFeedStore contract.
+ * @param {EthereumAddress} contractAddress - Address of the AggregatedDataFeedStore contract.
  * @param {NetworkName | string} provider - Either a known network name or an RPC URL.
  * @param {Record<string, number>} [roundsInfo] - Optional map of feed IDs to specific round numbers.
  */
 export function getDataFeedsInfoFromNetwork(
   feedIds: Array<bigint>,
-  contractAddress: `0x${string}`,
+  contractAddress: EthereumAddress,
   provider: NetworkName | string,
   roundsInfo?: Record<string, number>,
 ): Effect.Effect<FeedsValueAndRound, Error, never> {
   return Effect.gen(function* () {
-    const ADFSConsumer = isNetworkName(provider)
-      ? AggregatedDataFeedStoreConsumer.createConsumerByNetworkName(
-          contractAddress,
-          provider,
-        )
-      : AggregatedDataFeedStoreConsumer.createConsumerByRpcUrl(
-          contractAddress,
-          provider!,
-        );
+    const ADFSConsumer = AggregatedDataFeedStoreConsumer.create(
+      contractAddress,
+      provider,
+    );
 
     const feedsInfo: FeedsValueAndRound = {};
     for (const feedId of feedIds) {

@@ -1,7 +1,8 @@
-import { getContract, PublicClient, Address } from 'viem';
+import { getContract, PublicClient } from 'viem';
 
 import { ContractConsumerBase } from './ContractConsumerBase';
 import { abi as clAdapterAbi } from '../abis/CLAggregatorAdapter';
+import { EthereumAddress } from '@blocksense/base-utils/evm';
 
 export class CLAggregatorAdapterConsumer extends ContractConsumerBase {
   public contract;
@@ -12,7 +13,7 @@ export class CLAggregatorAdapterConsumer extends ContractConsumerBase {
    * @param contractAddress The address of the CLAggregatorAdapter contract.
    * @param client The Viem PublicClient instance to use.
    */
-  constructor(contractAddress: Address, client: PublicClient) {
+  constructor(contractAddress: EthereumAddress, client: PublicClient) {
     super(contractAddress, client);
 
     this.contract = getContract({
@@ -26,7 +27,7 @@ export class CLAggregatorAdapterConsumer extends ContractConsumerBase {
     return this.contract.read.decimals();
   }
 
-  async getDataFeedStore(): Promise<Address> {
+  async getDataFeedStore(): Promise<EthereumAddress> {
     return this.contract.read.dataFeedStore();
   }
 
@@ -78,7 +79,7 @@ export class CLAggregatorAdapterConsumer extends ContractConsumerBase {
       return result;
     });
     return {
-      dataFeedStore: results[0].result as Address,
+      dataFeedStore: results[0].result as EthereumAddress,
       decimals: results[1].result as number,
       description: results[2].result as string,
       id: results[3].result as bigint,
@@ -103,7 +104,7 @@ export type CLAggregatorAdapterData = {
   id: bigint;
   decimals: number;
   description: string;
-  dataFeedStore: Address;
+  dataFeedStore: EthereumAddress;
   latestAnswer: bigint;
   latestRound: bigint;
   latestRoundData: RoundData;

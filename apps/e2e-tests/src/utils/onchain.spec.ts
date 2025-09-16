@@ -24,15 +24,9 @@ describe('getDataFeedsInfoFromNetwork', () => {
   const value = 11223987629360;
 
   beforeEach(() => {
-    vi.spyOn(
-      AggregatedDataFeedStoreConsumer,
-      'createConsumerByNetworkName',
-    ).mockReturnValue(mockConsumer as any);
-
-    vi.spyOn(
-      AggregatedDataFeedStoreConsumer,
-      'createConsumerByRpcUrl',
-    ).mockReturnValue(mockConsumer as any);
+    vi.spyOn(AggregatedDataFeedStoreConsumer, 'create').mockReturnValue(
+      mockConsumer as any,
+    );
   });
 
   afterEach(() => {

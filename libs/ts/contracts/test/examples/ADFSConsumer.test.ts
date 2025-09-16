@@ -14,6 +14,7 @@ import { ADFSWrapper } from '../utils/wrappers';
 import { encodeDataAndTimestamp } from '../utils/helpers/common';
 import { Feed } from '../utils/wrappers/types';
 import { AggregatedDataFeedStoreConsumer as AggregatedDataFeedStoreViemConsumer } from '../../lib/viem/AggregatedDataFeedStore';
+import { parseEthereumAddress } from '@blocksense/base-utils';
 
 const feeds: Feed[] = [
   {
@@ -71,7 +72,7 @@ describe('Example: ADFSConsumer', function () {
 
     const viemPublicClient = await viem.getPublicClient();
     aggregatedDataFeedStoreViem = new AggregatedDataFeedStoreViemConsumer(
-      dataFeedStore.contract.target as `0x${string}`,
+      parseEthereumAddress(dataFeedStore.contract.target),
       viemPublicClient,
     );
   });

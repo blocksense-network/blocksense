@@ -6,8 +6,8 @@ use blocksense_data_providers_sdk::price_data::{
     fetchers::{
         fetch::fetch_all_prices,
         forex::{
-            alpha_vantage::AlphaVantagePriceFetcher, twelvedata::TwelveDataPriceFetcher,
-            yahoo_finance::YFPriceFetcher, fmp::FMPPriceFetcher
+            alpha_vantage::AlphaVantagePriceFetcher, fmp::FMPPriceFetcher,
+            twelvedata::TwelveDataPriceFetcher, yahoo_finance::YFPriceFetcher,
         },
     },
     traits::prices_fetcher::{fetch, TradingPairSymbol},
@@ -40,10 +40,7 @@ impl SymbolsData {
                 .get("YahooFinance")
                 .cloned()
                 .unwrap_or_default(),
-            fmp: providers_symbols
-                .get("FMP")
-                .cloned()
-                .unwrap_or_default(),
+            fmp: providers_symbols.get("FMP").cloned().unwrap_or_default(),
         })
     }
 }

@@ -1,22 +1,26 @@
-import type { ParseResult } from 'effect';
-import { Context, Data, Effect, Layer, Schema as S } from 'effect';
+import path from 'path';
+import { Clock, Context, Data, Effect, Layer, Schema as S } from 'effect';
+import type { ParseError } from 'effect/ParseResult';
+import type { HttpClientResponse } from '@effect/platform/HttpClientResponse';
+import type { HttpClientError } from '@effect/platform/HttpClientError';
+import { FetchHttpClient, HttpClientRequest } from '@effect/platform';
+import { HttpClient } from '@effect/platform/HttpClient';
+import { NodeHttpClient } from '@effect/platform-node';
 
-import {
-  fetchAndDecodeJSON,
-  fetchAndDecodeJSONEffect,
-} from '@blocksense/base-utils/http';
+import { fetchAndDecodeJSONEffect } from '@blocksense/base-utils/http';
+import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
+import { SequencerConfigV2Schema } from '@blocksense/config-types/node-config';
+import type { NewFeedsConfig } from '@blocksense/config-types';
+import { NewFeedsConfigSchema } from '@blocksense/config-types';
+import { rootDir, selectDirectory, skip0x } from '@blocksense/base-utils';
+
+import { ParseMetricsError, getMetrics } from '../utils/metrics';
+import { generateSignature, type FeedResult } from './generate-signature';
 import {
   startEnvironment,
   stopEnvironment,
   parseProcessesStatus,
 } from './helpers';
-import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
-import { SequencerConfigV2Schema } from '@blocksense/config-types/node-config';
-import type { NewFeedsConfig } from '@blocksense/config-types';
-import { NewFeedsConfigSchema } from '@blocksense/config-types';
-import type { HttpClientError } from '@effect/platform/HttpClientError';
-import { ParseMetricsError, getMetrics } from '../utils/metrics';
-import { FetchHttpClient } from '@effect/platform';
 
 export class ProcessComposeFailedToStartError extends Data.TaggedError(
   '@e2e-tests/ProcessComposeFailedToStartError',
@@ -29,11 +33,11 @@ export class ProcessCompose extends Context.Tag('@e2e-tests/ProcessCompose')<
   {
     readonly start: (
       name: string,
-    ) => Effect.Effect<void, ProcessComposeFailedToStartError, never>;
-    readonly stop: () => Effect.Effect<void, Error, never>;
+    ) => Effect.Effect<void, ProcessComposeError, never>;
+    readonly stop: () => Effect.Effect<void, ProcessComposeError, never>;
     readonly parseStatus: () => Effect.Effect<
       Record<string, { status: string; exit_code: number }>,
-      Error,
+      ProcessComposeError,
       never
     >;
   }
@@ -44,18 +48,26 @@ export class ProcessCompose extends Context.Tag('@e2e-tests/ProcessCompose')<
       start: (env: string = 'example-setup-03') =>
         Effect.tryPromise({
           try: () => startEnvironment(env),
-          catch: cause => new ProcessComposeFailedToStartError({ cause }),
+          catch: error =>
+            new ProcessComposeError({
+              message: `Failed to start environment: ${error}`,
+            }),
         }),
       stop: () =>
         Effect.tryPromise({
           try: () => stopEnvironment(),
-          catch: error => new Error(`Failed to stop environment: ${error}`),
+          catch: error =>
+            new ProcessComposeError({
+              message: `Failed to stop environment: ${error}`,
+            }),
         }),
       parseStatus: () =>
         Effect.tryPromise({
           try: () => parseProcessesStatus(),
           catch: error =>
-            new Error(`Failed to parse processes status: ${error}`),
+            new ProcessComposeError({
+              message: `Failed to parse processes status: ${error}`,
+            }),
         }),
     }),
   );
@@ -69,47 +81,88 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
     readonly configUrl: string;
     readonly feedsConfigUrl: string;
     readonly metricsUrl: string;
-    readonly getConfig: () => Effect.Effect<SequencerConfigV2, Error, never>;
-    readonly getFeedsConfig: () => Effect.Effect<NewFeedsConfig, Error, never>;
+    readonly postReportsBatchUrl: string;
+    readonly reporterKey: string;
+    readonly getConfig: () => Effect.Effect<
+      SequencerConfigV2,
+      HttpClientError | ParseError,
+      never
+    >;
+    readonly getFeedsConfig: () => Effect.Effect<
+      NewFeedsConfig,
+      HttpClientError | ParseError,
+      never
+    >;
     readonly fetchUpdatesToNetworksMetric: () => Effect.Effect<
       UpdatesToNetwork,
-      ParseMetricsError | HttpClientError | ParseResult.ParseError
+      ParseMetricsError | HttpClientError | ParseError
     >;
     readonly fetchHistory: () => Effect.Effect<
       FeedAggregateHistory,
-      Error,
+      HttpClientError | ParseError,
       never
     >;
+    readonly postReportsBatch: (
+      reports: Array<ReportData>,
+    ) => Effect.Effect<HttpClientResponse, HttpClientError | Error, never>;
   }
 >() {
   static Live = Layer.effect(
     Sequencer,
     Effect.gen(function* () {
+      const mainPort = 9856;
+      const adminPort = 5553;
+      const metricsPort = 5551;
+      const localhost = 'http://127.0.0.1';
+
       const configUrl = yield* Effect.succeed(
-        'http://127.0.0.1:5553/get_sequencer_config',
+        `${localhost}:${adminPort}/get_sequencer_config`,
       );
       const feedsConfigUrl = yield* Effect.succeed(
-        'http://127.0.0.1:5553/get_feeds_config',
+        `${localhost}:${adminPort}/get_feeds_config`,
       );
-      const metricsUrl = yield* Effect.succeed('http://127.0.0.1:5551/metrics');
+      const metricsUrl = yield* Effect.succeed(
+        `${localhost}:${metricsPort}/metrics`,
+      );
       const historyUrl = yield* Effect.succeed(
-        'http://127.0.0.1:5553/get_history',
+        `${localhost}:${adminPort}/get_history`,
+      );
+      const postReportsBatchUrl = yield* Effect.succeed(
+        `${localhost}:${mainPort}/post_reports_batch`,
+      );
+
+      const reporterKey = yield* Effect.tryPromise(() =>
+        selectDirectory(
+          path.resolve(rootDir, 'nix/test-environments/test-keys'),
+        )
+          .read({ base: 'reporter_secret_key' })
+          .then(s => s.trim()),
+      ).pipe(
+        Effect.catchAll(err => {
+          console.log('error: ', err);
+          return Effect.fail(new Error(String(err)));
+        }),
       );
 
       return Sequencer.of({
         configUrl,
         feedsConfigUrl,
         metricsUrl,
+        postReportsBatchUrl,
+        reporterKey,
         getConfig: () =>
-          Effect.tryPromise({
-            try: () => fetchAndDecodeJSON(SequencerConfigV2Schema, configUrl),
-            catch: error =>
-              new Error(`Failed to fetch sequencer config: ${error}`),
+          Effect.gen(function* () {
+            return yield* fetchAndDecodeJSONEffect(
+              SequencerConfigV2Schema,
+              configUrl,
+            ).pipe(Effect.provide(FetchHttpClient.layer));
           }),
         getFeedsConfig: () =>
-          Effect.tryPromise({
-            try: () => fetchAndDecodeJSON(NewFeedsConfigSchema, feedsConfigUrl),
-            catch: error => new Error(`Failed to fetch feeds config: ${error}`),
+          Effect.gen(function* () {
+            return yield* fetchAndDecodeJSONEffect(
+              NewFeedsConfigSchema,
+              feedsConfigUrl,
+            ).pipe(Effect.provide(FetchHttpClient.layer));
           }),
         fetchUpdatesToNetworksMetric: () => {
           return Effect.gen(function* () {
@@ -155,6 +208,45 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
             return history;
           });
         },
+        postReportsBatch: (reports: Array<ReportData>) =>
+          Effect.gen(function* () {
+            const timestamp = yield* Clock.currentTimeMillis;
+            const reportsPayload: Array<ReportPayload> = yield* Effect.forEach(
+              reports,
+              r =>
+                Effect.gen(function* () {
+                  const signature = yield* generateSignature(
+                    reporterKey,
+                    r.feed_id,
+                    BigInt(timestamp),
+                    r.value,
+                  ).pipe(
+                    Effect.mapError(
+                      err => new Error(`Failed to generate signature: ${err}`),
+                    ),
+                  );
+
+                  return {
+                    payload_metadata: {
+                      feed_id: r.feed_id,
+                      reporter_id: 0,
+                      signature: skip0x(signature),
+                      timestamp,
+                    },
+                    result: r.value,
+                  };
+                }),
+            );
+
+            const client = yield* HttpClient;
+            const response = HttpClientRequest.post(postReportsBatchUrl).pipe(
+              HttpClientRequest.setHeader('Content-Type', 'application/json'),
+              HttpClientRequest.bodyText(JSON.stringify(reportsPayload)),
+              client.execute,
+            );
+
+            return yield* response;
+          }).pipe(Effect.provide(NodeHttpClient.layer)),
       });
     }),
   );
@@ -168,10 +260,11 @@ export class RGLogCheckerError extends Data.TaggedError(
   cause: unknown;
 }> {}
 
-// TODO: (danielstoyanov) Define custom error types for Services and Layers
-// class ExampleError extends Data.TaggedError('@e2e-tests/ExampleError')<{
-//   readonly message: string;
-// }> {}
+export class ProcessComposeError extends Data.TaggedError(
+  '@e2e-tests/ProcessComposeError',
+)<{
+  readonly message: string;
+}> {}
 
 export const UpdatesToNetworkMetric = S.Struct({
   name: S.Literal('updates_to_networks'),
@@ -207,3 +300,20 @@ export const FeedAggregateHistorySchema = S.Struct({
 });
 
 export type FeedAggregateHistory = typeof FeedAggregateHistorySchema.Type;
+
+export type ReportData = {
+  feed_id: string;
+  value: FeedResult;
+};
+
+type ReportPayloadData = {
+  feed_id: string;
+  reporter_id: number;
+  timestamp: number;
+  signature: string;
+};
+
+type ReportPayload = {
+  payload_metadata: ReportPayloadData;
+  result: FeedResult;
+};

@@ -201,6 +201,7 @@ export const alignCenter = (text: string, width: number, padding = ' ') =>
   alignText(text, width, 'center', padding);
 
 export function getTextWidth(str: string) {
+  const whitelistedSymbols = ['₮'];
   // 1. Remove ANSI escape sequences.
   const cleanedStr = str.replace(/\u001b\[[0-9;?]*m/g, '');
   if (!cleanedStr) return 0; // Handle empty or only-ANSI string
@@ -223,14 +224,15 @@ export function getTextWidth(str: string) {
     const isSingleCodePointGrapheme =
       String.fromCodePoint(firstCodePoint) === grapheme;
 
-    // 3. Handle single-width characters:
+    // 3. Handle single-width characters and whitelisted symbols:
     //    - Printable ASCII (U+0020 space to U+007E ~)
     //    - Box Drawing characters (U+2500 to U+257F)
     if (
-      isSingleCodePointGrapheme &&
-      ((firstCodePoint >= 0x20 && firstCodePoint <= 0x7e) ||
-        (firstCodePoint >= 0x2000 && firstCodePoint <= 0x206f) || // General Punctuation
-        (firstCodePoint >= 0x2500 && firstCodePoint <= 0x257f))
+      (isSingleCodePointGrapheme &&
+        ((firstCodePoint >= 0x20 && firstCodePoint <= 0x7e) ||
+          (firstCodePoint >= 0x2000 && firstCodePoint <= 0x206f) || // General Punctuation
+          (firstCodePoint >= 0x2500 && firstCodePoint <= 0x257f))) ||
+      whitelistedSymbols.includes(grapheme)
     ) {
       width += 1;
       // 4. Approximate emoji detection (width 2):

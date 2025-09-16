@@ -46165,6 +46165,38 @@
       }
     },
     {
+      "id": "20000",
+      "full_name": "LME-XCU price in USD per troy ounce",
+      "description": "Price of LME Copper in US Dollar per troy ounce",
+      "type": "price-feed",
+      "oracle_id": "commodities-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 600000,
+        "heartbeat_ms": 7200000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "LME-XCU",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Commodities",
+        "market_hours": "Commodities",
+        "arguments": {
+          "kind": "commodities-price-feeds",
+          "providers": ["MetalsAPI"]
+        }
+      }
+    },
+    {
       "id": "50000",
       "full_name": "USDT / USD Peg-aware",
       "description": "Peg-aware price of USDT in USD",

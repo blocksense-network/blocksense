@@ -20,6 +20,7 @@ export interface ColumnDef {
   cell?: (args: { row: DataRowType }) => ReactNode;
   invisible?: boolean;
   facetedFilter?: boolean;
+  accessor: (row: DataRowType) => any;
 }
 
 export interface DataTableProps {
@@ -39,7 +40,7 @@ export function getFacetedFilters(
       acc.push({
         name: column.id,
         title: column.title,
-        options: Array.from(new Set(data.map(d => String(d[column.id])))),
+        options: Array.from(new Set(data.map(d => String(column.accessor(d))))),
         selectedValues: [],
       });
     }
@@ -49,18 +50,22 @@ export function getFacetedFilters(
 
 export function filterDataFromSearch(
   data: DataType,
+  columns: ColumnDef[],
   filterCell: string,
   searchValue: string,
 ): DataType {
   if (!filterCell || !searchValue) return data;
+  const col = columns.find(c => c.id === filterCell);
+  if (!col) return data;
   return data.filter(row =>
-    String(row[filterCell]).toLowerCase().includes(searchValue.toLowerCase()),
+    String(col.accessor(row)).toLowerCase().includes(searchValue.toLowerCase()),
   );
 }
 
 export function applyFacetedFilters(
   data: DataType,
   facetedFilters: FilterType[],
+  columns: ColumnDef[],
 ): DataType {
   if (facetedFilters.length === 0) return data;
 
@@ -69,8 +74,10 @@ export function applyFacetedFilters(
       filter.selectedValues.length === 0
         ? true
         : filter.selectedValues.some(
-            (val: string) =>
-              String(row[filter.name]).toLowerCase() === val.toLowerCase(),
+            val =>
+              String(
+                columns.find(c => c.id === filter.name)?.accessor(row),
+              ).toLowerCase() === val.toLowerCase(),
           ),
     ),
   );
@@ -86,8 +93,8 @@ export function sortData(
   if (!col) return data;
 
   return [...data].sort((a, b) => {
-    const cellA = a[col.id];
-    const cellB = b[col.id];
+    const cellA = col.accessor(a);
+    const cellB = col.accessor(b);
     if (cellA < cellB) return sorting.order === 'asc' ? -1 : 1;
     if (cellA > cellB) return sorting.order === 'asc' ? 1 : -1;
     return 0;

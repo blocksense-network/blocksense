@@ -2,7 +2,6 @@ import { Effect, Exit, Layer, pipe, Schedule } from 'effect';
 import { afterAll, beforeAll, describe, expect, it } from '@effect/vitest';
 import { deepStrictEqual } from 'assert';
 
-import { getProcessComposeLogsFiles } from '@blocksense/base-utils/env';
 import {
   entriesOf,
   fromEntries,
@@ -10,6 +9,11 @@ import {
   mapValues,
   valuesOf,
 } from '@blocksense/base-utils/array-iter';
+import { getProcessComposeLogsFiles } from '@blocksense/base-utils/env';
+import {
+  parseEthereumAddress,
+  type EthereumAddress,
+} from '@blocksense/base-utils/evm';
 import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
 import type { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 
@@ -23,8 +27,10 @@ import type {
   ProcessComposeService,
   SequencerService,
   UpdatesToNetwork,
+  ReportData,
 } from './types';
 import { ProcessCompose, Sequencer } from './types';
+import type { FeedResult } from './generate-signature';
 import type { FeedsValueAndRound } from '../utils/onchain';
 import { getDataFeedsInfoFromNetwork } from '../utils/onchain';
 
@@ -33,7 +39,7 @@ describe.sequential('E2E Tests with process-compose', () => {
   const MAX_HISTORY_ELEMENTS_PER_FEED = 8192;
 
   let feedIdsFromConfig: Array<bigint>;
-  let contractAddressFromConfig: `0x${string}`;
+  let contractAddressFromConfig: EthereumAddress;
 
   let sequencer: SequencerService;
   let processCompose: ProcessComposeService;
@@ -43,7 +49,7 @@ describe.sequential('E2E Tests with process-compose', () => {
   let feedsConfig: NewFeedsConfig;
 
   let feedIds: Array<bigint>;
-  let contractAddress: `0x${string}`;
+  let contractAddress: EthereumAddress;
 
   let updatesToNetworks = {} as UpdatesToNetwork;
   let initialFeedsInfo: FeedsValueAndRound;
@@ -56,6 +62,22 @@ describe.sequential('E2E Tests with process-compose', () => {
         processCompose = yield* ProcessCompose;
         yield* processCompose.start(testEnvironment);
         hasProcessComposeStarted = true;
+
+        if (!process.listenerCount('SIGINT')) {
+          process.once('SIGINT', () => {
+            if (hasProcessComposeStarted) {
+              Effect.runPromise(
+                processCompose
+                  .stop()
+                  .pipe(Effect.catchAll(() => Effect.succeed(undefined))),
+              ).finally(() => {
+                process.exit(130);
+              });
+            } else {
+              process.exit(130);
+            }
+          });
+        }
 
         sequencer = yield* Sequencer;
 
@@ -101,7 +123,7 @@ describe.sequential('E2E Tests with process-compose', () => {
           ),
         {
           schedule: Schedule.fixed(1000),
-          times: 30,
+          times: 90,
         },
       );
       // still validate the result
@@ -116,9 +138,11 @@ describe.sequential('E2E Tests with process-compose', () => {
       expect(sequencerConfig).toBeTypeOf('object');
       expect(feedsConfig).toBeTypeOf('object');
 
-      contractAddress = sequencerConfig.providers[network].contracts.find(
-        c => c.name === 'AggregatedDataFeedStore',
-      )!.address as `0x${string}`;
+      contractAddress = parseEthereumAddress(
+        sequencerConfig.providers[network].contracts.find(
+          c => c.name === 'AggregatedDataFeedStore',
+        )?.address,
+      );
 
       expect(contractAddress).toEqual(contractAddressFromConfig);
 
@@ -235,6 +259,53 @@ describe.sequential('E2E Tests with process-compose', () => {
       }
     }),
   );
+
+  describe.sequential('Reports results are correctly updated', () => {
+    it.live('Posts reports and observes a network update', () =>
+      Effect.gen(function* () {
+        const feed_id = feedIds[0].toString();
+
+        const numericalResult: FeedResult = { Ok: { Numerical: 3.14159 } }; // Ok → Numerical
+        const textResult: FeedResult = { Ok: { Text: 'sensor online' } }; // Ok → Text
+        const bytesResult: FeedResult = {
+          Ok: { Bytes: [72, 101, 108, 108, 111] },
+        }; // Ok → Bytes
+        const apiErrorResult: FeedResult = {
+          Err: { APIError: 'Rate limit exceeded' },
+        }; // Err → APIError
+        const undefinedErrorResult: FeedResult = {
+          Err: { UndefinedError: {} },
+        }; // Err → UndefinedError
+
+        const reports: Array<ReportData> = [
+          { feed_id, value: numericalResult },
+          { feed_id, value: textResult },
+          { feed_id, value: bytesResult },
+          { feed_id, value: apiErrorResult },
+          { feed_id, value: undefinedErrorResult },
+        ];
+
+        const baselineUpdates = yield* sequencer
+          .fetchUpdatesToNetworksMetric()
+          .pipe(Effect.map(m => m[network]?.[feed_id] ?? 0));
+
+        for (const report of reports) {
+          const response = yield* sequencer.postReportsBatch([report]);
+          expect(response.status).toEqual(200);
+        }
+
+        const finalCount = yield* Effect.retry(
+          sequencer.fetchUpdatesToNetworksMetric().pipe(
+            Effect.map(m => m[network]?.[feed_id] ?? 0),
+            Effect.filterOrFail(count => count >= baselineUpdates + 1),
+          ),
+          { schedule: Schedule.fixed(2000), times: 30 },
+        );
+
+        expect(finalCount).toBeGreaterThanOrEqual(baselineUpdates + 1);
+      }),
+    );
+  });
 
   describe.sequential('Reporter behavior based on logs', () => {
     const reporterLogsFile =

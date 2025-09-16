@@ -7,6 +7,9 @@ on:
 
 env:
   DFCG_ARTIFACTS_ACCESS_TOKEN: ${{ secrets.DFCG_ARTIFACTS_ACCESS_TOKEN }}
+  RPC_URL_ETHEREUM_SEPOLIA: ${{ secrets.RPC_URL_ETHEREUM_SEPOLIA }}
+  RPC_URL_INK_SEPOLIA: ${{ secrets.RPC_URL_INK_SEPOLIA }}
+  METALS_API_KEY: ${{ secrets.METALS_API_KEY }}
 
 jobs:
   deploy_websites:

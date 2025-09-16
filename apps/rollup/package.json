@@ -23,7 +23,7 @@
     "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-peer-deps-external": "^2.2.4",
     "tslib": "^2.8.1",
-    "typescript": "5.8.3"
+    "typescript": "5.9.2"
   },
   "bin": {
     "rollup-bundle": "bundle.mjs"

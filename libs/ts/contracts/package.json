@@ -65,7 +65,7 @@
     "@types/chai": "4",
     "@types/ejs": "^3",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^22.10.2",
+    "@types/node": "^24.3.1",
     "chai": "4",
     "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
@@ -77,11 +77,11 @@
     "prettier-plugin-solidity": "^1.4.1",
     "solidity-coverage": "^0.8.12",
     "ts-node": "^10.9.2",
-    "tsx": "^4.19.2",
+    "tsx": "^4.20.5",
     "typechain": "^8.3.2"
   },
   "dependencies": {
-    "effect": "^3.15.1",
+    "effect": "^3.17.13",
     "tslib": "^2.8.1",
     "viem": "^2.36.0"
   }
