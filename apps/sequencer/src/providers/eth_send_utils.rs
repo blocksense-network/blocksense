@@ -11,7 +11,7 @@ use alloy_primitives::{keccak256, B256, U256};
 use blocksense_config::{FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
-use blocksense_utils::{await_time, counter_unbounded_channel::CountedReceiver, EncodedFeedId};
+use blocksense_utils::{await_time, counter_unbounded_channel::CountedReceiver, to_hex_string, EncodedFeedId};
 use chrono::Local;
 use eyre::{bail, eyre, Result};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
@@ -622,6 +622,10 @@ pub async fn eth_batch_send_to_contract(
         serialized_updates,
     ]
     .concat();
+
+    let serialized_updates_hex = to_hex_string(serialized_updates.clone(), None);
+
+    info!("serialized_updates with state hashes: {serialized_updates_hex}");
 
     input = Bytes::from(serialized_updates);
 

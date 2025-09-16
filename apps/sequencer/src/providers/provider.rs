@@ -1094,6 +1094,107 @@ mod tests {
     };
     use std::time::UNIX_EPOCH;
 
+    // Common setup reused by multiple tests interacting with ADFS
+    async fn setup_adfs_test_env(
+        network: &str,
+        metrics_prefix: &str,
+        feed_id: FeedId,
+        stride: u8,
+    ) -> Result<(
+        SequencerConfig,
+        AllFeedsConfig,
+        actix_web::web::Data<crate::sequencer_state::SequencerState>,
+        futures_util::stream::FuturesUnordered<tokio::task::JoinHandle<Result<(), std::io::Error>>>,
+        Arc<Mutex<RpcProvider>>,
+        alloy::primitives::Address,
+        String,
+        alloy::node_bindings::AnvilInstance,
+    )> {
+        let anvil = alloy::node_bindings::Anvil::new().try_spawn()?;
+
+        let key_path = blocksense_utils::test_env::get_test_private_key_path();
+
+        let mut sequencer_config = blocksense_config::get_test_config_with_single_provider(
+            network,
+            key_path.as_path(),
+            &anvil.endpoint(),
+        );
+
+        let feeds: Vec<FeedConfig> = (16..32)
+            .map(|feed_id| test_feed_config(feed_id, stride))
+            .collect();
+        let feeds_config = AllFeedsConfig { feeds };
+
+        let p_entry = sequencer_config.providers.entry(network.to_string());
+        p_entry.and_modify(|p| {
+            p.should_load_rb_indices = true;
+        });
+
+        let (sequencer_state, collected_futures) = create_sequencer_state_and_collected_futures(
+            sequencer_config.clone(),
+            metrics_prefix,
+            feeds_config.clone(),
+        )
+        .await;
+
+        let msg = sequencer_state
+            .deploy_contract(network, ADFS_ACCESS_CONTROL_CONTRACT_NAME)
+            .await
+            .expect("ADFS access control contract deployment failed!");
+        info!("{msg}");
+        let msg = sequencer_state
+            .deploy_contract(network, ADFS_CONTRACT_NAME)
+            .await
+            .expect("Data feed publishing contract deployment failed!");
+        info!("{msg}");
+        let rpc_provider_mutex = sequencer_state.get_provider(network).await.clone().unwrap();
+        let (adfs_address, adfs_deployed_byte_code) = {
+            let mut rpc_provider = rpc_provider_mutex.lock().await;
+            rpc_provider
+                .history
+                .register_feed(EncodedFeedId::new(feed_id, 0), 100);
+
+            let block_number = rpc_provider.provider.get_block_number().await.unwrap();
+            let block_num_at_time_of_writing_this_test = 0_u64;
+            assert!(block_number > block_num_at_time_of_writing_this_test);
+            let last_rb_index = rpc_provider
+                .get_latest_rb_index(&EncodedFeedId::new(feed_id, 0))
+                .await
+                .unwrap();
+            assert_eq!(
+                last_rb_index.encoded_feed_id,
+                EncodedFeedId::new(feed_id, 0)
+            );
+            assert_eq!(last_rb_index.index, 0);
+            (
+                rpc_provider
+                    .get_contract(ADFS_CONTRACT_NAME)
+                    .unwrap()
+                    .address
+                    .unwrap(),
+                blocksense_utils::to_hex_string(
+                    rpc_provider
+                        .get_contract(ADFS_CONTRACT_NAME)
+                        .unwrap()
+                        .deployed_byte_code
+                        .unwrap(),
+                    None,
+                ),
+            )
+        };
+
+        Ok((
+            sequencer_config,
+            feeds_config,
+            sequencer_state,
+            collected_futures,
+            rpc_provider_mutex,
+            adfs_address,
+            adfs_deployed_byte_code,
+            anvil,
+        ))
+    }
+
     #[tokio::test]
     async fn basic_test_provider() -> Result<()> {
         let network = "ETH";
@@ -1210,80 +1311,18 @@ mod tests {
         let _guard = span.enter();
 
         let network = "ETH4378";
-        //let fork_url = "https://rpc-gel-sepolia.inkonchain.com";
-        //let anvil = Anvil::new().fork(fork_url).try_spawn()?;
-        let anvil = Anvil::new().try_spawn()?;
-
-        let key_path = get_test_private_key_path();
-
-        let mut sequencer_config =
-            get_test_config_with_single_provider(network, key_path.as_path(), &anvil.endpoint());
-
         let feed_id = 31;
         let stride = 0;
-        let feeds: Vec<FeedConfig> = (16..32)
-            .map(|feed_id| test_feed_config(feed_id, stride))
-            .collect();
-        let feeds_config = AllFeedsConfig { feeds };
-
-        let p_entry = sequencer_config.providers.entry(network.to_string());
-        p_entry.and_modify(|p| {
-            p.should_load_rb_indices = true;
-        });
-
-        let (sequencer_state, collected_futures) = create_sequencer_state_and_collected_futures(
-            sequencer_config.clone(),
-            metrics_prefix,
-            feeds_config.clone(),
-        )
-        .await;
-        let msg = sequencer_state
-            .deploy_contract(network, ADFS_ACCESS_CONTROL_CONTRACT_NAME)
-            .await
-            .expect("ADFS access control contract deployment failed!");
-        info!("{msg}");
-        let msg = sequencer_state
-            .deploy_contract(network, ADFS_CONTRACT_NAME)
-            .await
-            .expect("Data feed publishing contract deployment failed!");
-        info!("{msg}");
-        let rpc_provider_mutex = sequencer_state.get_provider(network).await.clone().unwrap();
-        let (_adfs_address, _adfs_deployed_byte_code) = {
-            let mut rpc_provider = rpc_provider_mutex.lock().await;
-            rpc_provider
-                .history
-                .register_feed(EncodedFeedId::new(feed_id, 0), 100);
-
-            let block_number = rpc_provider.provider.get_block_number().await.unwrap();
-            //println!("Block number from provider = {number}");
-            //let block_num_at_time_of_writing_this_test = 16500374_u64;
-            let block_num_at_time_of_writing_this_test = 0_u64;
-            assert!(block_number > block_num_at_time_of_writing_this_test);
-            let last_rb_index = rpc_provider
-                .get_latest_rb_index(&EncodedFeedId::new(feed_id, 0))
-                .await
-                .unwrap();
-            assert_eq!(
-                last_rb_index.encoded_feed_id,
-                EncodedFeedId::new(feed_id, 0)
-            );
-            assert_eq!(last_rb_index.index, 0);
-            (
-                rpc_provider
-                    .get_contract(ADFS_CONTRACT_NAME)
-                    .unwrap()
-                    .address
-                    .unwrap(),
-                blocksense_utils::to_hex_string(
-                    rpc_provider
-                        .get_contract(ADFS_CONTRACT_NAME)
-                        .unwrap()
-                        .deployed_byte_code
-                        .unwrap(),
-                    None,
-                ),
-            )
-        };
+        let (
+            _sequencer_config,
+            _feeds_config,
+            sequencer_state,
+            collected_futures,
+            rpc_provider_mutex,
+            _adfs_address,
+            _adfs_deployed_byte_code,
+            _anvil,
+        ) = setup_adfs_test_env(network, metrics_prefix, feed_id, stride).await?;
         let feed = test_feed_config(feed_id, stride);
         // Some arbitrary point in time in the past, nothing special about this value
         let first_report_start_time = UNIX_EPOCH + Duration::from_secs(1524885322);
@@ -1363,8 +1402,8 @@ mod tests {
 
     #[tokio::test]
     async fn test_recover_after_read_overflowed_rb_index_value() -> Result<()> {
-        let round_counter_val = 9111;
-        let wrapped_val = round_counter_val % MAX_HISTORY_ELEMENTS_PER_FEED as u16 + 1;
+        let rb_index = 9111;
+        let wrapped_val = rb_index % MAX_HISTORY_ELEMENTS_PER_FEED as u16 + 1;
 
         let metrics_prefix = "test_recover_after_read_overflowed_rb_index_value";
 
@@ -1372,96 +1411,24 @@ mod tests {
         let _guard = span.enter();
 
         let network = "ETH4380";
-        let anvil = Anvil::new().try_spawn()?;
-
-        let key_path = get_test_private_key_path();
-
-        let mut sequencer_config =
-            get_test_config_with_single_provider(network, key_path.as_path(), &anvil.endpoint());
-
         let feed_id = 31;
         let stride = 0;
-        let feeds: Vec<FeedConfig> = (16..32)
-            .map(|feed_id| test_feed_config(feed_id, stride))
-            .collect();
-        let feeds_config = AllFeedsConfig { feeds };
-
-        let p_entry = sequencer_config.providers.entry(network.to_string());
-        p_entry.and_modify(|p| {
-            p.should_load_historical_values = true;
-            p.should_load_round_counters = true;
-            if let Some(x) = p
-                .contracts
-                .iter_mut()
-                .find(|x| x.name == MULTICALL_CONTRACT_NAME)
-            {
-                x.address = None;
-                x.creation_byte_code = Some(Multicall::BYTECODE.to_string());
-            }
-        });
-
-        let (sequencer_state, collected_futures) = create_sequencer_state_and_collected_futures(
-            sequencer_config.clone(),
-            metrics_prefix,
-            feeds_config.clone(),
-        )
-        .await;
-        let msg = sequencer_state
-            .deploy_contract(network, ADFS_ACCESS_CONTROL_CONTRACT_NAME)
-            .await
-            .expect("ADFS access control contract deployment failed!");
-        info!("{msg}");
-        let msg = sequencer_state
-            .deploy_contract(network, ADFS_CONTRACT_NAME)
-            .await
-            .expect("Data feed publishing contract deployment failed!");
-        info!("{msg}");
-        let msg = sequencer_state
-            .deploy_contract(network, MULTICALL_CONTRACT_NAME)
-            .await
-            .expect("Error when deploying multicall contract!");
-        info!("{msg}");
-
-        let rpc_provider_mutex = sequencer_state.get_provider(network).await.clone().unwrap();
-        let (adfs_address, multicall_address, adfs_deployed_byte_code) = {
-            let mut rpc_provider = rpc_provider_mutex.lock().await;
-            rpc_provider.history.register_feed(feed_id, 100);
-            let contract_version = rpc_provider.get_latest_contract_version(Periodic);
-            assert_eq!(contract_version, 2);
-
-            let block_number = rpc_provider.provider.get_block_number().await.unwrap();
-            let block_num_at_time_of_writing_this_test = 0_u64;
-            assert!(block_number > block_num_at_time_of_writing_this_test);
-            let last_round = rpc_provider.get_latest_round(&feed_id).await.unwrap();
-            assert_eq!(last_round.feed_id, feed_id);
-            assert_eq!(last_round.round, 0);
-            (
-                rpc_provider
-                    .get_contract(ADFS_CONTRACT_NAME)
-                    .unwrap()
-                    .address
-                    .unwrap(),
-                rpc_provider
-                    .get_contract(MULTICALL_CONTRACT_NAME)
-                    .unwrap()
-                    .address
-                    .unwrap(),
-                blocksense_utils::to_hex_string(
-                    rpc_provider
-                        .get_contract(ADFS_CONTRACT_NAME)
-                        .unwrap()
-                        .deployed_byte_code
-                        .unwrap(),
-                    None,
-                ),
-            )
-        };
+        let (
+            sequencer_config,
+            feeds_config,
+            _sequencer_state,
+            collected_futures,
+            rpc_provider_mutex,
+            adfs_address,
+            adfs_deployed_byte_code,
+            anvil,
+        ) = setup_adfs_test_env(network, metrics_prefix, feed_id, stride).await?;
 
         // Write raw calldata to ADFS before any updates are made.
         {
             use alloy::hex::FromHex;
             // Provided calldata to pre-populate counters/values
-            let calldata_hex = "0x01000000000000000100000001000303e3970120000000000000000000000000000015d41642f71aa02900000000003647f7d78101010000000000000000000000000000000000000000000000000000000000002397";
+            let calldata_hex = "0x010000000000000000000000000000000000000000000000000000000000000000908e112c5ba35c399906f7e029ec927d3390b62188d7c51208f3d30e1283da4e00000001000303e3970120000000000000000000000000000015d41642f71aa02900000000003647f7d78101010000000000000000000000000000000000000000000000000000000000002397";
 
             let pre_data: Bytes = Bytes::from_hex(calldata_hex).expect("Invalid calldata hex");
 
@@ -1492,9 +1459,10 @@ mod tests {
             let pending_tx = provider.send_transaction(tx).await.expect("send tx");
             let receipt = pending_tx.get_receipt().await.expect("get receipt");
             info!("DEBUG: receipt = {receipt:?}");
-            let last_round = p.get_latest_round(&feed_id).await.unwrap();
-            assert_eq!(last_round.feed_id, feed_id);
-            assert_eq!(last_round.round, round_counter_val);
+            let encoded_feed_id = EncodedFeedId::new(feed_id, stride);
+            let last_round = p.get_latest_rb_index(&encoded_feed_id).await.unwrap();
+            assert_eq!(last_round.encoded_feed_id, encoded_feed_id);
+            assert_eq!(last_round.index, rb_index);
         }
 
         // Some arbitrary point in time in the past, nothing special about this value
@@ -1515,20 +1483,13 @@ mod tests {
             if let Some(x) = p
                 .contracts
                 .iter_mut()
-                .find(|x| x.name == MULTICALL_CONTRACT_NAME)
-            {
-                x.address = Some(multicall_address.to_string());
-            }
-            if let Some(x) = p
-                .contracts
-                .iter_mut()
                 .find(|x| x.name == ADFS_CONTRACT_NAME)
             {
                 x.address = Some(adfs_address.to_string());
                 x.deployed_byte_code = Some(adfs_deployed_byte_code)
             }
             p.publishing_criteria.push(PublishCriteria {
-                feed_id,
+                encoded_feed_id: EncodedFeedId::new(feed_id, stride),
                 skip_publish_if_less_then_percentage: 0.5,
                 always_publish_heartbeat_ms: Some(864000),
                 peg_to_value: None,
@@ -1548,13 +1509,14 @@ mod tests {
                 .cloned()
                 .unwrap();
             let provider = new_rpc_provider.lock().await;
-            let counters = &provider.round_counters;
-            assert_eq!(Some(wrapped_val as u64), counters.get(&feed_id).copied());
+            let counters = &provider.rb_indices;
+            let encoded_feed_id = EncodedFeedId::new(feed_id, stride);
+            assert_eq!(Some(wrapped_val as u64), counters.get(&encoded_feed_id).copied());
 
-            let x = provider.get_latest_values(&[feed_id]).await.unwrap();
+            let x = provider.get_latest_values(&[encoded_feed_id]).await.unwrap();
             assert_eq!(x.len(), 1);
             let v = x[0].clone().unwrap();
-            assert_eq!(v.num_updates, round_counter_val.into());
+            assert_eq!(v.num_updates, rb_index.into());
 
             {
                 let metrics_prefix3 = "test_recover_after_read_overflowed_rb_index_value_3";
@@ -1570,7 +1532,7 @@ mod tests {
                 // publish new update
                 let new_update = FeedType::Numerical(94011.11f64);
                 let v1 = VotedFeedUpdate {
-                    feed_id,
+                    encoded_feed_id,
                     value: new_update.clone(),
                     end_slot_timestamp: end_slot_timestamp + interval_ms * 4,
                 };
@@ -1582,7 +1544,6 @@ mod tests {
                 let p1 = eth_batch_send_to_all_contracts(
                     &sequencer_state,
                     &updates1,
-                    Repeatability::Periodic,
                     None,
                 )
                 .await;
@@ -1592,18 +1553,18 @@ mod tests {
 
                 let prov = sequencer_state.providers.read().await;
                 let p = prov.get(network).unwrap();
-                let round = p.lock().await.get_latest_round(&feed_id).await.unwrap();
+                let round = p.lock().await.get_latest_rb_index(&encoded_feed_id).await.unwrap();
                 let vals = p
                     .lock()
                     .await
-                    .get_latest_values(&[feed_id])
+                    .get_latest_values(&[encoded_feed_id])
                     .await
                     .expect("Could not get latest value");
                 let val = vals[0]
                     .as_ref()
                     .expect("Expected correct value in contract for feed id {feed_id}");
                 assert_eq!(
-                    round.round,
+                    round.index,
                     wrapped_val
                 );
 
