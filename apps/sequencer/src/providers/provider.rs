@@ -1835,7 +1835,7 @@ mod tests {
 
             let pending_tx = provider.send_transaction(tx).await.expect("send tx");
             let receipt = pending_tx.get_receipt().await.expect("get receipt");
-            info!("DEBUG: receipt = {receipt:?}");
+            info!("Receipt = {receipt:?}");
             let last_round = p.get_latest_round(&feed_id).await.unwrap();
             assert_eq!(last_round.feed_id, feed_id);
             assert_eq!(last_round.round, round_counter_val);
@@ -1946,10 +1946,11 @@ mod tests {
                 let val = vals[0]
                     .as_ref()
                     .expect("Expected correct value in contract for feed id {feed_id}");
-                assert_eq!(
-                    round.round,
-                    wrapped_val
-                );
+
+                // Assert that the value of the round counter in the contract is as expected.
+                // Note: The sequencer tracks the index of the *next* slot to write,
+                // while the contract stores the index of the *last* written value.
+                assert_eq!(round.round, wrapped_val);
 
                 assert_eq!(val.value, new_update);
 
