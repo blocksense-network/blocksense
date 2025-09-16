@@ -12,8 +12,8 @@ import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
 
 const availableNetworks = await listEvmNetworks();
 
-export const readAdfs = Command.make(
-  'read-adfs',
+export const adfs = Command.make(
+  'adfs',
   {
     network: Options.choice('network', availableNetworks),
     address: Options.optional(Options.text('address')),
