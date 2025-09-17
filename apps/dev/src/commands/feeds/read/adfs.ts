@@ -11,42 +11,28 @@ import { listEvmNetworks, readEvmDeployment } from '@blocksense/config-types';
 import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
 import { skip0x } from '@blocksense/base-utils';
 
+import { formatTimestamp } from '../../utils';
+
 const availableNetworks = await listEvmNetworks();
 
-// Helper: parse single ADFS data word into value + timestamp parts
 function formatNumericalValue(hexData: `0x${string}`) {
   const cleanHex = skip0x(hexData);
+  if (cleanHex.length !== 64) {
+    throw new Error(
+      'Unexpected ADFS data length, expected 32 bytes (64 hex characters), got ' +
+        cleanHex.length,
+    );
+  }
   const valueHex = '0x' + cleanHex.slice(0, 48);
   const value = BigInt(valueHex);
-  let timestamp: bigint | null = null;
-  let timestampHex: string | null = null;
-  if (cleanHex.length >= 64) {
-    timestampHex = '0x' + cleanHex.slice(48, 64); // next 8 bytes (16 hex chars)
-    try {
-      timestamp = BigInt(timestampHex);
-    } catch {
-      timestamp = null;
-    }
-  }
-  // Produce formatted timestamp (try to detect ms vs s)
-  let formattedTimestamp: string | null = null;
-  if (timestamp !== null) {
-    const tNum = Number(timestamp);
-    if (Number.isFinite(tNum)) {
-      const isMs = tNum >= 1_000_000_000_000; // heuristic
-      const date = new Date(isMs ? tNum : tNum * 1000);
-      const pad = (n: number) => String(n).padStart(2, '0');
-      formattedTimestamp = `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())} ${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()} (${timestamp.toString()}${isMs ? ' ms' : ' s'})`;
-    }
-  }
+  const timestampHex = '0x' + cleanHex.slice(48);
+  const unixTimestamp = BigInt(timestampHex) / 1000n;
+  const formattedTimestamp = formatTimestamp(unixTimestamp);
   return {
     rawHex: hexData,
     value: value.toString(),
-    valueHex,
-    timestamp: timestamp ? timestamp.toString() : null,
-    timestampHex,
-    formattedTimestamp,
-  } as const;
+    timestamp: formattedTimestamp,
+  };
 }
 
 export const adfs = Command.make(
@@ -62,6 +48,7 @@ export const adfs = Command.make(
     multi: Options.boolean('multi').pipe(Options.withDefault(false)),
     humanReadable: Options.boolean('human-readable').pipe(
       Options.withDefault(false),
+      Options.withAlias('h'),
     ),
   },
   ({
@@ -121,7 +108,7 @@ export const adfs = Command.make(
       const hasSlice = Option.isSome(startSlot) || Option.isSome(slots);
       const start = Option.isSome(startSlot) ? startSlot.value : 0;
       const len = Option.isSome(slots) ? slots.value : 0;
-      const isHumanReadable = humanReadable; // already boolean due to withDefault
+      const isHumanReadable = humanReadable;
 
       type DataRow = Array<[string, string]>;
       const rows: DataRow = [];
@@ -149,12 +136,7 @@ export const adfs = Command.make(
             const parsed = formatNumericalValue(single);
             rows.push(['Data (Raw)', parsed.rawHex]);
             rows.push(['Value', parsed.value]);
-            if (parsed.timestamp) {
-              rows.push(['Timestamp', parsed.timestamp]);
-              rows.push(['Timestamp (Hex)', parsed.timestampHex ?? '']);
-              if (parsed.formattedTimestamp)
-                rows.push(['Timestamp (Formatted)', parsed.formattedTimestamp]);
-            }
+            rows.push(['Timestamp', parsed.timestamp]);
           } else {
             rows.push(['Data', single]);
           }
@@ -188,12 +170,7 @@ export const adfs = Command.make(
             const parsed = formatNumericalValue(data as `0x${string}`);
             rows.push(['Data (Raw)', parsed.rawHex]);
             rows.push(['Value', parsed.value]);
-            if (parsed.timestamp) {
-              rows.push(['Timestamp', parsed.timestamp]);
-              rows.push(['Timestamp (Hex)', parsed.timestampHex ?? '']);
-              if (parsed.formattedTimestamp)
-                rows.push(['Timestamp (Formatted)', parsed.formattedTimestamp]);
-            }
+            rows.push(['Timestamp', parsed.timestamp]);
           } else {
             rows.push(['Data', data as string]);
           }
