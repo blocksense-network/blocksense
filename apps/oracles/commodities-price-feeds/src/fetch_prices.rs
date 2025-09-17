@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 use blocksense_data_providers_sdk::price_data::{
     fetchers::{
         fetch::fetch_all_prices,
-        metals::metals_api::MetalsApiPriceFetcher,
+        commodities::metals_api::MetalsApiPriceFetcher,
     },
     traits::prices_fetcher::{fetch, TradingPairSymbol},
     types::{PairsToResults, ProviderPriceData, ProvidersSymbols},
