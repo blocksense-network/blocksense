@@ -9,8 +9,45 @@ import {
 import { renderTui, drawTable } from '@blocksense/base-utils/tty';
 import { listEvmNetworks, readEvmDeployment } from '@blocksense/config-types';
 import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
+import { skip0x } from '@blocksense/base-utils';
 
 const availableNetworks = await listEvmNetworks();
+
+// Helper: parse single ADFS data word into value + timestamp parts
+function formatNumericalValue(hexData: `0x${string}`) {
+  const cleanHex = skip0x(hexData);
+  const valueHex = '0x' + cleanHex.slice(0, 48);
+  const value = BigInt(valueHex);
+  let timestamp: bigint | null = null;
+  let timestampHex: string | null = null;
+  if (cleanHex.length >= 64) {
+    timestampHex = '0x' + cleanHex.slice(48, 64); // next 8 bytes (16 hex chars)
+    try {
+      timestamp = BigInt(timestampHex);
+    } catch {
+      timestamp = null;
+    }
+  }
+  // Produce formatted timestamp (try to detect ms vs s)
+  let formattedTimestamp: string | null = null;
+  if (timestamp !== null) {
+    const tNum = Number(timestamp);
+    if (Number.isFinite(tNum)) {
+      const isMs = tNum >= 1_000_000_000_000; // heuristic
+      const date = new Date(isMs ? tNum : tNum * 1000);
+      const pad = (n: number) => String(n).padStart(2, '0');
+      formattedTimestamp = `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())} ${pad(date.getDate())}-${pad(date.getMonth() + 1)}-${date.getFullYear()} (${timestamp.toString()}${isMs ? ' ms' : ' s'})`;
+    }
+  }
+  return {
+    rawHex: hexData,
+    value: value.toString(),
+    valueHex,
+    timestamp: timestamp ? timestamp.toString() : null,
+    timestampHex,
+    formattedTimestamp,
+  } as const;
+}
 
 export const adfs = Command.make(
   'adfs',
@@ -23,8 +60,21 @@ export const adfs = Command.make(
     startSlot: Options.optional(Options.integer('start-slot')),
     slots: Options.optional(Options.integer('slots')),
     multi: Options.boolean('multi').pipe(Options.withDefault(false)),
+    humanReadable: Options.boolean('human-readable').pipe(
+      Options.withDefault(false),
+    ),
   },
-  ({ address, feedId, index, multi, network, rpcUrl, slots, startSlot }) =>
+  ({
+    address,
+    feedId,
+    humanReadable,
+    index,
+    multi,
+    network,
+    rpcUrl,
+    slots,
+    startSlot,
+  }) =>
     Effect.gen(function* () {
       let resolvedAddress: EthereumAddress;
       if (Option.isSome(address)) {
@@ -71,6 +121,7 @@ export const adfs = Command.make(
       const hasSlice = Option.isSome(startSlot) || Option.isSome(slots);
       const start = Option.isSome(startSlot) ? startSlot.value : 0;
       const len = Option.isSome(slots) ? slots.value : 0;
+      const isHumanReadable = humanReadable; // already boolean due to withDefault
 
       type DataRow = Array<[string, string]>;
       const rows: DataRow = [];
@@ -91,10 +142,22 @@ export const adfs = Command.make(
           );
           data.forEach((word, i) => rows.push([`Data[${i}]`, word]));
         } else {
-          const data = yield* Effect.tryPromise(() =>
+          const single = yield* Effect.tryPromise(() =>
             consumer.getSingleDataAtIndex(feed, index.value),
           );
-          rows.push(['Data', data]);
+          if (isHumanReadable && !hasSlice && !multi) {
+            const parsed = formatNumericalValue(single);
+            rows.push(['Data (Raw)', parsed.rawHex]);
+            rows.push(['Value', parsed.value]);
+            if (parsed.timestamp) {
+              rows.push(['Timestamp', parsed.timestamp]);
+              rows.push(['Timestamp (Hex)', parsed.timestampHex ?? '']);
+              if (parsed.formattedTimestamp)
+                rows.push(['Timestamp (Formatted)', parsed.formattedTimestamp]);
+            }
+          } else {
+            rows.push(['Data', single]);
+          }
         }
       } else {
         rows.push(['Mode', 'Latest']);
@@ -121,7 +184,19 @@ export const adfs = Command.make(
             consumer.getLatestSingleDataAndIndex(feed),
           );
           rows.push(['Index', index.toString()]);
-          rows.push(['Data', data as string]);
+          if (isHumanReadable && !hasSlice && !multi) {
+            const parsed = formatNumericalValue(data as `0x${string}`);
+            rows.push(['Data (Raw)', parsed.rawHex]);
+            rows.push(['Value', parsed.value]);
+            if (parsed.timestamp) {
+              rows.push(['Timestamp', parsed.timestamp]);
+              rows.push(['Timestamp (Hex)', parsed.timestampHex ?? '']);
+              if (parsed.formattedTimestamp)
+                rows.push(['Timestamp (Formatted)', parsed.formattedTimestamp]);
+            }
+          } else {
+            rows.push(['Data', data as string]);
+          }
         }
       }
 
