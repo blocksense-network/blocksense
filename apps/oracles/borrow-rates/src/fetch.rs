@@ -5,7 +5,7 @@ use std::collections::{HashMap, HashSet};
 
 use crate::{
     domain::{
-        group_feeds_by_marketplace_type, map_assets_to_feeds, FeedConfig, Marketplace,
+        group_feeds_by_marketplace_type, map_assets_to_feeds, FeedConfig,
         MarketplaceType, RatesPerFeed, RatesPerFeedPerMarket, SupportedNetworks,
     },
     providers::{
