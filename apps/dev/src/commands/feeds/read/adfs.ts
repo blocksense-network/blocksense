@@ -15,7 +15,7 @@ import { formatTimestamp } from '../../utils';
 
 const availableNetworks = await listEvmNetworks();
 
-function formatNumericalValue(hexData: `0x${string}`) {
+export function formatNumericalValue(hexData: `0x${string}`) {
   const cleanHex = skip0x(hexData);
   if (cleanHex.length !== 64) {
     throw new Error(
