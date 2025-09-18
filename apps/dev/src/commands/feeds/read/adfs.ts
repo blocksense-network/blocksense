@@ -13,8 +13,6 @@ import { skip0x } from '@blocksense/base-utils';
 
 import { formatTimestamp } from '../../utils';
 
-const availableNetworks = await listEvmNetworks();
-
 export function formatNumericalValue(hexData: `0x${string}`) {
   const cleanHex = skip0x(hexData);
   if (cleanHex.length !== 64) {
@@ -38,7 +36,7 @@ export function formatNumericalValue(hexData: `0x${string}`) {
 export const adfs = Command.make(
   'adfs',
   {
-    network: Options.choice('network', availableNetworks),
+    network: Options.choice('network', await listEvmNetworks()),
     address: Options.optional(Options.text('address')),
     rpcUrl: Options.optional(Options.text('rpc-url')),
     feedId: Options.integer('feed-id'),

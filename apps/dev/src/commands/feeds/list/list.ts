@@ -9,13 +9,11 @@ import {
 import { Command, Options } from '@effect/cli';
 import { Effect, Option } from 'effect';
 
-const availableNetworks = await listEvmNetworks();
-
 export const list = Command.make(
   'list',
   {
     dir: Options.directory('dir').pipe(Options.withDefault(configDir)),
-    network: Options.choice('network', availableNetworks),
+    network: Options.choice('network', await listEvmNetworks()),
     displayMode: Options.choice('display-mode', [
       'table',
       'markdown-list',
