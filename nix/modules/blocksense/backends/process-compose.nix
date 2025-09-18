@@ -95,12 +95,13 @@ let
               ${mkCargoTargetExePath "blocksense"} node build --up \
                 --from ${cfg.config-files."reporter_config_${name}".path}
             '';
-          environment =
-            [ "RUST_LOG=${log-level}" ]
-            ++ lib.optionals useLocalCargoResult [
-              "SPIN_DATA_DIR=$GIT_ROOT/target/spin-artifacts"
-              "LD_LIBRARY_PATH=${lib.makeLibraryPath self'.legacyPackages.commonLibDeps}"
-            ];
+          environment = [
+            "RUST_LOG=${log-level}"
+          ]
+          ++ lib.optionals useLocalCargoResult [
+            "SPIN_DATA_DIR=$GIT_ROOT/target/spin-artifacts"
+            "LD_LIBRARY_PATH=${lib.makeLibraryPath self'.legacyPackages.commonLibDeps}"
+          ];
 
           depends_on = {
             blocksense-sequencer.condition = "process_healthy";
