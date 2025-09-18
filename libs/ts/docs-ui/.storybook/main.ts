@@ -1,7 +1,7 @@
 import { join, dirname } from 'node:path';
 import { createRequire } from 'node:module';
 
-import type { StorybookConfig } from '@storybook/experimental-nextjs-vite';
+import type { StorybookConfig } from '@storybook/nextjs-vite';
 import { mergeConfig } from 'vite';
 
 const require = createRequire(import.meta.url);
@@ -25,13 +25,13 @@ const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
 
   addons: [
-    getAbsolutePath('@storybook/addon-essentials'),
     getAbsolutePath('@chromatic-com/storybook'),
-    getAbsolutePath('@storybook/addon-interactions'),
+    getAbsolutePath('@storybook/addon-docs'),
+    getAbsolutePath('@storybook/addon-a11y'),
   ],
 
   framework: {
-    name: getAbsolutePath('@storybook/experimental-nextjs-vite'),
+    name: getAbsolutePath('@storybook/nextjs-vite'),
     options: {},
   },
 
@@ -66,9 +66,5 @@ const config: StorybookConfig = {
       to: 'icons',
     },
   ],
-
-  docs: {
-    autodocs: true,
-  },
 };
 export default config;
