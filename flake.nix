@@ -30,6 +30,12 @@
     };
     nix2container.follows = "mcl-blockchain/nix2container";
     mk-shell-bin.url = "github:rrbutani/nix-mk-shell-bin";
+    yarnpnp2nix = {
+      url = "github:blocksense-network/yarnpnp2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-compat.follows = "mcl-blockchain/nixos-modules/flake-compat";
+      inputs.utils.follows = "mcl-blockchain/nixos-modules/flake-utils";
+    };
     blama = {
       url = "github:blocksense-network/blama";
       flake = false;
