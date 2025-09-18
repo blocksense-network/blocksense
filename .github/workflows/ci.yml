@@ -36,7 +36,7 @@ jobs:
   lint:
     runs-on: [self-hosted, nixos, x86-64-v3]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install Nix
         uses: metacraft-labs/nixos-modules/.github/install-nix@main
@@ -56,7 +56,7 @@ jobs:
     runs-on: [self-hosted, nixos, x86-64-v3]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install Nix
         uses: metacraft-labs/nixos-modules/.github/install-nix@main
@@ -85,7 +85,7 @@ jobs:
     runs-on: [self-hosted, nixos, x86-64-v3]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install Nix
         uses: metacraft-labs/nixos-modules/.github/install-nix@main
@@ -114,7 +114,7 @@ jobs:
     runs-on: [self-hosted, nixos, x86-64-v3]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install Nix
         uses: metacraft-labs/nixos-modules/.github/install-nix@main
@@ -171,7 +171,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install Nix
         uses: metacraft-labs/nixos-modules/.github/install-nix@main
@@ -222,7 +222,7 @@ jobs:
       docsUiDeploymentMessage: ${{ steps.docs-ui-ws-url.outputs.url }}
       uiDeploymentMessage: ${{ steps.ui-ws-url.outputs.url }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install Nix
         uses: metacraft-labs/nixos-modules/.github/install-nix@main
