@@ -216,9 +216,9 @@ async fn main() -> std::io::Result<()> {
 
     let (sequencer_config, feeds_config) = get_sequencer_and_feed_configs();
 
-    let agent_opt = setup_pyroscope(&sequencer_config).await;
-    let _agent_running =
-        agent_opt.map(|agent| agent.start().expect("Could not start PyroscopeAgent!"));
+    // let agent_opt = setup_pyroscope(&sequencer_config).await;
+    // let _agent_running =
+    //     agent_opt.map(|agent| agent.start().expect("Could not start PyroscopeAgent!"));
 
     let (
         aggregated_votes_to_block_creator_recv,

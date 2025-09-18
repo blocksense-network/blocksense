@@ -16,6 +16,7 @@
       rust = self'.legacyPackages.rustToolchain;
 
       craneLib = (inputs.mcl-blockchain.inputs.crane.mkLib pkgs).overrideToolchain rust;
+      inherit (inputs'.mcl-blockchain.legacyPackages) nix2container;
 
       version = "dev";
 
@@ -86,6 +87,47 @@
             spinCompatibility = ">=2.2";
             version = "0.1.0";
             packages = [ self'.apps.trigger-oracle.program ];
+          };
+        };
+
+        ociImages = {
+          sequencer = nix2container.buildImage {
+            name = "blocksense/sequencer";
+            tag = version;
+
+            config = {
+              cmd = [ "${self'.apps.sequencer.program}" ];
+            };
+          };
+
+          reporter = nix2container.buildImage {
+            name = "blocksense/reporter";
+            tag = version;
+
+            copyToRoot = pkgs.buildEnv {
+              name = "root";
+              paths = builtins.attrValues self'.legacyPackages.oracle-scripts ++ [
+                self'.legacyPackages.spinWrapped
+                pkgs.bashInteractive
+                pkgs.coreutils
+                pkgs.curl
+                pkgs.ripgrep
+              ];
+              pathsToLink = [
+                "/bin"
+              ];
+            };
+
+            config = {
+              cmd = [
+                "${self'.apps.blocksense.program}"
+                "node"
+                "build"
+                "--up"
+                "--from"
+                "/etc/blocksense/reporter_config_a.json"
+              ];
+            };
           };
         };
       };
