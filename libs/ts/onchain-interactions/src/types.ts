@@ -57,6 +57,7 @@ export const deployedNetworks = [
   'soneium-minato',
   'songbird-coston',
   'sonic-blaze',
+  'sonic-testnet',
   'status-network-sepolia',
   'superseed-sepolia',
   'swellchain-testnet',
