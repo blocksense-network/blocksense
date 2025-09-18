@@ -30,6 +30,10 @@
     };
     nix2container.follows = "mcl-blockchain/nix2container";
     mk-shell-bin.url = "github:rrbutani/nix-mk-shell-bin";
+    yarnpnp2nix = {
+      url = "github:blocksense-network/yarnpnp2nix/feat/manifest-directory-option";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     blama = {
       url = "github:blocksense-network/blama";
       flake = false;
