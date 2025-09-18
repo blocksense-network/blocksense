@@ -121,6 +121,7 @@ const networks = [
   'songbird-coston',
   'sonic-mainnet',
   'sonic-blaze',
+  'sonic-testnet',
   'status-network-sepolia',
   'superseed-mainnet',
   'superseed-sepolia',
@@ -152,9 +153,9 @@ const chainIds = [
   169, 3441006, 5000, 5003, 698, 6342, 1740, 59902, 31611, 10143, 2818, 2810,
   72080, 8801, 5851, 5611, 10, 11155420, 7849306, 688688, 9745, 9746, 98866,
   98867, 137, 80002, 1101, 2442, 695569, 11155931, 57000, 200018, 31, 534352,
-  534351, 11011, 5031, 50312, 1868, 1946, 16, 146, 57054, 1660990954, 5330,
-  53302, 1924, 239, 2391, 2390, 167000, 167009, 5678, 841, 842, 41, 130, 1301,
-  4801, 1417429182, 324, 300,
+  534351, 11011, 5031, 50312, 1868, 1946, 16, 146, 57054, 14601, 1660990954,
+  5330, 53302, 1924, 239, 2391, 2390, 167000, 167009, 5678, 841, 842, 41, 130,
+  1301, 4801, 1417429182, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks).annotations({
@@ -1615,6 +1616,18 @@ export const networkMetadata = {
   },
   'sonic-blaze': {
     chainId: 57054,
+    isTestnet: true,
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://testnet.sonicscan.org',
+        apiUrl: 'https://api-testnet.sonicscan.org/api',
+      },
+    ],
+    currency: Currency.S,
+  },
+  'sonic-testnet': {
+    chainId: 14601,
     isTestnet: true,
     explorers: [
       {
