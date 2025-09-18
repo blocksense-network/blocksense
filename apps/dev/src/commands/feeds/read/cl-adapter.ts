@@ -13,8 +13,6 @@ import {
 } from '@blocksense/contracts/viem';
 import { formatTimestamp } from '../../utils';
 
-const availableNetworks = await listEvmNetworks();
-
 function formatNumericalValue(
   value: bigint,
   decimals: number,
@@ -40,7 +38,7 @@ function formatNumericalValue(
 export const clAdapter = Command.make(
   'cl-adapter',
   {
-    network: Options.choice('network', availableNetworks),
+    network: Options.choice('network', await listEvmNetworks()),
     address: Options.optional(Options.text('address')),
     feedId: Options.optional(Options.integer('feed-id')),
     round: Options.optional(Options.integer('round')),
