@@ -1,26 +1,43 @@
 mod common;
 mod fetch_prices;
 
-use std::{
-    collections::{HashMap, HashSet},
-    fmt::Write,
-};
+use std::collections::{HashMap, HashSet};
 
 use anyhow::{Context, Result};
-use itertools::Itertools;
-use prettytable::{format, Cell, Row, Table};
+
 use serde::{Deserialize, Serialize};
-use tracing::{info, warn};
+use tracing::info;
 
 use blocksense_data_providers_sdk::price_data::types::{
     PairsToResults, PricePair, ProviderName, ProvidersSymbols,
 };
 use blocksense_data_providers_sdk::price_data::wap::vwap::compute_vwap;
+use itertools::Itertools;
 
 use blocksense_sdk::{
-    oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
+    oracle::{
+        logging::{print_price_feed_results, PriceResultsAccessor},
+        DataFeedResult, DataFeedResultValue, Payload, Settings,
+    },
     oracle_component,
 };
+struct ResultsView<'a>(&'a PairsToResults);
+
+impl<'a> PriceResultsAccessor for ResultsView<'a> {
+    fn has(&self, id: &str) -> bool { self.0.get(id).is_some() }
+    fn provider_names(&self, id: &str) -> Vec<String> {
+        self.0
+            .get(id)
+            .map(|res| {
+                res.providers_data
+                    .keys()
+                    .map(|x| x.split(' ').next().unwrap_or("").to_string())
+                    .unique()
+                    .collect::<Vec<_>>()
+            })
+            .unwrap_or_default()
+    }
+}
 
 use crate::{
     common::{ResourceData, ResourcePairData},
@@ -52,7 +69,8 @@ async fn oracle_request(settings: Settings) -> Result<Payload> {
     let results = get_prices(&resources, timeout_secs).await?;
     let payload = process_results(&results)?;
 
-    print_results(&resources.pairs, &results, &payload);
+    let view = ResultsView(&results);
+    print_price_feed_results(&resources.pairs, &view, &payload, "Exchanges", "exchange", true);
 
     Ok(payload)
 }
@@ -109,100 +127,4 @@ fn get_resources_from_settings(settings: &Settings) -> Result<ResourceData> {
         pairs: price_feeds,
         symbols: exchanges_symbols,
     })
-}
-
-struct ResultInfo {
-    pub id: i64,
-    pub name: String,
-    pub value: String,
-    pub exchanges: Vec<String>,
-}
-
-fn print_results(resources: &[ResourcePairData], results: &PairsToResults, payload: &Payload) {
-    let mut results_info: Vec<ResultInfo> = Vec::new();
-    let mut pairs_with_missing_exchange_data: String = String::new();
-    let mut pairs_with_missing_exchange_data_count = 0;
-    let mut missing_prices: String = String::new();
-    let mut missing_prices_count = 0;
-
-    for resurce in resources.iter() {
-        if results.get(&resurce.id).is_some() {
-            let exchanges = results
-                .get(&resurce.id)
-                .map(|res| {
-                    res.providers_data
-                        .keys()
-                        .map(|x| x.split(' ').next().unwrap().to_string())
-                        .unique()
-                        .collect()
-                })
-                .unwrap_or_default();
-
-            let value = match payload
-                .values
-                .iter()
-                .find(|x| x.id == resurce.id)
-                .unwrap()
-                .value
-                .clone()
-            {
-                DataFeedResultValue::Numerical(num) => format!("{num:.8}"),
-                _ => {
-                    missing_prices_count += 1;
-                    write!(
-                        missing_prices,
-                        "{{ {}: {} / {}, exchanges: {:?} }},",
-                        resurce.id, resurce.pair.base, resurce.pair.quote, exchanges
-                    )
-                    .unwrap();
-                    "-".to_string()
-                }
-            };
-
-            results_info.push(ResultInfo {
-                id: resurce.id.parse().unwrap(),
-                name: format!("{} / {}", resurce.pair.base, resurce.pair.quote),
-                value,
-                exchanges,
-            });
-        } else {
-            pairs_with_missing_exchange_data_count += 1;
-            write!(
-                pairs_with_missing_exchange_data,
-                "{{ {}: {} / {} }},",
-                resurce.id, resurce.pair.base, resurce.pair.quote
-            )
-            .unwrap();
-        }
-    }
-
-    results_info.sort_by(|a, b| a.id.cmp(&b.id));
-
-    let mut table = Table::new();
-    table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
-
-    table.set_titles(Row::new(vec![
-        Cell::new("ID").style_spec("bc"),
-        Cell::new("Name").style_spec("bc"),
-        Cell::new("Value").style_spec("bc"),
-        Cell::new("Exchanges").style_spec("bc"),
-    ]));
-
-    for data in results_info {
-        table.add_row(Row::new(vec![
-            Cell::new(&data.id.to_string()).style_spec("r"),
-            Cell::new(&data.name).style_spec("r"),
-            Cell::new(&data.value).style_spec("r"),
-            Cell::new(&data.exchanges.len().to_string()).style_spec("r"),
-        ]));
-    }
-
-    warn!("\n{pairs_with_missing_exchange_data_count} Pairs with no exchange data:");
-    warn!("[{pairs_with_missing_exchange_data}]");
-
-    warn!("\n{missing_prices_count} Pairs with missing price / volume data from exchange:");
-    warn!("[{missing_prices}]");
-
-    info!("\nResults:");
-    table.printstd();
 }
