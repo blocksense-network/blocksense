@@ -37,13 +37,13 @@ let
     name:
     {
       port,
-      command,
+      drv,
       ...
     }:
     {
       name = "anvil-${name}";
       value.process-compose = {
-        inherit command;
+        command = lib.getExe drv;
         readiness_probe = {
           exec.command = ''
             curl -fsSL http://127.0.0.1:${toString port}/ \

@@ -9,14 +9,14 @@ let
 
   anvilInstances = lib.mapAttrs' (
     name:
-    { command, ... }:
+    { drv, ... }:
     {
       name = "blocksense-anvil-${name}";
       value = {
         description = "Blocksense Anvil ${name}";
         wantedBy = [ "multi-user.target" ];
         serviceConfig = {
-          ExecStart = command;
+          ExecStart = lib.getExe drv;
           Restart = "always";
         };
       };

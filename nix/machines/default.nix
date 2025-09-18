@@ -14,19 +14,19 @@ let
     "x86_64-darwin"
     "aarch64-darwin"
   ];
-  allEnvironmentMachines = lib.foldl' (
-    acc: path:
-    let
-      baseName = builtins.baseNameOf path;
-      machinesForPath = lib.listToAttrs (
-        lib.map (system: {
-          name = if system == "x86_64-linux" then baseName else "${baseName}-${system}";
-          value = testEnvironmentConfig path system;
-        }) systems
-      );
-    in
-    acc // machinesForPath
-  ) { } allEnvironmentPaths;
+
+  allEnvironmentMachines = lib.listToAttrs (
+    lib.concatMap (
+      path:
+      let
+        baseName = builtins.baseNameOf path;
+      in
+      lib.map (system: {
+        name = "${baseName}-${system}";
+        value = testEnvironmentConfig path system;
+      }) systems
+    ) allEnvironmentPaths
+  );
 
   testEnvironmentConfig =
     conf: system:
@@ -45,24 +45,26 @@ let
 
 in
 {
-  flake.nixosModules.example-setup-vm = {
-    boot.loader = {
-      systemd-boot.enable = true;
-      efi.canTouchEfiVariables = true;
-      grub.devices = [ "nodev" ];
+  flake.nixosModules.example-setup-vm =
+    { pkgs, ... }:
+    {
+      boot.loader = {
+        systemd-boot.enable = true;
+        efi.canTouchEfiVariables = true;
+        grub.devices = [ "nodev" ];
+      };
+      fileSystems."/" = {
+        device = "/dev/sda1234";
+        fsType = "ext4";
+      };
+      nix.settings.sandbox = false;
+      networking.useNetworkd = true;
+      systemd = {
+        network.enable = true;
+        network.wait-online.enable = false;
+        services.network-online.enable = true;
+      };
+      environment.defaultPackages = [ pkgs.foundry ];
     };
-    fileSystems."/" = {
-      device = "/dev/sda1234";
-      fsType = "ext4";
-    };
-    nix.settings.sandbox = false;
-    networking.useNetworkd = true;
-    systemd = {
-      network.enable = true;
-      network.wait-online.enable = false;
-      services.network-online.enable = true;
-    };
-    environment.defaultPackages = [ self.legacyPackages.x86_64-linux.foundry ];
-  };
-  flake.nixosConfigurations = { } // allEnvironmentMachines;
+  flake.nixosConfigurations = allEnvironmentMachines;
 }

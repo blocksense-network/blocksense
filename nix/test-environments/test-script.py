@@ -4,7 +4,7 @@ import json
 import time
 from dataclasses import dataclass
 from typing import List
-from test_driver.errors import RequestedAssertionFailed # type: ignore
+from test_driver.errors import RequestedAssertionFailed
 
 # --- Configuration ---
 @dataclass
@@ -65,17 +65,17 @@ test_config = TestConfig()
 
 def wait_for_services(services):
     for service in services:
-        machine.wait_for_unit(service)  # type: ignore
+        machine.wait_for_unit(service)
 
 
 def wait_for_ports(ports):
     for port in ports:
-        machine.wait_for_open_port(port)  # type: ignore
+        machine.wait_for_open_port(port)
 
 
 def check_log_for_pattern(service, pattern):
     """Asserts that a pattern is NOT found in a service's journald log."""
-    log_output = machine.succeed(f"journalctl -u {service}")  # type: ignore
+    log_output = machine.succeed(f"journalctl -u {service}")
 
     # Extract logic into Python with better error handling
     match = re.search(pattern, log_output, re.IGNORECASE | re.MULTILINE)
@@ -95,7 +95,7 @@ def check_log_for_pattern(service, pattern):
 
 def check_sequencer_endpoint_exists(endpoint):
     """Checks that a sequencer endpoint returns a 2xx status code and returns the response."""
-    return machine.wait_until_succeeds(f"curl -sf {test_config.SEQUENCER_URL}/{endpoint}", test_config.ENDPOINT_EXISTENCE_TIMEOUT)  # type: ignore
+    return machine.wait_until_succeeds(f"curl -sf {test_config.SEQUENCER_URL}/{endpoint}", test_config.ENDPOINT_EXISTENCE_TIMEOUT)
 
 
 def check_sequencer_endpoint_json(endpoint):
@@ -174,7 +174,7 @@ def _make_cast_call_base(
     command = f"cast call {safe_contract_address} {call_data_arg} --rpc-url {safe_rpc_url}"
 
     try:
-        raw_output = machine.succeed(command).strip()  # type: ignore
+        raw_output = machine.succeed(command).strip()
 
         # Extract post-processing logic into Python
         processed_output = raw_output
@@ -241,7 +241,7 @@ def check_all_contracts():
 
 def wait_for_sequencer_history():
     """Waits until the sequencer history endpoint reports non-empty data."""
-    machine.wait_until_succeeds(  # type: ignore
+    machine.wait_until_succeeds(
         f"curl -s {test_config.SEQUENCER_URL}/get_history | jq -e '.aggregate_history | all(. != [])'",
         test_config.HISTORY_POPULATION_TIMEOUT,
     )
@@ -249,7 +249,7 @@ def wait_for_sequencer_history():
 
 def wait_for_ink_sepolia_updates(min_updates=2):
     """Waits for a minimum number of updates to the ink_sepolia network."""
-    machine.wait_until_succeeds(  # type: ignore
+    machine.wait_until_succeeds(
         f"curl -s {test_config.SEQUENCER_URL}/metrics | "
         + f"awk '/^updates_to_networks{{network=\"ink_sepolia\"}}/ {{ if ($2 <= {min_updates}) {{ exit 1 }} }} END {{ exit 0 }}'",
         test_config.NETWORK_UPDATE_TIMEOUT,
@@ -290,8 +290,8 @@ def run_core_logic_checks():
 
 
 """Main test execution function."""
-machine.start()  # type: ignore
-machine.wait_for_unit("multi-user.target")  # type: ignore
+machine.start()
+machine.wait_for_unit("multi-user.target")
 
 run_initial_health_checks()
 run_core_logic_checks()
