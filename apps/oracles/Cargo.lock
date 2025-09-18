@@ -963,10 +963,13 @@ dependencies = [
  "anyhow",
  "async-trait",
  "blocksense-macro",
+ "itertools 0.14.0",
+ "prettytable-rs",
  "reqwest",
  "serde",
  "serde_json",
  "spin-sdk",
+ "tracing",
  "url",
  "wit-bindgen",
 ]
