@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use blocksense_sdk::oracle::logging::PriceResultsAccessor;
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
 use crate::price_data::traits::prices_fetcher::{PairPriceData, PricePoint, TradingPairSymbol};
@@ -32,3 +34,26 @@ pub struct DataFeedResult {
 
 // A mapping of feed pairs to their respective results
 pub type PairsToResults = HashMap<TradingPairSymbol, DataFeedResult>;
+
+// Utility struct to provide read-only access to the results
+// Used for logging purposes
+pub struct ResultsView<'a>(pub &'a PairsToResults);
+
+impl<'a> PriceResultsAccessor for ResultsView<'a> {
+    fn has(&self, id: &str) -> bool {
+        self.0.get(id).is_some()
+    }
+
+    fn provider_names(&self, id: &str) -> Vec<String> {
+        self.0
+            .get(id)
+            .map(|res| {
+                res.providers_data
+                    .keys()
+                    .map(|x| x.split(' ').next().unwrap_or("").to_string())
+                    .unique()
+                    .collect::<Vec<_>>()
+            })
+            .unwrap_or_default()
+    }
+}

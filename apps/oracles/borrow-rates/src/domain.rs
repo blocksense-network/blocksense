@@ -132,7 +132,7 @@ pub enum UIPoolMarketplaceType {
     HyperLend,
 }
 
-#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy, AsRefStr)]
 pub enum MarketplaceType {
     UIPoolMarketplace(UIPoolMarketplaceType),
     HyperDrive,

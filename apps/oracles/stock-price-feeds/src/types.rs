@@ -28,6 +28,3 @@ pub struct ResourceData {
     pub pairs: Vec<ResourcePairData>,
     pub symbols: ProvidersSymbols,
 }
-
-
-/* Oracle results related types */

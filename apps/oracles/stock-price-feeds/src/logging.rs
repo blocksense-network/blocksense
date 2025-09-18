@@ -4,7 +4,7 @@ use blocksense_sdk::oracle::{
     Payload,
 };
 
-use crate::domain::ResourcePairData;
+use crate::types::ResourcePairData;
 
 impl ResourceLogEntry for ResourcePairData {
     fn get_id_str(&self) -> String {

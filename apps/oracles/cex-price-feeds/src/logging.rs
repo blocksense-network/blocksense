@@ -4,12 +4,13 @@ use blocksense_sdk::oracle::{
     Payload,
 };
 
-use crate::domain::ResourcePairData;
+use crate::common::ResourcePairData;
 
 impl ResourceLogEntry for ResourcePairData {
     fn get_id_str(&self) -> String {
         self.id.clone()
     }
+
     fn get_display_name(&self) -> String {
         format!("{} / {}", self.pair.base, self.pair.quote)
     }
