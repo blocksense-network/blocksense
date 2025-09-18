@@ -35,7 +35,7 @@ impl<'a> PricesFetcher<'a> for GeminiPriceFetcher<'a> {
         Self { symbols }
     }
 
-    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<'_, Result<PairPriceData>> {
         async move {
             let prices_futures = self
                 .symbols

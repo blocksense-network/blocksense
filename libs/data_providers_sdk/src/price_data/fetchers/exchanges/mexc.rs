@@ -31,7 +31,7 @@ impl PricesFetcher<'_> for MEXCPriceFetcher {
         Self
     }
 
-    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<'_, Result<PairPriceData>> {
         async move {
             let response = http_get_json::<MEXCPriceResponse>(
                 "https://api.mexc.com/api/v3/ticker/24hr",
