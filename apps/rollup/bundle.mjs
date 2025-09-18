@@ -10,7 +10,12 @@ import del from 'rollup-plugin-delete';
 import { glob } from 'glob';
 import { createRequire } from 'node:module';
 import { getTsconfig } from 'get-tsconfig';
-import chalkTemplate from 'chalk-template';
+
+const ANSI = {
+  bold: { on: '\x1b[1m', off: '\x1b[22m' },
+  underline: { on: '\x1b[4m', off: '\x1b[24m' },
+  red: { on: '\x1b[31m', off: '\x1b[39m' },
+};
 
 main().catch(console.error);
 
@@ -31,7 +36,7 @@ async function main() {
   const packageDir = `${path.resolve(inputDir)}/`;
 
   console.log(
-    chalkTemplate`╭─ Building {bold ${relativeDir}} ({underline ${packageDir}})`,
+    `╭─ Building ${ANSI.bold.on}${relativeDir}${ANSI.bold.off} (${ANSI.underline.on}${packageDir}${ANSI.underline.off})`,
   );
 
   // DO NOT REMOVE: Chesterson's fence
@@ -43,7 +48,7 @@ async function main() {
   ]);
   await fs.rename(`${packageDir}/dist/esm/types`, `${packageDir}/dist/types`);
   console.log(
-    chalkTemplate`╰─ Finished {bold ${relativeDir}/dist/\{cjs,esm,types\}} successfully.`,
+    `╰─ Finished ${ANSI.bold.on}${relativeDir}/dist/{cjs,esm,types}${ANSI.bold.off} successfully.`,
   );
 }
 
@@ -67,7 +72,9 @@ async function build(packageDir, relativeDir, tsConfigName, format) {
         .replace(/^\s+/gm, '│       '),
     );
     if (error.frame) console.log(error.frame.replace(/^/gm, '│     '));
-    console.log(chalkTemplate`╰─ {red Building {bold ${relativeDir}} failed.}`);
+    console.log(
+      `╰─ ${ANSI.red.on}Building ${ANSI.bold.on}${relativeDir}${ANSI.bold.off} failed.${ANSI.red.off}`,
+    );
     process.exit(1);
   } finally {
     await bundle?.close();
