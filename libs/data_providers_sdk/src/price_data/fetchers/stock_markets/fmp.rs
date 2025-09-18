@@ -36,7 +36,7 @@ impl<'a> PricesFetcher<'a> for FMPPriceFetcher<'a> {
         }
     }
 
-    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<'_, Result<PairPriceData>> {
         async move {
             let api_key = self
                 .api_keys

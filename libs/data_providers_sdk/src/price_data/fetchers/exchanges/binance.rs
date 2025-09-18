@@ -34,7 +34,7 @@ impl<'a> PricesFetcher<'a> for BinancePriceFetcher<'a> {
         Self { symbols }
     }
 
-    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<'_, Result<PairPriceData>> {
         async move {
             let req_symbols = format!(
                 "[{}]",
