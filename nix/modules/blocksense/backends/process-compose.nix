@@ -200,4 +200,14 @@ in
       (lib.mkIf cfg.blama.enable blamaInstance)
     ];
   };
+
+  options.processes = lib.mkOption {
+    type =
+      with lib.types;
+      attrsOf (submodule {
+        options.exec = lib.mkOption {
+          default = "echo 'You must specify process-compose.command' && exit 1";
+        };
+      });
+  };
 }
