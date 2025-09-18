@@ -9,7 +9,8 @@
 
   flake.lib = {
     filesets = import ./filesets.nix { inherit lib; };
-  } // (import ./lib lib);
+  }
+  // (import ./lib lib);
 
   perSystem =
     {

@@ -8,13 +8,12 @@ in
     ./anvil.nix
   ];
 
-  packages =
-    [
-      nodejs
-      corepack
-      pkgs.python3
-    ]
-    ++ lib.optionals pkgs.stdenv.isLinux [
-      pkgs.udev
-    ];
+  packages = [
+    nodejs
+    corepack
+    pkgs.python3
+  ]
+  ++ lib.optionals pkgs.stdenv.isLinux [
+    pkgs.udev
+  ];
 }
