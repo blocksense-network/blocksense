@@ -14,7 +14,7 @@ use blocksense_feed_registry::types::Repeatability;
 use blocksense_registry::config::FeedConfig;
 use blocksense_utils::counter_unbounded_channel::CountedSender;
 use blocksense_utils::time::current_unix_time;
-use blocksense_utils::FeedId;
+use blocksense_utils::EncodedFeedId;
 use rdkafka::producer::FutureRecord;
 use rdkafka::util::Timeout;
 use serde_json::json;
@@ -131,17 +131,19 @@ async fn recvd_feed_update_to_block(
     updates_to_block: &mut BTreeSet<VotedFeedUpdateWithProof>,
     backlog_updates: &mut VecDeque<VotedFeedUpdateWithProof>,
     max_feed_updates_to_batch: usize,
-    feeds_config: &Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
+    feeds_config: &Arc<RwLock<HashMap<EncodedFeedId, FeedConfig>>>,
 ) {
     match recvd_feed_update {
         Some(voted_update) => {
             let digits_in_fraction: usize = {
-                if let Some(feed_config) =
-                    feeds_config.read().await.get(&voted_update.update.feed_id)
+                if let Some(feed_config) = feeds_config
+                    .read()
+                    .await
+                    .get(&voted_update.update.encoded_feed_id)
                 {
                     feed_config.additional_feed_info.decimals.into()
                 } else {
-                    error!("Propagating result for unregistered feed {}! Support left for legacy one shot feeds of 32 bytes size. Decimal default to 18", voted_update.update.feed_id);
+                    error!("Propagating result for unregistered feed {}! Support left for legacy one shot feeds of 32 bytes size. Decimal default to 18", voted_update.update.encoded_feed_id);
                     18
                 }
             };
@@ -153,7 +155,7 @@ async fn recvd_feed_update_to_block(
             ) {
                 Ok((k, v)) => (k, v),
                 Err(e) => {
-                    error!("Error converting value for feed id {} to bytes {}. Skipping inclusion in block!", voted_update.update.feed_id, e);
+                    error!("Error converting value for feed id {} to bytes {}. Skipping inclusion in block!", voted_update.update.encoded_feed_id, e);
                     return;
                 }
             };
@@ -288,7 +290,7 @@ async fn generate_block(
         let mut value_updates = Vec::new();
         let mut proofs = HashMap::new();
         for v in updates {
-            let feed_id = v.update.feed_id;
+            let feed_id = v.update.encoded_feed_id;
             value_updates.push(v.update);
             proofs.insert(feed_id, v.proof);
         }
@@ -406,11 +408,12 @@ mod tests {
         let end_of_timeslot: Timestamp = 0;
 
         // Send test votes
-        let k1 = "ab000000000000000000000000000001";
+        let k1 = "00ab0000000000000000000000000001";
         let v1 = "000000000000000000000000000010f0da2079987e1000000000000000000000";
         let vote_1 = VotedFeedUpdateWithProof {
             update: VotedFeedUpdate::new_decode(
                 k1,
+                0,
                 v1,
                 end_of_timeslot,
                 FeedType::Numerical(0.0),
@@ -419,11 +422,12 @@ mod tests {
             .unwrap(),
             proof: Vec::new(),
         };
-        let k2 = "ac000000000000000000000000000002";
+        let k2 = "00ac0000000000000000000000000002";
         let v2 = "000000000000000000000000000010f0da2079987e2000000000000000000000";
         let vote_2 = VotedFeedUpdateWithProof {
             update: VotedFeedUpdate::new_decode(
                 k2,
+                0,
                 v2,
                 end_of_timeslot,
                 FeedType::Numerical(0.0),
@@ -432,11 +436,12 @@ mod tests {
             .unwrap(),
             proof: Vec::new(),
         };
-        let k3 = "ad000000000000000000000000000003";
+        let k3 = "00ad0000000000000000000000000003";
         let v3 = "000000000000000000000000000010f0da2079987e3000000000000000000000";
         let vote_3 = VotedFeedUpdateWithProof {
             update: VotedFeedUpdate::new_decode(
                 k3,
+                0,
                 v3,
                 end_of_timeslot,
                 FeedType::Numerical(0.0),
@@ -445,11 +450,12 @@ mod tests {
             .unwrap(),
             proof: Vec::new(),
         };
-        let k4 = "af000000000000000000000000000004";
+        let k4 = "00af0000000000000000000000000004";
         let v4 = "000000000000000000000000000010f0da2079987e4000000000000000000000";
         let vote_4 = VotedFeedUpdateWithProof {
             update: VotedFeedUpdate::new_decode(
                 k4,
+                0,
                 v4,
                 end_of_timeslot,
                 FeedType::Numerical(0.0),
