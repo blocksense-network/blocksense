@@ -32,28 +32,31 @@ export type ParsedCalldata =
  * @returns ParsedCalldata - The decoded calldata containing feeds and ring buffer table.
  * Throws an error if the calldata is invalid to indicate potential issues with the sequencer ADFS serialization logic.
  */
-export const decodeADFSCalldata = (
-  calldata: string,
-  hasBlockNumber: boolean = true,
-  revertOnError: boolean = true,
-): ParsedCalldata => {
-  const parsedData = {} as ParsedCalldata;
+export const decodeADFSCalldata = (args: {
+  calldata: string;
+  hasBlockNumber?: boolean;
+}): { parsedCalldata: ParsedCalldata; errors: Error[] } => {
+  const { calldata, hasBlockNumber = true } = args;
+  const errors: Error[] = [];
+  const parsedCalldata = {} as ParsedCalldata;
   let pointer = 0;
 
   if (hasBlockNumber) {
-    parsedData.blockNumber = BigInt('0x' + calldata.slice(4, 20));
+    parsedCalldata.blockNumber = BigInt('0x' + calldata.slice(4, 20));
     pointer = 20;
   } else {
-    parsedData.sourceAccumulator = '0x' + calldata.slice(4, 68);
-    parsedData.destinationAccumulator = '0x' + calldata.slice(68, 132);
+    parsedCalldata.sourceAccumulator = '0x' + calldata.slice(4, 68);
+    parsedCalldata.destinationAccumulator = '0x' + calldata.slice(68, 132);
     pointer = 132;
   }
 
-  parsedData.feedsLength = BigInt('0x' + calldata.slice(pointer, pointer + 8));
-  parsedData.feeds = [];
+  parsedCalldata.feedsLength = BigInt(
+    '0x' + calldata.slice(pointer, pointer + 8),
+  );
+  parsedCalldata.feeds = [];
 
   pointer += 8;
-  for (let i = 0; i < parsedData.feedsLength; i++) {
+  for (let i = 0; i < parsedCalldata.feedsLength; i++) {
     // 1b
     const stride = BigInt('0x' + calldata.slice(pointer, pointer + 2));
     pointer += 2;
@@ -82,23 +85,21 @@ export const decodeADFSCalldata = (
     const data = '0x' + calldata.slice(pointer, pointer + Number(bytes) * 2);
     pointer += Number(bytes) * 2;
 
-    if (revertOnError) {
-      if (stride > 31n || stride < 0n) {
-        throw new Error('invalid stride for feedIndex ' + feedIndex);
-      }
+    if (stride > 31n || stride < 0n) {
+      errors.push(new Error('invalid stride for feedIndex ' + feedIndex));
+    }
 
-      if (
-        feedIndex > 2n ** 115n - 1n * 2n ** stride ||
-        feedIndex < 2n ** stride
-      ) {
-        throw new Error('invalid feedIndex ' + feedIndex);
-      }
+    if (
+      feedIndex > 2n ** 115n - 1n * 2n ** stride ||
+      feedIndex < 2n ** stride
+    ) {
+      errors.push(new Error('invalid feedIndex ' + feedIndex));
     }
 
     // feedIndex = (feedId * 2 ** 13 + index) * 2 ** stride
     const feedId = feedIndex / (2n ** stride * 2n ** 13n);
 
-    parsedData.feeds.push({
+    parsedCalldata.feeds.push({
       stride,
       feedIndex,
       data,
@@ -106,7 +107,7 @@ export const decodeADFSCalldata = (
     });
   }
 
-  parsedData.ringBufferTable = [];
+  parsedCalldata.ringBufferTable = [];
 
   for (; pointer < calldata.length; ) {
     // 1b
@@ -123,11 +124,11 @@ export const decodeADFSCalldata = (
     const data = '0x' + calldata.slice(pointer, pointer + 64);
     pointer += 64;
 
-    if (revertOnError && index > 2n ** 116n - 1n) {
-      throw new Error('invalid ring buffer table index ' + index);
+    if (index > 2n ** 116n - 1n) {
+      errors.push(new Error('invalid ring buffer table index ' + index));
     }
 
-    parsedData.ringBufferTable.push({
+    parsedCalldata.ringBufferTable.push({
       index,
       data,
     });
@@ -136,7 +137,7 @@ export const decodeADFSCalldata = (
     const splitData = data.slice(2).match(/.{1,4}/g) || [];
 
     const feedId = (index * 16n) / (2n ** 115n * stride || 1n);
-    const feeds = parsedData.feeds.filter(
+    const feeds = parsedCalldata.feeds.filter(
       feed =>
         feed.stride === stride &&
         feed.feedId >= feedId &&
@@ -147,13 +148,15 @@ export const decodeADFSCalldata = (
       const rbIndex = BigInt('0x' + splitData[Number(feed.feedId % 16n)]);
       feed!.index = rbIndex;
 
-      if (revertOnError && rbIndex > 2n ** 13n - 1n) {
-        throw new Error(
-          `invalid ring buffer index ${rbIndex} for feedId ${feed!.feedId}`,
+      if (rbIndex > 2n ** 13n - 1n) {
+        errors.push(
+          new Error(
+            `invalid ring buffer index ${rbIndex} for feedId ${feed!.feedId}`,
+          ),
         );
       }
     }
   }
 
-  return parsedData;
+  return { parsedCalldata, errors };
 };
