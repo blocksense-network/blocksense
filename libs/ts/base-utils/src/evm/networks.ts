@@ -373,7 +373,7 @@ export const networkMetadata = {
       },
       {
         type: 'etherscan',
-        webUrl: 'https://arbiscan.io/',
+        webUrl: 'https://arbiscan.io',
         apiUrl: 'https://api-sepolia.arbiscan.io/api',
       },
     ],
@@ -438,7 +438,7 @@ export const networkMetadata = {
       },
       {
         type: 'etherscan',
-        webUrl: 'https://basescan.org/',
+        webUrl: 'https://basescan.org',
         apiUrl: 'https://api.basescan.org/api',
       },
     ],
@@ -450,7 +450,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'etherscan',
-        webUrl: 'https://sepolia.basescan.org/',
+        webUrl: 'https://sepolia.basescan.org',
         apiUrl: 'https://api-sepolia.basescan.org/api',
       },
       {
@@ -887,7 +887,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'etherscan',
-        webUrl: 'https://hyperevmscan.io/',
+        webUrl: 'https://hyperevmscan.io',
         apiUrl: 'https://api.etherscan.io/v2/api?chainid=999',
       },
     ],
@@ -947,7 +947,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'etherscan',
-        webUrl: 'https://testnet.kavascan.com/',
+        webUrl: 'https://testnet.kavascan.com',
         apiUrl: 'https://api.etherscan.io/v2/api?chainid=747474',
       },
     ],
@@ -959,7 +959,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'kava',
-        webUrl: 'https://testnet.kavascan.com/',
+        webUrl: 'https://testnet.kavascan.com',
         apiUrl: 'https://api.verify.mintscan.io/evm/api/0x8ad',
       },
     ],
@@ -1130,7 +1130,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'blockscout',
-        webUrl: 'https://matchscan.io/',
+        webUrl: 'https://matchscan.io',
         apiUrl: 'https://matchscan.io/api',
       },
     ],
@@ -1286,7 +1286,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'blockscout',
-        webUrl: 'https://optimism.blockscout.com/',
+        webUrl: 'https://optimism.blockscout.com',
         apiUrl: 'https://optimism.blockscout.com/api',
       },
       {
@@ -1490,7 +1490,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'blockscout',
-        webUrl: 'https://rootstock-testnet.blockscout.com/',
+        webUrl: 'https://rootstock-testnet.blockscout.com',
         apiUrl: 'https://rootstock-testnet.blockscout.com/api',
       },
     ],
@@ -1560,7 +1560,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'blockscout',
-        webUrl: 'https://shannon-explorer.somnia.network/',
+        webUrl: 'https://shannon-explorer.somnia.network',
         apiUrl: 'https://shannon-explorer.somnia.network/api',
       },
     ],
@@ -1849,7 +1849,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'blockscout',
-        webUrl: 'https://worldchain-sepolia.explorer.alchemy.com/',
+        webUrl: 'https://worldchain-sepolia.explorer.alchemy.com',
         apiUrl: 'https://worldchain-sepolia.explorer.alchemy.com/api',
       },
       {
@@ -1895,7 +1895,7 @@ export const networkMetadata = {
       },
       {
         type: 'blockscout',
-        webUrl: 'https://zksync-sepolia.blockscout.com/',
+        webUrl: 'https://zksync-sepolia.blockscout.com',
         apiUrl: 'https://zksync-sepolia.blockscout.com/api',
       },
       {
