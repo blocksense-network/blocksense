@@ -1,30 +1,37 @@
-import { isNetworkName } from '@blocksense/base-utils';
 import { task } from 'hardhat/config';
-import { NetworkConfig } from './types';
+import { solidityPacked } from 'ethers';
 import Safe from '@safe-global/protocol-kit';
-import SafeApiKit from '@safe-global/api-kit';
 import {
   OperationType,
   SafeTransactionDataPartial,
 } from '@safe-global/safe-core-sdk-types';
+
+import { isNetworkName } from '@blocksense/base-utils/evm';
+import {
+  color as c,
+  drawBox,
+  readline,
+  renderTui,
+  vlist,
+} from '@blocksense/base-utils/tty';
 import { readEvmDeployment } from '@blocksense/config-types/read-write-config';
+
+import { NetworkConfig } from './types';
 import { initChain } from './deployment-utils/init-chain';
-import { solidityPacked, toBeArray } from 'ethers';
-import { adjustVInSignature } from './utils';
+import { executeMultisigTransaction } from './deployment-utils/multisig-tx-exec';
 
 task('change-sequencer', 'Change sequencer role in Access Control contract')
   .addParam('networks', 'Network to deploy to')
   .addParam('sequencerAddress', 'Sequencer address')
   .addParam('setRole', 'Enable/Disable sequencer address role in AC')
-  .setAction(async (args, { ethers }) => {
-    console.log('args', args);
+  .setAction(async args => {
     const networks = args.networks.split(',');
     const configs: NetworkConfig[] = [];
     for (const network of networks) {
       if (!isNetworkName(network)) {
         throw new Error(`Invalid network: ${network}`);
       }
-      configs.push(await initChain(ethers, network));
+      configs.push(await initChain(network));
     }
 
     for (const config of configs) {
@@ -49,10 +56,31 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
         },
       });
 
-      // Initialize the API Kit
-      const apiKit = new SafeApiKit({
-        chainId: config.network.chainId,
-      });
+      const signers = await adminMultisig.getOwners();
+      const threshold = await adminMultisig.getThreshold();
+
+      renderTui(
+        drawBox(
+          'Change sequencer role in Access Control',
+          drawBox(
+            `ADMIN Multisig config`,
+            c`Address: {bold ${AdminMultisig}}`,
+            c`Threshold: {bold ${threshold} / ${signers.length}}`,
+            `Signers: `,
+            ...vlist(signers),
+          ),
+          drawBox(
+            'Sequencer',
+            `address: ${args.sequencerAddress}`,
+            `is allowed: ${args.setRole ? '✅' : '❌'}`,
+          ),
+        ),
+      );
+
+      if ((await readline().question('\nConfirm deployment? (y/n) ')) !== 'y') {
+        console.log('Aborting deployment...');
+        return;
+      }
 
       const safeTxSetAccessControl: SafeTransactionDataPartial = {
         to: AccessControl.address,
@@ -64,23 +92,10 @@ task('change-sequencer', 'Change sequencer role in Access Control contract')
         operation: OperationType.Call,
       };
 
-      const tx = await adminMultisig.createTransaction({
+      await executeMultisigTransaction({
         transactions: [safeTxSetAccessControl],
-      });
-
-      const safeTxHash = await adminMultisig.getTransactionHash(tx);
-
-      const typedDataHash = toBeArray(safeTxHash);
-      const signedData = await config.deployer.signMessage(typedDataHash);
-      const signature = await adjustVInSignature(signedData);
-
-      // Send the transaction to the Transaction Service with the signature from Owner A
-      await apiKit.proposeTransaction({
-        safeAddress: AdminMultisig,
-        safeTransactionData: tx.data,
-        safeTxHash,
-        senderAddress: config.deployerAddress,
-        senderSignature: signature,
+        safe: adminMultisig,
+        config,
       });
     }
   });

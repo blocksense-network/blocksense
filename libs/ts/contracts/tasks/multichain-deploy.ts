@@ -33,14 +33,14 @@ import { upgradeProxyImplementation } from './deployment-utils/upgrade-proxy-imp
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
-  .setAction(async (args, { ethers, artifacts, run }) => {
+  .setAction(async (args, { artifacts }) => {
     const networks = args.networks.split(',');
     const configs: NetworkConfig[] = [];
     for (const network of networks) {
       if (!isNetworkName(network)) {
         throw new Error(`Invalid network: ${network}`);
       }
-      configs.push(await initChain(ethers, network));
+      configs.push(await initChain(network));
     }
 
     const { feeds } = await readConfig('feeds_config_v2');
