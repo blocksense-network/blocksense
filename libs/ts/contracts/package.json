@@ -25,6 +25,11 @@
       "require": "./dist/cjs/viem/index.cjs",
       "import": "./dist/esm/viem/index.mjs",
       "types": "./lib/viem/index.ts"
+    },
+    "./calldata-decoder": {
+      "require": "./dist/cjs/utils/calldata-decoder.cjs",
+      "import": "./dist/esm/utils/calldata-decoder.mjs",
+      "types": "./lib/utils/calldata-decoder.ts"
     }
   },
   "scripts": {
