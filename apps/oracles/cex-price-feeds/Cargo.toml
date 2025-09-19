@@ -1,7 +1,7 @@
 [package]
 name = "cex-price-feeds"
 authors = ["Antoni Dikov"]
-description = ""
+description = "Oracle script providing real-time cryptocurrency price feeds aggregated from multiple centralized exchange APIs."
 version = "0.1.0"
 edition = "2021"
 
