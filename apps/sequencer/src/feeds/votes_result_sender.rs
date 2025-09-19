@@ -1,7 +1,7 @@
 use crate::providers::eth_send_utils::{
     eth_batch_send_to_all_contracts, get_serialized_updates_for_network,
 };
-use crate::providers::eth_send_utils::{increment_feeds_round_indexes, log_provider_enabled};
+use crate::providers::eth_send_utils::{increment_feeds_rb_indices, log_provider_enabled};
 use crate::providers::provider::ProvidersMetrics;
 
 use crate::sequencer_state::SequencerState;
@@ -247,7 +247,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
 
         let feeds_config = sequencer_state.active_feeds.clone();
 
-        let mut feeds_rounds = HashMap::new();
+        let mut feeds_rb_indices = HashMap::new();
 
         let serialized_updates = match get_serialized_updates_for_network(
             net,
@@ -255,7 +255,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             &mut updates,
             &provider_settings,
             feeds_config,
-            &mut feeds_rounds,
+            &mut feeds_rb_indices,
         )
         .await
         {
@@ -273,7 +273,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             debug!("No aggregated batch update for network {net}");
             continue;
         }
-        // After filtering for the network, we extract the feed_id-s that need round counter increment
+        // After filtering for the network, we extract the feed_id-s that need round buffer index increment
         let updated_feeds_ids = updates.updates.iter().cloned().map(|u| u.feed_id).collect();
 
         let serialized_updates_hex = hex::encode(&serialized_updates);
@@ -346,7 +346,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
             network: net.to_string(),
             calldata: serialized_updates_hex,
             updates: updates.updates,
-            feeds_rounds,
+            feeds_rb_indices,
         };
 
         let serialized_updates = match serde_json::to_string(&updates_to_kafka) {
@@ -381,7 +381,7 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
 
         {
             let mut provider = provider.lock().await;
-            increment_feeds_round_indexes(&updated_feeds_ids, net, &mut provider).await;
+            increment_feeds_rb_indices(&updated_feeds_ids, net, &mut provider).await;
             provider.inc_num_tx_in_progress();
         }
     }
