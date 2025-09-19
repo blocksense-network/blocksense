@@ -1537,6 +1537,7 @@ __metadata:
     tsup: "npm:^8.5.0"
     tsx: "npm:^4.20.5"
     typescript: "npm:5.9.2"
+    viem: "npm:^2.36.0"
     vitest: "npm:^3.2.4"
   bin:
     dev: ./dist/bin.cjs
