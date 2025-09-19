@@ -134,6 +134,18 @@ pub async fn init_shared_rpc_providers(
     ));
     check_contracts_in_networks(&providers).await;
     read_data_from_chains(&providers, feeds_config, conf).await;
+    {
+        let round_counter_initial_value = 8180;
+        let providers = providers.read().await;
+        for (net, p_mutex) in providers.iter() {
+            let mut p = p_mutex.lock().await;
+            for feed in feeds_config.feeds.iter() {
+                info!("Setting round_counter_initial_value = {round_counter_initial_value} for network = {net}, feed_id = {}", feed.id);
+                p.round_counters
+                    .insert(feed.id, round_counter_initial_value);
+            }
+        }
+    }
     providers
 }
 
