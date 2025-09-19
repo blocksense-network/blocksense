@@ -3,8 +3,11 @@ import { Command } from '@effect/cli';
 import packageJson from '../package.json';
 
 import { feeds } from './commands/feeds/feeds';
+import { oracles } from './commands/oracles/oracles';
 
-const command = Command.make('dev').pipe(Command.withSubcommands([feeds]));
+const command = Command.make('dev').pipe(
+  Command.withSubcommands([feeds, oracles]),
+);
 
 export const run = Command.run(command, {
   name: packageJson.description,
