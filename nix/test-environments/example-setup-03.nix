@@ -50,12 +50,16 @@ in
         port = anvilInkSepoliaPort;
         chain-id = 99999999999;
         fork-url = "$RPC_URL_INK_SEPOLIA";
+        # fork-block-number = 29297247;
+        # fork-chain-id = 11155111;
+        # state = "test-state.json";
       };
     };
 
     sequencer = {
       providers = lib.mkForce {
         ink-sepolia = {
+          is-enabled = false;
           url = "http://127.0.0.1:${toString anvilInkSepoliaPort}";
           private-key-path = "${testKeysDir}/sequencer-private-key";
           transaction-gas-limit = 20000000;
