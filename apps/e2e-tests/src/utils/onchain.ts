@@ -1,6 +1,7 @@
 import { Effect } from 'effect';
+import type { Schema as S } from 'effect';
 
-import type { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
+import type { EthereumAddress } from '@blocksense/base-utils/evm';
 import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
 
 export type FeedsValueAndRound = Record<
@@ -22,7 +23,7 @@ export type FeedsValueAndRound = Record<
 export function getDataFeedsInfoFromNetwork(
   feedIds: Array<bigint>,
   contractAddress: EthereumAddress,
-  provider: NetworkName | string,
+  provider: typeof S.URL.Type,
   roundsInfo?: Record<string, number>,
 ): Effect.Effect<FeedsValueAndRound, Error, never> {
   return Effect.gen(function* () {

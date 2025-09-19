@@ -10,6 +10,7 @@ import {
 } from '@blocksense/base-utils/evm';
 
 import { valuesOf } from '@blocksense/base-utils';
+import { Schema as S } from 'effect';
 
 export abstract class ContractConsumerBase {
   public client: PublicClient;
@@ -32,11 +33,11 @@ export abstract class ContractConsumerBase {
   public static create<T extends ContractConsumerBase>(
     this: new (contractAddress: EthereumAddress, client: PublicClient) => T,
     contractAddress: EthereumAddress,
-    networkNameOrRpcUrl: NetworkName | string,
+    networkNameOrRpcUrl: typeof S.URL.Type,
   ): T {
     const transport = isNetworkName(networkNameOrRpcUrl)
       ? http(getRpcUrl(networkNameOrRpcUrl))
-      : http(networkNameOrRpcUrl);
+      : http(networkNameOrRpcUrl.toString());
     const client = createPublicClient({ transport });
     return new this(contractAddress, client);
   }
