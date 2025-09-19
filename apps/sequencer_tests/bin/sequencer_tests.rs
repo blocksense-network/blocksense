@@ -90,13 +90,14 @@ async fn spawn_sequencer(
     _safe_contracts_per_net: &[String], // TODO: use when integration test starts using two rounds consensus
     contracts_in_networks: &[String],
 ) -> JoinHandle<()> {
+    //"contract_address": Some(contracts_in_networks[0].to_owned()), "safe_address": None::<String>
     let config_patch = json!(
     {
         "main_port": SEQUENCER_MAIN_PORT,
         "admin_port": SEQUENCER_ADMIN_PORT,
         "providers": {
-            "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[0]), "contract_address": Some(contracts_in_networks[0].to_owned()), "safe_address": None::<String>, "contract_version": 2},
-            "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[1]), "contract_address": Some(contracts_in_networks[1].to_owned()), "safe_address": None::<String>, "contract_version": 2}
+            "ETH1": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[0]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[0]), "contracts": [{"name": "AggregatedDataFeedStore", "address": Some(contracts_in_networks[0].to_owned())}]},
+            "ETH2": {"url": format!("http://127.0.0.1:{}", eth_networks_ports[1]), "private_key_path": format!("{}{}", PROVIDERS_KEY_PREFIX, eth_networks_ports[1]), "contracts": [{"name": "AggregatedDataFeedStore", "address": Some(contracts_in_networks[0].to_owned())}]}
         },
         "send_aggregated_updates_to_publishers": false,
 
@@ -291,6 +292,12 @@ fn verify_expected_data_in_contracts(expected_value: f64) {
     );
 
     // Verify expected data is set to contract in ETH1
+    println!("DEBUG: expected_value = {expected_value}");
+    let recvd_val = send_get_request(
+        format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH1/00000000000000000000000000000001")
+            .as_str(),
+    );
+    println!("DEBUG: recvd_val = {recvd_val}");
     assert!(
         send_get_request(
             format!(
