@@ -1,5 +1,6 @@
 use alloy::primitives::Address;
 use anyhow::Result;
+use blocksense_sdk::oracle::logging::GenericFeedResource;
 use blocksense_sdk::oracle::Settings;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::{collections::HashMap, str::FromStr};
@@ -132,7 +133,7 @@ pub enum UIPoolMarketplaceType {
     HyperLend,
 }
 
-#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy, AsRefStr)]
 pub enum MarketplaceType {
     UIPoolMarketplace(UIPoolMarketplaceType),
     HyperDrive,
@@ -152,6 +153,15 @@ impl From<&Marketplace> for MarketplaceType {
             Marketplace::HyperDrive(_) => MarketplaceType::HyperDrive,
             Marketplace::EulerFinance(_) => MarketplaceType::EulerFinance,
         }
+    }
+}
+
+impl GenericFeedResource for FeedConfig {
+    fn get_feed_id(&self) -> i64 {
+        self.feed_id as i64
+    }
+    fn get_display_name(&self) -> String {
+        format!("{} Borrow Rate on {:?}", self.pair.base, &self.arguments.as_ref())
     }
 }
 

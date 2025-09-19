@@ -8,7 +8,7 @@ use tracing::{info, warn};
 use anyhow::Result;
 use blocksense_sdk::{
     http::http_post_json,
-    oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
+    oracle::{logging::print_generic_payload, DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
 };
 use itertools::zip;
@@ -294,37 +294,7 @@ fn print_responses(results: &FetchedDataHashMap) {
 }
 
 fn print_payload(payload: &Payload, resourses: &[FeedConfig]) {
-    let mut feed_ids = resourses.iter().map(|x| x.feed_id).collect::<Vec<FeedId>>();
-    feed_ids.sort();
-
-    let mut table = Table::new();
-    table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
-
-    table.set_titles(Row::new(vec![
-        Cell::new("Feed ID").style_spec("bc"),
-        Cell::new("Pair").style_spec("bc"),
-        Cell::new("Value").style_spec("bc"),
-    ]));
-
-    for feed_id in feed_ids {
-        let x = payload
-            .values
-            .iter()
-            .find(|x| x.id.parse::<FeedId>().unwrap() == feed_id)
-            .unwrap();
-        let pair = resourses
-            .iter()
-            .find(|r| r.feed_id == feed_id)
-            .map(|x| format!("{} / {}", x.pair.base, x.pair.quote))
-            .unwrap_or("unknown".to_string());
-        let value = format!("{:?}", &x.value);
-        table.add_row(Row::new(vec![
-            Cell::new(&feed_id.to_string()).style_spec("r"),
-            Cell::new(&pair).style_spec("r"),
-            Cell::new(&value).style_spec("l"),
-        ]));
-    }
-    table.printstd();
+    print_generic_payload(payload, resourses, "Pair");
 }
 
 fn print_results(results: &FetchedDataHashMap, payload: &Payload, resourses: &[FeedConfig]) {
@@ -396,6 +366,15 @@ struct FeedConfig {
     #[serde(default)]
     pub market_hours: String,
     pub arguments: OracleArgs,
+}
+
+impl blocksense_sdk::oracle::logging::GenericFeedResource for FeedConfig {
+    fn get_feed_id(&self) -> i64 {
+        self.feed_id as i64
+    }
+    fn get_display_name(&self) -> String {
+        format!("{} / {}", self.pair.base, self.pair.quote)
+    }
 }
 
 fn get_resources_from_settings(settings: &Settings) -> Result<Vec<FeedConfig>> {
