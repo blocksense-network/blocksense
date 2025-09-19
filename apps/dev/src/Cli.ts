@@ -2,7 +2,7 @@ import { Command } from '@effect/cli';
 
 import packageJson from '../package.json';
 
-import { feeds } from './commands/feeds';
+import { feeds } from './commands/feeds/feeds';
 
 const command = Command.make('dev').pipe(Command.withSubcommands([feeds]));
 
