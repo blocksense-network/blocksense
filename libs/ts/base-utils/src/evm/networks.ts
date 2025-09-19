@@ -1944,14 +1944,22 @@ export function getTxHashExplorerUrl(
   network: NetworkName,
   txhash: TxHash,
 ): string {
-  return `${networkMetadata[network].explorers[0]?.webUrl}/tx/${txhash}`;
+  const baseUrl = networkMetadata[network].explorers[0]?.webUrl.replace(
+    /\/$/,
+    '',
+  );
+  return `${baseUrl}/tx/${txhash}`;
 }
 
 export function getAddressExplorerUrl(
   network: NetworkName,
   address: EthereumAddress,
 ): string {
-  return `${networkMetadata[network].explorers[0]?.webUrl}/address/${address}`;
+  const baseUrl = networkMetadata[network].explorers[0]?.webUrl.replace(
+    /\/$/,
+    '',
+  );
+  return `${baseUrl}/address/${address}`;
 }
 
 export type NetworkNameToRpcUrlEnvVar<Net extends NetworkName> =
