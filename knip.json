@@ -1,0 +1,108 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    "apps/avm-relayer": {
+      "entry": ["src/**/*.ts", "scripts/**/*.ts", "test/**/*.ts"],
+      "project": ["src/**/*.ts", "scripts/**/*.ts", "test/**/*.ts"]
+    },
+    "apps/chain-interactions": {
+      "entry": ["src/**/*.ts", "scripts/**/*.ts", "test/**/*.ts"],
+      "project": ["src/**/*.ts", "scripts/**/*.ts", "test/**/*.ts"]
+    },
+    "apps/data-feeds-config-generator": {
+      "entry": ["scripts/**/*.ts"],
+      "project": ["src/**/*.ts", "scripts/**/*.ts"]
+    },
+    "apps/dev": {
+      "entry": ["src/**/*.ts", "scripts/**/*.ts", "test/**/*.ts"],
+      "project": ["src/**/*.ts", "scripts/**/*.ts", "test/**/*.ts"]
+    },
+    "apps/docs.blocksense.network": {
+      "entry": [
+        "app/**/*.{ts,tsx,mdx}",
+        "components/**/*.{ts,tsx}",
+        "hooks/**/*.{ts,tsx}",
+        "service/**/*.{ts,tsx}",
+        "@types/**/*.ts"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx,mdx}",
+        "app/**/*.{ts,tsx,mdx}",
+        "components/**/*.{ts,tsx}",
+        "hooks/**/*.{ts,tsx}",
+        "service/**/*.{ts,tsx}",
+        "@types/**/*.ts"
+      ]
+    },
+    "apps/e2e-tests": {
+      "entry": ["src/**/*.ts", "@types/**/*.d.ts"],
+      "project": ["src/**/*.ts", "@types/**/*.d.ts"]
+    },
+    "apps/nft.blocksense.network": {
+      "entry": [
+        "app/**/*.{ts,tsx}",
+        "components/**/*.{ts,tsx}",
+        "service/**/*.{ts,tsx}"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "app/**/*.{ts,tsx}",
+        "components/**/*.{ts,tsx}",
+        "service/**/*.{ts,tsx}"
+      ]
+    },
+    "apps/rollup": {
+      "project": ["**/*.mjs"]
+    },
+    "apps/social-verification": {
+      "entry": ["src/**/*.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "libs/aztec_contracts": {
+      "project": []
+    },
+    "libs/ts/base-utils": {
+      "entry": ["src/**/*.spec.ts", "src/**/*.spec-d.ts", "src/**/*.test.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "libs/ts/config-types": {
+      "entry": ["tests/**/*.ts"],
+      "project": ["src/**/*.ts", "tests/**/*.ts"]
+    },
+    "libs/ts/contracts": {
+      "entry": ["scripts/**/*.ts", "tasks/**/*.ts", "test/**/*.ts"],
+      "project": [
+        "lib/**/*.ts",
+        "scripts/**/*.ts",
+        "tasks/**/*.ts",
+        "@types/**/*.ts",
+        "test/**/*.ts"
+      ]
+    },
+    "libs/ts/docs-ui": {
+      "project": ["src/**/*.{ts,tsx}"]
+    },
+    "libs/ts/esbuild-react-compiler-plugin": {
+      "project": ["src/**/*.ts"]
+    },
+    "libs/ts/nextra-theme-docs": {
+      "entry": ["src/**/*.{ts,tsx}"],
+      "project": ["src/**/*.{ts,tsx}"]
+    },
+    "libs/ts/onchain-interactions": {
+      "entry": ["src/scripts/**/*.ts", "src/utils.ts", "src/types.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "libs/ts/sol-reflector": {
+      "entry": [
+        "src/hardhat/**/*.ts",
+        "src/utils/**/*.ts",
+        "src/@types/**/*.ts"
+      ],
+      "project": ["src/**/*.ts"]
+    },
+    "libs/ts/ui": {
+      "project": ["src/**/*.{ts,tsx}"]
+    }
+  }
+}

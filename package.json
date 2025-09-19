@@ -20,7 +20,8 @@
     "build:all": "yarn workspaces foreach --all -p --topological-dev run build",
     "test": "yarn workspaces foreach --from $0 -Rp --topological-dev run test",
     "test-single": "yarn workspace $0 run test",
-    "test:all": "yarn workspaces foreach --all -p --topological-dev run test"
+    "test:all": "yarn workspaces foreach --all -p --topological-dev run test",
+    "knip": "knip"
   },
   "dependenciesMeta": {
     "@openzeppelin/contracts@5.0.2": {
