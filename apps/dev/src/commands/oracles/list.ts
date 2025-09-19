@@ -1,7 +1,7 @@
 import { stat } from 'fs/promises';
 import { join } from 'path';
 import { parse } from 'toml';
-import { Command } from '@effect/cli';
+import { Command, Options } from '@effect/cli';
 import { Effect } from 'effect';
 
 import { renderTui, drawTable } from '@blocksense/base-utils/tty';
@@ -14,75 +14,125 @@ export interface OracleMetadata {
   path: string;
 }
 
-async function getOraclesDirs(): Promise<Array<string>> {
-  const oraclesDir = join(rootDir, 'apps', 'oracles');
-  const oracles: Array<string> = [];
+function getOraclesDirs(): Effect.Effect<Array<string>, Error> {
+  return Effect.gen(function* () {
+    const oraclesDir = join(rootDir, 'apps', 'oracles');
+    const oracles: Array<string> = [];
 
-  try {
     const { readDir } = selectDirectory(oraclesDir);
-    const entries = await readDir();
+    const entries = yield* Effect.tryPromise({
+      try: () => readDir(),
+      catch: e =>
+        new Error(
+          `Failed to read oracles directory '${oraclesDir}': ${String((e as any)?.message ?? e)}`,
+        ),
+    });
 
     // Filter for directories only and check for Cargo.toml files
     for (const entry of entries) {
       const entryPath = join(oraclesDir, entry);
 
-      try {
-        const stats = await stat(entryPath);
+      yield* Effect.gen(function* () {
+        const stats = yield* Effect.tryPromise(() => stat(entryPath));
         const cargoTomlPath = join(entryPath, 'Cargo.toml');
-        const hasCargoToml = await stat(cargoTomlPath)
-          .then(() => true)
-          .catch(() => false);
+
+        const hasCargoToml = yield* Effect.tryPromise(() =>
+          stat(cargoTomlPath),
+        ).pipe(
+          Effect.as(true),
+          Effect.catchAll(() => Effect.succeed(false)),
+        );
 
         if (stats.isDirectory() && hasCargoToml) {
           oracles.push(entryPath);
         }
-      } catch (error) {
-        console.error(`Error processing entry ${entry}:`, error);
-      }
+      }).pipe(
+        Effect.catchAll(error =>
+          Effect.sync(() => {
+            console.error(`Error processing entry ${entry}:`, error);
+          }),
+        ),
+      );
     }
 
     return oracles.sort();
-  } catch (error) {
-    console.error(`Error reading oracles directory:`, error);
-    throw error;
-  }
+  }).pipe(
+    Effect.tapError(error =>
+      Effect.sync(() => {
+        console.error(`Error reading oracles directory:`, error);
+      }),
+    ),
+  );
 }
 
-async function parseOracleData(oracleDir: string): Promise<OracleMetadata> {
-  const { read } = selectDirectory(oracleDir);
-  const tomlFile = await read({ base: 'Cargo.toml' });
-
-  const content = parse(tomlFile);
-
-  return {
-    name: content?.package?.name,
-    description: content?.package?.description,
-    path: oracleDir,
-  };
-}
-
-export const list = Command.make('list', {}, () =>
-  Effect.gen(function* () {
-    return yield* Effect.gen(function* () {
-      const oracles = yield* Effect.tryPromise(getOraclesDirs);
-
-      if (oracles.length === 0) {
-        console.log('No oracles found.');
-        return;
-      }
-
-      const oraclesData = yield* Effect.forEach(oracles, oracleDir =>
-        Effect.tryPromise(() => parseOracleData(oracleDir)),
-      );
-
-      const headers = ['Name', 'Description', 'Path'];
-      const rows = oraclesData.map(o => [o.name, o.description, o.path]);
-
-      renderTui(
-        drawTable(rows, {
-          headers,
-        }),
-      );
+function parseOracleData(
+  oracleDir: string,
+): Effect.Effect<OracleMetadata, Error> {
+  return Effect.gen(function* () {
+    const { read } = selectDirectory(oracleDir);
+    const tomlFile = yield* Effect.tryPromise({
+      try: () => read({ base: 'Cargo.toml' }),
+      catch: e =>
+        new Error(
+          `Failed to read Cargo.toml in '${oracleDir}': ${String((e as any)?.message ?? e)}`,
+        ),
     });
-  }),
+    const content = yield* Effect.tryPromise({
+      try: () => Promise.resolve().then(() => parse(tomlFile)),
+      catch: e =>
+        new Error(
+          `Failed to parse Cargo.toml in '${oracleDir}': ${String((e as any)?.message ?? e)}`,
+        ),
+    });
+
+    return {
+      name: content?.package?.name,
+      description: content?.package?.description,
+      path: oracleDir,
+    } as OracleMetadata;
+  });
+}
+
+export const list = Command.make(
+  'list',
+  {
+    displayMode: Options.choice('display-mode', [
+      'table',
+      'markdown-list',
+    ]).pipe(Options.withDefault('table')),
+  },
+  ({ displayMode }) =>
+    Effect.gen(function* () {
+      return yield* Effect.gen(function* () {
+        const oracles = yield* getOraclesDirs();
+
+        if (oracles.length === 0) {
+          console.log('No oracles found.');
+          return;
+        }
+
+        const oraclesData = yield* Effect.forEach(oracles, oracleDir =>
+          parseOracleData(oracleDir),
+        );
+
+        if (displayMode === 'markdown-list') {
+          for (const o of oraclesData) {
+            console.log(`### ${o.name}`);
+            console.log(`- description: ${o.description ?? ''}`);
+            console.log(`- path ${o.path}`);
+            console.log('');
+          }
+          return;
+        }
+
+        const headers = ['Name', 'Description', 'Path'];
+        const rows = oraclesData.map(o => [o.name, o.description, o.path]);
+
+        renderTui(
+          drawTable(rows, {
+            headers,
+          }),
+        );
+      });
+    }),
 );
