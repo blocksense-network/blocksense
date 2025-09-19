@@ -3,7 +3,7 @@ type ParsedCalldataBase = {
   feeds: {
     stride: bigint;
     feedIndex: bigint; // (feedId * 2 ** 13 + index) * 2 ** stride
-    feedId?: bigint;
+    feedId: bigint;
     index?: bigint; // index in ring buffer table
     data: string;
   }[];
@@ -35,6 +35,7 @@ export type ParsedCalldata =
 export const decodeADFSCalldata = (
   calldata: string,
   hasBlockNumber: boolean = true,
+  revertOnError: boolean = true,
 ): ParsedCalldata => {
   const parsedData = {} as ParsedCalldata;
   let pointer = 0;
@@ -81,18 +82,27 @@ export const decodeADFSCalldata = (
     const data = '0x' + calldata.slice(pointer, pointer + Number(bytes) * 2);
     pointer += Number(bytes) * 2;
 
-    if (stride > 31n || stride < 0n) {
-      throw new Error('invalid stride');
+    if (revertOnError) {
+      if (stride > 31n || stride < 0n) {
+        throw new Error('invalid stride for feedIndex ' + feedIndex);
+      }
+
+      if (
+        feedIndex > 2n ** 115n - 1n * 2n ** stride ||
+        feedIndex < 2n ** stride
+      ) {
+        throw new Error('invalid feedIndex ' + feedIndex);
+      }
     }
 
-    if (feedIndex < 0n || feedIndex > 2n ** 115n - 1n) {
-      throw new Error('invalid feedIndex');
-    }
+    // feedIndex = (feedId * 2 ** 13 + index) * 2 ** stride
+    const feedId = feedIndex / (2n ** stride * 2n ** 13n);
 
     parsedData.feeds.push({
       stride,
-      feedIndex: feedIndex,
+      feedIndex,
       data,
+      feedId,
     });
   }
 
@@ -113,8 +123,8 @@ export const decodeADFSCalldata = (
     const data = '0x' + calldata.slice(pointer, pointer + 64);
     pointer += 64;
 
-    if (index < 0n || index > 2n ** 116n - 1n) {
-      throw new Error('invalid index');
+    if (revertOnError && index > 2n ** 116n - 1n) {
+      throw new Error('invalid ring buffer table index ' + index);
     }
 
     parsedData.ringBufferTable.push({
@@ -123,24 +133,24 @@ export const decodeADFSCalldata = (
     });
 
     const stride = (index * 16n) / 2n ** 115n;
-    const feedIdIndex = index * 16n - 2n ** 115n * stride;
     const splitData = data.slice(2).match(/.{1,4}/g) || [];
-    const indicesNotZero = splitData.map((_, i) => i);
 
-    for (const feedIndex of indicesNotZero) {
-      const feedId = BigInt(feedIndex) + feedIdIndex;
-      const index = BigInt('0x' + splitData[feedIndex]);
-      const indexInFeeds = (feedId * 2n ** 13n + index) * 2n ** stride;
-      const feed = parsedData.feeds.find(
-        feed => feed.feedIndex === indexInFeeds,
-      );
-      if (feed) {
-        feed.feedId = feedId;
-        feed.index = index;
+    const feedId = (index * 16n) / (2n ** 115n * stride || 1n);
+    const feeds = parsedData.feeds.filter(
+      feed =>
+        feed.stride === stride &&
+        feed.feedId >= feedId &&
+        feed.feedId < feedId + 16n,
+    );
 
-        if (feed.index > 2n ** 13n - 1n) {
-          throw new Error('invalid index');
-        }
+    for (const feed of feeds) {
+      const rbIndex = BigInt('0x' + splitData[Number(feed.feedId % 16n)]);
+      feed!.index = rbIndex;
+
+      if (revertOnError && rbIndex > 2n ** 13n - 1n) {
+        throw new Error(
+          `invalid ring buffer index ${rbIndex} for feedId ${feed!.feedId}`,
+        );
       }
     }
   }
