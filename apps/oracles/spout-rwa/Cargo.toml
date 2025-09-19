@@ -1,7 +1,7 @@
 [package]
 name = "spout-rwa"
 authors = ["Mila Genova", "Emil Ivanichkov"]
-description = ""
+description = "Oracle script providing proof of reserve feeds for Spout tokenaized assets."
 version = "0.1.0"
 edition = "2021"
 

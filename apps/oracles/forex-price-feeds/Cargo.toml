@@ -1,7 +1,7 @@
 [package]
 name = "forex-price-feeds"
 authors = ["Mila Genova", "Emil Ivanichkov"]
-description = ""
+description = "Oracle script serving accurate foreign exchange (forex) price feeds based on multiple currency data sources."
 version = "0.1.0"
 edition = "2021"
 

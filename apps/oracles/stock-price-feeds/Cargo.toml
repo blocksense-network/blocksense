@@ -1,7 +1,7 @@
 [package]
 name = "stock-price-feeds"
 authors = ["Mila Genova", "Emil Ivanichkov"]
-description = ""
+description = "Oracle script delivering up-to-date stock market price feeds from multiple financial data providers."
 version = "0.1.0"
 edition = "2021"
 
