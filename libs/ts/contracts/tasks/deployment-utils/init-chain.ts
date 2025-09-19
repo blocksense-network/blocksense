@@ -26,7 +26,7 @@ import type { NetworkConfig } from '../types';
 const sharedPerNetworkKind = {
   deployerAddressIsLedger: asVarSchema(S.BooleanFromString),
   deployerAddress: asVarSchema(ethereumAddress),
-  deployerPrivateKey: hexDataString,
+  deployerPrivateKey: asVarSchema(hexDataString),
 
   adfsUpgradeableProxySalt: asVarSchema(hexDataString),
 
