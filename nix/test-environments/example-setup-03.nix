@@ -50,6 +50,10 @@ in
         port = anvilInkSepoliaPort;
         chain-id = 99999999999;
         fork-url = "$RPC_URL_INK_SEPOLIA";
+        fork-block-number = 29297247;
+        fork-chain-id = 11155111;
+        state = "${config.devenv.root}/config/generated/process-compose/example-setup-03/anvil/state.json";
+        state-interval = 10;
       };
     };
 
