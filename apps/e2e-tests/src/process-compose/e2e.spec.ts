@@ -17,11 +17,7 @@ import {
 import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
 import type { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 
-import {
-  rgSearchPattern,
-  parseProcessesStatus,
-  getInitialFeedsInfoFromNetwork,
-} from './helpers';
+import { rgSearchPattern, parseProcessesStatus } from './helpers';
 import { expectedPCStatuses03 } from './expected';
 import type {
   ProcessComposeService,
@@ -37,9 +33,6 @@ import { getDataFeedsInfoFromNetwork } from '../utils/onchain';
 describe.sequential('E2E Tests with process-compose', () => {
   const network = 'ink_sepolia';
   const MAX_HISTORY_ELEMENTS_PER_FEED = 8192;
-
-  let feedIdsFromConfig: bigint[];
-  let contractAddressFromConfig: EthereumAddress;
 
   let sequencer: SequencerService;
   let processCompose: ProcessComposeService;
@@ -80,14 +73,6 @@ describe.sequential('E2E Tests with process-compose', () => {
         }
 
         sequencer = yield* Sequencer;
-
-        // Get feeds information from the original network. No affection of the work of the
-        // local sequencer.
-        ({
-          address: contractAddressFromConfig,
-          feedIds: feedIdsFromConfig,
-          initialFeedsInfo,
-        } = yield* getInitialFeedsInfoFromNetwork('ink-sepolia'));
       }),
       Effect.provide(Layer.merge(ProcessCompose.Live, Sequencer.Live)),
       Effect.runPromiseExit,
@@ -96,11 +81,6 @@ describe.sequential('E2E Tests with process-compose', () => {
     if (Exit.isFailure(res)) {
       throw new Error(`Failed to start test environment: ${testEnvironment}`);
     }
-  });
-
-  beforeAll(() => {
-    feedIds = feedIdsFromConfig;
-    contractAddress = contractAddressFromConfig;
   });
 
   afterAll(() => {
@@ -144,14 +124,27 @@ describe.sequential('E2E Tests with process-compose', () => {
         )?.address,
       );
 
-      expect(contractAddress).toEqual(contractAddressFromConfig);
-
       const allow_feeds = sequencerConfig.providers[network].allow_feeds;
       feedIds = allow_feeds?.length
         ? (allow_feeds as bigint[])
         : feedsConfig.feeds.map(feed => feed.id);
-      expect(feedIds).toEqual(feedIdsFromConfig);
-    }),
+    }).pipe(
+      Effect.tap(
+        Effect.gen(function* () {
+          const url = sequencerConfig.providers[network].url;
+
+          // Fetch the initial round data for the feeds from the local network ( anvil )
+          initialFeedsInfo = yield* getDataFeedsInfoFromNetwork(
+            feedIds,
+            contractAddress,
+            url,
+          );
+
+          // Enable the provider which is disabled by default ( ink_sepolia )
+          yield* sequencer.enableProvider(network);
+        }),
+      ),
+    ),
   );
 
   it.live(
