@@ -83,6 +83,7 @@ build-ts package="all":
     yarn build-single @blocksense/contracts
     yarn build-single @blocksense/data-feeds-config-generator
     yarn build-single @blocksense/dev
+    yarn build-single @blocksense/adfs-indexer
     yarn build-single @blocksense/chain-interactions
     yarn build-single @blocksense/avm-relayer
   else
@@ -96,6 +97,7 @@ test-ts:
   yarn test-single @blocksense/config-types
   yarn test-single @blocksense/data-feeds-config-generator
   yarn test-single @blocksense/dev
+  yarn test-single @blocksense/adfs-indexer
   yarn test-single @blocksense/chain-interactions
   yarn test-single @blocksense/avm-relayer
   yarn workspace @blocksense/e2e-tests run test:unit
