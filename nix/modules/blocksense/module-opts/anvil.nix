@@ -22,8 +22,8 @@ in
     };
 
     chain-id = mkOption {
-      type = types.int;
-      default = 99999999999;
+      type = types.nullOr types.int;
+      default = null;
       description = "The chain ID to use for the Anvil instance.";
     };
 
@@ -36,16 +36,19 @@ in
     command = mkOption {
       type = types.str;
       readOnly = true;
-      default = ''
-        ${config.package}/bin/anvil \
-          --port ${toString config.port} \
-          --chain-id ${toString config.chain-id} \
-          --auto-impersonate \
-          --prune-history \
-      ''
-      + lib.optionalString (config.fork-url != null) ''
-        --fork-url ${config.fork-url}
-      '';
+      default =
+        ''
+          ${config.package}/bin/anvil \
+            --port ${toString config.port} \
+            --auto-impersonate \
+            --prune-history \
+        ''
+        + lib.optionalString (config.fork-url != null) ''
+          --fork-url ${config.fork-url} \
+        ''
+        + lib.optionalString (config.chain-id != null) ''
+          --chain-id ${toString config.chain-id}
+        '';
     };
   };
 }
