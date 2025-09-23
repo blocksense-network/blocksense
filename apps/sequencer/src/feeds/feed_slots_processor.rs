@@ -13,7 +13,7 @@ use blocksense_feed_registry::{aggregate::FeedAggregate, registry::FeedReports};
 use blocksense_feeds_processing::utils::{consume_reports, ConsumedReports};
 use blocksense_metrics::{inc_metric, metrics::FeedsMetrics};
 use blocksense_utils::time::current_unix_time;
-use blocksense_utils::FeedId;
+use blocksense_utils::EncodedFeedId;
 use eyre::{eyre, ContextCompat, Result};
 use std::sync::Arc;
 use std::time::Duration;
@@ -24,11 +24,11 @@ use tracing::{debug, info};
 
 pub struct FeedSlotsProcessor {
     name: String,
-    key: FeedId,
+    key: EncodedFeedId,
 }
 
 impl FeedSlotsProcessor {
-    pub fn new(name: String, key: FeedId) -> FeedSlotsProcessor {
+    pub fn new(name: String, key: EncodedFeedId) -> FeedSlotsProcessor {
         FeedSlotsProcessor { name, key }
     }
 
@@ -45,18 +45,19 @@ impl FeedSlotsProcessor {
 
     async fn get_reports_for_feed(
         &self,
-        feed_id: FeedId,
+        encoded_feed_id: EncodedFeedId,
         reports: &Arc<RwLock<AllFeedsReports>>,
     ) -> Option<Arc<RwLock<FeedReports>>> {
-        debug!("Get a read lock on all reports [feed {feed_id}]");
-        let result: Option<Arc<RwLock<FeedReports>>> = match reports.read().await.get(feed_id) {
-            Some(x) => Some(x),
-            None => {
-                info!("No reports found!");
-                None
-            }
-        };
-        debug!("Release the read lock on all reports [feed {feed_id}]");
+        debug!("Get a read lock on all reports [feed {encoded_feed_id}]");
+        let result: Option<Arc<RwLock<FeedReports>>> =
+            match reports.read().await.get(encoded_feed_id) {
+                Some(x) => Some(x),
+                None => {
+                    info!("No reports found!");
+                    None
+                }
+            };
+        debug!("Release the read lock on all reports [feed {encoded_feed_id}]");
         result
     }
 
@@ -386,6 +387,7 @@ pub mod tests {
     use blocksense_feed_registry::types::test_payload_from_result;
     use blocksense_feed_registry::types::FeedMetaData;
     use blocksense_utils::test_env::get_test_private_key_path;
+    use blocksense_utils::FeedId;
     use std::sync::Arc;
     use std::time::{Duration, SystemTime, UNIX_EPOCH};
     use tokio::sync::RwLock;
@@ -400,7 +402,8 @@ pub mod tests {
         match received {
             Ok(Some(vote)) => {
                 assert_eq!(
-                    feed_id, vote.update.feed_id,
+                    EncodedFeedId::new(feed_id, 0),
+                    vote.update.encoded_feed_id,
                     "The key does not match the expected value"
                 );
                 assert_eq!(vote.update.value, original_report_data);
@@ -492,7 +495,7 @@ pub mod tests {
                 .write()
                 .await
                 .push(
-                    feed_id,
+                    EncodedFeedId::new(feed_id, 0),
                     reporter_id,
                     test_payload_from_result(Ok(original_report_data.clone())),
                 )
@@ -505,11 +508,12 @@ pub mod tests {
         let feed_metadata_arc_clone = Arc::clone(&feed_metadata_arc);
         {
             let mut history_guard = history.write().await;
-            history_guard.register_feed(feed_id, 10_000);
+            history_guard.register_feed(EncodedFeedId::new(feed_id, 0), 10_000);
         }
 
         tokio::spawn(async move {
-            let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
+            let feed_slots_processor =
+                FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
             let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
 
             feed_slots_processor
@@ -581,7 +585,7 @@ pub mod tests {
                 .write()
                 .await
                 .push(
-                    feed_id,
+                    EncodedFeedId::new(feed_id, 0),
                     reporter_id,
                     test_payload_from_result(Ok(original_report_data.clone())),
                 )
@@ -596,7 +600,8 @@ pub mod tests {
             Arc::new(RwLock::new(FeedAggregateHistory::new()));
         let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
         tokio::spawn(async move {
-            let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
+            let feed_slots_processor =
+                FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
             feed_slots_processor
                 .start_loop(
                     &sequencer_state,
@@ -623,7 +628,7 @@ pub mod tests {
                 .write()
                 .await
                 .push(
-                    feed_id,
+                    EncodedFeedId::new(feed_id, 0),
                     reporter_id,
                     test_payload_from_result(Ok(original_report_data.clone())),
                 )
@@ -699,7 +704,7 @@ pub mod tests {
                 .write()
                 .await
                 .push(
-                    feed_id,
+                    EncodedFeedId::new(feed_id, 0),
                     reporter_id,
                     test_payload_from_result(Ok(original_report_data.clone())),
                 )
@@ -712,11 +717,12 @@ pub mod tests {
         let feed_metadata_arc_clone = Arc::clone(&feed_metadata_arc);
         {
             let mut history_guard = history.write().await;
-            history_guard.register_feed(feed_id, 10_000);
+            history_guard.register_feed(EncodedFeedId::new(feed_id, 0), 10_000);
         }
 
         tokio::spawn(async move {
-            let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
+            let feed_slots_processor =
+                FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
             let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
 
             feed_slots_processor
@@ -788,7 +794,7 @@ pub mod tests {
                 .write()
                 .await
                 .push(
-                    feed_id,
+                    EncodedFeedId::new(feed_id, 0),
                     reporter_id,
                     test_payload_from_result(Ok(original_report_data.clone())),
                 )
@@ -801,30 +807,31 @@ pub mod tests {
         let feed_metadata_arc_clone = Arc::clone(&feed_metadata_arc);
         {
             let mut history_guard = history.write().await;
-            history_guard.register_feed(feed_id, 10_000);
+            history_guard.register_feed(EncodedFeedId::new(feed_id, 0), 10_000);
             let since_the_epoch = first_report_start_time
                 .duration_since(UNIX_EPOCH)
                 .expect("Time went backwards");
             let slot_start_in_ms = since_the_epoch.as_millis();
             history_guard.push_next(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedType::Numerical(130.0),
                 slot_start_in_ms + report_interval_ms as u128,
             );
             history_guard.push_next(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedType::Numerical(120.0),
                 slot_start_in_ms + 2 * report_interval_ms as u128,
             );
             history_guard.push_next(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedType::Numerical(102.0),
                 slot_start_in_ms + 3 * report_interval_ms as u128,
             );
         }
 
         tokio::spawn(async move {
-            let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
+            let feed_slots_processor =
+                FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
             let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
 
             feed_slots_processor
@@ -896,7 +903,7 @@ pub mod tests {
                 .write()
                 .await
                 .push(
-                    feed_id,
+                    EncodedFeedId::new(feed_id, 0),
                     reporter_id,
                     test_payload_from_result(Ok(original_report_data.clone())),
                 )
@@ -909,30 +916,31 @@ pub mod tests {
         let feed_metadata_arc_clone = Arc::clone(&feed_metadata_arc);
         {
             let mut history_guard = history.write().await;
-            history_guard.register_feed(feed_id, 10_000);
+            history_guard.register_feed(EncodedFeedId::new(feed_id, 0), 10_000);
             let since_the_epoch = first_report_start_time
                 .duration_since(UNIX_EPOCH)
                 .expect("Time went backwards");
             let slot_start_in_ms = since_the_epoch.as_millis();
             history_guard.push_next(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedType::Numerical(130.0),
                 slot_start_in_ms + report_interval_ms as u128,
             );
             history_guard.push_next(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedType::Numerical(120.0),
                 slot_start_in_ms + 2 * report_interval_ms as u128,
             );
             history_guard.push_next(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedType::Numerical(102.0),
                 slot_start_in_ms + 3 * report_interval_ms as u128,
             );
         }
 
         tokio::spawn(async move {
-            let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
+            let feed_slots_processor =
+                FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
             let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
 
             feed_slots_processor
@@ -1003,7 +1011,7 @@ pub mod tests {
                 .write()
                 .await
                 .push(
-                    feed_id,
+                    EncodedFeedId::new(feed_id, 0),
                     reporter_id,
                     test_payload_from_result(Ok(original_report_data.clone())),
                 )
@@ -1016,20 +1024,21 @@ pub mod tests {
         let feed_metadata_arc_clone = Arc::clone(&feed_metadata_arc);
         {
             let mut history_guard = history.write().await;
-            history_guard.register_feed(feed_id, 10_000);
+            history_guard.register_feed(EncodedFeedId::new(feed_id, 0), 10_000);
             let since_the_epoch = first_report_start_time
                 .duration_since(UNIX_EPOCH)
                 .expect("Time went backwards");
             let slot_start_in_ms = since_the_epoch.as_millis();
             history_guard.push_next(
-                feed_id,
+                EncodedFeedId::new(feed_id, 0),
                 FeedType::Numerical(102.1),
                 slot_start_in_ms + report_interval_ms as u128,
             );
         }
 
         tokio::spawn(async move {
-            let feed_slots_processor = FeedSlotsProcessor::new(name, feed_id);
+            let feed_slots_processor =
+                FeedSlotsProcessor::new(name, EncodedFeedId::new(feed_id, 0));
             let (cmd_send, cmd_recv) = mpsc::unbounded_channel();
             feed_slots_processor
                 .start_loop(

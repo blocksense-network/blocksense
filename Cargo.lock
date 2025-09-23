@@ -2355,6 +2355,8 @@ dependencies = [
  "dirs 6.0.0",
  "hex",
  "once_cell",
+ "serde 1.0.217",
+ "ssz_rs",
  "tokio",
  "tracing",
  "tracing-subscriber",
