@@ -2375,6 +2375,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "bridgetree"
+version = "0.7.0"
+source = "git+https://github.com/zcash/incrementalmerkletree#8bab449ebd6c3ce610b827afaa3b30584a36f3c9"
+dependencies = [
+ "incrementalmerkletree 0.8.2 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "brotli"
 version = "6.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5175,6 +5183,23 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.100",
+]
+
+[[package]]
+name = "incrementalmerkletree"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "30821f91f0fa8660edca547918dc59812893b497d07c1144f326f07fdd94aba9"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "incrementalmerkletree"
+version = "0.8.2"
+source = "git+https://github.com/zcash/incrementalmerkletree#8bab449ebd6c3ce610b827afaa3b30584a36f3c9"
+dependencies = [
+ "either",
 ]
 
 [[package]]
@@ -9115,12 +9140,14 @@ dependencies = [
  "blocksense-metrics",
  "blocksense-registry",
  "blocksense-utils",
+ "bridgetree",
  "bytes",
  "chrono",
  "console-subscriber",
  "eyre",
  "futures",
  "futures-util",
+ "incrementalmerkletree 0.8.2 (git+https://github.com/zcash/incrementalmerkletree)",
  "once_cell",
  "paste",
  "pprof",
