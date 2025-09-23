@@ -434,6 +434,42 @@ describe('AggregatedDataFeedStore', () => {
     ).to.be.reverted;
   });
 
+  it('Should mod ring buffer index by 2^13 - 1 when writing to the ring buffer table', async () => {
+    const feeds = [
+      {
+        id: 1n,
+        index: 8195n, // 8195 mod 8192 = 3
+        stride: 0n,
+        data: '0x1234',
+      },
+      {
+        id: 2n,
+        index: 8196n, // 8196 mod 8192 = 4
+        stride: 0n,
+        data: '0x5678',
+      },
+      {
+        id: 10n,
+        index: 8191n,
+        stride: 0n,
+        data: '0x5678',
+      },
+      {
+        id: 15n,
+        index: 8192n,
+        stride: 0n,
+        data: '0x5678',
+      },
+    ];
+
+    await contract.setFeeds(sequencer, feeds);
+    const rbIndices = await contract.getValues(sequencer, feeds, {
+      operations: feeds.map(_ => ReadOp.GetLatestIndex),
+    });
+
+    expect(rbIndices.map(BigInt)).to.deep.equal([3n, 4n, 8191n, 0n]);
+  });
+
   it('Should read from contract multiple slots', async () => {
     const feeds = generateRandomFeeds(15);
 
