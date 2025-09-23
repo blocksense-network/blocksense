@@ -33,6 +33,12 @@ in
       description = "The fork URL to use for the Anvil instance.";
     };
 
+    auto-impersonate = mkOption {
+      type = types.bool;
+      default = true;
+      description = "Enables automatic impersonation on startup. This allows any transaction sender to be simulated as different accounts, which is useful for testing contract behavior";
+    };
+
     command = mkOption {
       type = types.str;
       readOnly = true;
@@ -40,8 +46,10 @@ in
         ${config.package}/bin/anvil \
           --port ${toString config.port} \
           --chain-id ${toString config.chain-id} \
-          --auto-impersonate \
           --prune-history \
+      ''
+      + lib.optionalString config.auto-impersonate ''
+        --auto-impersonate \
       ''
       + lib.optionalString (config.fork-url != null) ''
         --fork-url ${config.fork-url}
