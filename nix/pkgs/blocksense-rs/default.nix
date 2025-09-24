@@ -40,13 +40,6 @@ let
     ]
     ++ lib.optionals stdenv.isDarwin [
       iconv
-
-      darwin.apple_sdk.frameworks.Security
-      darwin.apple_sdk.frameworks.AppKit
-
-      # Used by ggml / llama.cpp
-      darwin.apple_sdk.frameworks.Accelerate
-
       curl
     ];
 
