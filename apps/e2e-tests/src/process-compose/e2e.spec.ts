@@ -233,7 +233,9 @@ describe.sequential('E2E Tests with process-compose', () => {
       // Make sure that the feeds info is updated
       for (const [id, data] of entriesOf(currentFeedsInfo)) {
         const { round, value } = data;
-        expect(round).toBeGreaterThan(initialFeedsInfo[id].round);
+        const initialRound =
+          initialFeedsInfo[id].round % MAX_HISTORY_ELEMENTS_PER_FEED;
+        expect(round).toBeGreaterThan(initialRound);
         // Pegged asset with 10% tolerance should be pegged
         // Pegged asset with 0.000001% tolerance should not be pegged
         if (id === '50000') {
@@ -243,7 +245,7 @@ describe.sequential('E2E Tests with process-compose', () => {
         expect(value).not.toEqual(initialFeedsInfo[id].value);
 
         const actualData = historyData.aggregate_history[id].find(
-          feed => feed.update_number === round - initialFeedsInfo[id].round - 1,
+          feed => feed.update_number === round - initialRound - 1,
         );
         const decimals = feedsConfig.feeds.find(f => f.id.toString() === id)!
           .additional_feed_info.decimals;
