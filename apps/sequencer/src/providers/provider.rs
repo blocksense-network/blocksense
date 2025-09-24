@@ -124,8 +124,56 @@ pub struct RpcProvider {
     pub rpc_url: Url,
     pub rb_indices: RoundBufferIndices,
     num_tx_in_progress: u32,
-    non_finalized_updates: HashMap<u64, BatchOfUpdatesToProcess>,
+    pub inflight: InflightObservations,
+}
+
+// Holds information tied to blocks that may be reorged (non-finalized)
+#[derive(Default)]
+pub struct InflightObservations {
+    pub non_finalized_updates: HashMap<u64, BatchOfUpdatesToProcess>,
     pub observed_block_hashes: HashMap<u64, B256>,
+}
+
+impl InflightObservations {
+    pub fn new() -> Self {
+        Self {
+            non_finalized_updates: HashMap::new(),
+            observed_block_hashes: HashMap::new(),
+        }
+    }
+
+    pub fn insert_non_finalized_update(&mut self, block_height: u64, cmd: BatchOfUpdatesToProcess) {
+        self.non_finalized_updates.insert(block_height, cmd);
+    }
+
+    pub fn prune_observed_up_to(&mut self, finalized_block: u64) -> usize {
+        // 1) Prune cached updates up to finalized
+        let keys_to_remove: Vec<u64> = self
+            .non_finalized_updates
+            .keys()
+            .cloned()
+            .filter(|k| *k <= finalized_block)
+            .collect();
+        let removed = keys_to_remove.len();
+        for k in keys_to_remove {
+            self.non_finalized_updates.remove(&k);
+        }
+        // 2) Also prune cached block hashes up to finalized
+        let hash_keys_to_remove: Vec<u64> = self
+            .observed_block_hashes
+            .keys()
+            .cloned()
+            .filter(|k| *k <= finalized_block)
+            .collect();
+        for k in hash_keys_to_remove {
+            self.observed_block_hashes.remove(&k);
+        }
+        removed
+    }
+
+    pub fn insert_observed_block_hash(&mut self, block_height: u64, hash: B256) {
+        self.observed_block_hashes.insert(block_height, hash);
+    }
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -358,8 +406,7 @@ impl RpcProvider {
             rpc_url,
             rb_indices: RoundBufferIndices::new(),
             num_tx_in_progress: 0,
-            non_finalized_updates: HashMap::new(),
-            observed_block_hashes: HashMap::new(),
+            inflight: InflightObservations::new(),
         }
     }
 
@@ -854,36 +901,15 @@ impl RpcProvider {
     }
 
     pub fn insert_non_finalized_update(&mut self, block_height: u64, cmd: BatchOfUpdatesToProcess) {
-        self.non_finalized_updates.insert(block_height, cmd);
+        self.inflight.insert_non_finalized_update(block_height, cmd)
     }
 
     pub fn prune_observed_up_to(&mut self, finalized_block: u64) -> usize {
-        // 1) Prune cached updates up to finalized
-        let keys_to_remove: Vec<u64> = self
-            .non_finalized_updates
-            .keys()
-            .cloned()
-            .filter(|k| *k <= finalized_block)
-            .collect();
-        let removed = keys_to_remove.len();
-        for k in keys_to_remove {
-            self.non_finalized_updates.remove(&k);
-        }
-        // 2) Also prune cached block hashes up to finalized
-        let hash_keys_to_remove: Vec<u64> = self
-            .observed_block_hashes
-            .keys()
-            .cloned()
-            .filter(|k| *k <= finalized_block)
-            .collect();
-        for k in hash_keys_to_remove {
-            self.observed_block_hashes.remove(&k);
-        }
-        removed
+        self.inflight.prune_observed_up_to(finalized_block)
     }
 
     pub fn insert_observed_block_hash(&mut self, block_height: u64, hash: B256) {
-        self.observed_block_hashes.insert(block_height, hash);
+        self.inflight.insert_observed_block_hash(block_height, hash)
     }
 }
 

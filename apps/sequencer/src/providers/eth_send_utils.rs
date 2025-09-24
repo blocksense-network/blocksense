@@ -317,7 +317,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                         let provider = provider_mutex.lock().await;
                         (
                             provider.provider.clone(),
-                            provider.observed_block_hashes.clone(),
+                            provider.inflight.observed_block_hashes.clone(),
                         )
                     };
 
