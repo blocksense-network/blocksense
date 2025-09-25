@@ -807,9 +807,9 @@ impl RpcProvider {
             .with_chain_id(chain_id)
             .with_deploy_code(bytecode);
 
-        let gas_limit = get_gas_limit(network.as_str(), provider, &tx, 30).await;
-
-        tx = tx.with_gas_limit(gas_limit);
+        if let Some(gas_limit) = get_gas_limit(network.as_str(), provider, &tx, 30).await {
+            tx = tx.with_gas_limit(gas_limit);
+        }
 
         match gas_fees {
             GasFees::Legacy(gas_price) => {
@@ -1074,9 +1074,9 @@ async fn perform_post_deployment_transaction(
         //  .with_max_fee_per_gas(30_000_000_000)
         //  .with_max_priority_fee_per_gas(2_000_000_000);
 
-        let gas_limit = get_gas_limit(net, provider, &tx, 5 * 60).await;
-
-        tx = tx.with_gas_limit(gas_limit);
+        if let Some(gas_limit) = get_gas_limit(net, provider, &tx, 5 * 60).await {
+            tx = tx.with_gas_limit(gas_limit);
+        }
 
         match gas_fees {
             GasFees::Legacy(gas_price) => {
