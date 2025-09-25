@@ -461,7 +461,11 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                         );
                                     }
                                 }
+                            } else {
+                                warn!("Could not get contract's address for network: {net}");
                             }
+                        } else {
+                            warn!("No ADFS contract set for network: {net}");
                         }
                     }
                 };
@@ -469,28 +473,11 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                 // 3) If we detected divergence, resync round-buffer indices from chain
                 if need_resync_indices {
                     let mut provider = provider_mutex.lock().await;
-                    let keys: Vec<EncodedFeedId> = if provider.rb_indices.is_empty() {
-                        provider.feeds_variants.keys().cloned().collect()
-                    } else {
-                        provider.rb_indices.keys().cloned().collect()
-                    };
-
-                    let mut new_indices = provider.rb_indices.clone();
-                    for encoded_feed_id in keys {
-                        match provider.get_latest_rb_index(&encoded_feed_id).await {
-                            Ok(LatestRBIndex {
-                                encoded_feed_id,
-                                index,
-                            }) => {
-                                new_indices.insert(encoded_feed_id, index as u64);
-                            }
-                            Err(e) => {
-                                warn!("Failed to refresh rb index for feed {encoded_feed_id} in network `{net}`: {e:?}");
-                            }
+                    if let Some(contract) = provider.get_latest_contract() {
+                        if let Some(contract_address) = contract.address {
+                            try_to_sync(net.as_str(), &mut provider, &contract_address, None).await;
                         }
                     }
-                    provider.rb_indices = new_indices;
-                    debug!("Refreshed rb indices from chain for `{net}`");
                 }
             } else {
                 info!("Terminating reorg tracker for network {net} since it no longer has an active provider!");
@@ -678,14 +665,15 @@ pub async fn eth_batch_send_to_contract(
         {
             Ok(latest_nonce) => {
                 if latest_nonce > nonce {
+                    // If the nonce in the contract increased and the next state root hash is not as we expect,
+                    // another sequencer was able to post updates for the current block height before this one.
+                    // We need to take this into account and reread the round counters of the feeds.
+                    info!("Updates to contract already posted, network {net}, block_height {block_height}, latest_nonce {latest_nonce}, previous_nonce {nonce}, merkle_root in contract {prev_calldata_merkle_tree_root:?}");
                     try_to_sync(
                         net.as_str(),
                         &mut provider,
                         &contract_address,
-                        block_height,
-                        &next_calldata_merkle_tree_root,
-                        latest_nonce,
-                        nonce,
+                        Some(&next_calldata_merkle_tree_root),
                     )
                     .await;
                     return Ok(("true".to_string(), feeds_to_update_ids));
@@ -841,14 +829,12 @@ pub async fn eth_batch_send_to_contract(
                     Err(err) => {
                         warn!("Error while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
                         if err.to_string().contains("execution revert") {
+                            info!("Trying to sync due to tx revert, network {net}, block_height {block_height}, latest_nonce {latest_nonce}, previous_nonce {nonce}, merkle_root in contract {prev_calldata_merkle_tree_root:?}");
                             try_to_sync(
                                 net.as_str(),
                                 &mut provider,
                                 &contract_address,
-                                block_height,
-                                &next_calldata_merkle_tree_root,
-                                latest_nonce,
-                                nonce,
+                                Some(&next_calldata_merkle_tree_root),
                             )
                             .await;
                             return Ok(("false".to_string(), feeds_to_update_ids));
@@ -1037,10 +1023,7 @@ async fn try_to_sync(
     net: &str,
     provider: &mut RpcProvider,
     contract_address: &Address,
-    block_height: u64,
-    next_calldata_merkle_tree_root: &HashValue,
-    latest_nonce: u64,
-    previous_nonce: u64,
+    next_calldata_merkle_tree_root: Option<&HashValue>,
 ) {
     let rpc_handle = &provider.provider;
     match rpc_handle
@@ -1048,13 +1031,30 @@ async fn try_to_sync(
         .await
     {
         Ok(root) => {
-            if root != next_calldata_merkle_tree_root.0.into() {
-                // If the nonce in the contract increased and the next state root hash is not as we expect,
-                // another sequencer was able to post updates for the current block height before this one.
-                // We need to take this into account and reread the round counters of the feeds.
-                info!("Updates to contract already posted, network {net}, block_height {block_height}, latest_nonce {latest_nonce}, previous_nonce {previous_nonce}, merkle_root in contract {root}");
+            if next_calldata_merkle_tree_root.is_none_or(|val| root != val.0.into()) {
                 provider.merkle_root_in_contract = Some(HashValue(root.into()));
-                // TODO: Read round counters from contract
+                let keys: Vec<EncodedFeedId> = if provider.rb_indices.is_empty() {
+                    provider.feeds_variants.keys().cloned().collect()
+                } else {
+                    provider.rb_indices.keys().cloned().collect()
+                };
+
+                let mut new_indices = provider.rb_indices.clone();
+                for encoded_feed_id in keys {
+                    match provider.get_latest_rb_index(&encoded_feed_id).await {
+                        Ok(LatestRBIndex {
+                            encoded_feed_id,
+                            index,
+                        }) => {
+                            new_indices.insert(encoded_feed_id, index as u64);
+                        }
+                        Err(e) => {
+                            warn!("Failed to refresh rb index for feed {encoded_feed_id} in network `{net}`: {e:?}");
+                        }
+                    }
+                }
+                provider.rb_indices = new_indices;
+                debug!("Refreshed rb indices from chain for `{net}`");
             }
         }
         Err(e) => {
