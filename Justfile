@@ -5,6 +5,9 @@ process-compose-artifacts-dir := root-dir + "/config/generated/process-compose"
 default:
   @just --list
 
+dev *args:
+  @yarn workspace @blocksense/dev run start {{args}}
+
 [group('Working with devshells')]
 [doc('Switch to a different dev shell environment')]
 change-devshell shell="default":
