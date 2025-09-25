@@ -15,7 +15,7 @@ import { compareGasUsed } from './utils/helpers/compareGasWithExperiments';
 import { generateRandomFeeds } from './utils/helpers/common';
 import {
   decodeADFSCalldata,
-  ParsedCalldata,
+  ParsedCalldataBase,
 } from '../lib/utils/calldata-decoder';
 
 const feeds: Feed[] = [
@@ -642,7 +642,7 @@ describe('ADFS input parser', () => {
       ...new Set(feeds.map(feed => (2n ** 115n * feed.stride + feed.id) / 16n)),
     ].sort((a, b) => Number(a - b));
 
-    const expectedRingBufferTable: ParsedCalldata['ringBufferTable'] = [];
+    const expectedRingBufferTable: ParsedCalldataBase['ringBufferTable'] = [];
     for (const rowIndex of rowIndices) {
       const slot = await sequencer.provider.getStorage(
         contract.contract.target,
