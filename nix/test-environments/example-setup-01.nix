@@ -21,7 +21,7 @@ let
 in
 {
   services.kafka = {
-    enable = true;
+    enable = false;
   };
   services.blocksense = {
     enable = true;
