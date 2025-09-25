@@ -1,4 +1,4 @@
-type ParsedCalldataBase = {
+export type ParsedCalldataBase = {
   feedsLength: bigint;
   feeds: {
     stride: bigint;
