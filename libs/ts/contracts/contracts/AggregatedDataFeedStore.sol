@@ -60,7 +60,12 @@ contract AggregatedDataFeedStore {
         let feedId := shr(136, shl(16, selector))
         // ensure feedId is in range [0-2**115) and stride is in range [0-32)
         if or(gt(feedId, 0x7ffffffffffffffffffffffffffff), gt(stride, 31)) {
-          revert(0, 0)
+          // Invalid feedId or stride
+          mstore(
+            0x00,
+            0x496e76616c696420666565644964206f72207374726964650000000000000000
+          )
+          revert(0x00, 0x20)
         }
 
         let data := calldataload(17)
@@ -75,7 +80,12 @@ contract AggregatedDataFeedStore {
 
           // ensure index is in range [0-8192)
           if gt(index, 0x1fff) {
-            revert(0, 0)
+            // Invalid ring buffer index
+            mstore(
+              0x00,
+              0x496e76616c69642072696e672062756666657220696e64657800000000000000
+            )
+            revert(0x00, 0x20)
           }
 
           // base feed index: (feedId * 2**13) * 2**stride
@@ -103,7 +113,12 @@ contract AggregatedDataFeedStore {
 
             // ensure the caller is not trying to read past the end of the feed
             if gt(add(startDataIndex, sub(strideSlots, 1)), lastFeedIndex) {
-              revert(0, 0)
+              // Cannot read past end of feed
+              mstore(
+                0x00,
+                0x43616e6e6f742072656164207061737420656e64206f66206665656400000000
+              )
+              revert(0x00, 0x20)
             }
           }
 
@@ -208,7 +223,12 @@ contract AggregatedDataFeedStore {
 
             // ensure the caller is not trying to read past the end of the feed
             if gt(add(startDataIndex, sub(strideSlots, 1)), lastFeedIndex) {
-              revert(0, 0)
+              // Cannot read past end of feed
+              mstore(
+                0x00,
+                0x43616e6e6f742072656164207061737420656e64206f66206665656400000000
+              )
+              revert(0x00, 0x20)
             }
           }
 
@@ -258,7 +278,12 @@ contract AggregatedDataFeedStore {
 
       // revert if call failed or caller not authorized
       if iszero(and(success, mload(ptr))) {
-        revert(0, 0)
+        // AccessControl call failed
+        mstore(
+          0x00,
+          0x416363657373436f6e74726f6c2063616c6c206661696c656400000000000000
+        )
+        revert(0x00, 0x20)
       }
 
       mstore(ptr, 0)
@@ -275,7 +300,12 @@ contract AggregatedDataFeedStore {
 
         // ensure it is strictly increasing
         if eq(gt(newBlockNumber, prevBlockNumber), 0) {
-          revert(0x00, 0x00)
+          // Invalid new block number
+          mstore(
+            0x00,
+            0x496e76616c6964206e657720626c6f636b206e756d6265720000000000000000
+          )
+          revert(0x00, 0x20)
         }
         sstore(0x00, newBlockNumber)
 
@@ -315,7 +345,12 @@ contract AggregatedDataFeedStore {
           let metadata := calldataload(pointer)
           let stride := byte(0, metadata)
           if gt(stride, 31) {
-            revert(0, 0)
+            // Invalid stride
+            mstore(
+              0x00,
+              0x496e76616c696420737472696465000000000000000000000000000000000000
+            )
+            revert(0x00, 0x20)
           }
           // get correct stride address based on provided stride
           let strideAddress := shl(stride, DATA_FEED_ADDRESS)
@@ -351,7 +386,12 @@ contract AggregatedDataFeedStore {
             // maxWriteAddress: next stride address - current stride address - 1
             sub(sub(shl(add(stride, 1), DATA_FEED_ADDRESS), strideAddress), 1)
           ) {
-            revert(0, 0)
+            // Writing outside stride space
+            mstore(
+              0x00,
+              0x57726974696e67206f7574736964652073747269646520737061636500000000
+            )
+            revert(0x00, 0x20)
           }
 
           // store full 32 bytes data
@@ -411,7 +451,12 @@ contract AggregatedDataFeedStore {
           let slot := shr(sub(256, shl(3, indexLength)), shl(8, indexTableData))
           // slot must always be less than 2**116
           if gt(slot, 0xfffffffffffffffffffffffffffff) {
-            revert(0, 0)
+            // Invalid ring buffer slot
+            mstore(
+              0x00,
+              0x496e76616c69642072696e672062756666657220736c6f740000000000000000
+            )
+            revert(0x00, 0x20)
           }
 
           // update pointer to start start of index data
@@ -432,7 +477,12 @@ contract AggregatedDataFeedStore {
         return(0x00, 0x00)
       }
 
-      revert(0x00, 0x00)
+      // Invalid selector
+      mstore(
+        0x00,
+        0x496e76616c69642073656c6563746f7200000000000000000000000000000000
+      )
+      revert(0x00, 0x20)
     }
   }
 }
