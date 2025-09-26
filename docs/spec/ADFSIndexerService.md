@@ -275,13 +275,13 @@ CREATE TABLE processing_state (
 
 ### 4.4 Ring buffer addressing (for random reads)
 
-- Given `(feedId, indexWithinFeed, stride)`, compute the global **table index**:
+- Given `(feedId, stride)`, compute the global **table index**:
 
   ```
-  feedIndex = ((feedId << 13) + indexWithinFeed) << stride
+  table_index = (2 ** 115 * stride + feedId) / 16
   ```
 
-- To support **random historical reads**, queries compute that `feedIndex` and look up in `ring_buffer_writes (table_index)`.
+- To support **random historical reads**, queries compute that `table_index` and look up in `ring_buffer_writes (table_index)`.
 - We index `ring_buffer_writes` on `(chain_id, table_index, block_number DESC)` to get newest‑first results for any slot.
 
 ---
@@ -572,7 +572,7 @@ ORDER BY block_number, log_index;
 - **Ring buffer random read**:
 
 ```sql
--- Compute table_index in app: ((feedId << 13) + indexWithinFeed) << stride
+-- Compute table_index in app: (2 ** 115 * stride + feedId) / 16
 SELECT block_number, block_timestamp, data
 FROM   ring_buffer_writes
 WHERE  chain_id = $1 AND table_index = $2
@@ -686,7 +686,7 @@ interface FeedUpdateRow {
   version: number;
   stride: number;
   feedId: bigint; // convert to BIT(128) on insert
-  feedIndex: number; // u16
+  rbIndex: number; // u16
   data: `0x${string}`;
   extra: Record<string, unknown>;
 }
@@ -1334,7 +1334,7 @@ For an ordered batch belonging to one **block**:
 
 ## 14) Testing Strategy
 
-- **Unit**: decoding (`decodeADFSCalldata`) incl. stride/feedIndex derivations; version profile selection.
+- **Unit**: decoding (`decodeADFSCalldata`) incl. stride/table_index derivations; version profile selection.
 - **Integration**: viem (HTTP/WS) ↔ DB; end‑to‑end ingestion with a local devnet.
 - **Reorg simulation**: forked chain that rewinds < confirmations to verify `pending → dropped` and stability of `confirmed`.
 - **Load**: synthetic logs to validate QPS, queue backpressure, and batch write performance.
