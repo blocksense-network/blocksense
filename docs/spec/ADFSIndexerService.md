@@ -238,6 +238,7 @@ CREATE TABLE feed_latest (
   block_hash      BYTEA   NOT NULL,
   tx_hash         BYTEA   NOT NULL,
   log_index       INTEGER NOT NULL,
+  rb_index        SMALLINT NOT NULL,
   data            BYTEA NOT NULL,
   version         INTEGER NOT NULL,
   PRIMARY KEY (chain_id, feed_id, stride)
@@ -268,7 +269,7 @@ CREATE TABLE processing_state (
 
 ### 4.3 Latest maintenance
 
-- On **confirm** of a `feed_updates` row, perform an **UPSERT** into `feed_latest` keyed by `(chain_id, feed_id, stride)`, choosing the max `(block_number, log_index)` if there’s contention.
+- On **confirm** of a `feed_updates` row, perform an **UPSERT** into `feed_latest` keyed by `(chain_id, feed_id, stride)`, choosing the max `(block_number, log_index, rb_index)` if there’s contention.
 - `feed_latest` contains **confirmed rows only** and stores the last `block_timestamp` for recency filters.
 - Consumers may apply an optional "active since X days" filter using `block_timestamp ≥ now() - interval 'X days'`.
 
@@ -450,8 +451,8 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
 
 ```sql
 INSERT INTO feed_latest AS fl
-(chain_id, feed_id, stride, block_number, block_timestamp, block_hash, tx_hash, log_index, data, version)
-VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
+(chain_id, feed_id, stride, block_number, block_timestamp, block_hash, tx_hash, log_index, rb_index, data, version)
+VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
 ON CONFLICT (chain_id, feed_id, stride)
 DO UPDATE SET
   block_number = EXCLUDED.block_number,
@@ -459,9 +460,11 @@ DO UPDATE SET
   block_hash   = EXCLUDED.block_hash,
   tx_hash      = EXCLUDED.tx_hash,
   log_index    = EXCLUDED.log_index,
+  rb_index     = EXCLUDED.rb_index,
   data         = EXCLUDED.data,
   version      = EXCLUDED.version
-WHERE (fl.block_number, fl.log_index) < (EXCLUDED.block_number, EXCLUDED.log_index);
+WHERE (fl.block_number, fl.log_index, fl.rb_index)
+    < (EXCLUDED.block_number, EXCLUDED.log_index, EXCLUDED.rb_index);
 ```
 
 - **Idempotency**:
@@ -1100,7 +1103,7 @@ For an ordered batch belonging to one **block**:
 3. Insert/Upsert `feed_updates` rows (one per decoded feed) with `state=pending`.
 4. Insert/Upsert `ring_buffer_updates` rows (one per table entry) with `state=pending`.
 5. Flip **`pending → confirmed`** if `block_number ≤ last_safe_block`, else stay pending. (Writers check `FinalityManager`.)
-6. For rows confirmed in this block, **UPSERT** `feed_latest` on `(chain_id, feed_id, stride)` with the pointer `(block_number, log_index, tx_hash, ring_index, data, version, extra)`.
+6. For rows confirmed in this block, **UPSERT** `feed_latest` on `(chain_id, feed_id, stride)` with the pointer `(block_number, log_index, rb_index, tx_hash, data, version)`.
 7. Commit.
 
 ### 5.5 Reorgs
