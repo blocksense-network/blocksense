@@ -125,7 +125,7 @@ Below is a complete, implementation-ready **software specification** for your mu
 All binary data uses **BYTEA**. Addresses are stored as 20‑byte `BYTEA`. Timestamps as `TIMESTAMPTZ`. Integers:
 
 - `feed_id`: **BIT(128)** (per your choice).
-- `feed_index` (ring buffer index **within feed**): `SMALLINT` (u16).
+- `rb_index` (ring buffer index **within feed**): `SMALLINT` (u16).
 - Global `ring_buffer_table_index`: `BIGINT`.
 - `stride`: `SMALLINT`.
 - `block_number`: `BIGINT`.
@@ -199,10 +199,10 @@ CREATE TABLE feed_updates (
   version         INTEGER NOT NULL,
   stride          SMALLINT NOT NULL,
   feed_id         BIT(128) NOT NULL,
-  feed_index      SMALLINT NOT NULL,          -- ring buffer index within feed (u16)
+  rb_index        SMALLINT NOT NULL,          -- ring buffer index within feed (u16)
   data            BYTEA NOT NULL,
   extra           JSONB   NOT NULL DEFAULT '{}'::jsonb,
-  PRIMARY KEY (chain_id, tx_hash, log_index, feed_id, feed_index)
+  PRIMARY KEY (chain_id, tx_hash, log_index, feed_id, rb_index)
 ) PARTITION BY LIST (chain_id);
 
 CREATE INDEX feed_updates_idx_latest
@@ -467,7 +467,8 @@ WHERE (fl.block_number, fl.log_index) < (EXCLUDED.block_number, EXCLUDED.log_ind
 - **Idempotency**:
 
   - `adfs_events`: `PRIMARY KEY (chain_id, tx_hash, log_index)`.
-  - `feed_updates`: add composite PK including `feed_id` and `feed_index`.
+
+- `feed_updates`: add composite PK including `feed_id` and `rb_index`.
   - `ring_buffer_writes`: PK includes `table_index`.
 
 ---
