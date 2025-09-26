@@ -138,8 +138,9 @@ const main = async (): Promise<void> => {
       const balance = web3.utils.fromWei(balanceWei, 'ether');
       const { currency } = networkMetadata[networkName];
       console.log(
-        (balanceWei === 0n ? c`{grey` : c`{green`) +
-          ` ${networkName}: ${balance} ${currency}}`,
+        balanceWei === 0n
+          ? c`{grey ${networkName}: ${balance} ${currency}}`
+          : c`{green ${networkName}: ${balance} ${currency}}`,
       );
       if (balanceGauge) {
         balanceGauge.set(

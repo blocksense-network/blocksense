@@ -36,17 +36,16 @@ in
     command = mkOption {
       type = types.str;
       readOnly = true;
-      default =
-        ''
-          ${config.package}/bin/anvil \
-            --port ${toString config.port} \
-            --chain-id ${toString config.chain-id} \
-            --auto-impersonate \
-            --prune-history \
-        ''
-        + lib.optionalString (config.fork-url != null) ''
-          --fork-url ${config.fork-url}
-        '';
+      default = ''
+        ${config.package}/bin/anvil \
+          --port ${toString config.port} \
+          --chain-id ${toString config.chain-id} \
+          --auto-impersonate \
+          --prune-history \
+      ''
+      + lib.optionalString (config.fork-url != null) ''
+        --fork-url ${config.fork-url}
+      '';
     };
   };
 }

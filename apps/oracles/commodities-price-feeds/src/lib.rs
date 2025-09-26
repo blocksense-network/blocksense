@@ -8,12 +8,12 @@ use blocksense_data_providers_sdk::price_data::{types::PairsToResults, wap::vwap
 use tracing::info;
 
 use blocksense_sdk::{
-    oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
+    oracle::{get_capabilities_from_settings, DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
 };
 
 use crate::{
-    domain::{get_capabilities_from_settings, get_resources_from_settings},
+    domain::{get_resources_from_settings},
     fetch_prices::get_prices,
     logging::print_results,
 };

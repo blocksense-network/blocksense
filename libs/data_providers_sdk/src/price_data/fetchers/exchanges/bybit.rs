@@ -42,7 +42,7 @@ impl PricesFetcher<'_> for BybitPriceFetcher {
     fn new(_symbols: &[String], _api_keys: Option<HashMap<String, String>>) -> Self {
         Self
     }
-    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<'_, Result<PairPriceData>> {
         async move {
             let response = http_get_json::<BybitPriceResponse>(
                 "https://api.bybit.com/v5/market/tickers",

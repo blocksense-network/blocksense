@@ -20,7 +20,7 @@ pub trait PricesFetcher<'a> {
     const NAME: &'static str;
 
     fn new(symbols: &'a [String], api_keys: Option<HashMap<String, String>>) -> Self;
-    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>>;
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<'_, Result<PairPriceData>>;
 }
 
 pub fn fetch<'a, PF>(

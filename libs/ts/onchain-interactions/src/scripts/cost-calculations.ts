@@ -139,11 +139,11 @@ const logGasCosts = async (
       const daysBalanceWillLast = Number(balance) / (gasCosts.cost1h * 24);
       const balanceMsg = `  Balance of ${balance} ${currency} will last approximately ${daysBalanceWillLast.toFixed(2)} days based on 24-hour costs.`;
       if (daysBalanceWillLast < 10) {
-        console.log(c`{bold red ${balanceMsg}}`);
+        console.log(c`{red ${balanceMsg}}`);
       } else if (daysBalanceWillLast >= 10 && daysBalanceWillLast <= 30) {
-        console.log(c`{bold yellow ${balanceMsg}}`);
+        console.log(c`{yellow ${balanceMsg}}`);
       } else {
-        console.log(c`{bold green ${balanceMsg}}`);
+        console.log(c`{green ${balanceMsg}}`);
       }
 
       if (gauges) {

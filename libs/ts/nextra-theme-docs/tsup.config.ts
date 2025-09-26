@@ -3,7 +3,7 @@ import path from 'node:path';
 import { reactCompilerPlugin } from 'esbuild-react-compiler-plugin';
 import { defineConfig } from 'tsup';
 import { $ } from 'execa';
-import { defaultEntry } from './default-entry.js';
+import { defaultEntry } from './default-entry';
 import packageJson from './package.json';
 
 export default defineConfig({

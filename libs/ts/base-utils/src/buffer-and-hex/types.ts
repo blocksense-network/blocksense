@@ -32,9 +32,9 @@ export const hexString = S.String.pipe(
  * A schema representing an unformatted hexadecimal data string.
  * ref: https://ethereum.org/en/developers/docs/apis/json-rpc/#unformatted-data-encoding
  */
-export const hexDataString = hexString.pipe(
-  S.pattern(/^(0x)?([0-9a-fA-F]{2})*$/),
-  S.brand('Unformatted Data'),
+export const hexDataString = S.TemplateLiteral('0x', S.String).pipe(
+  S.pattern(/^0x([0-9a-fA-F]{2})*$/),
+  S.annotations({ identifier: 'Unformatted Data' }),
 );
 
 /**
@@ -88,11 +88,11 @@ export type Without0x<S extends string> = S extends `0x${infer R}` ? R : S;
  * these two characters are not counted in the byte length. If the length of the hex string is not a multiple of 2,
  * an error is thrown.
  *
- * @param {HexDataString} hex - The hexadecimal data string to calculate the byte length of.
+ * @param {HexDataString | HexString} hex - The hexadecimal data string to calculate the byte length of.
  * @returns {number} The byte length of the hex string.
  * @throws {Error} If the length of the hex string is not a multiple of 2.
  */
-export function byteLength(hex: HexDataString): number {
+export function byteLength(hex: HexDataString | HexString): number {
   if (hex.length % 2 !== 0) {
     throw new Error(
       `Invalid length. Received: string '${hex}' with length ${hex.length}. Expected length to be a multiple of 2`,

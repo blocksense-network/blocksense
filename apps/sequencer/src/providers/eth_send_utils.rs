@@ -2,7 +2,7 @@ use actix_web::{rt::time::interval, web::Data};
 use alloy::{
     hex,
     network::TransactionBuilder,
-    primitives::{Address, Bytes},
+    primitives::{Address, Bytes, U256},
     providers::{Provider, ProviderBuilder},
     rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
@@ -1044,6 +1044,31 @@ pub async fn get_tx_retry_params(
             bail!("Timed out");
         }
     };
+
+    if let Ok(priority_fee_rpc_call) = actix_web::rt::time::timeout(
+        Duration::from_secs(transaction_retry_timeout_secs),
+        rpc_handle
+            .client()
+            .request::<_, U256>("eth_getPriorityFee", ()),
+    )
+    .await
+    {
+        match priority_fee_rpc_call {
+            Ok(priority_fee_value) => {
+                // We only call eth_getPriorityFee to detect EIP-1559 support; the value itself is unused.
+                // Note: some legacy-only nodes expose eth_maxPriorityFeePerGas but not eth_getPriorityFee,
+                // whereas every EIP-1559-capable node provides both calls.
+                debug!("eth_getPriorityFee returned {priority_fee_value} for network {net}");
+            }
+            Err(err) => {
+                debug!("Failed eth_getPriorityFee request for network {net}: {err}");
+                return Ok(GasFees::Legacy(GasPrice { gas_price }));
+            }
+        }
+    } else {
+        debug!("Timed out while calling eth_getPriorityFee for network {net}");
+        bail!("Timed out");
+    }
 
     priority_fee = (priority_fee as f64 * price_increment) as u128;
     let mut max_fee_per_gas = gas_price + gas_price + priority_fee;

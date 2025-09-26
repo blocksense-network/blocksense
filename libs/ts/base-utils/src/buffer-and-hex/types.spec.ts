@@ -33,11 +33,11 @@ describe('`hex-types` tests', () => {
 
   test(`'isHexDataString' tests`, () => {
     expect(isHexDataString('0x')).toBe(true);
-    expect(isHexDataString('')).toBe(true);
+    expect(isHexDataString('')).toBe(false);
     expect(isHexDataString('1')).toBe(false);
-    expect(isHexDataString('12')).toBe(true);
-    expect(isHexDataString('ab')).toBe(true);
-    expect(isHexDataString('AB')).toBe(true);
+    expect(isHexDataString('12')).toBe(false);
+    expect(isHexDataString('ab')).toBe(false);
+    expect(isHexDataString('AB')).toBe(false);
     expect(isHexDataString('ug')).toBe(false);
     expect(isHexDataString('0x12')).toBe(true);
     expect(isHexDataString('0xab')).toBe(true);
@@ -48,9 +48,9 @@ describe('`hex-types` tests', () => {
   test(`'isHexDataString' with min length`, () => {
     expect(isHexDataString('0x', 0)).toBe(true);
     expect(isHexDataString('0x', 2)).toBe(false);
-    expect(isHexDataString('0a', 1)).toBe(true);
-    expect(isHexDataString('0b', 1)).toBe(true);
-    expect(isHexDataString('0b', 2)).toBe(false);
+    // missing '0x' prefix
+    expect(isHexDataString('0a', 1)).toBe(false);
+    expect(isHexDataString('004200', 1)).toBe(false);
   });
 
   test(`'isHexQuantityString' tests`, () => {

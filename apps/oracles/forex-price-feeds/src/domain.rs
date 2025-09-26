@@ -33,28 +33,6 @@ pub struct ResourceData {
     pub symbols: ProvidersSymbols,
 }
 
-//TODO: Consider moving this type to blocksense-sdk
-pub type Capabilities = HashMap<String, String>;
-
-pub fn get_capabilities_from_settings(settings: &Settings) -> Capabilities {
-    settings
-        .capabilities
-        .iter()
-        .map(|cap| (cap.id.to_string(), cap.data.to_string()))
-        .collect()
-}
-
-//TODO: Consider moving this function to blocksense-sdk
-pub fn get_api_keys(capabilities: &Capabilities, keys: &[&str]) -> Option<HashMap<String, String>> {
-    keys.iter()
-        .map(|&key| {
-            capabilities
-                .get(key)
-                .map(|value| (key.to_string(), value.clone()))
-        })
-        .collect()
-}
-
 pub fn get_resources_from_settings(settings: &Settings) -> Result<ResourceData> {
     let mut feeds_data = Vec::new();
     let mut providers_symbols: ProvidersSymbols = HashMap::new();

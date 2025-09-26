@@ -20,7 +20,8 @@
     "build:all": "yarn workspaces foreach --all -p --topological-dev run build",
     "test": "yarn workspaces foreach --from $0 -Rp --topological-dev run test",
     "test-single": "yarn workspace $0 run test",
-    "test:all": "yarn workspaces foreach --all -p --topological-dev run test"
+    "test:all": "yarn workspaces foreach --all -p --topological-dev run test",
+    "knip": "knip"
   },
   "dependenciesMeta": {
     "@openzeppelin/contracts@5.0.2": {
@@ -61,6 +62,7 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-sort-destructure-keys": "^2.0.0",
+    "knip": "^5.32.2",
     "prettier": "^3.4.2",
     "react": "^18.3.1",
     "ts-node": "^10.9.2",

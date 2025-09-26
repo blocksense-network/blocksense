@@ -47,10 +47,8 @@ const isOkResult = (result: FeedResult): result is { Ok: FeedType } =>
   'Ok' in result;
 const isErrResult = (result: FeedResult): result is { Err: FeedError } =>
   'Err' in result;
-const isAPIError = (error: FeedError): error is { APIError: string } =>
-  'APIError' in error;
 
-function asBytes(
+export function asBytes(
   feed: FeedType,
   timestamp: bigint,
   digitsInFraction: number,
@@ -113,7 +111,7 @@ export const generateSignature = (
     if (isOkResult(feedResult)) {
       const valueBytes = yield* asBytes(feedResult.Ok, timestamp, 18);
       byteBuffer = Buffer.concat([byteBuffer, valueBytes]);
-    } else if (isErrResult(feedResult) && isAPIError(feedResult.Err)) {
+    } else if (isErrResult(feedResult)) {
       const err = feedResult.Err;
       const msg = 'APIError' in err ? err.APIError : 'UndefinedError';
       console.warn(`Error parsing received result of vote: ${msg}`);

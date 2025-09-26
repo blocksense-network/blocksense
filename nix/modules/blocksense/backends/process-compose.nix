@@ -95,12 +95,13 @@ let
               ${mkCargoTargetExePath "blocksense"} node build --up \
                 --from ${cfg.config-files."reporter_config_${name}".path}
             '';
-          environment =
-            [ "RUST_LOG=${log-level}" ]
-            ++ lib.optionals useLocalCargoResult [
-              "SPIN_DATA_DIR=$GIT_ROOT/target/spin-artifacts"
-              "LD_LIBRARY_PATH=${lib.makeLibraryPath self'.legacyPackages.commonLibDeps}"
-            ];
+          environment = [
+            "RUST_LOG=${log-level}"
+          ]
+          ++ lib.optionals useLocalCargoResult [
+            "SPIN_DATA_DIR=$GIT_ROOT/target/spin-artifacts"
+            "LD_LIBRARY_PATH=${lib.makeLibraryPath self'.legacyPackages.commonLibDeps}"
+          ];
 
           depends_on = {
             blocksense-sequencer.condition = "process_healthy";
@@ -198,5 +199,15 @@ in
       (lib.mkIf config.services.kafka.enable aggregateConsensusReader)
       (lib.mkIf cfg.blama.enable blamaInstance)
     ];
+  };
+
+  options.processes = lib.mkOption {
+    type =
+      with lib.types;
+      attrsOf (submodule {
+        options.exec = lib.mkOption {
+          default = "echo 'You must specify process-compose.command' && exit 1";
+        };
+      });
   };
 }

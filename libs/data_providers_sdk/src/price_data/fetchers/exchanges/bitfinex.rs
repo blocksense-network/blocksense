@@ -54,7 +54,7 @@ impl<'a> PricesFetcher<'a> for BitfinexPriceFetcher<'a> {
         Self { symbols }
     }
 
-    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<Result<PairPriceData>> {
+    fn fetch(&self, timeout_secs: u64) -> LocalBoxFuture<'_, Result<PairPriceData>> {
         async move {
             let all_symbols = self.symbols.join(",");
 

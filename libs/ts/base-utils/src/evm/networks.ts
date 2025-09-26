@@ -121,6 +121,7 @@ const networks = [
   'songbird-coston',
   'sonic-mainnet',
   'sonic-blaze',
+  'sonic-testnet',
   'status-network-sepolia',
   'superseed-mainnet',
   'superseed-sepolia',
@@ -152,9 +153,9 @@ const chainIds = [
   169, 3441006, 5000, 5003, 698, 6342, 1740, 59902, 31611, 10143, 2818, 2810,
   72080, 8801, 5851, 5611, 10, 11155420, 7849306, 688688, 9745, 9746, 98866,
   98867, 137, 80002, 1101, 2442, 695569, 11155931, 57000, 200018, 31, 534352,
-  534351, 11011, 5031, 50312, 1868, 1946, 16, 146, 57054, 1660990954, 5330,
-  53302, 1924, 239, 2391, 2390, 167000, 167009, 5678, 841, 842, 41, 130, 1301,
-  4801, 1417429182, 324, 300,
+  534351, 11011, 5031, 50312, 1868, 1946, 16, 146, 57054, 14601, 1660990954,
+  5330, 53302, 1924, 239, 2391, 2390, 167000, 167009, 5678, 841, 842, 41, 130,
+  1301, 4801, 1417429182, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks).annotations({
@@ -372,7 +373,7 @@ export const networkMetadata = {
       },
       {
         type: 'etherscan',
-        webUrl: 'https://arbiscan.io/',
+        webUrl: 'https://arbiscan.io',
         apiUrl: 'https://api-sepolia.arbiscan.io/api',
       },
     ],
@@ -437,7 +438,7 @@ export const networkMetadata = {
       },
       {
         type: 'etherscan',
-        webUrl: 'https://basescan.org/',
+        webUrl: 'https://basescan.org',
         apiUrl: 'https://api.basescan.org/api',
       },
     ],
@@ -449,7 +450,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'etherscan',
-        webUrl: 'https://sepolia.basescan.org/',
+        webUrl: 'https://sepolia.basescan.org',
         apiUrl: 'https://api-sepolia.basescan.org/api',
       },
       {
@@ -886,7 +887,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'etherscan',
-        webUrl: 'https://hyperevmscan.io/',
+        webUrl: 'https://hyperevmscan.io',
         apiUrl: 'https://api.etherscan.io/v2/api?chainid=999',
       },
     ],
@@ -946,7 +947,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'etherscan',
-        webUrl: 'https://testnet.kavascan.com/',
+        webUrl: 'https://testnet.kavascan.com',
         apiUrl: 'https://api.etherscan.io/v2/api?chainid=747474',
       },
     ],
@@ -958,7 +959,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'kava',
-        webUrl: 'https://testnet.kavascan.com/',
+        webUrl: 'https://testnet.kavascan.com',
         apiUrl: 'https://api.verify.mintscan.io/evm/api/0x8ad',
       },
     ],
@@ -1129,7 +1130,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'blockscout',
-        webUrl: 'https://matchscan.io/',
+        webUrl: 'https://matchscan.io',
         apiUrl: 'https://matchscan.io/api',
       },
     ],
@@ -1285,7 +1286,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'blockscout',
-        webUrl: 'https://optimism.blockscout.com/',
+        webUrl: 'https://optimism.blockscout.com',
         apiUrl: 'https://optimism.blockscout.com/api',
       },
       {
@@ -1489,7 +1490,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'blockscout',
-        webUrl: 'https://rootstock-testnet.blockscout.com/',
+        webUrl: 'https://rootstock-testnet.blockscout.com',
         apiUrl: 'https://rootstock-testnet.blockscout.com/api',
       },
     ],
@@ -1559,7 +1560,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'blockscout',
-        webUrl: 'https://shannon-explorer.somnia.network/',
+        webUrl: 'https://shannon-explorer.somnia.network',
         apiUrl: 'https://shannon-explorer.somnia.network/api',
       },
     ],
@@ -1615,6 +1616,18 @@ export const networkMetadata = {
   },
   'sonic-blaze': {
     chainId: 57054,
+    isTestnet: true,
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://testnet.sonicscan.org',
+        apiUrl: 'https://api-testnet.sonicscan.org/api',
+      },
+    ],
+    currency: Currency.S,
+  },
+  'sonic-testnet': {
+    chainId: 14601,
     isTestnet: true,
     explorers: [
       {
@@ -1836,7 +1849,7 @@ export const networkMetadata = {
     explorers: [
       {
         type: 'blockscout',
-        webUrl: 'https://worldchain-sepolia.explorer.alchemy.com/',
+        webUrl: 'https://worldchain-sepolia.explorer.alchemy.com',
         apiUrl: 'https://worldchain-sepolia.explorer.alchemy.com/api',
       },
       {
@@ -1882,7 +1895,7 @@ export const networkMetadata = {
       },
       {
         type: 'blockscout',
-        webUrl: 'https://zksync-sepolia.blockscout.com/',
+        webUrl: 'https://zksync-sepolia.blockscout.com',
         apiUrl: 'https://zksync-sepolia.blockscout.com/api',
       },
       {
@@ -1931,14 +1944,22 @@ export function getTxHashExplorerUrl(
   network: NetworkName,
   txhash: TxHash,
 ): string {
-  return `${networkMetadata[network].explorers[0]?.webUrl}/tx/${txhash}`;
+  const baseUrl = networkMetadata[network].explorers[0]?.webUrl.replace(
+    /\/$/,
+    '',
+  );
+  return `${baseUrl}/tx/${txhash}`;
 }
 
 export function getAddressExplorerUrl(
   network: NetworkName,
   address: EthereumAddress,
 ): string {
-  return `${networkMetadata[network].explorers[0]?.webUrl}/address/${address}`;
+  const baseUrl = networkMetadata[network].explorers[0]?.webUrl.replace(
+    /\/$/,
+    '',
+  );
+  return `${baseUrl}/address/${address}`;
 }
 
 export type NetworkNameToRpcUrlEnvVar<Net extends NetworkName> =

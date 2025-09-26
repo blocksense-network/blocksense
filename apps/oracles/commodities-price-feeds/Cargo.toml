@@ -1,7 +1,7 @@
 [package]
 name = "commodities-price-feeds"
 authors = ["Mila Genova", "Emil Ivanichkov"]
-description = ""
+description = "Oracle script providing price feeds for commodities such as gold, silver, oil, and other raw materials, sourced from multiple market APIs."
 version = "0.1.0"
 edition = "2021"
 

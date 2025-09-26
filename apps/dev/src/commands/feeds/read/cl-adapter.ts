@@ -11,31 +11,46 @@ import {
   CLAggregatorAdapterConsumer,
   type CLAggregatorAdapterData,
 } from '@blocksense/contracts/viem';
+import { formatTimestamp } from '../../utils';
 
-const availableNetworks = await listEvmNetworks();
+function formatNumericalValue(
+  value: bigint,
+  decimals: number,
+  humanReadable: boolean,
+): string {
+  if (!humanReadable) return value.toString();
+  const decimalsBig = BigInt(decimals);
+  if (decimalsBig === 0n) return value.toString();
+  const negative = value < 0n;
+  const abs = negative ? -value : value;
+  const base = 10n ** decimalsBig;
+  const whole = abs / base;
+  const fraction = abs % base;
+  let fractionStr = fraction.toString().padStart(Number(decimalsBig), '0');
+  fractionStr = fractionStr.replace(/0+$/u, '');
+  const formatted =
+    fractionStr.length > 0
+      ? `${whole.toString()}.${fractionStr}`
+      : whole.toString();
+  return negative ? `-${formatted}` : formatted;
+}
 
-const formatTimestamp = (timestamp: bigint | number | string): string => {
-  const seconds = Number(timestamp);
-  const date = new Date(seconds * 1000);
-  const padToTwoDigits = (n: number) => String(n).padStart(2, '0');
-  const formattedTimestamp =
-    `${padToTwoDigits(date.getHours())}:${padToTwoDigits(date.getMinutes())}:${padToTwoDigits(date.getSeconds())}` +
-    ` ${padToTwoDigits(date.getDate())}-${padToTwoDigits(date.getMonth() + 1)}-${date.getFullYear()}` +
-    ` (${timestamp})`;
-  return formattedTimestamp;
-};
-
-export const readClAdapter = Command.make(
-  'read-cl-adapter',
+export const clAdapter = Command.make(
+  'cl-adapter',
   {
-    network: Options.choice('network', availableNetworks),
+    network: Options.choice('network', await listEvmNetworks()),
     address: Options.optional(Options.text('address')),
     feedId: Options.optional(Options.integer('feed-id')),
     round: Options.optional(Options.integer('round')),
     rpcUrl: Options.optional(Options.text('rpc-url')),
+    humanReadable: Options.optional(
+      Options.boolean('human-readable').pipe(Options.withAlias('h')),
+    ),
   },
-  ({ address, feedId, network, round, rpcUrl }) =>
+  ({ address, feedId, humanReadable, network, round, rpcUrl }) =>
     Effect.gen(function* () {
+      const isHumanReadable =
+        Option.isSome(humanReadable) && humanReadable.value;
       let resolvedAddress: string | undefined = Option.isSome(address)
         ? address.value
         : undefined;
@@ -82,12 +97,13 @@ export const readClAdapter = Command.make(
       if (Option.isSome(round)) {
         const requestedRound = BigInt(round.value);
 
-        const { id, roundData } = yield* Effect.all(
+        const { decimals, id, roundData } = yield* Effect.all(
           {
             id: Effect.tryPromise(() => consumer.getId()),
             roundData: Effect.tryPromise(() =>
               consumer.getRoundData(requestedRound),
             ),
+            decimals: Effect.tryPromise(() => consumer.getDecimals()),
           },
           { concurrency: 'unbounded' },
         ).pipe(
@@ -105,7 +121,11 @@ export const readClAdapter = Command.make(
           ['Explorer', getAddressExplorerUrl(network, contractAddress)],
           ['Id', id.toString()],
           ['Round', requestedRound.toString()],
-          ['Answer', roundData.answer.toString()],
+          [
+            'Answer',
+            formatNumericalValue(roundData.answer, decimals, isHumanReadable),
+          ],
+          ['Decimals', decimals.toString()],
           ['LatestRoundData.startedAt', formatTimestamp(roundData.startedAt)],
           ['LatestRoundData.updatedAt', formatTimestamp(roundData.updatedAt)],
         ];
@@ -171,10 +191,24 @@ export const readClAdapter = Command.make(
         ['Description', data.description],
         ['Decimals', data.decimals.toString()],
         ['DataFeedStore', data.dataFeedStore],
-        ['LatestAnswer', data.latestAnswer.toString()],
+        [
+          'LatestAnswer',
+          formatNumericalValue(
+            data.latestAnswer,
+            data.decimals,
+            isHumanReadable,
+          ),
+        ],
         ['LatestRound', data.latestRound.toString()],
         ['LatestRoundData.roundId', data.latestRoundData.roundId.toString()],
-        ['LatestRoundData.answer', data.latestRoundData.answer.toString()],
+        [
+          'LatestRoundData.answer',
+          formatNumericalValue(
+            data.latestRoundData.answer,
+            data.decimals,
+            isHumanReadable,
+          ),
+        ],
         [
           'LatestRoundData.startedAt',
           formatTimestamp(data.latestRoundData.startedAt),

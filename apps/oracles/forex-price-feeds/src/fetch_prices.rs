@@ -14,7 +14,8 @@ use blocksense_data_providers_sdk::price_data::{
     types::{PairsToResults, ProviderPriceData, ProvidersSymbols},
 };
 
-use crate::domain::{get_api_keys, Capabilities, ResourceData, ResourcePairData};
+use blocksense_sdk::oracle::{get_api_keys, Capabilities};
+use crate::domain::{ResourceData, ResourcePairData};
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

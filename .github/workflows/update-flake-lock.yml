@@ -1,6 +1,11 @@
 name: Update Nix Flake lockfile
 
 on:
+  # Allow other repos to trigger this workflow:
+  repository_dispatch:
+    types:
+      - flake-update
+
   # Enable option to manually run the action:
   workflow_dispatch:
 
@@ -16,5 +21,8 @@ jobs:
       CACHIX_AUTH_TOKEN: ${{ secrets.BLOCKSENSE_INFRA_CACHIX_AUTH_TOKEN }}
       CREATE_PR_APP_ID: ${{ secrets.NIX_FLAKE_UPDATE_PR_BOT_APP_ID }}
       CREATE_PR_APP_PRIVATE_KEY: ${{ secrets.NIX_FLAKE_UPDATE_PR_BOT_APP_PRIVATE_KEY }}
+      GIT_GPG_SIGNING_SECRET_KEY: ${{ secrets.GIT_GPG_SIGNING_SECRET_KEY }}
     with:
       runner: '["self-hosted", "Linux", "x86-64-v2"]'
+      flake-input: ${{ github.event_name == 'repository_dispatch' && format('blocksense-{0}', github.event.client_payload['branch-trigger']) || '' }}
+      sign-commits: true

@@ -1,7 +1,7 @@
 [package]
 name = "eth-rpc"
 authors = ["Yordan Madzhunkov"]
-description = ""
+description = "Oracle script exposing Ethereum RPC-based data feeds, including redemption rates such as YieldNest Restaked Ethereum / Wrapped Ethereum via on-chain contract calls."
 version = "0.1.0"
 edition = "2021"
 

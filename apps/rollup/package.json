@@ -16,7 +16,6 @@
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-typescript": "^12.1.2",
     "@types/rollup-plugin-peer-deps-external": "^2",
-    "chalk-template": "^1.1.0",
     "get-tsconfig": "^4.8.1",
     "glob": "^11.0.0",
     "rollup": "^4.20.0",

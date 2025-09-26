@@ -9,13 +9,34 @@ import {
 import { renderTui, drawTable } from '@blocksense/base-utils/tty';
 import { listEvmNetworks, readEvmDeployment } from '@blocksense/config-types';
 import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
+import { skip0x } from '@blocksense/base-utils';
 
-const availableNetworks = await listEvmNetworks();
+import { formatTimestamp } from '../../utils';
 
-export const readAdfs = Command.make(
-  'read-adfs',
+export function formatNumericalValue(hexData: `0x${string}`) {
+  const cleanHex = skip0x(hexData);
+  if (cleanHex.length !== 64) {
+    throw new Error(
+      'Unexpected ADFS data length, expected 32 bytes (64 hex characters), got ' +
+        cleanHex.length,
+    );
+  }
+  const valueHex = '0x' + cleanHex.slice(0, 48);
+  const value = BigInt(valueHex);
+  const timestampHex = '0x' + cleanHex.slice(48);
+  const unixTimestamp = BigInt(timestampHex) / 1000n;
+  const formattedTimestamp = formatTimestamp(unixTimestamp);
+  return {
+    rawHex: hexData,
+    value: value.toString(),
+    timestamp: formattedTimestamp,
+  };
+}
+
+export const adfs = Command.make(
+  'adfs',
   {
-    network: Options.choice('network', availableNetworks),
+    network: Options.choice('network', await listEvmNetworks()),
     address: Options.optional(Options.text('address')),
     rpcUrl: Options.optional(Options.text('rpc-url')),
     feedId: Options.integer('feed-id'),
@@ -23,8 +44,22 @@ export const readAdfs = Command.make(
     startSlot: Options.optional(Options.integer('start-slot')),
     slots: Options.optional(Options.integer('slots')),
     multi: Options.boolean('multi').pipe(Options.withDefault(false)),
+    humanReadable: Options.boolean('human-readable').pipe(
+      Options.withDefault(false),
+      Options.withAlias('h'),
+    ),
   },
-  ({ address, feedId, index, multi, network, rpcUrl, slots, startSlot }) =>
+  ({
+    address,
+    feedId,
+    humanReadable,
+    index,
+    multi,
+    network,
+    rpcUrl,
+    slots,
+    startSlot,
+  }) =>
     Effect.gen(function* () {
       let resolvedAddress: EthereumAddress;
       if (Option.isSome(address)) {
@@ -71,6 +106,7 @@ export const readAdfs = Command.make(
       const hasSlice = Option.isSome(startSlot) || Option.isSome(slots);
       const start = Option.isSome(startSlot) ? startSlot.value : 0;
       const len = Option.isSome(slots) ? slots.value : 0;
+      const isHumanReadable = humanReadable;
 
       type DataRow = Array<[string, string]>;
       const rows: DataRow = [];
@@ -91,10 +127,17 @@ export const readAdfs = Command.make(
           );
           data.forEach((word, i) => rows.push([`Data[${i}]`, word]));
         } else {
-          const data = yield* Effect.tryPromise(() =>
+          const single = yield* Effect.tryPromise(() =>
             consumer.getSingleDataAtIndex(feed, index.value),
           );
-          rows.push(['Data', data]);
+          if (isHumanReadable && !hasSlice && !multi) {
+            const parsed = formatNumericalValue(single);
+            rows.push(['Data (Raw)', parsed.rawHex]);
+            rows.push(['Value', parsed.value]);
+            rows.push(['Timestamp', parsed.timestamp]);
+          } else {
+            rows.push(['Data', single]);
+          }
         }
       } else {
         rows.push(['Mode', 'Latest']);
@@ -121,7 +164,14 @@ export const readAdfs = Command.make(
             consumer.getLatestSingleDataAndIndex(feed),
           );
           rows.push(['Index', index.toString()]);
-          rows.push(['Data', data as string]);
+          if (isHumanReadable && !hasSlice && !multi) {
+            const parsed = formatNumericalValue(data as `0x${string}`);
+            rows.push(['Data (Raw)', parsed.rawHex]);
+            rows.push(['Value', parsed.value]);
+            rows.push(['Timestamp', parsed.timestamp]);
+          } else {
+            rows.push(['Data', data as string]);
+          }
         }
       }
 
