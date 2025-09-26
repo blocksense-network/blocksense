@@ -111,7 +111,7 @@ describe('bigIntToBytesBE', () => {
   });
 
   it('round-trips across a variety of values', () => {
-    const values: Array<bigint> = [
+    const values: bigint[] = [
       0n,
       1n,
       42n,

@@ -14,10 +14,10 @@ export interface OracleMetadata {
   path: string;
 }
 
-function getOraclesDirs(): Effect.Effect<Array<string>, Error> {
+function getOraclesDirs(): Effect.Effect<string[], Error> {
   return Effect.gen(function* () {
     const oraclesDir = join(rootDir, 'apps', 'oracles');
-    const oracles: Array<string> = [];
+    const oracles: string[] = [];
 
     const { readDir } = selectDirectory(oraclesDir);
     const entries = yield* Effect.tryPromise({

@@ -145,7 +145,7 @@ export const adfs = Command.make(
             consumer.getLatestDataSliceAndIndex(feed, start, len),
           );
           rows.push(['Index', index.toString()]);
-          (data as Array<string>).forEach((word, i) =>
+          (data as string[]).forEach((word, i) =>
             rows.push([`Data[${i}]`, word]),
           );
         } else if (multi) {
@@ -153,7 +153,7 @@ export const adfs = Command.make(
             consumer.getLatestDataAndIndex(feed),
           );
           rows.push(['Index', index.toString()]);
-          (data as Array<string>).forEach((word, i) =>
+          (data as string[]).forEach((word, i) =>
             rows.push([`Data[${i}]`, word]),
           );
         } else {
