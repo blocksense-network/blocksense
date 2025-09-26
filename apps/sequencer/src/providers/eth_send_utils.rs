@@ -787,16 +787,16 @@ pub async fn get_gas_limit(
     {
         Ok(gas_limit_result) => match gas_limit_result {
             Ok(gas_limit) => {
-                debug!("Got gas_limit={gas_limit} for network {net}");
+                println!("Got gas_limit={gas_limit} for network {net}");
                 gas_limit * 2
             }
             Err(err) => {
-                debug!("Failed to get gas_limit for network {net} due to {err}");
+                println!("Failed to get gas_limit for network {net} due to {err}");
                 default_gas_limit as u64
             }
         },
         Err(err) => {
-            warn!("Timed out while getting gas_limit for network {net} due to {err}");
+            println!("Timed out while getting gas_limit for network {net} due to {err}");
             default_gas_limit as u64
         }
     }
@@ -994,7 +994,7 @@ pub async fn get_tx_retry_params(
 ) -> Result<GasFees> {
     let price_increment = 1.0 + (transaction_retries_count as f64 * retry_fee_increment_fraction);
 
-    debug!("Getting gas_price for network {net}...");
+    println!("Getting gas_price for network {net}...");
     let gas_price = match actix_web::rt::time::timeout(
         Duration::from_secs(transaction_retry_timeout_secs),
         rpc_handle.get_gas_price(),
@@ -1004,23 +1004,23 @@ pub async fn get_tx_retry_params(
         Ok(gas_price_result) => match gas_price_result {
             Ok(gas_price) => {
                 inc_metric!(provider_metrics, net, success_get_gas_price);
-                debug!("Got gas_price={gas_price} for network {net}");
+                println!("Got gas_price={gas_price} for network {net}");
                 gas_price
             }
             Err(err) => {
                 inc_metric!(provider_metrics, net, failed_get_gas_price);
-                debug!("Failed to get gas_price for network {net} due to {err}");
+                println!("Failed to get gas_price for network {net} due to {err}");
                 return Err(err.into());
             }
         },
         Err(err) => {
             inc_metric!(provider_metrics, net, failed_get_gas_price);
-            warn!("Timed out while getting gas_price for network {net} and address {sender_address} due to {err}");
+            println!("Timed out while getting gas_price for network {net} and address {sender_address} due to {err}");
             bail!("Timed out");
         }
     };
 
-    debug!("Getting priority_fee for network {net}...");
+    println!("Getting priority_fee for network {net}...");
     let mut priority_fee = match actix_web::rt::time::timeout(
         Duration::from_secs(transaction_retry_timeout_secs),
         rpc_handle.get_max_priority_fee_per_gas(),
@@ -1030,18 +1030,18 @@ pub async fn get_tx_retry_params(
         Ok(priority_fee_result) => match priority_fee_result {
             Ok(priority_fee) => {
                 inc_metric!(provider_metrics, net, success_get_max_priority_fee_per_gas);
-                debug!("Got priority_fee={priority_fee} for network {net}");
+                println!("Got priority_fee={priority_fee} for network {net}");
                 priority_fee
             }
             Err(err) => {
                 inc_metric!(provider_metrics, net, failed_get_max_priority_fee_per_gas);
-                warn!("Failed to get priority_fee for network {net} due to {err}");
+                println!("Failed to get priority_fee for network {net} due to {err}");
                 return Ok(GasFees::Legacy(GasPrice { gas_price }));
             }
         },
         Err(err) => {
             inc_metric!(provider_metrics, net, failed_get_max_priority_fee_per_gas);
-            warn!("Timed out while getting priority_fee for network {net} and address {sender_address} due to {err}");
+            println!("Timed out while getting priority_fee for network {net} and address {sender_address} due to {err}");
             bail!("Timed out");
         }
     };
@@ -1059,15 +1059,15 @@ pub async fn get_tx_retry_params(
                 // We only call eth_getPriorityFee to detect EIP-1559 support; the value itself is unused.
                 // Note: some legacy-only nodes expose eth_maxPriorityFeePerGas but not eth_getPriorityFee,
                 // whereas every EIP-1559-capable node provides both calls.
-                debug!("eth_getPriorityFee returned {priority_fee_value} for network {net}");
+                println!("eth_getPriorityFee returned {priority_fee_value} for network {net}");
             }
             Err(err) => {
-                debug!("Failed eth_getPriorityFee request for network {net}: {err}");
+                println!("Failed eth_getPriorityFee request for network {net}: {err}");
                 return Ok(GasFees::Legacy(GasPrice { gas_price }));
             }
         }
     } else {
-        debug!("Timed out while calling eth_getPriorityFee for network {net}");
+        println!("Timed out while calling eth_getPriorityFee for network {net}");
         bail!("Timed out");
     }
 
