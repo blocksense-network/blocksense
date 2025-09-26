@@ -103,7 +103,7 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
       never
     >;
     readonly postReportsBatch: (
-      reports: Array<ReportData>,
+      reports: ReportData[],
     ) => Effect.Effect<HttpClientResponse, HttpClientError | Error, never>;
   }
 >() {
@@ -208,10 +208,10 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
             return history;
           });
         },
-        postReportsBatch: (reports: Array<ReportData>) =>
+        postReportsBatch: (reports: ReportData[]) =>
           Effect.gen(function* () {
             const timestamp = yield* Clock.currentTimeMillis;
-            const reportsPayload: Array<ReportPayload> = yield* Effect.forEach(
+            const reportsPayload: ReportPayload[] = yield* Effect.forEach(
               reports,
               r =>
                 Effect.gen(function* () {

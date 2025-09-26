@@ -40,7 +40,7 @@ export type DataFeedPayload = typeof DataFeedPayloadSchema.Type;
 const isNumericalFeed = (feed: FeedType): feed is { Numerical: number } =>
   'Numerical' in feed;
 const isTextFeed = (feed: FeedType): feed is { Text: string } => 'Text' in feed;
-const isBytesFeed = (feed: FeedType): feed is { Bytes: Array<number> } =>
+const isBytesFeed = (feed: FeedType): feed is { Bytes: number[] } =>
   'Bytes' in feed;
 
 const isOkResult = (result: FeedResult): result is { Ok: FeedType } =>

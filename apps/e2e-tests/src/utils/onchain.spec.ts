@@ -45,7 +45,7 @@ describe('getDataFeedsInfoFromNetwork', () => {
       const result: FeedsValueAndRound = yield* getDataFeedsInfoFromNetwork(
         [feedId],
         '0xabc123',
-        'mainnet',
+        'ethereum-mainnet',
       );
 
       const expected: FeedsValueAndRound = {
@@ -69,7 +69,7 @@ describe('getDataFeedsInfoFromNetwork', () => {
       const result: FeedsValueAndRound = yield* getDataFeedsInfoFromNetwork(
         [feedId],
         '0xabc123',
-        'mainnet',
+        'ethereum-mainnet',
         { '2': round },
       );
 

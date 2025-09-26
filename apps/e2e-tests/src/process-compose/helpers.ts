@@ -88,7 +88,7 @@ export const rgSearchPattern = ({
 }: {
   caseInsensitive?: boolean;
   file: string;
-  flags?: Array<string>;
+  flags?: string[];
   pattern: string;
 }): Effect.Effect<boolean, RGLogCheckerError> => {
   const args = caseInsensitive
@@ -122,7 +122,7 @@ export function getInitialFeedsInfoFromNetwork(
   network: NetworkName,
 ): Effect.Effect<
   {
-    feedIds: Array<bigint>;
+    feedIds: bigint[];
     address: EthereumAddress;
     initialFeedsInfo: FeedsValueAndRound;
   },

@@ -104,8 +104,8 @@ export default [
       '@typescript-eslint/array-type': [
         'warn',
         {
-          default: 'generic',
-          readonly: 'generic',
+          default: 'array-simple',
+          readonly: 'array-simple',
         },
       ],
 

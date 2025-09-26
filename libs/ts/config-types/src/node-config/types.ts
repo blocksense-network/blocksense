@@ -50,7 +50,7 @@ const ContractSchema = S.Struct({
 
 const ProviderSchema = S.Struct({
   private_key_path: S.String,
-  url: S.String,
+  url: S.URL,
   transaction_retries_count_before_give_up: S.Number,
   transaction_retry_timeout_secs: S.Number,
   retry_fee_increment_fraction: S.Number,

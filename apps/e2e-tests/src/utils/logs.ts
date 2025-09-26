@@ -4,7 +4,7 @@ type LogLevel = 'info' | 'error' | 'warn';
 
 interface LogLevelConfig {
   icon: string;
-  logFunction: (message?: any, ...optionalParams: Array<any>) => void;
+  logFunction: (message?: any, ...optionalParams: any[]) => void;
 }
 
 const logLevelConfig: Record<LogLevel, LogLevelConfig> = {

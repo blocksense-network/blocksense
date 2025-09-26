@@ -1,4 +1,4 @@
-type ParsedCalldataBase = {
+export type ParsedCalldataBase = {
   feedsLength: bigint;
   feeds: {
     stride: bigint;
@@ -13,17 +13,18 @@ type ParsedCalldataBase = {
   }[];
 };
 
-export type ParsedCalldata =
-  | (ParsedCalldataBase & {
-      blockNumber: bigint;
-      sourceAccumulator: never;
-      destinationAccumulator: never;
-    })
-  | (ParsedCalldataBase & {
-      blockNumber: never;
-      sourceAccumulator: string;
-      destinationAccumulator: string;
-    });
+export type ParsedCalldata<HasBlockNumber extends boolean> =
+  HasBlockNumber extends true
+    ? ParsedCalldataBase & {
+        blockNumber: bigint;
+        sourceAccumulator: never;
+        destinationAccumulator: never;
+      }
+    : ParsedCalldataBase & {
+        blockNumber: never;
+        sourceAccumulator: string;
+        destinationAccumulator: string;
+      };
 
 /** * Decodes calldata for ADFS (Accumulator Data Feed System) contracts.
  * @param calldata - The transaction calldata to decode.
@@ -32,21 +33,23 @@ export type ParsedCalldata =
  * @returns ParsedCalldata - The decoded calldata containing feeds and ring buffer table.
  * Throws an error if the calldata is invalid to indicate potential issues with the sequencer ADFS serialization logic.
  */
-export const decodeADFSCalldata = (args: {
+export const decodeADFSCalldata = <HasBlockNumber extends boolean>(args: {
   calldata: string;
-  hasBlockNumber?: boolean;
-}): { parsedCalldata: ParsedCalldata; errors: Error[] } => {
+  hasBlockNumber: HasBlockNumber;
+}): { parsedCalldata: ParsedCalldata<HasBlockNumber>; errors: Error[] } => {
   const { calldata, hasBlockNumber = true } = args;
   const errors: Error[] = [];
-  const parsedCalldata = {} as ParsedCalldata;
+  const parsedCalldata = {} as ParsedCalldata<HasBlockNumber>;
   let pointer = 0;
 
   if (hasBlockNumber) {
-    parsedCalldata.blockNumber = BigInt('0x' + calldata.slice(4, 20));
+    const parsed = parsedCalldata as ParsedCalldata<true>;
+    parsed.blockNumber = BigInt('0x' + calldata.slice(4, 20));
     pointer = 20;
   } else {
-    parsedCalldata.sourceAccumulator = '0x' + calldata.slice(4, 68);
-    parsedCalldata.destinationAccumulator = '0x' + calldata.slice(68, 132);
+    const parsed = parsedCalldata as ParsedCalldata<false>;
+    parsed.sourceAccumulator = '0x' + calldata.slice(4, 68);
+    parsed.destinationAccumulator = '0x' + calldata.slice(68, 132);
     pointer = 132;
   }
 

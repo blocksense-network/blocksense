@@ -1,5 +1,5 @@
 import { Command, Options } from '@effect/cli';
-import { Data, Effect, Option } from 'effect';
+import { Data, Effect, Option, Schema as S } from 'effect';
 
 import {
   getAddressExplorerUrl,
@@ -42,7 +42,9 @@ export const clAdapter = Command.make(
     address: Options.optional(Options.text('address')),
     feedId: Options.optional(Options.integer('feed-id')),
     round: Options.optional(Options.integer('round')),
-    rpcUrl: Options.optional(Options.text('rpc-url')),
+    rpcUrl: Options.optional(
+      Options.text('rpc-url').pipe(Options.withSchema(S.URL)),
+    ),
     humanReadable: Options.optional(
       Options.boolean('human-readable').pipe(Options.withAlias('h')),
     ),
@@ -84,15 +86,10 @@ export const clAdapter = Command.make(
           ),
       });
 
-      const consumer = Option.isSome(rpcUrl)
-        ? CLAggregatorAdapterConsumer.createConsumerByRpcUrl(
-            contractAddress,
-            rpcUrl.value,
-          )
-        : CLAggregatorAdapterConsumer.createConsumerByNetworkName(
-            contractAddress,
-            network,
-          );
+      const consumer = CLAggregatorAdapterConsumer.create(
+        contractAddress,
+        Option.isSome(rpcUrl) ? rpcUrl.value : network,
+      );
 
       if (Option.isSome(round)) {
         const requestedRound = BigInt(round.value);
