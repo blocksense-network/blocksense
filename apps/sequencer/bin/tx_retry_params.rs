@@ -2,13 +2,18 @@ use std::env;
 use std::fs;
 use std::sync::Arc;
 
+use alloy::hex::FromHex;
 use alloy::network::TransactionBuilder;
+use alloy::primitives::{Address, Bytes};
 use alloy::rpc::types::TransactionRequest;
 use alloy::signers::local::PrivateKeySigner;
 use anyhow::{anyhow, Context, Result};
 use blocksense_config::{AllFeedsConfig, Provider as ProviderConfig};
+use blocksense_data_feeds::feeds_processing::BatchedAggregatesToSend;
 use blocksense_metrics::metrics::ProviderMetrics;
 use reqwest::Url;
+use sequencer::providers::eth_send_utils::get_chain_id;
+use sequencer::providers::eth_send_utils::get_nonce;
 use sequencer::providers::eth_send_utils::{get_gas_limit, get_tx_retry_params, GasFees};
 use sequencer::providers::provider::RpcProvider;
 use tokio::sync::RwLock;
@@ -83,17 +88,159 @@ async fn main() -> Result<()> {
     )
     .await;
 
-    let tx_request = TransactionRequest::default().with_from(signer.address());
-    let gas_limit = get_gas_limit(
-        DEFAULT_NETWORK_NAME,
-        &rpc_provider.provider,
-        &tx_request,
-        provider_config.transaction_retry_timeout_secs as u64,
-        provider_config.transaction_gas_limit,
-    )
-    .await;
+    let to_address: Address = "0xadf5aadbe080819209bf641fdf03748bb495c6f3"
+        .parse()
+        .expect("invalid destination address literal");
 
-    println!("Estimated gas limit: {}", gas_limit);
+    let input = Bytes::from_hex(
+        "0x0100000000d1ad41e700000001000303400201200000000000000000000000000000000000000000015a2138000001998664b15001010001000000000000000000000000000000000000000200000000000100000000"
+    ).expect("Wrong hex data");
+
+    // 1) to, from, data
+    {
+        let tx_request = TransactionRequest::default()
+            .to(to_address)
+            .with_from(signer.address())
+            .input(Some(input.clone()).into());
+
+        println!("1) to, from, data: {tx_request:?}");
+        let gas_limit = get_gas_limit(
+            DEFAULT_NETWORK_NAME,
+            &rpc_provider.provider,
+            &tx_request,
+            provider_config.transaction_retry_timeout_secs as u64,
+            provider_config.transaction_gas_limit,
+        )
+        .await;
+        println!("1) Estimated gas limit: {}", gas_limit);
+    }
+
+    // 2) to, from, data, nonce
+    {
+        let nonce = match get_nonce(
+            DEFAULT_NETWORK_NAME,
+            &rpc_provider.provider,
+            &signer.address(),
+            10000, //This is only used for logging
+            300,
+            false,
+        )
+        .await
+        {
+            Ok(n) => n,
+            Err(e) => {
+                panic!("Could not get nonce! {e}");
+            }
+        };
+
+        let tx_request = TransactionRequest::default()
+            .to(to_address)
+            .with_nonce(nonce)
+            .with_from(signer.address())
+            .input(Some(input.clone()).into());
+
+        println!("2) to, from, data, nonce: {tx_request:?}");
+        let gas_limit = get_gas_limit(
+            DEFAULT_NETWORK_NAME,
+            &rpc_provider.provider,
+            &tx_request,
+            provider_config.transaction_retry_timeout_secs as u64,
+            provider_config.transaction_gas_limit,
+        )
+        .await;
+        println!("2) Estimated gas limit: {}", gas_limit);
+    }
+
+    // 3) to, from, data, chain_id
+    {
+        let chain_id = match get_chain_id(
+            DEFAULT_NETWORK_NAME,
+            &rpc_provider,
+            &BatchedAggregatesToSend::default(),
+            300,
+        )
+        .await
+        {
+            Ok(v) => {
+                println!("Successfully got value in network block height for chain_id");
+                v
+            }
+            Err(err) => {
+                panic!("get_chain_id error {err} in network ");
+            }
+        };
+
+        let tx_request = TransactionRequest::default()
+            .to(to_address)
+            .with_from(signer.address())
+            .with_chain_id(chain_id)
+            .input(Some(input.clone()).into());
+
+        println!("3) to, from, data, chain_id: {tx_request:?}");
+        let gas_limit = get_gas_limit(
+            DEFAULT_NETWORK_NAME,
+            &rpc_provider.provider,
+            &tx_request,
+            provider_config.transaction_retry_timeout_secs as u64,
+            provider_config.transaction_gas_limit,
+        )
+        .await;
+        println!("3) Estimated gas limit: {}", gas_limit);
+    }
+
+    // 4) to, from, data, nonce, chain_id
+    {
+        let nonce = match get_nonce(
+            DEFAULT_NETWORK_NAME,
+            &rpc_provider.provider,
+            &signer.address(),
+            10000, //This is only used for logging
+            300,
+            false,
+        )
+        .await
+        {
+            Ok(n) => n,
+            Err(e) => {
+                panic!("Could not get nonce! {e}");
+            }
+        };
+
+        let chain_id = match get_chain_id(
+            DEFAULT_NETWORK_NAME,
+            &rpc_provider,
+            &BatchedAggregatesToSend::default(),
+            300,
+        )
+        .await
+        {
+            Ok(v) => {
+                println!("Successfully got value in network block height for chain_id");
+                v
+            }
+            Err(err) => {
+                panic!("get_chain_id error {err} in network ");
+            }
+        };
+
+        let tx_request = TransactionRequest::default()
+            .to(to_address)
+            .with_nonce(nonce)
+            .with_from(signer.address())
+            .with_chain_id(chain_id)
+            .input(Some(input.clone()).into());
+
+        println!("4) to, from, data, nonce, chain_id: {tx_request:?}");
+        let gas_limit = get_gas_limit(
+            DEFAULT_NETWORK_NAME,
+            &rpc_provider.provider,
+            &tx_request,
+            provider_config.transaction_retry_timeout_secs as u64,
+            provider_config.transaction_gas_limit,
+        )
+        .await;
+        println!("4) Estimated gas limit: {}", gas_limit);
+    }
 
     let gas_fees = get_tx_retry_params(
         DEFAULT_NETWORK_NAME,
