@@ -1,4 +1,4 @@
-Below is a complete, implementation‑ready **software specification** for your multichain EVM indexing service built with **Node.js + TypeScript + Effect** and **viem**, persisting into **PostgreSQL**. It encodes all choices you provided; places where you passed are filled with reasonable, clearly‑marked defaults that you can change before coding.
+Below is a complete, implementation-ready **software specification** for your multichain EVM indexing service built with **Node.js + TypeScript + Effect** and **viem**, persisting into **PostgreSQL**. It encodes all choices you provided; unspecified areas use clearly marked defaults that you can change before coding.
 
 ---
 
@@ -41,7 +41,7 @@ Below is a complete, implementation‑ready **software specification** for your 
   - `feeds[]` items expose `stride`, `feedIndex`, and **always** `feedId` (u128) and `index` (u16), plus `data` (bytes).
   - `ringBufferTable[]` items expose `index` (global table index) and `data` (bytes).
 
-- **Source of truth for block number**: **event data** (answer “1 = A”).
+- **Source of truth for block number**: **event data**.
 - **Multiple ADFS versions**: DB includes a `version` column; per‑version extra data goes into `extra` (JSONB).
 
 ### 1.3 Queries consumers must support (day‑1)
@@ -287,9 +287,9 @@ CREATE TABLE processing_state (
 
 # 5) Reorg & finality policy
 
-- **Uniqueness key**: `(chain_id, tx_hash, log_index)` (answer “2 = Yes”).
+- **Uniqueness key**: `(chain_id, tx_hash, log_index)`.
 - **Pending window**: rows remain `pending` until confirmed depth is reached.
-- **Reorg handling** (answer “3 = b”):
+- **Reorg handling**:
 
   - Do **not** replay from common ancestor.
   - Instead, mark disappeared `pending` rows as `dropped`. Live tail will emit the canonical logs, which we’ll insert separately.
@@ -313,14 +313,14 @@ CREATE TABLE processing_state (
 
 - **DB writes**:
 
-  - **One DB transaction per block per chain** (answer “15”).
+  - **One DB transaction per block per chain**.
   - `UPSERT` everywhere to ensure idempotency.
 
-- **Batching defaults** (fill for “16 pass”):
+- **Batching defaults**:
 
   - `db_write_batch_rows`: **200** rows per insert/UPSERT statement (configurable).
 
-- **Backpressure** (answer “17 yes”, “18 yes”, “19 config option”):
+- **Backpressure**:
 
   - Per‑chain bounded queue with **drop‑oldest (pending only)**.
   - `queue_max_items`: **10,000** (default; configurable).
@@ -348,9 +348,9 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
 
 # 8) Configuration
 
-**Format**: **JSON file**, **no hot reload** (answer “22”).
+**Format**: **JSON file**, **no hot reload**.
 **Secrets** via **env** (DB URL, RPC keys).
-**Separate config files** per environment; **separate Postgres databases** (answer “24”).
+**Separate config files** per environment; **separate Postgres databases**.
 
 ### 8.1 JSON schema (logical)
 
@@ -525,7 +525,7 @@ WHERE (fl.block_number, fl.log_index) < (EXCLUDED.block_number, EXCLUDED.log_ind
 # 15) Deployment & operations
 
 - **Packaging**: Docker image.
-- **Modes** (answer “33”):
+- **Modes**:
 
   - `--mode=multi` (all chains in one process).
   - `--mode=per-chain --chainId=...` (one process per chain).
@@ -535,8 +535,8 @@ WHERE (fl.block_number, fl.log_index) < (EXCLUDED.block_number, EXCLUDED.log_ind
   - `/healthz` (process + DB ping)
   - `/readyz` (initial backfill not required to be “ready”).
 
-- **Postgres HA**: “OK” for managed HA; otherwise single instance acceptable initially (answers “34 ok”, “35 ok” = online‑safe migrations only).
-- **Runbooks** (answer “32 yes”):
+- **Postgres HA**: “OK” for managed HA; otherwise single instance acceptable initially; enforce online-safe migrations only.
+- **Runbooks**:
 
   1. **RPC outage**: switch providers; increase backoff; drain queue.
   2. **DB saturation**: raise pool size cautiously; reduce batch; shard per chain.
@@ -579,7 +579,7 @@ LIMIT 1;
 
 ---
 
-# 17) Defaults & tunables (filled where you passed)
+# 17) Defaults & tunables
 
 - `db_write_batch_rows`: **200**
 - `queue_max_items`: **10,000**
@@ -614,7 +614,7 @@ LIMIT 1;
 
 # 19) Out‑of‑scope (v1)
 
-- Admin API/CLI (you answered “no”).
+- Admin API/CLI: not planned.
 - Web UI dashboard (Grafana only).
 - Dead‑letter queue (disabled; rely on metrics + retries).
 
@@ -744,7 +744,7 @@ Build a multichain indexer that listens to a single proxy‑fronted ADFS contrac
 
 ---
 
-## 2) Key Requirements (from answers)
+## 2) Key Requirements
 
 - **Sync target**: DB is the source for downstream services.
 - **Backfill**: Yes, from deployment block.
