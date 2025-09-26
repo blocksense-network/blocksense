@@ -87,3 +87,7 @@ actix-test = { workspace = true }
 [[bin]]
 name = "sequencer"
 path = "bin/sequencer_runner.rs"
+
+[[bin]]
+name = "tx-retry-params"
+path = "bin/tx_retry_params.rs"

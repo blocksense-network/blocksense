@@ -807,7 +807,14 @@ impl RpcProvider {
             .with_chain_id(chain_id)
             .with_deploy_code(bytecode);
 
-        let gas_limit = get_gas_limit(network.as_str(), provider, &tx, 30).await;
+        let gas_limit = get_gas_limit(
+            network.as_str(),
+            provider,
+            &tx,
+            30,
+            self.transaction_gas_limit,
+        )
+        .await;
 
         tx = tx.with_gas_limit(gas_limit);
 
@@ -844,6 +851,7 @@ impl RpcProvider {
             sender_address,
             chain_id,
             contract_address,
+            self.transaction_gas_limit,
         )
         .await?;
 
@@ -1025,6 +1033,7 @@ impl RpcProvider {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn perform_post_deployment_transaction(
     net: &str,
     provider: &ProviderType,
@@ -1033,6 +1042,7 @@ async fn perform_post_deployment_transaction(
     sender_address: Address,
     chain_id: u64,
     to_address: Address,
+    default_gas_limit: u32,
 ) -> Result<(), eyre::Error> {
     if contract_name == ADFS_ACCESS_CONTROL_CONTRACT_NAME {
         let input = DynSolValue::Tuple(vec![
@@ -1074,7 +1084,7 @@ async fn perform_post_deployment_transaction(
         //  .with_max_fee_per_gas(30_000_000_000)
         //  .with_max_priority_fee_per_gas(2_000_000_000);
 
-        let gas_limit = get_gas_limit(net, provider, &tx, 5 * 60).await;
+        let gas_limit = get_gas_limit(net, provider, &tx, 5 * 60, default_gas_limit).await;
 
         tx = tx.with_gas_limit(gas_limit);
 

@@ -599,6 +599,7 @@ pub async fn eth_batch_send_to_contract(
             rpc_handle,
             &tx,
             transaction_retry_timeout_secs,
+            provider.transaction_gas_limit,
         )
         .await;
 
@@ -776,8 +777,8 @@ pub async fn get_gas_limit(
     rpc_handle: &ProviderType,
     tx: &TransactionRequest,
     transaction_retry_timeout_secs: u64,
+    default_gas_limit: u32,
 ) -> u64 {
-    let default_gas_limit = 10_000_000;
     match actix_web::rt::time::timeout(
         Duration::from_secs(transaction_retry_timeout_secs),
         rpc_handle.estimate_gas(tx.clone()),
@@ -791,12 +792,12 @@ pub async fn get_gas_limit(
             }
             Err(err) => {
                 debug!("Failed to get gas_limit for network {net} due to {err}");
-                default_gas_limit
+                default_gas_limit as u64
             }
         },
         Err(err) => {
             warn!("Timed out while getting gas_limit for network {net} due to {err}");
-            default_gas_limit
+            default_gas_limit as u64
         }
     }
 }
