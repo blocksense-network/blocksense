@@ -1,15 +1,8 @@
-import { createPublicClient, http, type PublicClient, Chain } from 'viem';
-import * as viemChains from 'viem/chains';
+import { type PublicClient } from 'viem';
 
-import {
-  getRpcUrl,
-  networkMetadata,
-  NetworkName,
-  EthereumAddress,
-  isNetworkName,
-} from '@blocksense/base-utils/evm';
+import { NetworkName, EthereumAddress } from '@blocksense/base-utils/evm';
 
-import { valuesOf } from '@blocksense/base-utils';
+import { createViemClient } from './create-client';
 
 export abstract class ContractConsumerBase {
   public client: PublicClient;
@@ -34,10 +27,10 @@ export abstract class ContractConsumerBase {
     contractAddress: EthereumAddress,
     networkNameOrRpcUrl: NetworkName | string,
   ): T {
-    const transport = isNetworkName(networkNameOrRpcUrl)
-      ? http(getRpcUrl(networkNameOrRpcUrl))
-      : http(networkNameOrRpcUrl);
-    const client = createPublicClient({ transport });
+    const url = URL.canParse(networkNameOrRpcUrl)
+      ? new URL(networkNameOrRpcUrl)
+      : (networkNameOrRpcUrl as NetworkName);
+    const client = createViemClient(url);
     return new this(contractAddress, client);
   }
 
@@ -55,13 +48,7 @@ export abstract class ContractConsumerBase {
     contractAddress: EthereumAddress,
     networkName: NetworkName,
   ): T {
-    const chain = getViemChain(networkName);
-    const client = createPublicClient({
-      chain: chain,
-      transport: chain
-        ? http(chain.rpcUrls.default.http[0])
-        : http(getRpcUrl(networkName)),
-    });
+    const client = createViemClient(networkName);
     return new this(contractAddress, client);
   }
   /**
@@ -78,20 +65,7 @@ export abstract class ContractConsumerBase {
     contractAddress: EthereumAddress,
     rpcUrl: string,
   ): T {
-    const client = createPublicClient({
-      transport: http(rpcUrl),
-    });
+    const client = createViemClient(new URL(rpcUrl));
     return new this(contractAddress, client);
   }
-}
-
-// TODO:(EmilIvanichkovv): Consider moving this function to a more appropriate location, if necessary.
-export function getViemChain(network: NetworkName): Chain | undefined {
-  const id = networkMetadata[network].chainId;
-  const chain = valuesOf(viemChains).find(chain => chain.id === id);
-  if (!chain) {
-    console.error(`Viem chain definition not found for network: ${network}`);
-    return undefined;
-  }
-  return chain;
 }
