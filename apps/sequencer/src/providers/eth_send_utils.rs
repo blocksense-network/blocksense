@@ -397,6 +397,90 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                         != *observed_latest_block_hash
                                     {
                                         warn!("Reorg detected in network {net}");
+
+                                        // Inspect previously observed blocks to find the
+                                        // first common ancestor and log the diverged ones.
+                                        let mut observed_heights: Vec<u64> = observed_block_hashes
+                                            .keys()
+                                            .copied()
+                                            .filter(|h| *h <= observed_latest_height)
+                                            .collect();
+                                        observed_heights.sort_unstable();
+                                        observed_heights.reverse();
+
+                                        let fmt_hash = |hash: &B256| {
+                                            format!("0x{}", hex::encode(hash.as_slice()))
+                                        };
+
+                                        let mut diverged_blocks = Vec::new();
+                                        let mut first_common: Option<(u64, B256)> = None;
+
+                                        for height in observed_heights {
+                                            let stored_hash =
+                                                match observed_block_hashes.get(&height) {
+                                                    Some(hash) => *hash,
+                                                    None => continue,
+                                                };
+
+                                            match rpc_handle
+                                                .get_block_by_number(BlockNumberOrTag::Number(
+                                                    height,
+                                                ))
+                                                .await
+                                            {
+                                                Ok(Some(chain_block)) => {
+                                                    let chain_hash = chain_block.header.hash;
+                                                    if chain_hash == stored_hash {
+                                                        first_common = Some((height, chain_hash));
+                                                        break;
+                                                    } else {
+                                                        diverged_blocks.push((
+                                                            height,
+                                                            chain_hash,
+                                                            stored_hash,
+                                                        ));
+                                                    }
+                                                }
+                                                Ok(None) => {
+                                                    warn!(
+                                                            "Block {height} missing while inspecting reorg in network {net}"
+                                                        );
+                                                }
+                                                Err(e) => {
+                                                    warn!(
+                                                            "Failed to get block {height} in network {net} while inspecting reorg: {e:?}"
+                                                        );
+                                                }
+                                            }
+                                        }
+
+                                        if !diverged_blocks.is_empty() {
+                                            let diverged_description: Vec<String> = diverged_blocks
+                                                .iter()
+                                                .map(|(height, chain_hash, stored_hash)| {
+                                                    format!(
+                                                        "height={height}, chain={}, stored={}",
+                                                        fmt_hash(chain_hash),
+                                                        fmt_hash(stored_hash),
+                                                    )
+                                                })
+                                                .collect();
+                                            warn!(
+                                                "Diverged blocks observed in network {net}: {}",
+                                                diverged_description.join("; ")
+                                            );
+                                        }
+
+                                        if let Some((common_height, common_hash)) = first_common {
+                                            info!(
+                                                    "First common ancestor for reorg in network {net} at height {common_height} with hash {}",
+                                                    fmt_hash(&common_hash)
+                                                );
+                                        } else {
+                                            warn!(
+                                                    "Failed to find a common ancestor within stored block hashes for reorg in network {net}"
+                                                );
+                                        }
                                     } else {
                                         info!(
                                             "Chain goes on in {net}, loop {loop_count} ... need to add {} new blocks",
