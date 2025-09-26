@@ -22,7 +22,7 @@ export type FeedsValueAndRound = Record<
 export function getDataFeedsInfoFromNetwork(
   feedIds: Array<bigint>,
   contractAddress: EthereumAddress,
-  provider: NetworkName | string,
+  provider: NetworkName | URL,
   roundsInfo?: Record<string, number>,
 ): Effect.Effect<FeedsValueAndRound, Error, never> {
   return Effect.gen(function* () {

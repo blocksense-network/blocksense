@@ -1,6 +1,7 @@
 import { Command, Options } from '@effect/cli';
-import { Effect, Option } from 'effect';
+import { Effect, Option, Schema as S } from 'effect';
 
+import { skip0x } from '@blocksense/base-utils/buffer-and-hex';
 import {
   getAddressExplorerUrl,
   parseEthereumAddress,
@@ -9,7 +10,6 @@ import {
 import { renderTui, drawTable } from '@blocksense/base-utils/tty';
 import { listEvmNetworks, readEvmDeployment } from '@blocksense/config-types';
 import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
-import { skip0x } from '@blocksense/base-utils';
 
 import { formatTimestamp } from '../../utils';
 
@@ -38,7 +38,9 @@ export const adfs = Command.make(
   {
     network: Options.choice('network', await listEvmNetworks()),
     address: Options.optional(Options.text('address')),
-    rpcUrl: Options.optional(Options.text('rpc-url')),
+    rpcUrl: Options.optional(
+      Options.text('rpc-url').pipe(Options.withSchema(S.URL)),
+    ),
     feedId: Options.integer('feed-id'),
     index: Options.optional(Options.integer('index')),
     startSlot: Options.optional(Options.integer('start-slot')),
@@ -91,15 +93,10 @@ export const adfs = Command.make(
         });
       }
 
-      const consumer = Option.isSome(rpcUrl)
-        ? AggregatedDataFeedStoreConsumer.createConsumerByRpcUrl(
-            resolvedAddress,
-            rpcUrl.value,
-          )
-        : AggregatedDataFeedStoreConsumer.createConsumerByNetworkName(
-            resolvedAddress,
-            network,
-          );
+      const consumer = AggregatedDataFeedStoreConsumer.create(
+        resolvedAddress,
+        Option.isSome(rpcUrl) ? rpcUrl.value : network,
+      );
 
       const feed = BigInt(feedId);
 
