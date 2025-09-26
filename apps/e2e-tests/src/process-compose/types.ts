@@ -4,7 +4,7 @@ import type { ParseError } from 'effect/ParseResult';
 import type { HttpClientResponse } from '@effect/platform/HttpClientResponse';
 import type { HttpClientError } from '@effect/platform/HttpClientError';
 import { FetchHttpClient, HttpClientRequest } from '@effect/platform';
-import { HttpClient } from '@effect/platform/HttpClient';
+import { HttpClient, post } from '@effect/platform/HttpClient';
 import { NodeHttpClient } from '@effect/platform-node';
 
 import { fetchAndDecodeJSONEffect } from '@blocksense/base-utils/http';
@@ -105,6 +105,9 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
     readonly postReportsBatch: (
       reports: Array<ReportData>,
     ) => Effect.Effect<HttpClientResponse, HttpClientError | Error, never>;
+    readonly enableProvider: (
+      provider: string,
+    ) => Effect.Effect<void, Error, never>;
   }
 >() {
   static Live = Layer.effect(
@@ -130,7 +133,6 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
       const postReportsBatchUrl = yield* Effect.succeed(
         `${localhost}:${mainPort}/post_reports_batch`,
       );
-
       const reporterKey = yield* Effect.tryPromise(() =>
         selectDirectory(
           path.resolve(rootDir, 'nix/test-environments/test-keys'),
@@ -247,6 +249,14 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
 
             return yield* response;
           }).pipe(Effect.provide(NodeHttpClient.layer)),
+        enableProvider: (provider: string) => {
+          return Effect.gen(function* () {
+            const url = yield* Effect.succeed(
+              `${localhost}:${adminPort}/enable_provider/${provider}`,
+            );
+            return yield* post(url).pipe(Effect.provide(NodeHttpClient.layer));
+          });
+        },
       });
     }),
   );
