@@ -297,9 +297,22 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
     let mut observed_latest_height = 0;
     let mut loop_count: u64 = 0;
 
+    // Loop until block generation time is determined
+    let average_block_generation_time: u64 = loop {
+        let poll_period = 60 * 1000;
+        if let Some(t) =
+            calculate_block_generation_time_in_network(net.as_str(), &providers_mutex, 100).await
+        {
+            break t;
+        } else {
+            warn!("Could not determine block generation time for network: {net}. Will retry in {poll_period}ms")
+        }
+        await_time(poll_period).await;
+    };
+
     loop {
         // Sleep between polls
-        await_time(3000).await;
+        await_time(average_block_generation_time).await;
 
         loop_count += 1;
         {
@@ -489,6 +502,83 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
             }
         }
     }
+}
+
+/// Calculates the average block generation time over the last `num_blocks`
+/// as `(ts_latest - ts_{latest - num_blocks}) / num_blocks` (in milliseconds).
+/// Returns `None` if the calculation cannot be performed.
+pub async fn calculate_block_generation_time_in_network(
+    net: &str,
+    providers_mutex: &SharedRpcProviders,
+    num_blocks: u64,
+) -> Option<u64> {
+    if num_blocks == 0 {
+        warn!("num_blocks must be >= 1 for average block time in network {net}");
+        return None;
+    }
+    let providers = providers_mutex.read().await;
+    let Some(provider_mutex) = providers.get(net) else {
+        warn!("No active provider found for network {net}");
+        return None;
+    };
+    // Clone the RPC handle without holding the provider lock across awaits
+    let rpc_handle = {
+        let provider = provider_mutex.lock().await;
+        provider.provider.clone()
+    };
+
+    let latest_block = match rpc_handle
+        .get_block_by_number(BlockNumberOrTag::Latest)
+        .await
+    {
+        Ok(Some(b)) => b,
+        Ok(None) => {
+            warn!("Could not get latest block in network {net} (None)");
+            return None;
+        }
+        Err(e) => {
+            warn!("Error getting latest block in network {net}: {e:?}");
+            return None;
+        }
+    };
+
+    let latest_height = latest_block.header.inner.number;
+    if latest_height < num_blocks {
+        warn!(
+            "Latest block height {latest_height} < requested lookback {num_blocks} in network {net}"
+        );
+        return None;
+    }
+
+    let lookback_height = latest_height - num_blocks;
+    let prev_block = match rpc_handle
+        .get_block_by_number(BlockNumberOrTag::Number(lookback_height))
+        .await
+    {
+        Ok(Some(b)) => b,
+        Ok(None) => {
+            warn!("Could not get lookback block {lookback_height} in network {net} (None)");
+            return None;
+        }
+        Err(e) => {
+            warn!("Error getting lookback block {lookback_height} in network {net}: {e:?}");
+            return None;
+        }
+    };
+
+    let latest_ts = latest_block.header.inner.timestamp;
+    let prev_ts = prev_block.header.inner.timestamp;
+    if latest_ts < prev_ts {
+        warn!(
+            "Latest block timestamp < lookback block timestamp in {net}: {} < {}",
+            latest_ts, prev_ts
+        );
+        return None;
+    }
+    let total_span = latest_ts.saturating_sub(prev_ts);
+    // Convert to milliseconds before averaging to preserve precision.
+    let total_span_ms = total_span.saturating_mul(1000);
+    Some(total_span_ms / num_blocks)
 }
 
 #[allow(clippy::too_many_arguments)]
