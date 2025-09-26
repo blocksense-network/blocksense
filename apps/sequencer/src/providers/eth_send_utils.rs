@@ -476,6 +476,46 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                                     "First common ancestor for reorg in network {net} at height {common_height} with hash {}",
                                                     fmt_hash(&common_hash)
                                                 );
+                                            let fork_height = common_height + 1;
+                                            info!(
+                                                "Fork point for reorg in network {net} is at height {fork_height}"
+                                            );
+
+                                            // Print all non-finalized updates at or above the fork height
+                                            {
+                                                let provider = provider_mutex.lock().await;
+                                                let mut heights: Vec<u64> = provider
+                                                    .inflight
+                                                    .non_finalized_updates
+                                                    .keys()
+                                                    .copied()
+                                                    .filter(|h| *h >= fork_height)
+                                                    .collect();
+                                                heights.sort_unstable();
+
+                                                if heights.is_empty() {
+                                                    info!(
+                                                        "No non_finalized_updates at or above fork height {fork_height} in network {net}"
+                                                    );
+                                                } else {
+                                                    for h in heights {
+                                                        if let Some(batch) = provider
+                                                            .inflight
+                                                            .non_finalized_updates
+                                                            .get(&h)
+                                                        {
+                                                            let updates_count =
+                                                                batch.updates.updates.len();
+                                                            info!(
+                                                                "non_finalized_update >= fork: height={h}, batch_block_height={}, updates_count={}, net={}",
+                                                                batch.updates.block_height,
+                                                                updates_count,
+                                                                batch.net,
+                                                            );
+                                                        }
+                                                    }
+                                                }
+                                            }
                                         } else {
                                             warn!(
                                                     "Failed to find a common ancestor within stored block hashes for reorg in network {net}"
