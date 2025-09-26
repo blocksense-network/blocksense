@@ -12,43 +12,48 @@ import {
   encodeSSZData,
   TupleField,
   DecoderContract,
-} from '../templates';
+} from '../src';
 
-describe('Template Decoder @skip-coverage', function () {
+describe('Template Decoder', function () {
   this.timeout(1000000);
+
+  const evmVersionBefore = hre.config.solidity.compilers[0].settings.evmVersion;
+  const evmVersion = process.env.EVM_VERSION || 'cancun';
 
   const encodePacked = {
     contractName: 'EncodePackedDecoder',
-    templatePath: path.join(
-      __dirname,
-      '../templates/encode-packed/decoder.sol.ejs',
-    ),
+    templatePath: path.join(__dirname, '../src/encode-packed/decoder.sol.ejs'),
     tempFilePath: path.join(__dirname, '../contracts/EncodePackedDecoder.sol'),
   };
 
   const ssz = {
     contractName: 'SSZDecoder',
-    templatePath: path.join(__dirname, '../templates/ssz/decoder.sol.ejs'),
+    templatePath: path.join(__dirname, '../src/ssz/decoder.sol.ejs'),
     tempFilePath: path.join(__dirname, '../contracts/SSZDecoder.sol'),
   };
 
-  before(() => {
-    hre.config.solidity.compilers[0].settings.viaIR = true;
-    hre.config.solidity.compilers[0].settings.evmVersion = 'cancun';
+  before(function () {
+    hre.config.solidity.compilers[0].settings.evmVersion = evmVersion;
   });
 
   async function generateAndDeployDecoders(fields: TupleField) {
+    // Check if `contracts` directory exists, if not create it
+    const contractsDir = path.join(__dirname, '../contracts');
+    if (!(await fs.stat(contractsDir).catch(() => false))) {
+      await fs.mkdir(contractsDir, { recursive: true });
+    }
+
     const templateEP = await fs.readFile(encodePacked.templatePath, 'utf-8');
     const templateSSZ = await fs.readFile(ssz.templatePath, 'utf-8');
 
     await fs.writeFile(
       encodePacked.tempFilePath,
-      await generateEPDecoder(templateEP, fields),
+      await generateEPDecoder(templateEP, fields, evmVersion),
       'utf-8',
     );
     await fs.writeFile(
       ssz.tempFilePath,
-      await generateSSZDecoder(templateSSZ, fields),
+      await generateSSZDecoder(templateSSZ, fields, evmVersion),
       'utf-8',
     );
 
@@ -59,10 +64,11 @@ describe('Template Decoder @skip-coverage', function () {
     );
     const DecoderFactorySSZ = await ethers.getContractFactory(ssz.contractName);
     return {
-      decoderEP: (await DecoderFactoryEP.deploy()) as BaseContract &
+      decoderEP: (await DecoderFactoryEP.deploy()) as unknown as BaseContract &
         DecoderContract,
-      decoderSSZ: (await DecoderFactorySSZ.deploy()) as BaseContract &
-        DecoderContract,
+      decoderSSZ:
+        (await DecoderFactorySSZ.deploy()) as unknown as BaseContract &
+          DecoderContract,
     };
   }
 
@@ -83,8 +89,15 @@ describe('Template Decoder @skip-coverage', function () {
   });
 
   after(() => {
-    hre.config.solidity.compilers[0].settings.viaIR = false;
-    hre.config.solidity.compilers[0].settings.evmVersion = '';
+    hre.config.solidity.compilers[0].settings.evmVersion = evmVersionBefore;
+
+    // Check if `contracts` directory is empty, if yes remove it
+    const contractsDir = path.join(__dirname, '../contracts');
+    fs.readdir(contractsDir).then(files => {
+      if (files.length === 0) {
+        fs.rmdir(contractsDir);
+      }
+    });
   });
 
   describe('Primitive', function () {
@@ -1917,6 +1930,40 @@ describe('Template Decoder @skip-coverage', function () {
         [123, ethers.hexlify(ethers.randomBytes(16))],
         [456, ethers.hexlify(ethers.randomBytes(16))],
       ];
+
+      await testDecoder(fields, values);
+    });
+
+    it('should decode main tuple with lower case name', async () => {
+      const fields: TupleField = {
+        name: 'mainTuple',
+        type: 'tuple',
+        components: [
+          { name: 'id', type: 'uint256', size: 256 },
+          {
+            name: 'record',
+            type: 'string',
+          },
+        ],
+      };
+      const values = [123, 'Some data string'];
+
+      await testDecoder(fields, values);
+    });
+
+    it('should decode main tuple with "data" field', async () => {
+      const fields: TupleField = {
+        name: 'MainTuple',
+        type: 'tuple',
+        components: [
+          { name: 'id', type: 'uint256', size: 256 },
+          {
+            name: 'data',
+            type: 'string',
+          },
+        ],
+      };
+      const values = [123, 'Some data string'];
 
       await testDecoder(fields, values);
     });

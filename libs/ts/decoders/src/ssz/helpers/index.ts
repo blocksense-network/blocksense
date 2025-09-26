@@ -1,11 +1,18 @@
 import { Schema, Offset, isVector, hasFields } from '../utils/';
 import { addOffsets } from '../utils/addOffsets';
 import { handleFieldRanges } from '../utils/container';
-import { generateDecoderPrimitiveLines } from './primitiveField';
-import { generateDecoderStringBytes } from './stringBytes';
+import { getDecoderImplementations } from '../utils';
 import { generateNestedDynamic } from './nestedDynamic';
 
-export const generateDecoderLines = (schema: Schema, name: string) => {
+export const generateDecoderLines = (
+  schema: Schema,
+  name: string,
+  evmVersion: string,
+  start: number = 0,
+): string[] => {
+  const { generateDecoderPrimitiveLines, generateDecoderStringBytes } =
+    getDecoderImplementations(evmVersion);
+
   let dynamicIndex = 0;
   const generateDecoderLines = (
     schema: Schema,
@@ -280,12 +287,23 @@ export const generateDecoderLines = (schema: Schema, name: string) => {
     );
   };
 
-  return generateDecoderLines(
-    schema,
-    name,
-    0,
-    32, // data starts 32 bytes after beginning (this is where length is stored)
-    'add(mload(data), 32)', // load length of data
-    null,
+  const lines: string[] = [];
+  let length = 'mload(data)'; // default length location
+  if (start) {
+    lines.push(
+      `let data_length := shr(${256 - start * 8}, mload(add(data, 32)))`,
+    );
+    length = 'data_length';
+  }
+
+  return lines.concat(
+    generateDecoderLines(
+      schema,
+      name,
+      0,
+      32 + start, // data starts 32 bytes after beginning (this is where length is stored)
+      `add(${length}, 32)`, // load length of data
+      null,
+    ),
   );
 };

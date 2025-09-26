@@ -2,6 +2,7 @@ import { encodeSSZData, sszSchema } from './encodeData';
 import { Schema, BytesRange, Offset, isVector, hasFields } from './types';
 import { addOffsets } from './addOffsets';
 import { handleFieldRanges } from './container';
+import { getDecoderImplementations } from './helpers';
 
 export {
   // encode data
@@ -18,4 +19,5 @@ export {
   // helpers
   addOffsets,
   handleFieldRanges,
+  getDecoderImplementations,
 };
