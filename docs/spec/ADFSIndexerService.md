@@ -309,7 +309,7 @@ CREATE TABLE processing_state (
 
 - **Backfill**:
 
-  - One **backfill worker per chain** scanning `getLogs` from `startBlock` with adaptive ranges (start at 2k blocks; shrink on RPC errors).
+  - One **backfill worker per chain** scanning `getLogs` from `startBlock` with adaptive ranges (initial span pulled from config, defaulting to 10k blocks; shrink on RPC errors).
   - Backfill and live tail run concurrently; the writer enforces ordering.
 
 - **DB writes**:
