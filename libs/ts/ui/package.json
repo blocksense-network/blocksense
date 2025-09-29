@@ -24,6 +24,7 @@
     "@storybook/addon-designs": "^10.0.1",
     "@storybook/addon-docs": "^9.0.14",
     "@storybook/nextjs-vite": "^9.0.15",
+    "@tailwindcss/cli": "^4.1.13",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24.3.1",
     "@types/react": "^19",
