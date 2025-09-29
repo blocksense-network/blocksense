@@ -202,7 +202,7 @@ CREATE TABLE feed_updates (
   rb_index        SMALLINT NOT NULL,          -- ring buffer index within feed (u16)
   data            BYTEA NOT NULL,
   extra           JSONB   NOT NULL DEFAULT '{}'::jsonb,
-  PRIMARY KEY (chain_id, tx_hash, log_index, feed_id, rb_index)
+  PRIMARY KEY (chain_id, tx_hash, log_index, feed_id, stride, rb_index)
 ) PARTITION BY LIST (chain_id);
 
 CREATE INDEX feed_updates_idx_latest
@@ -979,7 +979,7 @@ CREATE TABLE feed_updates (
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
 
-  PRIMARY KEY (chain_id, tx_hash, log_index, feed_id, ring_index)
+  PRIMARY KEY (chain_id, tx_hash, log_index, feed_id, stride, ring_index)
 ) PARTITION BY LIST (chain_id);
 ```
 
