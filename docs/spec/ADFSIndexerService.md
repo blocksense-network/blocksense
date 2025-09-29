@@ -84,9 +84,9 @@ Below is a complete, implementation-ready **software specification** for your mu
 |  - ConfigLayer       (JSON -> types, no hot reload)                  |
 |  - RpcLayer          (viem clients: HTTP + WS)                       |
 |  - DbLayer           (Postgres pool)                                 |
-|  - MetricsLayer      (Prometheus)                                    |
+|  - MetricsLayer      (Effect tracing spans → Prom exporter)          |
 |  - LogLayer          (JSON logs)                                     |
-|  - TracingLayer      (OTel)                                          |
+|  - TracingLayer      (Effect metrics counters)                       |
 |                                                                      |
 |  Supervisors:                                                        |
 |  - ChainRuntime[chain]                                               |
@@ -396,9 +396,11 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
 - **ConfigLayer**: parses JSON, validates against schema.
 - **RpcLayer**: builds per-chain viem clients (`publicClient` HTTP + `webSocketClient`) with fallback selection across configured endpoint arrays.
 - **DbLayer**: `pg` pool with tuned pool size; exposes repo methods (idempotent UPSERTs).
-- **MetricsLayer**: Prometheus registry + HTTP endpoint `/metrics`.
+- **MetricsLayer**: wraps `Effect.Tracing` instrumentation (see Effect observability docs) to create spans around pipeline stages, derives latency metrics from span data, and exposes them via a Prometheus `/metrics` endpoint.
 - **LogLayer**: JSON structured logging (`pino` or `console` wrapper).
-- **TracingLayer**: OpenTelemetry instrumentation; OTLP export if endpoint present.
+- **TracingLayer**: uses `Effect.Metric` primitives to register counters/histograms (ingest lag, error rates) and exports them to OTLP/Prom sinks configured by the metrics module.
+
+  Reference: Effect observability guides — tracing (`https://effect.website/docs/observability/tracing/`) for span instrumentation powering the MetricsLayer, and metrics (`https://effect.website/docs/observability/metrics/`) for the TracingLayer data-plane counters.
 
 ### 9.2 Fibers per chain
 
@@ -836,8 +838,12 @@ Build a multichain indexer that listens to a single proxy‑fronted ADFS contrac
 
 - **MetricsLayer / LoggingLayer**:
 
-  - Prometheus endpoint; JSON structured logs.
-  - Optional OTLP tracing (disabled unless endpoint env is present).
+  - `Effect.Tracing` spans wrap ingestion/backfill stages; span annotations feed the Prometheus metrics exporter.
+  - JSON structured logs remain; OTLP span export only when the endpoint env is present.
+
+- **TracingLayer**:
+
+  - Uses `Effect.Metric` counters/histograms to track per-chain lag, queue depth, and error rates; metrics flow either to Prometheus or OTLP depending on runtime configuration.
 
 - **Supervisor**:
 
