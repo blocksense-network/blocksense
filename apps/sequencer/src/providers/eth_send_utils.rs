@@ -594,6 +594,8 @@ pub async fn eth_batch_send_to_contract(
             .with_chain_id(chain_id)
             .input(Some(input.clone()).into());
 
+        tx.set_input_and_data();
+
         let gas_limit = get_gas_limit(
             net.as_str(),
             rpc_handle,
