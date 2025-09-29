@@ -150,6 +150,7 @@ pub async fn get_serialized_updates_for_network(
     Ok(serialized_updates)
 }
 
+#[derive(Clone)]
 pub struct BatchOfUpdatesToProcess {
     pub net: String,
     pub provider: Arc<Mutex<RpcProvider>>,
@@ -1770,6 +1771,270 @@ mod tests {
         None
     }
 
+    async fn mine_self_txs(
+        rpc: &ProviderType,
+        signer: &alloy::signers::local::PrivateKeySigner,
+        count: u64,
+    ) -> eyre::Result<()> {
+        use alloy::network::TransactionBuilder;
+        use alloy::rpc::types::TransactionRequest;
+        for _ in 0..count {
+            let tx = TransactionRequest::default()
+                .to(signer.address())
+                .value(U256::from(0u8));
+            let pending = rpc.send_transaction(tx).await?;
+            // Wait for inclusion to make sure a block is mined
+            let _ = pending.get_receipt().await?;
+        }
+        Ok(())
+    }
+
+    async fn rpc_call(
+        url: &str,
+        method: &str,
+        params: serde_json::Value,
+    ) -> eyre::Result<serde_json::Value> {
+        let client = reqwest::Client::new();
+        let body = serde_json::json!({
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": method,
+            "params": params,
+        });
+        let resp = client.post(url).json(&body).send().await?;
+        let v: serde_json::Value = resp.json().await?;
+        if let Some(err) = v.get("error") {
+            eyre::bail!(format!("rpc error on {method}: {err}"));
+        }
+        Ok(v["result"].clone())
+    }
+
+    async fn anvil_snapshot(url: &str) -> eyre::Result<String> {
+        // Try anvil_snapshot, then evm_snapshot as fallback
+        match rpc_call(url, "anvil_snapshot", serde_json::json!([])).await {
+            Ok(v) => Ok(v.as_str().unwrap_or_default().to_string()),
+            Err(_) => {
+                let v = rpc_call(url, "evm_snapshot", serde_json::json!([])).await?;
+                Ok(v.as_str().unwrap_or_default().to_string())
+            }
+        }
+    }
+
+    async fn anvil_revert(url: &str, snap: &str) -> eyre::Result<()> {
+        // Prefer anvil_revert; fallback to evm_revert
+        let params = serde_json::json!([snap]);
+        match rpc_call(url, "anvil_revert", params.clone()).await {
+            Ok(_v) => Ok(()),
+            Err(_) => {
+                let _ = rpc_call(url, "evm_revert", params).await?;
+                Ok(())
+            }
+        }
+    }
+
+    // End-to-end style test that reproduces a fork and exercises the reorg tracker loop.
+    // It also verifies that a resync of indices is initiated when the on-chain root differs
+    // from the local calldata-merkle frontier (without deploying contracts).
+    #[tokio::test]
+    async fn loop_tracking_reorg_detect_and_resync_indices() {
+        // 1) Spin up anvil and build a provider bound to its first funded key
+        let anvil = Anvil::new().try_spawn().unwrap();
+        let net = "ETH1";
+
+        // Write the anvil key to a temp file that SequencerConfig will use
+        let signer = anvil.keys()[0].clone();
+        let signer_hex = signer.to_bytes().encode_hex();
+        let tmp_dir = tempfile::tempdir().unwrap();
+        let key_path = tmp_dir.path().join("key");
+        std::fs::write(&key_path, signer_hex).unwrap();
+
+        // Minimal feeds config with a single feed so resync has keys to refresh
+        let feed = test_feed_config(13, 0);
+        let feeds_config = AllFeedsConfig {
+            feeds: vec![feed.clone()],
+        };
+
+        let mut cfg = get_test_config_with_single_provider(
+            net,
+            key_path.as_path(),
+            anvil.endpoint().as_str(),
+        );
+        // Ensure we do not auto-load indices during init to keep control in the test
+        if let Some(p) = cfg.providers.get_mut(net) {
+            p.should_load_rb_indices = false;
+        }
+
+        let providers = init_shared_rpc_providers(&cfg, Some("test_reorg_"), &feeds_config).await;
+        let provider_mutex = providers.read().await.get(net).unwrap().clone();
+
+        // 2) Seed local state: non-zero local calldata frontier and initial observed hash for height 0
+        {
+            let mut provider = provider_mutex.lock().await;
+
+            // Make local frontier root non-zero so the loop triggers a resync vs on-chain (zero) root
+            let dummy_leaf = keccak256([0x42u8; 32]);
+            provider
+                .calldata_merkle_tree_frontier
+                .append(HashValue(dummy_leaf));
+
+            // Pre-set an rb index value to detect refresh to on-chain (expected zero)
+            let encoded = EncodedFeedId::new(13u128, 0);
+            provider.rb_indices.insert(encoded, 7);
+
+            // Insert observed hash for genesis (height 0) so the first loop can progress without finalized support
+            if let Ok(Some(genesis)) = provider
+                .provider
+                .get_block_by_number(BlockNumberOrTag::Number(0))
+                .await
+            {
+                provider.insert_observed_block_hash(0, genesis.header.hash);
+            }
+        }
+
+        // 3) Pre-mine 110 blocks by sending self txs to ensure avg block time > 0
+        {
+            let provider = provider_mutex.lock().await;
+            mine_self_txs(&provider.provider, &provider.signer, 110)
+                .await
+                .expect("failed to pre-mine blocks");
+        }
+
+        // Snapshot the chain at T0
+        let snapshot_id = anvil_snapshot(anvil.endpoint().as_str())
+            .await
+            .expect("snapshot should succeed");
+
+        // 4) Start the reorg tracking loop in background
+        let loop_handle = tokio::spawn(loop_tracking_for_reorg_in_network(
+            net.to_string(),
+            providers.clone(),
+        ));
+
+        // Give the loop time to run once and ingest the chain
+        tokio::time::sleep(std::time::Duration::from_millis(1500)).await;
+
+        // Produce a few more blocks so observed_latest_height advances to T1 > T0
+        {
+            let provider = provider_mutex.lock().await;
+            mine_self_txs(&provider.provider, &provider.signer, 5)
+                .await
+                .expect("failed to add blocks after snapshot");
+        }
+
+        // Give it time to incorporate the new tip
+        tokio::time::sleep(std::time::Duration::from_millis(1200)).await;
+
+        // Capture current latest height (T1) and the observed hash we stored for it
+        let (t1_height, observed_t1_hash) = {
+            let provider = provider_mutex.lock().await;
+            let latest = provider
+                .provider
+                .get_block_by_number(BlockNumberOrTag::Latest)
+                .await
+                .unwrap()
+                .unwrap();
+            let h = latest.header.inner.number;
+            let obs = provider.inflight.observed_block_hashes.get(&h).copied();
+            (h, obs)
+        };
+
+        // Inject non-finalized updates at heights >= fork_height (which will be T0 + 1)
+        // We cannot know T0 precisely here, but using T1 and T1-1 guarantees >= fork.
+        {
+            let mut provider = provider_mutex.lock().await;
+            let enc = EncodedFeedId::new(13u128, 0);
+            let provider_settings = cfg.providers.get(net).unwrap().clone();
+            let feeds_map: Arc<
+                RwLock<HashMap<EncodedFeedId, blocksense_registry::config::FeedConfig>>,
+            > = Arc::new(RwLock::new(HashMap::new()));
+            let dummy_updates = BatchedAggregatesToSend {
+                block_height: 0,
+                updates: vec![],
+            };
+            let batch = BatchOfUpdatesToProcess {
+                net: net.to_string(),
+                provider: provider_mutex.clone(),
+                provider_settings: provider_settings.clone(),
+                updates: dummy_updates.clone(),
+                feeds_config: feeds_map.clone(),
+                transaction_retry_timeout_secs: 3,
+                transaction_retries_count_limit: 1,
+                retry_fee_increment_fraction: 0.1,
+            };
+            // Insert at T1 and T1-1
+            provider
+                .inflight
+                .insert_non_finalized_update(t1_height, batch.clone());
+            if t1_height > 0 {
+                provider
+                    .inflight
+                    .insert_non_finalized_update(t1_height - 1, batch);
+            }
+            // Also ensure the feed index map has our key
+            provider.rb_indices.insert(enc, 7);
+        }
+
+        // 5) Revert to the snapshot (T0) and mine a different branch beyond T1
+        anvil_revert(anvil.endpoint().as_str(), snapshot_id.as_str())
+            .await
+            .expect("revert should succeed");
+
+        // Mine enough blocks to surpass T1 + 1 on the new branch
+        {
+            let provider = provider_mutex.lock().await;
+            let needed = 8u64; // mine a few to be safely past T1
+            mine_self_txs(&provider.provider, &provider.signer, needed)
+                .await
+                .expect("failed to mine on new branch");
+        }
+
+        // Let the loop observe the new branch and trigger resync
+        tokio::time::sleep(std::time::Duration::from_millis(2000)).await;
+
+        // Abort the loop to finish the test
+        loop_handle.abort();
+
+        // 6) Assert reorg happened (chain hash at T1 changed vs previously observed)
+        let chain_t1_hash = {
+            let provider = provider_mutex.lock().await;
+            provider
+                .provider
+                .get_block_by_number(BlockNumberOrTag::Number(t1_height))
+                .await
+                .unwrap()
+                .unwrap()
+                .header
+                .hash
+        };
+        if let Some(prev_obs) = observed_t1_hash {
+            assert_ne!(
+                chain_t1_hash, prev_obs,
+                "Chain did not diverge at height {} as expected",
+                t1_height
+            );
+        }
+
+        // 7) Assert indices resync was initiated: merkle_root_in_contract is set from chain (zero) and rb_indices refreshed
+        {
+            let provider = provider_mutex.lock().await;
+            // On empty address storage, root is zero
+            assert_eq!(
+                provider.merkle_root_in_contract.unwrap().0,
+                B256::ZERO,
+                "Expected merkle_root_in_contract to be updated from chain root"
+            );
+
+            let idx = provider
+                .rb_indices
+                .get(&EncodedFeedId::new(13u128, 0))
+                .copied();
+            assert_eq!(
+                idx,
+                Some(0),
+                "Expected rb index for the feed to be refreshed from chain (default 0)"
+            );
+        }
+    }
     #[tokio::test]
     async fn test_deploy_contract_returns_valid_address() {
         // setup
