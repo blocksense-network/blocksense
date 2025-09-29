@@ -126,6 +126,7 @@ pub struct RpcProvider {
     pub rb_indices: RoundBufferIndices,
     num_tx_in_progress: u32,
     pub inflight: InflightObservations,
+    pub reorgs_count: Arc<Mutex<u64>>,
 }
 
 #[derive(PartialEq, Debug, Serialize, Deserialize)]
@@ -359,6 +360,7 @@ impl RpcProvider {
             rb_indices: RoundBufferIndices::new(),
             num_tx_in_progress: 0,
             inflight: InflightObservations::new(),
+            reorgs_count: Arc::new(Mutex::new(0)),
         }
     }
 
