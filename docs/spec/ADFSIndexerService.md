@@ -65,8 +65,6 @@ Below is a complete, implementation-ready **software specification** for your mu
 - **Observability**: Prometheus metrics; Grafana dashboards; JSON logs; OpenTelemetry tracing (endpoint to be provided).
 - **Limits/guards**:
 
-  - `maxFeedsLength` (default **10,000**, configurable).
-  - `maxCalldataBytes` (configurable, **128 KB** default).
   - Bounded in‑memory queue per chain with **drop‑oldest** (configurable size).
 
 ---
@@ -358,11 +356,8 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
 ```json
 {
   "service": {
-    "mode": "multi|single", // allows multichain in one process or one chain per process
     "queueMaxItems": 10000, // default; drop-oldest policy
-    "dbWriteBatchRows": 200,
-    "maxCalldataBytes": 131072, // 128 KB default
-    "maxFeedsLength": 10000 // anomaly guard
+    "dbWriteBatchRows": 200
   },
   "chains": [
     {
@@ -587,8 +582,6 @@ LIMIT 1;
 
 - `db_write_batch_rows`: **200**
 - `queue_max_items`: **10,000**
-- `maxCalldataBytes`: **131,072** (128 KB)
-- `maxFeedsLength`: **10,000**
 - Backfill range step: start **2,000** blocks; shrink to **256** on error
 - Confirmations per chain: from config
 - Metrics endpoint: `:8080/metrics`
@@ -1080,11 +1073,9 @@ CREATE TABLE processing_state (
 
   - Fetch tx (`eth_getTransactionByHash`) and header (`eth_getBlockByNumber`).
   - Derive `hasBlockNumber` from current **version** (VersionManager).
-  - Decode calldata with `decodeADFSCalldata`; validate guardrails:
+  - Decode calldata with `decodeADFSCalldata`; drop rows failing contract-level guardrails.
 
-    - `feedsLength ≤ maxFeedsLength`; `input.length ≤ maxCalldataSize`.
-
-  - Emit to per‑chain **OrderingBuffer**.
+  - Emit to per-chain **OrderingBuffer**.
 
 - Update `backfill_cursor` and `last_seen_block`/`last_safe_block`.
 
@@ -1136,10 +1127,6 @@ For an ordered batch belonging to one **block**:
       "queue": { "maxItems": 10000 }
     }
   ],
-  "limits": {
-    "maxFeedsLength": 10000,
-    "maxCalldataBytes": 131072
-  },
   "db": {
     "batch": { "maxInsert": 100 }, // default; tunable
     "migrations": { "tool": "drizzle" }
