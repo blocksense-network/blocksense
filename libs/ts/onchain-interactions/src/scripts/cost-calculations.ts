@@ -13,11 +13,12 @@ import {
   parseNetworkName,
   EthereumAddress,
   parseEthereumAddress,
+  isTestnet,
 } from '@blocksense/base-utils/evm';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 import { throwError } from '@blocksense/base-utils/errors';
 
-import { Transaction, deployedNetworks } from '../types';
+import { Transaction, deployedTestnets, deployedMainnets } from '../types';
 import { startPrometheusServer } from '../utils';
 
 const networksUseSecondExplorer: NetworkName[] = [
@@ -388,7 +389,6 @@ const DEFAULT_FIRST_TX_TIME = '';
 const DEFAULT_LAST_TX_TIME = '';
 
 const main = async (): Promise<void> => {
-  const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
   const argv = await yargs(hideBin(process.argv))
     .usage(
       'Usage: $0 --numberOfTransactions <number> [--address <ethereum address>]',
@@ -397,7 +397,7 @@ const main = async (): Promise<void> => {
       alias: 'a',
       describe: 'Ethereum address to fetch transactions for',
       type: 'string',
-      default: sequencerAddress,
+      default: '',
     })
     .option('numberOfTransactions', {
       alias: 'num',
@@ -440,11 +440,32 @@ const main = async (): Promise<void> => {
       type: 'number',
       default: 9100,
     })
+    .option('mainnet', {
+      alias: 'm',
+      describe: 'Show mainnet costs',
+      type: 'boolean',
+      default: false,
+    })
     .help()
     .alias('help', 'h')
     .parse();
 
-  const address = parseEthereumAddress(argv.address);
+  const parsedNetwork = argv.network ? parseNetworkName(argv.network) : null;
+  const shouldUseMainnetSequencer =
+    argv.mainnet || (parsedNetwork !== null && !isTestnet(parsedNetwork));
+
+  const sequencerAddress = parseEthereumAddress(
+    getEnvStringNotAssert(
+      shouldUseMainnetSequencer
+        ? 'SEQUENCER_ADDRESS_MAINNET'
+        : 'SEQUENCER_ADDRESS_TESTNET',
+    ),
+  );
+
+  const address: EthereumAddress = argv.address
+    ? parseEthereumAddress(argv.address)
+    : sequencerAddress;
+
   let gauges: Gauges | null = null;
 
   if (argv.prometheus) {
@@ -491,7 +512,11 @@ const main = async (): Promise<void> => {
   );
 
   const networks =
-    argv.network == '' ? deployedNetworks : [parseNetworkName(argv.network)];
+    argv.network == ''
+      ? argv.mainnet
+        ? deployedMainnets
+        : deployedTestnets
+      : [parseNetworkName(argv.network)];
 
   for (const network of networks) {
     const { transactions, firstTxTime, lastTxTime } =
