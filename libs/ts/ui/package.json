@@ -9,8 +9,10 @@
     "./utils/renderEmail": "./src/utils/renderEmail.tsx"
   },
   "scripts": {
+    "build": "yarn build-tailwind",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "build-tailwind": "tailwindcss -i src/styles/globals.css -o dist/style.css"
   },
   "peerDependencies": {
     "next": "*",
