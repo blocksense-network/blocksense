@@ -378,13 +378,12 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
 > `hasBlockNumber` **not** in config (derived by version).
 > Provide HTTP/WS RPC endpoints as arrays in priority order; the service tries each until one succeeds.
 > **Rate limits** and **max queue size** are optional config knobs; defaults provided.
-> `topicName` is a config‑only field; the database persists only the computed hash (`topic0`) as `BYTEA` (e.g., `chains.topic_hash`, `contracts.topic_hash`, `events_adfs.topic0`).
+> `topicName` is a config-only field; the database persists only the computed hash (`topic0`) as `BYTEA` (e.g., `chains.topic_hash`, `contracts.topic_hash`, `events_adfs.topic0`).
+> Embed any provider API keys directly in the RPC URLs; no extra env indirection.
 
 **Env variables**:
 
 - `PG_URL` (writer)
-- `PG_URL_RO` (read-only for consumers)
-- `RPC_KEY_*` (if provider requires keys)
 - `OTEL_EXPORTER_OTLP_ENDPOINT` (when provided)
 - `LOG_LEVEL` (`info` default)
 
