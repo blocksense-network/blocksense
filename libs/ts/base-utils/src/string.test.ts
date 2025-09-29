@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
 
-import { camelCaseToScreamingSnakeCase, envVarNameJoin } from './string';
+import {
+  camelCaseToScreamingSnakeCase,
+  envVarNameJoin,
+  kebabToHumanReadable,
+} from './string';
 
 describe('camelCaseSnakeCase', () => {
   it('should convert a simple camelCase string to SNAKE_CASE', () => {
@@ -95,6 +99,38 @@ describe('envVarNameJoin', () => {
   it('should handle parts with numbers', () => {
     expect(envVarNameJoin('part1', 'part2WithNumber')).toBe(
       'PART1_PART2_WITH_NUMBER',
+    );
+  });
+});
+
+describe('kebabToHumanReadable', () => {
+  it('converts simple kebab-case to human readable', () => {
+    expect(kebabToHumanReadable('this-is-cool')).toBe('This Is Cool');
+  });
+
+  it('handles single segment', () => {
+    expect(kebabToHumanReadable('single')).toBe('Single');
+  });
+
+  it('handles empty string', () => {
+    expect(kebabToHumanReadable('')).toBe('');
+  });
+
+  it('skips consecutive dashes (empty segments)', () => {
+    expect(kebabToHumanReadable('this--is---cool')).toBe('This Is Cool');
+  });
+
+  it('handles leading and trailing dashes', () => {
+    expect(kebabToHumanReadable('-leading-trailing-')).toBe('Leading Trailing');
+  });
+
+  it('preserves inner casing except first letter capitalization', () => {
+    expect(kebabToHumanReadable('mixED-case-WORD')).toBe('MixED Case WORD');
+  });
+
+  it('handles numbers in segments', () => {
+    expect(kebabToHumanReadable('version-2-release-10')).toBe(
+      'Version 2 Release 10',
     );
   });
 });
