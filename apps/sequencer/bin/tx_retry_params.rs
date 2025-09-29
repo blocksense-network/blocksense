@@ -98,10 +98,12 @@ async fn main() -> Result<()> {
 
     // 1) to, from, data
     {
-        let tx_request = TransactionRequest::default()
+        let mut tx_request = TransactionRequest::default()
             .to(to_address)
             .with_from(signer.address())
             .input(Some(input.clone()).into());
+
+        tx_request.set_input_and_data();
 
         println!("1) to, from, data: {tx_request:?}");
         let gas_limit = get_gas_limit(
@@ -133,11 +135,13 @@ async fn main() -> Result<()> {
             }
         };
 
-        let tx_request = TransactionRequest::default()
+        let mut tx_request = TransactionRequest::default()
             .to(to_address)
             .with_nonce(nonce)
             .with_from(signer.address())
             .input(Some(input.clone()).into());
+
+        tx_request.set_input_and_data();
 
         println!("2) to, from, data, nonce: {tx_request:?}");
         let gas_limit = get_gas_limit(
@@ -170,11 +174,13 @@ async fn main() -> Result<()> {
             }
         };
 
-        let tx_request = TransactionRequest::default()
+        let mut tx_request = TransactionRequest::default()
             .to(to_address)
             .with_from(signer.address())
             .with_chain_id(chain_id)
             .input(Some(input.clone()).into());
+
+        tx_request.set_input_and_data();
 
         println!("3) to, from, data, chain_id: {tx_request:?}");
         let gas_limit = get_gas_limit(
@@ -223,12 +229,14 @@ async fn main() -> Result<()> {
             }
         };
 
-        let tx_request = TransactionRequest::default()
+        let mut tx_request = TransactionRequest::default()
             .to(to_address)
             .with_nonce(nonce)
             .with_from(signer.address())
             .with_chain_id(chain_id)
             .input(Some(input.clone()).into());
+
+        tx_request.set_input_and_data();
 
         println!("4) to, from, data, nonce, chain_id: {tx_request:?}");
         let gas_limit = get_gas_limit(
