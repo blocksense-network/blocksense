@@ -363,8 +363,8 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
     {
       "chainId": 1,
       "name": "ethereum",
-      "rpcHttp": "https://.../",
-      "rpcWs": "wss://.../",
+      "rpcHttp": ["https://.../"], // fallback order
+      "rpcWs": ["wss://.../"],
       "finality": 12,
       "contractAddress": "0xProxyAddress", // proxy
       "topicName": "DataFeedsUpdated(uint256)",
@@ -376,6 +376,7 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
 ```
 
 > `hasBlockNumber` **not** in config (derived by version).
+> Provide HTTP/WS RPC endpoints as arrays in priority order; the service tries each until one succeeds.
 > **Rate limits** and **max queue size** are optional config knobs; defaults provided.
 > `topicName` is a config‑only field; the database persists only the computed hash (`topic0`) as `BYTEA` (e.g., `chains.topic_hash`, `contracts.topic_hash`, `events_adfs.topic0`).
 
@@ -394,7 +395,7 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
 ### 9.1 Layers
 
 - **ConfigLayer**: parses JSON, validates against schema.
-- **RpcLayer**: builds per‑chain viem clients (`publicClient` HTTP + `webSocketClient`).
+- **RpcLayer**: builds per-chain viem clients (`publicClient` HTTP + `webSocketClient`) with fallback selection across configured endpoint arrays.
 - **DbLayer**: `pg` pool with tuned pool size; exposes repo methods (idempotent UPSERTs).
 - **MetricsLayer**: Prometheus registry + HTTP endpoint `/metrics`.
 - **LogLayer**: JSON structured logging (`pino` or `console` wrapper).
@@ -1116,8 +1117,11 @@ For an ordered batch belonging to one **block**:
     {
       "name": "Ethereum",
       "chainId": 1,
-      "rpcHttp": "https://provider.example/http",
-      "rpcWs": "wss://provider.example/ws",
+      "rpcHttp": [
+        "https://provider.example/http",
+        "https://backup.example/http"
+      ], // fallback order
+      "rpcWs": ["wss://provider.example/ws"],
       "contractAddress": "0xProxyAddress",
       "topicName": "DataFeedsUpdated(uint256)",
       "startBlock": 19000000,
