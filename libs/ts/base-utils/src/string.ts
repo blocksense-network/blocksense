@@ -53,6 +53,35 @@ export function kebabToCamelCase<Str extends string>(
 }
 
 /**
+ * Converts a kebab-case string literal type to Human Readable Title Case with spaces.
+ */
+export type KebabToHumanReadable<S extends string> =
+  S extends `${infer Head}-${infer Tail}`
+    ? `${Capitalize<Head>} ${KebabToHumanReadable<Tail>}`
+    : Capitalize<S>;
+
+/**
+ * Converts a kebab-case (dash-separated) string into a Human Readable Title Case string.
+ * Consecutive dashes are treated as a single separator at runtime (empty segments skipped).
+ * @param str - The kebab-case string to convert.
+ * @returns Human readable Title Case string (e.g. `"this-is-cool" -> "This Is Cool"`).
+ * @example
+ * ```ts
+ * kebabToHumanReadable('this-is-cool'); // 'This Is Cool'
+ * ```
+ * @see {@link KebabToHumanReadable}
+ */
+export function kebabToHumanReadable<Str extends string>(
+  str: Str,
+): KebabToHumanReadable<Str> {
+  return str
+    .split('-')
+    .filter(segment => segment.length > 0)
+    .map(segment => segment[0].toUpperCase() + segment.slice(1))
+    .join(' ') as KebabToHumanReadable<Str>;
+}
+
+/**
  * Converts a camelCase string to SCREAMING_SNAKE_CASE.
  * @param str - The camelCase string to convert.
  * @returns The SCREAMING_SNAKE_CASE version of the input string.
