@@ -1777,14 +1777,31 @@ mod tests {
         count: u64,
     ) -> eyre::Result<()> {
         use alloy::network::TransactionBuilder;
+        use alloy::primitives::U256 as U;
         use alloy::rpc::types::TransactionRequest;
+
+        // Fetch chain id and starting nonce
+        let chain_id = rpc.get_chain_id().await?;
+        let mut nonce = rpc
+            .get_transaction_count(signer.address())
+            .pending()
+            .await?;
+
         for _ in 0..count {
-            let tx = TransactionRequest::default()
+            let mut tx = TransactionRequest::default()
                 .to(signer.address())
-                .value(U256::from(0u8));
+                .from(signer.address())
+                .with_chain_id(chain_id)
+                .with_nonce(nonce)
+                .value(U::from(0u8));
+            // Provide minimal gas params since recommended fillers are disabled on the provider
+            tx = tx.with_gas_limit(21_000);
+            // Use legacy gas pricing for simplicity
+            tx = tx.with_gas_price(1_000_000_000u128); // 1 gwei
+
             let pending = rpc.send_transaction(tx).await?;
-            // Wait for inclusion to make sure a block is mined
             let _ = pending.get_receipt().await?;
+            nonce += 1;
         }
         Ok(())
     }
@@ -1836,7 +1853,7 @@ mod tests {
     // It also verifies that a resync of indices is initiated when the on-chain root differs
     // from the local calldata-merkle frontier (without deploying contracts).
     #[tokio::test]
-    async fn loop_tracking_reorg_detect_and_resync_indices() {
+    async fn test_loop_tracking_reorg_detect_and_resync_indices() {
         // 1) Spin up anvil and build a provider bound to its first funded key
         let anvil = Anvil::new().try_spawn().unwrap();
         let net = "ETH1";
@@ -1847,6 +1864,14 @@ mod tests {
         let tmp_dir = tempfile::tempdir().unwrap();
         let key_path = tmp_dir.path().join("key");
         std::fs::write(&key_path, signer_hex).unwrap();
+
+        // Ensure block timestamps increase per mined block (1s interval) to avoid 0ms averages
+        let _ = rpc_call(
+            anvil.endpoint().as_str(),
+            "anvil_setBlockTimestampInterval",
+            serde_json::json!([1]),
+        )
+        .await;
 
         // Minimal feeds config with a single feed so resync has keys to refresh
         let feed = test_feed_config(13, 0);
@@ -1866,6 +1891,18 @@ mod tests {
 
         let providers = init_shared_rpc_providers(&cfg, Some("test_reorg_"), &feeds_config).await;
         let provider_mutex = providers.read().await.get(net).unwrap().clone();
+
+        // Inject a dummy ADFS contract address so the reorg loop's root-check and resync paths are exercised
+        {
+            use std::str::FromStr;
+            let mut provider = provider_mutex.lock().await;
+            let dummy_contract_address =
+                Address::from_str("0x1000000000000000000000000000000000000000").unwrap();
+            provider.set_contract_address(
+                blocksense_config::ADFS_CONTRACT_NAME,
+                &dummy_contract_address,
+            );
+        }
 
         // 2) Seed local state: non-zero local calldata frontier and initial observed hash for height 0
         {
@@ -1982,7 +2019,7 @@ mod tests {
         // Mine enough blocks to surpass T1 + 1 on the new branch
         {
             let provider = provider_mutex.lock().await;
-            let needed = 8u64; // mine a few to be safely past T1
+            let needed = 80u64; // mine a few to be safely past T1
             mine_self_txs(&provider.provider, &provider.signer, needed)
                 .await
                 .expect("failed to mine on new branch");
@@ -1990,9 +2027,6 @@ mod tests {
 
         // Let the loop observe the new branch and trigger resync
         tokio::time::sleep(std::time::Duration::from_millis(2000)).await;
-
-        // Abort the loop to finish the test
-        loop_handle.abort();
 
         // 6) Assert reorg happened (chain hash at T1 changed vs previously observed)
         let chain_t1_hash = {
@@ -2017,11 +2051,33 @@ mod tests {
         // 7) Assert indices resync was initiated: merkle_root_in_contract is set from chain (zero) and rb_indices refreshed
         {
             let provider = provider_mutex.lock().await;
+            assert!(
+                provider.get_latest_contract().is_some(),
+                "Expected ADFS contract to be present in provider config"
+            );
+        }
+        // Give the loop a bit more time to run the resync path if needed
+        for _ in 0..10 {
+            {
+                let provider = provider_mutex.lock().await;
+                if provider.merkle_root_in_contract.is_some() {
+                    break;
+                }
+            }
+            tokio::time::sleep(std::time::Duration::from_millis(200)).await;
+        }
+        {
+            let provider = provider_mutex.lock().await;
+            let root = provider.merkle_root_in_contract.clone();
+            assert!(
+                root.is_some(),
+                "Expected merkle_root_in_contract to be set by resync loop"
+            );
             // On empty address storage, root is zero
             assert_eq!(
-                provider.merkle_root_in_contract.unwrap().0,
+                root.unwrap().0,
                 B256::ZERO,
-                "Expected merkle_root_in_contract to be updated from chain root"
+                "Expected on-chain root to be zero"
             );
 
             let idx = provider
@@ -2034,7 +2090,11 @@ mod tests {
                 "Expected rb index for the feed to be refreshed from chain (default 0)"
             );
         }
+
+        // Abort the loop to finish the test
+        loop_handle.abort();
     }
+
     #[tokio::test]
     async fn test_deploy_contract_returns_valid_address() {
         // setup
