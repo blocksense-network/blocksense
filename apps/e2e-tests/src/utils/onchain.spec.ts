@@ -1,12 +1,12 @@
-import { Effect } from 'effect';
 import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
   afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
 } from '@effect/vitest';
+import { Effect } from 'effect';
 
 import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
 

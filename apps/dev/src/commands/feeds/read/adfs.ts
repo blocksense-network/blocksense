@@ -3,11 +3,11 @@ import { Effect, Option, Schema as S } from 'effect';
 
 import { skip0x } from '@blocksense/base-utils/buffer-and-hex';
 import {
+  type EthereumAddress,
   getAddressExplorerUrl,
   parseEthereumAddress,
-  type EthereumAddress,
 } from '@blocksense/base-utils/evm';
-import { renderTui, drawTable } from '@blocksense/base-utils/tty';
+import { drawTable, renderTui } from '@blocksense/base-utils/tty';
 import { listEvmNetworks, readEvmDeployment } from '@blocksense/config-types';
 import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
 

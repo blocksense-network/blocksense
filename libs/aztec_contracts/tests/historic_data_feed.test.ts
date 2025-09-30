@@ -1,16 +1,15 @@
 import { getInitialTestAccountsWallets } from '@aztec/accounts/testing';
+import type { AccountWallet, CompleteAddress, PXE } from '@aztec/aztec.js';
 import {
-  AccountWallet,
-  CompleteAddress,
   ContractDeployer,
   createPXEClient,
   Fr,
   getContractInstanceFromDeployParams,
-  PXE,
   TxStatus,
   waitForPXE,
 } from '@aztec/aztec.js';
 import { beforeAll, describe, expect, test } from 'vitest';
+
 import {
   HistoricDataFeedStoreContract,
   HistoricDataFeedStoreContractArtifact,
@@ -81,11 +80,11 @@ describe('Data feed store contract', () => {
   }, 30000);
 
   test('Setting and getting 2 feeds in a single transaction', async () => {
-    let keys = [];
+    const keys = [];
     for (let i = 0; i <= 2; i++) {
       keys.push(new Fr(i));
     }
-    let values = Array.from(
+    const values = Array.from(
       { length: 48 },
       () => Math.floor(Math.random() * 256) as number | bigint,
     );

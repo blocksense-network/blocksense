@@ -1,12 +1,13 @@
 import { stat } from 'fs/promises';
 import { join } from 'path';
-import { parse } from 'toml';
+
 import { Command, Options } from '@effect/cli';
 import { Effect } from 'effect';
+import { parse } from 'toml';
 
-import { renderTui, drawTable } from '@blocksense/base-utils/tty';
 import { rootDir } from '@blocksense/base-utils/env';
 import { selectDirectory } from '@blocksense/base-utils/fs';
+import { drawTable, renderTui } from '@blocksense/base-utils/tty';
 
 export const list = Command.make(
   'list',

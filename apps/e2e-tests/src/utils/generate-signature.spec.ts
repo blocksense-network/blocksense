@@ -1,12 +1,12 @@
-import { Effect } from 'effect';
-import { afterAll, beforeEach, describe, expect, it, vi } from '@effect/vitest';
 import bls from '@chainsafe/bls';
+import { afterAll, beforeEach, describe, expect, it, vi } from '@effect/vitest';
+import { Effect } from 'effect';
 
 import {
   asBytes,
-  generateSignature,
   type FeedResult,
   type FeedType,
+  generateSignature,
 } from './generate-signature';
 import { bytesToBigIntBE } from './utilities';
 
