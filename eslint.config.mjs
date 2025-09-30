@@ -34,7 +34,6 @@ export default [
       'libs/ts/contracts/typechain',
       'libs/ts/esbuild-react-compiler-plugin',
       'libs/ts/nextra-theme-docs',
-      'libs/ts/onchain-interactions',
       'libs/ts/sol-reflector',
       'libs/ts/ui',
       'apps/data-feeds-config-generator',

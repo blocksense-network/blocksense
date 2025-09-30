@@ -1,23 +1,24 @@
-import axios, { AxiosResponse } from 'axios';
+import type { AxiosResponse } from 'axios';
+import axios from 'axios';
+import client from 'prom-client';
 import Web3 from 'web3';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { color as c } from '@blocksense/base-utils/tty';
-import client from 'prom-client';
 
+import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
+import { throwError } from '@blocksense/base-utils/errors';
+import type { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 import {
   getOptionalApiKey,
   getOptionalRpcUrl,
   networkMetadata,
-  NetworkName,
-  parseNetworkName,
-  EthereumAddress,
   parseEthereumAddress,
+  parseNetworkName,
 } from '@blocksense/base-utils/evm';
-import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
-import { throwError } from '@blocksense/base-utils/errors';
+import { color as c } from '@blocksense/base-utils/tty';
 
-import { Transaction, deployedNetworks } from '../types';
+import type { Transaction } from '../types';
+import { deployedNetworks } from '../types';
 import { startPrometheusServer } from '../utils';
 
 const networksUseSecondExplorer: NetworkName[] = [
@@ -226,7 +227,7 @@ const fetchTransactionsForNetwork = async (
       );
       rawTransactions = response.data.result.records || [];
     } else if (network === 'cronos-testnet') {
-      let pageCounter = 1; //max 10000 blocks per page
+      let _pageCounter = 1; //max 10000 blocks per page
       let currentBlock = latestBlock;
       do {
         const page = await axios.get(apiUrl, {
@@ -242,7 +243,7 @@ const fetchTransactionsForNetwork = async (
         const txFromPage = page.data.result;
 
         rawTransactions = rawTransactions.concat(txFromPage);
-        pageCounter++;
+        _pageCounter++;
         currentBlock -= 10000n;
       } while (rawTransactions.length < numberOfTransactions);
     } else if (
@@ -494,7 +495,7 @@ const main = async (): Promise<void> => {
     argv.network == '' ? deployedNetworks : [parseNetworkName(argv.network)];
 
   for (const network of networks) {
-    const { transactions, firstTxTime, lastTxTime } =
+    const { firstTxTime, lastTxTime, transactions } =
       await fetchTransactionsForNetwork(
         network,
         address,
