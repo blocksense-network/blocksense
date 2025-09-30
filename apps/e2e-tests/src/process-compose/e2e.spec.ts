@@ -1,6 +1,7 @@
-import { Effect, Exit, Layer, pipe, Schedule } from 'effect';
-import { afterAll, beforeAll, describe, expect, it } from '@effect/vitest';
 import { deepStrictEqual } from 'assert';
+
+import { afterAll, beforeAll, describe, expect, it } from '@effect/vitest';
+import { Effect, Exit, Layer, pipe, Schedule } from 'effect';
 
 import {
   entriesOf,
@@ -11,24 +12,25 @@ import {
 } from '@blocksense/base-utils/array-iter';
 import { getProcessComposeLogsFiles } from '@blocksense/base-utils/env';
 import {
-  parseEthereumAddress,
   type EthereumAddress,
+  parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
-import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
 import type { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
+import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
 
-import { rgSearchPattern, parseProcessesStatus } from './helpers';
-import { expectedPCStatuses03 } from './expected';
-import type {
-  ProcessComposeService,
-  SequencerService,
-  UpdatesToNetwork,
-  ReportData,
-} from './types';
-import { ProcessCompose, Sequencer } from './types';
-import type { FeedResult } from './generate-signature';
 import type { FeedsValueAndRound } from '../utils/onchain';
 import { getDataFeedsInfoFromNetwork } from '../utils/onchain';
+
+import { expectedPCStatuses03 } from './expected';
+import type { FeedResult } from './generate-signature';
+import { parseProcessesStatus, rgSearchPattern } from './helpers';
+import type {
+  ProcessComposeService,
+  ReportData,
+  SequencerService,
+  UpdatesToNetwork,
+} from './types';
+import { ProcessCompose, Sequencer } from './types';
 
 describe.sequential('E2E Tests with process-compose', () => {
   const network = 'ink_sepolia';

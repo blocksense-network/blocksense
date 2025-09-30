@@ -1,13 +1,14 @@
-import { Effect } from 'effect';
-import { afterAll, beforeEach, describe, expect, it, vi } from '@effect/vitest';
 import bls from '@chainsafe/bls';
+import { afterAll, beforeEach, describe, expect, it, vi } from '@effect/vitest';
+import { Effect } from 'effect';
 
 import {
   asBytes,
-  generateSignature,
   type FeedResult,
   type FeedType,
+  generateSignature,
 } from '../process-compose/generate-signature';
+
 import { bytesToBigIntBE } from './utilities';
 
 const toBE8 = (x: bigint) => {
