@@ -1,10 +1,7 @@
 import { Schema as S } from 'effect';
 
-import {
-  ethereumAddress,
-  NetworkName,
-  networkName,
-} from '@blocksense/base-utils/evm';
+import type { NetworkName } from '@blocksense/base-utils/evm';
+import { ethereumAddress, networkName } from '@blocksense/base-utils/evm';
 
 const CoreContractSchema = S.mutable(
   S.Struct({
@@ -25,7 +22,7 @@ const CoreContractsPerNetworkSchema = S.mutable(
 export type CoreContractsPerNetwork = typeof CoreContractsPerNetworkSchema.Type;
 
 export type CoreContractsDataAndNetworks = {
-  contracts: (CoreContractsPerNetwork | undefined)[];
+  contracts: Array<CoreContractsPerNetwork | undefined>;
   networks: NetworkName[];
 };
 

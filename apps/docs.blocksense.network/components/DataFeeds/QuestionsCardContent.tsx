@@ -1,5 +1,5 @@
-import { config } from '@/config';
 import { ImageWrapper } from '@blocksense/docs-ui/ImageWrapper';
+import { config } from '@/config';
 
 export const QuestionsCardContent = () => {
   return (

@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { Signature as SignatureType } from '@blocksense/sol-reflector';
-
+import type { Signature as SignatureType } from '@blocksense/sol-reflector';
 import { CodeBlock } from '@/components/common/CodeBlock';
 
 type SignatureProps = {

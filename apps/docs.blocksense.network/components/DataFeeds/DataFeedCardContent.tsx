@@ -1,4 +1,6 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
+import type { ReactNode } from 'react';
+
 import { CardContent } from '@blocksense/docs-ui/Card';
 
 type DataFeedCardContentProps = {

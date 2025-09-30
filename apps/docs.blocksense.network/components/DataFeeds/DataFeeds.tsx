@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-import { FeedsConfig } from '@blocksense/config-types/data-feeds-config';
-import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
+import type { FeedsConfig } from '@blocksense/config-types/data-feeds-config';
 import { DataFeedsTable } from '@/components/DataFeeds/DataFeedsTable';
+import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 
 type DataFeedsProps = {
   feedsType: string;
@@ -10,8 +10,8 @@ type DataFeedsProps = {
 };
 
 export const DataFeeds = ({
-  feedsType,
   feedsConfig: { feeds },
+  feedsType,
 }: DataFeedsProps) => {
   return (
     <section className="mt-4">

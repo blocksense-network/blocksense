@@ -1,4 +1,5 @@
-import { useEffect, useState, RefObject } from 'react';
+import { useEffect, useState } from 'react';
+import type { RefObject } from 'react';
 
 type AccordionStates = {
   [key: string]: boolean;
@@ -30,7 +31,7 @@ export const useExpandCollapse = (
       const hash = decodeURIComponent(window.location.hash.slice(1).trim());
 
       if (hash) {
-        let resultHash = hash.includes('-') ? hash.split('-')[0] : hash;
+        const resultHash = hash.includes('-') ? hash.split('-')[0] : hash;
         setAccordionStates({
           ...accordionStates,
           [resultHash]: true,

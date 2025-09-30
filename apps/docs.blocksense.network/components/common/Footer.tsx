@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { ImageWrapper } from '@blocksense/docs-ui/ImageWrapper';
-
 import { config } from '@/config';
 
 export const Footer = () => {

@@ -1,14 +1,13 @@
-import { FunctionDocItem } from '@blocksense/sol-reflector';
-
+import type { FunctionDocItem } from '@blocksense/sol-reflector';
+import { getContractElementsNames } from '@/components/ReferenceDocumentation/SourceUnit';
+import { ContractAccordion } from '@/components/sol-contracts/ContractAccordion';
+import { ABIModal } from '@/sol-contracts-components/ABIModal/ABIModal';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { Signature } from '@/sol-contracts-components/Signature';
+import { FunctionModifiers } from '@/sol-contracts-components/FunctionModifiers';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
 import { Parameters } from '@/sol-contracts-components/Parameters';
-import { FunctionModifiers } from '@/sol-contracts-components/FunctionModifiers';
-import { ABIModal } from '@/sol-contracts-components/ABIModal/ABIModal';
 import { Selector } from '@/sol-contracts-components/Selector';
-import { ContractAccordion } from '@/components/sol-contracts/ContractAccordion';
-import { getContractElementsNames } from '@/components/ReferenceDocumentation/SourceUnit';
+import { Signature } from '@/sol-contracts-components/Signature';
 
 type FunctionsProps = {
   functions?: FunctionDocItem[];

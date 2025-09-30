@@ -2,9 +2,11 @@
 
 import { usePathname } from 'next/navigation';
 
-import { transformerOverviewLineLink } from '@/src/contract-overview';
-import { getOverviewCodeContent } from '@/src/contract-overview';
 import { CodeBlock } from '@/components/common/CodeBlock';
+import {
+  getOverviewCodeContent,
+  transformerOverviewLineLink,
+} from '@/src/contract-overview';
 
 type ContractOverviewProps = {
   contractString: string;
