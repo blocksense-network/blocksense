@@ -368,7 +368,8 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
       "finality": 12,
       "contractAddress": "0xProxyAddress", // proxy
       "topicName": "DataFeedsUpdated(uint256)",
-      "startBlock": 12345678
+      "startBlock": 12345678,
+      "alertsConfig": { "noEventsSeconds": 300, "maxLagBlocks": 64 }
     }
     // more chains...
   ]
@@ -381,6 +382,7 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
 > `topicName` is a config-only field; the database persists only the computed hash (`topic0`) as `BYTEA` (e.g., `chains.topic_hash`, `contracts.topic_hash`, `events_adfs.topic0`).
 > Embed any provider API keys directly in the RPC URLs; no extra env indirection.
 > Live tailing will fall back to HTTP polling against the `rpcHttp` list whenever all WS endpoints are unavailable.
+> Per-chain `alertsConfig` thresholds drive "no events" and "lag" alert timing; tune them to the expected update cadence.
 
 **Env variables**:
 
@@ -478,21 +480,23 @@ WHERE (fl.block_number, fl.log_index, fl.rb_index)
 
 ### 12.1 Metrics (Prometheus)
 
-- `events_processed_total{chain,status}`
+- `events_processed_total{chain,status}` — `status` reflects the `adfs_state` enum: `pending`, `confirmed`, or `dropped`.
 - `events_lag_blocks{chain}` (head − last_seen_block)
 - `finality_lag_blocks{chain}` (head − last_finalized_block)
 - `rpc_requests_total{chain,method,outcome}` / `rpc_latency_ms_bucket`
-- `db_ops_total{op}` / `db_latency_ms_bucket`
+- `db_ops_total{op,status}` / `db_latency_ms_bucket`
 - `reorgs_pending_dropped_total{chain}`
 - `bytes_ingested_total{chain}`
 - `backfill_progress{chain}` (last_backfill_block / target)
 - `queue_depth{chain}`
 
+Per-chain `alertsConfig` values provide the expected cadence: `noEventsSeconds` feeds the "no events" alert window, while `maxLagBlocks` sets the allowable block lag before paging. Operators should calibrate these numbers to the on-chain feed update frequency and block times.
+
 ### 12.2 Alerts (accepted defaults)
 
-- No events on a chain **5 min**.
+- No events on a chain for longer than the configured `alertsConfig.noEventsSeconds`.
 - Error rate > **2%** for **5 min**.
-- Lag > **64 blocks** for **2 min**.
+- Lag above `alertsConfig.maxLagBlocks`.
 - Backfill progress stalled **10 min**.
 
 ### 12.3 Logging & tracing
@@ -585,6 +589,7 @@ LIMIT 1;
 
 - `db_write_batch_rows`: **200**
 - `queue_max_items`: **10,000**
+- `alertsConfig`: `noEventsSeconds=300`, `maxLagBlocks=64` (per chain; adjust to feed cadence)
 - Backfill range step: start **2,000** blocks; shrink to **256** on error
 - Confirmations per chain: from config
 - Metrics endpoint: `:8080/metrics`
