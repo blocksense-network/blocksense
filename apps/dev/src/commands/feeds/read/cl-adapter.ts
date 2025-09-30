@@ -13,28 +13,6 @@ import {
 } from '@blocksense/contracts/viem';
 import { formatTimestamp } from '../../utils';
 
-function formatNumericalValue(
-  value: bigint,
-  decimals: number,
-  humanReadable: boolean,
-): string {
-  if (!humanReadable) return value.toString();
-  const decimalsBig = BigInt(decimals);
-  if (decimalsBig === 0n) return value.toString();
-  const negative = value < 0n;
-  const abs = negative ? -value : value;
-  const base = 10n ** decimalsBig;
-  const whole = abs / base;
-  const fraction = abs % base;
-  let fractionStr = fraction.toString().padStart(Number(decimalsBig), '0');
-  fractionStr = fractionStr.replace(/0+$/u, '');
-  const formatted =
-    fractionStr.length > 0
-      ? `${whole.toString()}.${fractionStr}`
-      : whole.toString();
-  return negative ? `-${formatted}` : formatted;
-}
-
 export const clAdapter = Command.make(
   'cl-adapter',
   {
@@ -231,6 +209,28 @@ export const clAdapter = Command.make(
     }),
 );
 
-export class FetchError extends Data.TaggedError('@dev/FetchError')<{
+function formatNumericalValue(
+  value: bigint,
+  decimals: number,
+  humanReadable: boolean,
+): string {
+  if (!humanReadable) return value.toString();
+  const decimalsBig = BigInt(decimals);
+  if (decimalsBig === 0n) return value.toString();
+  const negative = value < 0n;
+  const abs = negative ? -value : value;
+  const base = 10n ** decimalsBig;
+  const whole = abs / base;
+  const fraction = abs % base;
+  let fractionStr = fraction.toString().padStart(Number(decimalsBig), '0');
+  fractionStr = fractionStr.replace(/0+$/u, '');
+  const formatted =
+    fractionStr.length > 0
+      ? `${whole.toString()}.${fractionStr}`
+      : whole.toString();
+  return negative ? `-${formatted}` : formatted;
+}
+
+class FetchError extends Data.TaggedError('@dev/FetchError')<{
   readonly message: string;
 }> {}

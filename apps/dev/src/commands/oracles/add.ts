@@ -18,6 +18,83 @@ const DEV_TEMPLATES_DIR = join(
   'apps/dev/src/commands/oracles/templates',
 );
 
+export const add = Command.make(
+  'add',
+  {
+    workspaceName: Options.optional(Options.text('workspace-name')),
+    description: Options.optional(Options.text('description')),
+    noNix: Options.boolean('no-nix').pipe(Options.withDefault(false)),
+  },
+  ({ description, noNix, workspaceName }) =>
+    Effect.gen(function* () {
+      const ws = Option.getOrElse(workspaceName, () => '').trim();
+      const desc = Option.getOrElse(description, () => '').trim();
+      const oname = kebabToHumanReadable(ws);
+
+      if (!isValidWorkspace(ws)) {
+        return yield* Effect.fail(
+          new Error(
+            'Invalid workspace name. Use kebab-case: ^[a-z0-9]+(-[a-z0-9]+)*$',
+          ),
+        );
+      }
+
+      const targetDir = join(ORACLES_DIR, ws);
+      const targetExists = yield* pathExists(targetDir);
+      if (targetExists) {
+        return yield* Effect.fail(
+          new Error(`Workspace directory already exists: ${targetDir}`),
+        );
+      }
+
+      const cargoTomlText = (yield* Effect.tryPromise(() =>
+        readFile(join(ORACLES_DIR, 'Cargo.toml'), 'utf8'),
+      )) as string;
+      if (cargoTomlText.includes(`"${ws}"`)) {
+        return yield* Effect.fail(
+          new Error(
+            `Workspace member '${ws}' already listed in apps/oracles/Cargo.toml`,
+          ),
+        );
+      }
+
+      const wasmFileName = ws.replace(/-/g, '_');
+      const componentName = ws;
+      const ctx = {
+        workspaceName: ws,
+        oracleName: oname,
+        description: desc,
+        wasmFileName,
+        componentName,
+      } as const;
+
+      yield* ensureTemplates();
+      yield* Effect.tryPromise(() =>
+        mkdir(join(targetDir, 'src'), { recursive: true }),
+      );
+      yield* writeOracleWorkspaceFiles(targetDir, ctx);
+
+      yield* addToCargoMembers(ws);
+      if (!noNix) {
+        yield* addToNixOracleScripts(ws);
+        yield* addToNixTestEnv(ws);
+      }
+
+      renderTui(
+        drawTable(
+          [
+            ['workspace', ws],
+            ['oracle name', oname],
+            ['directory', targetDir],
+            ['cargo member', 'added'],
+            ['nix wiring', noNix ? 'skipped' : 'added'],
+          ],
+          { headers: ['Item', 'Value'] },
+        ),
+      );
+    }),
+);
+
 const isValidWorkspace = (name: string) =>
   /^[a-z0-9]+(-[a-z0-9]+)*$/.test(name);
 
@@ -285,80 +362,3 @@ function ensureTemplates(): Effect.Effect<void, Error, never> {
     }
   });
 }
-
-export const add = Command.make(
-  'add',
-  {
-    workspaceName: Options.optional(Options.text('workspace-name')),
-    description: Options.optional(Options.text('description')),
-    noNix: Options.boolean('no-nix').pipe(Options.withDefault(false)),
-  },
-  ({ description, noNix, workspaceName }) =>
-    Effect.gen(function* () {
-      const ws = Option.getOrElse(workspaceName, () => '').trim();
-      const desc = Option.getOrElse(description, () => '').trim();
-      const oname = kebabToHumanReadable(ws);
-
-      if (!isValidWorkspace(ws)) {
-        return yield* Effect.fail(
-          new Error(
-            'Invalid workspace name. Use kebab-case: ^[a-z0-9]+(-[a-z0-9]+)*$',
-          ),
-        );
-      }
-
-      const targetDir = join(ORACLES_DIR, ws);
-      const targetExists = yield* pathExists(targetDir);
-      if (targetExists) {
-        return yield* Effect.fail(
-          new Error(`Workspace directory already exists: ${targetDir}`),
-        );
-      }
-
-      const cargoTomlText = (yield* Effect.tryPromise(() =>
-        readFile(join(ORACLES_DIR, 'Cargo.toml'), 'utf8'),
-      )) as string;
-      if (cargoTomlText.includes(`"${ws}"`)) {
-        return yield* Effect.fail(
-          new Error(
-            `Workspace member '${ws}' already listed in apps/oracles/Cargo.toml`,
-          ),
-        );
-      }
-
-      const wasmFileName = ws.replace(/-/g, '_');
-      const componentName = ws;
-      const ctx = {
-        workspaceName: ws,
-        oracleName: oname,
-        description: desc,
-        wasmFileName,
-        componentName,
-      } as const;
-
-      yield* ensureTemplates();
-      yield* Effect.tryPromise(() =>
-        mkdir(join(targetDir, 'src'), { recursive: true }),
-      );
-      yield* writeOracleWorkspaceFiles(targetDir, ctx);
-
-      yield* addToCargoMembers(ws);
-      if (!noNix) {
-        yield* addToNixOracleScripts(ws);
-        yield* addToNixTestEnv(ws);
-      }
-
-      renderTui(
-        drawTable(
-          [
-            ['workspace', ws],
-            ['oracle name', oname],
-            ['directory', targetDir],
-            ['cargo member', 'added'],
-            ['nix wiring', noNix ? 'skipped' : 'added'],
-          ],
-          { headers: ['Item', 'Value'] },
-        ),
-      );
-    }),
-);
