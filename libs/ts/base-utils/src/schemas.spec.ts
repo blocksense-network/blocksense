@@ -1,10 +1,10 @@
 // basic vitest scaffolding
-import { describe, it, expect } from 'vitest';
-
 import { Schema as S } from 'effect';
+import { describe, expect, it } from 'vitest';
+
 import {
-  NumberFromSelfBigIntOrString,
   fromCommaSeparatedString,
+  NumberFromSelfBigIntOrString,
 } from './schemas';
 
 describe('schemas', () => {

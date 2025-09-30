@@ -1,12 +1,15 @@
-import { describe, expectTypeOf, test } from 'vitest';
-
 import { Schema as S } from 'effect';
+import { describe, expectTypeOf, test } from 'vitest';
 
 import { asVarSchema } from '../env/functions';
 import { fromCommaSeparatedString } from '../schemas';
-import { EthereumAddress, ethereumAddress } from './hex-types';
-import { networkName, NetworkName } from './networks';
-import { DeploymentEnvSchema, parseDeploymentEnvConfig } from './functions';
+
+import type { DeploymentEnvSchema } from './functions';
+import { parseDeploymentEnvConfig } from './functions';
+import type { EthereumAddress } from './hex-types';
+import { ethereumAddress } from './hex-types';
+import type { NetworkName } from './networks';
+import { networkName } from './networks';
 
 describe('evm/functions', () => {
   describe('parseDeploymentEnvConfig', () => {

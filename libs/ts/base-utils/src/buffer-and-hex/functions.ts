@@ -7,15 +7,15 @@
 
 import { Buffer } from 'buffer';
 
-import { ReplaceType } from '../type-level';
-import {
-  byteLength,
+import type { ReplaceType } from '../type-level';
+
+import type {
   HexDataString,
   HexQuantityString,
   HexString,
-  parseHexDataString,
   Without0x,
 } from './types';
+import { byteLength, parseHexDataString } from './types';
 
 /**
  * Replaces all instances of Uint8Array with hex string in the given object.

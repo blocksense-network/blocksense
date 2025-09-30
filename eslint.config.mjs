@@ -30,7 +30,6 @@ export default [
       '.pnp.cjs',
       '.prettierrc.cjs',
       'libs/aztec_contracts',
-      'libs/ts/base-utils',
       'libs/ts/config-types',
       'libs/ts/contracts',
       'libs/ts/contracts/typechain',

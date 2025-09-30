@@ -1,10 +1,10 @@
-import { vi, describe, expect, test, afterEach, beforeEach } from 'vitest';
 import fs from 'fs/promises';
-import path from 'path';
 import { tmpdir } from 'os';
+import path from 'path';
+
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 
 import { selectDirectory } from './fs';
-import { write } from 'fs';
 
 describe('selectDirectory', async () => {
   let fsTestFolder = '';
@@ -19,7 +19,7 @@ describe('selectDirectory', async () => {
   });
 
   test('should write text content to a file and then be able to read it', async () => {
-    const { write, read } = selectDirectory(fsTestFolder);
+    const { read, write } = selectDirectory(fsTestFolder);
     const args = {
       base: 'test.txt',
       content: 'Hello, fs utils!',
@@ -33,7 +33,7 @@ describe('selectDirectory', async () => {
   });
 
   test('should write JSON content to a file and then be able to read it', async () => {
-    const { writeJSON, readJSON } = selectDirectory(fsTestFolder);
+    const { readJSON, writeJSON } = selectDirectory(fsTestFolder);
 
     const args = {
       name: 'test',
@@ -49,7 +49,7 @@ describe('selectDirectory', async () => {
   });
 
   test('working with JSON content should work without specifying an extension', async () => {
-    const { writeJSON, readJSON } = selectDirectory(fsTestFolder);
+    const { readJSON, writeJSON } = selectDirectory(fsTestFolder);
     const args = {
       name: 'test',
       content: { message: 'Hello, fs utils!' },
@@ -67,7 +67,7 @@ describe('selectDirectory', async () => {
   });
 
   test('working with JSON content should allow overwriting the extension', async () => {
-    const { writeJSON, readJSON } = selectDirectory(fsTestFolder);
+    const { readJSON, writeJSON } = selectDirectory(fsTestFolder);
     const args = {
       name: 'test',
       ext: '.yaml',
@@ -100,7 +100,7 @@ describe('selectDirectory', async () => {
   });
 
   test('readAllJSONFiles should return an array of objects with file names and content', async () => {
-    const { writeJSON, readAllJSONFiles } = selectDirectory(fsTestFolder);
+    const { readAllJSONFiles, writeJSON } = selectDirectory(fsTestFolder);
     const files = [
       { base: 'file1.json', content: { message: 'Hello, fs utils!' } },
       { base: 'file2.json', content: { message: 'Goodbye, fs utils!' } },
