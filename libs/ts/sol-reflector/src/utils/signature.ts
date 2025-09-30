@@ -1,7 +1,8 @@
 import * as prettier from 'prettier/standalone';
 import solidityPlugin from 'prettier-plugin-solidity';
 
-import { ASTNode, Signature, SolReflection } from '../types';
+import type { ASTNode, Signature, SolReflection } from '../types';
+
 import { formatVariable, iterateContractElements } from './common';
 
 export function getSignature(node: ASTNode): Signature | undefined {
@@ -20,7 +21,7 @@ export function getSignature(node: ASTNode): Signature | undefined {
         kind === 'function' || kind === 'freeFunction'
           ? `function ${name}`
           : kind;
-      let res = [
+      const res = [
         `${head}(${params.map(formatVariable).join(', ')})`,
         node.visibility,
       ];

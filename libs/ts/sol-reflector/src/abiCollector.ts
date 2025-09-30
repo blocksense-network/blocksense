@@ -1,16 +1,18 @@
 import * as path from 'path';
 
+import type { AbiStruct } from 'web3-types';
+
 import { selectDirectory } from '@blocksense/base-utils';
 
-import { Config, defaults } from './config';
 import {
   isFileIncluded,
   iterateContractElements,
   iterateContracts,
   writeArtifactFile,
 } from './utils/common';
-import { SolReflection } from './types';
-import type { AbiStruct } from 'web3-types';
+import type { Config } from './config';
+import { defaults } from './config';
+import type { SolReflection } from './types';
 
 export type ArtifactsRecord = Record<string, Record<string, any>>;
 
@@ -87,7 +89,7 @@ export function appendAbiToSolReflection(
   solReflection: SolReflection,
   abiArtifacts: ArtifactsRecord,
 ) {
-  for (const { sourceUnit, contract } of iterateContracts(solReflection)) {
+  for (const { contract, sourceUnit } of iterateContracts(solReflection)) {
     const sourceUnitName = path.parse(sourceUnit.absolutePath).name;
     const contractAbi = abiArtifacts[sourceUnitName]![contract.name]
       .abi as AbiStruct[];
@@ -95,7 +97,7 @@ export function appendAbiToSolReflection(
     contract.abi = contractAbi;
   }
 
-  for (const { sourceUnit, contract, element } of iterateContractElements(
+  for (const { contract, element, sourceUnit } of iterateContractElements(
     solReflection,
   )) {
     const sourceUnitName = path.parse(sourceUnit.absolutePath).name;

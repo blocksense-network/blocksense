@@ -1,6 +1,5 @@
-import { Config, defaults } from './config';
-import { BuildArtifacts, SolReflection } from './types';
 import './hardhat/type-extensions';
+
 import { filterRelevantFiles, writeDocFiles } from './utils/common';
 import { addNatspec, convertSourceUnit } from './utils/convertors';
 import {
@@ -8,7 +7,10 @@ import {
   appendNatspecDetailsToParams,
 } from './utils/natspec';
 import { appendAbiToSolReflection, collectAbi } from './abiCollector';
+import type { Config } from './config';
+import { defaults } from './config';
 import { enableFileTree } from './contractsFileStructure';
+import type { BuildArtifacts, SolReflection } from './types';
 
 if ('extendConfig' in global && 'task' in global) {
   // Assume Hardhat.
