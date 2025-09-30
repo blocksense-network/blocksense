@@ -357,7 +357,8 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
 {
   "service": {
     "queueMaxItems": 10000, // default; drop-oldest policy
-    "dbWriteBatchRows": 200
+    "dbWriteBatchRows": 200,
+    "metricsPort": 9464 // HTTP :metricsPort/metrics exporter
   },
   "chains": [
     {
@@ -383,6 +384,7 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
 > Embed any provider API keys directly in the RPC URLs; no extra env indirection.
 > Live tailing will fall back to HTTP polling against the `rpcHttp` list whenever all WS endpoints are unavailable.
 > Per-chain `alertsConfig` thresholds drive "no events" and "lag" alert timing; tune them to the expected update cadence.
+> Prometheus metrics are served from `http://0.0.0.0:${service.metricsPort}/metrics`.
 
 **Env variables**:
 
@@ -399,7 +401,7 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
 - **ConfigLayer**: parses JSON, validates against schema.
 - **RpcLayer**: builds per-chain viem clients (`publicClient` HTTP + `webSocketClient`) with fallback selection across configured endpoint arrays.
 - **DbLayer**: `pg` pool with tuned pool size; exposes repo methods (idempotent UPSERTs).
-- **MetricsLayer**: wraps `Effect.Tracing` instrumentation (see Effect observability docs) to create spans around pipeline stages, derives latency metrics from span data, and exposes them via a Prometheus `/metrics` endpoint.
+- **MetricsLayer**: wraps `Effect.Tracing` instrumentation (see Effect observability docs) to create spans around pipeline stages, derives latency metrics from span data, and exposes them via a Prometheus `/metrics` endpoint bound to `service.metricsPort`.
 - **LogLayer**: JSON structured logging (`pino` or `console` wrapper).
 - **TracingLayer**: uses `Effect.Metric` primitives to register counters/histograms (ingest lag, error rates) and exports them to OTLP/Prom sinks configured by the metrics module.
 
@@ -592,7 +594,7 @@ LIMIT 1;
 - `alertsConfig`: `noEventsSeconds=300`, `maxLagBlocks=64` (per chain; adjust to feed cadence)
 - Backfill range step: start **2,000** blocks; shrink to **256** on error
 - Confirmations per chain: from config
-- Metrics endpoint: `:8080/metrics`
+- Metrics endpoint: `:service.metricsPort/metrics` (default `:9464/metrics`)
 - Logs: `info` level (configurable `LOG_LEVEL`)
 - Tracing: enabled when `OTEL_EXPORTER_OTLP_ENDPOINT` is set
 
