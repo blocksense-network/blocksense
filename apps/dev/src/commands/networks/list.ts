@@ -3,11 +3,11 @@ import { join } from 'node:path';
 import { Command, Options } from '@effect/cli';
 import { Effect } from 'effect';
 
-import { listEvmNetworks, configDirs } from '@blocksense/config-types';
-import type { NetworkName } from '@blocksense/base-utils/evm';
-import { networkMetadata, isTestnet } from '@blocksense/base-utils/evm';
-import { renderTui, drawTable } from '@blocksense/base-utils/tty';
 import { valuesOf } from '@blocksense/base-utils/array-iter';
+import type { NetworkName } from '@blocksense/base-utils/evm';
+import { isTestnet,networkMetadata } from '@blocksense/base-utils/evm';
+import { drawTable,renderTui } from '@blocksense/base-utils/tty';
+import { configDirs,listEvmNetworks } from '@blocksense/config-types';
 
 export const list = Command.make(
   'list',

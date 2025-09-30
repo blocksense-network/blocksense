@@ -5,12 +5,13 @@ import {
   getAddressExplorerUrl,
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
-import { renderTui, drawTable } from '@blocksense/base-utils/tty';
+import { drawTable, renderTui } from '@blocksense/base-utils/tty';
 import { listEvmNetworks, readEvmDeployment } from '@blocksense/config-types';
 import {
   CLAggregatorAdapterConsumer,
   type CLAggregatorAdapterData,
 } from '@blocksense/contracts/viem';
+
 import { formatTimestamp } from '../../utils';
 
 export const clAdapter = Command.make(

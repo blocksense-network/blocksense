@@ -1,8 +1,8 @@
-import { Effect, Schema as S } from 'effect';
-import type { ParseError } from 'effect/ParseResult';
 import type { HttpClientError } from '@effect/platform';
 import { HttpClientRequest } from '@effect/platform';
 import { HttpClient } from '@effect/platform/HttpClient';
+import { Effect, Schema as S } from 'effect';
+import type { ParseError } from 'effect/ParseResult';
 import parsePrometheusTextFormat from 'parse-prometheus-text-format';
 
 import type { PrometheusMetrics } from './types';

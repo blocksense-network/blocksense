@@ -1,6 +1,6 @@
-import { Effect, ParseResult, Schema as S } from 'effect';
-import { NodeContext } from '@effect/platform-node';
 import { Command } from '@effect/platform';
+import { NodeContext } from '@effect/platform-node';
+import { Effect, ParseResult, Schema as S } from 'effect';
 import { $, execa } from 'execa';
 
 import { arrayToObject } from '@blocksense/base-utils/array-iter';
@@ -8,10 +8,10 @@ import { rootDir } from '@blocksense/base-utils/env';
 import type { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 import { readConfig, readEvmDeployment } from '@blocksense/config-types';
 
-import { RGLogCheckerError } from '../../utils/types';
 import { logMessage } from '../../utils/logs';
 import type { FeedsValueAndRound } from '../../utils/onchain';
 import { getDataFeedsInfoFromNetwork } from '../../utils/onchain';
+import { RGLogCheckerError } from '../../utils/types';
 
 const E2E_TESTS_FEEDS_CONFIG_DIR = `${rootDir}/apps/e2e-tests/src/test-scenarios/general`;
 
