@@ -9,8 +9,9 @@ import {
   parseEthereumAddress,
   parseNetworkName,
 } from '@blocksense/base-utils';
-import { readEvmDeployment } from '@blocksense/config-types';
+import { readEvmDeployment } from '@blocksense/config-types/read-write-config';
 
+import { predictMultisigAddress } from './deployment-utils/deploy-multisig';
 import { initChain } from './deployment-utils/init-chain';
 import { ContractNames, NetworkConfig } from './types';
 
@@ -48,9 +49,21 @@ export async function mineVanityAddress({
   maxRetries?: number;
 }): Promise<{ address: EthereumAddress; salt: string } | null> {
   if (!adminMultisigAddr) {
-    console.log(`No multisig address provided, using default`);
-    const { contracts } = await readEvmDeployment(config.networkName, true);
-    adminMultisigAddr = contracts.safe.AdminMultisig;
+    const res = await readEvmDeployment(config.networkName);
+    if (res) {
+      adminMultisigAddr = res.contracts.safe.AdminMultisig;
+      console.log(
+        `Using admin multisig address from deployment: ${adminMultisigAddr}`,
+      );
+    } else {
+      adminMultisigAddr = (
+        await predictMultisigAddress({
+          config,
+          type: 'adminMultisig',
+        })
+      ).safeAddress;
+      console.log(`Predicted admin multisig address: ${adminMultisigAddr}`);
+    }
   }
 
   const createCallAddress = config.safeAddresses.createCallAddress;
