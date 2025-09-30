@@ -32,6 +32,7 @@ const networksV2Api: NetworkName[] = [
   'metis-sepolia',
   'mezo-matsnet-testnet',
   'songbird-coston',
+  'flare-coston',
 ];
 
 type Gauges = {
@@ -213,7 +214,7 @@ const fetchTransactionsForNetwork = async (
     } else if (network === 'telos-testnet') {
       response = await axios.get(`${apiUrl}/address/${address}/transactions`);
       rawTransactions = response.data.results || [];
-    } else if (network === 'pharos-testnet') {
+    } else if (network === 'pharos-testnet' || network === 'cyber-testnet') {
       response = await axios.get(`${apiUrl}/address/${address}/transactions`);
       rawTransactions = response.data.data || [];
     } else if (network === 'taraxa-testnet') {
@@ -289,14 +290,17 @@ const fetchTransactionsForNetwork = async (
           tx.gasUsed ?? tx.gas_used ?? tx.gas ?? tx.gasused ?? tx.gasCost ?? 0,
         );
 
-        let fee = tx.txFee ?? tx.fee ?? tx.transaction_fee;
+        let fee =
+          tx.txFee ?? tx.fee ?? tx.transaction_fee ?? tx.total_transaction_fee;
         fee =
           typeof fee === 'string'
             ? BigInt((Number(fee) * 1000000000000000000).toFixed(0))
             : BigInt(0);
 
-        const gasPrice = BigInt(tx.gasPrice ?? tx.gas_price ?? 0);
-
+        if (network === 'cyber-testnet') {
+          tx.gas_price = 0;
+        }
+        let gasPrice = BigInt(tx.gasPrice ?? tx.gas_price ?? 0);
         let timestamp =
           tx.timestamp?.toString() ??
           tx.blockTime?.toString() ??
