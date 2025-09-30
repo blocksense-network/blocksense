@@ -1,5 +1,4 @@
 import React from 'react';
-
 import Link from 'next/link';
 
 import { Icon } from '@blocksense/docs-ui/Icon';

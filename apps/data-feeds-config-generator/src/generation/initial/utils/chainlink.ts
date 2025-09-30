@@ -1,24 +1,26 @@
 import { isTestnet } from '@blocksense/base-utils/evm';
-
-import { pairToString } from '@blocksense/config-types/data-feeds-config';
 import {
-  parseNetworkFilename,
   chainlinkNetworkNameToChainId,
+  parseNetworkFilename,
 } from '@blocksense/config-types/chainlink-compatibility';
+import { pairToString } from '@blocksense/config-types/data-feeds-config';
 
-import {
+import type {
   AggregatedFeedInfo,
-  getFieldFromAggregatedData,
-  getBaseQuote,
-  getHighestDecimals,
   CookedDataFeeds,
-  aggregateNetworkInfoPerField,
 } from '../../../data-services/fetchers/chainlink/chainlink_feeds';
-import { SimplifiedFeed } from '../types';
 import {
+  aggregateNetworkInfoPerField,
+  getBaseQuote,
+  getFieldFromAggregatedData,
+  getHighestDecimals,
+} from '../../../data-services/fetchers/chainlink/chainlink_feeds';
+import type {
   ChainLinkFeedInfo,
   RawDataFeeds,
 } from '../../../data-services/fetchers/chainlink/types';
+import type { SimplifiedFeed } from '../types';
+
 export function feedFromChainLinkFeedInfo(
   additionalData: AggregatedFeedInfo,
 ): SimplifiedFeed {
@@ -43,7 +45,7 @@ export function feedFromChainLinkFeedInfo(
     description,
     full_name,
     additional_feed_info: {
-      pair: pair,
+      pair,
       decimals: getHighestDecimals(additionalData),
       category:
         category in categoryFixup

@@ -3,12 +3,8 @@ import * as React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import {
-  getAddressExplorerUrl,
-  NetworkName,
-  EthereumAddress,
-} from '@blocksense/base-utils/evm';
-
+import type { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
+import { getAddressExplorerUrl } from '@blocksense/base-utils/evm';
 import { DataTableBadge } from '@/components/common/DataTable/DataTableBadge';
 import { onLinkClick } from '@/src/utils';
 

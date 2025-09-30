@@ -1,6 +1,7 @@
 import { selectDirectory } from '@blocksense/base-utils/fs';
-import { artifactsDir } from '../src/paths';
+
 import { getCryptoProvidersData } from '../src/data-services/processors/crypto-providers/data-collection';
+import { artifactsDir } from '../src/paths';
 
 async function main() {
   const cryptoProvidersData = await getCryptoProvidersData();

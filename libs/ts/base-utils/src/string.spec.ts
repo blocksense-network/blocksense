@@ -1,10 +1,11 @@
-import { expect, describe, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
 import {
-  kebabToScreamingSnakeCase,
-  kebabToCamelCase,
   camelCaseToScreamingSnakeCase,
   envVarNameJoin,
+  kebabToCamelCase,
   kebabToHumanReadable,
+  kebabToScreamingSnakeCase,
 } from './string';
 
 describe('camelCaseSnakeCase', () => {
@@ -138,7 +139,7 @@ describe('kebabToHumanReadable', () => {
 
 describe('String Utils', () => {
   it('should convert kebab-case to SCREAMING_SNAKE_CASE', () => {
-    const testCases: [input: string, expected: string][] = [
+    const testCases: Array<[input: string, expected: string]> = [
       // Valid transformations
       ['hello-world', 'HELLO_WORLD'],
       ['foo-bar-baz', 'FOO_BAR_BAZ'],
@@ -169,7 +170,7 @@ describe('String Utils', () => {
   });
 
   it('should convert kebab-case to CamelCase', () => {
-    const testCases: [input: string, expected: string][] = [
+    const testCases: Array<[input: string, expected: string]> = [
       // Valid transformations
       ['hello-world', 'helloWorld'],
       ['foo-bar-baz', 'fooBarBaz'],
@@ -192,7 +193,7 @@ describe('String Utils', () => {
   });
 
   it('should compare case insesitive strings', () => {
-    const testCases: [a: string, b: string, expected: boolean][] = [
+    const testCases: Array<[a: string, b: string, expected: boolean]> = [
       // Basic case insensitivity
       ['hello', 'hello', true],
       ['HELLO', 'HELLO', true],

@@ -21,8 +21,8 @@ import {
   stopEnvironment,
 } from '../test-scenarios/general/helpers';
 
-import { type FeedResult,generateSignature } from './generate-signature';
-import { getMetrics,ParseMetricsError } from './metrics';
+import { type FeedResult, generateSignature } from './generate-signature';
+import { getMetrics, ParseMetricsError } from './metrics';
 
 export class ProcessComposeFailedToStartError extends Data.TaggedError(
   '@e2e-tests/ProcessComposeFailedToStartError',

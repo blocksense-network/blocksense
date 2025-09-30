@@ -1,15 +1,16 @@
 import React from 'react';
 
+import { Separator } from '@blocksense/docs-ui';
+
 import {
   Command,
-  CommandInput,
-  CommandList,
   CommandEmpty,
   CommandGroup,
+  CommandInput,
   CommandItem,
+  CommandList,
   CommandShortcut,
 } from './Command';
-import { Separator } from '@blocksense/docs-ui';
 
 export default {
   title: 'Components/Command',

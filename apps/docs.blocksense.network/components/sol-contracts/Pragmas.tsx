@@ -1,7 +1,7 @@
 import React from 'react';
-import { Badge } from '@blocksense/docs-ui/Badge';
 
-import { PragmaDocItem } from '@blocksense/sol-reflector';
+import { Badge } from '@blocksense/docs-ui/Badge';
+import type { PragmaDocItem } from '@blocksense/sol-reflector';
 
 type PragmasProps = {
   pragmas: PragmaDocItem[];

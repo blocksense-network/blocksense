@@ -1,19 +1,20 @@
-import { tuple, fromEntries } from '@blocksense/base-utils/array-iter';
+import { fromEntries, tuple } from '@blocksense/base-utils/array-iter';
 import { parseEthereumAddress, zeroAddress } from '@blocksense/base-utils/evm';
-
-import { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
-import {
+import type {
   BlocksenseFeedsCompatibility,
   ChainlinkAddressToBlocksenseId,
   ChainlinkCompatibilityConfig,
-  isSupportedCurrencySymbol,
-  currencySymbolToDenominationAddress,
-  parseNetworkFilename,
-  chainlinkNetworkNameToChainId,
 } from '@blocksense/config-types/chainlink-compatibility';
+import {
+  chainlinkNetworkNameToChainId,
+  currencySymbolToDenominationAddress,
+  isSupportedCurrencySymbol,
+  parseNetworkFilename,
+} from '@blocksense/config-types/chainlink-compatibility';
+import type { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 
-import { RawDataFeeds } from '../data-services/fetchers/chainlink/types';
-import { FeedRegistryEventsPerAggregator } from '../chainlink-compatibility/types';
+import type { FeedRegistryEventsPerAggregator } from '../chainlink-compatibility/types';
+import type { RawDataFeeds } from '../data-services/fetchers/chainlink/types';
 
 async function getBlocksenseFeedsCompatibility(
   rawDataFeeds: RawDataFeeds,
@@ -132,7 +133,7 @@ export async function generateChainlinkCompatibilityConfig(
     await getChainlinkAddressToBlocksenseId(rawDataFeeds, feedConfig);
 
   return {
-    blocksenseFeedsCompatibility: blocksenseFeedsCompatibility,
-    chainlinkAddressToBlocksenseId: chainlinkAddressToBlocksenseId,
+    blocksenseFeedsCompatibility,
+    chainlinkAddressToBlocksenseId,
   };
 }

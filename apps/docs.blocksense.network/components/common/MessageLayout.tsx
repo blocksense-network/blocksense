@@ -7,11 +7,11 @@ interface MessageLayoutProps {
 }
 
 export const MessageLayout = ({
-  className,
-  title,
-  heading,
-  hasIcon = true,
   alternativeContent,
+  className,
+  hasIcon = true,
+  heading,
+  title,
 }: MessageLayoutProps) => {
   return (
     <div

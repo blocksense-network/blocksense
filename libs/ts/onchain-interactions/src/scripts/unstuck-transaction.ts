@@ -1,15 +1,14 @@
-import assert from 'node:assert';
-import yargs from 'yargs';
-import Web3 from 'web3';
-import { hideBin } from 'yargs/helpers';
-import { color as c } from '@blocksense/base-utils/tty';
 import fs from 'fs/promises';
+import assert from 'node:assert';
 
-import {
-  EthereumAddress,
-  parseEthereumAddress,
-} from '@blocksense/base-utils/evm';
+import Web3 from 'web3';
+import yargs from 'yargs';
+import { hideBin } from 'yargs/helpers';
+
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
+import type { EthereumAddress } from '@blocksense/base-utils/evm';
+import { parseEthereumAddress } from '@blocksense/base-utils/evm';
+import { color as c } from '@blocksense/base-utils/tty';
 
 async function getWeb3(
   providerUrl: string,
@@ -74,7 +73,7 @@ async function replaceTransaction(
   console.log(c`{blue On chainID: '${chainID}'}`);
   console.log(c`{blue Latest nonce: ${nextNonce}}`);
 
-  let currentGasPrice = await web3.eth.getGasPrice();
+  const currentGasPrice = await web3.eth.getGasPrice();
   let multiplier = 1.4;
 
   console.log(
@@ -107,6 +106,7 @@ async function replaceTransaction(
       break;
     } catch (error) {
       if (error instanceof Error && error.message.includes('underpriced')) {
+        // Ignore underpriced error and retry with higher gas price
       } else {
         console.error(
           c`{red Transaction failed at multiplier ${multiplier}:}`,
@@ -160,7 +160,7 @@ const main = async (): Promise<void> => {
     .alias('help', 'h')
     .parse();
 
-  const { providerUrl, privateKeyPath, address: rawAddress } = argv;
+  const { address: rawAddress, privateKeyPath, providerUrl } = argv;
   const privateKey = (await fs.readFile(privateKeyPath, 'utf8')).replace(
     /(\r\n|\n|\r)/gm,
     '',
@@ -174,7 +174,7 @@ const main = async (): Promise<void> => {
   );
 
   try {
-    const { web3, signer, account } = await getWeb3(
+    const { account, signer, web3 } = await getWeb3(
       providerUrl,
       address,
       privateKey,
@@ -182,7 +182,7 @@ const main = async (): Promise<void> => {
 
     console.log(c`{green Successfully connected to Web3.}`);
 
-    let pendingNonce = await web3.eth.getTransactionCount(account, 'pending');
+    const pendingNonce = await web3.eth.getTransactionCount(account, 'pending');
     let latestNonce = await web3.eth.getTransactionCount(account, 'latest');
     console.log('pendingNonce:', pendingNonce);
     console.log('latestNonce:', latestNonce);

@@ -1,16 +1,15 @@
 import React from 'react';
 
-import { ContractDocItem } from '@blocksense/sol-reflector';
-
-import { Functions } from '@/sol-contracts-components/Functions';
-import { Errors } from '@/sol-contracts-components/Errors';
-import { Events } from '@/sol-contracts-components/Events';
-import { Modifiers } from '@/sol-contracts-components/Modifiers';
-import { Enums } from '@/sol-contracts-components/Enums';
-import { Structs } from '@/sol-contracts-components/Structs';
-import { Variables } from '@/sol-contracts-components/Variables';
+import type { ContractDocItem } from '@blocksense/sol-reflector';
 import { ContractBaseInfo } from '@/sol-contracts-components/ContractBaseInfo';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
+import { Enums } from '@/sol-contracts-components/Enums';
+import { Errors } from '@/sol-contracts-components/Errors';
+import { Events } from '@/sol-contracts-components/Events';
+import { Functions } from '@/sol-contracts-components/Functions';
+import { Modifiers } from '@/sol-contracts-components/Modifiers';
+import { Structs } from '@/sol-contracts-components/Structs';
+import { Variables } from '@/sol-contracts-components/Variables';
 import { filterConstants, filterVariables } from '@/src/utils';
 
 type ContractsProps = {

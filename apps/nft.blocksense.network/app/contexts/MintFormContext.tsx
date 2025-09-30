@@ -1,11 +1,5 @@
-import React, {
-  createContext,
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  useContext,
-  useState,
-} from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import type { Dispatch, ReactNode, SetStateAction } from 'react';
 
 type VerificationStatus = {
   type: 'error' | 'success' | 'loading' | 'none';

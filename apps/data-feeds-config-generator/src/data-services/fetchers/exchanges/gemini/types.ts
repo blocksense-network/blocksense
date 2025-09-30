@@ -5,14 +5,14 @@ import { Schema as S } from 'effect';
  *
  * Ref: https://docs.gemini.com/rest-api/#ticker
  */
-const GeminiAssetInfoSchema = S.mutable(
+const _GeminiAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
     price: S.Number,
   }),
 );
 
-export type GeminiAssetInfo = typeof GeminiAssetInfoSchema.Type;
+export type GeminiAssetInfo = typeof _GeminiAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about symbols received from Gemini Exchange.

@@ -2,11 +2,12 @@ import Image from 'next/image';
 
 import { assertNotNull } from '@blocksense/base-utils/assert';
 
-import { StatusMessage } from './StatusMessage';
-import blocksenseEllipseIcon from '/public/icons/blocksense-ellipse.svg';
-
-import sendArrowIcon from '/public/icons/send-arrow.svg';
 import { useMintFormContext } from '../app/contexts/MintFormContext';
+
+import { StatusMessage } from './StatusMessage';
+
+import blocksenseEllipseIcon from '/public/icons/blocksense-ellipse.svg';
+import sendArrowIcon from '/public/icons/send-arrow.svg';
 
 export const RetweetCard = () => {
   const { retweetCode, retweetStatus } = useMintFormContext();

@@ -2,26 +2,26 @@
 
 import { useEffect, useState } from 'react';
 
-import { DeploymentConfigV2 } from '@blocksense/config-types';
-import { NetworkName } from '@blocksense/base-utils/evm';
-
-import { useHash } from '@/hooks/useHash';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-} from '@blocksense/docs-ui/DropdownMenu';
+import { valuesOf } from '@blocksense/base-utils/array-iter';
+import type { NetworkName } from '@blocksense/base-utils/evm';
+import type { DeploymentConfigV2 } from '@blocksense/config-types';
+import { ImageWrapper } from '@blocksense/docs-ui';
 import { Button } from '@blocksense/docs-ui/Button';
 import { Card, CardHeader, CardTitle } from '@blocksense/docs-ui/Card';
-import { DataFeedCardContentItem } from '../DataFeedCardContentItem';
 import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
 import { capitalizeWords, networkNameToIconName } from '@/src/utils';
-import { DataFeedCardContent } from '../DataFeedCardContent';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@blocksense/docs-ui/DropdownMenu';
 import { Icon } from '@blocksense/docs-ui/Icon';
 import { Separator } from '@blocksense/docs-ui/Separator';
-import { ImageWrapper } from '@blocksense/docs-ui';
-import { valuesOf } from '@blocksense/base-utils/array-iter';
+import { useHash } from '@/hooks/useHash';
+
+import { DataFeedCardContent } from '../DataFeedCardContent';
+import { DataFeedCardContentItem } from '../DataFeedCardContentItem';
 
 const NetworkIcon = ({ network }: { network: NetworkName }) => {
   const path = `/images/network-icons/${networkNameToIconName(network)}.png`;
@@ -41,8 +41,8 @@ type NetworkDropdownProps = {
 
 const NetworkDropdown = ({
   networks,
-  selectedNetwork,
   onSelect,
+  selectedNetwork,
 }: NetworkDropdownProps) => {
   return (
     <DropdownMenu>

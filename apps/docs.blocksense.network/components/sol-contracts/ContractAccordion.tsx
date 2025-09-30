@@ -1,17 +1,18 @@
 'use client';
 
-import { ReactNode, useRef } from 'react';
+import { useRef } from 'react';
+import type { ReactNode } from 'react';
 
-import { Label } from '@blocksense/docs-ui/Label';
-import { Switch } from '@blocksense/docs-ui/Switch';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@blocksense/docs-ui/Accordion';
-import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
+import { Label } from '@blocksense/docs-ui/Label';
+import { Switch } from '@blocksense/docs-ui/Switch';
 import { useExpandCollapse } from '@/hooks/useExpandCollapse';
+import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 
 type ContractAccordionProps = {
   elementsNames: string[];
@@ -19,11 +20,11 @@ type ContractAccordionProps = {
 };
 
 export const ContractAccordion = ({
-  elementsNames,
   children,
+  elementsNames,
 }: ContractAccordionProps) => {
   const elementsRef = useRef<HTMLDivElement>(null);
-  const { accordionStates, expandAll, collapseAll, toggleAccordion } =
+  const { accordionStates, collapseAll, expandAll, toggleAccordion } =
     useExpandCollapse(elementsNames, elementsRef);
   const allExpanded = Object.values(accordionStates).every(Boolean);
 

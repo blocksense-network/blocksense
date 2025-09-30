@@ -8,12 +8,11 @@
 import { Schema as S } from 'effect';
 
 import { getEnvString, getOptionalEnvString } from '../env/functions';
-import { EthereumAddress, TxHash } from './hex-types';
-import {
-  KebabToScreamingSnakeCase,
-  kebabToScreamingSnakeCase,
-} from '../string';
 import { NumberFromSelfBigIntOrString } from '../schemas';
+import type { KebabToScreamingSnakeCase } from '../string';
+import { kebabToScreamingSnakeCase } from '../string';
+
+import type { EthereumAddress, TxHash } from './hex-types';
 
 const networks = [
   'local',
@@ -1982,7 +1981,7 @@ export const networkMetadata = {
   [Net in NetworkName]: {
     chainId: ChainId | undefined;
     isTestnet: boolean;
-    explorers: {
+    explorers: Array<{
       type:
         | 'blockscout'
         | 'etherscan'
@@ -2000,7 +1999,7 @@ export const networkMetadata = {
         | 'unknown';
       webUrl: string;
       apiUrl: string | null;
-    }[];
+    }>;
     currency: Currency;
   };
 };

@@ -1,4 +1,6 @@
-import { createInterface, Interface } from 'node:readline/promises';
+/* eslint-disable no-control-regex */
+import type { Interface } from 'node:readline/promises';
+import { createInterface } from 'node:readline/promises';
 
 import { assert } from './assert';
 
@@ -376,7 +378,7 @@ interface TableOptions {
 export const drawTable =
   (rows: TableRow[], options: TableOptions = {}) =>
   (args: RenderArgs): string[] => {
-    const { headers, align = [] } = options;
+    const { align = [], headers } = options;
     const colCount = Math.max(...rows.map(r => r.length), headers?.length ?? 0);
 
     const normalizedRows = rows.map(row =>
@@ -412,7 +414,7 @@ export const drawTable =
     const wrapAndAlign = (lines: string[], width: number, a: Align) =>
       wrapLines(lines.join('\n'), width).map(l => alignText(l, width, a));
 
-    const renderRow = (row: string[][], isHeader = false): string[] => {
+    const renderRow = (row: string[][], _isHeader = false): string[] => {
       const wrapped = row.map((lines, i) =>
         wrapAndAlign(lines, colWidths[i], align[i] ?? 'left'),
       );

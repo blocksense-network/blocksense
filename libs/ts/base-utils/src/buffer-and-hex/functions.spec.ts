@@ -5,34 +5,30 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { describe, expect, test } from 'vitest';
 import { Buffer } from 'buffer';
 
-import {
-  HexDataString,
-  parseHexDataString,
-  parseHexString,
-  byteLength,
-} from './types';
+import { describe, expect, test } from 'vitest';
 
 import {
   addHexPrefix,
+  appendHex,
   arrayToHex,
   checkedHexToArray,
   hexToArray,
   hexToBuffer,
   isValidInteger,
   littleEndianBytesToBigInt,
+  padHex,
+  previewHexString,
   replaceHexString,
   replaceUint8Array,
   skip0x,
   splitHexString,
   splitHexStringEqually,
   toHexData,
-  padHex,
-  appendHex,
-  previewHexString,
 } from './functions';
+import type { HexDataString } from './types';
+import { byteLength, parseHexDataString, parseHexString } from './types';
 
 describe('`buffer-and-hex-utils` tests', () => {
   test(`'replaceUint8Array' should replace Uint8Array with string in the object`, () => {

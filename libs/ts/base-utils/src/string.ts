@@ -116,7 +116,7 @@ export function padNumber(num: number | bigint, size: number, padChar = ' ') {
 }
 
 export function envVarNameJoin(
-  ...parts: (string | null | undefined)[]
+  ...parts: Array<string | null | undefined>
 ): string {
   return parts
     .filter(x => x?.trim()?.length ?? 0 > 0)

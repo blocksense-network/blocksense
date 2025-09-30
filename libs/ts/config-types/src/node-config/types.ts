@@ -1,7 +1,8 @@
 import { Schema as S } from 'effect';
 
-import { FeedIdSchema } from '../data-feeds-config/types';
 import { PortSchema } from '@blocksense/base-utils/schemas';
+
+import { FeedIdSchema } from '../data-feeds-config/types';
 
 // This is a partial schema including only allowed feeds
 // TODO: (danielstoyanov) Expand to whole config schema

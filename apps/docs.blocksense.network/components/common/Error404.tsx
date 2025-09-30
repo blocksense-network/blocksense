@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { MessageLayout } from './MessageLayout';
 
 export const Error404 = () => {

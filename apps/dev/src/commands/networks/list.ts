@@ -5,9 +5,9 @@ import { Effect } from 'effect';
 
 import { valuesOf } from '@blocksense/base-utils/array-iter';
 import type { NetworkName } from '@blocksense/base-utils/evm';
-import { isTestnet,networkMetadata } from '@blocksense/base-utils/evm';
-import { drawTable,renderTui } from '@blocksense/base-utils/tty';
-import { configDirs,listEvmNetworks } from '@blocksense/config-types';
+import { isTestnet, networkMetadata } from '@blocksense/base-utils/evm';
+import { drawTable, renderTui } from '@blocksense/base-utils/tty';
+import { configDirs, listEvmNetworks } from '@blocksense/config-types';
 
 export const list = Command.make(
   'list',

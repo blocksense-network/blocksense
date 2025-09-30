@@ -1,6 +1,6 @@
-import { throwError } from './errors';
-
 import { ok } from 'assert';
+
+import { throwError } from './errors';
 
 let assert: (value: unknown, errorMessage?: string) => asserts value;
 

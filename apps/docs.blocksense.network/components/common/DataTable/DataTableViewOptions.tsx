@@ -2,15 +2,15 @@
 
 import { useContext } from 'react';
 
+import { Separator } from '@blocksense/docs-ui';
 import { Button } from '@blocksense/docs-ui/Button';
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
-  DropdownMenuCheckboxItem,
+  DropdownMenuTrigger,
 } from '@blocksense/docs-ui/DropdownMenu';
-import { Separator } from '@blocksense/docs-ui';
 import { ImageWrapper } from '@blocksense/docs-ui/ImageWrapper';
 
 import { DataTableContext } from './DataTableContext';

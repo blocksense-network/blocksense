@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export type AssetInfo<ExtraData extends Record<string, unknown> = {}> = {
   pair: {
     base: string;
@@ -7,5 +8,5 @@ export type AssetInfo<ExtraData extends Record<string, unknown> = {}> = {
 };
 
 export interface ExchangeAssetsFetcher<ExtraData extends Record<string, any>> {
-  fetchAssets(): Promise<AssetInfo<ExtraData>[]>;
+  fetchAssets(): Promise<Array<AssetInfo<ExtraData>>>;
 }

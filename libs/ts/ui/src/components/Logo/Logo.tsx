@@ -1,4 +1,5 @@
-import Image, { ImageProps } from 'next/image';
+import type { ImageProps } from 'next/image';
+import Image from 'next/image';
 
 import IconBlack from '../../assets/logos/icon-black.svg';
 import IconBlackWhite from '../../assets/logos/icon-black-white.svg';

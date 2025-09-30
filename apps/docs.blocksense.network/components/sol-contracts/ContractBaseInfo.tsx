@@ -1,13 +1,13 @@
 import React from 'react';
 
-import { ContractDocItem } from '@blocksense/sol-reflector';
-
+import { ImageWrapper } from '@blocksense/docs-ui/ImageWrapper';
+import type { ContractDocItem } from '@blocksense/sol-reflector';
+import { ContractAnchorLink } from '@/components/sol-contracts/ContractAnchorLink';
 import { ABIModal } from '@/sol-contracts-components/ABIModal/ABIModal';
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 import { NatSpec } from '@/sol-contracts-components/NatSpec';
+
 import { ContractOverview } from './ContractOverview';
-import { ImageWrapper } from '@blocksense/docs-ui/ImageWrapper';
-import { ContractAnchorLink } from '@/components/sol-contracts/ContractAnchorLink';
 
 export const ContractBaseInfo = ({ ...contract }: ContractDocItem) => {
   return (

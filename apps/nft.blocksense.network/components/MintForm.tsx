@@ -1,15 +1,15 @@
 'use client';
 
-import { FormStepTitle } from './FormStepTitle';
-import { FormStepContainer } from './FormStepContainer';
-import { NetworkLink } from './NetworkLink';
-import { Separator } from './Separator';
 import { AlertMessage } from './AlertMessage';
-import { XHandle } from './XHandle';
-import { Discord } from './Discord';
-import { MintMyNFTButton } from './MintMyNFTButton';
 import { ConnectSignButtons } from './ConnectSignButtons';
+import { Discord } from './Discord';
+import { FormStepContainer } from './FormStepContainer';
+import { FormStepTitle } from './FormStepTitle';
+import { MintMyNFTButton } from './MintMyNFTButton';
+import { NetworkLink } from './NetworkLink';
 import { RetweetCard } from './RetweetCard';
+import { Separator } from './Separator';
+import { XHandle } from './XHandle';
 
 type MintFormProps = {
   onSuccessAction: (

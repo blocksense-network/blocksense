@@ -5,14 +5,14 @@ import { Schema as S } from 'effect';
  *
  * Ref: https://www.okx.com/docs-v5/en/#public-data-rest-api-get-index-tickers
  */
-const OKXAssetInfoSchema = S.mutable(
+const _OKXAssetInfoSchema = S.mutable(
   S.Struct({
     instId: S.String,
     price: S.Number,
   }),
 );
 
-export type OKXAssetInfo = typeof OKXAssetInfoSchema.Type;
+export type OKXAssetInfo = typeof _OKXAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from OKX Exchange.

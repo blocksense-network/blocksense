@@ -1,34 +1,30 @@
 import { Web3 } from 'web3';
 
-import { assertIsObject } from '@blocksense/base-utils/assert';
-import { getRpcUrl, isTestnet, networkName } from '@blocksense/base-utils/evm';
-
-import {
-  NetworkName,
-  EthereumAddress,
-  parseEthereumAddress,
-  isZeroAddress,
-} from '@blocksense/base-utils/evm';
-
 import { keysOf } from '@blocksense/base-utils/array-iter';
-import { KeysOf, isObject } from '@blocksense/base-utils/type-level';
-
+import { assertIsObject } from '@blocksense/base-utils/assert';
+import type { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
+import {
+  getRpcUrl,
+  isTestnet,
+  isZeroAddress,
+  networkName,
+  parseEthereumAddress,
+} from '@blocksense/base-utils/evm';
+import type { KeysOf } from '@blocksense/base-utils/type-level';
+import { isObject } from '@blocksense/base-utils/type-level';
 import {
   chainlinkNetworkNameToChainId,
   parseNetworkFilename,
 } from '@blocksense/config-types/chainlink-compatibility';
+import type { Pair } from '@blocksense/config-types/data-feeds-config';
+import { createPair } from '@blocksense/config-types/data-feeds-config';
 
-import {
-  decodeConfirmedFeedEvent,
-  FeedRegistryEventsPerAggregator,
-} from '../../../chainlink-compatibility/types';
-import {
-  ChainLinkFeedDocsInfo,
-  RawDataFeeds,
-  decodeChainLinkFeedsInfo,
-} from './types';
-import { Pair, createPair } from '@blocksense/config-types/data-feeds-config';
-import { CLArtifacts } from '../../artifacts-downloader';
+import type { FeedRegistryEventsPerAggregator } from '../../../chainlink-compatibility/types';
+import { decodeConfirmedFeedEvent } from '../../../chainlink-compatibility/types';
+import type { CLArtifacts } from '../../artifacts-downloader';
+
+import type { ChainLinkFeedDocsInfo, RawDataFeeds } from './types';
+import { decodeChainLinkFeedsInfo } from './types';
 
 export async function collectRawDataFeeds(clArtifacts: CLArtifacts[]) {
   const rawDataFeeds: RawDataFeeds = {};

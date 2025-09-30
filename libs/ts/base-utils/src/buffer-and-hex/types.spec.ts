@@ -8,9 +8,9 @@
 import { describe, expect, test } from 'vitest';
 
 import {
-  isHexString,
   isHexDataString,
   isHexQuantityString,
+  isHexString,
   parseHexDataString,
   parseHexQuantityString,
   parseHexString,
