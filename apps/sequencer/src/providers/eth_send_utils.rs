@@ -327,11 +327,12 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                 // Gather data and perform minimal work while holding the provider lock
                 let mut need_resync_indices = false;
                 {
-                    let (rpc_handle, observed_block_hashes) = {
+                    let (rpc_handle, observed_block_hashes, reorgs_count_in_network_mutex) = {
                         let provider = provider_mutex.lock().await;
                         (
                             provider.provider.clone(),
                             provider.inflight.observed_block_hashes.clone(),
+                            provider.reorgs_count.clone(),
                         )
                     };
 
@@ -356,6 +357,47 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                 }
                                 if observed_latest_height < finalized_height {
                                     warn!("Lost track of chain in network {net} beyond a finalized checkpoint: {finalized_height}, last observed block at height: {observed_latest_height}");
+
+                                    // Before updating our observed state to the finalized tip,
+                                    // detect if a reorg has occurred at/above the last observed height.
+                                    if let Some(stored_hash) =
+                                        observed_block_hashes.get(&observed_latest_height)
+                                    {
+                                        match rpc_handle
+                                            .get_block_by_number(BlockNumberOrTag::Number(
+                                                observed_latest_height,
+                                            ))
+                                            .await
+                                        {
+                                            Ok(Some(chain_block)) => {
+                                                let chain_hash = chain_block.header.hash;
+                                                if chain_hash != *stored_hash {
+                                                    warn!(
+                                                        "Reorg detected in network {net} while catching up to finalized tip"
+                                                    );
+                                                    // Increment reorg counter
+                                                    {
+                                                        let mut reorgs_count_in_network =
+                                                            reorgs_count_in_network_mutex
+                                                                .lock()
+                                                                .await;
+                                                        *reorgs_count_in_network += 1;
+                                                    }
+                                                }
+                                            }
+                                            Ok(None) => {
+                                                warn!(
+                                                    "Could not get block {observed_latest_height} while checking reorg at finalized catch-up in {net}"
+                                                );
+                                            }
+                                            Err(e) => {
+                                                warn!(
+                                                    "Failed to get block {observed_latest_height} while checking reorg at finalized catch-up in {net}: {e:?}"
+                                                );
+                                            }
+                                        }
+                                    }
+
                                     observed_latest_height = finalized_height;
                                     // Insert current hash into provider cache
                                     provider.insert_observed_block_hash(
@@ -381,6 +423,42 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                         let _latest_hash = b.header.hash;
                         let latest_height = b.header.inner.number;
                         if latest_height > observed_latest_height {
+                            // Before proceeding, verify whether the block at our observed tip
+                            // still matches what we stored. If not, a reorg has occurred.
+                            if let Some(stored_hash) =
+                                observed_block_hashes.get(&observed_latest_height)
+                            {
+                                match rpc_handle
+                                    .get_block_by_number(BlockNumberOrTag::Number(
+                                        observed_latest_height,
+                                    ))
+                                    .await
+                                {
+                                    Ok(Some(chain_block)) => {
+                                        let chain_hash = chain_block.header.hash;
+                                        if chain_hash != *stored_hash {
+                                            warn!(
+                                                "Reorg detected in network {net} at observed tip before processing new blocks"
+                                            );
+                                            {
+                                                let mut reorgs_count_in_network =
+                                                    reorgs_count_in_network_mutex.lock().await;
+                                                *reorgs_count_in_network += 1;
+                                            }
+                                        }
+                                    }
+                                    Ok(None) => {
+                                        warn!(
+                                            "Could not get block {observed_latest_height} in network {net} while pre-checking for reorg"
+                                        );
+                                    }
+                                    Err(e) => {
+                                        warn!(
+                                            "Failed to get block {observed_latest_height} in network {net} while pre-checking for reorg: {e:?}"
+                                        );
+                                    }
+                                }
+                            }
                             info!("Found new blocks in {net} loop_count = {loop_count} latest_height = {latest_height} {}", latest_height - observed_latest_height);
 
                             // Check for reorg:
@@ -398,6 +476,12 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                         != *observed_latest_block_hash
                                     {
                                         warn!("Reorg detected in network {net}");
+
+                                        {
+                                            let mut reorgs_count_in_network =
+                                                reorgs_count_in_network_mutex.lock().await;
+                                            *reorgs_count_in_network += 1;
+                                        }
 
                                         // Inspect previously observed blocks to find the
                                         // first common ancestor and log the diverged ones.
@@ -560,7 +644,172 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                             }
                             observed_latest_height = latest_height;
                         } else {
-                            info!("No new blocks in {net} loop_count = {loop_count} latest_height = {latest_height}");
+                            info!(
+                                "No new blocks in {net} loop_count = {loop_count} latest_height = {latest_height}"
+                            );
+                            // Even if there are no new blocks, a reorg could have occurred if
+                            // the block at our observed_latest_height now has a different hash.
+                            if let Some(stored_hash) =
+                                observed_block_hashes.get(&observed_latest_height)
+                            {
+                                match rpc_handle
+                                    .get_block_by_number(BlockNumberOrTag::Number(
+                                        observed_latest_height,
+                                    ))
+                                    .await
+                                {
+                                    Ok(Some(chain_block)) => {
+                                        let chain_hash = chain_block.header.hash;
+                                        if chain_hash != *stored_hash {
+                                            warn!(
+                                                "Reorg detected in network {net} without new tip advancement"
+                                            );
+                                            {
+                                                let mut reorgs_count_in_network =
+                                                    reorgs_count_in_network_mutex.lock().await;
+                                                *reorgs_count_in_network += 1;
+                                            }
+
+                                            // Find first common ancestor by scanning downwards from observed_latest_height
+                                            let mut observed_heights: Vec<u64> =
+                                                observed_block_hashes
+                                                    .keys()
+                                                    .copied()
+                                                    .filter(|h| *h <= observed_latest_height)
+                                                    .collect();
+                                            observed_heights.sort_unstable();
+                                            observed_heights.reverse();
+
+                                            let fmt_hash = |hash: &B256| {
+                                                format!("0x{}", hex::encode(hash.as_slice()))
+                                            };
+
+                                            let mut diverged_blocks = Vec::new();
+                                            let mut first_common: Option<(u64, B256)> = None;
+
+                                            for height in observed_heights {
+                                                let stored_hash =
+                                                    match observed_block_hashes.get(&height) {
+                                                        Some(hash) => *hash,
+                                                        None => continue,
+                                                    };
+
+                                                match rpc_handle
+                                                    .get_block_by_number(BlockNumberOrTag::Number(
+                                                        height,
+                                                    ))
+                                                    .await
+                                                {
+                                                    Ok(Some(chain_block)) => {
+                                                        let chain_hash = chain_block.header.hash;
+                                                        if chain_hash == stored_hash {
+                                                            first_common =
+                                                                Some((height, chain_hash));
+                                                            break;
+                                                        } else {
+                                                            diverged_blocks.push((
+                                                                height,
+                                                                chain_hash,
+                                                                stored_hash,
+                                                            ));
+                                                        }
+                                                    }
+                                                    Ok(None) => {
+                                                        warn!(
+                                                            "Block {height} missing while inspecting reorg in network {net}"
+                                                        );
+                                                    }
+                                                    Err(e) => {
+                                                        warn!(
+                                                            "Failed to get block {height} in network {net} while inspecting reorg: {e:?}"
+                                                        );
+                                                    }
+                                                }
+                                            }
+
+                                            if !diverged_blocks.is_empty() {
+                                                let diverged_description: Vec<String> =
+                                                    diverged_blocks
+                                                        .iter()
+                                                        .map(|(height, chain_hash, stored_hash)| {
+                                                            format!(
+                                                                "height={height}, chain={}, stored={}",
+                                                                fmt_hash(chain_hash),
+                                                                fmt_hash(stored_hash),
+                                                            )
+                                                        })
+                                                        .collect();
+                                                warn!(
+                                                    "Diverged blocks observed in network {net}: {}",
+                                                    diverged_description.join("; ")
+                                                );
+                                            }
+
+                                            if let Some((common_height, common_hash)) = first_common
+                                            {
+                                                info!(
+                                                    "First common ancestor for reorg in network {net} at height {common_height} with hash {}",
+                                                    fmt_hash(&common_hash)
+                                                );
+                                                let fork_height = common_height + 1;
+                                                info!(
+                                                    "Fork point for reorg in network {net} is at height {fork_height}"
+                                                );
+
+                                                // Print all non-finalized updates at or above the fork height
+                                                {
+                                                    let provider = provider_mutex.lock().await;
+                                                    let mut heights: Vec<u64> = provider
+                                                        .inflight
+                                                        .non_finalized_updates
+                                                        .keys()
+                                                        .copied()
+                                                        .filter(|h| *h >= fork_height)
+                                                        .collect();
+                                                    heights.sort_unstable();
+
+                                                    if heights.is_empty() {
+                                                        info!(
+                                                            "No non_finalized_updates at or above fork height {fork_height} in network {net}"
+                                                        );
+                                                    } else {
+                                                        for h in heights {
+                                                            if let Some(batch) = provider
+                                                                .inflight
+                                                                .non_finalized_updates
+                                                                .get(&h)
+                                                            {
+                                                                let updates_count =
+                                                                    batch.updates.updates.len();
+                                                                info!(
+                                                                    "non_finalized_update >= fork: height={h}, batch_block_height={}, updates_count={}, net={}",
+                                                                    batch.updates.block_height,
+                                                                    updates_count,
+                                                                    batch.net,
+                                                                );
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            } else {
+                                                warn!(
+                                                    "Failed to find a common ancestor within stored block hashes for reorg in network {net}"
+                                                );
+                                            }
+                                        }
+                                    }
+                                    Ok(None) => {
+                                        warn!(
+                                            "Could not get block {observed_latest_height} in network {net} (None) while checking for reorg without tip advancement"
+                                        );
+                                    }
+                                    Err(e) => {
+                                        warn!(
+                                            "Failed to get block {observed_latest_height} in network {net} while checking for reorg (no tip advance): {e:?}"
+                                        );
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -1806,6 +2055,78 @@ mod tests {
         Ok(())
     }
 
+    async fn mine_self_txs_with_gas_price(
+        rpc: &ProviderType,
+        signer: &alloy::signers::local::PrivateKeySigner,
+        count: u64,
+        gas_price: u128,
+    ) -> eyre::Result<()> {
+        use alloy::network::TransactionBuilder;
+        use alloy::primitives::U256 as U;
+        use alloy::rpc::types::TransactionRequest;
+
+        let chain_id = rpc.get_chain_id().await?;
+        let mut nonce = rpc
+            .get_transaction_count(signer.address())
+            .pending()
+            .await?;
+
+        for _ in 0..count {
+            let mut tx = TransactionRequest::default()
+                .to(signer.address())
+                .from(signer.address())
+                .with_chain_id(chain_id)
+                .with_nonce(nonce)
+                .value(U::from(0u8));
+            tx = tx.with_gas_limit(21_000);
+            tx = tx.with_gas_price(gas_price);
+
+            let pending = rpc.send_transaction(tx).await?;
+            let _ = pending.get_receipt().await?;
+            nonce += 1;
+        }
+        Ok(())
+    }
+
+    async fn mine_varied_txs(
+        rpc: &ProviderType,
+        signer: &alloy::signers::local::PrivateKeySigner,
+        count: u64,
+        gas_price: u128,
+    ) -> eyre::Result<()> {
+        use alloy::network::TransactionBuilder;
+        use alloy::primitives::{Address as Addr, U256 as U};
+        use alloy::rpc::types::TransactionRequest;
+
+        let chain_id = rpc.get_chain_id().await?;
+        let mut nonce = rpc
+            .get_transaction_count(signer.address())
+            .pending()
+            .await?;
+
+        for i in 0..count {
+            // Send to a pseudo-random address derived from i to ensure different block content
+            let mut bytes = [0u8; 20];
+            bytes[0] = (i & 0xff) as u8;
+            bytes[1] = ((i >> 8) & 0xff) as u8;
+            let to_addr = Addr::from_slice(&bytes);
+
+            let mut tx = TransactionRequest::default()
+                .to(to_addr)
+                .from(signer.address())
+                .with_chain_id(chain_id)
+                .with_nonce(nonce)
+                .value(U::from(1u8));
+            tx = tx.with_gas_limit(50_000);
+            tx = tx.with_gas_price(gas_price);
+
+            let pending = rpc.send_transaction(tx).await?;
+            let _ = pending.get_receipt().await?;
+            nonce += 1;
+        }
+        Ok(())
+    }
+
     async fn rpc_call(
         url: &str,
         method: &str,
@@ -1828,25 +2149,34 @@ mod tests {
 
     async fn anvil_snapshot(url: &str) -> eyre::Result<String> {
         // Try anvil_snapshot, then evm_snapshot as fallback
-        match rpc_call(url, "anvil_snapshot", serde_json::json!([])).await {
-            Ok(v) => Ok(v.as_str().unwrap_or_default().to_string()),
-            Err(_) => {
-                let v = rpc_call(url, "evm_snapshot", serde_json::json!([])).await?;
-                Ok(v.as_str().unwrap_or_default().to_string())
-            }
-        }
+        let res = match rpc_call(url, "anvil_snapshot", serde_json::json!([])).await {
+            Ok(v) => v,
+            Err(_) => rpc_call(url, "evm_snapshot", serde_json::json!([])).await?,
+        };
+        // Result may be a hex string or a number; normalize to hex string
+        let snap_id = if let Some(s) = res.as_str() {
+            s.to_string()
+        } else if let Some(n) = res.as_u64() {
+            // Encode as 0x-prefixed hex as many clients do
+            format!("0x{:x}", n)
+        } else {
+            eyre::bail!(format!("Unexpected snapshot id result: {res}"));
+        };
+        Ok(snap_id)
     }
 
     async fn anvil_revert(url: &str, snap: &str) -> eyre::Result<()> {
         // Prefer anvil_revert; fallback to evm_revert
         let params = serde_json::json!([snap]);
-        match rpc_call(url, "anvil_revert", params.clone()).await {
-            Ok(_v) => Ok(()),
-            Err(_) => {
-                let _ = rpc_call(url, "evm_revert", params).await?;
-                Ok(())
-            }
+        let res = match rpc_call(url, "anvil_revert", params.clone()).await {
+            Ok(v) => v,
+            Err(_) => rpc_call(url, "evm_revert", params).await?,
+        };
+        let ok = res.as_bool().unwrap_or(false);
+        if !ok {
+            eyre::bail!(format!("Snapshot revert failed for id {snap}: {res}"));
         }
+        Ok(())
     }
 
     // End-to-end style test that reproduces a fork and exercises the reorg tracker loop.
@@ -1975,6 +2305,21 @@ mod tests {
             (h, obs)
         };
 
+        // Ensure the tracker has recorded observed hash at T1 before inducing the reorg
+        for _ in 0..20 {
+            let has_observed_t1 = {
+                let provider = provider_mutex.lock().await;
+                provider
+                    .inflight
+                    .observed_block_hashes
+                    .contains_key(&t1_height)
+            };
+            if has_observed_t1 {
+                break;
+            }
+            tokio::time::sleep(std::time::Duration::from_millis(200)).await;
+        }
+
         // Inject non-finalized updates at heights >= fork_height (which will be T0 + 1)
         // We cannot know T0 precisely here, but using T1 and T1-1 guarantees >= fork.
         {
@@ -2019,8 +2364,14 @@ mod tests {
         // Mine enough blocks to surpass T1 + 1 on the new branch
         {
             let provider = provider_mutex.lock().await;
-            let needed = 80u64; // mine a few to be safely past T1
-            mine_self_txs(&provider.provider, &provider.signer, needed)
+            // First, mine the first 10 blocks with a different gas price so that
+            // blocks [T0+1..T0+10] differ from the previously observed chain.
+            mine_varied_txs(&provider.provider, &provider.signer, 10, 2_000_000_000u128)
+                .await
+                .expect("failed to mine on new branch (differing blocks)");
+            // Then mine additional blocks to move the tip clearly beyond T1
+            let additional = 70u64;
+            mine_self_txs(&provider.provider, &provider.signer, additional)
                 .await
                 .expect("failed to mine on new branch");
         }
@@ -2088,6 +2439,27 @@ mod tests {
                 idx,
                 Some(0),
                 "Expected rb index for the feed to be refreshed from chain (default 0)"
+            );
+        }
+
+        // Wait until the reorg counter increments to confirm detection
+        for _ in 0..100 {
+            let count = {
+                let provider = provider_mutex.lock().await;
+                let c = *provider.reorgs_count.lock().await;
+                c
+            };
+            if count > 0 {
+                break;
+            }
+            tokio::time::sleep(std::time::Duration::from_millis(200)).await;
+        }
+        {
+            let provider = provider_mutex.lock().await;
+            let reorgs_count = provider.reorgs_count.lock().await;
+            assert!(
+                *reorgs_count > 0,
+                "Expected at least one reorg to be detected"
             );
         }
 
