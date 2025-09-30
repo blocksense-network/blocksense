@@ -1,32 +1,29 @@
 import { readdir } from 'fs/promises';
+import { join } from 'path';
 
 import { describe, expect, it, test } from 'vitest';
 
 import { keysOf } from '@blocksense/base-utils/array-iter';
 import { assertNotNull } from '@blocksense/base-utils/assert';
-import {
-  parseNetworkName,
-  networkMetadata,
-  NetworkName,
-} from '@blocksense/base-utils/evm';
+import type { NetworkName } from '@blocksense/base-utils/evm';
+import { networkMetadata, parseNetworkName } from '@blocksense/base-utils/evm';
 
-import {
-  configDirs,
-  readConfig,
-  readEvmDeployment,
-  readAllEvmDeployments,
-  configTypes,
-  legacyConfigTypes,
-  getConfigFilePath,
-  ConfigFileName,
-} from '../src/read-write-config';
-import { DeploymentConfigV2 } from '../src/evm-contracts-deployment';
+import { rootDir } from '../../base-utils/src/env/constants';
 import {
   downloadAndDecodeFile,
   isTokenValid,
 } from '../src/dfcg/artifacts/downloader';
-import { join } from 'path';
-import { rootDir } from '../../base-utils/src/env/constants';
+import type { DeploymentConfigV2 } from '../src/evm-contracts-deployment';
+import type { ConfigFileName } from '../src/read-write-config';
+import {
+  configDirs,
+  configTypes,
+  getConfigFilePath,
+  legacyConfigTypes,
+  readAllEvmDeployments,
+  readConfig,
+  readEvmDeployment,
+} from '../src/read-write-config';
 
 const LEGACY_CONFIGS_DIR = 'configs';
 
