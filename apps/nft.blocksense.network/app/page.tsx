@@ -1,10 +1,11 @@
+import { About } from 'components/About';
+import { CTA } from 'components/CTA';
+import { Form } from 'components/Form';
+import { Hero } from 'components/Hero';
 import type { Metadata } from 'next';
 
 import { nftDropConfig } from '../config';
-import { Hero } from 'components/Hero';
-import { Form } from 'components/Form';
-import { CTA } from 'components/CTA';
-import { About } from 'components/About';
+
 export const metadata: Metadata = {
   title: nftDropConfig.title,
 };

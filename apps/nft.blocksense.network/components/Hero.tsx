@@ -4,9 +4,10 @@ import { motion } from 'motion/react';
 import Image from 'next/image';
 
 import { ClaimNFTButton } from './ClaimNFTButton';
-import heroVector from '/public/images/hero-vector.svg';
+
 import heroPirateFlag from '/public/images/hero-pirate-flag.png';
 import heroPirateFlagMobile from '/public/images/hero-pirate-flag-mobile.png';
+import heroVector from '/public/images/hero-vector.svg';
 
 export const Hero = () => {
   return (

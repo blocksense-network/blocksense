@@ -1,8 +1,8 @@
 import Image from 'next/image';
 
+import discordIcon from '/public/icons/discord.svg';
 import telegramIcon from '/public/icons/telegram.svg';
 import xIcon from '/public/icons/x.svg';
-import discordIcon from '/public/icons/discord.svg';
 
 const socialNetworks = [
   {

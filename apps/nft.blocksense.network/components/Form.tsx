@@ -3,16 +3,17 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
 
-import { SuccessForm } from './SuccessForm';
 import { MintFormProvider } from '../app/contexts/MintFormContext';
+
 import { RestForm } from './RestFrom';
+import { SuccessForm } from './SuccessForm';
 
 export const Form = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [mintTransactionUrl, setMintTransactionUrl] = useState('');
   const [isAlreadyMinted, setIsAlreadyMinted] = useState(false);
 
-  const onSuccess = (mintTransactionUrl: string, isMinted: boolean) => {
+  const _onSuccess = (mintTransactionUrl: string, isMinted: boolean) => {
     const mintForm = document.getElementById('mint-form');
     if (mintForm) {
       const mintFormTop = mintForm.getBoundingClientRect().top + window.scrollY;

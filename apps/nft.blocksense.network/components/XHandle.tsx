@@ -1,12 +1,15 @@
-import { ChangeEvent, useEffect } from 'react';
-
+import { useEffect } from 'react';
+import type { ChangeEvent } from 'react';
 import { isXUserFollowing } from 'service/client';
+
 import { clearXHandle } from '@/utils';
+
 import { useMintFormContext } from '../app/contexts/MintFormContext';
+
 import { Input } from './Input';
 
 export const XHandle = () => {
-  const { xHandle, setXHandle, xStatus, setXStatus, setXUserId, mintLoading } =
+  const { mintLoading, setXHandle, setXStatus, setXUserId, xHandle, xStatus } =
     useMintFormContext();
 
   useEffect(() => {

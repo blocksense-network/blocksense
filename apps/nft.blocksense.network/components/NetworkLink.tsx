@@ -1,7 +1,7 @@
 import Image from 'next/image';
 
-import xIcon from '/public/icons/x-form.svg';
 import discordIcon from '/public/icons/discord-form.svg';
+import xIcon from '/public/icons/x-form.svg';
 
 const networkLinks = {
   x: {
@@ -23,7 +23,7 @@ type NetworkLinkProps = {
 };
 
 export const NetworkLink = ({ type }: NetworkLinkProps) => {
-  const { title, description, url, icon } = networkLinks[type];
+  const { description, icon, title, url } = networkLinks[type];
 
   return (
     <a

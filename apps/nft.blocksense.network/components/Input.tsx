@@ -1,12 +1,14 @@
 'use client';
 
-import { ChangeEvent, InputHTMLAttributes } from 'react';
 import Image from 'next/image';
+import type { ChangeEvent, InputHTMLAttributes } from 'react';
+
+import { InputLoadingIcon } from './InputLoadingIcon';
+import type { StatusType } from './StatusMessage';
+import { StatusMessage } from './StatusMessage';
 
 import checkIcon from '/public/icons/check.svg';
 import exclamationIcon from '/public/icons/exclamation.svg';
-import { StatusMessage, StatusType } from './StatusMessage';
-import { InputLoadingIcon } from './InputLoadingIcon';
 
 type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   labelClassName?: string;
@@ -15,14 +17,14 @@ type InputProps = InputHTMLAttributes<HTMLInputElement> & {
 };
 
 export const Input = ({
-  value = '',
   className = '',
   disabled,
   id,
   labelClassName = '',
-  status = 'none',
   message = '',
   onChange,
+  status = 'none',
+  value = '',
   ...props
 }: InputProps) => {
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
