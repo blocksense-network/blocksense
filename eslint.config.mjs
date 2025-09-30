@@ -36,7 +36,6 @@ export default [
       'libs/ts/nextra-theme-docs',
       'libs/ts/sol-reflector',
       'apps/docs.blocksense.network',
-      'apps/social-verification',
       'apps/rollup',
       'scripts/',
     ],

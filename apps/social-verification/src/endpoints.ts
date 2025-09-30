@@ -1,20 +1,13 @@
-import {
-  Context,
-  Effect as E,
-  Effect,
-  Layer,
-  Redacted,
-  Schema as S,
-  Schedule,
-} from 'effect';
-import { Tag } from 'effect/Context';
-import { NotFound, Unauthorized } from '@effect/platform/HttpApiError';
-import { HttpMethod } from '@effect/platform/HttpMethod';
 import { HttpApiBuilder } from '@effect/platform';
+import { NotFound, Unauthorized } from '@effect/platform/HttpApiError';
+import type { HttpMethod } from '@effect/platform/HttpMethod';
+import type { Effect as E, Schema as S } from 'effect';
+import { Context, Effect, Layer, Redacted, Schedule } from 'effect';
+import type { Tag } from 'effect/Context';
 import { createThirdwebClient, getContract } from 'thirdweb';
 import { arbitrum } from 'thirdweb/chains';
-import { privateKeyToAccount } from 'thirdweb/wallets';
 import { balanceOf, generateMintSignature } from 'thirdweb/extensions/erc721';
+import { privateKeyToAccount } from 'thirdweb/wallets';
 import Web3 from 'web3';
 
 import { renderLetsTalkEmail } from '@blocksense/ui/website/LetsTalkEmail';
@@ -61,7 +54,7 @@ const cors = HttpApiBuilder.middlewareCors({
 export const AuthorizationLive = Layer.effect(
   Authorization,
   Effect.gen(function* () {
-    console.log('Creating Authorization middleware');
+    yield* Effect.logInfo('Creating Authorization middleware');
     return {
       apiKey: (apiKey: Redacted.Redacted<string>) =>
         Effect.contextWith(context => {
@@ -329,7 +322,7 @@ export const server: ApiServer<Api> = {
       const socialDataApiKey = env['SOCIAL_DATA_API_KEY'];
       const tweetId = env['X_BLOCKSENSE_TWEET_ID'];
 
-      const { retweetCode, userId, discord, xHandle, accountAddress } = payload;
+      const { accountAddress, discord, retweetCode, userId, xHandle } = payload;
 
       const metadata = {
         name: 'Blocksense Pirate',
@@ -379,7 +372,7 @@ export const server: ApiServer<Api> = {
             socialDataApiKey,
           );
 
-          const { isRetweeted, isCodeCorrect } = retweetStatus;
+          const { isCodeCorrect, isRetweeted } = retweetStatus;
           if (!isRetweeted) {
             return { error: 'You have not retweeted' };
           }
@@ -514,7 +507,7 @@ export const server: ApiServer<Api> = {
 
           console.log(`Participant check result: ${isParticipant}`);
 
-          return { isParticipant: isParticipant, mintingTx: participantMintTx };
+          return { isParticipant, mintingTx: participantMintTx };
         },
         catch: error => {
           console.error('Error checking data in database:', error);
