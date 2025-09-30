@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
   SelectLabel,
+  SelectTrigger,
+  SelectValue,
 } from './Select';
 
 export default {

@@ -1,13 +1,10 @@
 'use client';
 
-import React, {
-  createContext,
-  useContext,
-  HTMLAttributes,
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import type {
   ButtonHTMLAttributes,
+  HTMLAttributes,
   ReactNode,
-  useState,
-  useEffect,
   RefObject,
 } from 'react';
 
@@ -78,8 +75,8 @@ export interface AccordionItemProps extends HTMLAttributes<HTMLDivElement> {
 
 export const AccordionItem = ({
   children,
-  value,
   className,
+  value,
   ...props
 }: AccordionItemProps) => {
   const { openItems } = useContext(AccordionContext);

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
 
 import { cn } from '@blocksense/docs-ui/utils';
 
@@ -29,8 +29,8 @@ type CardProps = HTMLAttributes<HTMLDivElement> & {
 
 export const Card = ({
   className,
-  variant = 'default',
   size = 'md',
+  variant = 'default',
   ...props
 }: CardProps) => {
   return (

@@ -1,20 +1,18 @@
 'use client';
 
 import React, {
-  useState,
-  useEffect,
-  useRef,
-  HTMLAttributes,
-  RefObject,
-  ReactNode,
   createContext,
   useContext,
+  useEffect,
+  useRef,
+  useState,
 } from 'react';
+import type { HTMLAttributes, ReactNode, RefObject } from 'react';
 
-import { cn } from '@blocksense/docs-ui/utils';
+import type { ButtonProps } from '@blocksense/docs-ui/Button';
 import { Button } from '@blocksense/docs-ui/Button';
 import { ImageWrapper } from '@blocksense/docs-ui/ImageWrapper';
-import { ButtonProps } from '@blocksense/docs-ui/Button';
+import { cn } from '@blocksense/docs-ui/utils';
 
 type CarouselProps = {
   orientation?: 'horizontal' | 'vertical';
@@ -36,9 +34,9 @@ const CarouselContext = createContext<CarouselContextProps>(
 );
 
 export const Carousel = ({
-  orientation = 'horizontal',
-  className,
   children,
+  className,
+  orientation = 'horizontal',
   ...props
 }: CarouselProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
@@ -131,8 +129,8 @@ export const Carousel = ({
 };
 
 export const CarouselContent = ({
-  className,
   children,
+  className,
   ...props
 }: HTMLAttributes<HTMLDivElement>) => {
   const { contentRef, orientation } = useContext(CarouselContext);
@@ -156,8 +154,8 @@ export const CarouselContent = ({
 };
 
 export const CarouselItem = ({
-  className,
   children,
+  className,
   ...props
 }: HTMLAttributes<HTMLDivElement>) => {
   return (
@@ -177,11 +175,11 @@ export const CarouselItem = ({
 
 export const CarouselPrevious = ({
   className,
-  variant = 'outline',
   size = 'icon',
+  variant = 'outline',
   ...props
 }: ButtonProps) => {
-  const { scrollPrev, canScrollPrev, orientation } =
+  const { canScrollPrev, orientation, scrollPrev } =
     useContext(CarouselContext);
 
   return (
@@ -211,11 +209,11 @@ export const CarouselPrevious = ({
 
 export const CarouselNext = ({
   className,
-  variant = 'outline',
   size = 'icon',
+  variant = 'outline',
   ...props
 }: ButtonProps) => {
-  const { scrollNext, canScrollNext, orientation } =
+  const { canScrollNext, orientation, scrollNext } =
     useContext(CarouselContext);
 
   return (

@@ -8,10 +8,10 @@ type ImageProps = {
 };
 
 export const ImageWrapper = ({
-  src,
   alt = ' ',
   className = ' ',
   onClick,
+  src,
 }: ImageProps) => {
   return <img src={src} alt={alt} className={className} onClick={onClick} />;
 };

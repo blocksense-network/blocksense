@@ -1,10 +1,11 @@
 'use client';
 
-import React, { FieldsetHTMLAttributes, InputHTMLAttributes } from 'react';
+import React from 'react';
+import type { FieldsetHTMLAttributes, InputHTMLAttributes } from 'react';
 
-import { cn } from '@blocksense/docs-ui/utils';
-import { Label } from '@blocksense/docs-ui/Label';
 import { Input } from '@blocksense/docs-ui/Input';
+import { Label } from '@blocksense/docs-ui/Label';
+import { cn } from '@blocksense/docs-ui/utils';
 
 type CheckboxProps = InputHTMLAttributes<HTMLInputElement>;
 

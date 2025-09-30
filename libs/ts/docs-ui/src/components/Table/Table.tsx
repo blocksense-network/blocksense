@@ -1,10 +1,7 @@
 'use client';
 
-import React, {
-  HTMLAttributes,
-  TdHTMLAttributes,
-  ThHTMLAttributes,
-} from 'react';
+import React from 'react';
+import type { HTMLAttributes, TdHTMLAttributes, ThHTMLAttributes } from 'react';
 
 import { cn } from '@blocksense/docs-ui/utils';
 
@@ -12,7 +9,7 @@ interface TableProps extends HTMLAttributes<HTMLTableElement> {
   containerClassName?: string;
 }
 
-export function Table({ containerClassName, className, ...props }: TableProps) {
+export function Table({ className, containerClassName, ...props }: TableProps) {
   return (
     <section
       className={cn(

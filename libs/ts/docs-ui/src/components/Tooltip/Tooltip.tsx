@@ -1,9 +1,5 @@
-import React, {
-  ReactNode,
-  ReactElement,
-  Children,
-  isValidElement,
-} from 'react';
+import React, { Children, isValidElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 import { cn } from '@blocksense/docs-ui/utils';
 
@@ -32,9 +28,9 @@ const arrowClasses = {
 };
 
 export const Tooltip = ({
-  position = 'top',
   children,
   contentClassName = '',
+  position = 'top',
 }: TooltipProps) => {
   const childrenArray = Children.toArray(children);
   const content = childrenArray.find(

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useRef, useEffect, TextareaHTMLAttributes } from 'react';
+import React, { useEffect, useRef } from 'react';
+import type { TextareaHTMLAttributes } from 'react';
 
 import { cn } from '@blocksense/docs-ui/utils';
 
@@ -26,13 +27,13 @@ type TextAreaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
 };
 
 export const TextArea = ({
-  label,
-  name,
   className,
-  variant = 'outline',
-  labelSize = 'text-base',
   error = false,
   errorMessage,
+  label,
+  labelSize = 'text-base',
+  name,
+  variant = 'outline',
   ...props
 }: TextAreaProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);

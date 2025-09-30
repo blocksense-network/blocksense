@@ -1,6 +1,5 @@
-import React from 'react';
+import type { Meta, StoryObj } from '@storybook/react';
 
-import { Meta, StoryObj } from '@storybook/react';
 import { Callout } from './Callout';
 
 const meta: Meta<typeof Callout> = {

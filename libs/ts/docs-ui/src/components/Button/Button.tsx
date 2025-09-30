@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { FocusEventHandler, MouseEventHandler, ReactNode } from 'react';
+import type { FocusEventHandler, MouseEventHandler, ReactNode } from 'react';
 
 import { cn } from '@blocksense/docs-ui/utils';
 
@@ -54,16 +54,16 @@ export type ButtonProps = {
 };
 
 const ButtonBase = ({
+  children,
   className,
+  content,
   href,
-  target,
-  onFocus,
+  icon,
   onClick,
+  onFocus,
   onMouseEnter,
   onMouseLeave,
-  icon,
-  children,
-  content,
+  target,
   ...props
 }: ButtonProps) => {
   const Component = href ? 'a' : 'button';
@@ -88,9 +88,9 @@ const ButtonBase = ({
 
 export const Button = ({
   className,
-  variant = 'action',
-  size = 'base',
   disabled = false,
+  size = 'base',
+  variant = 'action',
   ...props
 }: ButtonProps) => {
   const baseClasses =

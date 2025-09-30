@@ -1,5 +1,5 @@
-import { join, dirname } from 'node:path';
 import { createRequire } from 'node:module';
+import { dirname, join } from 'node:path';
 
 import type { StorybookConfig } from '@storybook/nextjs-vite';
 import { mergeConfig } from 'vite';

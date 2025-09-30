@@ -1,6 +1,7 @@
 'use client';
 
-import React, { MouseEvent, useState } from 'react';
+import React, { useState } from 'react';
+import type { MouseEvent } from 'react';
 
 import { ImageWrapper } from '@blocksense/docs-ui/ImageWrapper';
 import { Tooltip } from '@blocksense/docs-ui/Tooltip';
@@ -15,12 +16,12 @@ type CopyButtonProps = {
 };
 
 export const CopyButton = ({
-  textToCopy,
-  tooltipPosition = 'bottom',
+  background = true,
   copyButtonClasses = '',
   disabled = false,
   showTooltip = true,
-  background = true,
+  textToCopy,
+  tooltipPosition = 'bottom',
 }: CopyButtonProps) => {
   const [isCopied, setIsCopied] = useState(false);
   let imageClassName = 'w-4 h-4 invert';

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { ReactNode, ReactElement } from 'react';
+import React from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 import { cn } from '@blocksense/docs-ui/utils';
 
@@ -20,11 +21,11 @@ export type CalloutProps = {
 };
 
 export const Callout = ({
-  type = 'default',
-  emoji,
-  title,
   children,
   className,
+  emoji,
+  title,
+  type = 'default',
 }: CalloutProps) => {
   const defaultEmoji = typeToEmoji[type];
 

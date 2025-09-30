@@ -1,21 +1,23 @@
 'use client';
 
 import React, {
-  useState,
-  useRef,
-  useEffect,
   createContext,
   useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import type {
+  ButtonHTMLAttributes,
   HTMLAttributes,
+  MouseEvent,
   ReactNode,
   RefObject,
-  MouseEvent,
-  ButtonHTMLAttributes,
 } from 'react';
 
-import { cn } from '@blocksense/docs-ui/utils';
-import { Icon } from '@blocksense/docs-ui/Icon';
 import { Button } from '@blocksense/docs-ui/Button';
+import { Icon } from '@blocksense/docs-ui/Icon';
+import { cn } from '@blocksense/docs-ui/utils';
 
 interface DialogContextValue {
   isOpen: boolean;
@@ -125,11 +127,11 @@ type DialogContentProps = {
 };
 
 export const DialogContent = ({
-  className,
   children,
+  className,
   ...props
 }: DialogContentProps) => {
-  const { isOpen, dialogRef } = useContext(DialogContext);
+  const { dialogRef, isOpen } = useContext(DialogContext);
 
   if (!isOpen) return null;
 
@@ -155,8 +157,8 @@ export const DialogContent = ({
 };
 
 export const DialogHeader = ({
-  className,
   children,
+  className,
   ...props
 }: HTMLAttributes<HTMLHeadElement>) => (
   <header
@@ -168,8 +170,8 @@ export const DialogHeader = ({
 );
 
 export const DialogTitle = ({
-  className,
   children,
+  className,
   ...props
 }: HTMLAttributes<HTMLHeadingElement>) => (
   <h2
@@ -181,8 +183,8 @@ export const DialogTitle = ({
 );
 
 export const DialogDescription = ({
-  className,
   children,
+  className,
   ...props
 }: HTMLAttributes<HTMLParagraphElement>) => (
   <p className={cn('dialog__description text-sm', className)} {...props}>
@@ -191,8 +193,8 @@ export const DialogDescription = ({
 );
 
 export const DialogFooter = ({
-  className,
   children,
+  className,
   ...props
 }: HTMLAttributes<HTMLElement>) => (
   <footer

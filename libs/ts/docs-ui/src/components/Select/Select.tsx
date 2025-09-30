@@ -1,23 +1,18 @@
 'use client';
 
 import React, {
-  useState,
-  useEffect,
-  ReactNode,
   createContext,
   useContext,
+  useEffect,
   useRef,
-  HTMLAttributes,
+  useState,
 } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 
-import {
-  cn,
-  getSideAlignClasses,
-  Align,
-  Side,
-} from '@blocksense/docs-ui/utils';
-import { Icon } from '@blocksense/docs-ui/Icon';
 import { Button } from '@blocksense/docs-ui/Button';
+import { Icon } from '@blocksense/docs-ui/Icon';
+import type { Align, Side } from '@blocksense/docs-ui/utils';
+import { cn, getSideAlignClasses } from '@blocksense/docs-ui/utils';
 
 type SelectProps = {
   children: ReactNode;
@@ -37,9 +32,9 @@ const SelectContext = createContext<SelectContextType>({} as SelectContextType);
 
 export const Select = ({
   children,
-  value,
-  onValueChangeAction,
   className,
+  onValueChangeAction,
+  value,
 }: SelectProps) => {
   const [selectedValue, setSelectedValue] = useState(value);
   const [isOpen, setIsOpen] = useState(false);
@@ -105,11 +100,11 @@ type SelectTriggerProps = HTMLAttributes<HTMLButtonElement> & {
 };
 
 export const SelectTrigger = ({
-  className,
   children,
+  className,
   ...props
 }: SelectTriggerProps) => {
-  const { toggleOpen, isOpen } = useContext(SelectContext);
+  const { isOpen, toggleOpen } = useContext(SelectContext);
 
   return (
     <Button
@@ -143,8 +138,8 @@ type SelectValueProps = HTMLAttributes<HTMLSpanElement> & {
 };
 
 export const SelectValue = ({
-  placeholder,
   className,
+  placeholder,
   ...props
 }: SelectValueProps) => {
   const { selectedValue } = useContext(SelectContext);
@@ -164,10 +159,10 @@ type SelectContentProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 export const SelectContent = ({
-  className,
-  children,
-  side = 'bottom',
   align = 'start',
+  children,
+  className,
+  side = 'bottom',
   ...props
 }: SelectContentProps) => {
   const { isOpen } = useContext(SelectContext);
@@ -198,12 +193,12 @@ type SelectItemProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 export const SelectItem = ({
+  children,
   className,
   value,
-  children,
   ...props
 }: SelectItemProps) => {
-  const { selectedValue, onValueChangeAction } = useContext(SelectContext);
+  const { onValueChangeAction, selectedValue } = useContext(SelectContext);
 
   return (
     <div
@@ -238,8 +233,8 @@ type SelectLabelProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 export const SelectLabel = ({
-  className,
   children,
+  className,
   ...props
 }: SelectLabelProps) => {
   return (

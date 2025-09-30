@@ -2,9 +2,9 @@ import React from 'react';
 
 import {
   Accordion,
+  AccordionContent,
   AccordionItem,
   AccordionTrigger,
-  AccordionContent,
 } from '../Accordion';
 
 export default {

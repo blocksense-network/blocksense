@@ -1,6 +1,7 @@
 'use client';
 
-import React, { ReactNode, LabelHTMLAttributes } from 'react';
+import React from 'react';
+import type { LabelHTMLAttributes, ReactNode } from 'react';
 
 import { cn } from '@blocksense/docs-ui/utils';
 
@@ -9,7 +10,7 @@ type LabelProps = {
   children?: ReactNode;
 } & LabelHTMLAttributes<HTMLLabelElement>;
 
-export const Label = ({ className, children, ...props }: LabelProps) => {
+export const Label = ({ children, className, ...props }: LabelProps) => {
   const baseClasses =
     'label text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 dark:text-white';
 
