@@ -87,19 +87,10 @@ export default [
       'object-shorthand': 'error',
       'prefer-destructuring': 'off',
       'sort-imports': 'off',
-
-      'no-restricted-syntax': [
-        'error',
-        {
-          selector:
-            "CallExpression[callee.property.name='push'] > SpreadElement.arguments",
-          message: 'Do not use spread arguments in Array.push',
-        },
-      ],
-
       'no-unused-vars': 'off',
       'prefer-rest-params': 'off',
       'prefer-spread': 'off',
+
       'import/first': 'error',
       'import/newline-after-import': 'error',
       'import/no-duplicates': 'error',
@@ -164,6 +155,7 @@ export default [
       '@typescript-eslint/no-array-constructor': 'off',
       '@typescript-eslint/no-use-before-define': 'off',
       '@typescript-eslint/no-namespace': 'off',
+      '@typescript-eslint/no-duplicate-enum-values': 'off',
     },
   },
 ];
