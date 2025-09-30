@@ -43,6 +43,125 @@ use futures_util::stream::FuturesUnordered;
 use std::io::Error;
 use tokio::task::JoinHandle;
 
+// Helper to handle reorg once already detected. Finds fork point and prints
+// discarded observations, mirroring the existing log messages and structure.
+async fn handle_reorg(
+    net: &str,
+    rpc_handle: &ProviderType,
+    provider_mutex: &Arc<Mutex<RpcProvider>>,
+    observed_block_hashes: &HashMap<u64, B256>,
+    observed_latest_height: u64,
+) -> Option<u64> {
+    // Build list of observed heights up to observed_latest_height, highest to lowest
+    let mut observed_heights: Vec<u64> = observed_block_hashes
+        .keys()
+        .copied()
+        .filter(|h| *h <= observed_latest_height)
+        .collect();
+    observed_heights.sort_unstable();
+    observed_heights.reverse();
+
+    let fmt_hash = |hash: &B256| format!("0x{}", hex::encode(hash.as_slice()));
+
+    let mut diverged_blocks = Vec::new();
+    let mut first_common: Option<(u64, B256)> = None;
+
+    for height in observed_heights {
+        let stored_hash = match observed_block_hashes.get(&height) {
+            Some(hash) => *hash,
+            None => continue,
+        };
+
+        match rpc_handle
+            .get_block_by_number(BlockNumberOrTag::Number(height))
+            .await
+        {
+            Ok(Some(chain_block)) => {
+                let chain_hash = chain_block.header.hash;
+                if chain_hash == stored_hash {
+                    first_common = Some((height, chain_hash));
+                    break;
+                } else {
+                    diverged_blocks.push((height, chain_hash, stored_hash));
+                }
+            }
+            Ok(None) => {
+                warn!("Block {height} missing while inspecting reorg in network {net}");
+            }
+            Err(e) => {
+                warn!(
+                    "Failed to get block {height} in network {net} while inspecting reorg: {e:?}"
+                );
+            }
+        }
+    }
+
+    if !diverged_blocks.is_empty() {
+        let diverged_description: Vec<String> = diverged_blocks
+            .iter()
+            .map(|(height, chain_hash, stored_hash)| {
+                format!(
+                    "height={height}, chain={}, stored={}",
+                    fmt_hash(chain_hash),
+                    fmt_hash(stored_hash),
+                )
+            })
+            .collect();
+        warn!(
+            "Diverged blocks observed in network {net}: {}",
+            diverged_description.join("; ")
+        );
+    }
+
+    if let Some((common_height, common_hash)) = first_common {
+        info!(
+            "First common ancestor for reorg in network {net} at height {common_height} with hash {}",
+            fmt_hash(&common_hash)
+        );
+        let fork_height = common_height + 1;
+        info!(
+            "Fork point for reorg in network {net} is at height {fork_height}"
+        );
+
+        // Print all non-finalized updates at or above the fork height
+        {
+            let provider = provider_mutex.lock().await;
+            let mut heights: Vec<u64> = provider
+                .inflight
+                .non_finalized_updates
+                .keys()
+                .copied()
+                .filter(|h| *h >= fork_height)
+                .collect();
+            heights.sort_unstable();
+
+            if heights.is_empty() {
+                info!(
+                    "No non_finalized_updates at or above fork height {fork_height} in network {net}"
+                );
+            } else {
+                for h in heights {
+                    if let Some(batch) = provider.inflight.non_finalized_updates.get(&h) {
+                        let updates_count = batch.updates.updates.len();
+                        info!(
+                            "non_finalized_update >= fork: height={h}, batch_block_height={}, updates_count={}, net={}",
+                            batch.updates.block_height,
+                            updates_count,
+                            batch.net,
+                        );
+                    }
+                }
+            }
+        }
+
+        Some(fork_height)
+    } else {
+        warn!(
+            "Failed to find a common ancestor within stored block hashes for reorg in network {net}"
+        );
+        None
+    }
+}
 pub async fn deploy_contract(
     network: &String,
     providers: &SharedRpcProviders,
@@ -365,6 +484,14 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                                     reorgs_count_in_network_mutex.lock().await;
                                                 *reorgs_count_in_network += 1;
                                             }
+                                            let _ = handle_reorg(
+                                                net.as_str(),
+                                                &rpc_handle,
+                                                provider_mutex,
+                                                &observed_block_hashes,
+                                                observed_latest_height,
+                                            )
+                                            .await;
                                         }
                                     }
                                     Ok(None) => {
@@ -417,115 +544,14 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                             format!("0x{}", hex::encode(hash.as_slice()))
                                         };
 
-                                        let mut diverged_blocks = Vec::new();
-                                        let mut first_common: Option<(u64, B256)> = None;
-
-                                        for height in observed_heights {
-                                            let stored_hash =
-                                                match observed_block_hashes.get(&height) {
-                                                    Some(hash) => *hash,
-                                                    None => continue,
-                                                };
-
-                                            match rpc_handle
-                                                .get_block_by_number(BlockNumberOrTag::Number(
-                                                    height,
-                                                ))
-                                                .await
-                                            {
-                                                Ok(Some(chain_block)) => {
-                                                    let chain_hash = chain_block.header.hash;
-                                                    if chain_hash == stored_hash {
-                                                        first_common = Some((height, chain_hash));
-                                                        break;
-                                                    } else {
-                                                        diverged_blocks.push((
-                                                            height,
-                                                            chain_hash,
-                                                            stored_hash,
-                                                        ));
-                                                    }
-                                                }
-                                                Ok(None) => {
-                                                    warn!(
-                                                            "Block {height} missing while inspecting reorg in network {net}"
-                                                        );
-                                                }
-                                                Err(e) => {
-                                                    warn!(
-                                                            "Failed to get block {height} in network {net} while inspecting reorg: {e:?}"
-                                                        );
-                                                }
-                                            }
-                                        }
-
-                                        if !diverged_blocks.is_empty() {
-                                            let diverged_description: Vec<String> = diverged_blocks
-                                                .iter()
-                                                .map(|(height, chain_hash, stored_hash)| {
-                                                    format!(
-                                                        "height={height}, chain={}, stored={}",
-                                                        fmt_hash(chain_hash),
-                                                        fmt_hash(stored_hash),
-                                                    )
-                                                })
-                                                .collect();
-                                            warn!(
-                                                "Diverged blocks observed in network {net}: {}",
-                                                diverged_description.join("; ")
-                                            );
-                                        }
-
-                                        if let Some((common_height, common_hash)) = first_common {
-                                            info!(
-                                                    "First common ancestor for reorg in network {net} at height {common_height} with hash {}",
-                                                    fmt_hash(&common_hash)
-                                                );
-                                            let fork_height = common_height + 1;
-                                            info!(
-                                                "Fork point for reorg in network {net} is at height {fork_height}"
-                                            );
-
-                                            // Print all non-finalized updates at or above the fork height
-                                            {
-                                                let provider = provider_mutex.lock().await;
-                                                let mut heights: Vec<u64> = provider
-                                                    .inflight
-                                                    .non_finalized_updates
-                                                    .keys()
-                                                    .copied()
-                                                    .filter(|h| *h >= fork_height)
-                                                    .collect();
-                                                heights.sort_unstable();
-
-                                                if heights.is_empty() {
-                                                    info!(
-                                                        "No non_finalized_updates at or above fork height {fork_height} in network {net}"
-                                                    );
-                                                } else {
-                                                    for h in heights {
-                                                        if let Some(batch) = provider
-                                                            .inflight
-                                                            .non_finalized_updates
-                                                            .get(&h)
-                                                        {
-                                                            let updates_count =
-                                                                batch.updates.updates.len();
-                                                            info!(
-                                                                "non_finalized_update >= fork: height={h}, batch_block_height={}, updates_count={}, net={}",
-                                                                batch.updates.block_height,
-                                                                updates_count,
-                                                                batch.net,
-                                                            );
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        } else {
-                                            warn!(
-                                                    "Failed to find a common ancestor within stored block hashes for reorg in network {net}"
-                                                );
-                                        }
+                                        let _ = handle_reorg(
+                                            net.as_str(),
+                                            &rpc_handle,
+                                            provider_mutex,
+                                            &observed_block_hashes,
+                                            observed_latest_height,
+                                        )
+                                        .await;
                                     } else {
                                         info!(
                                             "Chain goes on in {net}, loop {loop_count} ... need to add {} new blocks",
@@ -591,133 +617,14 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                                     reorgs_count_in_network_mutex.lock().await;
                                                 *reorgs_count_in_network += 1;
                                             }
-
-                                            // Find first common ancestor by scanning downwards from observed_latest_height
-                                            let mut observed_heights: Vec<u64> =
-                                                observed_block_hashes
-                                                    .keys()
-                                                    .copied()
-                                                    .filter(|h| *h <= observed_latest_height)
-                                                    .collect();
-                                            observed_heights.sort_unstable();
-                                            observed_heights.reverse();
-
-                                            let fmt_hash = |hash: &B256| {
-                                                format!("0x{}", hex::encode(hash.as_slice()))
-                                            };
-
-                                            let mut diverged_blocks = Vec::new();
-                                            let mut first_common: Option<(u64, B256)> = None;
-
-                                            for height in observed_heights {
-                                                let stored_hash =
-                                                    match observed_block_hashes.get(&height) {
-                                                        Some(hash) => *hash,
-                                                        None => continue,
-                                                    };
-
-                                                match rpc_handle
-                                                    .get_block_by_number(BlockNumberOrTag::Number(
-                                                        height,
-                                                    ))
-                                                    .await
-                                                {
-                                                    Ok(Some(chain_block)) => {
-                                                        let chain_hash = chain_block.header.hash;
-                                                        if chain_hash == stored_hash {
-                                                            first_common =
-                                                                Some((height, chain_hash));
-                                                            break;
-                                                        } else {
-                                                            diverged_blocks.push((
-                                                                height,
-                                                                chain_hash,
-                                                                stored_hash,
-                                                            ));
-                                                        }
-                                                    }
-                                                    Ok(None) => {
-                                                        warn!(
-                                                            "Block {height} missing while inspecting reorg in network {net}"
-                                                        );
-                                                    }
-                                                    Err(e) => {
-                                                        warn!(
-                                                            "Failed to get block {height} in network {net} while inspecting reorg: {e:?}"
-                                                        );
-                                                    }
-                                                }
-                                            }
-
-                                            if !diverged_blocks.is_empty() {
-                                                let diverged_description: Vec<String> =
-                                                    diverged_blocks
-                                                        .iter()
-                                                        .map(|(height, chain_hash, stored_hash)| {
-                                                            format!(
-                                                                "height={height}, chain={}, stored={}",
-                                                                fmt_hash(chain_hash),
-                                                                fmt_hash(stored_hash),
-                                                            )
-                                                        })
-                                                        .collect();
-                                                warn!(
-                                                    "Diverged blocks observed in network {net}: {}",
-                                                    diverged_description.join("; ")
-                                                );
-                                            }
-
-                                            if let Some((common_height, common_hash)) = first_common
-                                            {
-                                                info!(
-                                                    "First common ancestor for reorg in network {net} at height {common_height} with hash {}",
-                                                    fmt_hash(&common_hash)
-                                                );
-                                                let fork_height = common_height + 1;
-                                                info!(
-                                                    "Fork point for reorg in network {net} is at height {fork_height}"
-                                                );
-
-                                                // Print all non-finalized updates at or above the fork height
-                                                {
-                                                    let provider = provider_mutex.lock().await;
-                                                    let mut heights: Vec<u64> = provider
-                                                        .inflight
-                                                        .non_finalized_updates
-                                                        .keys()
-                                                        .copied()
-                                                        .filter(|h| *h >= fork_height)
-                                                        .collect();
-                                                    heights.sort_unstable();
-
-                                                    if heights.is_empty() {
-                                                        info!(
-                                                            "No non_finalized_updates at or above fork height {fork_height} in network {net}"
-                                                        );
-                                                    } else {
-                                                        for h in heights {
-                                                            if let Some(batch) = provider
-                                                                .inflight
-                                                                .non_finalized_updates
-                                                                .get(&h)
-                                                            {
-                                                                let updates_count =
-                                                                    batch.updates.updates.len();
-                                                                info!(
-                                                                    "non_finalized_update >= fork: height={h}, batch_block_height={}, updates_count={}, net={}",
-                                                                    batch.updates.block_height,
-                                                                    updates_count,
-                                                                    batch.net,
-                                                                );
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            } else {
-                                                warn!(
-                                                    "Failed to find a common ancestor within stored block hashes for reorg in network {net}"
-                                                );
-                                            }
+                                            let _ = handle_reorg(
+                                                net.as_str(),
+                                                &rpc_handle,
+                                                provider_mutex,
+                                                &observed_block_hashes,
+                                                observed_latest_height,
+                                            )
+                                            .await;
                                         }
                                     }
                                     Ok(None) => {
