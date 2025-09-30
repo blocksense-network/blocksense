@@ -216,7 +216,7 @@ describe.sequential('E2E Tests with process-compose', () => {
       // Info is fetched for specific round - the initial round of the feed
       // + number of updates that happened while the local sequencer was running
       // modulo the maximum number of history elements per feed
-      const currentFeedsInfo = yield* getDataFeedsInfoFromNetwork(
+      const feedInfoAfterUpdates = yield* getDataFeedsInfoFromNetwork(
         updatedFeedIds,
         contractAddress,
         url,
@@ -228,20 +228,20 @@ describe.sequential('E2E Tests with process-compose', () => {
         ),
       );
 
-      const historyData = yield* sequencer.fetchHistory();
+      const feedAggregateHistory = yield* sequencer.fetchHistory();
 
       // Make sure that the feeds info is updated
-      for (const [id, data] of entriesOf(currentFeedsInfo)) {
-        const { round, value } = data;
+      for (const [id, data] of entriesOf(feedInfoAfterUpdates)) {
+        const { round: roundAfterUpdates, value: valueAfterUpdates } = data;
         // Pegged asset with 10% tolerance should be pegged
         // Pegged asset with 0.000001% tolerance should not be pegged
         if (id === '50000') {
-          expect(value).toEqual(1 * 10 ** 8);
+          expect(valueAfterUpdates).toEqual(1 * 10 ** 8);
           continue;
         }
-        expect(value).not.toEqual(initialFeedsInfo[id].value);
+        expect(valueAfterUpdates).not.toEqual(initialFeedsInfo[id].value);
 
-        const actualData = historyData.aggregate_history[id].find(
+        const historyData = feedAggregateHistory.aggregate_history[id].find(
           // In history data, the indexing of updates starts from 0.
           // Hence, we need to subtract 1 from the number of updates
           feed => feed.update_number === updatesToNetworks[network][id] - 1,
@@ -249,11 +249,13 @@ describe.sequential('E2E Tests with process-compose', () => {
         const decimals = feedsConfig.feeds.find(f => f.id.toString() === id)!
           .additional_feed_info.decimals;
 
-        expect(value / 10 ** decimals).toBeCloseTo(actualData!.value.Numerical);
+        expect(valueAfterUpdates / 10 ** decimals).toBeCloseTo(
+          historyData!.value.Numerical,
+        );
 
         const expectedNumberOfUpdates =
           (MAX_HISTORY_ELEMENTS_PER_FEED +
-            (round - initialFeedsInfo[id].round)) %
+            (roundAfterUpdates - initialFeedsInfo[id].round)) %
           MAX_HISTORY_ELEMENTS_PER_FEED;
 
         expect(expectedNumberOfUpdates).toEqual(updatesToNetworks[network][id]);
