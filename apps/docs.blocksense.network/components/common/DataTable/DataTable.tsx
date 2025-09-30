@@ -1,29 +1,26 @@
 'use client';
 
-import { MouseEvent, useContext } from 'react';
+import { useContext } from 'react';
 import { useRouter } from 'next/navigation';
+import type { MouseEvent } from 'react';
 
-import { onLinkClick } from '@/src/utils';
 import {
   Table,
-  TableHeader,
   TableBody,
-  TableRow,
-  TableHead,
   TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@blocksense/docs-ui/Table';
 import { cn } from '@blocksense/docs-ui/utils';
+import { onLinkClick } from '@/src/utils';
 
+import { DataTableColumnHeader } from './DataTableColumnHeader';
 import { DataTableContext, DataTableProvider } from './DataTableContext';
 import { DataTablePagination } from './DataTablePagination';
 import { DataTableToolbar } from './DataTableToolbar';
-import { DataTableColumnHeader } from './DataTableColumnHeader';
-import {
-  DataTableProps,
-  getSortingState,
-  cellHaveContent,
-  noCellData,
-} from './dataTableUtils';
+import type { DataTableProps } from './dataTableUtils';
+import { cellHaveContent, getSortingState, noCellData } from './dataTableUtils';
 
 export function DataTable({ ...props }: DataTableProps) {
   return (
@@ -40,11 +37,11 @@ export function DataTable({ ...props }: DataTableProps) {
 function DataTableContent({
   columns,
   filterCell = '',
-  hasToolbar,
   getRowLink,
+  hasToolbar,
 }: DataTableProps) {
   const router = useRouter();
-  const { sorting, setSorting, columnVisibility, paginatedData } =
+  const { columnVisibility, paginatedData, setSorting, sorting } =
     useContext(DataTableContext);
 
   return (

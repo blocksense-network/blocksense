@@ -1,10 +1,9 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
-import {
-  BinanceTRAssetInfo,
-  BinanceTRInfoResp,
-  BinanceTRInfoRespSchema,
-} from './types';
+
+import type { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
+
+import type { BinanceTRAssetInfo, BinanceTRInfoResp } from './types';
+import { BinanceTRInfoRespSchema } from './types';
 
 /**
  * Class to fetch assets information from BinanceTR Exchange.
@@ -12,7 +11,7 @@ import {
 export class BinanceTRAssetsFetcher
   implements ExchangeAssetsFetcher<BinanceTRAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<BinanceTRAssetInfo>[]> {
+  async fetchAssets(): Promise<Array<AssetInfo<BinanceTRAssetInfo>>> {
     const assets = await fetchBinanceTRInfo();
     return assets.data.list.map(asset => ({
       pair: {

@@ -1,14 +1,15 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
 
-import { Logo } from './Logo';
 import { ClaimNFTButton } from './ClaimNFTButton';
+import { Logo } from './Logo';
 import { SocialNetworks } from './SocialNetworks';
-import openIcon from '/public/icons/open.svg';
+
 import closeIcon from '/public/icons/close.svg';
+import openIcon from '/public/icons/open.svg';
 
 const navLinks = [
   { href: 'https://blog.blocksense.network/', label: 'Blog' },

@@ -1,9 +1,7 @@
-import { NewFeed } from '@blocksense/config-types';
-
+import type { NewFeed } from '@blocksense/config-types';
 import { Card, CardHeader, CardTitle } from '@blocksense/docs-ui/Card';
-
-import { CodeBlock } from '@/components/common/CodeBlock';
 import { ScrollArea } from '@blocksense/docs-ui/ScrollArea';
+import { CodeBlock } from '@/components/common/CodeBlock';
 import { shikiDefaultThemes } from '@/config';
 
 type DataFeedCardProps = {

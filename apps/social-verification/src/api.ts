@@ -1,4 +1,3 @@
-import { Schema as S } from 'effect';
 import {
   HttpApi,
   HttpApiEndpoint,
@@ -7,6 +6,7 @@ import {
   HttpApiMiddleware,
   HttpApiSecurity,
 } from '@effect/platform';
+import { Schema as S } from 'effect';
 
 import { EmailSchema } from '@blocksense/base-utils/schemas';
 

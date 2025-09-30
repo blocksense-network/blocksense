@@ -1,4 +1,4 @@
-import { HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
 
 export type StatusType = 'error' | 'success' | 'loading' | 'none';
 
@@ -9,8 +9,8 @@ type StatusMessageProps = HTMLAttributes<HTMLParagraphElement> & {
 };
 
 export const StatusMessage = ({
-  message = '',
   className = '',
+  message = '',
   status = 'none',
   ...props
 }: StatusMessageProps) => {

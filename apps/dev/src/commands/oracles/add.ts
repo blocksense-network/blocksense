@@ -1,16 +1,17 @@
-import { join } from 'path';
-import { mkdir, writeFile, readFile, rm, access } from 'fs/promises';
 import { constants as fsConstants } from 'fs';
-import ejs from 'ejs';
-import { parse as parseToml } from 'toml';
-import { Effect, Option } from 'effect';
+import { access, mkdir, readFile, rm, writeFile } from 'fs/promises';
+import { join } from 'path';
+
 import { Command, Options } from '@effect/cli';
 import { Command as PlatformCommand } from '@effect/platform';
 import * as NodeContext from '@effect/platform-node/NodeContext';
+import { Effect, Option } from 'effect';
+import ejs from 'ejs';
+import { parse as parseToml } from 'toml';
 
-import { rootDir } from '@blocksense/base-utils/env';
-import { renderTui, drawTable } from '@blocksense/base-utils/tty';
 import { kebabToHumanReadable } from '@blocksense/base-utils';
+import { rootDir } from '@blocksense/base-utils/env';
+import { drawTable, renderTui } from '@blocksense/base-utils/tty';
 
 const ORACLES_DIR = join(rootDir, 'apps/oracles');
 const DEV_TEMPLATES_DIR = join(

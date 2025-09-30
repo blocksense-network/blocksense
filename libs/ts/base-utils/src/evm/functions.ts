@@ -1,20 +1,24 @@
-import {
+import type {
   EnvSchema,
   LayeredEnvSchema,
   LayeredEnvSchemaToConfig,
+} from '../env/layered-config';
+import {
   parseLayeredEnvConfig,
   reportParsedEnvConfig,
 } from '../env/layered-config';
 import { kebabToScreamingSnakeCase } from '../string';
-import { getNetworkKind, NetworkName } from './networks';
 
-const deploymentEnvLayerPriority = [
+import type { NetworkName } from './networks';
+import { getNetworkKind } from './networks';
+
+const _deploymentEnvLayerPriority = [
   'perNetworkName',
   'perNetworkKind',
   'global',
 ] as const;
 
-export type DeploymentEnvPriority = typeof deploymentEnvLayerPriority;
+export type DeploymentEnvPriority = typeof _deploymentEnvLayerPriority;
 
 export type DeploymentEnvSchema = LayeredEnvSchema<
   DeploymentEnvPriority,

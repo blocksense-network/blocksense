@@ -1,13 +1,12 @@
 'use client';
 
-import React, { ReactNode, HTMLAttributes, ComponentProps } from 'react';
-
+import React from 'react';
 import { Command as CommandPrimitive } from 'cmdk';
+import type { ComponentProps, HTMLAttributes, ReactNode } from 'react';
 
-import { cn } from '@blocksense/docs-ui/utils';
-
-import { Icon } from '@blocksense/docs-ui/Icon';
 import { Dialog, DialogContent } from '@blocksense/docs-ui/Dialog';
+import { Icon } from '@blocksense/docs-ui/Icon';
+import { cn } from '@blocksense/docs-ui/utils';
 
 export const Command = ({
   className,
@@ -87,7 +86,6 @@ export const CommandList = ({
 );
 
 export const CommandEmpty = ({
-  className,
   ...props
 }: ComponentProps<typeof CommandPrimitive.Empty>) => (
   <CommandPrimitive.Empty

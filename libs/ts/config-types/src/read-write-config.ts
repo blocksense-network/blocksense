@@ -1,21 +1,22 @@
 import { join } from 'node:path';
 
-import { Schema as S, Either } from 'effect';
+import { Either, Schema as S } from 'effect';
 
 import { configDir } from '@blocksense/base-utils/env';
+import type { NetworkName } from '@blocksense/base-utils/evm';
+import { parseNetworkName } from '@blocksense/base-utils/evm';
 import { selectDirectory } from '@blocksense/base-utils/fs';
-import { NetworkName, parseNetworkName } from '@blocksense/base-utils/evm';
+
 import {
   SequencerConfigV1Schema,
   SequencerConfigV2Schema,
 } from './node-config/types';
-
-import { FeedsConfigSchema, NewFeedsConfigSchema } from './data-feeds-config';
 import { ChainlinkCompatibilityConfigSchema } from './chainlink-compatibility';
+import { FeedsConfigSchema, NewFeedsConfigSchema } from './data-feeds-config';
+import type { DeploymentConfigV2 } from './evm-contracts-deployment';
 import {
   DeploymentConfigSchemaV1,
   DeploymentConfigSchemaV2,
-  DeploymentConfigV2,
 } from './evm-contracts-deployment';
 
 export function readConfig<Name extends ConfigFileName>(

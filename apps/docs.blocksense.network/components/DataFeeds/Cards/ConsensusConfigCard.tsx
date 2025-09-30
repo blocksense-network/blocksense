@@ -1,5 +1,6 @@
+import type { NewFeed } from '@blocksense/config-types';
 import { capitalizeWords, showMsInSeconds, showPercentage } from '@/src/utils';
-import { NewFeed } from '@blocksense/config-types';
+
 import { DataFeedCardContentItem } from '../DataFeedCardContentItem';
 import { DataFeedCardSection } from '../DataFeedCardSection';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { InputHTMLAttributes, ReactNode } from 'react';
+import type { InputHTMLAttributes, ReactNode } from 'react';
 
 import { cn } from '@blocksense/docs-ui/utils';
 
@@ -35,12 +35,12 @@ type InputBaseProps = InputHTMLAttributes<HTMLInputElement> & {
 
 export const InputBase = ({
   className,
-  variant = 'outline',
-  inputSize = 'sm',
   disabled = false,
-  type = 'text',
   error = false,
   icon,
+  inputSize = 'sm',
+  type = 'text',
+  variant = 'outline',
   ...props
 }: InputBaseProps) => {
   const baseClasses =
@@ -70,13 +70,13 @@ type InputProps = InputBaseProps & {
 
 export const Input = ({
   className,
-  variant = 'outline',
-  inputSize = 'md',
   disabled = false,
-  errorMessage,
-  type = 'text',
   error = false,
+  errorMessage,
   icon,
+  inputSize = 'md',
+  type = 'text',
+  variant = 'outline',
   ...props
 }: InputProps) => {
   return (

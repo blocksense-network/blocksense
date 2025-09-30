@@ -1,4 +1,4 @@
-import { NewFeed } from '@blocksense/config-types/data-feeds-config';
+import type { NewFeed } from '@blocksense/config-types/data-feeds-config';
 
 export type SimplifiedFeed = Pick<
   NewFeed,

@@ -1,7 +1,7 @@
 'use client';
 
-import { ButtonHTMLAttributes, MouseEvent } from 'react';
 import Image from 'next/image';
+import type { ButtonHTMLAttributes, MouseEvent } from 'react';
 
 import loadingIcon from '/public/icons/loading.svg';
 

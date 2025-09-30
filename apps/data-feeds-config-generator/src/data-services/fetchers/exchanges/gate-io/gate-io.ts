@@ -1,12 +1,9 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
-import {
-  GateIoAssetInfo,
-  GateIoInfoResp,
-  GateIoInfoRespSchema,
-  GateIoPrice,
-  GateIoPriceSchema,
-} from './types';
+
+import type { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
+
+import type { GateIoAssetInfo, GateIoInfoResp, GateIoPrice } from './types';
+import { GateIoInfoRespSchema, GateIoPriceSchema } from './types';
 
 /**
  * Class to fetch assets information from GateIo Exchange.
@@ -14,7 +11,7 @@ import {
 export class GateIoAssetsFetcher
   implements ExchangeAssetsFetcher<GateIoAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<GateIoAssetInfo>[]> {
+  async fetchAssets(): Promise<Array<AssetInfo<GateIoAssetInfo>>> {
     const assets = await fetchGateIoInfo();
     const prices = await fetchGateIoPricesInfo();
     return assets.map(asset => {

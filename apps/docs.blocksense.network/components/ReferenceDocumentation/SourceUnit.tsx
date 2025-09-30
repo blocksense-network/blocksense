@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {
+import type {
   EnumDocItem,
   ErrorDocItem,
   EventDocItem,
@@ -10,13 +10,12 @@ import {
   StructDocItem,
   VariableDocItem,
 } from '@blocksense/sol-reflector';
-
 import { AbsolutePath } from '@/sol-contracts-components/AbsolutePath';
-import { License } from '@/sol-contracts-components/License';
 import { Contracts } from '@/sol-contracts-components/Contracts';
 import { Enums } from '@/sol-contracts-components/Enums';
 import { Errors } from '@/sol-contracts-components/Errors';
 import { Functions } from '@/sol-contracts-components/Functions';
+import { License } from '@/sol-contracts-components/License';
 import { Structs } from '@/sol-contracts-components/Structs';
 import { Variables } from '@/sol-contracts-components/Variables';
 import { filterConstants, filterVariables } from '@/src/utils';

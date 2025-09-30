@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 
 import { Button } from '@blocksense/docs-ui/Button';
-import { RadioGroup, RadioGroupLabel, RadioGroupItem } from './RadioGroup';
+
+import { RadioGroup, RadioGroupItem, RadioGroupLabel } from './RadioGroup';
 
 export default {
   title: 'Components/RadioGroup',

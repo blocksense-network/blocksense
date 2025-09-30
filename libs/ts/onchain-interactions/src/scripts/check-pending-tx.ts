@@ -1,14 +1,14 @@
+import client from 'prom-client';
 import Web3 from 'web3';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import client from 'prom-client';
-import { color as c } from '@blocksense/base-utils/tty';
 
+import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 import {
   getOptionalRpcUrl,
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
-import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
+import { color as c } from '@blocksense/base-utils/tty';
 
 import { deployedNetworks } from '../types';
 import { startPrometheusServer } from '../utils';

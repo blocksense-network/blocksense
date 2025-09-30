@@ -1,11 +1,10 @@
-import { VariableDocItem } from '@blocksense/sol-reflector';
-
-import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { Signature } from '@/sol-contracts-components/Signature';
-import { NatSpec } from '@/sol-contracts-components/NatSpec';
-import { ABIModal } from '@/sol-contracts-components/ABIModal/ABIModal';
-import { ContractAccordion } from '@/components/sol-contracts/ContractAccordion';
+import type { VariableDocItem } from '@blocksense/sol-reflector';
 import { getContractElementsNames } from '@/components/ReferenceDocumentation/SourceUnit';
+import { ContractAccordion } from '@/components/sol-contracts/ContractAccordion';
+import { ABIModal } from '@/sol-contracts-components/ABIModal/ABIModal';
+import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
+import { NatSpec } from '@/sol-contracts-components/NatSpec';
+import { Signature } from '@/sol-contracts-components/Signature';
 
 type VariablesProps = {
   variables?: VariableDocItem[];
@@ -14,9 +13,9 @@ type VariablesProps = {
 };
 
 export const Variables = ({
-  variables = [],
   title,
   titleLevel,
+  variables = [],
 }: VariablesProps) => {
   return (
     <ContractItemWrapper

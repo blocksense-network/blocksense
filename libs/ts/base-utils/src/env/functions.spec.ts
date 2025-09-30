@@ -1,20 +1,20 @@
+import { Schema as S } from 'effect';
 import { describe, expect, test } from 'vitest';
 
-import { Schema as S } from 'effect';
-
-import {
-  asVarSchema,
-  EnvSchema,
-  getEnvString,
-  parseEnvVar,
-  parseEnvConfig,
-  parseOptionalEnvVar,
-  parseRequiredEnvVar,
-  VarSchema,
-} from './functions';
-import { NetworkName, networkName } from '../evm';
+import type { NetworkName } from '../evm';
+import { networkName } from '../evm';
 import { fromCommaSeparatedString } from '../schemas';
 import { kebabToScreamingSnakeCase } from '../string';
+
+import type { EnvSchema, VarSchema } from './functions';
+import {
+  asVarSchema,
+  getEnvString,
+  parseEnvConfig,
+  parseEnvVar,
+  parseOptionalEnvVar,
+  parseRequiredEnvVar,
+} from './functions';
 
 describe('env', () => {
   describe('getEnvString', () => {

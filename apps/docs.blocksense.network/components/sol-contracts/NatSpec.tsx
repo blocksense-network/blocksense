@@ -1,7 +1,6 @@
 import React from 'react';
 
-import { NatSpec as NatSpecType } from '@blocksense/sol-reflector';
-
+import type { NatSpec as NatSpecType } from '@blocksense/sol-reflector';
 import { NatSpecItem } from '@/sol-contracts-components/NatSpecItem';
 
 type NatSpecProps = {

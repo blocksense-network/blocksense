@@ -1,5 +1,5 @@
-import { Header } from './components/common/Header';
 import { Footer } from './components/common/Footer';
+import { Header } from './components/common/Header';
 
 const fonts = [
   '/fonts/fira/FiraCode-Regular.woff2',

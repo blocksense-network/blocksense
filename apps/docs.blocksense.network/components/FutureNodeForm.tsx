@@ -1,11 +1,11 @@
 'use client';
 
-import { FormEvent, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Effect } from 'effect';
 import * as S from 'effect/Schema';
+import type { FormEvent } from 'react';
 
 import { EmailSchema } from '@blocksense/base-utils/schemas';
-
 import { getApiClient } from '@/service/client';
 
 export default function FutureNodeForm() {

@@ -1,7 +1,5 @@
 import * as React from 'react';
 
-import { VariableDocItem } from '@blocksense/sol-reflector';
-
 import {
   Table,
   TableBody,
@@ -10,6 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from '@blocksense/docs-ui/Table';
+import type { VariableDocItem } from '@blocksense/sol-reflector';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 
 type Column =
@@ -64,11 +63,11 @@ const getParameterValueByColumn = (
 };
 
 export const Parameters = ({
-  parameters,
-  title = 'Parameters',
-  parentTitle,
-  titleLevel = 5,
   columns = ['type', 'name', 'description'],
+  parameters,
+  parentTitle,
+  title = 'Parameters',
+  titleLevel = 5,
 }: ParametersProps) => {
   return (
     <ContractItemWrapper

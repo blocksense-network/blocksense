@@ -5,14 +5,14 @@ import { Schema as S } from 'effect';
  *
  * Ref: https://docs.binance.us/#get-live-ticker-price
  */
-const BinanceUSAssetInfoSchema = S.mutable(
+const _BinanceUSAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
     price: S.Number,
   }),
 );
 
-export type BinanceUSAssetInfo = typeof BinanceUSAssetInfoSchema.Type;
+export type BinanceUSAssetInfo = typeof _BinanceUSAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from BinanceUS Exchange.

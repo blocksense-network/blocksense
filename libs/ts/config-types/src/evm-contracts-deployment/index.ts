@@ -1,11 +1,12 @@
 import { Schema as S } from 'effect';
 
+import { hexDataString } from '@blocksense/base-utils';
 import {
   chainId,
   ethereumAddress,
   networkName,
 } from '@blocksense/base-utils/evm';
-import { hexDataString } from '@blocksense/base-utils';
+
 import { FeedIdSchema } from '../data-feeds-config/types';
 
 const ParameterType = S.Union(S.String, S.Number, S.BigIntFromSelf, S.Boolean);
@@ -96,7 +97,7 @@ export const DeploymentConfigSchemaV1 = S.mutable(
     key: networkName,
     value: S.UndefinedOr(
       S.Struct({
-        chainId: chainId,
+        chainId,
         contracts: ContractsConfigSchemaV1,
       }),
     ),
@@ -110,7 +111,7 @@ export type DeploymentConfigV1 = typeof DeploymentConfigSchemaV1.Type;
 export const DeploymentConfigSchemaV2 = S.mutable(
   S.Struct({
     network: networkName,
-    chainId: chainId,
+    chainId,
     contracts: ContractsConfigSchemaV2,
   }),
 ).annotations({

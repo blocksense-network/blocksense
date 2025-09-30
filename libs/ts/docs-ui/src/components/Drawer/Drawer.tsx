@@ -2,12 +2,12 @@
 
 import React, {
   createContext,
-  useContext,
-  useState,
-  useEffect,
   useCallback,
-  ReactNode,
+  useContext,
+  useEffect,
+  useState,
 } from 'react';
+import type { ReactNode } from 'react';
 
 import { cn } from '@blocksense/docs-ui/utils';
 
@@ -22,9 +22,9 @@ const DrawerContext = createContext<DrawerContextValue>(
 
 export const Drawer = ({
   children,
-  open,
-  onOpenChange,
   className,
+  onOpenChange,
+  open,
 }: {
   children: ReactNode;
   open?: boolean;
@@ -90,8 +90,8 @@ export const DrawerTrigger = ({ children }: { children: ReactNode }) => {
 };
 
 export const DrawerContent = ({
-  className,
   children,
+  className,
 }: {
   className?: string;
   children: ReactNode;
@@ -115,8 +115,8 @@ export const DrawerContent = ({
 };
 
 export const DrawerHeader = ({
-  className,
   children,
+  className,
 }: {
   className?: string;
   children: ReactNode;
@@ -132,8 +132,8 @@ export const DrawerHeader = ({
 );
 
 export const DrawerTitle = ({
-  className,
   children,
+  className,
 }: {
   className?: string;
   children: ReactNode;
@@ -149,8 +149,8 @@ export const DrawerTitle = ({
 );
 
 export const DrawerDescription = ({
-  className,
   children,
+  className,
 }: {
   className?: string;
   children: ReactNode;

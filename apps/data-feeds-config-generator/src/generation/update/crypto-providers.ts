@@ -1,19 +1,16 @@
 import { Schema as S } from 'effect';
 
-import {
-  cexPriceFeedsArgsSchema,
-  NewFeedsConfig,
-  readConfig,
-} from '@blocksense/config-types';
+import type { NewFeedsConfig } from '@blocksense/config-types';
+import { cexPriceFeedsArgsSchema, readConfig } from '@blocksense/config-types';
 
+import { getCryptoProvidersData } from '../../data-services/processors/crypto-providers/data-collection';
 import {
   getAllProvidersForPair,
   getExchangesPriceDataForPair,
   removePriceOutliers,
 } from '../../data-services/processors/crypto-providers/data-transformers';
 import { detectPriceOutliers } from '../../data-services/processors/crypto-providers/outliers-detector';
-import { CryptoProviderData } from '../../data-services/processors/crypto-providers/types';
-import { getCryptoProvidersData } from '../../data-services/processors/crypto-providers/data-collection';
+import type { CryptoProviderData } from '../../data-services/processors/crypto-providers/types';
 
 /**
  * Updates the configuration for exchange arguments in the feeds configuration.

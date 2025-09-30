@@ -8,24 +8,22 @@ import { selectDirectory } from '@blocksense/base-utils/fs';
 import { ChainlinkCompatibilityConfigSchema } from '@blocksense/config-types/chainlink-compatibility';
 import { NewFeedsConfigSchema } from '@blocksense/config-types/data-feeds-config';
 
-import { artifactsDir, configDir } from '../src/paths';
+import { generateChainlinkCompatibilityConfig } from '../src/chainlink-compatibility/index';
+import { FeedRegistryEventsPerAggregatorSchema } from '../src/chainlink-compatibility/types';
+import type { Artifacts } from '../src/data-services/artifacts-downloader';
+import { fetchRepoFiles } from '../src/data-services/artifacts-downloader';
 import {
-  collectRawDataFeeds,
   aggregateNetworkInfoPerField,
+  collectRawDataFeeds,
   getAllProposedFeedsInRegistry,
 } from '../src/data-services/fetchers/chainlink/chainlink_feeds';
 import { RawDataFeedsSchema } from '../src/data-services/fetchers/chainlink/types';
 import { generateFeedConfig } from '../src/generation/initial/index';
-import { generateChainlinkCompatibilityConfig } from '../src/chainlink-compatibility/index';
-import { FeedRegistryEventsPerAggregatorSchema } from '../src/chainlink-compatibility/types';
-import {
-  Artifacts,
-  fetchRepoFiles,
-} from '../src/data-services/artifacts-downloader';
 import {
   getAllPossibleCLFeeds,
   getCLFeedsOnMainnet,
 } from '../src/generation/initial/utils/chainlink';
+import { artifactsDir, configDir } from '../src/paths';
 
 async function createArtifact<T, EncodedT = T>(
   name: string,
@@ -33,8 +31,7 @@ async function createArtifact<T, EncodedT = T>(
   create: () => Promise<T>,
   artifacts: any[],
 ): Promise<T> {
-  let json: unknown;
-  json = await create();
+  const json = await create();
   if (schema) {
     const asserts: (u: unknown) => asserts u is T = S.asserts(schema);
     asserts(json);
@@ -49,7 +46,7 @@ async function createArtifact<T, EncodedT = T>(
 
 async function saveConfigsToDir(
   outputDir: string,
-  ...configs: { name: string; content: any }[]
+  ...configs: Array<{ name: string; content: any }>
 ) {
   const { writeJSON } = selectDirectory(outputDir);
 
@@ -70,7 +67,7 @@ async function main() {
     throw new Error('Failed to fetch artifacts');
   }
 
-  let DFCGArtifacts = [];
+  const DFCGArtifacts = [];
 
   const rawDataFeeds = await createArtifact(
     'DFCG_0_raw_chainlink_feeds',
@@ -87,7 +84,7 @@ async function main() {
   );
 
   // Representation of all the Chainlink data feeds in our feed config format.
-  const allPossibleCLDataFeeds = await createArtifact(
+  const _allPossibleCLDataFeeds = await createArtifact(
     'DFCG_2_chainlink_all_possible_feeds',
     null,
     async () => getAllPossibleCLFeeds(aggregatedDataFeeds),
@@ -95,7 +92,7 @@ async function main() {
   );
 
   // Representation of all the Chainlink data feeds on mainnets in our feed config format.
-  const onMainnetCLDataFeeds = await createArtifact(
+  const _onMainnetCLDataFeeds = await createArtifact(
     'DFCG_3_chainlink_on_mainnet_feeds',
     null,
     async () => getCLFeedsOnMainnet(rawDataFeeds),

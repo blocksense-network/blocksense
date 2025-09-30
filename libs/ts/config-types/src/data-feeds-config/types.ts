@@ -2,14 +2,14 @@ import { Schema as S } from 'effect';
 
 import {
   cexPriceFeedsArgsSchema,
+  commoditiesPriceFeedsArgsSchema,
   ethRpcArgsSchema,
   exSatHoldingsArgsSchema,
+  forexPriceFeedsArgsSchema,
   geckoTerminalArgsSchema,
+  hyperBorrowRatesArgsSchema,
   spoutRwaArgsSchema,
   stockPriceFeedsArgsSchema,
-  hyperBorrowRatesArgsSchema,
-  forexPriceFeedsArgsSchema,
-  commoditiesPriceFeedsArgsSchema,
 } from './oracles';
 /**
  * Schema for the data feed category ( Chainlink compatible ).

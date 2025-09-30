@@ -10,11 +10,11 @@ type DiagramImageProps = {
 };
 
 export const DiagramImageWrapper = ({
-  src,
   alt = 'Blocksense diagram',
   className = 'blocksense__diagram',
-  width = 800,
   height = 600,
+  src,
+  width = 800,
 }: DiagramImageProps) => {
   return (
     <div className={`${className}`}>

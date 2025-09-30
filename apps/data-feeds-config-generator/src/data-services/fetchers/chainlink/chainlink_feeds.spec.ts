@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
+
+import type { AggregatedFeedInfo } from './chainlink_feeds';
 import {
-  AggregatedFeedInfo,
   getBaseQuote,
   getFieldFromAggregatedData,
   getHighestDecimals,

@@ -1,7 +1,7 @@
-import { useRouter } from 'next/navigation';
+import type { useRouter } from 'next/navigation';
 
 import { previewHexString } from '@blocksense/base-utils/buffer-and-hex';
-import { VariableDocItem } from '@blocksense/sol-reflector';
+import type { VariableDocItem } from '@blocksense/sol-reflector';
 
 export const filterConstants = (
   variables: VariableDocItem[] = [],

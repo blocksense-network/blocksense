@@ -4,15 +4,15 @@ import * as React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-import { Tooltip } from '@blocksense/docs-ui/Tooltip';
-import { CopyButton } from '@blocksense/docs-ui/CopyButton';
-import { onLinkClick, previewHexStringOrDefault } from '@/src/utils';
+import type { NetworkName } from '@blocksense/base-utils/evm';
 import {
   getAddressExplorerUrl,
   isEthereumAddress,
-  NetworkName,
 } from '@blocksense/base-utils/evm';
+import { CopyButton } from '@blocksense/docs-ui/CopyButton';
+import { Tooltip } from '@blocksense/docs-ui/Tooltip';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { onLinkClick, previewHexStringOrDefault } from '@/src/utils';
 
 type ContractAddressProps = {
   network?: NetworkName;
@@ -28,10 +28,10 @@ type ContractAddressProps = {
 };
 
 export const ContractAddress = ({
-  network,
+  abbreviation = { hasAbbreviation: false, bytesToShow: 6 },
   address,
   copyButton = { enableCopy: true, background: true },
-  abbreviation = { hasAbbreviation: false, bytesToShow: 6 },
+  network,
 }: ContractAddressProps) => {
   const router = useRouter();
   const isDesktop = useMediaQuery('(min-width: 890px)');

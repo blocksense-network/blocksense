@@ -1,12 +1,13 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { ExchangeAssetsFetcher, AssetInfo } from '../exchange-assets';
-import {
+
+import type { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
+
+import type {
   BybitAssetInfo,
   BybitInstrumentsInfoResp,
-  BybitInstrumentsInfoRespSchema,
   BybitPrice,
-  BybitPriceSchema,
 } from './types';
+import { BybitInstrumentsInfoRespSchema, BybitPriceSchema } from './types';
 
 /**
  * Class to fetch assets information from Bybit.
@@ -14,7 +15,7 @@ import {
 export class BybitAssetsFetcher
   implements ExchangeAssetsFetcher<BybitAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<BybitAssetInfo>[]> {
+  async fetchAssets(): Promise<Array<AssetInfo<BybitAssetInfo>>> {
     const assets = (await fetchBybitSymbolsInfo()).result.list;
     const prices = (await fetchBybitPricesInfo()).result.list;
     return assets.map(asset => {

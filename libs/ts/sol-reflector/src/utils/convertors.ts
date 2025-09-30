@@ -1,39 +1,42 @@
-import {
+import type {
+  ContractDefinition,
   EnumDefinition,
   ErrorDefinition,
   EventDefinition,
   FunctionDefinition,
   ModifierDefinition,
   PragmaDirective,
+  SourceUnit,
   StructDefinition,
   VariableDeclaration,
-  SourceUnit,
-  ContractDefinition,
 } from 'solidity-ast';
 
-import {
+import type {
   ASTNode,
+  DocItemConstructor,
+  FunctionModifierDocItem,
+  NodeType,
+  WithNatspec,
+} from '../types';
+import {
   ContractDocItem,
   EnumDocItem,
   ErrorDocItem,
   EventDocItem,
   FunctionDocItem,
-  FunctionModifierDocItem,
-  ModifierDocItem,
-  PragmaDocItem,
-  SourceUnitDocItem,
-  StructDocItem,
-  VariableDocItem,
   isContractDefinition,
   isFunctionDefinition,
   isLiteral,
   isParameterList,
   isSourceUnit,
   isVariableDeclaration,
-  WithNatspec,
-  NodeType,
-  DocItemConstructor,
+  ModifierDocItem,
+  PragmaDocItem,
+  SourceUnitDocItem,
+  StructDocItem,
+  VariableDocItem,
 } from '../types';
+
 import { extractFields } from './common';
 import { parseNatspec } from './natspec';
 import { getSignature } from './signature';

@@ -1,4 +1,5 @@
-import React, { MouseEventHandler } from 'react';
+import React from 'react';
+import type { MouseEventHandler } from 'react';
 
 type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
@@ -25,12 +26,12 @@ type IconProps = {
 };
 
 export const Icon = ({
-  icon,
-  className,
-  size = 'md',
-  color,
-  onClick,
   ariaLabel,
+  className,
+  color,
+  icon,
+  onClick,
+  size = 'md',
 }: IconProps) => {
   const cursorClass = onClick ? 'cursor-pointer' : '';
 

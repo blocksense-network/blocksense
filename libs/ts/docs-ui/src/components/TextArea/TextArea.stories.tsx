@@ -1,6 +1,8 @@
-import React, { useState, ChangeEvent, MouseEvent } from 'react';
+import React, { useState } from 'react';
+import type { ChangeEvent, MouseEvent } from 'react';
 
 import { Button } from '@blocksense/docs-ui/Button';
+
 import { TextArea } from './TextArea';
 
 export default {

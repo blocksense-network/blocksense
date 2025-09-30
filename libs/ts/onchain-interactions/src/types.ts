@@ -1,4 +1,4 @@
-import { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
+import type { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 
 export const deployedNetworks = [
   'abstract-testnet',

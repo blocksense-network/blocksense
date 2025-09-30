@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 
+import { Separator } from '@blocksense/docs-ui';
 import { Button } from '@blocksense/docs-ui/Button';
 import { RadioGroup, RadioGroupItem } from '@blocksense/docs-ui/RadioGroup';
+
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuCheckboxItem,
   DropdownMenuLabel,
   DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
 } from './DropdownMenu';
-import { Separator } from '@blocksense/docs-ui';
 
 export default {
   title: 'Components/DropdownMenu',

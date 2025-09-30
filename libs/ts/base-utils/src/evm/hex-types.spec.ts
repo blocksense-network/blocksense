@@ -9,10 +9,10 @@ import { describe, expect, test } from 'vitest';
 
 import {
   isEthereumAddress,
-  parseEthereumAddress,
   isHash32byte,
-  parseHash32byte,
   isTxHash,
+  parseEthereumAddress,
+  parseHash32byte,
   parseTxHash,
 } from './hex-types';
 

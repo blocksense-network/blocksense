@@ -1,22 +1,20 @@
 'use client';
 
-import React, {
-  useState,
-  useContext,
-  createContext,
-  FormEvent,
+import React, { createContext, useContext, useState } from 'react';
+import type {
   ChangeEvent,
+  FormEvent,
   FormHTMLAttributes,
-  ReactNode,
-  ReactElement,
   MouseEvent,
+  ReactElement,
+  ReactNode,
 } from 'react';
 
-import { cn } from '@blocksense/docs-ui/utils';
 import { Button } from '@blocksense/docs-ui/Button';
 import { Input } from '@blocksense/docs-ui/Input';
-import { TextArea } from '@blocksense/docs-ui/TextArea';
 import { Label } from '@blocksense/docs-ui/Label';
+import { TextArea } from '@blocksense/docs-ui/TextArea';
+import { cn } from '@blocksense/docs-ui/utils';
 
 interface FormContextValue {
   values: Record<string, string | boolean | null>;
@@ -38,10 +36,10 @@ interface FormProps extends FormHTMLAttributes<HTMLFormElement> {
 
 export const Form = ({
   children,
-  onSubmit = () => {},
-  onReset = () => {},
   className,
   errorMessage = 'Please fill out all required fields.',
+  onReset = () => {},
+  onSubmit = () => {},
   successMessage = 'Form submitted successfully!',
   ...props
 }: FormProps): ReactElement => {
@@ -135,11 +133,11 @@ interface FormFieldProps {
 }
 
 export const FormField = ({
-  name,
   label,
+  name,
   placeholder,
 }: FormFieldProps): ReactElement => {
-  const { values, setValue, clearMessages } = useContext(FormContext);
+  const { clearMessages, setValue, values } = useContext(FormContext);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     clearMessages();
@@ -164,11 +162,11 @@ export const FormField = ({
 };
 
 export const FormTextArea = ({
-  name,
   label,
+  name,
   placeholder,
 }: FormFieldProps): ReactElement => {
-  const { values, setValue, clearMessages } = useContext(FormContext);
+  const { clearMessages, setValue, values } = useContext(FormContext);
 
   const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     clearMessages();

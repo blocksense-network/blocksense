@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 type ProgressBarProps = {
   value?: number;
@@ -10,10 +10,10 @@ type ProgressBarProps = {
 };
 
 export const ProgressBar = ({
-  value = 0,
+  className = '',
   isIndeterminate = false,
   size = 40,
-  className = '',
+  value = 0,
 }: ProgressBarProps) => {
   const [animatedValue, setAnimatedValue] = useState(value);
 

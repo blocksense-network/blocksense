@@ -1,7 +1,8 @@
-import { NewFeed } from '@blocksense/config-types';
+import type { NewFeed } from '@blocksense/config-types';
+import { getDataSources } from '@/src/data-feeds/utils';
+
 import { DataFeedCardContentItem } from '../DataFeedCardContentItem';
 import { DataFeedCardSection } from '../DataFeedCardSection';
-import { getDataSources } from '@/src/data-feeds/utils';
 
 type DataFeedCardProps = {
   feed: NewFeed;

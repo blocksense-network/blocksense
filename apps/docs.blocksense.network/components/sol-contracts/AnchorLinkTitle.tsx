@@ -1,4 +1,5 @@
-import { createElement, HTMLAttributes } from 'react';
+import { createElement } from 'react';
+import type { HTMLAttributes } from 'react';
 
 type AnchorLinkTitleProps = {
   title?: string;
@@ -23,11 +24,11 @@ const borderStyles =
   'nx-border-b nx-border-neutral-200/70 contrast-more:nx-border-neutral-400 dark:nx-border-primary-100/10 contrast-more:dark:nx-border-neutral-400  py-3';
 
 export const AnchorLinkTitle = ({
-  title,
-  parentTitle,
-  titleLevel,
   accordion,
   pagefindIgnore = false,
+  parentTitle,
+  title,
+  titleLevel,
 }: AnchorLinkTitleProps) => {
   if (!titleLevel) {
     return null;

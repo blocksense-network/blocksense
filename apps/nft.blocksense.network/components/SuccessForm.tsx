@@ -1,7 +1,7 @@
 import Image from 'next/image';
 
-import successFormBlocksenseLogo from '/public/icons/success-form-blocksense-logo.svg';
 import exploreIcon from '/public/icons/explore.svg';
+import successFormBlocksenseLogo from '/public/icons/success-form-blocksense-logo.svg';
 
 type SuccessFormProps = {
   mintTransactionUrl: string;
@@ -9,8 +9,8 @@ type SuccessFormProps = {
 };
 
 export const SuccessForm = ({
-  mintTransactionUrl,
   isAlreadyMinted,
+  mintTransactionUrl,
 }: SuccessFormProps) => {
   return (
     <form className="success-form w-full mx-auto flex flex-col items-center justify-center md:gap-8 gap-6 md:p-8 p-6 bg-[var(--gray-dark)] md:rounded-3xl rounded-2xl text-center">

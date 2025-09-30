@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, ChangeEvent } from 'react';
+import React, { useEffect, useState } from 'react';
+import type { ChangeEvent } from 'react';
 
 type SliderProps = {
   value?: number;
@@ -13,13 +14,13 @@ type SliderProps = {
 };
 
 export const Slider = ({
-  value = 0,
-  min = 0,
+  className = '',
   max = 100,
+  min = 0,
+  onChange,
   step = 1,
   tickMode,
-  className = '',
-  onChange,
+  value = 0,
 }: SliderProps) => {
   const [sliderValue, setSliderValue] = useState(value);
 

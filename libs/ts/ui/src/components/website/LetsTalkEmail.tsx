@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 import { links } from '../../constants/links';
 import { renderEmail } from '../../utils/renderEmail';
@@ -9,7 +9,7 @@ type ResourceLinkProps = {
   children: ReactNode;
 };
 
-const ResourceLink = ({ href, children }: ResourceLinkProps) => (
+const ResourceLink = ({ children, href }: ResourceLinkProps) => (
   <li className="mb-[8px]">
     <a
       href={href}
@@ -29,7 +29,7 @@ type SocialCardProps = {
   cta: string;
 };
 
-const SocialCard = ({ href, stat, label, cta }: SocialCardProps) => (
+const SocialCard = ({ cta, href, label, stat }: SocialCardProps) => (
   <a
     href={href}
     target="_blank"

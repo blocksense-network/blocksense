@@ -1,16 +1,13 @@
 'use client';
 
-import { FeedsConfig } from '@blocksense/config-types/data-feeds-config';
+import type { FeedsConfig } from '@blocksense/config-types/data-feeds-config';
 import { Tooltip } from '@blocksense/docs-ui/Tooltip';
-
-import { dataFeedUrl } from '@/src/constants';
 import { DataTable } from '@/components/common/DataTable/DataTable';
-import {
-  cellHaveContent,
-  DataRowType,
-} from '@/components/common/DataTable/dataTableUtils';
-import { DataTableColumnHeader } from '@/components/common/DataTable/DataTableColumnHeader';
 import { DataTableBadge } from '@/components/common/DataTable/DataTableBadge';
+import { DataTableColumnHeader } from '@/components/common/DataTable/DataTableColumnHeader';
+import type { DataRowType } from '@/components/common/DataTable/dataTableUtils';
+import { cellHaveContent } from '@/components/common/DataTable/dataTableUtils';
+import { dataFeedUrl } from '@/src/constants';
 
 export const DataFeedsTable = ({ feeds }: { feeds: FeedsConfig['feeds'] }) => {
   function getRowLink(row: DataRowType) {

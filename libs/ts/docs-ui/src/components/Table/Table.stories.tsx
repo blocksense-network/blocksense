@@ -2,13 +2,13 @@ import React from 'react';
 
 import {
   Table,
-  TableCaption,
-  TableHeader,
   TableBody,
+  TableCaption,
+  TableCell,
   TableFooter,
   TableHead,
+  TableHeader,
   TableRow,
-  TableCell,
 } from './Table';
 
 export default {

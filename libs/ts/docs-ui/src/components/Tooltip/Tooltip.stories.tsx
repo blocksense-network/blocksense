@@ -1,6 +1,4 @@
-import React from 'react';
-
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta } from '@storybook/react';
 
 import { Tooltip } from './Tooltip';
 
@@ -33,7 +31,7 @@ const meta: Meta<typeof Tooltip> = {
               {position} Tooltips
             </h2>
             <div className="grid grid-cols-2 gap-4">
-              {styles.map((style, index) => (
+              {styles.map(style => (
                 <Tooltip position={position} contentClassName={style}>
                   <Tooltip.Content>Tooltip works!</Tooltip.Content>
                   <button className="px-4 py-2 bg-blue-500 text-white rounded">
@@ -48,8 +46,6 @@ const meta: Meta<typeof Tooltip> = {
     </div>
   ),
 };
-
-type Story = StoryObj<typeof Tooltip>;
 
 export const Default = {};
 

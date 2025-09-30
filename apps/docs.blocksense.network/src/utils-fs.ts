@@ -1,7 +1,7 @@
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
 export async function updateMetaJsonFile(fileDir: string, newContent: any) {
-  const { writeJSON, readJSON } = selectDirectory(fileDir);
+  const { readJSON, writeJSON } = selectDirectory(fileDir);
 
   let metaFileContent = await readJSON({ name: '_meta' });
   metaFileContent = {

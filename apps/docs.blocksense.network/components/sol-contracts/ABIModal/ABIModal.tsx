@@ -4,15 +4,12 @@ import React from 'react';
 
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogClose,
   DialogTrigger,
 } from '@blocksense/docs-ui/Dialog';
-import { ScrollArea } from '@blocksense/docs-ui/ScrollArea';
-import { CodeBlock } from '@/components/common/CodeBlock';
-import { useMediaQuery } from '@/hooks/useMediaQuery';
 import {
   Drawer,
   DrawerContent,
@@ -20,9 +17,12 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@blocksense/docs-ui/Drawer';
-import { TriggerButton } from '@/components/sol-contracts/ABIModal/TriggerButton';
+import { ScrollArea } from '@blocksense/docs-ui/ScrollArea';
+import { CodeBlock } from '@/components/common/CodeBlock';
 import { FormatButton } from '@/components/sol-contracts/ABIModal/FormatButton';
+import { TriggerButton } from '@/components/sol-contracts/ABIModal/TriggerButton';
 import { shikiDefaultThemes } from '@/config';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 export interface AbiStruct {
   [key: string]: unknown;
