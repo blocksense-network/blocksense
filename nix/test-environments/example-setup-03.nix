@@ -60,6 +60,7 @@ in
     sequencer = {
       providers = lib.mkForce {
         ink-sepolia = {
+          is-enabled = false;
           url = "http://127.0.0.1:${toString anvilInkSepoliaPort}";
           private-key-path = "${testKeysDir}/sequencer-private-key";
           transaction-gas-limit = 20000000;
