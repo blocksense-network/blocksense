@@ -1,4 +1,4 @@
-Below is a complete, implementation-ready **software specification** for your multichain EVM indexing service built with **Node.js + TypeScript + Effect** and **viem**, persisting into **PostgreSQL**. It encodes all choices you provided; unspecified areas use clearly marked defaults that you can change before coding.
+# EVM Multichain Indexing Service — Software Specification
 
 ---
 
@@ -523,36 +523,14 @@ Per-chain `alertsConfig` values provide the expected cadence: `noEventsSeconds` 
 # 14) Testing strategy
 
 - **Unit**: decoding (`decodeADFSCalldata`), topic/version routing, address/bit conversions.
-- **Integration**: chain harness with local Postgres; viem calls mocked and real (against devnet).
+- **Integration**: chain harness with local Postgres; viem calls mocked and real (against anvil).
 - **Reorg simulation**: fabricate pending -> dropped transitions and confirm finality flips.
 - **Load**: synthetic bursts (feedsLength up to guardrail) to exercise queue/backpressure.
 - **End‑to‑end**: backfill from known block range; verify `feed_latest` correctness.
 
 ---
 
-# 15) Deployment & operations
-
-- **Packaging**: Docker image.
-- **Modes**:
-
-  - `--mode=multi` (all chains in one process).
-  - `--mode=per-chain --chainId=...` (one process per chain).
-
-- **Kubernetes or Compose**: both supported; health/readiness endpoints:
-
-  - `/healthz` (process + DB ping)
-  - `/readyz` (initial backfill not required to be “ready”).
-
-- **Postgres HA**: “OK” for managed HA; otherwise single instance acceptable initially; enforce online-safe migrations only.
-- **Runbooks**:
-
-  1. **RPC outage**: switch providers; increase backoff; drain queue.
-  2. **DB saturation**: raise pool size cautiously; reduce batch; shard per chain.
-  3. **Stuck backfill**: restart backfill fiber at last_backfill_block; shrink range.
-
----
-
-# 16) Client‑facing schema notes (for consumers)
+# 15) Client‑facing schema notes (for consumers)
 
 - **Latest read**:
 
@@ -567,8 +545,8 @@ WHERE  chain_id = $1 AND feed_id = $2 AND stride = $3;
 ```sql
 SELECT block_number, block_timestamp, data, version
 FROM   feed_updates
-WHERE  chain_id = $1 AND feed_id = $2
-  AND  block_number BETWEEN $3 AND $4
+WHERE  chain_id = $1 AND feed_id = $2 AND stride = $3
+  AND  block_number BETWEEN $4 AND $5
   AND  status = 'confirmed'
 ORDER BY block_number, log_index;
 ```
@@ -587,12 +565,12 @@ LIMIT 1;
 
 ---
 
-# 17) Defaults & tunables
+# 16) Defaults & tunables
 
 - `db_write_batch_rows`: **200**
 - `queue_max_items`: **10,000**
 - `alertsConfig`: `noEventsSeconds=300`, `maxLagBlocks=64` (per chain; adjust to feed cadence)
-- Backfill range step: start **2,000** blocks; shrink to **256** on error
+- Backfill range step: start **10,000** blocks; shrink to **256** on error
 - Confirmations per chain: from config
 - Metrics endpoint: `:service.metricsPort/metrics` (default `:9464/metrics`)
 - Logs: `info` level (configurable `LOG_LEVEL`)
@@ -600,7 +578,7 @@ LIMIT 1;
 
 ---
 
-# 18) Implementation notes (TS/Effect)
+# 17) Implementation notes (TS/Effect)
 
 - **Decoding**: `decodeADFSCalldata(calldata, hasBlockNumber)` returns:
 
@@ -619,7 +597,7 @@ LIMIT 1;
 
 ---
 
-# 19) Out‑of‑scope (v1)
+# 18) Out‑of‑scope (v1)
 
 - Admin API/CLI: not planned.
 - Web UI dashboard (Grafana only).
@@ -627,19 +605,18 @@ LIMIT 1;
 
 ---
 
-# 20) Deliverables
+# 19) Deliverables
 
-1. **Repository** with:
+1. **Workspace** (`apps/adfs-indexer`) with:
 
    - `/src` (Effect layers, workers, repos)
+   - `/tests` (unit, integration, etc.)
    - `/migrations` (SQL; online‑safe)
    - `/config/example.config.json`
-   - `/helm` or `/compose` (optional)
 
 2. **Grafana dashboards** JSON for metrics above.
-3. **Runbooks** for three incident types.
-4. **Tests** (unit, integration, reorg, load).
-5. **Docs** (`README.md`) describing config, deploy modes, and schema.
+3. **Tests** (unit, integration, reorg, load).
+4. **Docs** (`README.md`) describing config, deploy modes, and schema.
 
 ---
 
@@ -648,10 +625,17 @@ LIMIT 1;
 ```ts
 export const UpgradedEventAbi = [
   {
-    type: 'event',
-    name: 'Upgraded',
-    inputs: [{ name: 'implementation', type: 'address', indexed: true }],
     anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'implementation',
+        type: 'address',
+      },
+    ],
+    name: 'Upgraded',
+    type: 'event',
   },
 ] as const;
 ```
