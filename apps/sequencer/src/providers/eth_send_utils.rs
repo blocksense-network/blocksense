@@ -530,20 +530,6 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                             *reorgs_count_in_network += 1;
                                         }
 
-                                        // Inspect previously observed blocks to find the
-                                        // first common ancestor and log the diverged ones.
-                                        let mut observed_heights: Vec<u64> = observed_block_hashes
-                                            .keys()
-                                            .copied()
-                                            .filter(|h| *h <= observed_latest_height)
-                                            .collect();
-                                        observed_heights.sort_unstable();
-                                        observed_heights.reverse();
-
-                                        let fmt_hash = |hash: &B256| {
-                                            format!("0x{}", hex::encode(hash.as_slice()))
-                                        };
-
                                         let _ = handle_reorg(
                                             net.as_str(),
                                             &rpc_handle,
