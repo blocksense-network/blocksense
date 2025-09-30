@@ -78,7 +78,7 @@ Below is a complete, implementation-ready **software specification** for your mu
           |                          |                          ^
           v                          v                          |
 +---------+------------------------------------------------------+-----+
-|                     Indexer Process (Effect runtime)                |
+|                     Indexer Process (Effect runtime)                 |
 |                                                                      |
 |  Layers:                                                             |
 |  - ConfigLayer       (JSON -> types, no hot reload)                  |
@@ -91,7 +91,7 @@ Below is a complete, implementation-ready **software specification** for your mu
 |  Supervisors:                                                        |
 |  - ChainRuntime[chain]                                               |
 |     * BackfillWorker (HTTP getLogs)                                  |
-|     * LiveTailWorker (WS watchLogs)                                  |
+|     * LiveTailWorker (WS watchEvent)                                 |
 |     * ProxyUpgradeWatcher (WS/HTTP)                                  |
 |     * BlockHeaderCache (HTTP)                                        |
 |     * OrderingBuffer (per-chain)                                     |
@@ -380,6 +380,7 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
 > **Rate limits** and **max queue size** are optional config knobs; defaults provided.
 > `topicName` is a config-only field; the database persists only the computed hash (`topic0`) as `BYTEA` (e.g., `chains.topic_hash`, `contracts.topic_hash`, `events_adfs.topic0`).
 > Embed any provider API keys directly in the RPC URLs; no extra env indirection.
+> Live tailing will fall back to HTTP polling against the `rpcHttp` list whenever all WS endpoints are unavailable.
 
 **Env variables**:
 
@@ -404,11 +405,11 @@ const VersionMode: Record<number, { hasBlockNumber: boolean }> = {
 
 ### 9.2 Fibers per chain
 
-- **BackfillWorker**: sequential ranges; emits decoded rows to ordering buffer.
-- **LiveTailWorker**: WS `watchLogs` subscription; fetch `tx`, `calldata`, `block`.
-- **ProxyUpgradeWatcher**: subscribes to proxy `Upgraded` events; persists `proxy_versions`.
-- **OrderingBuffer**: merges backfill and live tail, enforces per‑block total order.
-- **Writer**: one DB transaction per block; writes `adfs_events`, `feed_updates`, `ring_buffer_writes`, and maintains `feed_latest`; flips `pending → confirmed` on finality.
+- **BackfillWorker**: walks historical block ranges via `eth_getLogs`, starting from the chain’s `startBlock` up to `head − finality`. It adapts the range size based on RPC failures, hydrates missing tx/block metadata, decodes payloads, and forwards normalized rows to the OrderingBuffer while emitting tracing spans for range latency.
+- **LiveTailWorker**: uses viem’s `watchEvent` WebSocket helper to stream new `DataFeedsUpdated` logs; it automatically handles resubscription/backoff and, when WS connectivity becomes unavailable, falls back to HTTP polling (`getLogs`) through the configured `rpcHttp` fallback list to keep tailing until WS recovers. For each live log it fetches tx input + block header when absent, enriches with version metadata, and publishes decoded results into the shared OrderingBuffer with causality metadata.
+- **ProxyUpgradeWatcher**: watches the proxy’s `Upgraded` topic (both WS and catch-up HTTP) to detect implementation changes. It persists `contract_versions`, bumps the in-memory VersionManager, and backfills any missed upgrades so the decoder always uses the correct ABI.
+- **OrderingBuffer**: merges the backfill and live streams in `(block_number, log_index)` order. It buffers gaps within configured bounds, drops only oldest pending data on overflow, and surfaces queue depth metrics so operators can tune throughput.
+- **Writer**: drains ordered batches per block, executes a single UPSERT-heavy transaction to populate `adfs_events`, `feed_updates`, `ring_buffer_writes`, and `feed_latest`, and flips `pending → confirmed/dropped` once finality is satisfied. It also records success/error counters for observability.
 
 ---
 
