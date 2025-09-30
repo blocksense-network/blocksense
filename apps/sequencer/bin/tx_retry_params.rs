@@ -5,6 +5,7 @@ use std::sync::Arc;
 use alloy::hex::FromHex;
 use alloy::network::TransactionBuilder;
 use alloy::primitives::{Address, Bytes};
+use alloy::providers::Provider;
 use alloy::rpc::types::TransactionRequest;
 use alloy::signers::local::PrivateKeySigner;
 use anyhow::{anyhow, Context, Result};
@@ -115,6 +116,28 @@ async fn main() -> Result<()> {
         )
         .await;
         println!("1) Estimated gas limit: {}", gas_limit);
+
+        // let tx_result = rpc_provider.provider.send_transaction(tx_request).await;
+
+        // println!("1) tx_result = {tx_result:?}");
+
+        // match tx_result {
+        //     Ok(tx) => {
+        //         let tx_receipt_result = tx.get_receipt().await;
+        //         println!("1) tx_receipt_result = {tx_receipt_result:?}");
+        //         match tx_receipt_result {
+        //             Ok(tx_receipt) => {
+        //                 println!("1) tx_receipt = {tx_receipt:?}");
+        //             },
+        //             Err(e) => {
+        //                 println!("1) error in receipt: {e:?}");
+        //             },
+        //         }
+        //     },
+        //     Err(e) => {
+        //         println!("1) Error sending transaction: {e:?}");
+        //     },
+        // }
     }
 
     // 2) to, from, data, nonce
@@ -153,6 +176,28 @@ async fn main() -> Result<()> {
         )
         .await;
         println!("2) Estimated gas limit: {}", gas_limit);
+
+        // let tx_result = rpc_provider.provider.send_transaction(tx_request).await;
+
+        // println!("2) tx_result = {tx_result:?}");
+
+        // match tx_result {
+        //     Ok(tx) => {
+        //         let tx_receipt_result = tx.get_receipt().await;
+        //         println!("2) tx_receipt_result = {tx_receipt_result:?}");
+        //         match tx_receipt_result {
+        //             Ok(tx_receipt) => {
+        //                 println!("2) tx_receipt = {tx_receipt:?}");
+        //             },
+        //             Err(e) => {
+        //                 println!("2) error in receipt: {e:?}");
+        //             },
+        //         }
+        //     },
+        //     Err(e) => {
+        //         println!("2) Error sending transaction: {e:?}");
+        //     },
+        // }
     }
 
     // 3) to, from, data, chain_id
@@ -192,6 +237,28 @@ async fn main() -> Result<()> {
         )
         .await;
         println!("3) Estimated gas limit: {}", gas_limit);
+
+        //     let tx_result = rpc_provider.provider.send_transaction(tx_request).await;
+
+        //     println!("3) tx_result = {tx_result:?}");
+
+        //     match tx_result {
+        //         Ok(tx) => {
+        //             let tx_receipt_result = tx.get_receipt().await;
+        //             println!("3) tx_receipt_result = {tx_receipt_result:?}");
+        //             match tx_receipt_result {
+        //                 Ok(tx_receipt) => {
+        //                     println!("3) tx_receipt = {tx_receipt:?}");
+        //                 },
+        //                 Err(e) => {
+        //                     println!("3) error in receipt: {e:?}");
+        //                 },
+        //             }
+        //         },
+        //         Err(e) => {
+        //             println!("3) Error sending transaction: {e:?}");
+        //         },
+        //     }
     }
 
     // 4) to, from, data, nonce, chain_id
@@ -248,6 +315,55 @@ async fn main() -> Result<()> {
         )
         .await;
         println!("4) Estimated gas limit: {}", gas_limit);
+
+        tx_request.set_gas_limit(2 * gas_limit);
+
+        let gas_fees = get_tx_retry_params(
+            DEFAULT_NETWORK_NAME,
+            &rpc_provider.provider,
+            &provider_metrics,
+            &signer.address(),
+            100,
+            100,
+            0.1,
+        )
+        .await
+        .expect("Could not get gas fees");
+
+        match gas_fees {
+            GasFees::Legacy(gas_price) => {
+                tx_request = tx_request
+                    .with_gas_price(gas_price.gas_price)
+                    .transaction_type(0);
+            }
+            GasFees::Eip1559(eip1559_gas_fees) => {
+                tx_request = tx_request
+                    .with_max_priority_fee_per_gas(eip1559_gas_fees.priority_fee)
+                    .with_max_fee_per_gas(eip1559_gas_fees.max_fee_per_gas);
+            }
+        }
+
+        let tx_result = rpc_provider.provider.send_transaction(tx_request).await;
+
+        println!("4) tx_result = {tx_result:?}");
+
+        match tx_result {
+            Ok(tx) => {
+                let tx_receipt_result = tx.get_receipt().await;
+                println!("4) tx_receipt_result = {tx_receipt_result:?}");
+                match tx_receipt_result {
+                    Ok(tx_receipt) => {
+                        println!("4) tx_receipt = {tx_receipt:?}");
+                    }
+                    Err(e) => {
+                        println!("4) error in receipt: {e:?}");
+                    }
+                }
+            }
+            Err(e) => {
+                println!("4) Error sending transaction: {e:?}");
+            }
+        }
     }
 
     let gas_fees = get_tx_retry_params(
