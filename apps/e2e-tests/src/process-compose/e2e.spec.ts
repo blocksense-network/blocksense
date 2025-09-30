@@ -38,7 +38,7 @@ describe.sequential('E2E Tests with process-compose', () => {
   const network = 'ink_sepolia';
   const MAX_HISTORY_ELEMENTS_PER_FEED = 8192;
 
-  let feedIdsFromConfig: Array<bigint>;
+  let feedIdsFromConfig: bigint[];
   let contractAddressFromConfig: EthereumAddress;
 
   let sequencer: SequencerService;
@@ -48,7 +48,7 @@ describe.sequential('E2E Tests with process-compose', () => {
   let sequencerConfig: SequencerConfigV2;
   let feedsConfig: NewFeedsConfig;
 
-  let feedIds: Array<bigint>;
+  let feedIds: bigint[];
   let contractAddress: EthereumAddress;
 
   let updatesToNetworks = {} as UpdatesToNetwork;
@@ -148,7 +148,7 @@ describe.sequential('E2E Tests with process-compose', () => {
 
       const allow_feeds = sequencerConfig.providers[network].allow_feeds;
       feedIds = allow_feeds?.length
-        ? (allow_feeds as Array<bigint>)
+        ? (allow_feeds as bigint[])
         : feedsConfig.feeds.map(feed => feed.id);
       expect(feedIds).toEqual(feedIdsFromConfig);
     }),
@@ -277,7 +277,7 @@ describe.sequential('E2E Tests with process-compose', () => {
           Err: { UndefinedError: {} },
         }; // Err → UndefinedError
 
-        const reports: Array<ReportData> = [
+        const reports: ReportData[] = [
           { feed_id, value: numericalResult },
           { feed_id, value: textResult },
           { feed_id, value: bytesResult },

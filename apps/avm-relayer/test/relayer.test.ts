@@ -14,7 +14,7 @@ const pxeUrl = S.is(S.URL)(process.env['PXE_URL'])
 
 describe.skipIf(!pxeUrl)('AVM Relayer', () => {
   let pxe: PXE;
-  let wallets: Array<AccountWallet> = [];
+  let wallets: AccountWallet[] = [];
 
   beforeAll(async () => {
     assert(pxeUrl, 'PXE_URL must be set for AVM Relayer tests');

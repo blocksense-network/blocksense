@@ -151,10 +151,10 @@ function matchesRegex(value: unknown, pattern: string, flags = 'i') {
 }
 
 const filterBy = <T>(
-  arr: Array<T>,
+  arr: T[],
   opt: Option.Option<string>,
   getValue: (item: T) => unknown,
-): Array<T> => {
+): T[] => {
   if (Option.isSome(opt)) {
     return arr.filter(item => matchesRegex(getValue(item), opt.value));
   }

@@ -15,7 +15,7 @@ export function bigIntToBytesBE(x: bigint): Buffer {
   if (x < 0n) throw new Error('bigIntToBytesBE: negative input not supported');
   if (x === 0n) return Buffer.from([0]);
 
-  const bytes: Array<number> = [];
+  const bytes: number[] = [];
   let n = x;
   while (n > 0n) {
     bytes.push(Number(n & 0xffn));

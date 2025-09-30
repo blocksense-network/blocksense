@@ -20,9 +20,9 @@ export type FeedsValueAndRound = Record<
  * @param {Record<string, number>} [roundsInfo] - Optional map of feed IDs to specific round numbers.
  */
 export function getDataFeedsInfoFromNetwork(
-  feedIds: Array<bigint>,
+  feedIds: bigint[],
   contractAddress: EthereumAddress,
-  provider: NetworkName | string,
+  provider: NetworkName | URL,
   roundsInfo?: Record<string, number>,
 ): Effect.Effect<FeedsValueAndRound, Error, never> {
   return Effect.gen(function* () {

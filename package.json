@@ -56,7 +56,7 @@
     "@typescript-eslint/eslint-plugin": "^8.42.0",
     "@typescript-eslint/parser": "^8.42.0",
     "eslint": "^9.35.0",
-    "eslint-import-resolver-typescript": "^3.10.1",
+    "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-codegen": "0.33.0",
     "eslint-plugin-deprecation": "^3.0.0",
     "eslint-plugin-import": "^2.32.0",

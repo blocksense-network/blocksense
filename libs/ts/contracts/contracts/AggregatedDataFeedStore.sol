@@ -416,7 +416,17 @@ contract AggregatedDataFeedStore {
 
           // update pointer to start start of index data
           pointer := add(pointer, add(indexLength, 1))
-          sstore(add(RING_BUFFER_TABLE_ADDRESS, slot), calldataload(pointer))
+          sstore(
+            add(RING_BUFFER_TABLE_ADDRESS, slot),
+            // Writers are expected to wrap indices modulo 8192, but we defensively
+            // mask to 0x1fff per 16-bit lane so a malformed (unwrapped) index
+            // (e.g. 0x2000 - 0xffff) cannot cause readers to compute out-of-bounds
+            // data positions (which would otherwise point into another feed's region).
+            and(
+              calldataload(pointer),
+              0x1fff1fff1fff1fff1fff1fff1fff1fff1fff1fff1fff1fff1fff1fff1fff1fff
+            )
+          )
         }
 
         ///////////////////////////////////
