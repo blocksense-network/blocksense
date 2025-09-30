@@ -97,7 +97,31 @@ export default [
       'import/no-duplicates': 'error',
       'import/no-unresolved': 'off',
       'import/order': 'off',
-      'simple-import-sort/imports': 'off',
+      'simple-import-sort/imports': [
+        'error',
+        {
+          groups: [
+            // 1. Side effect imports
+            ['^\\u0000'],
+            // 2. Node.js built-ins
+            [
+              '^(node:)?(assert|buffer|child_process|cluster|crypto|dgram|dns|domain|events|fs|http|http2|https|inspector|module|net|os|path|perf_hooks|process|punycode|querystring|readline|repl|stream|string_decoder|timers|tls|trace_events|tty|url|util|v8|vm|worker_threads|zlib)(/|$)',
+            ],
+            // 3. External packages (react related first)
+            ['^react$', '^react-dom$', '^@?\\w'],
+            // 4. Internal monorepo packages (adjust these aliases if needed)
+            ['^@blocksense/', '^@apps/', '^@libs/', '^@/'],
+            // 5. Absolute imports (capitalized or other root based)
+            ['^[A-Z]'],
+            // 6. Parent imports
+            ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
+            // 7. Sibling & index
+            ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
+            // 8. Style imports
+            ['^.+\\.s?css$'],
+          ],
+        },
+      ],
       'sort-destructure-keys/sort-destructure-keys': 'error',
       'deprecation/deprecation': 'off',
 
