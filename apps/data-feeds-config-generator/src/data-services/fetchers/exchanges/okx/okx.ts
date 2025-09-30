@@ -1,18 +1,15 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
-import {
-  OKXAssetInfo,
-  OKXInfoResp,
-  OKXInfoRespSchema,
-  OKXPrice,
-  OKXPriceSchema,
-} from './types';
+
+import type { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
+
+import type { OKXAssetInfo, OKXInfoResp, OKXPrice } from './types';
+import { OKXInfoRespSchema, OKXPriceSchema } from './types';
 
 /**
  * Class to fetch assets information from OKX Exchange.
  */
 export class OKXAssetsFetcher implements ExchangeAssetsFetcher<OKXAssetInfo> {
-  async fetchAssets(): Promise<AssetInfo<OKXAssetInfo>[]> {
+  async fetchAssets(): Promise<Array<AssetInfo<OKXAssetInfo>>> {
     const assets = (await fetchOKXInfo()).data;
     const prices = (await fetchOKXPricesInfo()).data;
     return assets.map(asset => {

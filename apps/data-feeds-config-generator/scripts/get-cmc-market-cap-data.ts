@@ -1,4 +1,5 @@
 import { selectDirectory } from '@blocksense/base-utils/fs';
+
 import { fetchAssetsInMarketCapOrder } from '../src/data-services/fetchers/aggregators/cmc';
 import { artifactsDir } from '../src/paths';
 

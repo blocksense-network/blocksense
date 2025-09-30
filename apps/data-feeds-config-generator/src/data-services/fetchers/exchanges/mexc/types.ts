@@ -5,14 +5,14 @@ import { Schema as S } from 'effect';
  *
  * Ref: https://mexcdevelop.github.io/apidocs/spot_v3_en/#symbol-price-ticker
  */
-const MEXCAssetInfoSchema = S.mutable(
+const _MEXCAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
     price: S.Number,
   }),
 );
 
-export type MEXCAssetInfo = typeof MEXCAssetInfoSchema.Type;
+export type MEXCAssetInfo = typeof _MEXCAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from MEXC Exchange.

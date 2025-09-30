@@ -1,12 +1,13 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
-import {
+
+import type { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
+
+import type {
   BitfinexAssetInfo,
   BitfinexInfoResp,
-  BitfinexInfoRespSchema,
   BitfinexPrice,
-  BitfinexPriceSchema,
 } from './types';
+import { BitfinexInfoRespSchema, BitfinexPriceSchema } from './types';
 
 /**
  * Class to fetch assets information from Bitfinex Exchange.
@@ -14,7 +15,7 @@ import {
 export class BitfinexAssetsFetcher
   implements ExchangeAssetsFetcher<BitfinexAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<BitfinexAssetInfo>[]> {
+  async fetchAssets(): Promise<Array<AssetInfo<BitfinexAssetInfo>>> {
     const assets = await fetchBitfinexInfo();
     const prices = await fetchBitfinexPricesInfo(assets[0]);
     return assets[0].map(asset => {

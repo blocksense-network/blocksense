@@ -1,6 +1,7 @@
 import { selectDirectory } from '@blocksense/base-utils/fs';
-import * as exchangeFetchers from '../exchanges/index';
+
 import { dataProvidersDir } from '../../../paths';
+import * as exchangeFetchers from '../exchanges/index';
 
 export async function fetchSymbols() {
   const exchangeSupportedSymbols = await Promise.all(

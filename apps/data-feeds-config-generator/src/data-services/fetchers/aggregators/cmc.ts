@@ -2,7 +2,11 @@ import { Schema as S } from 'effect';
 
 import { getEnvString } from '@blocksense/base-utils/env';
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { AssetInfo, ExchangeAssetsFetcher } from '../exchanges/exchange-assets';
+
+import type {
+  AssetInfo,
+  ExchangeAssetsFetcher,
+} from '../exchanges/exchange-assets';
 
 /**
  * Class to fetch assets information from CoinMarketCap.
@@ -10,7 +14,7 @@ import { AssetInfo, ExchangeAssetsFetcher } from '../exchanges/exchange-assets';
 export class CoinMarketCapAssetsFetcher
   implements ExchangeAssetsFetcher<CMCAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<CMCAssetInfo>[]> {
+  async fetchAssets(): Promise<Array<AssetInfo<CMCAssetInfo>>> {
     const assets = (await fetchCMCCryptoList()).data;
     return assets.map(asset => ({
       pair: {
@@ -84,14 +88,14 @@ export type CMCInfoResp = typeof CMCInfoRespSchema.Type;
  *
  * Ref: https://coinmarketcap.com/api/documentation/v1/#operation/getV2CryptocurrencyQuotesLatest
  */
-const CMCAssetInfoSchema = S.mutable(
+const _CMCAssetInfoSchema = S.mutable(
   S.Struct({
     id: S.Number,
     symbol: S.String,
   }),
 );
 
-export type CMCAssetInfo = typeof CMCAssetInfoSchema.Type;
+export type CMCAssetInfo = typeof _CMCAssetInfoSchema.Type;
 
 /**
  * Function to decode CoinMarketCap symbol information.

@@ -1,9 +1,10 @@
+import { keysOf } from '@blocksense/base-utils/array-iter';
+import { assertNotNull } from '@blocksense/base-utils/assert';
+
 import * as aggregatorFetchers from '../../fetchers/aggregators/index';
 import * as exchangeFetchers from '../../fetchers/exchanges/index';
 
-import { keysOf } from '@blocksense/base-utils/array-iter';
-import { assertNotNull } from '@blocksense/base-utils/assert';
-import { CryptoProviderData } from './types';
+import type { CryptoProviderData } from './types';
 
 export async function getCryptoProvidersData() {
   const fetcherCategories = {

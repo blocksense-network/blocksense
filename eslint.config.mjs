@@ -35,7 +35,6 @@ export default [
       'libs/ts/esbuild-react-compiler-plugin',
       'libs/ts/nextra-theme-docs',
       'libs/ts/sol-reflector',
-      'apps/data-feeds-config-generator',
       'apps/docs.blocksense.network',
       'apps/nft.blocksense.network',
       'apps/social-verification',

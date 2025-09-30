@@ -5,14 +5,14 @@ import { Schema as S } from 'effect';
  *
  * Ref: https://www.kucoin.com/docs/rest/spot-trading/market-data/get-all-tickers
  */
-const KuCoinAssetInfoSchema = S.mutable(
+const _KuCoinAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
     price: S.Number,
   }),
 );
 
-export type KuCoinAssetInfo = typeof KuCoinAssetInfoSchema.Type;
+export type KuCoinAssetInfo = typeof _KuCoinAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from KuCoin Exchange.

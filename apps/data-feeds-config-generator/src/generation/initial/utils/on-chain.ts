@@ -2,16 +2,16 @@ import Web3 from 'web3';
 
 import { assertNotNull } from '@blocksense/base-utils/assert';
 import { everyAsync } from '@blocksense/base-utils/async';
-import { NetworkName, getRpcUrl, isTestnet } from '@blocksense/base-utils/evm';
-
-import { ChainLinkFeedInfo } from '../../../data-services/fetchers/chainlink/types';
+import type { NetworkName } from '@blocksense/base-utils/evm';
+import { getRpcUrl, isTestnet } from '@blocksense/base-utils/evm';
 import {
   chainlinkNetworkNameToChainId,
   parseNetworkFilename,
 } from '@blocksense/config-types/chainlink-compatibility';
-import { SimplifiedFeed } from '../types';
-
 import ChainLinkAbi from '@blocksense/contracts/abis/ChainlinkAggregatorProxy.json';
+
+import type { ChainLinkFeedInfo } from '../../../data-services/fetchers/chainlink/types';
+import type { SimplifiedFeed } from '../types';
 
 export async function isFeedDataSameOnChain(
   networkName: NetworkName,
@@ -35,7 +35,7 @@ export async function isFeedDataSameOnChain(
       BigInt(decimals) === BigInt(feedInfo.decimals) &&
       description === feedInfo.name
     );
-  } catch (e) {
+  } catch {
     console.error(
       `Failed to fetch data from ${networkName} for ${feedInfo.name} at ${chainLinkContractAddress}`,
     );
@@ -49,7 +49,7 @@ export async function checkOnChainData(
   rawDataFeedsOnMainnets: any[],
   feeds: SimplifiedFeed[],
 ) {
-  let flatedNonTestnetSupportedFeeds = rawDataFeedsOnMainnets
+  const flatedNonTestnetSupportedFeeds = rawDataFeedsOnMainnets
     .filter(([feedName, _feedData]) =>
       feeds.some(feed => feed.description === feedName),
     )

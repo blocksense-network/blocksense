@@ -1,22 +1,23 @@
-import { NewFeedsConfig, NewFeed } from '@blocksense/config-types';
+import type { NewFeed, NewFeedsConfig } from '@blocksense/config-types';
 
-import { Artifacts } from '../../data-services/artifacts-downloader';
-import { RawDataFeeds } from '../../data-services/fetchers/chainlink/types';
-import { addDataProviders } from './data-providers';
-import { SimplifiedFeed } from './types';
+import type { Artifacts } from '../../data-services/artifacts-downloader';
+import type { RawDataFeeds } from '../../data-services/fetchers/chainlink/types';
+
 import {
+  chainLinkFileNameIsNotTestnet,
   getCLFeedsOnMainnet,
   removeUnsupportedRateDataFeeds,
-  chainLinkFileNameIsNotTestnet,
 } from './utils/chainlink';
 import {
+  addMarketCapRank,
+  addStableCoinVariants,
   getUniqueDataFeeds,
   removeNonCryptoDataFeeds,
-  addStableCoinVariants,
-  addMarketCapRank,
   sortFeedsConfig,
 } from './utils/common';
 import { checkOnChainData } from './utils/on-chain';
+import { addDataProviders } from './data-providers';
+import type { SimplifiedFeed } from './types';
 
 export async function generateFeedConfig(
   rawDataFeeds: RawDataFeeds,
@@ -51,7 +52,7 @@ export async function generateFeedConfig(
       Object.keys(dataFeed.additional_feed_info.arguments).length !== 0,
   );
 
-  let rawDataFeedsOnMainnets = Object.entries(rawDataFeeds).filter(
+  const rawDataFeedsOnMainnets = Object.entries(rawDataFeeds).filter(
     ([_feedName, feedData]) =>
       // If the data feed is not present on any mainnet, we don't include it.
       Object.entries(feedData.networks).some(([chainlinkFileName, _feedData]) =>
@@ -93,5 +94,5 @@ export async function generateFeedConfig(
     return feed;
   });
 
-  return { feeds: feeds };
+  return { feeds };
 }

@@ -1,9 +1,11 @@
 import { keysOf } from '@blocksense/base-utils/array-iter';
-import { Pair, CexPriceFeedsArgs } from '@blocksense/config-types';
-import { AssetInfo } from '../../fetchers/exchanges/exchange-assets';
 import { equalsCaseInsensitive } from '@blocksense/base-utils/string';
-import { CryptoProviderData } from './types';
+import type { CexPriceFeedsArgs, Pair } from '@blocksense/config-types';
+
+import type { AssetInfo } from '../../fetchers/exchanges/exchange-assets';
+
 import { stableCoins } from './constants';
+import type { CryptoProviderData } from './types';
 
 // Function to get all providers for a pair
 export function getAllProvidersForPair(
@@ -12,7 +14,7 @@ export function getAllProvidersForPair(
 ): CexPriceFeedsArgs {
   const providers: CexPriceFeedsArgs = { kind: 'cex-price-feeds' };
 
-  for (const { name, type, data } of providersData) {
+  for (const { data, name, type } of providersData) {
     const resources = getProviderResourcesForPair(pair, data);
     if (!resources) continue;
     providers[type] ??= {};
@@ -38,7 +40,7 @@ export function getProviderResourcesForPair(
   providerAssets: AssetInfo[],
   excludePriceInfo: boolean = true,
   includeStableCoins: boolean = true,
-): Record<string, (string | number)[]> | null {
+): Record<string, Array<string | number>> | null {
   const supportedAssets = providerAssets.filter(symbol =>
     isPairSupportedByCryptoProvider(pair, symbol.pair, includeStableCoins),
   );
@@ -51,7 +53,7 @@ export function getProviderResourcesForPair(
       });
       return acc;
     },
-    {} as Record<string, (string | number)[]>,
+    {} as Record<string, Array<string | number>>,
   );
 
   if (keysOf(providerInfo).length === 0) {
@@ -94,12 +96,12 @@ export function isPairSupportedByCryptoProvider(
 export function getExchangesPriceDataForPair(
   pair: Pair,
   providersData: CryptoProviderData[],
-): Record<string, number>[] {
+): Array<Record<string, number>> {
   const exchangesInfo = providersData.filter(
     ({ type }) => type === 'exchanges',
   );
   const exchangesPrices = exchangesInfo
-    .map(({ name, data }) => {
+    .map(({ data, name }) => {
       const exchangeDataForPair = getProviderResourcesForPair(
         pair,
         data,

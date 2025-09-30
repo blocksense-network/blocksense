@@ -1,12 +1,9 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
-import {
-  KuCoinAssetInfo,
-  KuCoinInfoResp,
-  KuCoinInfoRespSchema,
-  KuCoinPrice,
-  KuCoinPriceSchema,
-} from './types';
+
+import type { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
+
+import type { KuCoinAssetInfo, KuCoinInfoResp, KuCoinPrice } from './types';
+import { KuCoinInfoRespSchema, KuCoinPriceSchema } from './types';
 
 /**
  * Class to fetch assets information from KuCoin Exchange.
@@ -14,7 +11,7 @@ import {
 export class KuCoinAssetsFetcher
   implements ExchangeAssetsFetcher<KuCoinAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<KuCoinAssetInfo>[]> {
+  async fetchAssets(): Promise<Array<AssetInfo<KuCoinAssetInfo>>> {
     const assets = (await fetchKuCoinInfo()).data;
     const prices = (await fetchKuCoinPricesInfo()).data.ticker;
     return assets.map(asset => {
