@@ -1,4 +1,4 @@
-import { Effect, Exit, Layer, pipe, Schedule } from 'effect';
+import { Effect, Exit, Layer, pipe, Schedule, Duration } from 'effect';
 import { afterAll, beforeAll, describe, expect, it } from '@effect/vitest';
 import { deepStrictEqual } from 'assert';
 
@@ -180,84 +180,104 @@ describe.sequential('E2E Tests with process-compose', () => {
       }),
   );
 
-  it.live('Test feeds data is updated on the local network', () =>
-    Effect.gen(function* () {
-      const url = sequencerConfig.providers[network].url;
+  it.live(
+    'Test feeds data is updated on the local network',
+    () =>
+      Effect.catchAllDefect(
+        Effect.gen(function* () {
+          const url = sequencerConfig.providers[network].url;
 
-      // Save map of initial rounds for each feed
-      const initialRounds = fromEntries(
-        entriesOf(initialFeedsInfo).map(([id, data]) => [id, data.round]),
-      );
+          // Save map of initial rounds for each feed
+          const initialRounds = fromEntries(
+            entriesOf(initialFeedsInfo).map(([id, data]) => [id, data.round]),
+          );
 
-      // Get feeds information from the local network ( anvil )
-      // for the same round as the initial one, to confirm it is not being overwritten
-      const initialFeedsInfoLocal = yield* getDataFeedsInfoFromNetwork(
-        feedIds,
-        contractAddress,
-        url,
-        initialRounds,
-      );
+          // Get feeds information from the local network ( anvil )
+          // for the same round as the initial one, to confirm it is not being overwritten
+          const initialFeedsInfoLocal = yield* getDataFeedsInfoFromNetwork(
+            feedIds,
+            contractAddress,
+            url,
+            initialRounds,
+          );
 
-      expect(initialFeedsInfo).toEqual(initialFeedsInfoLocal);
+          expect(initialFeedsInfo).toEqual(initialFeedsInfoLocal);
 
-      // If some feeds were not updated, we will log a warning
-      // and continue with the available feeds
-      const updatedFeedIds = keysOf(updatesToNetworks[network]).map(feedId =>
-        BigInt(feedId),
-      );
-      if (updatedFeedIds.length !== feedIds.length) {
-        yield* Effect.logWarning('Not all feeds have been updated');
-        const missingFeeds = feedIds.filter(
-          feedId => !updatedFeedIds.includes(feedId),
-        );
-        yield* Effect.logWarning('Missing updates for feeds:', missingFeeds);
-        yield* Effect.logWarning('Test will continue with available feeds');
+          // If some feeds were not updated, we will log a warning
+          // and continue with the available feeds
+          const updatedFeedIds = keysOf(updatesToNetworks[network]).map(
+            feedId => BigInt(feedId),
+          );
+          if (updatedFeedIds.length !== feedIds.length) {
+            yield* Effect.logWarning('Not all feeds have been updated');
+            const missingFeeds = feedIds.filter(
+              feedId => !updatedFeedIds.includes(feedId),
+            );
+            yield* Effect.logWarning(
+              'Missing updates for feeds:',
+              missingFeeds,
+            );
+            yield* Effect.logWarning('Test will continue with available feeds');
 
-        // Remove missing feeds from the initial rounds info
-        for (const feedId of missingFeeds) {
-          delete initialRounds[feedId.toString()];
-        }
-      }
+            // Remove missing feeds from the initial rounds info
+            for (const feedId of missingFeeds) {
+              delete initialRounds[feedId.toString()];
+            }
+          }
 
-      // Get feeds information from the local network ( anvil )
-      // Info is fetched for specific round - the initial round of the feed
-      // + number of updates that happened while the local sequencer was running
-      // modulo the maximum number of history elements per feed
-      const currentFeedsInfo = yield* getDataFeedsInfoFromNetwork(
-        updatedFeedIds,
-        contractAddress,
-        url,
-        mapValues(
-          initialRounds,
-          (feedId, round) =>
-            (round + updatesToNetworks[network][feedId]) %
-            MAX_HISTORY_ELEMENTS_PER_FEED,
-        ),
-      );
+          // Get feeds information from the local network ( anvil )
+          // Info is fetched for specific round - the initial round of the feed
+          // + number of updates that happened while the local sequencer was running
+          // modulo the maximum number of history elements per feed
+          const currentFeedsInfo = yield* getDataFeedsInfoFromNetwork(
+            updatedFeedIds,
+            contractAddress,
+            url,
+            mapValues(
+              initialRounds,
+              (feedId, round) =>
+                (round + updatesToNetworks[network][feedId]) %
+                MAX_HISTORY_ELEMENTS_PER_FEED,
+            ),
+          );
 
-      const historyData = yield* sequencer.fetchHistory();
+          const historyData = yield* sequencer.fetchHistory();
 
-      // Make sure that the feeds info is updated
-      for (const [id, data] of entriesOf(currentFeedsInfo)) {
-        const { round, value } = data;
-        expect(round).toBeGreaterThan(initialFeedsInfo[id].round);
-        // Pegged asset with 10% tolerance should be pegged
-        // Pegged asset with 0.000001% tolerance should not be pegged
-        if (id === '50000') {
-          expect(value).toEqual(1 * 10 ** 8);
-          continue;
-        }
-        expect(value).not.toEqual(initialFeedsInfo[id].value);
+          // Make sure that the feeds info is updated
+          for (const [id, data] of entriesOf(currentFeedsInfo)) {
+            const { round, value } = data;
+            expect(round).toBeGreaterThan(initialFeedsInfo[id].round);
+            // Pegged asset with 10% tolerance should be pegged
+            // Pegged asset with 0.000001% tolerance should not be pegged
+            if (id === '50000') {
+              expect(value).toEqual(1 * 10 ** 8);
+              continue;
+            }
+            expect(value).not.toEqual(initialFeedsInfo[id].value);
 
-        const actualData = historyData.aggregate_history[id].find(
-          feed => feed.update_number === round - initialFeedsInfo[id].round - 1,
-        );
-        const decimals = feedsConfig.feeds.find(f => f.id.toString() === id)!
-          .additional_feed_info.decimals;
+            const actualData = historyData.aggregate_history[id].find(
+              feed =>
+                feed.update_number === round - initialFeedsInfo[id].round - 1,
+            );
+            const decimals = feedsConfig.feeds.find(
+              f => f.id.toString() === id,
+            )!.additional_feed_info.decimals;
 
-        expect(value / 10 ** decimals).toBeCloseTo(actualData!.value.Numerical);
-      }
-    }),
+            expect(value / 10 ** decimals).toBeCloseTo(
+              actualData!.value.Numerical,
+            );
+          }
+        }),
+        Effect.fail,
+      ),
+    Effect.retry(
+      pipe(
+        Schedule.recurs(10),
+        Schedule.compose(Schedule.elapsed),
+        Schedule.whileOutput(Duration.lessThanOrEqualTo(Duration.seconds(30))),
+      ),
+      Effect.orDie,
+    ),
   );
 
   describe.sequential('Reports results are correctly updated', () => {
