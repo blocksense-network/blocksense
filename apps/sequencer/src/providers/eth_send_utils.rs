@@ -318,7 +318,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
         loop_count += 1;
         {
             let now = Local::now();
-            info!("DEBUG: BEGIN loop_tracking_for_reorg_in_network for {net} loop_count: {loop_count}: {}!", now.format("%Y-%m-%d %H:%M:%S%.3f"));
+            info!("DEBUG: BEGIN loop_tracking_for_reorg_in_network for {net} loop_count: {loop_count}: {} finalized_height={finalized_height} observed_latest_height={observed_latest_height}!", now.format("%Y-%m-%d %H:%M:%S%.3f"));
         }
         // Scope the lock on providers so we don't hold it across awaits/sleeps
         {
@@ -337,84 +337,84 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                     };
 
                     // 1) Observe latest finalized block for logging/visibility
-                    match rpc_handle
-                        .get_block_by_number(BlockNumberOrTag::Finalized)
-                        .await
-                    {
-                        Ok(res) => match res {
-                            Some(eth_finalized_block) => {
-                                let mut provider = provider_mutex.lock().await;
+                    // match rpc_handle
+                    //     .get_block_by_number(BlockNumberOrTag::Finalized)
+                    //     .await
+                    // {
+                    //     Ok(res) => match res {
+                    //         Some(eth_finalized_block) => {
+                    //             let mut provider = provider_mutex.lock().await;
 
-                                // Prune non-finalized updates up to finalized height
-                                if finalized_height < eth_finalized_block.header.inner.number {
-                                    info!("Last finalized block in network {net} = {eth_finalized_block:?}");
+                    //             // Prune non-finalized updates up to finalized height
+                    //             if finalized_height < eth_finalized_block.header.inner.number {
+                    //                 info!("Last finalized block in network {net} = {eth_finalized_block:?}");
 
-                                    finalized_height = eth_finalized_block.header.inner.number;
-                                    let removed = provider.prune_observed_up_to(finalized_height);
-                                    if removed > 0 {
-                                        info!("Pruned {removed} non-finalized updates up to finalized height {finalized_height} in `{net}`");
-                                    }
-                                }
-                                if observed_latest_height < finalized_height {
-                                    warn!("Lost track of chain in network {net} beyond a finalized checkpoint: {finalized_height}, last observed block at height: {observed_latest_height}");
+                    //                 finalized_height = eth_finalized_block.header.inner.number;
+                    //                 let removed = provider.prune_observed_up_to(finalized_height);
+                    //                 if removed > 0 {
+                    //                     info!("Pruned {removed} non-finalized updates up to finalized height {finalized_height} in `{net}`");
+                    //                 }
+                    //             }
+                    //             if observed_latest_height < finalized_height {
+                    //                 warn!("Lost track of chain in network {net} beyond a finalized checkpoint: {finalized_height}, last observed block at height: {observed_latest_height}");
 
-                                    // Before updating our observed state to the finalized tip,
-                                    // detect if a reorg has occurred at/above the last observed height.
-                                    if let Some(stored_hash) =
-                                        observed_block_hashes.get(&observed_latest_height)
-                                    {
-                                        match rpc_handle
-                                            .get_block_by_number(BlockNumberOrTag::Number(
-                                                observed_latest_height,
-                                            ))
-                                            .await
-                                        {
-                                            Ok(Some(chain_block)) => {
-                                                let chain_hash = chain_block.header.hash;
-                                                if chain_hash != *stored_hash {
-                                                    warn!(
-                                                        "Reorg detected in network {net} while catching up to finalized tip"
-                                                    );
-                                                    // Increment reorg counter
-                                                    {
-                                                        let mut reorgs_count_in_network =
-                                                            reorgs_count_in_network_mutex
-                                                                .lock()
-                                                                .await;
-                                                        *reorgs_count_in_network += 1;
-                                                    }
-                                                }
-                                            }
-                                            Ok(None) => {
-                                                warn!(
-                                                    "Could not get block {observed_latest_height} while checking reorg at finalized catch-up in {net}"
-                                                );
-                                            }
-                                            Err(e) => {
-                                                warn!(
-                                                    "Failed to get block {observed_latest_height} while checking reorg at finalized catch-up in {net}: {e:?}"
-                                                );
-                                            }
-                                        }
-                                    }
+                    //                 // Before updating our observed state to the finalized tip,
+                    //                 // detect if a reorg has occurred at/above the last observed height.
+                    //                 if let Some(stored_hash) =
+                    //                     observed_block_hashes.get(&observed_latest_height)
+                    //                 {
+                    //                     match rpc_handle
+                    //                         .get_block_by_number(BlockNumberOrTag::Number(
+                    //                             observed_latest_height,
+                    //                         ))
+                    //                         .await
+                    //                     {
+                    //                         Ok(Some(chain_block)) => {
+                    //                             let chain_hash = chain_block.header.hash;
+                    //                             if chain_hash != *stored_hash {
+                    //                                 warn!(
+                    //                                     "Reorg detected in network {net} while catching up to finalized tip"
+                    //                                 );
+                    //                                 // Increment reorg counter
+                    //                                 {
+                    //                                     let mut reorgs_count_in_network =
+                    //                                         reorgs_count_in_network_mutex
+                    //                                             .lock()
+                    //                                             .await;
+                    //                                     *reorgs_count_in_network += 1;
+                    //                                 }
+                    //                             }
+                    //                         }
+                    //                         Ok(None) => {
+                    //                             warn!(
+                    //                                 "Could not get block {observed_latest_height} while checking reorg at finalized catch-up in {net}"
+                    //                             );
+                    //                         }
+                    //                         Err(e) => {
+                    //                             warn!(
+                    //                                 "Failed to get block {observed_latest_height} while checking reorg at finalized catch-up in {net}: {e:?}"
+                    //                             );
+                    //                         }
+                    //                     }
+                    //                 }
 
-                                    observed_latest_height = finalized_height;
-                                    // Insert current hash into provider cache
-                                    provider.insert_observed_block_hash(
-                                        observed_latest_height,
-                                        eth_finalized_block.header.hash,
-                                    );
-                                    continue;
-                                }
-                            }
-                            None => {
-                                warn!("Could not get finalized block in network {net}, got None!");
-                            }
-                        },
-                        Err(e) => {
-                            warn!("Could not get finalized block in network {net}: {e:?}!");
-                        }
-                    };
+                    //                 observed_latest_height = finalized_height;
+                    //                 // Insert current hash into provider cache
+                    //                 provider.insert_observed_block_hash(
+                    //                     observed_latest_height,
+                    //                     eth_finalized_block.header.hash,
+                    //                 );
+                    //                 continue;
+                    //             }
+                    //         }
+                    //         None => {
+                    //             warn!("Could not get finalized block in network {net}, got None!");
+                    //         }
+                    //     },
+                    //     Err(e) => {
+                    //         warn!("Could not get finalized block in network {net}: {e:?}!");
+                    //     }
+                    // };
 
                     if let Ok(Some(b)) = rpc_handle
                         .get_block_by_number(BlockNumberOrTag::Latest)
@@ -618,7 +618,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                             first_new_block.header.hash,
                                         );
                                         for block_height in
-                                            first_new_block_height + 1..latest_height
+                                            first_new_block_height + 1..=latest_height
                                         {
                                             if let Ok(Some(new_block)) = rpc_handle
                                                 .get_block_by_number(BlockNumberOrTag::Number(
@@ -643,6 +643,8 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                 warn!("DEBUG: Could not get block {first_new_block_height}");
                             }
                             observed_latest_height = latest_height;
+                        } if latest_height < observed_latest_height {
+                            info!("Chain went back");
                         } else {
                             info!(
                                 "No new blocks in {net} loop_count = {loop_count} latest_height = {latest_height}"
@@ -872,7 +874,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
             }
             {
                 let now = Local::now();
-                info!("DEBUG: END loop_tracking_for_reorg_in_network for {net} loop_count: {loop_count}: {}!", now.format("%Y-%m-%d %H:%M:%S%.3f"));
+                info!("DEBUG: END loop_tracking_for_reorg_in_network for {net} loop_count: {loop_count}: {} finalized_height={finalized_height} observed_latest_height={observed_latest_height}!", now.format("%Y-%m-%d %H:%M:%S%.3f"));
             }
         }
     }
@@ -2151,7 +2153,10 @@ mod tests {
         // Try anvil_snapshot, then evm_snapshot as fallback
         let res = match rpc_call(url, "anvil_snapshot", serde_json::json!([])).await {
             Ok(v) => v,
-            Err(_) => rpc_call(url, "evm_snapshot", serde_json::json!([])).await?,
+            Err(_) => {
+                println!("DEBUG: anvil_snapshot failed 1");
+                rpc_call(url, "evm_snapshot", serde_json::json!([])).await?
+            },
         };
         // Result may be a hex string or a number; normalize to hex string
         let snap_id = if let Some(s) = res.as_str() {
@@ -2160,6 +2165,7 @@ mod tests {
             // Encode as 0x-prefixed hex as many clients do
             format!("0x{:x}", n)
         } else {
+            println!("DEBUG: anvil_snapshot failed 2");
             eyre::bail!(format!("Unexpected snapshot id result: {res}"));
         };
         Ok(snap_id)
@@ -2170,10 +2176,14 @@ mod tests {
         let params = serde_json::json!([snap]);
         let res = match rpc_call(url, "anvil_revert", params.clone()).await {
             Ok(v) => v,
-            Err(_) => rpc_call(url, "evm_revert", params).await?,
+            Err(_) => {
+                println!("DEBUG: anvil_revert failed 1");
+                rpc_call(url, "evm_revert", params).await?
+            },
         };
         let ok = res.as_bool().unwrap_or(false);
         if !ok {
+            println!("DEBUG: anvil_revert failed 2");
             eyre::bail!(format!("Snapshot revert failed for id {snap}: {res}"));
         }
         Ok(())
@@ -2184,6 +2194,13 @@ mod tests {
     // from the local calldata-merkle frontier (without deploying contracts).
     #[tokio::test]
     async fn test_loop_tracking_reorg_detect_and_resync_indices() {
+
+        let _ = tracing_subscriber::fmt()
+        .with_test_writer() // makes it play nicely with tests
+        .try_init();
+
+        println!("DEBUG: anvil_test");
+
         // 1) Spin up anvil and build a provider bound to its first funded key
         let anvil = Anvil::new().try_spawn().unwrap();
         let net = "ETH1";
@@ -2271,6 +2288,7 @@ mod tests {
             .await
             .expect("snapshot should succeed");
 
+        println!("DEBUG: anvil_test starting loop_tracking_for_reorg_in_network");
         // 4) Start the reorg tracking loop in background
         let loop_handle = tokio::spawn(loop_tracking_for_reorg_in_network(
             net.to_string(),
@@ -2288,6 +2306,7 @@ mod tests {
                 .expect("failed to add blocks after snapshot");
         }
 
+        println!("DEBUG: anvil_test waiting for chain new tip ingestion");
         // Give it time to incorporate the new tip
         tokio::time::sleep(std::time::Duration::from_millis(1200)).await;
 
@@ -2356,6 +2375,7 @@ mod tests {
             provider.rb_indices.insert(enc, 7);
         }
 
+        println!("DEBUG: anvil_test reverting the chain");
         // 5) Revert to the snapshot (T0) and mine a different branch beyond T1
         anvil_revert(anvil.endpoint().as_str(), snapshot_id.as_str())
             .await
