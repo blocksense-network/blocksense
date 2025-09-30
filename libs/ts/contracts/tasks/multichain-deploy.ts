@@ -30,9 +30,13 @@ import { predictAddress } from './utils';
 import { initChain } from './deployment-utils/init-chain';
 import { setUpAccessControl } from './deployment-utils/access-control';
 import { deployContracts } from './deployment-utils/deploy-contracts';
-import { deployMultisig } from './deployment-utils/deploy-multisig';
+import {
+  deployMultisig,
+  predictMultisigAddress,
+} from './deployment-utils/deploy-multisig';
 import { registerCLAdapters } from './deployment-utils/register-cl-adapters';
 import { upgradeProxyImplementation } from './deployment-utils/upgrade-proxy-implementation';
+import { mineVanityAddress } from './mine-vanity-address';
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
@@ -81,8 +85,37 @@ task('deploy', 'Deploy contracts')
 
       const keccak256 = (str: string) => parseHexDataString(id(str));
 
+      const { safeAddress: adminMultisigAddress } =
+        await predictMultisigAddress({
+          config,
+          type: 'adminMultisig',
+        });
+
+      let upgradeableProxySalt = config.adfsUpgradeableProxySalt;
+      if (upgradeableProxySalt === id('upgradeableProxy')) {
+        while (true) {
+          const res = await mineVanityAddress({
+            config,
+            adminMultisigAddr: adminMultisigAddress,
+            artifacts,
+            prefix: 'ADF5aa',
+            maxRetries: 200,
+          });
+
+          if (
+            res &&
+            (await readline().question(
+              `\nConfirm ${res?.address} address for UpgradeableProxy with salt ${res?.salt}? (y/n) `,
+            )) === 'y'
+          ) {
+            upgradeableProxySalt = parseHexDataString(res!.salt);
+            break;
+          }
+        }
+      }
+
       const create2ContractSalts = {
-        upgradeableProxy: config.adfsUpgradeableProxySalt,
+        upgradeableProxy: upgradeableProxySalt,
         accessControl: keccak256('accessControl'),
         adfs: keccak256('aggregatedDataFeedStore'),
         safeGuard: keccak256('onlySafeGuard'),
@@ -149,9 +182,6 @@ task('deploy', 'Deploy contracts')
         config,
         type: 'adminMultisig',
       });
-      const adminMultisigAddress = parseEthereumAddress(
-        await adminMultisig.getAddress(),
-      );
 
       const accessControlAddress = await predictAddress(
         artifacts,
