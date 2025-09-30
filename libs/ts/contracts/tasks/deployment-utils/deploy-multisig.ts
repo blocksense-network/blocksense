@@ -8,13 +8,17 @@ import { hexlify, toUtf8Bytes } from 'ethers';
 import { NetworkConfig } from '../types';
 import { checkAddressExists } from '../utils';
 import { sendTx } from './send-tx';
+import { EthereumAddress, parseEthereumAddress } from '@blocksense/base-utils';
 
 type Params = {
   config: NetworkConfig;
   type: keyof Pick<NetworkConfig, 'adminMultisig' | 'reporterMultisig'>;
 };
 
-export async function deployMultisig({ config, type }: Params): Promise<Safe> {
+export async function predictMultisigAddress({
+  config,
+  type,
+}: Params): Promise<{ protocolKit: Safe; safeAddress: EthereumAddress }> {
   const safeVersion = '1.4.1';
 
   const signer = config.deployerIsLedger
@@ -55,6 +59,17 @@ export async function deployMultisig({ config, type }: Params): Promise<Safe> {
     customContracts: config.safeAddresses,
   });
 
+  return {
+    protocolKit,
+    safeAddress: parseEthereumAddress(safeAddress),
+  };
+}
+
+export async function deployMultisig({ config, type }: Params): Promise<Safe> {
+  const { protocolKit, safeAddress } = await predictMultisigAddress({
+    config,
+    type,
+  });
   console.log(`Predicted ${type} address: ${safeAddress}`);
 
   if (await checkAddressExists(config, safeAddress)) {
@@ -76,7 +91,7 @@ export async function deployMultisig({ config, type }: Params): Promise<Safe> {
 
   return protocolKit.connect({
     provider: config.rpc,
-    signer,
+    signer: config.deployerIsLedger ? undefined : config.deployer.privateKey,
     safeAddress,
     contractNetworks: {
       [config.network.chainId.toString()]: config.safeAddresses,
