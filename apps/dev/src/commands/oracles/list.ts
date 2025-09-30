@@ -8,6 +8,49 @@ import { renderTui, drawTable } from '@blocksense/base-utils/tty';
 import { rootDir } from '@blocksense/base-utils/env';
 import { selectDirectory } from '@blocksense/base-utils/fs';
 
+export const list = Command.make(
+  'list',
+  {
+    displayMode: Options.choice('display-mode', [
+      'table',
+      'markdown-list',
+    ]).pipe(Options.withDefault('table')),
+  },
+  ({ displayMode }) =>
+    Effect.gen(function* () {
+      return yield* Effect.gen(function* () {
+        const oracles = yield* getOraclesDirs();
+
+        if (oracles.length === 0) {
+          console.log('No oracles found.');
+          return;
+        }
+
+        const oraclesData = yield* Effect.forEach(oracles, oracleDir =>
+          parseOracleData(oracleDir),
+        );
+
+        if (displayMode === 'markdown-list') {
+          for (const o of oraclesData) {
+            console.log(`### ${o.name}`);
+            console.log(`- description: ${o.description ?? ''}`);
+            console.log(`- path ${o.path}`);
+            console.log('');
+          }
+          return;
+        }
+
+        const headers = ['Name', 'Description', 'Path'];
+        const rows = oraclesData.map(o => [o.name, o.description, o.path]);
+
+        renderTui(
+          drawTable(rows, {
+            headers,
+          }),
+        );
+      });
+    }),
+);
 export interface OracleMetadata {
   name: string;
   description: string;
@@ -92,47 +135,3 @@ function parseOracleData(
     } as OracleMetadata;
   });
 }
-
-export const list = Command.make(
-  'list',
-  {
-    displayMode: Options.choice('display-mode', [
-      'table',
-      'markdown-list',
-    ]).pipe(Options.withDefault('table')),
-  },
-  ({ displayMode }) =>
-    Effect.gen(function* () {
-      return yield* Effect.gen(function* () {
-        const oracles = yield* getOraclesDirs();
-
-        if (oracles.length === 0) {
-          console.log('No oracles found.');
-          return;
-        }
-
-        const oraclesData = yield* Effect.forEach(oracles, oracleDir =>
-          parseOracleData(oracleDir),
-        );
-
-        if (displayMode === 'markdown-list') {
-          for (const o of oraclesData) {
-            console.log(`### ${o.name}`);
-            console.log(`- description: ${o.description ?? ''}`);
-            console.log(`- path ${o.path}`);
-            console.log('');
-          }
-          return;
-        }
-
-        const headers = ['Name', 'Description', 'Path'];
-        const rows = oraclesData.map(o => [o.name, o.description, o.path]);
-
-        renderTui(
-          drawTable(rows, {
-            headers,
-          }),
-        );
-      });
-    }),
-);
