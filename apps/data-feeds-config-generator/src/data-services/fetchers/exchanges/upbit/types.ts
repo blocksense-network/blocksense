@@ -5,14 +5,14 @@ import { Schema as S } from 'effect';
  *
  * Ref: https://global-docs.upbit.com/docs/rest-api#1-market-information-and-ticker
  */
-const UpbitAssetInfoSchema = S.mutable(
+const _UpbitAssetInfoSchema = S.mutable(
   S.Struct({
     market: S.String,
     price: S.Number,
   }),
 );
 
-export type UpbitAssetInfo = typeof UpbitAssetInfoSchema.Type;
+export type UpbitAssetInfo = typeof _UpbitAssetInfoSchema.Type;
 
 /**
  * Schema for the market information received from Upbit.

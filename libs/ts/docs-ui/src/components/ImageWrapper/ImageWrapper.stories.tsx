@@ -1,4 +1,5 @@
-import { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react';
+
 import { ImageWrapper } from './ImageWrapper';
 
 const meta: Meta<typeof ImageWrapper> = {

@@ -1,19 +1,20 @@
 import React from 'react';
 
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../Card';
+
+import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
 } from './Carousel';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from '../Card';
 
 export default {
   title: 'Components/Carousel',
@@ -39,9 +40,9 @@ const cards = [
 ];
 
 const CarouselCard = ({
-  title,
-  description,
   content,
+  description,
+  title,
 }: {
   title: string;
   description: string;

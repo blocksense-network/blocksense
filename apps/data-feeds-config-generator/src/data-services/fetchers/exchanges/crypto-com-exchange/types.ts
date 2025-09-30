@@ -5,14 +5,14 @@ import { Schema as S } from 'effect';
  *
  * Ref: https://exchange-docs.crypto.com/exchange/v1/rest-ws/index.html#public-get-tickers
  */
-const CryptoComAssetInfoSchema = S.mutable(
+const _CryptoComAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
     price: S.Number,
   }),
 );
 
-export type CryptoComAssetInfo = typeof CryptoComAssetInfoSchema.Type;
+export type CryptoComAssetInfo = typeof _CryptoComAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from CryptoCom Exchange.

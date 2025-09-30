@@ -12,8 +12,8 @@ type NetworkIconProps = {
 };
 
 export const NetworkIcon = ({
-  network,
   isSelected,
+  network,
   onClick,
 }: NetworkIconProps) => {
   const iconPath = `/images/network-icons/${networkNameToIconName(network)}.png`;

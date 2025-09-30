@@ -3,8 +3,8 @@
 import { motion } from 'motion/react';
 import Image from 'next/image';
 
-import heroesGrid from '/public/images/heroes-grid.png';
 import aboutPirateFlag from '/public/images/about-pirate-flag.png';
+import heroesGrid from '/public/images/heroes-grid.png';
 
 export const About = () => {
   return (

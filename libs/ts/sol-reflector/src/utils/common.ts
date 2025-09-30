@@ -1,21 +1,22 @@
-import path from 'path';
 import { promises as fs } from 'fs';
+import path from 'path';
 
-import { VariableDeclaration } from 'solidity-ast';
-import { SolcOutput } from 'solidity-ast/solc';
+import type { VariableDeclaration } from 'solidity-ast';
+import type { SolcOutput } from 'solidity-ast/solc';
 
 import { selectDirectory } from '@blocksense/base-utils';
 
-import { Config, FullConfig, defaults } from '../config';
-import {
+import type { ArtifactsRecord } from '../abiCollector';
+import type { Config, FullConfig } from '../config';
+import { defaults } from '../config';
+import type {
   ContractDocItem,
   ContractElement,
-  OutputFormat,
   SolReflection,
   SourceUnitDocItem,
   TreeNode,
 } from '../types';
-import { ArtifactsRecord } from '../abiCollector';
+import { OutputFormat } from '../types';
 
 /**
  * Writes documentation files based on the provided content and configuration.
@@ -30,7 +31,7 @@ export async function writeDocFiles(
 ): Promise<void> {
   const config = { ...defaults, ...userConfig };
 
-  const tasks: Promise<void>[] = [];
+  const tasks: Array<Promise<void>> = [];
 
   if (
     config.format === OutputFormat.Raw ||
@@ -106,7 +107,7 @@ export async function writeArtifactFile(
   }
 
   const artifactsPath = await writeJSON({
-    name: name,
+    name,
     content: artifactsRecord,
   });
   console.info(`${name} artifacts collected in ${artifactsPath}`);
@@ -170,8 +171,8 @@ export type KeysOf<T> = Extract<keyof T, string>;
  * @param {T} obj - The object to get keys from.
  * @returns {KeysOf<T>[]} - An array of keys of the object.
  */
-export function keysOf<T extends {}>(obj: T): KeysOf<T>[] {
-  return Object.keys(obj) as KeysOf<T>[];
+export function keysOf<T extends {}>(obj: T): Array<KeysOf<T>> {
+  return Object.keys(obj) as Array<KeysOf<T>>;
 }
 
 /**
@@ -245,7 +246,7 @@ type SourceUnitContractElementTuple = {
 export function* iterateContractElements(
   solReflection: SolReflection,
 ): Generator<SourceUnitContractElementTuple> {
-  for (const { sourceUnit, contract } of iterateContracts(solReflection)) {
+  for (const { contract, sourceUnit } of iterateContracts(solReflection)) {
     const contractElements = [
       contract.functions,
       contract.errors,

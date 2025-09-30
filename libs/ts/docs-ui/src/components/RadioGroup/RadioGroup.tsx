@@ -1,15 +1,11 @@
 'use client';
 
-import React, {
-  createContext,
-  useContext,
-  HTMLAttributes,
-  FieldsetHTMLAttributes,
-} from 'react';
+import React, { createContext, useContext } from 'react';
+import type { FieldsetHTMLAttributes, HTMLAttributes } from 'react';
 
-import { cn } from '@blocksense/docs-ui/utils';
-import { Label } from '@blocksense/docs-ui/Label';
 import { Input } from '@blocksense/docs-ui/Input';
+import { Label } from '@blocksense/docs-ui/Label';
+import { cn } from '@blocksense/docs-ui/utils';
 
 type RadioGroupContextValue = {
   selectedValue: string;
@@ -28,11 +24,11 @@ type RadioGroupProps = FieldsetHTMLAttributes<HTMLFieldSetElement> & {
 };
 
 export const RadioGroup = ({
-  selectedValue,
-  name,
-  onValueChangeAction,
   children,
   className,
+  name,
+  onValueChangeAction,
+  selectedValue,
   ...props
 }: RadioGroupProps) => {
   return (
@@ -71,12 +67,12 @@ type RadioGroupItemProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 export const RadioGroupItem = ({
-  value,
   children,
   className,
+  value,
   ...props
 }: RadioGroupItemProps) => {
-  const { selectedValue, name, onValueChangeAction } =
+  const { name, onValueChangeAction, selectedValue } =
     useContext(RadioGroupContext);
 
   const isSelected = selectedValue === value;

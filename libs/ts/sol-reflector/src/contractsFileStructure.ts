@@ -1,16 +1,18 @@
 import path from 'path';
 
-import { Config, defaults } from './config';
-import { generateFileTree } from './utils/common';
-import { TreeNode } from './types';
 import { rootDir, selectDirectory } from '@blocksense/base-utils';
+
+import { generateFileTree } from './utils/common';
+import type { Config } from './config';
+import { defaults } from './config';
+import type { TreeNode } from './types';
 
 function constructFileTreeStructure(
   {
-    name,
     children,
     icon,
     id,
+    name,
   }: TreeNode<{ path?: string; icon?: 'folder' | 'solidity'; id?: number }>,
   idCounter: number = 0,
 ) {

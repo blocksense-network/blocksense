@@ -30,7 +30,7 @@ import type {
 import { ProcessCompose, Sequencer } from '../../utils/types';
 
 import { expectedPCStatuses03 } from './expected-service-status';
-import { parseProcessesStatus,rgSearchPattern } from './helpers';
+import { parseProcessesStatus, rgSearchPattern } from './helpers';
 
 describe.sequential('E2E Tests with process-compose', () => {
   const network = 'ink_sepolia';

@@ -4,7 +4,6 @@ import {
   HttpClientRequest,
   HttpClientResponse,
 } from '@effect/platform';
-import { Effect, Layer, Schema as S } from 'effect';
 import {
   afterEach,
   beforeEach,
@@ -13,8 +12,10 @@ import {
   it,
   vi,
 } from '@effect/vitest';
-import { fetchAndDecodeJSON, fetchAndDecodeJSONEffect } from './http';
+import { Effect, Layer, Schema as S } from 'effect';
 import { ParseError } from 'effect/ParseResult';
+
+import { fetchAndDecodeJSON, fetchAndDecodeJSONEffect } from './http';
 
 describe('fetchAndDecodeJSON', () => {
   beforeEach(() => {

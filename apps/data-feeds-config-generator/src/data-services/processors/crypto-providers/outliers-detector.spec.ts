@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+
 import { detectPriceOutliers } from './outliers-detector';
 
 describe('`data-providers.ts` tests', () => {
@@ -13,7 +14,7 @@ describe('`data-providers.ts` tests', () => {
   });
 
   test('should return an empty array when no exchange has >10% price difference', () => {
-    const input: Record<string, number>[] = [
+    const input: Array<Record<string, number>> = [
       { Binance: 0.19244 },
       { BinanceUS: 0.19246 },
       { Bitget: 0.1924 },
@@ -32,7 +33,10 @@ describe('`data-providers.ts` tests', () => {
   });
 
   test('should return an empty array for an edge case with exactly 10% difference', () => {
-    const input: Record<string, number>[] = [{ Binance: 1 }, { Bitget: 1.1 }];
+    const input: Array<Record<string, number>> = [
+      { Binance: 1 },
+      { Bitget: 1.1 },
+    ];
     const expectedResult: string[] = [];
     const result = detectPriceOutliers(input, onOutlierCb);
     expect(result).toEqual(expectedResult);
@@ -40,7 +44,7 @@ describe('`data-providers.ts` tests', () => {
   });
 
   test('should return an empty array when price difference is slightly below 10%', () => {
-    const input: Record<string, number>[] = [
+    const input: Array<Record<string, number>> = [
       { Binance: 30000 },
       { Bitget: 32999 },
       { Bybit: 31000 },
@@ -52,7 +56,7 @@ describe('`data-providers.ts` tests', () => {
   });
 
   test('should handle floating-point precision issues near 10% threshold', () => {
-    const input: Record<string, number>[] = [
+    const input: Array<Record<string, number>> = [
       { Binance: 30000 },
       { Bitget: 33000.0000001 },
       { Bybit: 31000 },
@@ -64,7 +68,7 @@ describe('`data-providers.ts` tests', () => {
   });
 
   test('should return an array with one outliner', () => {
-    const input: Record<string, number>[] = [
+    const input: Array<Record<string, number>> = [
       { Binance: 0 },
       { Bitget: 0.01014 },
       { Bybit: 0.01009 },
@@ -80,7 +84,7 @@ describe('`data-providers.ts` tests', () => {
   });
 
   test('should return an array with two outliners', () => {
-    const input: Record<string, number>[] = [
+    const input: Array<Record<string, number>> = [
       { Binance: 0 },
       { BinanceUS: 0.01154 },
       { Bitget: 0.01014 },
@@ -96,7 +100,7 @@ describe('`data-providers.ts` tests', () => {
   });
 
   test('should return an empty array when no exchanges are listed for an asset', () => {
-    const input: Record<string, number>[] = [];
+    const input: Array<Record<string, number>> = [];
 
     const expectedResult: string[] = [];
     const result = detectPriceOutliers(input, onOutlierCb);
@@ -105,7 +109,7 @@ describe('`data-providers.ts` tests', () => {
   });
 
   test('should return an empty array when all exchanges have the same price', () => {
-    const input: Record<string, number>[] = [
+    const input: Array<Record<string, number>> = [
       { Binance: 2000 },
       { Bitget: 2000 },
       { Bybit: 2000 },
@@ -118,7 +122,7 @@ describe('`data-providers.ts` tests', () => {
   });
 
   test('should return an empty array when an asset has only one exchange', () => {
-    const input: Record<string, number>[] = [{ Binance: 30000 }];
+    const input: Array<Record<string, number>> = [{ Binance: 30000 }];
     const expectedResult: string[] = [];
     const result = detectPriceOutliers(input, onOutlierCb);
     expect(result).toEqual(expectedResult);
@@ -126,7 +130,7 @@ describe('`data-providers.ts` tests', () => {
   });
 
   test('should return array with all exchanges when all exchanges have a price of 0', () => {
-    const input: Record<string, number>[] = [
+    const input: Array<Record<string, number>> = [
       { Binance: 0 },
       { Bitget: 0 },
       { Bybit: 0 },
@@ -138,7 +142,7 @@ describe('`data-providers.ts` tests', () => {
   });
 
   test('should detect outlier with extremely large price differences', () => {
-    const input: Record<string, number>[] = [
+    const input: Array<Record<string, number>> = [
       { Binance: 30000 },
       { Bitget: 330000 },
       { Bybit: 31000 },
@@ -150,7 +154,7 @@ describe('`data-providers.ts` tests', () => {
   });
 
   test('should handle negative prices and detect outliers', () => {
-    const input: Record<string, number>[] = [
+    const input: Array<Record<string, number>> = [
       { Binance: -30000 },
       { Bitget: -33000 },
       { Bybit: -31000 },
@@ -162,7 +166,7 @@ describe('`data-providers.ts` tests', () => {
   });
 
   test('should handle mixed positive and negative prices and detect outliers', () => {
-    const input: Record<string, number>[] = [
+    const input: Array<Record<string, number>> = [
       { Binance: 30000 },
       { Bitget: -33000 },
       { Bybit: 31000 },

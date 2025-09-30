@@ -1,12 +1,9 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { ExchangeAssetsFetcher, AssetInfo } from '../exchange-assets';
-import {
-  UpbitAssetInfo,
-  UpbitMarketResp,
-  UpbitMarketRespSchema,
-  UpbitPrice,
-  UpbitPriceSchema,
-} from './types';
+
+import type { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
+
+import type { UpbitAssetInfo, UpbitMarketResp, UpbitPrice } from './types';
+import { UpbitMarketRespSchema, UpbitPriceSchema } from './types';
 
 /**
  * Class to fetch assets information from Upbit.
@@ -14,7 +11,7 @@ import {
 export class UpbitAssetsFetcher
   implements ExchangeAssetsFetcher<UpbitAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<UpbitAssetInfo>[]> {
+  async fetchAssets(): Promise<Array<AssetInfo<UpbitAssetInfo>>> {
     const assets = await fetchUpbitSymbolsInfo();
     const prices = await fetchUpbitPricesInfo(
       assets.map(asset => asset.market),

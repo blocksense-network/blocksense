@@ -1,6 +1,7 @@
 'use client';
 
-import React, { ReactNode } from 'react';
+import React from 'react';
+import type { ReactNode } from 'react';
 
 import { cn } from '@blocksense/docs-ui/utils';
 
@@ -25,9 +26,9 @@ type BadgeProps = {
 };
 
 export const Badge = ({
+  children,
   className,
   variant = 'primary',
-  children,
   ...props
 }: BadgeProps) => {
   const baseClasses =

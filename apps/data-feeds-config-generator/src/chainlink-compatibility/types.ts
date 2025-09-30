@@ -1,4 +1,4 @@
-import { Schema as S, ParseResult, BigInt as EFBigInt } from 'effect';
+import { BigInt as EFBigInt, ParseResult, Schema as S } from 'effect';
 
 import { ethereumAddress } from '@blocksense/base-utils/evm';
 

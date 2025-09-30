@@ -1,6 +1,8 @@
 import { HttpApiSchema } from '@effect/platform';
 import { Schema as S } from 'effect';
-import { RetweetCheckPayload, TweetsResponseSchema } from './types';
+
+import type { RetweetCheckPayload } from './types';
+import { TweetsResponseSchema } from './types';
 
 export class TooManyRequests extends HttpApiSchema.EmptyError<TooManyRequests>()(
   {
@@ -42,7 +44,7 @@ export async function checkCodeRetweet(
   tweetId: string,
   socialDataApiKey: string,
 ) {
-  const { userId, retweetCode } = payload;
+  const { retweetCode, userId } = payload;
   const xUserRetweetsResponse = await fetchAndDecodeJSON(
     TweetsResponseSchema,
     `https://api.socialdata.tools/twitter/user/${userId}/tweets`,

@@ -1,20 +1,20 @@
+import client from 'prom-client';
 import Web3 from 'web3';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { color as c } from '@blocksense/base-utils/tty';
-import client from 'prom-client';
 
+import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
+import type { EthereumAddress } from '@blocksense/base-utils/evm';
 import {
   getNetworkNameByChainId,
   getOptionalRpcUrl,
+  isChainId,
+  isTestnet,
   networkMetadata,
   parseEthereumAddress,
-  isChainId,
   parseNetworkName,
-  isTestnet,
-  EthereumAddress,
 } from '@blocksense/base-utils/evm';
-import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
+import { color as c } from '@blocksense/base-utils/tty';
 
 import { deployedMainnets, deployedTestnets } from '../types';
 import { startPrometheusServer } from '../utils';

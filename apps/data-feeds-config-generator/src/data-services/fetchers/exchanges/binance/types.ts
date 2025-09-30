@@ -4,14 +4,14 @@ import { Schema as S } from 'effect';
  * Schema for the data relevant to a Binance oracle.
  * Ref: https://developers.binance.com/docs/binance-spot-api-docs/rest-api/market-data-endpoints#symbol-price-ticker
  */
-const BinanceAssetInfoSchema = S.mutable(
+const _BinanceAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
     price: S.Number,
   }),
 );
 
-export type BinanceAssetInfo = typeof BinanceAssetInfoSchema.Type;
+export type BinanceAssetInfo = typeof _BinanceAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about symbols received from Binance.

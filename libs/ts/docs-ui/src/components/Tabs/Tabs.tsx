@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import type { ReactNode } from 'react';
 
 import { cn } from '@blocksense/docs-ui/utils';
 
@@ -32,8 +32,8 @@ export const Tabs = ({
 };
 
 export const TabsList = ({
-  className,
   children,
+  className,
 }: {
   className?: string;
   children: ReactNode;
@@ -49,9 +49,9 @@ export const TabsList = ({
 );
 
 export const TabsTrigger = ({
+  children,
   className,
   value,
-  children,
 }: {
   className?: string;
   value: string;
@@ -76,9 +76,9 @@ export const TabsTrigger = ({
 };
 
 export const TabsContent = ({
+  children,
   className,
   value,
-  children,
 }: {
   className?: string;
   value: string;

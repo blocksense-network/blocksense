@@ -5,22 +5,23 @@ import { Input } from '@blocksense/docs-ui/Input';
 import { RadioGroup, RadioGroupItem } from '@blocksense/docs-ui/RadioGroup';
 
 import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogClose,
-  DialogFooter,
-} from './Dialog';
-import {
   DropdownMenu,
-  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuCheckboxItem,
+  DropdownMenuTrigger,
 } from '../DropdownMenu';
+
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from './Dialog';
 
 export default {
   title: 'Components/Dialog',

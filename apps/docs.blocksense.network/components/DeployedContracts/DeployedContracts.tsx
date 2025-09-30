@@ -2,27 +2,23 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { entriesOf, keysOf } from '@blocksense/base-utils/array-iter';
+import type { NetworkName } from '@blocksense/base-utils/evm/networks';
+import { isNetworkName } from '@blocksense/base-utils/evm/networks';
+import type { DeploymentConfigV2 } from '@blocksense/config-types';
 import { Callout } from '@blocksense/docs-ui/Callout';
-import {
-  NetworkName,
-  isNetworkName,
-} from '@blocksense/base-utils/evm/networks';
-
-import { capitalizeWords } from '@/src/utils';
 import { DataTable } from '@/components/common/DataTable/DataTable';
-import { ContractItemWrapper } from '@/components/sol-contracts/ContractItemWrapper';
 import { CoreContractCard } from '@/components/DeployedContracts/CoreContractCard';
 import { NetworkIcon } from '@/components/DeployedContracts/NetworkIcon';
-import { dataFeedUrl } from '@/src/constants';
+import { ContractItemWrapper } from '@/components/sol-contracts/ContractItemWrapper';
 import { useHash } from '@/hooks/useHash';
-import {
-  cellHaveContent,
-  DataRowType,
-} from '../common/DataTable/dataTableUtils';
-import { DeploymentConfigV2 } from '@blocksense/config-types';
-import { entriesOf, keysOf } from '@blocksense/base-utils/array-iter';
+import { dataFeedUrl } from '@/src/constants';
+import { capitalizeWords } from '@/src/utils';
+
 import { DataTableBadge } from '../common/DataTable/DataTableBadge';
 import { DataTableColumnHeader } from '../common/DataTable/DataTableColumnHeader';
+import type { DataRowType } from '../common/DataTable/dataTableUtils';
+import { cellHaveContent } from '../common/DataTable/dataTableUtils';
 import { ContractAddress } from '../sol-contracts/ContractAddress';
 
 type DeployedContractsProps = {
@@ -31,8 +27,8 @@ type DeployedContractsProps = {
 };
 
 export const DeployedContracts = ({
-  networks,
   deploymentInfo,
+  networks,
 }: DeployedContractsProps) => {
   const [selectedNetwork, setSelectedNet] = useState<NetworkName | null>(null);
   const contractsRef = useRef<HTMLDivElement | null>(null);
