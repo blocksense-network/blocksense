@@ -1,7 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import * as prettier from 'prettier';
 
-import { AbiCoder, formatEther, id, ZeroAddress } from 'ethers';
+import { AbiCoder, formatEther, id } from 'ethers';
 import { task } from 'hardhat/config';
 
 import type Safe from '@safe-global/protocol-kit';
@@ -14,7 +14,6 @@ import {
   isNetworkName,
   NetworkName,
   parseChainId,
-  parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
 import { padNumber } from '@blocksense/base-utils/string';
 import { readline } from '@blocksense/base-utils/tty';
@@ -165,10 +164,127 @@ task('deploy', 'Deploy contracts')
           printFeed(i);
         }
       }
+
+      const accessControlAddress = predictAddress(
+        artifacts,
+        config,
+        ContractNames.AccessControl,
+        create2ContractSalts.accessControl,
+        abiCoder.encode(['address'], [adminMultisigAddress]),
+      );
+      const upgradeableProxyAddress = predictAddress(
+        artifacts,
+        config,
+        ContractNames.UpgradeableProxyADFS,
+        create2ContractSalts.upgradeableProxy,
+        abiCoder.encode(['address'], [adminMultisigAddress]),
+      );
+
+      const { safeAddress: reporterMultisigAddress } =
+        await predictMultisigAddress({
+          config,
+          type: 'reporterMultisig',
+        });
+
+      const contracts: DeployContract[] = [
+        ...(config.deployWithReporterMultisig
+          ? ([
+              {
+                name: ContractNames.OnlySequencerGuard,
+                argsTypes: ['address', 'address', 'address'],
+                argsValues: [
+                  reporterMultisigAddress,
+                  adminMultisigAddress,
+                  upgradeableProxyAddress,
+                ],
+                salt: create2ContractSalts.safeGuard,
+                value: 0n,
+              },
+              {
+                name: ContractNames.AdminExecutorModule,
+                argsTypes: ['address', 'address'],
+                argsValues: [reporterMultisigAddress, adminMultisigAddress],
+                salt: parseHexDataString(create2ContractSalts.safeModule),
+                value: 0n,
+              },
+            ] as DeployContract[])
+          : []),
+        ...([
+          {
+            name: ContractNames.AccessControl,
+            argsTypes: ['address'],
+            argsValues: [adminMultisigAddress],
+            salt: create2ContractSalts.accessControl,
+            value: 0n,
+          },
+          {
+            name: ContractNames.ADFS,
+            argsTypes: ['address'],
+            argsValues: [accessControlAddress],
+            salt: create2ContractSalts.adfs,
+            value: 0n,
+          },
+          {
+            name: ContractNames.UpgradeableProxyADFS,
+            argsTypes: ['address'],
+            argsValues: [adminMultisigAddress],
+            salt: create2ContractSalts.upgradeableProxy,
+            value: 0n,
+          },
+          {
+            name: ContractNames.CLFeedRegistryAdapter,
+            argsTypes: ['address', 'address'],
+            argsValues: [adminMultisigAddress, upgradeableProxyAddress],
+            salt: create2ContractSalts.clFeedRegistry,
+            value: 0n,
+          },
+          ...dataFeedConfig.map(data => {
+            const { base, quote } = getCLRegistryPair(data.id);
+            return {
+              name: ContractNames.CLAggregatorAdapter as const,
+              argsTypes: ['string', 'uint8', 'uint256', 'address'],
+              argsValues: [
+                data.full_name,
+                data.additional_feed_info.decimals,
+                data.id,
+                upgradeableProxyAddress,
+              ],
+              salt: create2ContractSalts.clAggregatorProxy,
+              value: 0n,
+              feedRegistryInfo: {
+                feedId: data.id,
+                description: `${data.full_name} (${data.id})`,
+                base,
+                quote,
+              },
+            } satisfies DeployContract;
+          }),
+        ] as DeployContract[]),
+      ];
+
       console.log(`// `);
-      console.log(`// CREATE2 salts:`);
-      for (const [name, salt] of Object.entries(create2ContractSalts)) {
-        console.log(`//   | ${name.padStart(17)}| ${salt}`);
+      console.log(`// Predicted contract addresses:`);
+      console.log(
+        `//   | ${'AdminMultisig'.padStart(25)}| ${adminMultisigAddress}`,
+      );
+      if (config.deployWithReporterMultisig) {
+        console.log(
+          `//   | ${'ReporterMultisig'.padStart(25)}| ${reporterMultisigAddress}`,
+        );
+      }
+      for (const contract of contracts) {
+        if (contract.name === ContractNames.CLAggregatorAdapter) {
+          continue;
+        }
+        console.log(
+          `//   | ${contract.name.padStart(25)}| ${predictAddress(
+            artifacts,
+            config,
+            contract.name,
+            contract.salt,
+            abiCoder.encode(contract.argsTypes, contract.argsValues),
+          )}`,
+        );
       }
 
       if ((await readline().question('\nConfirm deployment? (y/n) ')) !== 'y') {
@@ -182,105 +298,12 @@ task('deploy', 'Deploy contracts')
         config,
         type: 'adminMultisig',
       });
-
-      const accessControlAddress = await predictAddress(
-        artifacts,
-        config,
-        ContractNames.AccessControl,
-        create2ContractSalts.accessControl,
-        abiCoder.encode(['address'], [adminMultisigAddress]),
-      );
-      const upgradeableProxyAddress = await predictAddress(
-        artifacts,
-        config,
-        ContractNames.UpgradeableProxyADFS,
-        create2ContractSalts.upgradeableProxy,
-        abiCoder.encode(['address'], [adminMultisigAddress]),
-      );
-
-      const contracts: DeployContract[] = [
-        {
-          name: ContractNames.AccessControl,
-          argsTypes: ['address'],
-          argsValues: [adminMultisigAddress],
-          salt: create2ContractSalts.accessControl,
-          value: 0n,
-        },
-        {
-          name: ContractNames.ADFS,
-          argsTypes: ['address'],
-          argsValues: [accessControlAddress],
-          salt: create2ContractSalts.adfs,
-          value: 0n,
-        },
-        {
-          name: ContractNames.UpgradeableProxyADFS,
-          argsTypes: ['address'],
-          argsValues: [adminMultisigAddress],
-          salt: create2ContractSalts.upgradeableProxy,
-          value: 0n,
-        },
-        {
-          name: ContractNames.CLFeedRegistryAdapter,
-          argsTypes: ['address', 'address'],
-          argsValues: [adminMultisigAddress, upgradeableProxyAddress],
-          salt: create2ContractSalts.clFeedRegistry,
-          value: 0n,
-        },
-        ...dataFeedConfig.map(data => {
-          const { base, quote } = getCLRegistryPair(data.id);
-          return {
-            name: ContractNames.CLAggregatorAdapter as const,
-            argsTypes: ['string', 'uint8', 'uint256', 'address'],
-            argsValues: [
-              data.full_name,
-              data.additional_feed_info.decimals,
-              data.id,
-              upgradeableProxyAddress,
-            ],
-            salt: create2ContractSalts.clAggregatorProxy,
-            value: 0n,
-            feedRegistryInfo: {
-              feedId: data.id,
-              description: `${data.full_name} (${data.id})`,
-              base,
-              quote,
-            },
-          } satisfies DeployContract;
-        }),
-      ];
-
-      let reporterMultisig: Safe | undefined;
-      let reporterMultisigAddress = parseEthereumAddress(ZeroAddress);
-
-      if (config.deployWithReporterMultisig) {
-        reporterMultisig = await deployMultisig({
-          config,
-          type: 'reporterMultisig',
-        });
-        reporterMultisigAddress = parseEthereumAddress(
-          await reporterMultisig!.getAddress(),
-        );
-
-        contracts.unshift({
-          name: ContractNames.AdminExecutorModule,
-          argsTypes: ['address', 'address'],
-          argsValues: [reporterMultisigAddress, adminMultisigAddress],
-          salt: parseHexDataString(create2ContractSalts.safeModule),
-          value: 0n,
-        });
-        contracts.unshift({
-          name: ContractNames.OnlySequencerGuard,
-          argsTypes: ['address', 'address', 'address'],
-          argsValues: [
-            reporterMultisigAddress,
-            adminMultisigAddress,
-            upgradeableProxyAddress,
-          ],
-          salt: create2ContractSalts.safeGuard,
-          value: 0n,
-        });
-      }
+      let reporterMultisig: Safe | undefined = config.deployWithReporterMultisig
+        ? await deployMultisig({
+            config,
+            type: 'reporterMultisig',
+          })
+        : undefined;
 
       const deployData = await deployContracts({
         config,
@@ -296,10 +319,9 @@ task('deploy', 'Deploy contracts')
           ...deployData,
           safe: {
             AdminMultisig: adminMultisigAddress,
-            ReporterMultisig:
-              reporterMultisigAddress === ZeroAddress
-                ? null
-                : reporterMultisigAddress,
+            ReporterMultisig: config.deployWithReporterMultisig
+              ? reporterMultisigAddress
+              : null,
             AdminExecutorModule: deployData.safe.AdminExecutorModule,
             OnlySequencerGuard: deployData.safe.OnlySequencerGuard,
           },
