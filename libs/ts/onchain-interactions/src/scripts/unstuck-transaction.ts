@@ -92,7 +92,7 @@ async function replaceTransaction(
 
   console.log(c`{magenta Transaction data:}`, txData);
 
-  while (multiplier <= 4) {
+  while (multiplier <= 10) {
     try {
       const signedTx = await web3.eth.accounts.signTransaction(
         txData,
@@ -114,8 +114,8 @@ async function replaceTransaction(
         );
       }
 
-      multiplier += 0.2;
-      if (multiplier > 4) {
+      multiplier += 0.3;
+      if (multiplier > 10) {
         console.error(c`{red Maximum multiplier reached, aborting.}`);
         break;
       }
