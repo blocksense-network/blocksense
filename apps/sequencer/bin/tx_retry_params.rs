@@ -4,8 +4,9 @@ use std::sync::Arc;
 
 use alloy::hex::FromHex;
 use alloy::network::TransactionBuilder;
-use alloy::primitives::{Address, Bytes};
+use alloy::primitives::{Address, Bytes, TxHash};
 use alloy::providers::Provider;
+use alloy::rpc::types::TransactionReceipt;
 use alloy::rpc::types::TransactionRequest;
 use alloy::signers::local::PrivateKeySigner;
 use anyhow::{anyhow, Context, Result};
@@ -94,172 +95,8 @@ async fn main() -> Result<()> {
         .expect("invalid destination address literal");
 
     let input = Bytes::from_hex(
-        "0x0100000000d1ad41e700000001000303400201200000000000000000000000000000000000000000015a2138000001998664b15001010001000000000000000000000000000000000000000200000000000100000000"
+        "0x0100000000d1b82ab900000001000303400201200000000000000000000000000000000000000000015a2138000001998664b15001010001000000000000000000000000000000000000000200000000000100000000"
     ).expect("Wrong hex data");
-
-    // 1) to, from, data
-    {
-        let mut tx_request = TransactionRequest::default()
-            .to(to_address)
-            .with_from(signer.address())
-            .input(Some(input.clone()).into());
-
-        tx_request.set_input_and_data();
-
-        println!("1) to, from, data: {tx_request:?}");
-        let gas_limit = get_gas_limit(
-            DEFAULT_NETWORK_NAME,
-            &rpc_provider.provider,
-            &tx_request,
-            provider_config.transaction_retry_timeout_secs as u64,
-            provider_config.transaction_gas_limit,
-        )
-        .await;
-        println!("1) Estimated gas limit: {}", gas_limit);
-
-        // let tx_result = rpc_provider.provider.send_transaction(tx_request).await;
-
-        // println!("1) tx_result = {tx_result:?}");
-
-        // match tx_result {
-        //     Ok(tx) => {
-        //         let tx_receipt_result = tx.get_receipt().await;
-        //         println!("1) tx_receipt_result = {tx_receipt_result:?}");
-        //         match tx_receipt_result {
-        //             Ok(tx_receipt) => {
-        //                 println!("1) tx_receipt = {tx_receipt:?}");
-        //             },
-        //             Err(e) => {
-        //                 println!("1) error in receipt: {e:?}");
-        //             },
-        //         }
-        //     },
-        //     Err(e) => {
-        //         println!("1) Error sending transaction: {e:?}");
-        //     },
-        // }
-    }
-
-    // 2) to, from, data, nonce
-    {
-        let nonce = match get_nonce(
-            DEFAULT_NETWORK_NAME,
-            &rpc_provider.provider,
-            &signer.address(),
-            10000, //This is only used for logging
-            300,
-            false,
-        )
-        .await
-        {
-            Ok(n) => n,
-            Err(e) => {
-                panic!("Could not get nonce! {e}");
-            }
-        };
-
-        let mut tx_request = TransactionRequest::default()
-            .to(to_address)
-            .with_nonce(nonce)
-            .with_from(signer.address())
-            .input(Some(input.clone()).into());
-
-        tx_request.set_input_and_data();
-
-        println!("2) to, from, data, nonce: {tx_request:?}");
-        let gas_limit = get_gas_limit(
-            DEFAULT_NETWORK_NAME,
-            &rpc_provider.provider,
-            &tx_request,
-            provider_config.transaction_retry_timeout_secs as u64,
-            provider_config.transaction_gas_limit,
-        )
-        .await;
-        println!("2) Estimated gas limit: {}", gas_limit);
-
-        // let tx_result = rpc_provider.provider.send_transaction(tx_request).await;
-
-        // println!("2) tx_result = {tx_result:?}");
-
-        // match tx_result {
-        //     Ok(tx) => {
-        //         let tx_receipt_result = tx.get_receipt().await;
-        //         println!("2) tx_receipt_result = {tx_receipt_result:?}");
-        //         match tx_receipt_result {
-        //             Ok(tx_receipt) => {
-        //                 println!("2) tx_receipt = {tx_receipt:?}");
-        //             },
-        //             Err(e) => {
-        //                 println!("2) error in receipt: {e:?}");
-        //             },
-        //         }
-        //     },
-        //     Err(e) => {
-        //         println!("2) Error sending transaction: {e:?}");
-        //     },
-        // }
-    }
-
-    // 3) to, from, data, chain_id
-    {
-        let chain_id = match get_chain_id(
-            DEFAULT_NETWORK_NAME,
-            &rpc_provider,
-            &BatchedAggregatesToSend::default(),
-            300,
-        )
-        .await
-        {
-            Ok(v) => {
-                println!("Successfully got value in network block height for chain_id");
-                v
-            }
-            Err(err) => {
-                panic!("get_chain_id error {err} in network ");
-            }
-        };
-
-        let mut tx_request = TransactionRequest::default()
-            .to(to_address)
-            .with_from(signer.address())
-            .with_chain_id(chain_id)
-            .input(Some(input.clone()).into());
-
-        tx_request.set_input_and_data();
-
-        println!("3) to, from, data, chain_id: {tx_request:?}");
-        let gas_limit = get_gas_limit(
-            DEFAULT_NETWORK_NAME,
-            &rpc_provider.provider,
-            &tx_request,
-            provider_config.transaction_retry_timeout_secs as u64,
-            provider_config.transaction_gas_limit,
-        )
-        .await;
-        println!("3) Estimated gas limit: {}", gas_limit);
-
-        //     let tx_result = rpc_provider.provider.send_transaction(tx_request).await;
-
-        //     println!("3) tx_result = {tx_result:?}");
-
-        //     match tx_result {
-        //         Ok(tx) => {
-        //             let tx_receipt_result = tx.get_receipt().await;
-        //             println!("3) tx_receipt_result = {tx_receipt_result:?}");
-        //             match tx_receipt_result {
-        //                 Ok(tx_receipt) => {
-        //                     println!("3) tx_receipt = {tx_receipt:?}");
-        //                 },
-        //                 Err(e) => {
-        //                     println!("3) error in receipt: {e:?}");
-        //                 },
-        //             }
-        //         },
-        //         Err(e) => {
-        //             println!("3) Error sending transaction: {e:?}");
-        //         },
-        //     }
-    }
 
     // 4) to, from, data, nonce, chain_id
     {
@@ -316,7 +153,7 @@ async fn main() -> Result<()> {
         .await;
         println!("4) Estimated gas limit: {}", gas_limit);
 
-        tx_request.set_gas_limit(2 * gas_limit);
+        tx_request.set_gas_limit(gas_limit);
 
         let gas_fees = get_tx_retry_params(
             DEFAULT_NETWORK_NAME,
@@ -343,53 +180,56 @@ async fn main() -> Result<()> {
             }
         }
 
-        let tx_result = rpc_provider.provider.send_transaction(tx_request).await;
+        println!("tx_request = {tx_request:?}");
 
-        println!("4) tx_result = {tx_result:?}");
+        // let tx_result = rpc_provider.provider.send_transaction(tx_request).await;
+        let tx_hash: TxHash = "0x84ae26d7a64c10d6b9f6708c98d99dde1b41f93ef2b6c62394845456b5db098e"
+            .parse()
+            .expect("invalid tx hash literal");
 
-        match tx_result {
-            Ok(tx) => {
-                let tx_receipt_result = tx.get_receipt().await;
-                println!("4) tx_receipt_result = {tx_receipt_result:?}");
-                match tx_receipt_result {
-                    Ok(tx_receipt) => {
-                        println!("4) tx_receipt = {tx_receipt:?}");
-                    }
-                    Err(e) => {
-                        println!("4) error in receipt: {e:?}");
-                    }
-                }
+        let tx_result: Option<serde_json::Value> = rpc_provider
+            .provider.raw_request("eth_getTransactionReceipt".into(), (tx_hash,))
+            .await?;
+
+        match get_receipt_with_default_type(tx_result) {
+            Ok(Some(receipt)) => {
+                println!("4) tx_receipt = {receipt:?}");
+            }
+            Ok(None) => {
+                println!("4) No receipt found for transaction hash: {tx_hash}");
             }
             Err(e) => {
-                println!("4) Error sending transaction: {e:?}");
+                println!("4) Error parsing receipt: {e:?}");
             }
-        }
-    }
-
-    let gas_fees = get_tx_retry_params(
-        DEFAULT_NETWORK_NAME,
-        &rpc_provider.provider,
-        &rpc_provider.provider_metrics,
-        &signer.address(),
-        provider_config.transaction_retry_timeout_secs as u64,
-        0,
-        provider_config.retry_fee_increment_fraction,
-    )
-    .await
-    .map_err(|err| anyhow!(err.to_string()))?;
-
-    match gas_fees {
-        GasFees::Legacy(gas_price) => {
-            println!("Legacy gas price (wei): {}", gas_price.gas_price);
-        }
-        GasFees::Eip1559(gas_fees) => {
-            println!(
-                "EIP-1559 max fee per gas (wei): {}",
-                gas_fees.max_fee_per_gas
-            );
-            println!("EIP-1559 priority fee (wei): {}", gas_fees.priority_fee);
         }
     }
 
     Ok(())
+}
+
+
+fn get_receipt_with_default_type(
+    receipt_json: Option<serde_json::Value>,
+) -> Result<Option<TransactionReceipt>, Box<dyn std::error::Error>> {
+    match receipt_json {
+        None => Ok(None),
+        Some(mut value) => {
+            // We expect the receipt to be a JSON object; if it’s not, return an error.
+            let obj = value
+                .as_object_mut()
+                .ok_or_else(|| "receipt JSON is not an object")?;
+
+            // If the "type" key is missing, insert a legacy type ("0x0").
+            if !obj.contains_key("type") {
+                // You can also insert 0_u64 or "0x0" depending on what your RPC expects.
+                obj.insert("type".into(), serde_json::Value::String("0x0".into()));
+            }
+
+            // Now attempt to deserialize into a TransactionReceipt.  Unknown fields
+            // are ignored by serde as long as the struct doesn’t use `#[serde(deny_unknown_fields)]`.
+            let receipt: TransactionReceipt = serde_json::from_value(serde_json::Value::Object(obj.clone()))?;
+
+            Ok(Some(receipt))
+        }
+    }
 }
