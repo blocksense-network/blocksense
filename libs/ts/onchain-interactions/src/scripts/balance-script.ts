@@ -36,7 +36,7 @@ const main = async (): Promise<void> => {
     })
     .option('network', {
       alias: 'n',
-      describe: 'Use only this network from the deployed list',
+      describe: 'Fetch balance only for this network',
       type: 'string',
       default: '',
     })
