@@ -620,19 +620,31 @@ pub async fn eth_batch_send_to_contract(
 
                     match actix_web::rt::time::timeout(
                         Duration::from_secs(transaction_retry_timeout_secs),
-                        rpc_handle.get_transaction_receipt(tx_hash),
+                        rpc_handle.raw_request("eth_getTransactionReceipt".into(), (tx_hash,)),
                     )
                     .await
                     {
                         Ok(v) => match v {
-                            Ok(v) => match v {
-                                Some(v) => {
+                            Ok(v) => match get_receipt_with_default_type(v) {
+                                Ok(Some(v)) => {
                                     debug!("Successfully got receipt from RPC in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash} receipt = {v:?}");
                                     inc_metric!(provider_metrics, net, success_get_receipt);
                                     v
                                 }
-                                None => {
+                                Ok(None) => {
                                     warn!("Get tx_receipt returned None in network `{net}` block height {block_height}");
+                                    inc_metric!(provider_metrics, net, failed_get_receipt);
+                                    inc_retries_with_backoff(
+                                        net.as_str(),
+                                        &mut transaction_retries_count,
+                                        provider_metrics,
+                                        BACKOFF_SECS,
+                                    )
+                                    .await;
+                                    continue;
+                                }
+                                Err(e) => {
+                                    warn!("Get tx_receipt returned Error: {e:?} in network `{net}` block height {block_height}");
                                     inc_metric!(provider_metrics, net, failed_get_receipt);
                                     inc_retries_with_backoff(
                                         net.as_str(),
@@ -699,6 +711,32 @@ pub async fn eth_batch_send_to_contract(
     debug!("Released a read/write lock on provider state in network `{net}` block height {block_height}");
 
     Ok((receipt.status().to_string(), feeds_to_update_ids))
+}
+
+fn get_receipt_with_default_type(
+    receipt_json: Option<serde_json::Value>,
+) -> eyre::Result<Option<TransactionReceipt>> {
+    match receipt_json {
+        None => Ok(None),
+        Some(mut value) => {
+            // We expect the receipt to be a JSON object; if it’s not, return an error.
+            let receipt_obj = value
+                .as_object_mut()
+                .ok_or_else(|| eyre::eyre!("receipt JSON is not an object"))?;
+
+            // If the "type" key is missing, insert a legacy type ("0x0").
+            if !receipt_obj.contains_key("type") {
+                receipt_obj.insert("type".into(), serde_json::Value::String("0x0".into()));
+            }
+
+            // Now attempt to deserialize into a TransactionReceipt. Unknown fields
+            // are ignored by serde as long as the struct doesn’t use `#[serde(deny_unknown_fields)]`.
+            let receipt: TransactionReceipt =
+                serde_json::from_value(serde_json::Value::Object(receipt_obj.clone()))?;
+
+            Ok(Some(receipt))
+        }
+    }
 }
 
 pub async fn get_gas_limit(
