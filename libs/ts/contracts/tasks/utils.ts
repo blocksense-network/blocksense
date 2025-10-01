@@ -26,7 +26,7 @@ export const awaitTimeout = (delayMs: number, reason: string) =>
     ),
   );
 
-export const predictAddress = async (
+export const predictAddress = (
   artifacts: Artifacts,
   config: NetworkConfig,
   contractName: ContractNames,
