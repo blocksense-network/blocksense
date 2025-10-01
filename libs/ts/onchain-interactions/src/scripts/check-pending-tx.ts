@@ -7,7 +7,9 @@ import { color as c } from '@blocksense/base-utils/tty';
 import {
   EthereumAddress,
   getOptionalRpcUrl,
+  isTestnet,
   parseEthereumAddress,
+  parseNetworkName,
 } from '@blocksense/base-utils/evm';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 
@@ -20,6 +22,12 @@ const main = async (): Promise<void> => {
     .option('address', {
       alias: 'a',
       describe: 'Ethereum address to fetch transactions for',
+      type: 'string',
+      default: '',
+    })
+    .option('network', {
+      alias: 'n',
+      describe: 'Check pending tx only for this network',
       type: 'string',
       default: '',
     })
@@ -49,7 +57,9 @@ const main = async (): Promise<void> => {
     .alias('help', 'h')
     .parse();
 
-  const shouldUseMainnetSequencer = argv.mainnet;
+  const parsedNetwork = argv.network ? parseNetworkName(argv.network) : null;
+  const shouldUseMainnetSequencer =
+    argv.mainnet || (parsedNetwork !== null && !isTestnet(parsedNetwork));
 
   const sequencerAddress = parseEthereumAddress(
     getEnvStringNotAssert(
@@ -59,10 +69,6 @@ const main = async (): Promise<void> => {
     ),
   );
   const address: EthereumAddress = sequencerAddress;
-
-  const deployedNetworks = shouldUseMainnetSequencer
-    ? deployedMainnets
-    : deployedTestnets;
 
   let pendingGauge: client.Gauge | null = null;
 
@@ -80,8 +86,14 @@ const main = async (): Promise<void> => {
       address === sequencerAddress
     })}\n`,
   );
+  const networks =
+    argv.network == ''
+      ? argv.mainnet
+        ? deployedMainnets
+        : deployedTestnets
+      : [parseNetworkName(argv.network)];
 
-  for (const networkName of deployedNetworks) {
+  for (const networkName of networks) {
     const rpcUrl = getOptionalRpcUrl(networkName);
     if (rpcUrl === '') {
       console.log(c`{red No rpc url for network ${networkName}. Skipping.}`);
