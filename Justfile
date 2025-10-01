@@ -104,7 +104,7 @@ test-ts:
   yarn workspace @blocksense/e2e-tests run test:unit
 
 test-e2e:
-  yarn workspace @blocksense/e2e-tests run test:process-compose-e2e
+  yarn workspace @blocksense/e2e-tests run test:scenarios
 
 [group('Working with oracles')]
 [doc('Build a specific oracle')]
