@@ -18,17 +18,17 @@ import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
 import type { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 
 import { rgSearchPattern, parseProcessesStatus } from './helpers';
-import { expectedPCStatuses03 } from './expected';
+import { expectedPCStatuses03 } from './expected-service-status';
 import type {
   ProcessComposeService,
   SequencerService,
   UpdatesToNetwork,
   ReportData,
-} from './types';
-import { ProcessCompose, Sequencer } from './types';
-import type { FeedResult } from './generate-signature';
-import type { FeedsValueAndRound } from '../utils/onchain';
-import { getDataFeedsInfoFromNetwork } from '../utils/onchain';
+} from '../../utils/types';
+import { ProcessCompose, Sequencer } from '../../utils/types';
+import type { FeedResult } from '../../utils/generate-signature';
+import type { FeedsValueAndRound } from '../../utils/onchain';
+import { getDataFeedsInfoFromNetwork } from '../../utils/onchain';
 
 describe.sequential('E2E Tests with process-compose', () => {
   const network = 'ink_sepolia';

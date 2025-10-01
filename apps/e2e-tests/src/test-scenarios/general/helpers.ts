@@ -8,12 +8,15 @@ import { rootDir } from '@blocksense/base-utils/env';
 import type { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 import { readConfig, readEvmDeployment } from '@blocksense/config-types';
 
-import { RGLogCheckerError } from './types';
-import { logMessage } from '../utils/logs';
-import type { FeedsValueAndRound } from '../utils/onchain';
-import { getDataFeedsInfoFromNetwork } from '../utils/onchain';
+import { RGLogCheckerError } from '../../utils/types';
+import { logMessage } from '../../utils/logs';
+import type { FeedsValueAndRound } from '../../utils/onchain';
+import { getDataFeedsInfoFromNetwork } from '../../utils/onchain';
 
-const E2E_TESTS_FEEDS_CONFIG_DIR = `${rootDir}/apps/e2e-tests/src/process-compose/config`;
+const E2E_TESTS_FEEDS_CONFIG_DIR = `${rootDir}/apps/e2e-tests/src/test-scenarios/general`;
+
+// TODO: (danielstoyanov) The following functions will be moved to utils package
+// and the new ProcessComposeManager (implementation of EnvironmentManager abstraction)
 
 const ProcessComposeStatusSchema = S.mutable(
   S.Array(
