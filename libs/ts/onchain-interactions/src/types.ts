@@ -23,6 +23,7 @@ export const deployedTestnets = [
   'fantom-testnet',
   'flare-coston',
   'fraxtal-testnet',
+  'giwa-sepolia',
   'gravity-sepolia',
   'harmony-testnet-shard0',
   'hemi-sepolia',
