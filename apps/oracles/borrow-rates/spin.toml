@@ -151,6 +151,12 @@ stride = 0
 decimals = 18
 data = '{"pair":{"base":"USDC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"Aave","network":"ethereum-mainnet"}}'
 
+[[trigger.oracle.data_feeds]]
+id = "102251"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"cbBTC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"Morpho","network":"ethereum-mainnet", "market_id":"0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64", "morpho_core_address":"0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"}}'
+
 [component.borrow-rates]
 source = "../target/wasm32-wasip1/release/borrow_rates.wasm"
 allowed_outbound_hosts = [

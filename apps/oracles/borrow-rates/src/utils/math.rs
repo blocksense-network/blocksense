@@ -51,3 +51,9 @@ pub fn apr_continuous<T: Into<U256>>(apy_ray: T) -> f64 {
     let apy = apy_ray_to_f64_fraction(apy_ray);
     (1.0 + apy).ln()
 }
+
+// Converts per second wad to apr
+pub fn apr_from_per_sec_wad<T: Into<U256>>(per_sec_wad: T) -> f64 {
+    let per_sec = (u256_low_u128(per_sec_wad.into()) as f64) / 1e18;
+    per_sec * _SECONDS_PER_YEAR
+}
