@@ -14,7 +14,7 @@ import {
 } from '@blocksense/base-utils/evm';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 
-import { deployedNetworks } from '../types';
+import { deployedTestnets } from '../types';
 import { startPrometheusServer } from '../utils';
 
 function filterSmallBalance(balance: string, threshold = 1e-6): number {
@@ -125,7 +125,7 @@ const main = async (): Promise<void> => {
   }
 
   const networks =
-    argv.network == '' ? deployedNetworks : [parseNetworkName(argv.network)];
+    argv.network == '' ? deployedTestnets : [parseNetworkName(argv.network)];
 
   for (const networkName of networks) {
     const rpcUrl = getOptionalRpcUrl(networkName);
