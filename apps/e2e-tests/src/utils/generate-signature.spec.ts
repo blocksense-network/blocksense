@@ -7,7 +7,7 @@ import {
   generateSignature,
   type FeedResult,
   type FeedType,
-} from '../process-compose/generate-signature';
+} from './generate-signature';
 import { bytesToBigIntBE } from './utilities';
 
 const toBE8 = (x: bigint) => {

@@ -1,7 +1,7 @@
 import { Effect, Schema as S } from 'effect';
 import bls from '@chainsafe/bls';
 
-import { powerOf10BigInt, bigIntToBytesBE, truncate } from '../utils/utilities';
+import { powerOf10BigInt, bigIntToBytesBE, truncate } from './utilities';
 
 export const ReportPayloadDataSchema = S.Struct({
   feed_id: S.String,

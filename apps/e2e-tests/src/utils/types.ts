@@ -14,13 +14,13 @@ import type { NewFeedsConfig } from '@blocksense/config-types';
 import { NewFeedsConfigSchema } from '@blocksense/config-types';
 import { rootDir, selectDirectory, skip0x } from '@blocksense/base-utils';
 
-import { ParseMetricsError, getMetrics } from '../utils/metrics';
+import { ParseMetricsError, getMetrics } from './metrics';
 import { generateSignature, type FeedResult } from './generate-signature';
 import {
   startEnvironment,
   stopEnvironment,
   parseProcessesStatus,
-} from './helpers';
+} from '../test-scenarios/general/helpers';
 
 export class ProcessComposeFailedToStartError extends Data.TaggedError(
   '@e2e-tests/ProcessComposeFailedToStartError',
