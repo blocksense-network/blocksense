@@ -10,7 +10,7 @@ import {
 } from '@blocksense/base-utils/evm';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 
-import { deployedNetworks } from '../types';
+import { deployedTestnets } from '../types';
 import { startPrometheusServer } from '../utils';
 
 const main = async (): Promise<void> => {
@@ -61,7 +61,7 @@ const main = async (): Promise<void> => {
     })}\n`,
   );
 
-  for (const networkName of deployedNetworks) {
+  for (const networkName of deployedTestnets) {
     const rpcUrl = getOptionalRpcUrl(networkName);
     if (rpcUrl === '') {
       console.log(c`{red No rpc url for network ${networkName}. Skipping.}`);
