@@ -11,10 +11,12 @@ import {
   parseEthereumAddress,
   isChainId,
   parseNetworkName,
+  isTestnet,
+  EthereumAddress,
 } from '@blocksense/base-utils/evm';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 
-import { deployedTestnets } from '../types';
+import { deployedMainnets, deployedTestnets } from '../types';
 import { startPrometheusServer } from '../utils';
 
 function filterSmallBalance(balance: string, threshold = 1e-6): number {
@@ -22,7 +24,6 @@ function filterSmallBalance(balance: string, threshold = 1e-6): number {
 }
 
 const main = async (): Promise<void> => {
-  const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
   const argv = await yargs(hideBin(process.argv))
     .usage(
       'Usage: $0 [--address <ethereum address>] [--network <name>] [--rpc <url1,url2,...>] [--prometheus] [--host <host>] [--port <port>]',
@@ -31,7 +32,7 @@ const main = async (): Promise<void> => {
       alias: 'a',
       describe: 'Ethereum address to fetch balance for',
       type: 'string',
-      default: sequencerAddress,
+      default: '',
     })
     .option('network', {
       alias: 'n',
@@ -61,11 +62,32 @@ const main = async (): Promise<void> => {
       type: 'number',
       default: 9100,
     })
+    .option('mainnet', {
+      alias: 'm',
+      describe: 'Show mainnet balances',
+      type: 'boolean',
+      default: false,
+    })
     .help()
     .alias('help', 'h')
     .parse();
 
-  const address = parseEthereumAddress(argv.address);
+  const parsedNetwork = argv.network ? parseNetworkName(argv.network) : null;
+  const shouldUseMainnetSequencer =
+    argv.mainnet || (parsedNetwork !== null && !isTestnet(parsedNetwork));
+
+  const sequencerAddress = parseEthereumAddress(
+    getEnvStringNotAssert(
+      shouldUseMainnetSequencer
+        ? 'SEQUENCER_ADDRESS_MAINNET'
+        : 'SEQUENCER_ADDRESS_TESTNET',
+    ),
+  );
+
+  const address: EthereumAddress = argv.address
+    ? parseEthereumAddress(argv.address)
+    : sequencerAddress;
+
   let balanceGauge: client.Gauge | null = null;
 
   if (argv.prometheus) {
@@ -125,7 +147,11 @@ const main = async (): Promise<void> => {
   }
 
   const networks =
-    argv.network == '' ? deployedTestnets : [parseNetworkName(argv.network)];
+    argv.network == ''
+      ? argv.mainnet
+        ? deployedMainnets
+        : deployedTestnets
+      : [parseNetworkName(argv.network)];
 
   for (const networkName of networks) {
     const rpcUrl = getOptionalRpcUrl(networkName);
