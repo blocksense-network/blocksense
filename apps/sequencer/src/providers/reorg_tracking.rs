@@ -8,6 +8,7 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 use tracing::{error, info, warn};
 
+use blocksense_metrics::inc_vec_metric;
 use blocksense_utils::await_time;
 
 // Local helpers from eth_send_utils we need to call
@@ -162,12 +163,12 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                 // Gather data and perform minimal work while holding the provider lock
                 let mut need_resync_indices = false;
                 {
-                    let (rpc_handle, observed_block_hashes, reorgs_count_in_network_mutex) = {
+                    let (rpc_handle, observed_block_hashes, provider_metrics) = {
                         let provider = provider_mutex.lock().await;
                         (
                             provider.provider.clone(),
                             provider.inflight.observed_block_hashes.clone(),
-                            provider.reorgs_count.clone(),
+                            provider.provider_metrics.clone(),
                         )
                     };
 
@@ -195,11 +196,8 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                             warn!(
                                                 "Reorg detected in network {net} at observed tip before processing new blocks"
                                             );
-                                            {
-                                                let mut reorgs_count_in_network =
-                                                    reorgs_count_in_network_mutex.lock().await;
-                                                *reorgs_count_in_network += 1;
-                                            }
+                                            // Increment reorg metric for this network
+                                            inc_vec_metric!(provider_metrics, observed_reorgs, net);
                                             let _ = handle_reorg(
                                                 net.as_str(),
                                                 &rpc_handle,
@@ -236,11 +234,8 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                     {
                                         warn!("Reorg detected in network {net}");
 
-                                        {
-                                            let mut reorgs_count_in_network =
-                                                reorgs_count_in_network_mutex.lock().await;
-                                            *reorgs_count_in_network += 1;
-                                        }
+                                        // Increment reorg metric for this network
+                                        inc_vec_metric!(provider_metrics, observed_reorgs, net);
                                         let _ = handle_reorg(
                                             net.as_str(),
                                             &rpc_handle,
@@ -309,11 +304,8 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                             warn!(
                                                 "Reorg detected in network {net} without new tip advancement"
                                             );
-                                            {
-                                                let mut reorgs_count_in_network =
-                                                    reorgs_count_in_network_mutex.lock().await;
-                                                *reorgs_count_in_network += 1;
-                                            }
+                                            // Increment reorg metric for this network
+                                            inc_vec_metric!(provider_metrics, observed_reorgs, net);
                                             let _ = handle_reorg(
                                                 net.as_str(),
                                                 &rpc_handle,
@@ -917,12 +909,15 @@ mod tests {
             );
         }
 
-        // Wait until the reorg counter increments to confirm detection
+        // Wait until the reorg metric increments to confirm detection
         for _ in 0..100 {
             let count = {
-                let provider = provider_mutex.lock().await;
-                let c = *provider.reorgs_count.lock().await;
-                c
+                let provider_metrics = {
+                    let provider = provider_mutex.lock().await;
+                    provider.provider_metrics.clone()
+                };
+                let metrics = provider_metrics.read().await;
+                metrics.observed_reorgs.with_label_values(&[net]).get()
             };
             if count > 0 {
                 break;
@@ -930,12 +925,13 @@ mod tests {
             tokio::time::sleep(std::time::Duration::from_millis(200)).await;
         }
         {
-            let provider = provider_mutex.lock().await;
-            let reorgs_count = provider.reorgs_count.lock().await;
-            assert!(
-                *reorgs_count > 0,
-                "Expected at least one reorg to be detected"
-            );
+            let provider_metrics = {
+                let provider = provider_mutex.lock().await;
+                provider.provider_metrics.clone()
+            };
+            let metrics = provider_metrics.read().await;
+            let count = metrics.observed_reorgs.with_label_values(&[net]).get();
+            assert!(count > 0, "Expected at least one reorg to be detected");
         }
 
         // Abort the loop to finish the test
