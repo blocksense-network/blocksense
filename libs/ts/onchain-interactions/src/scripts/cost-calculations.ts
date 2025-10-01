@@ -411,8 +411,7 @@ const main = async (): Promise<void> => {
     })
     .option('network', {
       alias: 'n',
-      describe:
-        'Calculate cost only for this network, not all deployed networks',
+      describe: 'Calculate cost only for this network',
       type: 'string',
       default: '',
     })
