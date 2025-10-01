@@ -5,23 +5,23 @@ import client from 'prom-client';
 import { color as c } from '@blocksense/base-utils/tty';
 
 import {
+  EthereumAddress,
   getOptionalRpcUrl,
   parseEthereumAddress,
 } from '@blocksense/base-utils/evm';
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 
-import { deployedTestnets } from '../types';
+import { deployedMainnets, deployedTestnets } from '../types';
 import { startPrometheusServer } from '../utils';
 
 const main = async (): Promise<void> => {
-  const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
   const argv = await yargs(hideBin(process.argv))
     .usage('Usage: $0 [--address <ethereum address>]')
     .option('address', {
       alias: 'a',
       describe: 'Ethereum address to fetch transactions for',
       type: 'string',
-      default: sequencerAddress,
+      default: '',
     })
     .option('prometheus', {
       alias: 'p',
@@ -39,11 +39,31 @@ const main = async (): Promise<void> => {
       type: 'number',
       default: 9100,
     })
+    .option('mainnet', {
+      alias: 'm',
+      describe: 'Show mainnet pending transactions',
+      type: 'boolean',
+      default: false,
+    })
     .help()
     .alias('help', 'h')
     .parse();
 
-  const address = parseEthereumAddress(argv.address);
+  const shouldUseMainnetSequencer = argv.mainnet;
+
+  const sequencerAddress = parseEthereumAddress(
+    getEnvStringNotAssert(
+      shouldUseMainnetSequencer
+        ? 'SEQUENCER_ADDRESS_MAINNET'
+        : 'SEQUENCER_ADDRESS_TESTNET',
+    ),
+  );
+  const address: EthereumAddress = sequencerAddress;
+
+  const deployedNetworks = shouldUseMainnetSequencer
+    ? deployedMainnets
+    : deployedTestnets;
+
   let pendingGauge: client.Gauge | null = null;
 
   if (argv.prometheus) {
@@ -61,7 +81,7 @@ const main = async (): Promise<void> => {
     })}\n`,
   );
 
-  for (const networkName of deployedTestnets) {
+  for (const networkName of deployedNetworks) {
     const rpcUrl = getOptionalRpcUrl(networkName);
     if (rpcUrl === '') {
       console.log(c`{red No rpc url for network ${networkName}. Skipping.}`);
