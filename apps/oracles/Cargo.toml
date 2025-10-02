@@ -3,6 +3,7 @@ members = [
   "borrow-rates",
   "cex-price-feeds",
   "commodities-price-feeds",
+  "eth-gas-info",
   "eth-rpc",
   "exsat-holdings",
   "forex-price-feeds",
