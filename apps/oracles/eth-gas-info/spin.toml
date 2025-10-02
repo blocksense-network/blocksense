@@ -17,34 +17,32 @@ reporter_id = 0
 component = "eth-gas-info"
 
 [[trigger.oracle.data_feeds]]
-id = "70000"
-decimals = 2
+id = "105000"
 stride = 0
-# Gas price in Gwei (integer-ish). We only need 2 decimals typically.
-data = '{"metric":"safe"}'
+decimals = 8
+data = '{"pair":{"base":"SafeGasPrice","quote":"Gwei"},"decimals":8,"category":"","market_hours":"","arguments":{"kind":"eth-gas-info"}}'
 
 [[trigger.oracle.data_feeds]]
-id = "70001"
-decimals = 2
+id = "105001"
 stride = 0
-data = '{"metric":"propose"}'
+decimals = 8
+data = '{"pair":{"base":"ProposeGasPrice","quote":"Gwei"},"decimals":8,"category":"","market_hours":"","arguments":{"kind":"eth-gas-info"}}'
 
 [[trigger.oracle.data_feeds]]
-id = "70002"
-decimals = 2
+id = "105002"
 stride = 0
-data = '{"metric":"fast"}'
+decimals = 8
+data = '{"pair":{"base":"FastGasPrice","quote":"Gwei"},"decimals":8,"category":"","market_hours":"","arguments":{"kind":"eth-gas-info"}}'
 
 [[trigger.oracle.data_feeds]]
-id = "70003"
-decimals = 2
+id = "105003"
 stride = 0
-data = '{"metric":"base"}'
+decimals = 8
+data = '{"pair":{"base":"suggestBaseFee","quote":"Gwei"},"decimals":8,"category":"","market_hours":"","arguments":{"kind":"eth-gas-info"}}'
 
 [component.eth-gas-info]
 source = "../target/wasm32-wasip1/release/eth_gas_info.wasm"
-# NOTE: Spin requires host entries without paths. The Etherscan v2 API base is
-# https://api.etherscan.io/v2/api but we must only whitelist the host origin.
+
 allowed_outbound_hosts = ["https://api.etherscan.io"]
 
 [component.eth-gas-info.build]
