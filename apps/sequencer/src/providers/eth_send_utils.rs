@@ -7,7 +7,7 @@ use alloy::{
     rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
 use alloy_primitives::{keccak256, B256, U256};
-use blocksense_config::{FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
+use blocksense_config::{FeedStrideAndDecimals, ReorgConfig, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
 use blocksense_utils::{counter_unbounded_channel::CountedReceiver, EncodedFeedId};
@@ -279,12 +279,24 @@ pub async fn create_per_network_reorg_trackers(
         let reorg_trackers_name = format!("reorg_tracker for {net}");
         let net_clone = net.clone();
         let sequencer_state_providers_clone = sequencer_state.providers.clone();
+        let sequencer_config = sequencer_state.sequencer_config.read().await;
+        let reorg_tracker_config = match sequencer_config.providers.get(net.as_str()) {
+            Some(c) => c.reorg.clone(),
+            None => {
+                error!("No config for provider for network {net} will set to default!");
+                ReorgConfig::default()
+            }
+        };
         collected_futures.push(
             tokio::task::Builder::new()
                 .name(reorg_trackers_name.clone().as_str())
                 .spawn(async move {
-                    loop_tracking_for_reorg_in_network(net_clone, sequencer_state_providers_clone)
-                        .await;
+                    loop_tracking_for_reorg_in_network(
+                        net_clone,
+                        sequencer_state_providers_clone,
+                        reorg_tracker_config,
+                    )
+                    .await;
                     Ok(())
                 })
                 .expect("Failed to spawn tracker for reorgs loop in network {net}!"),
