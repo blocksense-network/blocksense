@@ -241,6 +241,10 @@ pub struct Provider {
 
     #[serde(default)]
     pub contracts: Vec<ContractConfig>,
+
+    // Reorg tracking related configuration
+    #[serde(default)]
+    pub reorg: ReorgConfig,
 }
 
 fn default_is_enabled() -> bool {
@@ -318,6 +322,21 @@ impl Validated for Provider {
 impl Provider {
     pub fn get_contract_config(&self, name: &str) -> Option<&ContractConfig> {
         self.contracts.iter().find(|c| c.name == name)
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+#[serde(default)]
+pub struct ReorgConfig {
+    // Timeout for JSON-RPC requests used during reorg tracking (in seconds)
+    pub rpc_timeout_secs: u64,
+}
+
+impl Default for ReorgConfig {
+    fn default() -> Self {
+        ReorgConfig {
+            rpc_timeout_secs: 4,
+        }
     }
 }
 
@@ -604,6 +623,7 @@ pub fn get_test_config_with_multiple_providers(
                         min_quorum: None,
                     }
                 ],
+                reorg: ReorgConfig::default(),
             },
         );
     }
