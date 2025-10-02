@@ -263,6 +263,7 @@ in
           "FMP_API_KEY"
         ];
       };
+
       spout-rwa = {
         exec-interval = 60;
         allowed-outbound-hosts = [
@@ -272,6 +273,7 @@ in
           "SPOUT_RWA_API_KEY"
         ];
       };
+
       borrow-rates = {
         exec-interval = 10;
         allowed-outbound-hosts = [
@@ -281,6 +283,7 @@ in
           "https://eth.blockrazor.xyz"
         ];
       };
+
       forex-price-feeds = {
         exec-interval = 10;
         allowed-outbound-hosts = [
@@ -296,6 +299,7 @@ in
           "FMP_API_KEY"
         ];
       };
+
       commodities-price-feeds = {
         exec-interval = 60;
         allowed-outbound-hosts = [
@@ -303,6 +307,13 @@ in
         ];
         api-keys = [
           "METALS_API_KEY"
+        ];
+      };
+
+      eth-gas-info = {
+        exec-interval = 10;
+        allowed-outbound-hosts = [
+          "https://api.etherscan.io"
         ];
       };
     };
