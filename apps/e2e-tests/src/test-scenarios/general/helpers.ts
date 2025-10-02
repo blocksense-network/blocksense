@@ -1,7 +1,6 @@
 import { Effect, ParseResult, Schema as S } from 'effect';
 import { NodeContext } from '@effect/platform-node';
 import { Command } from '@effect/platform';
-import { $, execa } from 'execa';
 
 import { arrayToObject } from '@blocksense/base-utils/array-iter';
 import { rootDir } from '@blocksense/base-utils/env';
@@ -41,46 +40,86 @@ const ProcessComposeStatusSchema = S.mutable(
   ),
 );
 
-export async function parseProcessesStatus() {
-  const { stdout } = await $`process-compose process list -o json`;
-  return arrayToObject(
-    ParseResult.decodeUnknownSync(ProcessComposeStatusSchema)(
-      JSON.parse(stdout),
-    ),
-    'name',
-  );
+export function parseProcessesStatus(): Effect.Effect<
+  Record<string, (typeof ProcessComposeStatusSchema.Type)[number]>,
+  Error
+> {
+  return Effect.gen(function* () {
+    const command = Command.make(
+      'process-compose',
+      'process',
+      'list',
+      '-o',
+      'json',
+    );
+    const result = yield* command.pipe(
+      Command.string,
+      Effect.provide(NodeContext.layer),
+    );
+    return arrayToObject(
+      ParseResult.decodeUnknownSync(ProcessComposeStatusSchema)(
+        JSON.parse(result),
+      ),
+      'name',
+    );
+  });
 }
 
-export async function startEnvironment(testEnvironment: string): Promise<void> {
-  logTestEnvironmentInfo('Starting', testEnvironment);
-  await execa(
-    'just',
-    ['start-environment', testEnvironment, '0', '--detached'],
-    {
-      stdout: ['inherit'],
-      stderr: ['inherit'],
-      env: {
-        FEEDS_CONFIG_DIR: `${E2E_TESTS_FEEDS_CONFIG_DIR}`,
-      },
-    },
-  );
+export function startEnvironment(
+  testEnvironment: string,
+): Effect.Effect<void, Error> {
+  return Effect.gen(function* () {
+    yield* logTestEnvironmentInfo('Starting', testEnvironment);
+    yield* Effect.sync(() => {
+      process.env['FEEDS_CONFIG_DIR'] = E2E_TESTS_FEEDS_CONFIG_DIR;
+    });
+    const command = Command.make(
+      'just',
+      'start-environment',
+      testEnvironment,
+      '0',
+      '--detached',
+    );
+    const exitCode = yield* command.pipe(
+      Command.exitCode,
+      Effect.provide(NodeContext.layer),
+    );
+    if (exitCode !== 0) {
+      return yield* Effect.fail(
+        new Error(`Command failed with exit code ${exitCode}`),
+      );
+    }
+  });
 }
 
-export async function stopEnvironment(): Promise<void> {
-  logTestEnvironmentInfo('Stopping');
-  await $`just stop-environment`;
+export function stopEnvironment(): Effect.Effect<void, Error> {
+  return Effect.gen(function* () {
+    yield* logTestEnvironmentInfo('Stopping');
+    const command = Command.make('just', 'stop-environment');
+    const exitCode = yield* command.pipe(
+      Command.exitCode,
+      Effect.provide(NodeContext.layer),
+    );
+    if (exitCode !== 0) {
+      return yield* Effect.fail(
+        new Error(`Command failed with exit code ${exitCode}`),
+      );
+    }
+  });
 }
 
 export function logTestEnvironmentInfo(
   status: 'Starting' | 'Stopping',
   name?: string,
-): void {
-  const time = new Date();
-  logMessage(
-    'info',
-    `${status} test environment${name ? `: ${name}` : ''}...`,
-    `${status} time: ${time.toDateString()} ${time.toTimeString()}`,
-  );
+): Effect.Effect<void> {
+  return Effect.sync(() => {
+    const time = new Date();
+    logMessage(
+      'info',
+      `${status} test environment${name ? `: ${name}` : ''}...`,
+      `${status} time: ${time.toDateString()} ${time.toTimeString()}`,
+    );
+  });
 }
 
 export const rgSearchPattern = ({
