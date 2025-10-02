@@ -17,7 +17,7 @@ import {
 import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
 import type { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 
-import { rgSearchPattern, parseProcessesStatus } from './helpers';
+import { parseProcessesStatus, rgSearchPattern } from '../../utils/utilities';
 import { expectedPCStatuses03 } from './expected-service-status';
 import type {
   SequencerService,

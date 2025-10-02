@@ -1,3 +1,130 @@
+import { Effect, ParseResult } from 'effect';
+import { NodeContext } from '@effect/platform-node';
+import { Command } from '@effect/platform';
+
+import { rootDir } from '@blocksense/base-utils/env';
+import type { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
+import { readConfig, readEvmDeployment } from '@blocksense/config-types';
+
+import { logMessage } from './logs';
+import type { FeedsValueAndRound } from './onchain';
+import { getDataFeedsInfoFromNetwork } from './onchain';
+import { ProcessComposeStatusSchema, RGLogCheckerError } from './types';
+import { arrayToObject } from '@blocksense/base-utils';
+
+export const E2E_TESTS_FEEDS_CONFIG_DIR = `${rootDir}/apps/e2e-tests/src/test-scenarios/general`;
+
+export function logTestEnvironmentInfo(
+  status: 'Starting' | 'Stopping',
+  name?: string,
+): Effect.Effect<void> {
+  return Effect.sync(() => {
+    const time = new Date();
+    logMessage(
+      'info',
+      `${status} test environment${name ? `: ${name}` : ''}...`,
+      `${status} time: ${time.toDateString()} ${time.toTimeString()}`,
+    );
+  });
+}
+
+export const rgSearchPattern = ({
+  caseInsensitive = true,
+  file,
+  flags = [],
+  pattern,
+}: {
+  caseInsensitive?: boolean;
+  file: string;
+  flags?: string[];
+  pattern: string;
+}): Effect.Effect<boolean, RGLogCheckerError> => {
+  const args = caseInsensitive
+    ? ['--quiet', '-i', ...flags, pattern, file]
+    : ['--quiet', ...flags, pattern, file];
+
+  return Command.make('rg', ...args).pipe(
+    Command.exitCode,
+    Effect.matchEffect({
+      onFailure: commandError =>
+        Effect.fail(new RGLogCheckerError({ cause: commandError })),
+      onSuccess: exitCode => {
+        if (exitCode === 0) {
+          return Effect.succeed(true);
+        }
+        if (exitCode === 1) {
+          return Effect.succeed(false);
+        }
+        return Effect.fail(
+          new RGLogCheckerError({
+            cause: `ripgrep process error: exited with code ${exitCode}`,
+          }),
+        );
+      },
+    }),
+    Effect.provide(NodeContext.layer),
+  );
+};
+
+export function getInitialFeedsInfoFromNetwork(
+  network: NetworkName,
+): Effect.Effect<
+  {
+    feedIds: bigint[];
+    address: EthereumAddress;
+    initialFeedsInfo: FeedsValueAndRound;
+  },
+  Error,
+  never
+> {
+  return Effect.gen(function* () {
+    const feedConfig = yield* Effect.tryPromise(() =>
+      readConfig('feeds_config_v2', E2E_TESTS_FEEDS_CONFIG_DIR),
+    );
+    const feedIds = feedConfig.feeds.map(feed => BigInt(feed.id));
+
+    const deploymentConfig = yield* Effect.tryPromise(() =>
+      readEvmDeployment(network, true),
+    );
+    const { address } =
+      deploymentConfig.contracts.coreContracts.UpgradeableProxyADFS;
+
+    const initialFeedsInfo = yield* getDataFeedsInfoFromNetwork(
+      feedIds,
+      address,
+      'ink-sepolia',
+    );
+
+    return { feedIds, address, initialFeedsInfo };
+  });
+}
+
+// TODO: (danielstoyanov) Once we introduce new environment manager(docker/systemd), we have to make method generic
+export function parseProcessesStatus(): Effect.Effect<
+  Record<string, (typeof ProcessComposeStatusSchema.Type)[number]>,
+  Error
+> {
+  return Effect.gen(function* () {
+    const command = Command.make(
+      'process-compose',
+      'process',
+      'list',
+      '-o',
+      'json',
+    );
+    const result = yield* command.pipe(
+      Command.string,
+      Effect.provide(NodeContext.layer),
+    );
+    return arrayToObject(
+      ParseResult.decodeUnknownSync(ProcessComposeStatusSchema)(
+        JSON.parse(result),
+      ),
+      'name',
+    );
+  });
+}
+
 export function truncate(str: string, maxLen: number): string {
   return str.length > maxLen ? str.slice(0, maxLen) : str;
 }

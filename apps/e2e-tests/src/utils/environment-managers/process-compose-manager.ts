@@ -1,10 +1,12 @@
 import { Layer, Effect } from 'effect';
+import { Command } from '@effect/platform';
+import { NodeContext } from '@effect/platform-node';
 
 import {
-  startEnvironment,
-  stopEnvironment,
+  E2E_TESTS_FEEDS_CONFIG_DIR,
+  logTestEnvironmentInfo,
   parseProcessesStatus,
-} from '../../test-scenarios/general/helpers';
+} from '../utilities';
 import { EnvironmentManager, EnvironmentError } from '../types';
 
 export const ProcessComposeLive = Layer.succeed(
@@ -39,3 +41,44 @@ export const ProcessComposeLive = Layer.succeed(
       ),
   }),
 );
+
+function startEnvironment(testEnvironment: string): Effect.Effect<void, Error> {
+  return Effect.gen(function* () {
+    yield* logTestEnvironmentInfo('Starting', testEnvironment);
+    yield* Effect.sync(() => {
+      process.env['FEEDS_CONFIG_DIR'] = E2E_TESTS_FEEDS_CONFIG_DIR;
+    });
+    const command = Command.make(
+      'just',
+      'start-environment',
+      testEnvironment,
+      '0',
+      '--detached',
+    );
+    const exitCode = yield* command.pipe(
+      Command.exitCode,
+      Effect.provide(NodeContext.layer),
+    );
+    if (exitCode !== 0) {
+      return yield* Effect.fail(
+        new Error(`Command failed with exit code ${exitCode}`),
+      );
+    }
+  });
+}
+
+function stopEnvironment(): Effect.Effect<void, Error> {
+  return Effect.gen(function* () {
+    yield* logTestEnvironmentInfo('Stopping');
+    const command = Command.make('just', 'stop-environment');
+    const exitCode = yield* command.pipe(
+      Command.exitCode,
+      Effect.provide(NodeContext.layer),
+    );
+    if (exitCode !== 0) {
+      return yield* Effect.fail(
+        new Error(`Command failed with exit code ${exitCode}`),
+      );
+    }
+  });
+}
