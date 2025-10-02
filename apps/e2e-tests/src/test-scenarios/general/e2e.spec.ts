@@ -20,16 +20,17 @@ import type { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config'
 import { parseProcessesStatus, rgSearchPattern } from '../../utils/utilities';
 import { expectedPCStatuses03 } from './expected-service-status';
 import type {
-  SequencerService,
   UpdatesToNetwork,
   ReportData,
   EnvironmentManagerService,
 } from '../../utils/types';
-import { EnvironmentManager, Sequencer } from '../../utils/types';
+import { EnvironmentManager } from '../../utils/types';
 import type { FeedResult } from '../../utils/generate-signature';
 import type { FeedsValueAndRound } from '../../utils/onchain';
 import { getDataFeedsInfoFromNetwork } from '../../utils/onchain';
 import { ProcessComposeLive } from '../../utils/environment-managers/process-compose-manager';
+import { Sequencer } from '../../utils/sequencer';
+import type { SequencerService } from '../../utils/sequencer';
 
 describe.sequential('E2E Tests with process-compose', () => {
   const network = 'ink_sepolia';
