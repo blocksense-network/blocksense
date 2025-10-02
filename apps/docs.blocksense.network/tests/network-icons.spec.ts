@@ -1,14 +1,17 @@
 import { describe, test, expect } from 'vitest';
 import path from 'path';
+
 import { listEvmNetworks } from '@blocksense/config-types/read-write-config';
 import { selectDirectory } from '@blocksense/base-utils/fs';
+
+import { networkNameToIconName } from '../src/utils';
 
 describe('Network Icons', () => {
   test('all deployed networks should have corresponding icons in the website', async () => {
     const deployedNetworks = await listEvmNetworks();
 
-    const expectedIconNames = deployedNetworks.map(
-      network => network.split('-')[0],
+    const expectedIconNames = deployedNetworks.map(network =>
+      networkNameToIconName(network),
     );
 
     const uniqueExpectedIconNames = [...new Set(expectedIconNames)];

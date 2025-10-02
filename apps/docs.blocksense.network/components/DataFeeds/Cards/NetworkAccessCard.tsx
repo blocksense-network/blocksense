@@ -16,7 +16,7 @@ import { Button } from '@blocksense/docs-ui/Button';
 import { Card, CardHeader, CardTitle } from '@blocksense/docs-ui/Card';
 import { DataFeedCardContentItem } from '../DataFeedCardContentItem';
 import { ContractAddress } from '@/components/sol-contracts/ContractAddress';
-import { capitalizeWords } from '@/src/utils';
+import { capitalizeWords, networkNameToIconName } from '@/src/utils';
 import { DataFeedCardContent } from '../DataFeedCardContent';
 import { Icon } from '@blocksense/docs-ui/Icon';
 import { Separator } from '@blocksense/docs-ui/Separator';
@@ -24,7 +24,7 @@ import { ImageWrapper } from '@blocksense/docs-ui';
 import { valuesOf } from '@blocksense/base-utils/array-iter';
 
 const NetworkIcon = ({ network }: { network: NetworkName }) => {
-  const path = `/images/network-icons/${network.split('-')[0]}.png`;
+  const path = `/images/network-icons/${networkNameToIconName(network)}.png`;
   return (
     <div className="flex items-center gap-2">
       <ImageWrapper src={path} alt={network} className="relative w-5 h-5" />
