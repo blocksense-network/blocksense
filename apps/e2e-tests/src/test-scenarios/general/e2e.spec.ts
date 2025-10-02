@@ -29,9 +29,9 @@ import type {
   UpdatesToNetwork,
 } from '../../utils/types';
 import { EnvironmentManager, Sequencer } from '../../utils/types';
+import { parseProcessesStatus, rgSearchPattern } from '../../utils/utilities';
 
 import { expectedPCStatuses03 } from './expected-service-status';
-import { parseProcessesStatus,rgSearchPattern } from './helpers';
 
 describe.sequential('E2E Tests with process-compose', () => {
   const network = 'ink_sepolia';
