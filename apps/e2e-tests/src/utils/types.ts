@@ -16,64 +16,38 @@ import { rootDir, selectDirectory, skip0x } from '@blocksense/base-utils';
 
 import { ParseMetricsError, getMetrics } from './metrics';
 import { generateSignature, type FeedResult } from './generate-signature';
-import {
-  startEnvironment,
-  stopEnvironment,
-  parseProcessesStatus,
-} from '../test-scenarios/general/helpers';
 
-export class ProcessComposeFailedToStartError extends Data.TaggedError(
-  '@e2e-tests/ProcessComposeFailedToStartError',
-)<{
-  cause: unknown;
-}> {}
-
-export class ProcessCompose extends Context.Tag('@e2e-tests/ProcessCompose')<
-  ProcessCompose,
+export class EnvironmentManager extends Context.Tag(
+  '@e2e-tests/EnvironmentManager',
+)<
+  EnvironmentManager,
   {
     readonly start: (
-      name: string,
-    ) => Effect.Effect<void, ProcessComposeError, never>;
-    readonly stop: () => Effect.Effect<void, ProcessComposeError, never>;
-    readonly parseStatus: () => Effect.Effect<
-      Record<string, { status: string; exit_code: number }>,
-      ProcessComposeError,
+      environmentName: string,
+    ) => Effect.Effect<void, EnvironmentError, never>;
+    readonly stop: () => Effect.Effect<void, EnvironmentError, never>;
+    readonly getProcessesStatus: () => Effect.Effect<
+      ProcessStatuses,
+      EnvironmentError,
       never
     >;
   }
->() {
-  static Live = Layer.succeed(
-    ProcessCompose,
-    ProcessCompose.of({
-      start: (env: string = 'example-setup-03') =>
-        Effect.tryPromise({
-          try: () => startEnvironment(env),
-          catch: error =>
-            new ProcessComposeError({
-              message: `Failed to start environment: ${error}`,
-            }),
-        }),
-      stop: () =>
-        Effect.tryPromise({
-          try: () => stopEnvironment(),
-          catch: error =>
-            new ProcessComposeError({
-              message: `Failed to stop environment: ${error}`,
-            }),
-        }),
-      parseStatus: () =>
-        Effect.tryPromise({
-          try: () => parseProcessesStatus(),
-          catch: error =>
-            new ProcessComposeError({
-              message: `Failed to parse processes status: ${error}`,
-            }),
-        }),
-    }),
-  );
-}
+>() {}
 
-export type ProcessComposeService = Context.Tag.Service<ProcessCompose>;
+export type EnvironmentManagerService = Context.Tag.Service<EnvironmentManager>;
+
+export class EnvironmentError extends Data.TaggedError(
+  '@e2e-tests/EnvironmentError',
+)<{
+  readonly message: string;
+}> {}
+
+export type ProcessStatus = Readonly<{
+  status: string;
+  exit_code: number;
+}>;
+
+export type ProcessStatuses = Readonly<Record<string, ProcessStatus>>;
 
 export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
   Sequencer,
@@ -265,12 +239,6 @@ export class RGLogCheckerError extends Data.TaggedError(
   '@e2e-tests/RGLogCheckerError',
 )<{
   cause: unknown;
-}> {}
-
-export class ProcessComposeError extends Data.TaggedError(
-  '@e2e-tests/ProcessComposeError',
-)<{
-  readonly message: string;
 }> {}
 
 export const UpdatesToNetworkMetric = S.Struct({

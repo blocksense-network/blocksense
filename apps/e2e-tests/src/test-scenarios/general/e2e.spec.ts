@@ -20,22 +20,23 @@ import type { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config'
 import { rgSearchPattern, parseProcessesStatus } from './helpers';
 import { expectedPCStatuses03 } from './expected-service-status';
 import type {
-  ProcessComposeService,
   SequencerService,
   UpdatesToNetwork,
   ReportData,
+  EnvironmentManagerService,
 } from '../../utils/types';
-import { ProcessCompose, Sequencer } from '../../utils/types';
+import { EnvironmentManager, Sequencer } from '../../utils/types';
 import type { FeedResult } from '../../utils/generate-signature';
 import type { FeedsValueAndRound } from '../../utils/onchain';
 import { getDataFeedsInfoFromNetwork } from '../../utils/onchain';
+import { ProcessComposeLive } from '../../utils/environment-managers/process-compose-manager';
 
 describe.sequential('E2E Tests with process-compose', () => {
   const network = 'ink_sepolia';
   const MAX_HISTORY_ELEMENTS_PER_FEED = 8192;
 
   let sequencer: SequencerService;
-  let processCompose: ProcessComposeService;
+  let processCompose: EnvironmentManagerService;
   let hasProcessComposeStarted = false;
 
   let sequencerConfig: SequencerConfigV2;
@@ -52,7 +53,7 @@ describe.sequential('E2E Tests with process-compose', () => {
 
     const res = await pipe(
       Effect.gen(function* () {
-        processCompose = yield* ProcessCompose;
+        processCompose = yield* EnvironmentManager;
         yield* processCompose.start(testEnvironment);
         hasProcessComposeStarted = true;
 
@@ -74,7 +75,7 @@ describe.sequential('E2E Tests with process-compose', () => {
 
         sequencer = yield* Sequencer;
       }),
-      Effect.provide(Layer.merge(ProcessCompose.Live, Sequencer.Live)),
+      Effect.provide(Layer.merge(ProcessComposeLive, Sequencer.Live)),
       Effect.runPromiseExit,
     );
 
@@ -93,7 +94,7 @@ describe.sequential('E2E Tests with process-compose', () => {
     Effect.gen(function* () {
       const equal = yield* Effect.retry(
         processCompose
-          .parseStatus()
+          .getProcessesStatus()
           .pipe(
             Effect.tap(processes =>
               Effect.try(() =>
@@ -108,7 +109,7 @@ describe.sequential('E2E Tests with process-compose', () => {
       );
       // still validate the result
       expect(equal).toBeTruthy();
-    }).pipe(Effect.provide(ProcessCompose.Live)),
+    }).pipe(Effect.provide(ProcessComposeLive)),
   );
 
   it.live('Test sequencer configs are available and in correct format', () =>
