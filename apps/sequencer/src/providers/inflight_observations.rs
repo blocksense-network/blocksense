@@ -91,6 +91,7 @@ mod tests {
             allow_feeds: None,
             publishing_criteria: Vec::new(),
             contracts: Vec::new(),
+            reorg: blocksense_config::ReorgConfig::default(),
         };
         let provider_config_clone = provider_config.clone();
 
