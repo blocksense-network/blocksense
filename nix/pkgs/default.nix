@@ -75,6 +75,7 @@
           forex-price-feeds = mkOracleScript "forex-price-feeds";
           commodities-price-feeds = mkOracleScript "commodities-price-feeds";
           spout-rwa = mkOracleScript "spout-rwa";
+          eth-gas-info = mkOracleScript "eth-gas-info";
         };
 
         spinPlugins = {
