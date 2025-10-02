@@ -2,10 +2,11 @@ import * as React from 'react';
 import { Button } from 'nextra/components';
 
 import { ImageWrapper } from '@blocksense/docs-ui/ImageWrapper';
-import { capitalizeWords } from '@/src/utils';
+import { capitalizeWords, networkNameToIconName } from '@/src/utils';
+import { NetworkName } from '@blocksense/base-utils/evm/networks';
 
 type NetworkIconProps = {
-  network: string;
+  network: NetworkName;
   isSelected: boolean;
   onClick: () => void;
 };
@@ -15,7 +16,7 @@ export const NetworkIcon = ({
   isSelected,
   onClick,
 }: NetworkIconProps) => {
-  const iconPath = `/images/network-icons/${network.split('-')[0]}.png`;
+  const iconPath = `/images/network-icons/${networkNameToIconName(network)}.png`;
 
   return (
     <Button
