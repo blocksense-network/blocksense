@@ -16,10 +16,6 @@ use blocksense_utils::await_time;
 // Local helpers from eth_send_utils we need to call
 use crate::providers::eth_send_utils::try_to_sync;
 
-// Default JSON-RPC timeouts for provider calls in this module
-const RPC_TIMEOUT_BLOCK: Duration = Duration::from_secs(5);
-const RPC_TIMEOUT_STORAGE: Duration = Duration::from_secs(5);
-
 // Helper to handle reorg once already detected. Finds fork point and prints
 // discarded observations, mirroring the existing log messages and structure.
 pub(crate) async fn handle_reorg(
@@ -28,6 +24,7 @@ pub(crate) async fn handle_reorg(
     provider_mutex: &Arc<Mutex<RpcProvider>>,
     observed_block_hashes: &HashMap<u64, B256>,
     observed_latest_height: u64,
+    rpc_timeout: Duration,
 ) -> Option<u64> {
     // Build list of observed heights up to observed_latest_height, highest to lowest
     let mut observed_heights: Vec<u64> = observed_block_hashes
@@ -49,7 +46,7 @@ pub(crate) async fn handle_reorg(
             None => continue,
         };
         match timeout(
-            RPC_TIMEOUT_BLOCK,
+            rpc_timeout,
             rpc_handle.get_block_by_number(BlockNumberOrTag::Number(height)),
         )
         .await
@@ -138,18 +135,28 @@ pub(crate) async fn handle_reorg(
     }
 }
 
-pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: SharedRpcProviders) {
+pub async fn loop_tracking_for_reorg_in_network(
+    net: String,
+    providers_mutex: SharedRpcProviders,
+    reorg_config: blocksense_config::ReorgConfig,
+) {
     tracing::info!("Starting tracker for reorgs in network {net} loop...");
 
     let mut finalized_height = 0;
     let mut observed_latest_height = 0;
     let mut loop_count: u64 = 0;
+    let rpc_timeout = Duration::from_secs(reorg_config.rpc_timeout_secs);
 
     // Loop until block generation time is determined
     let average_block_generation_time: u64 = loop {
         let poll_period = 60 * 1000;
-        if let Some(t) =
-            calculate_block_generation_time_in_network(net.as_str(), &providers_mutex, 100).await
+        if let Some(t) = calculate_block_generation_time_in_network(
+            net.as_str(),
+            &providers_mutex,
+            100,
+            rpc_timeout,
+        )
+        .await
         {
             break t;
         } else {
@@ -184,7 +191,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                     };
 
                     let latest_res = timeout(
-                        RPC_TIMEOUT_BLOCK,
+                        rpc_timeout,
                         rpc_handle.get_block_by_number(BlockNumberOrTag::Latest),
                     )
                     .await;
@@ -198,7 +205,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                 observed_block_hashes.get(&observed_latest_height)
                             {
                                 match timeout(
-                                    RPC_TIMEOUT_BLOCK,
+                                    rpc_timeout,
                                     rpc_handle.get_block_by_number(BlockNumberOrTag::Number(
                                         observed_latest_height,
                                     )),
@@ -219,6 +226,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                                 provider_mutex,
                                                 &observed_block_hashes,
                                                 observed_latest_height,
+                                                rpc_timeout,
                                             )
                                             .await;
                                         }
@@ -239,7 +247,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                             // Check for reorg via parent mismatch
                             let first_new_block_height = observed_latest_height + 1;
                             if let Ok(Ok(Some(first_new_block))) = timeout(
-                                RPC_TIMEOUT_BLOCK,
+                                rpc_timeout,
                                 rpc_handle.get_block_by_number(BlockNumberOrTag::Number(
                                     first_new_block_height,
                                 )),
@@ -262,6 +270,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                             provider_mutex,
                                             &observed_block_hashes,
                                             observed_latest_height,
+                                            rpc_timeout,
                                         )
                                         .await;
                                     } else {
@@ -279,7 +288,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                             first_new_block_height + 1..=latest_height
                                         {
                                             if let Ok(Ok(Some(new_block))) = timeout(
-                                                RPC_TIMEOUT_BLOCK,
+                                                rpc_timeout,
                                                 rpc_handle.get_block_by_number(
                                                     BlockNumberOrTag::Number(block_height),
                                                 ),
@@ -315,7 +324,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                 observed_block_hashes.get(&observed_latest_height)
                             {
                                 match timeout(
-                                    RPC_TIMEOUT_BLOCK,
+                                    rpc_timeout,
                                     rpc_handle.get_block_by_number(BlockNumberOrTag::Number(
                                         observed_latest_height,
                                     )),
@@ -336,6 +345,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                                 provider_mutex,
                                                 &observed_block_hashes,
                                                 observed_latest_height,
+                                                rpc_timeout,
                                             )
                                             .await;
                                         }
@@ -361,7 +371,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                         if let Some(contract) = provider.get_latest_contract() {
                             if let Some(contract_address) = contract.address {
                                 match timeout(
-                                    RPC_TIMEOUT_STORAGE,
+                                    rpc_timeout,
                                     rpc_handle.get_storage_at(
                                         contract_address,
                                         alloy_primitives::U256::from(0),
@@ -407,7 +417,7 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
 
                     // 1) Observe latest finalized block for logging/visibility
                     match timeout(
-                        RPC_TIMEOUT_BLOCK,
+                        rpc_timeout,
                         rpc_handle.get_block_by_number(BlockNumberOrTag::Finalized),
                     )
                     .await
@@ -477,6 +487,7 @@ pub async fn calculate_block_generation_time_in_network(
     net: &str,
     providers_mutex: &SharedRpcProviders,
     num_blocks: u64,
+    rpc_timeout: Duration,
 ) -> Option<u64> {
     if num_blocks == 0 {
         warn!("num_blocks must be >= 1 for average block time in network {net}");
@@ -487,14 +498,14 @@ pub async fn calculate_block_generation_time_in_network(
         warn!("No active provider found for network {net}");
         return None;
     };
-    // Clone the RPC handle without holding the provider lock across awaits
+    // Clone the RPC handle and read configured timeout without holding the lock across awaits
     let rpc_handle = {
         let provider = provider_mutex.lock().await;
         provider.provider.clone()
     };
 
     let latest_block = match timeout(
-        RPC_TIMEOUT_BLOCK,
+        rpc_timeout,
         rpc_handle.get_block_by_number(BlockNumberOrTag::Latest),
     )
     .await
@@ -524,7 +535,7 @@ pub async fn calculate_block_generation_time_in_network(
 
     let lookback_height = latest_height - num_blocks;
     let prev_block = match timeout(
-        RPC_TIMEOUT_BLOCK,
+        rpc_timeout,
         rpc_handle.get_block_by_number(BlockNumberOrTag::Number(lookback_height)),
     )
     .await
@@ -793,6 +804,7 @@ mod tests {
         let loop_handle = tokio::spawn(super::loop_tracking_for_reorg_in_network(
             net.to_string(),
             providers.clone(),
+            blocksense_config::ReorgConfig::default(),
         ));
 
         // Give the loop time to run once and ingest the chain
