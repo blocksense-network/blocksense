@@ -168,9 +168,7 @@ describe.sequential('E2E Tests with process-compose', () => {
           },
         );
 
-        const processes = yield* Effect.tryPromise(() =>
-          parseProcessesStatus(),
-        );
+        const processes = yield* parseProcessesStatus();
 
         expect(processes).toEqual(expectedPCStatuses03);
       }),
