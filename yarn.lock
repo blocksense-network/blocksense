@@ -1630,7 +1630,6 @@ __metadata:
     "@types/node": "npm:^24.3.1"
     "@vitest/coverage-v8": "npm:^3.2.4"
     effect: "npm:^3.17.13"
-    execa: "npm:^9.6.0"
     parse-prometheus-text-format: "npm:^1.1.1"
     tsx: "npm:^4.20.5"
     typescript: "npm:5.9.2"
