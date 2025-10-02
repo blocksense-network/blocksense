@@ -1527,6 +1527,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "eth-gas-info"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "blocksense-data-providers-sdk",
+ "blocksense-sdk",
+ "futures",
+ "itertools 0.14.0",
+ "prettytable-rs",
+ "serde",
+ "serde-this-or-that",
+ "serde_json",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+ "wit-bindgen",
+]
+
+[[package]]
 name = "eth-rpc"
 version = "0.1.0"
 dependencies = [
