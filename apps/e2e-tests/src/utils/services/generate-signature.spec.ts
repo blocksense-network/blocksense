@@ -2,13 +2,14 @@ import { Effect } from 'effect';
 import { afterAll, beforeEach, describe, expect, it, vi } from '@effect/vitest';
 import bls from '@chainsafe/bls';
 
+import { bytesToBigIntBE } from '../utilities';
+
 import {
   asBytes,
   type FeedResult,
   type FeedType,
   generateSignature,
 } from './generate-signature';
-import { bytesToBigIntBE } from './utilities';
 
 const toBE8 = (x: bigint) => {
   const buf = Buffer.allocUnsafe(8);
