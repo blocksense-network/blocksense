@@ -43,7 +43,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 ### 2.2 Events & Decoding
 
-- `topicName` is configured (e.g. `"DataFeedsUpdated(uint256)"`); derive `topic0 = keccak256(topicName)` internally.
+- `topicNames` config maps contract `version` → event signature (e.g. `{ "1": "DataFeedsUpdated(uint256)" }`); the service derives `topic0 = keccak256(topicNames[version])` for the active version and subscribes to that topic per chain.
 - For each matched log: fetch transaction, receipt, and input data; decode with `decodeADFSCalldata(calldata, hasBlockNumber)` where `hasBlockNumber` is dictated by the active contract version.
 - Decoder yields `feeds[]` (exposes `stride`, `feedId` as u128, `index` as u16, and `data` bytes) and `ringBufferTable[]` (global `table_index`, `data`).
 - Version-specific extras (e.g., `sourceAccumulator`, `destinationAccumulator`) are persisted in a JSONB `extra` column.
@@ -139,8 +139,8 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 ### 5.1 VersionManager
 
 - On startup: scans `Upgraded(address)` events from `startBlock` to head; computes current `version`.
-- Maintains in-memory map `chain_id → {version, decoderProfile}`.
-- Live subscription bumps version and persists change log to DB.
+- Maintains in-memory map `chain_id → {version, decoderProfile, topic0}` where `topic0` is derived from `topicNames[version]` in config.
+- Live subscription bumps version, recalculates `topic0` from config, and persists change log (including the hash) to DB.
 - Decoder profiles (extensible):
   - Version 1: `hasBlockNumber = true` (ignore on persistence).
   - Version 2+: `hasBlockNumber = false`; expect accumulator fields in `extra`.
@@ -154,7 +154,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 ### 5.3 LiveTailWorker
 
-- WS subscription filtered by proxy address + `topic0`.
+- WS subscription filtered by proxy address + the current `topic0` supplied by VersionManager (updates after each version change).
 - For each log: fetches transaction & receipt via HTTP client, decodes calldata via VersionManager, enqueues event.
 - Reconnect strategy with exponential backoff; HTTP polling fallback when WS unreachable.
 
@@ -173,8 +173,8 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 ### 5.6 ProxyUpgradeWatcher
 
 - Watches proxy `Upgraded(address implementation)` topic over WS and scheduled HTTP catch-up.
-- Persists `(chain_id, version, implementation, activated_block)` to `proxy_versions`.
-- Notifies VersionManager to reload decoder profile and re-evaluate `hasBlockNumber`.
+- Persists `(chain_id, version, implementation, topic_hash, activated_block)` to `proxy_versions`, where `topic_hash = keccak256(topicNames[version])`.
+- Notifies VersionManager to reload decoder profile, `topic0`, and re-evaluate `hasBlockNumber`.
 
 ### 5.7 BlockHeaderCache & Metadata Fetchers
 
@@ -189,8 +189,8 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 ### 6.1 Tables
 
 - `chains`: chain metadata and default finality confirmations.
-- `contracts`: proxy address, config topic hash, deployment `start_block` per chain.
-- `proxy_versions`: `(chain_id, version, implementation, activated_block)`; append-only.
+- `contracts`: proxy address, deployment `start_block`, and initial `topic_hash` (derived from the version-to-signature map) per chain.
+- `proxy_versions`: `(chain_id, version, implementation, topic_hash, activated_block)`; append-only and sourced from config mapping at activation time.
 - `adfs_events`: partitioned by chain/timestamp; raw event metadata, status enum, calldata, version, `topic0`.
 - `tx_inputs`: optional normalized transaction input archive storing selector, decoded JSON, status, and version for auditing.
 - `feed_updates`: normalized feed entries with `feed_id` as `BIT(128)`, `stride`, `rb_index`, payload bytes, status, version.
@@ -284,11 +284,11 @@ CREATE TABLE chains (
 );
 
 CREATE TABLE contracts (
-  chain_id         INTEGER REFERENCES chains(chain_id),
-  proxy_address    BYTEA  NOT NULL,
-  contract_address BYTEA  NOT NULL,
-  topic_hash       BYTEA  NOT NULL,
-  start_block      BIGINT NOT NULL,
+  chain_id            INTEGER REFERENCES chains(chain_id),
+  proxy_address       BYTEA  NOT NULL,
+  contract_address    BYTEA  NOT NULL,
+  initial_topic_hash  BYTEA  NOT NULL,
+  start_block         BIGINT NOT NULL,
   UNIQUE (chain_id)
 );
 
@@ -296,6 +296,7 @@ CREATE TABLE proxy_versions (
   chain_id        INTEGER NOT NULL REFERENCES chains(chain_id),
   version         INTEGER NOT NULL,
   implementation  BYTEA   NOT NULL,
+  topic_hash      BYTEA   NOT NULL,
   activated_block BIGINT  NOT NULL,
   PRIMARY KEY (chain_id, version)
 );
@@ -385,7 +386,7 @@ CREATE TABLE processing_state (
 ### 7.1 Event Processing Flow
 
 1. Detect matching log (`topic0`, proxy address).
-2. Resolve active version at `block_number` from `proxy_versions`.
+2. Resolve active version at `block_number` from `proxy_versions` and fetch the corresponding signature `topic0` from config-derived mapping (fallback to DB hash if config lacks entry).
 3. Fetch transaction calldata and receipt (`eth_getTransactionByHash`).
 4. Decode calldata via `decodeADFSCalldata(calldata, VersionMode[version].hasBlockNumber)`.
 5. Assemble rows for `adfs_events`, `tx_inputs`, `feed_updates`, `ring_buffer_updates`.
@@ -413,6 +414,7 @@ CREATE TABLE processing_state (
 - `queue.maxItems`: default 10,000 pending items per chain (drop-oldest overflow).
 - `alertsConfig`: `noEventsSeconds` default 300, `maxLagBlocks` default 64 per chain.
 - Optional knobs: RPC rate limits, queue sizing, and backfill range bounds.
+- `topicNames`: mapping from version → event signature; every active version must have a configured signature.
 - `metrics.port`: default `9464` (`/metrics`).
 - `LOG_LEVEL`: default `info`; structured JSON logs.
 - `OTEL_EXPORTER_OTLP_ENDPOINT`: enables tracing when set.
@@ -434,7 +436,10 @@ CREATE TABLE processing_state (
       "rpcWs": ["wss://primary.ws"],
       "finality": 12,
       "contractAddress": "0xProxyAddress",
-      "topicName": "DataFeedsUpdated(uint256)",
+      "topicNames": {
+        "1": "DataFeedsUpdated(uint256)",
+        "2": "DataFeedsUpdated(uint256,address)"
+      },
       "startBlock": 19000000,
       "alertsConfig": { "noEventsSeconds": 300, "maxLagBlocks": 64 },
       "backfill": { "initialRange": 10000, "minRange": 256, "maxRange": 20000 }
@@ -444,7 +449,7 @@ CREATE TABLE processing_state (
 ```
 
 > `hasBlockNumber` is derived from `version`. Provide HTTP/WS endpoints in priority order; service iterates until a healthy provider responds. When WS endpoints fail, the tailer temporarily polls via HTTP to avoid data loss.
-> `topicName` stays in config only; the database stores the computed hash (`topic0`) as `BYTEA` on relevant tables.
+> `topicNames` stay in config only; the database stores the computed hash (`topic0`) as `BYTEA` on relevant tables when events are ingested.
 > Embed provider API keys directly inside RPC URLs; no extra indirection required.
 > Prometheus metrics surface at `http://0.0.0.0:${service.metricsPort}/metrics` (default `9464`).
 > Per-chain `alertsConfig` thresholds tune "no events" and "lag" alerts to the expected cadence.
@@ -681,6 +686,7 @@ WHERE chain_id = $1 AND block_timestamp >= now() - interval '$2 days';
 ## 24) Implementation Notes (TS/Effect)
 
 - `decodeADFSCalldata(calldata, hasBlockNumber)` returns version-specific extras; persist accumulator fields when `hasBlockNumber=false`.
+- Maintain a `topicNames: Record<number, string>` map after config parsing; fail fast if a required version lacks a signature before subscribing or writing rows.
 - Convert 0x addresses to `BYTEA` before inserting; provide helpers for hex ↔ BIT(128) conversions.
 - Ordering buffer implemented as minimal in-memory index keyed by `(blockNumber, logIndex)`; flush per block.
 - Expose Effect services (`ConfigService`, `DbService`, `RpcService`, etc.) via dependency injection for unit tests.
