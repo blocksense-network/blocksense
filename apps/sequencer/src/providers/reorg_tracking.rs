@@ -1,4 +1,5 @@
 use crate::providers::provider::{ProviderType, RpcProvider, SharedRpcProviders};
+use actix_web::rt::time::timeout;
 use alloy::hex;
 use alloy::{eips::BlockNumberOrTag, providers::Provider};
 use alloy_primitives::B256;
@@ -6,6 +7,7 @@ use chrono::Local;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
+use tokio::time::Duration;
 use tracing::{error, info, warn};
 
 use blocksense_metrics::inc_vec_metric;
@@ -13,6 +15,10 @@ use blocksense_utils::await_time;
 
 // Local helpers from eth_send_utils we need to call
 use crate::providers::eth_send_utils::try_to_sync;
+
+// Default JSON-RPC timeouts for provider calls in this module
+const RPC_TIMEOUT_BLOCK: Duration = Duration::from_secs(5);
+const RPC_TIMEOUT_STORAGE: Duration = Duration::from_secs(5);
 
 // Helper to handle reorg once already detected. Finds fork point and prints
 // discarded observations, mirroring the existing log messages and structure.
@@ -42,11 +48,13 @@ pub(crate) async fn handle_reorg(
             Some(hash) => *hash,
             None => continue,
         };
-        match rpc_handle
-            .get_block_by_number(BlockNumberOrTag::Number(height))
-            .await
+        match timeout(
+            RPC_TIMEOUT_BLOCK,
+            rpc_handle.get_block_by_number(BlockNumberOrTag::Number(height)),
+        )
+        .await
         {
-            Ok(Some(chain_block)) => {
+            Ok(Ok(Some(chain_block))) => {
                 let chain_hash = chain_block.header.hash;
                 if chain_hash == stored_hash {
                     first_common = Some((height, chain_hash));
@@ -55,9 +63,12 @@ pub(crate) async fn handle_reorg(
                     diverged_blocks.push((height, chain_hash, stored_hash));
                 }
             }
-            Ok(None) => warn!("Block {height} missing while inspecting reorg in network {net}"),
-            Err(e) => {
+            Ok(Ok(None)) => warn!("Block {height} missing while inspecting reorg in network {net}"),
+            Ok(Err(e)) => {
                 warn!("Failed to get block {height} in network {net} while inspecting reorg: {e:?}")
+            }
+            Err(_) => {
+                warn!("Timed out getting block {height} in network {net} while inspecting reorg")
             }
         }
     }
@@ -172,10 +183,12 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                         )
                     };
 
-                    if let Ok(Some(b)) = rpc_handle
-                        .get_block_by_number(BlockNumberOrTag::Latest)
-                        .await
-                    {
+                    let latest_res = timeout(
+                        RPC_TIMEOUT_BLOCK,
+                        rpc_handle.get_block_by_number(BlockNumberOrTag::Latest),
+                    )
+                    .await;
+                    if let Ok(Ok(Some(b))) = latest_res {
                         let _latest_hash = b.header.hash;
                         let latest_height = b.header.inner.number;
                         if latest_height > observed_latest_height {
@@ -184,13 +197,15 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                             if let Some(stored_hash) =
                                 observed_block_hashes.get(&observed_latest_height)
                             {
-                                match rpc_handle
-                                    .get_block_by_number(BlockNumberOrTag::Number(
+                                match timeout(
+                                    RPC_TIMEOUT_BLOCK,
+                                    rpc_handle.get_block_by_number(BlockNumberOrTag::Number(
                                         observed_latest_height,
-                                    ))
-                                    .await
+                                    )),
+                                )
+                                .await
                                 {
-                                    Ok(Some(chain_block)) => {
+                                    Ok(Ok(Some(chain_block))) => {
                                         let chain_hash = chain_block.header.hash;
                                         if chain_hash != *stored_hash {
                                             warn!(
@@ -208,11 +223,14 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                             .await;
                                         }
                                     }
-                                    Ok(None) => warn!(
+                                    Ok(Ok(None)) => warn!(
                                         "Could not get block {observed_latest_height} in network {net} while pre-checking for reorg"
                                     ),
-                                    Err(e) => warn!(
+                                    Ok(Err(e)) => warn!(
                                         "Failed to get block {observed_latest_height} in network {net} while pre-checking for reorg: {e:?}"
+                                    ),
+                                    Err(_) => warn!(
+                                        "Timed out getting block {observed_latest_height} in network {net} while pre-checking for reorg"
                                     ),
                                 }
                             }
@@ -220,11 +238,13 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
 
                             // Check for reorg via parent mismatch
                             let first_new_block_height = observed_latest_height + 1;
-                            if let Ok(Some(first_new_block)) = rpc_handle
-                                .get_block_by_number(BlockNumberOrTag::Number(
+                            if let Ok(Ok(Some(first_new_block))) = timeout(
+                                RPC_TIMEOUT_BLOCK,
+                                rpc_handle.get_block_by_number(BlockNumberOrTag::Number(
                                     first_new_block_height,
-                                ))
-                                .await
+                                )),
+                            )
+                            .await
                             {
                                 if let Some(observed_latest_block_hash) =
                                     observed_block_hashes.get(&observed_latest_height)
@@ -258,11 +278,13 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                         for block_height in
                                             first_new_block_height + 1..=latest_height
                                         {
-                                            if let Ok(Some(new_block)) = rpc_handle
-                                                .get_block_by_number(BlockNumberOrTag::Number(
-                                                    block_height,
-                                                ))
-                                                .await
+                                            if let Ok(Ok(Some(new_block))) = timeout(
+                                                RPC_TIMEOUT_BLOCK,
+                                                rpc_handle.get_block_by_number(
+                                                    BlockNumberOrTag::Number(block_height),
+                                                ),
+                                            )
+                                            .await
                                             {
                                                 info!("DEBUG: Further adding block with height {block_height}");
                                                 provider.insert_observed_block_hash(
@@ -292,13 +314,15 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                             if let Some(stored_hash) =
                                 observed_block_hashes.get(&observed_latest_height)
                             {
-                                match rpc_handle
-                                    .get_block_by_number(BlockNumberOrTag::Number(
+                                match timeout(
+                                    RPC_TIMEOUT_BLOCK,
+                                    rpc_handle.get_block_by_number(BlockNumberOrTag::Number(
                                         observed_latest_height,
-                                    ))
-                                    .await
+                                    )),
+                                )
+                                .await
                                 {
-                                    Ok(Some(chain_block)) => {
+                                    Ok(Ok(Some(chain_block))) => {
                                         let chain_hash = chain_block.header.hash;
                                         if chain_hash != *stored_hash {
                                             warn!(
@@ -316,11 +340,14 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                             .await;
                                         }
                                     }
-                                    Ok(None) => warn!(
+                                    Ok(Ok(None)) => warn!(
                                         "Could not get block {observed_latest_height} in network {net} (None) while checking for reorg without tip advancement"
                                     ),
-                                    Err(e) => warn!(
+                                    Ok(Err(e)) => warn!(
                                         "Failed to get block {observed_latest_height} in network {net} while checking for reorg (no tip advance): {e:?}"
+                                    ),
+                                    Err(_) => warn!(
+                                        "Timed out getting block {observed_latest_height} in network {net} while checking for reorg (no tip advance)"
                                     ),
                                 }
                             }
@@ -333,14 +360,16 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                         let mut provider = provider_mutex.lock().await;
                         if let Some(contract) = provider.get_latest_contract() {
                             if let Some(contract_address) = contract.address {
-                                match rpc_handle
-                                    .get_storage_at(
+                                match timeout(
+                                    RPC_TIMEOUT_STORAGE,
+                                    rpc_handle.get_storage_at(
                                         contract_address,
                                         alloy_primitives::U256::from(0),
-                                    )
-                                    .await
+                                    ),
+                                )
+                                .await
                                 {
-                                    Ok(chain_root) => {
+                                    Ok(Ok(chain_root)) => {
                                         let chain_root_h = crate::providers::provider::HashValue(
                                             chain_root.into(),
                                         );
@@ -361,9 +390,12 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                             need_resync_indices = true;
                                         }
                                     }
-                                    Err(e) => warn!(
+                                    Ok(Err(e)) => warn!(
                                         "Failed to read ADFS root from network `{net}`: {e:?}"
                                     ),
+                                    Err(_) => {
+                                        warn!("Timed out reading ADFS root from network `{net}`")
+                                    }
                                 }
                             } else {
                                 warn!("Could not get contract's address for network: {net}");
@@ -374,11 +406,13 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                     }
 
                     // 1) Observe latest finalized block for logging/visibility
-                    match rpc_handle
-                        .get_block_by_number(BlockNumberOrTag::Finalized)
-                        .await
+                    match timeout(
+                        RPC_TIMEOUT_BLOCK,
+                        rpc_handle.get_block_by_number(BlockNumberOrTag::Finalized),
+                    )
+                    .await
                     {
-                        Ok(res) => match res {
+                        Ok(Ok(res)) => match res {
                             Some(eth_finalized_block) => {
                                 let mut provider = provider_mutex.lock().await;
 
@@ -408,7 +442,10 @@ pub async fn loop_tracking_for_reorg_in_network(net: String, providers_mutex: Sh
                                 warn!("Could not get finalized block in network {net}, got None!")
                             }
                         },
-                        Err(e) => warn!("Could not get finalized block in network {net}: {e:?}!"),
+                        Ok(Err(e)) => {
+                            warn!("Could not get finalized block in network {net}: {e:?}!")
+                        }
+                        Err(_) => warn!("Timed out getting finalized block in network {net}"),
                     };
                 };
 
@@ -456,17 +493,23 @@ pub async fn calculate_block_generation_time_in_network(
         provider.provider.clone()
     };
 
-    let latest_block = match rpc_handle
-        .get_block_by_number(BlockNumberOrTag::Latest)
-        .await
+    let latest_block = match timeout(
+        RPC_TIMEOUT_BLOCK,
+        rpc_handle.get_block_by_number(BlockNumberOrTag::Latest),
+    )
+    .await
     {
-        Ok(Some(b)) => b,
-        Ok(None) => {
+        Ok(Ok(Some(b))) => b,
+        Ok(Ok(None)) => {
             warn!("Could not get latest block in network {net} (None)");
             return None;
         }
-        Err(e) => {
+        Ok(Err(e)) => {
             warn!("Error getting latest block in network {net}: {e:?}");
+            return None;
+        }
+        Err(_) => {
+            warn!("Timed out getting latest block in network {net}");
             return None;
         }
     };
@@ -480,17 +523,23 @@ pub async fn calculate_block_generation_time_in_network(
     }
 
     let lookback_height = latest_height - num_blocks;
-    let prev_block = match rpc_handle
-        .get_block_by_number(BlockNumberOrTag::Number(lookback_height))
-        .await
+    let prev_block = match timeout(
+        RPC_TIMEOUT_BLOCK,
+        rpc_handle.get_block_by_number(BlockNumberOrTag::Number(lookback_height)),
+    )
+    .await
     {
-        Ok(Some(b)) => b,
-        Ok(None) => {
+        Ok(Ok(Some(b))) => b,
+        Ok(Ok(None)) => {
             warn!("Could not get lookback block {lookback_height} in network {net} (None)");
             return None;
         }
-        Err(e) => {
+        Ok(Err(e)) => {
             warn!("Error getting lookback block {lookback_height} in network {net}: {e:?}");
+            return None;
+        }
+        Err(_) => {
+            warn!("Timed out getting lookback block {lookback_height} in network {net}");
             return None;
         }
     };
