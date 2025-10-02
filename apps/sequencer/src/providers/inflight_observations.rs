@@ -93,6 +93,7 @@ mod tests {
             contracts: Vec::new(),
             receipt_polling_back_off_period_ms: 15000,
             transaction_retry_back_off_ms: 15000,
+            reorg: blocksense_config::ReorgConfig::default(),
         };
         let provider_config_clone = provider_config.clone();
 
