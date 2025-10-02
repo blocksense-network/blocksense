@@ -33,6 +33,8 @@ export interface NetworkConfigBase {
     safeWebAuthnSharedSignerAddress: EthereumAddress;
     safeWebAuthnSignerFactoryAddress: EthereumAddress;
   };
+  // When set to a bigint value (not 'auto'), skip gas estimation and use this gas limit.
+  txGasLimit: 'auto' | bigint;
 }
 
 export type NetworkConfig = NetworkConfigBase &

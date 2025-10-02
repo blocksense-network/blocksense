@@ -57,6 +57,10 @@ const envSchema = {
   perNetworkName: {
     rpcUrl: S.URL,
     feedIds: S.Union(S.Literal('all'), fromCommaSeparatedString(S.BigInt)),
+    // When set to a bigint value, this gas limit will be used for every
+    // deployment transaction instead of calling estimateGas. Useful for
+    // RPC endpoints that have issues with eth_estimateGas. Defaults to 'auto'.
+    txGasLimit: S.Union(S.Literal('auto'), S.BigInt),
 
     ...sharedPerNetworkKind,
   },
@@ -77,13 +81,17 @@ export async function initChain(
       ? '0xf8f3965692216a43513fd1ea951d2b3c9d48fac5a96a95a159ce854886f7c1bd'
       : id('upgradeableProxy'),
   );
+
   // Allow the deployer private key to be empty if the deployer is a Ledger.
   if (parsedEnv.mergedConfig.deployerAddressIsLedger) {
     parsedEnv.mergedConfig.deployerPrivateKey ??= parseHexDataString('0x00');
   } else {
     parsedEnv.mergedConfig.deployerHDWalletDerivationPath = '';
   }
+
   parsedEnv.mergedConfig.isSafeOriginalDeployment ??= true;
+
+  parsedEnv.mergedConfig.txGasLimit ??= 'auto';
 
   const { mergedConfig: envCfg } =
     validateAndPrintDeploymentEnvConfig(parsedEnv);
@@ -151,6 +159,7 @@ export async function initChain(
     },
     feedIds: envCfg.feedIds,
     safeAddresses,
+    txGasLimit: envCfg.txGasLimit,
   } satisfies NetworkConfig;
 }
 
