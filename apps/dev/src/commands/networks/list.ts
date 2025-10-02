@@ -22,8 +22,9 @@ export const list = Command.make(
       'testnet',
       'mainnet',
     ] as const).pipe(Options.withDefault('all')),
+    count: Options.boolean('count').pipe(Options.withDefault(false)),
   },
-  ({ displayMode, networkType, showConfig }) =>
+  ({ count, displayMode, networkType, showConfig }) =>
     Effect.gen(function* () {
       const networks = networkTypeFilter(
         yield* Effect.tryPromise(() => listEvmNetworks()),
@@ -32,6 +33,12 @@ export const list = Command.make(
 
       if (networks.length === 0) {
         console.log('No deployed networks found.');
+        return;
+      }
+
+      if (count) {
+        const scopeMsg = networkType === 'all' ? '' : ` (${networkType})`;
+        console.log(`Total deployed networks${scopeMsg}: ${networks.length}`);
         return;
       }
 
