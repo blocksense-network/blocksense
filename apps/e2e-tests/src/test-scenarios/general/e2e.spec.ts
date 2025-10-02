@@ -22,13 +22,14 @@ import { ProcessComposeLive } from '../../utils/environment-managers/process-com
 import type { FeedResult } from '../../utils/generate-signature';
 import type { FeedsValueAndRound } from '../../utils/onchain';
 import { getDataFeedsInfoFromNetwork } from '../../utils/onchain';
+import type { SequencerService } from '../../utils/sequencer';
+import { Sequencer } from '../../utils/sequencer';
 import type {
   EnvironmentManagerService,
   ReportData,
-  SequencerService,
   UpdatesToNetwork,
 } from '../../utils/types';
-import { EnvironmentManager, Sequencer } from '../../utils/types';
+import { EnvironmentManager } from '../../utils/types';
 import { parseProcessesStatus, rgSearchPattern } from '../../utils/utilities';
 
 import { expectedPCStatuses03 } from './expected-service-status';
