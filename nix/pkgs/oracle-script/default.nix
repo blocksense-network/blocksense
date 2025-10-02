@@ -8,7 +8,7 @@ let
 
   sharedAttrs = rec {
     pname = "blocksense-oracle-scripts";
-    inherit (filesets.rustSrc) src;
+    inherit (filesets.oracleSrc) src;
 
     nativeBuildInputs = [
       pkg-config
