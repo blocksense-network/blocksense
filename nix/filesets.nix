@@ -1,36 +1,59 @@
 { lib, ... }:
 let
   root = ../.;
+
+  cargoFiles = [
+    "Cargo.toml"
+    "Cargo.lock"
+  ];
 in
 with lib.fileset;
 {
   inherit (lib.fileset) trace;
 
-  rustSrc = rec {
+  nodeSoftwareSrc = rec {
+    fileset =
+      let
+        oracleRelated = unions [
+          (lib.path.append root "apps/oracles")
+        ];
+      in
+      difference (unions [
+        (lib.path.append root ".cargo/config.toml")
+
+        (fileFilter (
+          file:
+          builtins.elem file.name (cargoFiles ++ [ "deps.toml" ])
+          || builtins.any file.hasExt [
+            "rs"
+            "wit"
+          ]
+        ) root)
+
+        # JSON files must be listed one by one, otherwise changing an
+        # unrelated JSON file will cause all Rust derivations to be rebuilt
+        (lib.path.append root "apps/sequencer_tests/Safe.json")
+        (lib.path.append root "apps/sequencer_tests/SafeProxyFactory.json")
+        (lib.path.append root "libs/gnosis_safe/safe_abi.json")
+      ]) oracleRelated;
+    src = toSource { inherit root fileset; };
+  };
+
+  oracleSrc = rec {
     fileset = unions [
+      (lib.path.append root "libs/data_providers_sdk")
+      (lib.path.append root "libs/sdk")
       (lib.path.append root "Cargo.toml")
       (lib.path.append root "Cargo.lock")
 
       (fileFilter (
         file:
-        builtins.any file.hasExt [
+        builtins.elem file.name cargoFiles
+        || builtins.any file.hasExt [
           "rs"
-          "toml"
-          "wit"
+          "json"
         ]
-      ) root)
-
-      # JSON files must be listed one by one, otherwise changing an
-      # unrelated JSON file will cause all Rust derivations to be rebuilt
-      (lib.path.append root "apps/sequencer_tests/Safe.json")
-      (lib.path.append root "apps/oracles/eth-rpc/src/abi/VaultABI.json")
-      (lib.path.append root "apps/oracles/eth-rpc/src/abi/YieldFiyUSD.json")
-      (lib.path.append root "apps/sequencer_tests/SafeProxyFactory.json")
-      (lib.path.append root "apps/oracles/borrow-rates/src/abi/Aave/UiPoolDataProvider.json")
-      (lib.path.append root "apps/oracles/borrow-rates/src/abi/HyperLand/UiPoolDataProvider.json")
-      (lib.path.append root "apps/oracles/borrow-rates/src/abi/HypurrFi/UiPoolDataProvider.json")
-      (lib.path.append root "apps/oracles/borrow-rates/src/abi/Euler/utilsLens.json")
-      (lib.path.append root "libs/gnosis_safe/safe_abi.json")
+      ) (lib.path.append root "apps/oracles"))
     ];
     src = toSource { inherit root fileset; };
   };

@@ -19,7 +19,7 @@
 let
   sharedAttrs = {
     pname = "blocksense";
-    inherit (filesets.rustSrc) src;
+    inherit (filesets.nodeSoftwareSrc) src;
 
     nativeBuildInputs = [
       git
