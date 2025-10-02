@@ -45,9 +45,12 @@ export async function sendTx({
           maxPriorityFeePerGas: feeData.maxPriorityFeePerGas,
         }),
   };
-
-  const gasLimit = await config.provider.estimateGas(txRequest);
-  txRequest.gasLimit = Number(gasLimit);
+  if (config.txGasLimit === 'auto') {
+    const gasLimit = await config.provider.estimateGas(txRequest);
+    txRequest.gasLimit = gasLimit;
+  } else {
+    txRequest.gasLimit = config.txGasLimit;
+  }
 
   const signedTx = await config.deployer.signTransaction(txRequest);
 
