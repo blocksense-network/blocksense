@@ -244,6 +244,12 @@ WHERE (fl.block_number, fl.log_index, fl.rb_index)
     < (EXCLUDED.block_number, EXCLUDED.log_index, EXCLUDED.rb_index);
 ```
 
+- Indexes supporting day-1 queries:
+
+  - `feed_latest_point_lookup_idx` on `(chain_id, feed_id, stride)`.
+  - `feed_updates_range_q_idx` on `(chain_id, feed_id, stride, block_number, log_index)`.
+  - `ring_buffer_updates_slot_latest_idx` on `(chain_id, table_index, block_number DESC, log_index DESC)`.
+
 - Composite PKs:
   - `adfs_events (chain_id, tx_hash, log_index)`
   - `feed_updates (chain_id, tx_hash, log_index, feed_id, stride, rb_index)`
@@ -326,6 +332,16 @@ CREATE TABLE adfs_events (
   PRIMARY KEY (chain_id, tx_hash, log_index)
 ) PARTITION BY LIST (chain_id);
 
+CREATE TABLE tx_inputs (
+  chain_id        INTEGER NOT NULL,
+  tx_hash         BYTEA   NOT NULL,
+  status          adfs_state NOT NULL,
+  version         INTEGER NOT NULL,
+  selector        BYTEA   NOT NULL,
+  decoded         JSONB   NOT NULL,
+  PRIMARY KEY (chain_id, tx_hash)
+) PARTITION BY LIST (chain_id);
+
 CREATE TABLE feed_updates (
   chain_id        INTEGER NOT NULL,
   block_number    BIGINT  NOT NULL,
@@ -343,6 +359,9 @@ CREATE TABLE feed_updates (
   PRIMARY KEY (chain_id, tx_hash, log_index, feed_id, stride, rb_index)
 ) PARTITION BY LIST (chain_id);
 
+CREATE INDEX feed_updates_range_q_idx
+  ON feed_updates (chain_id, feed_id, stride, block_number, log_index);
+
 CREATE TABLE ring_buffer_updates (
   chain_id        INTEGER NOT NULL,
   block_number    BIGINT  NOT NULL,
@@ -357,6 +376,9 @@ CREATE TABLE ring_buffer_updates (
   extra           JSONB   NOT NULL DEFAULT '{}'::jsonb,
   PRIMARY KEY (chain_id, tx_hash, log_index, table_index)
 ) PARTITION BY LIST (chain_id);
+
+CREATE INDEX ring_buffer_updates_slot_latest_idx
+  ON ring_buffer_updates (chain_id, table_index, block_number DESC, log_index DESC);
 
 CREATE TABLE feed_latest (
   chain_id        INTEGER NOT NULL,
@@ -373,6 +395,9 @@ CREATE TABLE feed_latest (
   extra           JSONB    NOT NULL DEFAULT '{}'::jsonb,
   PRIMARY KEY (chain_id, feed_id, stride)
 );
+
+CREATE INDEX feed_latest_point_lookup_idx
+  ON feed_latest (chain_id, feed_id, stride);
 
 CREATE TABLE processing_state (
   chain_id             INTEGER PRIMARY KEY,
