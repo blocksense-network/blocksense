@@ -369,7 +369,9 @@ pub async fn eth_batch_send_to_contract(
 
     let mut transaction_retries_count = 0;
     let mut nonce_get_retries_count = 0;
-    const BACKOFF_SECS: u64 = 1;
+    // Per-provider configurable backoffs
+    let retry_backoff_ms = provider_settings.transaction_retry_back_off_ms;
+    let receipt_polling_back_off_period_ms = provider_settings.receipt_polling_back_off_period_ms;
 
     // First get the correct nonce
     let nonce = loop {
@@ -394,7 +396,7 @@ pub async fn eth_batch_send_to_contract(
                     net.as_str(),
                     &mut nonce_get_retries_count,
                     provider_metrics,
-                    BACKOFF_SECS,
+                    retry_backoff_ms,
                 )
                 .await;
                 continue;
@@ -432,7 +434,7 @@ pub async fn eth_batch_send_to_contract(
                     net.as_str(),
                     &mut transaction_retries_count,
                     provider_metrics,
-                    BACKOFF_SECS,
+                    retry_backoff_ms,
                 )
                 .await;
                 continue;
@@ -457,7 +459,7 @@ pub async fn eth_batch_send_to_contract(
                     net.as_str(),
                     &mut transaction_retries_count,
                     provider_metrics,
-                    BACKOFF_SECS,
+                    retry_backoff_ms,
                 )
                 .await;
                 continue;
@@ -484,7 +486,7 @@ pub async fn eth_batch_send_to_contract(
                     net.as_str(),
                     &mut transaction_retries_count,
                     provider_metrics,
-                    BACKOFF_SECS,
+                    retry_backoff_ms,
                 )
                 .await;
                 continue;
@@ -510,7 +512,7 @@ pub async fn eth_batch_send_to_contract(
                     net.as_str(),
                     &mut transaction_retries_count,
                     provider_metrics,
-                    BACKOFF_SECS,
+                    retry_backoff_ms,
                 )
                 .await;
                 continue;
@@ -583,7 +585,7 @@ pub async fn eth_batch_send_to_contract(
                                 net.as_str(),
                                 &mut transaction_retries_count,
                                 provider_metrics,
-                                BACKOFF_SECS,
+                                retry_backoff_ms,
                             )
                             .await;
                             continue;
@@ -596,7 +598,7 @@ pub async fn eth_batch_send_to_contract(
                         net.as_str(),
                         &mut transaction_retries_count,
                         provider_metrics,
-                        BACKOFF_SECS,
+                        retry_backoff_ms,
                     )
                     .await;
                     continue;
@@ -616,6 +618,7 @@ pub async fn eth_batch_send_to_contract(
                 block_height,
                 &sender_address,
                 tx_get_receipt_start_time,
+                receipt_polling_back_off_period_ms,
             )
             .await
             {
@@ -630,7 +633,7 @@ pub async fn eth_batch_send_to_contract(
                         net.as_str(),
                         &mut transaction_retries_count,
                         provider_metrics,
-                        BACKOFF_SECS,
+                        retry_backoff_ms,
                     )
                     .await;
                     continue;
@@ -659,6 +662,7 @@ pub async fn eth_batch_send_to_contract(
     Ok((receipt.status().to_string(), feeds_to_update_ids))
 }
 
+#[allow(clippy::too_many_arguments)]
 async fn await_receipt(
     net: &str,
     rpc_handle: &ProviderType,
@@ -667,6 +671,7 @@ async fn await_receipt(
     block_height: u64,
     sender_address: &Address,
     start_time_point: Instant,
+    receipt_polling_back_off_period_ms: u64,
 ) -> eyre::Result<TransactionReceipt> {
     loop {
         match actix_web::rt::time::timeout(
@@ -687,7 +692,7 @@ async fn await_receipt(
                         if Instant::now() > deadline {
                             eyre::bail!("Get tx_receipt returned None and deadline for getting it elapsed in network `{net}` block height {block_height}");
                         }
-                        await_time(1000).await;
+                        await_time(receipt_polling_back_off_period_ms).await;
                         continue;
                     }
                     Err(e) => {
@@ -801,12 +806,12 @@ pub async fn inc_retries_with_backoff(
     net: &str,
     transaction_retries_count: &mut u64,
     provider_metrics: &Arc<RwLock<ProviderMetrics>>,
-    backoff_secs: u64,
+    backoff_ms: u64,
 ) {
     *transaction_retries_count += 1;
     inc_metric!(provider_metrics, net, total_transaction_retries);
     // Wait before sending the next request
-    let time_to_await: Duration = Duration::from_secs(backoff_secs);
+    let time_to_await: Duration = Duration::from_millis(backoff_ms);
     let mut interval = interval(time_to_await);
     interval.tick().await;
     // The first tick completes immediately.
