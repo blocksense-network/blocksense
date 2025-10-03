@@ -20,8 +20,8 @@ license = "to be decided"
 edition = "2021"
 
 [workspace.dependencies]
-blocksense-sdk = { path = "../../libs/sdk" }
-blocksense-data-providers-sdk = { path = "../../libs/data_providers_sdk" }
+blocksense-sdk = { path = "../../libs/sdk/sdk" }
+blocksense-data-providers-sdk = { path = "../../libs/sdk/data_providers" }
 
 anyhow = "1"
 futures = "0.3"
