@@ -16,6 +16,7 @@ with lib.fileset;
       let
         oracleRelated = unions [
           (lib.path.append root "apps/oracles")
+          (difference (lib.path.append root "libs/sdk") (lib.path.append root "libs/sdk/wit"))
         ];
       in
       difference (unions [
@@ -41,10 +42,7 @@ with lib.fileset;
 
   oracleSrc = rec {
     fileset = unions [
-      (lib.path.append root "libs/data_providers_sdk")
       (lib.path.append root "libs/sdk")
-      (lib.path.append root "Cargo.toml")
-      (lib.path.append root "Cargo.lock")
 
       (fileFilter (
         file:

@@ -7,10 +7,8 @@ members = [
   "libs/alpaca_core",
   "libs/anomaly_detection",
   "libs/data_feeds",
-  "libs/data_providers_sdk",
   "libs/metrics",
   "libs/registry",
-  "libs/sdk",
   "libs/utils",
   "libs/config",
   "libs/crypto",
@@ -31,13 +29,10 @@ edition = "2021"
 blocksense-utils = { path = "libs/utils" }
 blocksense-anomaly-detection = { path = "libs/anomaly_detection" }
 blocksense-blockchain-data-model = { path = "libs/blockchain_data_model" }
-blocksense-macro = { path = "libs/sdk/macro" }
 blocksense-registry = { path = "libs/registry" }
-blocksense-sdk = { path = "libs/sdk" }
 blocksense-config = { path = "libs/config" }
 blocksense-crypto = { path = "libs/crypto" }
 blocksense-data-feeds = { path = "libs/data_feeds" }
-blocksense-data-providers-sdk = { path = "libs/data_providers_sdk" }
 blocksense-feed-registry = { path = "libs/feed_registry" }
 blocksense-feeds-processing = { path = "libs/feeds_processing" }
 blocksense-gnosis-safe = { path = "libs/gnosis_safe" }
@@ -84,9 +79,7 @@ outbound-http = { git = "https://github.com/blocksense-network/spin", branch = "
 paste = "1.0.15"
 port_scanner = "0.1.5"
 prettytable-rs = "0.10"
-proc-macro2 = "1"
 prometheus = { package = "prometheus", version = "0.13.4" }
-quote = "1.0"
 rand_distr = "0.4.3"
 rdkafka = "0.37.0"
 regex = "1.11.1"
@@ -103,7 +96,6 @@ spin-trigger = { git = "https://github.com/blocksense-network/spin", branch = "b
 ssz_rs = "0.9.0"
 strum = "0.26.3"
 strum_macros = "0.26.4"
-syn = "1.0"
 tempfile = "3.13.0"
 terminal = { git = "https://github.com/blocksense-network/spin", branch = "blocksense" }
 thiserror = "2.0.11"
