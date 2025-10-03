@@ -10,9 +10,6 @@ let
 
   systems = [
     "x86_64-linux"
-    "aarch64-linux"
-    "x86_64-darwin"
-    "aarch64-darwin"
   ];
 
   allEnvironmentMachines = lib.listToAttrs (
@@ -45,8 +42,9 @@ let
 
 in
 {
+  # NixOS module for the VM used in the example setup environments
   flake.nixosModules.example-setup-vm =
-    { pkgs, ... }:
+    { ... }:
     {
       boot.loader = {
         systemd-boot.enable = true;
@@ -64,7 +62,6 @@ in
         network.wait-online.enable = false;
         services.network-online.enable = true;
       };
-      environment.defaultPackages = [ pkgs.foundry ];
     };
   flake.nixosConfigurations = allEnvironmentMachines;
 }

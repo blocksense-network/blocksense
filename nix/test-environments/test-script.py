@@ -10,29 +10,29 @@ from test_driver.errors import RequestedAssertionFailed
 @dataclass
 class TestConfig:
     """Centralized configuration for the integration test."""
-    BASE_URL: str = "http://127.0.0.1"
-    INK_PORT: int = 8547
-    SEPOLIA_PORT: int = 8546
-    SEQUENCER_PORT: int = 5553
+    BASE_URL: str = "@BASE_URL@"
+    INK_PORT: int = @INK_PORT@
+    SEPOLIA_PORT: int = @SEPOLIA_PORT@
+    SEQUENCER_ADMIN_PORT: int = @SEQUENCER_ADMIN_PORT@
 
     # Contract Addresses
-    UPGRADEABLE_PROXY_CONTRACT: str = "0xee5a4826068c5326a7f06fd6c7cbf816f096846c"
-    CHAINLINK_PROXY_CONTRACT: str = "0x9fAb38E38d526c6ba82879c6bDe1c4Fd73378f17"
-    UPGRADEABLE_PROXY_ADFS_CONTRACT: str = "0xADF5aad6faA8f2bFD388D38434Fc45625Ebd9d3b"
-    CL_AGGREGATOR_ADAPTER_CONTRACT: str = "0xcBD6FC059bEDc859d43994F5C221d96F9eD5340f"
+    UPGRADEABLE_PROXY_CONTRACT: str = "@UPGRADEABLE_PROXY_CONTRACT@"
+    CHAINLINK_PROXY_CONTRACT: str = "@CHAINLINK_PROXY_CONTRACT@"
+    UPGRADEABLE_PROXY_ADFS_CONTRACT: str = "@UPGRADEABLE_PROXY_ADFS_CONTRACT@"
+    CL_AGGREGATOR_ADAPTER_CONTRACT: str = "@CL_AGGREGATOR_ADAPTER_CONTRACT@"
 
     # Service Names
-    REPORTER_SERVICE: str = "blocksense-reporter-a.service"
-    ANVIL_SEPOLIA_SERVICE: str = "blocksense-anvil-ethereum-sepolia.service"
-    ANVIL_INK_SERVICE: str = "blocksense-anvil-ink-sepolia.service"
-    SEQUENCER_SERVICE: str = "blocksense-sequencer.service"
+    REPORTER_SERVICE: str = "@REPORTER_SERVICE@"
+    ANVIL_SEPOLIA_SERVICE: str = "@ANVIL_SEPOLIA_SERVICE@"
+    ANVIL_INK_SERVICE: str = "@ANVIL_INK_SERVICE@"
+    SEQUENCER_SERVICE: str = "@SEQUENCER_SERVICE@"
 
     # Timeouts
-    ENDPOINT_EXISTENCE_TIMEOUT: int = 900
-    HISTORY_POPULATION_TIMEOUT: int = 360
-    NETWORK_UPDATE_TIMEOUT: int = 180
-    VALUE_CHANGE_TIMEOUT: int = 20
-    VALUE_CHANGE_POLL_INTERVAL: int = 1
+    ENDPOINT_EXISTENCE_TIMEOUT: int = @ENDPOINT_EXISTENCE_TIMEOUT@
+    HISTORY_POPULATION_TIMEOUT: int = @HISTORY_POPULATION_TIMEOUT@
+    NETWORK_UPDATE_TIMEOUT: int = @NETWORK_UPDATE_TIMEOUT@
+    VALUE_CHANGE_TIMEOUT: int = @VALUE_CHANGE_TIMEOUT@
+    VALUE_CHANGE_POLL_INTERVAL: int = @VALUE_CHANGE_POLL_INTERVAL@
 
     @property
     def INK_RPC_URL(self) -> str:
@@ -43,8 +43,12 @@ class TestConfig:
         return f"{self.BASE_URL}:{self.SEPOLIA_PORT}"
 
     @property
-    def SEQUENCER_URL(self) -> str:
-        return f"{self.BASE_URL}:{self.SEQUENCER_PORT}"
+    def SEQUENCER_ADMIN_URL(self) -> str:
+        return f"{self.BASE_URL}:{self.SEQUENCER_ADMIN_PORT}"
+
+    @property
+    def SEQUENCER_METRICS_URL(self) -> str:
+        return f"{self.BASE_URL}:{self.SEQUENCER_METRICS_PORT}"
 
     @property
     def services_to_wait_for(self) -> List[str]:
@@ -57,7 +61,7 @@ class TestConfig:
 
     @property
     def ports_to_wait_for(self) -> List[int]:
-        return [self.SEPOLIA_PORT, self.INK_PORT, self.SEQUENCER_PORT]
+        return [self.SEPOLIA_PORT, self.INK_PORT, self.SEQUENCER_ADMIN_PORT]
 
 # Create a single instance of the config to be used throughout the script
 test_config = TestConfig()
@@ -77,11 +81,9 @@ def check_log_for_pattern(service, pattern):
     """Asserts that a pattern is NOT found in a service's journald log."""
     log_output = machine.succeed(f"journalctl -u {service}")
 
-    # Extract logic into Python with better error handling
     match = re.search(pattern, log_output, re.IGNORECASE | re.MULTILINE)
 
     if match:
-        # Provide more context about what was found
         matched_text = match.group(0)
         line_number = log_output[:match.start()].count('\n') + 1
 
@@ -93,14 +95,17 @@ def check_log_for_pattern(service, pattern):
     print(f"✓ No unwanted pattern '{pattern}' found in {service} logs")
 
 
-def check_sequencer_endpoint_exists(endpoint):
+def check_sequencer_admin_endpoint_exists(endpoint):
     """Checks that a sequencer endpoint returns a 2xx status code and returns the response."""
-    return machine.wait_until_succeeds(f"curl -sf {test_config.SEQUENCER_URL}/{endpoint}", test_config.ENDPOINT_EXISTENCE_TIMEOUT)
+    return machine.wait_until_succeeds(f"curl -sf {test_config.SEQUENCER_ADMIN_URL}/{endpoint}", test_config.ENDPOINT_EXISTENCE_TIMEOUT)
 
+def check_sequencer_metrics_endpoint_exists():
+    """Checks that a sequencer metrics endpoint returns a 2xx status code and returns the response."""
+    return machine.wait_until_succeeds(f"curl -sf {test_config.SEQUENCER_METRICS_URL}/metrics", test_config.ENDPOINT_EXISTENCE_TIMEOUT)
 
 def check_sequencer_endpoint_json(endpoint):
     """Check that a sequencer endpoint returns valid JSON."""
-    response = check_sequencer_endpoint_exists(endpoint)
+    response = check_sequencer_admin_endpoint_exists(endpoint)
 
     try:
         json.loads(response)
@@ -111,14 +116,14 @@ def check_sequencer_endpoint_json(endpoint):
 
 def check_health_endpoint():
     """Checks the health endpoint for a 200 OK status and an empty body."""
-    response = check_sequencer_endpoint_exists("health")
+    response = check_sequencer_admin_endpoint_exists("health")
     assert response == "", f"Health endpoint should return an empty body, but got: '{response}'"
     print("✓ health endpoint is responding correctly")
 
 
 def check_metrics_endpoint():
     """Checks the metrics endpoint for a 200 OK status and valid Prometheus content."""
-    response = check_sequencer_endpoint_exists("metrics")
+    response = check_sequencer_metrics_endpoint_exists()
     assert "sequencer_active_feeds" in response, "Metrics output is missing 'sequencer_active_feeds'"
     assert "updates_to_networks" in response, "Metrics output is missing 'updates_to_networks'"
     print("✓ metrics endpoint is responding with valid metrics")
@@ -128,7 +133,6 @@ def check_all_sequencer_endpoints():
     """Check all sequencer endpoints are responding correctly."""
     print("Checking all sequencer endpoints...")
 
-    # JSON endpoints
     json_endpoints = [
         "get_feeds_config",
         "get_sequencer_config",
@@ -142,7 +146,7 @@ def check_all_sequencer_endpoints():
         print(f"✓ {endpoint} endpoint is responding with valid JSON")
 
     # Non-JSON endpoints
-    # check_metrics_endpoint() # metrics aren't wokring
+    check_metrics_endpoint()
     check_health_endpoint()
 
     print("✓ All sequencer endpoints are responding correctly")
@@ -171,7 +175,7 @@ def _make_cast_call_base(
         call_data_arg = shlex.quote(call_data)
 
     # Execute just the cast call without post-processing pipeline
-    command = f"cast call {safe_contract_address} {call_data_arg} --rpc-url {safe_rpc_url}"
+    command = f"@cast@ call {safe_contract_address} {call_data_arg} --rpc-url {safe_rpc_url}"
 
     try:
         raw_output = machine.succeed(command).strip()
@@ -221,19 +225,15 @@ def check_all_contracts():
     """Check all contracts respond successfully."""
     print("Checking all contracts...")
 
-    # Using UpgradeableProxy contract - calls description()
     make_cast_call_sepolia(
         test_config.UPGRADEABLE_PROXY_CONTRACT, "0x80000000", truncate_output=True
     )
-    # Using ChainlinkProxy contract - calls latestAnswer()
     make_cast_call_sepolia(test_config.CHAINLINK_PROXY_CONTRACT)
-    # Using UpgradeableProxyADFS contract - calls description()
     make_cast_call_ink(
         test_config.UPGRADEABLE_PROXY_ADFS_CONTRACT,
         "0x8200000000000000000000000000000000",
         truncate_output=True,
     )
-    # Using CLAggregatorAdapter contract - calls latestAnswer()
     make_cast_call_ink(test_config.CL_AGGREGATOR_ADAPTER_CONTRACT)
 
     print("✓ All contracts responded successfully")
@@ -242,7 +242,7 @@ def check_all_contracts():
 def wait_for_sequencer_history():
     """Waits until the sequencer history endpoint reports non-empty data."""
     machine.wait_until_succeeds(
-        f"curl -s {test_config.SEQUENCER_URL}/get_history | jq -e '.aggregate_history | all(. != [])'",
+        f"curl -s {test_config.SEQUENCER_ADMIN_URL}/get_history | @jq@ -e '.aggregate_history | all(. != [])'",
         test_config.HISTORY_POPULATION_TIMEOUT,
     )
 
@@ -250,7 +250,7 @@ def wait_for_sequencer_history():
 def wait_for_ink_sepolia_updates(min_updates=2):
     """Waits for a minimum number of updates to the ink_sepolia network."""
     machine.wait_until_succeeds(
-        f"curl -s {test_config.SEQUENCER_URL}/metrics | "
+        f"curl -s {test_config.SEQUENCER_ADMIN_URL}/metrics | "
         + f"awk '/^updates_to_networks{{network=\"ink_sepolia\"}}/ {{ if ($2 <= {min_updates}) {{ exit 1 }} }} END {{ exit 0 }}'",
         test_config.NETWORK_UPDATE_TIMEOUT,
     )
