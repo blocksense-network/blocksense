@@ -58,5 +58,6 @@ export async function sendTx({
     signedTx,
   ]);
 
-  return config.provider.waitForTransaction(txHash);
+  const transaction = await config.provider.getTransaction(txHash);
+  return transaction!.wait();
 }
