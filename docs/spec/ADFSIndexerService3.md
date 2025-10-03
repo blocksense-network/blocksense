@@ -72,7 +72,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - Throughput target: approximately 1–2 matching transactions per block per chain.
 - Strict ordering by `(block_number, log_index)` within a chain; cross-chain work executes concurrently.
 - Idempotency via natural key `(chain_id, tx_hash, log_index)` enforced with UPSERT semantics.
-- Environment separation: dedicated Postgres instances for `devnet`, `testnet`, and `mainnet`.
+- Environment separation: dedicated Postgres instances (or at minimum isolated databases/schema search_paths) for `devnet`, `testnet`, and `mainnet` to avoid cross-env accidents.
 - Partitioning: LIST by `chain_id`, RANGE by `block_timestamp` (monthly subpartitions).
 - Security: network access via Tailscale; secrets injected by environment variables.
 - Availability: ingestion process targets ≥99.9% uptime excluding upstream outages.
@@ -716,7 +716,18 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 - Recommended pattern: one deployment per environment (devnet/testnet/mainnet) pointing to dedicated Postgres instances.
 - Partition creation can be automated via scheduled job invoking `partitions create --month <YYYY-MM>` for current + next 3 months.
 - Rolling upgrades: drain queue by pausing LiveTailWorker, allow Writer to flush, then restart with new version; resume tailing.
-- Include health endpoints exposing liveness/readiness (e.g., queue depth, RPC connectivity) to integrate with orchestration probes.
+- Include health endpoints exposing liveness/readiness with JSON payload:
+  ```json
+  {
+    "chain": 1,
+    "rpc": { "http": "healthy", "ws": "connecting" },
+    "queueDepth": 123,
+    "lastSeenBlock": 19_345_678,
+    "lastSafeBlock": 19_345_600,
+    "lastBackfillBlock": 19_340_000
+  }
+  ```
+  Expose both aggregated status and per-chain entries so operators can monitor RPC/WS connectivity and ingestion progress.
 
 ---
 
