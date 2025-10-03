@@ -17,10 +17,28 @@ reporter_id = 0
 component = "eth-gas-info"
 
 [[trigger.oracle.data_feeds]]
-id = "0"
+id = "105000"
 stride = 0
 decimals = 8
-data = 'dummy'
+data = '{"pair":{"base":"SafeGasPrice","quote":"Gwei"},"decimals":8,"category":"","market_hours":"","arguments":{"kind":"eth-gas-info","metric":"SafeGasPrice"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "105001"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"ProposeGasPrice","quote":"Gwei"},"decimals":8,"category":"","market_hours":"","arguments":{"kind":"eth-gas-info","metric":"ProposeGasPrice"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "105002"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"FastGasPrice","quote":"Gwei"},"decimals":8,"category":"","market_hours":"","arguments":{"kind":"eth-gas-info","metric":"FastGasPrice"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "105003"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"suggestBaseFee","quote":"Gwei"},"decimals":8,"category":"","market_hours":"","arguments":{"kind":"eth-gas-info","metric":"suggestBaseFee"}}'
 
 [component.eth-gas-info]
 source = "../target/wasm32-wasip1/release/eth_gas_info.wasm"
