@@ -47736,6 +47736,134 @@
       }
     },
     {
+      "id": "105000",
+      "full_name": "Ethereum SafeGasPrice",
+      "description": "Current SafeGasPrice (in Gwei) on Ethereum Mainnet",
+      "type": "price-feed",
+      "oracle_id": "eth-gas-info",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 10000,
+        "heartbeat_ms": 30000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "SafeGasPrice",
+          "quote": "Gwei"
+        },
+        "decimals": 8,
+        "category": "",
+        "market_hours": "",
+        "arguments": {
+          "kind": "eth-gas-info",
+          "metric": "SafeGasPrice"
+        }
+      }
+    },
+    {
+      "id": "105001",
+      "full_name": "Ethereum ProposeGasPrice",
+      "description": "Current ProposeGasPrice (in Gwei) on Ethereum Mainnet",
+      "type": "price-feed",
+      "oracle_id": "eth-gas-info",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 10000,
+        "heartbeat_ms": 30000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "ProposeGasPrice",
+          "quote": "Gwei"
+        },
+        "decimals": 8,
+        "category": "",
+        "market_hours": "",
+        "arguments": {
+          "kind": "eth-gas-info",
+          "metric": "ProposeGasPrice"
+        }
+      }
+    },
+    {
+      "id": "105002",
+      "full_name": "Ethereum FastGasPrice",
+      "description": "Current FastGasPrice (in Gwei) on Ethereum Mainnet",
+      "type": "price-feed",
+      "oracle_id": "eth-gas-info",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 10000,
+        "heartbeat_ms": 30000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "FastGasPrice",
+          "quote": "Gwei"
+        },
+        "decimals": 8,
+        "category": "",
+        "market_hours": "",
+        "arguments": {
+          "kind": "eth-gas-info",
+          "metric": "FastGasPrice"
+        }
+      }
+    },
+    {
+      "id": "105003",
+      "full_name": "Ethereum suggestBaseFee",
+      "description": "Current suggestBaseFee (in Gwei) on Ethereum Mainnet",
+      "type": "price-feed",
+      "oracle_id": "eth-gas-info",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 10000,
+        "heartbeat_ms": 30000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "suggestBaseFee",
+          "quote": "Gwei"
+        },
+        "decimals": 8,
+        "category": "",
+        "market_hours": "",
+        "arguments": {
+          "kind": "eth-gas-info",
+          "metric": "suggestBaseFee"
+        }
+      }
+    },
+    {
       "id": "1000000",
       "full_name": "WMON / USD",
       "description": "Price of Wrapped Monad in USD on Monad Testnet",
