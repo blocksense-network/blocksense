@@ -287,6 +287,17 @@ pub async fn create_per_network_reorg_trackers(
                 ReorgConfig::default()
             }
         };
+        let relayer_send_channel = match sequencer_state
+            .relayers_send_channels
+            .read()
+            .await
+            .get(net.as_str())
+        {
+            Some(chan) => chan.clone(),
+            None => {
+                panic!("Failed to spawn tracker for reorgs loop in network {net} because no updates sending relayer exists for it!");
+            }
+        };
         collected_futures.push(
             tokio::task::Builder::new()
                 .name(reorg_trackers_name.clone().as_str())
@@ -295,6 +306,7 @@ pub async fn create_per_network_reorg_trackers(
                         net_clone,
                         sequencer_state_providers_clone,
                         reorg_tracker_config,
+                        relayer_send_channel,
                     )
                     .await;
                     Ok(())
