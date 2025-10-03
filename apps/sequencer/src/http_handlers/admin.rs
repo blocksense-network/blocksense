@@ -943,6 +943,8 @@ mod tests {
                     transaction_retry_timeout_secs: 20,
                     retry_fee_increment_fraction: 0.1,
                     transaction_gas_limit: 1337,
+                    receipt_polling_back_off_period_ms: 5_000,
+                    transaction_retry_back_off_ms: 1_000,
                     is_enabled,
                     allow_feeds: None,
                     impersonated_anvil_account: None,
