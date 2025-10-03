@@ -170,8 +170,10 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 ### 5.5 Finality Processor
 
 - Periodically checks chain head to compute `last_safe_block = head - confirmations`.
+- Acquires a per-chain Postgres advisory lock (`pg_try_advisory_lock(hashtext('finality:' || chain_id))`); only the lock holder executes finality for that chain.
 - Transitions pending rows at or below safe block to `confirmed` and updates latest table with upsert semantics.
 - Marks pending rows as `dropped` when replaced by competing fork before confirmation.
+- If lock acquisition fails, log at debug and retry on next cycle without performing state transitions.
 
 ### 5.6 ProxyUpgradeWatcher
 
@@ -387,7 +389,7 @@ CREATE TABLE processing_state (
 3. BackfillWorker and LiveTailWorker emit decoded payloads into OrderingBuffer.
 4. OrderingBuffer ensures ordered batches; on overflow, it pauses the chain and enqueues a catch-up backfill starting `overflowBackfillWindow` blocks before the last persisted block.
 5. Writer persists pending rows in per-block transactions.
-6. Finality processor promotes rows to `confirmed`, updates `feed_latest`, and soft deletes (`dropped`) orphaned pending rows.
+6. Finality processor acquires advisory lock per chain; if held, promotes rows to `confirmed`, updates `feed_latest`, and soft deletes (`dropped`) orphaned pending rows.
 7. Downstream consumers read confirmed and latest tables with read-only credentials.
 
 ### 7.1 Event Processing Flow
@@ -499,6 +501,7 @@ CREATE TABLE processing_state (
 - `reorgs_pending_dropped_total{chain}`.
 - `version_paused{chain}` (1 when ingestion paused due to unknown implementation or failed checksum).
 - `queue_overflow_total{chain}` and `queue_overflow_backfill_height{chain}` to track pauses triggered by buffer saturation and the block height of the auto-backfill.
+- `finality_lock_contention{chain}` counting failed advisory lock attempts.
 
 Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSeconds` feeds the "no events" alert window, while `maxLagBlocks` caps acceptable lag before paging.
 
@@ -511,6 +514,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 - `version_paused{chain}` = 1 for > 1 minute (unknown implementation or checksum mismatch).
 - `queue_overflow_total{chain}` increments → trigger immediate page; verify auto backfill kicked off.
 - Queue depth exceeding 80% of `queue.maxItems` for >5 minutes.
+- Sustained `finality_lock_contention{chain}` > 0 for 5 minutes (investigate competing instances).
 
 ### 10.3 Logging & Tracing
 
@@ -717,6 +721,7 @@ WHERE chain_id = $1 AND block_timestamp >= now() - interval '$2 days';
 - Unique natural key `(chain_id, tx_hash, log_index)` ensures deduplication across backfill/live overlap.
 - OrderingBuffer enforces strict `(block_number, log_index)` ordering; gaps trigger bounded waiting until missing logs arrive or timeout leads to warning + partial flush.
 - On queue overflow, emit critical alert, pause the chain, and enqueue a mandatory catch-up backfill covering the window since the last persisted block.
+- Finality processing uses advisory locks (`pg_try_advisory_lock`) to ensure only one instance per chain flips states.
 - Writer executes one transaction per block per chain, batching inserts into `adfs_events`, `tx_inputs`, `feed_updates`, and `ring_buffer_updates`, followed by state transitions and `feed_latest` UPSERTs.
 - FinalityManager maintains `last_safe_block` computed from latest head; confirmed rows never revert.
 - Processing cursors (`processing_state`) allow resumable restarts without replaying confirmed data.
@@ -729,7 +734,7 @@ WHERE chain_id = $1 AND block_timestamp >= now() - interval '$2 days';
 - Maintain `versions: Record<number, VersionProfile>`, `implVersionMap: Record<string, ImplVersionConfig>`, and `topicNames: Record<number, string>` after config parsing; fail fast if any required mapping is missing before subscribing or writing rows.
 - Convert 0x addresses to `BYTEA` before inserting; provide helpers for hex ↔ `BIT(128)` conversions, and convert u128 `tableIndex` values into `BIT(128)` before persistence.
 - When checksum enforcement is enabled, fetch runtime bytecode once per implementation (`eth_getCode`) and store `code_hash` (keccak) in `proxy_versions`.
-- Ordering buffer implemented as minimal in-memory index keyed by `(blockNumber, logIndex)`; flush per block, and use configured `overflowBackfillWindow` when pausing + backfilling after overflow.
+- Ordering buffer implemented as minimal in-memory index keyed by `(blockNumber, logIndex)`; flush per block, use configured `overflowBackfillWindow` when pausing + backfilling after overflow, and rely on advisory locks to coordinate finality across instances.
 - Expose Effect services (`ConfigService`, `DbService`, `RpcService`, etc.) via dependency injection for unit tests.
 - Prefer viem batch RPC for block + transaction fetching to minimize HTTP round-trips.
 - Drizzle migrations manage enum/type creation and partition DDL; ensure forward-compatible schema evolution (online-safe `ALTER TABLE ... ATTACH PARTITION`).
