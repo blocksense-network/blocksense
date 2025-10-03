@@ -39,7 +39,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - Monitor the proxy address; derive implementation changes via `Upgraded(address)`.
 - Backfill from each contract’s deployment `startBlock` including the block itself.
 - Run live tail via WebSocket subscriptions, maintaining block-number and log-index ordering per chain.
-- Confirmations (finality depth) are per-chain configurable and persisted in config.
+- Finality mode is per-chain configurable (e.g., simple confirmations vs. dual-source L2 finality) and persisted in config.
 
 ### 2.2 Events & Decoding
 
@@ -149,7 +149,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 ### 5.2 BackfillWorker
 
-- Iterates `getLogs` batches from `startBlock` up to `head - confirmations`.
+- Iterates `getLogs` batches from `startBlock` up to the chain's configured finality horizon (e.g., `head - confirmations` for L1 or L2-specific depth for dual-source).
 - Uses adaptive range: initial 10,000 blocks; halves to minimum 256 on RPC failures.
 - Writes pending rows; relies on Writer for batching.
 - Resumable via per-chain cursors stored in DB.
@@ -169,7 +169,9 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 ### 5.5 Finality Processor
 
-- Periodically checks chain head to compute `last_safe_block = head - confirmations`.
+- Periodically evaluates per-chain finality mode from config:
+  - `l1_confirmations`: compute `last_safe_block = head - confirmations`.
+  - `dual_source`: require both L2 head depth and L1 inclusion (timestamped) thresholds before advancing `last_safe_block`.
 - Acquires a per-chain Postgres advisory lock (`pg_try_advisory_lock(hashtext('finality:' || chain_id))`); only the lock holder executes finality for that chain.
 - Transitions pending rows at or below safe block to `confirmed` and updates latest table with upsert semantics.
 - Marks pending rows as `dropped` when replaced by competing fork before confirmation.
@@ -195,7 +197,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 ### 6.1 Tables
 
-- `chains`: chain metadata and default finality confirmations.
+- `chains`: chain metadata and default finality configuration (mode, depths, windows).
 - `contracts`: proxy address, deployment `start_block`, and initial `topic_hash` (derived from the version-to-signature map) per chain.
 - `proxy_versions`: `(chain_id, version, implementation, topic_hash, activated_block, code_hash)`; append-only and sourced from config mapping at activation time, with optional runtime code hash for auditing.
 - `adfs_events`: partitioned by chain/timestamp; raw event metadata, status enum, calldata, version, `topic0`.
@@ -400,7 +402,7 @@ CREATE TABLE processing_state (
 4. Decode calldata via `decodeADFSCalldata(calldata, versionsConfig[version].hasBlockNumber)`; validate that `extra` payload matches `versionsConfig[version].extraFields` when present.
 5. Assemble rows for `adfs_events`, `tx_inputs`, `feed_updates`, `ring_buffer_updates`.
 6. Upsert pending rows within a single DB transaction per block.
-7. Separate finality loop computes `last_finalized_block = head - confirmations` and flips eligible rows to `confirmed`, upserting `feed_latest`. Pending rows orphaned by reorgs flip to `dropped` (no replay).
+7. Separate finality loop computes `last_finalized_block` according to the configured finality mode (simple confirmations vs. dual-source) and flips eligible rows to `confirmed`, upserting `feed_latest`. Pending rows orphaned by reorgs flip to `dropped` (no replay).
 
 ---
 
@@ -410,6 +412,7 @@ CREATE TABLE processing_state (
 - Confirmed rows remain immutable; dropped rows flagged via soft delete (`status = 'dropped'`).
 - Backfill replays ranges to reconcile after large reorgs or missed periods.
 - `reorgs_pending_dropped_total` counter surfaces reorg churn for alerting.
+- Dual-source finality ensures L2 chains wait for both sequencer depth and L1 inclusion before marking rows confirmed.
 
 ---
 
@@ -418,12 +421,15 @@ CREATE TABLE processing_state (
 **Format**: configuration lives in JSON files with **no hot reload**; restart the service to apply changes.
 **Secrets** enter via **environment variables** (DB URL, RPC credentials), and each environment (`devnet`, `testnet`, `mainnet`) owns a separate Postgres database plus JSON config.
 
-- `confirmations[chainId]`: integer finality depth.
+- `finality`: per-chain config describing mode and thresholds.
+- `finality.mode`: `"l1_confirmations"` (default) uses simple confirmation depth; `"dual_source"` requires both L2 head depth and L1 inclusion windows.
+- `finality.confirmations`/`l1Confirmations`: integer depth used for L1 safety.
+- `finality.l2Depth` & `finality.maxL1DelaySeconds`: parameters for dual-source/L2 chains.
 - `db.write.batchRows`: default 200 rows per insert batch.
 - `queue.maxItems`: default 10,000 pending items per chain; on overflow pause the chain and initiate backfill.
 - `overflowBackfillWindow`: blocks to rewind when queue overflow occurs (default 2,000).
 - `alertsConfig`: `noEventsSeconds` default 300, `maxLagBlocks` default 64 per chain.
-- Optional knobs: RPC rate limits, queue sizing, and backfill range bounds.
+- Optional knobs: RPC rate limits, queue sizing, backfill range bounds, and finality windows.
 - `versions`: mapping from version → decoder profile (hasBlockNumber, expected extra fields, optional guards).
 - `implVersionMap`: mapping from implementation address → `{ version, expectedCodeHash? }`; every deployed implementation must be listed and may optionally include a runtime code checksum.
 - `topicNames`: mapping from version → event signature; every active version must have a configured signature.
@@ -457,7 +463,12 @@ CREATE TABLE processing_state (
       "name": "ethereum",
       "rpcHttp": ["https://primary.http", "https://backup.http"],
       "rpcWs": ["wss://primary.ws"],
-      "finality": 12,
+      "finality": {
+        "mode": "dual_source",
+        "l2Depth": 30,
+        "l1Confirmations": 12,
+        "maxL1DelaySeconds": 180
+      },
       "contractAddress": "0xProxyAddress",
       "topicNames": {
         "1": "DataFeedsUpdated(uint256)",
@@ -735,6 +746,7 @@ WHERE chain_id = $1 AND block_timestamp >= now() - interval '$2 days';
 - Convert 0x addresses to `BYTEA` before inserting; provide helpers for hex ↔ `BIT(128)` conversions, and convert u128 `tableIndex` values into `BIT(128)` before persistence.
 - When checksum enforcement is enabled, fetch runtime bytecode once per implementation (`eth_getCode`) and store `code_hash` (keccak) in `proxy_versions`.
 - Ordering buffer implemented as minimal in-memory index keyed by `(blockNumber, logIndex)`; flush per block, use configured `overflowBackfillWindow` when pausing + backfilling after overflow, and rely on advisory locks to coordinate finality across instances.
+- Finality evaluator reads `finality.mode` per chain; implement strategy interfaces so future modes (e.g., optimistic rollup finality) can be added without touching core pipeline.
 - Expose Effect services (`ConfigService`, `DbService`, `RpcService`, etc.) via dependency injection for unit tests.
 - Prefer viem batch RPC for block + transaction fetching to minimize HTTP round-trips.
 - Drizzle migrations manage enum/type creation and partition DDL; ensure forward-compatible schema evolution (online-safe `ALTER TABLE ... ATTACH PARTITION`).
