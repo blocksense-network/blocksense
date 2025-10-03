@@ -3,18 +3,19 @@ use actix_web::rt::time::timeout;
 use alloy::hex;
 use alloy::{eips::BlockNumberOrTag, providers::Provider};
 use alloy_primitives::B256;
+use blocksense_utils::counter_unbounded_channel::CountedSender;
 use chrono::Local;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::time::Duration;
-use tracing::{error, info, warn};
+use tracing::{debug, error, info, warn};
 
-use blocksense_metrics::inc_vec_metric;
+use blocksense_metrics::{inc_metric, inc_vec_metric};
 use blocksense_utils::await_time;
 
 // Local helpers from eth_send_utils we need to call
-use crate::providers::eth_send_utils::try_to_sync;
+use crate::providers::eth_send_utils::{try_to_sync, BatchOfUpdatesToProcess};
 
 // Helper to handle reorg once already detected. Finds fork point and prints
 // discarded observations, mirroring the existing log messages and structure.
@@ -25,6 +26,7 @@ pub(crate) async fn handle_reorg(
     observed_block_hashes: &HashMap<u64, B256>,
     observed_latest_height: u64,
     rpc_timeout: Duration,
+    updates_relayer_send_chan: &CountedSender<BatchOfUpdatesToProcess>,
 ) -> Option<u64> {
     // Build list of observed heights up to observed_latest_height, highest to lowest
     let mut observed_heights: Vec<u64> = observed_block_hashes
@@ -97,7 +99,7 @@ pub(crate) async fn handle_reorg(
 
         // Print all non-finalized updates at or above the fork height
         {
-            let provider = provider_mutex.lock().await;
+            let mut provider = provider_mutex.lock().await;
             let mut heights: Vec<u64> = provider
                 .inflight
                 .non_finalized_updates
@@ -113,7 +115,7 @@ pub(crate) async fn handle_reorg(
                 );
             } else {
                 for h in heights {
-                    if let Some(batch) = provider.inflight.non_finalized_updates.get(&h) {
+                    if let Some(batch) = provider.inflight.non_finalized_updates.remove(&h) {
                         let updates_count = batch.updates.updates.len();
                         info!(
                             "non_finalized_update >= fork: height={h}, batch_block_height={}, updates_count={}, net={}",
@@ -121,6 +123,18 @@ pub(crate) async fn handle_reorg(
                             updates_count,
                             batch.net,
                         );
+                        let msgs_in_queue = updates_relayer_send_chan.len();
+                        let block_height = batch.updates.block_height;
+                        let provider_metrics = &provider.provider_metrics;
+                        match updates_relayer_send_chan.send(batch) {
+                            Ok(()) => {
+                                debug!("Resent updates to relayer for network {net} and block height {block_height}, messages in queue = {msgs_in_queue}");
+                                inc_metric!(provider_metrics, net, num_transactions_in_queue);
+                            }
+                            Err(e) => {
+                                error!("Error while sending updates to relayer for network {net} and block height {block_height}, messages in queue = {msgs_in_queue}: {e}")
+                            }
+                        };
                     }
                 }
             }
@@ -139,6 +153,7 @@ pub async fn loop_tracking_for_reorg_in_network(
     net: String,
     providers_mutex: SharedRpcProviders,
     reorg_config: blocksense_config::ReorgConfig,
+    updates_relayer_send_chan: CountedSender<BatchOfUpdatesToProcess>,
 ) {
     tracing::info!("Starting tracker for reorgs in network {net} loop...");
 
@@ -227,6 +242,7 @@ pub async fn loop_tracking_for_reorg_in_network(
                                                 &observed_block_hashes,
                                                 observed_latest_height,
                                                 rpc_timeout,
+                                                &updates_relayer_send_chan,
                                             )
                                             .await;
                                         }
@@ -271,6 +287,7 @@ pub async fn loop_tracking_for_reorg_in_network(
                                             &observed_block_hashes,
                                             observed_latest_height,
                                             rpc_timeout,
+                                            &updates_relayer_send_chan,
                                         )
                                         .await;
                                     } else {
@@ -346,6 +363,7 @@ pub async fn loop_tracking_for_reorg_in_network(
                                                 &observed_block_hashes,
                                                 observed_latest_height,
                                                 rpc_timeout,
+                                                &updates_relayer_send_chan,
                                             )
                                             .await;
                                         }
@@ -580,6 +598,7 @@ mod tests {
     use blocksense_config::{get_test_config_with_single_provider, test_feed_config};
     use blocksense_data_feeds::feeds_processing::BatchedAggregatesToSend;
     use blocksense_registry::config::FeedConfig;
+    use blocksense_utils::counter_unbounded_channel::counted_unbounded_channel;
     use blocksense_utils::EncodedFeedId;
     use std::str::FromStr;
     use tokio::sync::RwLock;
@@ -800,11 +819,14 @@ mod tests {
             .await
             .expect("snapshot should succeed");
 
+        let (feed_updates_send, _feed_updates_recv) = counted_unbounded_channel();
+
         // 4) Start the reorg tracking loop in background
         let loop_handle = tokio::spawn(super::loop_tracking_for_reorg_in_network(
             net.to_string(),
             providers.clone(),
             blocksense_config::ReorgConfig::default(),
+            feed_updates_send,
         ));
 
         // Give the loop time to run once and ingest the chain
