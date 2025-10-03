@@ -44,6 +44,8 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 ### 2.2 Events & Decoding
 
 - `topicNames` config maps contract `version` → event signature (e.g. `{ "1": "DataFeedsUpdated(uint256)" }`); the service derives `topic0 = keccak256(topicNames[version])` for the active version and subscribes to that topic per chain.
+- `versions` config maps version → decoder profile (`hasBlockNumber`, expected `extraFields[]`, optional guards).
+- `implVersionMap` config maps proxy implementation address → version; unknown implementations pause ingestion for that chain and raise an alert.
 - For each matched log: fetch transaction, receipt, and input data; decode with `decodeADFSCalldata(calldata, hasBlockNumber)` where `hasBlockNumber` is dictated by the active contract version.
 - Decoder yields `feeds[]` (exposes `stride`, `feedId` as u128, `index` as u16 - `rb_index`, and `data` bytes) and `ringBufferTable[]` (global `table_index` as u128`, plus `data`).
 - Version-specific extras (e.g., `sourceAccumulator`, `destinationAccumulator`) are persisted in a JSONB `extra` column.
@@ -138,12 +140,12 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 ### 5.1 VersionManager
 
-- On startup: scans `Upgraded(address)` events from `startBlock` to head; computes current `version`.
-- Maintains in-memory map `chain_id → {version, decoderProfile, topic0}` where `topic0` is derived from `topicNames[version]` in config.
-- Live subscription bumps version, recalculates `topic0` from config, and persists change log (including the hash) to DB.
-- Decoder profiles (extensible):
-  - Version 1: `hasBlockNumber = true` (ignore on persistence).
-  - Version 2+: `hasBlockNumber = false`; expect accumulator fields in `extra`.
+- On startup: scans `Upgraded(address)` events from `startBlock` to head; resolves implementation → version using `implVersionMap`. Unknown implementations trigger a chain-specific pause + alert.
+- Maintains in-memory map `chain_id → {version, decoderProfile, topic0, expectedExtraFields, impl, expectedCodeHash?}` derived from config `versions`, `topicNames`, and `implVersionMap`.
+- Live subscription bumps version, recalculates `topic0` from config, stores `(chain_id, version, implementation, topic_hash, code_hash)` in DB, and resumes only after config contains the mapping.
+- Decoder profiles come directly from config:
+  - Example: Version 1 → `{ hasBlockNumber: true, extraFields: [] }`.
+  - Example: Version 2 → `{ hasBlockNumber: false, extraFields: ['sourceAccumulator','destinationAccumulator'] }`.
 
 ### 5.2 BackfillWorker
 
@@ -173,8 +175,10 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 ### 5.6 ProxyUpgradeWatcher
 
 - Watches proxy `Upgraded(address implementation)` topic over WS and scheduled HTTP catch-up.
-- Persists `(chain_id, version, implementation, topic_hash, activated_block)` to `proxy_versions`, where `topic_hash = keccak256(topicNames[version])`.
-- Notifies VersionManager to reload decoder profile, `topic0`, and re-evaluate `hasBlockNumber`.
+- Uses `implVersionMap` to resolve version; if the implementation is unknown, raises alert and pauses ingestion for that chain until operators update config.
+- When checksum guard enabled, fetches runtime bytecode once, compares keccak hash to expected value (if provided), and pauses ingestion on mismatch.
+- Persists `(chain_id, version, implementation, topic_hash, activated_block, code_hash)` to `proxy_versions`, where `topic_hash = keccak256(topicNames[version])` and `code_hash` is optional keccak of runtime bytecode for guardrails.
+- Notifies VersionManager to reload decoder profile, `topic0`, expected extra fields, and re-evaluate `hasBlockNumber`.
 
 ### 5.7 BlockHeaderCache & Metadata Fetchers
 
@@ -190,7 +194,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 - `chains`: chain metadata and default finality confirmations.
 - `contracts`: proxy address, deployment `start_block`, and initial `topic_hash` (derived from the version-to-signature map) per chain.
-- `proxy_versions`: `(chain_id, version, implementation, topic_hash, activated_block)`; append-only and sourced from config mapping at activation time.
+- `proxy_versions`: `(chain_id, version, implementation, topic_hash, activated_block, code_hash)`; append-only and sourced from config mapping at activation time, with optional runtime code hash for auditing.
 - `adfs_events`: partitioned by chain/timestamp; raw event metadata, status enum, calldata, version, `topic0`.
 - `tx_inputs`: optional normalized transaction input archive storing selector, decoded JSON, status, and version for auditing.
 - `feed_updates`: normalized feed entries with `feed_id` as `BIT(128)`, `stride`, `rb_index`, payload bytes, status, version.
@@ -297,6 +301,7 @@ CREATE TABLE proxy_versions (
   version         INTEGER NOT NULL,
   implementation  BYTEA   NOT NULL,
   topic_hash      BYTEA   NOT NULL,
+  code_hash       BYTEA   NULL,
   activated_block BIGINT  NOT NULL,
   PRIMARY KEY (chain_id, version)
 );
@@ -386,9 +391,9 @@ CREATE TABLE processing_state (
 ### 7.1 Event Processing Flow
 
 1. Detect matching log (`topic0`, proxy address).
-2. Resolve active version at `block_number` from `proxy_versions` and fetch the corresponding signature `topic0` from config-derived mapping (fallback to DB hash if config lacks entry).
+2. Resolve active version at `block_number` from `proxy_versions`; verify the recorded implementation exists in `implVersionMap`, check optional `expectedCodeHash` when provided, and fetch the corresponding signature `topic0` from config (fallback to DB hash if config lacks entry).
 3. Fetch transaction calldata and receipt (`eth_getTransactionByHash`).
-4. Decode calldata via `decodeADFSCalldata(calldata, VersionMode[version].hasBlockNumber)`.
+4. Decode calldata via `decodeADFSCalldata(calldata, versionsConfig[version].hasBlockNumber)`; validate that `extra` payload matches `versionsConfig[version].extraFields` when present.
 5. Assemble rows for `adfs_events`, `tx_inputs`, `feed_updates`, `ring_buffer_updates`.
 6. Upsert pending rows within a single DB transaction per block.
 7. Separate finality loop computes `last_finalized_block = head - confirmations` and flips eligible rows to `confirmed`, upserting `feed_latest`. Pending rows orphaned by reorgs flip to `dropped` (no replay).
@@ -414,6 +419,8 @@ CREATE TABLE processing_state (
 - `queue.maxItems`: default 10,000 pending items per chain (drop-oldest overflow).
 - `alertsConfig`: `noEventsSeconds` default 300, `maxLagBlocks` default 64 per chain.
 - Optional knobs: RPC rate limits, queue sizing, and backfill range bounds.
+- `versions`: mapping from version → decoder profile (hasBlockNumber, expected extra fields, optional guards).
+- `implVersionMap`: mapping from implementation address → `{ version, expectedCodeHash? }`; every deployed implementation must be listed and may optionally include a runtime code checksum.
 - `topicNames`: mapping from version → event signature; every active version must have a configured signature.
 - `metrics.port`: default `9464` (`/metrics`).
 - `LOG_LEVEL`: default `info`; structured JSON logs.
@@ -427,6 +434,17 @@ CREATE TABLE processing_state (
     "queueMaxItems": 10000,
     "dbWriteBatchRows": 200,
     "metricsPort": 9464
+  },
+  "versions": {
+    "1": { "hasBlockNumber": true, "extraFields": [] },
+    "2": {
+      "hasBlockNumber": false,
+      "extraFields": ["sourceAccumulator", "destinationAccumulator"]
+    }
+  },
+  "implVersionMap": {
+    "0xabc...implA": { "version": 1, "expectedCodeHash": "0xhash1" },
+    "0xdef...implB": { "version": 2 }
   },
   "chains": [
     {
@@ -449,6 +467,7 @@ CREATE TABLE processing_state (
 ```
 
 > `hasBlockNumber` is derived from `version`. Provide HTTP/WS endpoints in priority order; service iterates until a healthy provider responds. When WS endpoints fail, the tailer temporarily polls via HTTP to avoid data loss.
+> `versions` and `implVersionMap` define decoder behavior and implementation authorization. Unknown implementations must be added before ingestion resumes.
 > `topicNames` stay in config only; the database stores the computed hash (`topic0`) as `BYTEA` on relevant tables when events are ingested.
 > Embed provider API keys directly inside RPC URLs; no extra indirection required.
 > Prometheus metrics surface at `http://0.0.0.0:${service.metricsPort}/metrics` (default `9464`).
@@ -474,6 +493,7 @@ CREATE TABLE processing_state (
 - `backfill_progress{chain}` (ratio of `last_backfill_block` to head).
 - `queue_depth{chain}`.
 - `reorgs_pending_dropped_total{chain}`.
+- `version_paused{chain}` (1 when ingestion paused due to unknown implementation or failed checksum).
 
 Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSeconds` feeds the "no events" alert window, while `maxLagBlocks` caps acceptable lag before paging.
 
@@ -483,6 +503,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 - `events_lag_blocks` or `finality_lag_blocks` above `alertsConfig.maxLagBlocks`.
 - RPC error rate >2% for 5 minutes.
 - `backfill_progress` flat for >10 minutes.
+- `version_paused{chain}` = 1 for > 1 minute (unknown implementation or checksum mismatch).
 - Queue depth exceeding 80% of `queue.maxItems` for >5 minutes.
 
 ### 10.3 Logging & Tracing
@@ -523,8 +544,13 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
    - Actions: tune `db.write.batchRows`, scale DB resources, consider per-chain deployment, add missing indices.
 
 3. **Stuck Backfill**
+
    - Symptoms: `adfs_backfill_progress` flat for >10 minutes.
    - Actions: inspect RPC rate limits, narrow block ranges, restart targeted backfill.
+
+4. **Unknown Implementation / Version Pause**
+   - Symptoms: `version_paused{chain}` remains 1, alerts firing, ingestion halted for that chain.
+   - Actions: inspect `proxy_versions` to identify new implementation; update `implVersionMap`, `versions`, and `topicNames` in config (including optional `code_hash`), redeploy/restart service to resume ingestion.
 
 ---
 
@@ -593,6 +619,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 - Helper SQL functions and views for BIT(128) ergonomics (hex in/out).
 - Optional materialized views for recent updates to support dashboards.
 - Toggle for HTTP polling fallback thresholds and alerting when WS unavailable beyond SLA.
+- Admin tooling to update `implVersionMap` entries and reload config without restart (future work).
 
 ---
 
@@ -685,9 +712,10 @@ WHERE chain_id = $1 AND block_timestamp >= now() - interval '$2 days';
 
 ## 24) Implementation Notes (TS/Effect)
 
-- `decodeADFSCalldata(calldata, hasBlockNumber)` returns version-specific extras; persist accumulator fields when `hasBlockNumber=false`.
-- Maintain a `topicNames: Record<number, string>` map after config parsing; fail fast if a required version lacks a signature before subscribing or writing rows.
-- Convert 0x addresses to `BYTEA` before inserting; provide helpers for hex ↔ BIT(128) conversions, and convert u128`tableIndex`values into`BIT(128)` before persistence.
+- `decodeADFSCalldata(calldata, hasBlockNumber)` returns version-specific extras; persist accumulator fields when `hasBlockNumber=false` and validate `extraFields` align with `versions[version].extraFields`.
+- Maintain `versions: Record<number, VersionProfile>`, `implVersionMap: Record<string, number>`, and `topicNames: Record<number, string>` after config parsing; fail fast if any required mapping is missing before subscribing or writing rows.
+- Convert 0x addresses to `BYTEA` before inserting; provide helpers for hex ↔ `BIT(128)` conversions, and convert u128 `tableIndex` values into `BIT(128)` before persistence.
+- When checksum enforcement is enabled, fetch runtime bytecode once per implementation (`eth_getCode`) and store `code_hash` (keccak) in `proxy_versions`.
 - Ordering buffer implemented as minimal in-memory index keyed by `(blockNumber, logIndex)`; flush per block.
 - Expose Effect services (`ConfigService`, `DbService`, `RpcService`, etc.) via dependency injection for unit tests.
 - Prefer viem batch RPC for block + transaction fetching to minimize HTTP round-trips.
