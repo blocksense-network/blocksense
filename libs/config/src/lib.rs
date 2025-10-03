@@ -198,6 +198,12 @@ pub struct Provider {
     pub transaction_retry_timeout_secs: u32,
     pub retry_fee_increment_fraction: f64,
     pub transaction_gas_limit: u32,
+    // How long to sleep between successive polls for a tx receipt (milliseconds)
+    #[serde(default = "default_receipt_polling_back_off_period_ms")]
+    pub receipt_polling_back_off_period_ms: u64,
+    // How long to sleep before retrying failed RPC ops (milliseconds)
+    #[serde(default = "default_transaction_retry_back_off_ms")]
+    pub transaction_retry_back_off_ms: u64,
     pub impersonated_anvil_account: Option<String>,
 
     /// Whether data is written to the network (provider) or not. Useful for devops, if a single
@@ -229,6 +235,16 @@ fn contract_initial_version() -> u16 {
     1
 }
 
+fn default_receipt_polling_back_off_period_ms() -> u64 {
+    // Default 5 seconds (as milliseconds)
+    5_000
+}
+
+fn default_transaction_retry_back_off_ms() -> u64 {
+    // Default 1 second (as milliseconds)
+    1_000
+}
+
 impl Validated for Provider {
     fn validate(&self, context: &str) -> anyhow::Result<()> {
         if self.transaction_retry_timeout_secs == 0 {
@@ -239,6 +255,22 @@ impl Validated for Provider {
         }
         if self.transaction_gas_limit == 0 {
             anyhow::bail!("{}: transaction_gas_limit cannot be set to 0", context);
+        }
+        // receipt polling backoff must be > 0 ms and < 12 seconds (12000 ms)
+        if self.receipt_polling_back_off_period_ms == 0
+            || self.receipt_polling_back_off_period_ms >= 12_000
+        {
+            anyhow::bail!(
+                "{}: receipt_polling_back_off_period_ms must be > 0 and < 12000 ms",
+                context
+            );
+        }
+        // retry backoff must be > 0 sec and < 12 sec
+        if self.transaction_retry_back_off_ms == 0 || self.transaction_retry_back_off_ms >= 12_000 {
+            anyhow::bail!(
+                "{}: transaction_retry_back_off_ms must be > 0 and < 12000 ms",
+                context
+            );
         }
         Ok(())
     }
@@ -508,6 +540,8 @@ pub fn get_test_config_with_multiple_providers(
                 transaction_retry_timeout_secs: 24,
                 retry_fee_increment_fraction: 0.1,
                 transaction_gas_limit: 7500000,
+                receipt_polling_back_off_period_ms: default_receipt_polling_back_off_period_ms(),
+                transaction_retry_back_off_ms: default_transaction_retry_back_off_ms(),
                 is_enabled: true,
                 should_load_round_counters: false,
                 should_load_historical_values: false,
