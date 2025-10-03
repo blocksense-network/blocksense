@@ -45,7 +45,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 - `topicNames` config maps contract `version` → event signature (e.g. `{ "1": "DataFeedsUpdated(uint256)" }`); the service derives `topic0 = keccak256(topicNames[version])` for the active version and subscribes to that topic per chain.
 - For each matched log: fetch transaction, receipt, and input data; decode with `decodeADFSCalldata(calldata, hasBlockNumber)` where `hasBlockNumber` is dictated by the active contract version.
-- Decoder yields `feeds[]` (exposes `stride`, `feedId` as u128, `index` as u16, and `data` bytes) and `ringBufferTable[]` (global `table_index` as u128`, plus `data`).
+- Decoder yields `feeds[]` (exposes `stride`, `feedId` as u128, `index` as u16 - `rb_index`, and `data` bytes) and `ringBufferTable[]` (global `table_index` as u128`, plus `data`).
 - Version-specific extras (e.g., `sourceAccumulator`, `destinationAccumulator`) are persisted in a JSONB `extra` column.
 - Event block metadata remains the source of truth for `blockNumber` and `blockTimestamp`.
 
@@ -53,7 +53,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 - Fetch latest confirmed value for `(chain_id, feed_id, stride)`.
 - Fetch confirmed updates for `(chain_id, feed_id)` within block range `[A, B]`.
-- Fetch ring buffer slot by `(chain_id, feed_id, index, stride)`.
+- Fetch ring buffer slot by `(chain_id, feed_id, rb_index, stride)`.
 - List active feeds per chain filtered by `block_timestamp >= now() - interval 'X days'`.
 
 ### 2.4 Guardrails & Limits
@@ -201,7 +201,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 ### 6.2 Keys, Partitions & Types
 
 - Natural unique index `(chain_id, tx_hash, log_index)` across `adfs_events`, cascaded via FKs to child tables.
-- Secondary indexes on `(chain_id, feed_id, stride)` for `feed_latest` and `feed_updates`.
+- Secondary indices on `(chain_id, feed_id, stride)` for `feed_latest` and `feed_updates`.
 - LIST partitions by `chain_id`; RANGE (monthly) subpartitions by `block_timestamp` for `adfs_events`, `feed_updates`, `ring_buffer_updates`, and `tx_inputs`.
 - `feed_id`: `BIT(128)`; `rb_index`: `INTEGER CHECK (0 <= value AND value <= 65535)`; `ring_buffer_table_index`: `BIT(128)`.
 - Enum `adfs_state` = `('pending','confirmed','dropped')` shared across partitioned tables.
@@ -520,7 +520,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 2. **DB Saturation**
 
    - Symptoms: elevated `adfs_db_latency_ms`, queue depth increases.
-   - Actions: tune `db.write.batchRows`, scale DB resources, consider per-chain deployment, add missing indexes.
+   - Actions: tune `db.write.batchRows`, scale DB resources, consider per-chain deployment, add missing indices.
 
 3. **Stuck Backfill**
    - Symptoms: `adfs_backfill_progress` flat for >10 minutes.
