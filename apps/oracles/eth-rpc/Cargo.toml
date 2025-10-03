@@ -9,8 +9,9 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
+blocksense-sdk = { workspace = true }
+
 wit-bindgen = "0.16.0"
-blocksense-sdk = { path = "../../../libs/sdk" }
 anyhow = "1.0.82"
 serde_json = "1.0"
 url = "2.5"
