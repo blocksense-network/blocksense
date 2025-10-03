@@ -62,7 +62,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 - `feedsLength` limit defaults to 10,000 (configurable); drop-or-alert if exceeded.
 - Maximum calldata size defaults to 128 KiB (configurable per chain).
-- In-memory ordering queue per chain with drop-oldest strategy for pending items; size configurable (default 10,000).
+- In-memory ordering queue per chain with hard capacity (default 10,000); on overflow the chain pauses ingestion and schedules a catch-up backfill.
 - Decoder rejects malformed payloads or indices outside `0..8192`.
 
 ---
@@ -132,7 +132,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - **LiveTailWorker** streams WS events via `watchEvent`, falling back to HTTP polling against `rpcHttp` when WS is unavailable, and enriches each log with tx input + header data before enqueueing.
 - **ProxyUpgradeWatcher** monitors `Upgraded(address)` events over WS/HTTP catch-up, persists `proxy_versions`, recomputes decoder profile, and backfills missed upgrades.
 - **BlockHeaderCache** memoizes recent block headers per chain to avoid redundant RPC calls when multiple logs share the same block.
-- **OrderingBuffer/Writer** merges backfill + live feeds in `(block_number, log_index)` order and flushes per-block batches inside a single transaction, emitting queue-depth metrics and dropping only oldest pending items on overflow.
+- **OrderingBuffer/Writer** merges backfill + live feeds in `(block_number, log_index)` order and flushes per-block batches inside a single transaction; on overflow it pauses the chain and triggers catch-up backfill.
 
 ---
 
@@ -163,6 +163,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 ### 5.4 OrderingBuffer & Writer
 
 - Buffer keyed by `(blockNumber, logIndex)`; per-chain single writer fiber.
+- Maintains bounded capacity; on overflow it pauses the chain, emits `queue_overflow` alert, and triggers a catch-up backfill covering the recent unpersisted range.
 - Flushes one block at a time inside a DB transaction: insert pending events, updates, ring buffer writes, raw calldata.
 - Applies UPSERT on natural keys and writes to latest table on confirmation.
 
@@ -384,9 +385,10 @@ CREATE TABLE processing_state (
 1. Startup loads config, establishes DB/RPC clients, runs migrations, initializes metrics/logging.
 2. VersionManager backfills upgrade events and seeds `version` map.
 3. BackfillWorker and LiveTailWorker emit decoded payloads into OrderingBuffer.
-4. OrderingBuffer ensures ordered batches; Writer persists pending rows in per-block transactions.
-5. Finality processor promotes rows to `confirmed`, updates `feed_latest`, and soft deletes (`dropped`) orphaned pending rows.
-6. Downstream consumers read confirmed and latest tables with read-only credentials.
+4. OrderingBuffer ensures ordered batches; on overflow, it pauses the chain and enqueues a catch-up backfill starting `overflowBackfillWindow` blocks before the last persisted block.
+5. Writer persists pending rows in per-block transactions.
+6. Finality processor promotes rows to `confirmed`, updates `feed_latest`, and soft deletes (`dropped`) orphaned pending rows.
+7. Downstream consumers read confirmed and latest tables with read-only credentials.
 
 ### 7.1 Event Processing Flow
 
@@ -416,7 +418,8 @@ CREATE TABLE processing_state (
 
 - `confirmations[chainId]`: integer finality depth.
 - `db.write.batchRows`: default 200 rows per insert batch.
-- `queue.maxItems`: default 10,000 pending items per chain (drop-oldest overflow).
+- `queue.maxItems`: default 10,000 pending items per chain; on overflow pause the chain and initiate backfill.
+- `overflowBackfillWindow`: blocks to rewind when queue overflow occurs (default 2,000).
 - `alertsConfig`: `noEventsSeconds` default 300, `maxLagBlocks` default 64 per chain.
 - Optional knobs: RPC rate limits, queue sizing, and backfill range bounds.
 - `versions`: mapping from version → decoder profile (hasBlockNumber, expected extra fields, optional guards).
@@ -460,7 +463,8 @@ CREATE TABLE processing_state (
       },
       "startBlock": 19000000,
       "alertsConfig": { "noEventsSeconds": 300, "maxLagBlocks": 64 },
-      "backfill": { "initialRange": 10000, "minRange": 256, "maxRange": 20000 }
+      "backfill": { "initialRange": 10000, "minRange": 256, "maxRange": 20000 },
+      "overflowBackfillWindow": 2000
     }
   ]
 }
@@ -494,6 +498,7 @@ CREATE TABLE processing_state (
 - `queue_depth{chain}`.
 - `reorgs_pending_dropped_total{chain}`.
 - `version_paused{chain}` (1 when ingestion paused due to unknown implementation or failed checksum).
+- `queue_overflow_total{chain}` and `queue_overflow_backfill_height{chain}` to track pauses triggered by buffer saturation and the block height of the auto-backfill.
 
 Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSeconds` feeds the "no events" alert window, while `maxLagBlocks` caps acceptable lag before paging.
 
@@ -504,6 +509,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 - RPC error rate >2% for 5 minutes.
 - `backfill_progress` flat for >10 minutes.
 - `version_paused{chain}` = 1 for > 1 minute (unknown implementation or checksum mismatch).
+- `queue_overflow_total{chain}` increments → trigger immediate page; verify auto backfill kicked off.
 - Queue depth exceeding 80% of `queue.maxItems` for >5 minutes.
 
 ### 10.3 Logging & Tracing
@@ -549,8 +555,14 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
    - Actions: inspect RPC rate limits, narrow block ranges, restart targeted backfill.
 
 4. **Unknown Implementation / Version Pause**
+
    - Symptoms: `version_paused{chain}` remains 1, alerts firing, ingestion halted for that chain.
    - Actions: inspect `proxy_versions` to identify new implementation; update `implVersionMap`, `versions`, and `topicNames` in config (including optional `code_hash`), redeploy/restart service to resume ingestion.
+
+5. **Queue Overflow Pause**
+
+   - Symptoms: `queue_overflow_total{chain}` increments, ingestion auto-paused for that chain, catch-up backfill scheduled from `overflowBackfillWindow`.
+   - Actions: confirm RPC health and consumer load, adjust `queue.maxItems` or throughput if necessary, monitor backfill completion, then resume ingestion once backlog clears.
 
 ---
 
@@ -568,7 +580,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 - Unit: decoder profiles, topic/version routing, address/bit conversions, ordering buffer invariants.
 - Integration: viem clients against HTTP/WS endpoints, Postgres writes, migrations requiring partitions.
 - Reorg simulation: forked chain verifying `pending → dropped` and confirmed stability beyond finality depth.
-- Load: synthetic bursts up to guardrail limits (feedsLength 10k, calldata 128 KiB) to exercise queue/backpressure.
+- Load: synthetic bursts up to guardrail limits (feedsLength 10k, calldata 128 KiB) to exercise queue/backpressure and validate overflow pause/backfill flow.
 - End-to-end: backfill known block range and validate `feed_latest` pointers and consumer queries.
 
 ---
@@ -637,7 +649,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 
 ## 20) Backpressure, Limits & Failure Policy
 
-- Per-chain bounded queue drops **oldest pending** items only; confirmed data never evicted.
+- Per-chain bounded queue has hard capacity; on overflow, pause ingestion for that chain, emit `queue_overflow_total`, and enqueue mandatory backfill before resuming.
 - Queue depth exported via metrics; alert when >80% capacity for >5 minutes.
 - `feedsLength` guard defaults to 10,000 entries; payloads exceeding limit trigger warn-level log, metrics increment, and request drop (pending row omitted) to preserve memory.
 - Calldata limit 128 KiB prevents oversized RPC payloads from stalling decoding; configurable per chain.
@@ -703,7 +715,8 @@ WHERE chain_id = $1 AND block_timestamp >= now() - interval '$2 days';
 ## 23) Idempotency, Ordering & Transactions
 
 - Unique natural key `(chain_id, tx_hash, log_index)` ensures deduplication across backfill/live overlap.
-- OrderingBuffer enforces strict `(block_number, log_index)` ordering before persistence; gaps trigger bounded waiting until missing logs arrive or timeout leads to warning + partial flush.
+- OrderingBuffer enforces strict `(block_number, log_index)` ordering; gaps trigger bounded waiting until missing logs arrive or timeout leads to warning + partial flush.
+- On queue overflow, emit critical alert, pause the chain, and enqueue a mandatory catch-up backfill covering the window since the last persisted block.
 - Writer executes one transaction per block per chain, batching inserts into `adfs_events`, `tx_inputs`, `feed_updates`, and `ring_buffer_updates`, followed by state transitions and `feed_latest` UPSERTs.
 - FinalityManager maintains `last_safe_block` computed from latest head; confirmed rows never revert.
 - Processing cursors (`processing_state`) allow resumable restarts without replaying confirmed data.
@@ -713,10 +726,10 @@ WHERE chain_id = $1 AND block_timestamp >= now() - interval '$2 days';
 ## 24) Implementation Notes (TS/Effect)
 
 - `decodeADFSCalldata(calldata, hasBlockNumber)` returns version-specific extras; persist accumulator fields when `hasBlockNumber=false` and validate `extraFields` align with `versions[version].extraFields`.
-- Maintain `versions: Record<number, VersionProfile>`, `implVersionMap: Record<string, number>`, and `topicNames: Record<number, string>` after config parsing; fail fast if any required mapping is missing before subscribing or writing rows.
+- Maintain `versions: Record<number, VersionProfile>`, `implVersionMap: Record<string, ImplVersionConfig>`, and `topicNames: Record<number, string>` after config parsing; fail fast if any required mapping is missing before subscribing or writing rows.
 - Convert 0x addresses to `BYTEA` before inserting; provide helpers for hex ↔ `BIT(128)` conversions, and convert u128 `tableIndex` values into `BIT(128)` before persistence.
 - When checksum enforcement is enabled, fetch runtime bytecode once per implementation (`eth_getCode`) and store `code_hash` (keccak) in `proxy_versions`.
-- Ordering buffer implemented as minimal in-memory index keyed by `(blockNumber, logIndex)`; flush per block.
+- Ordering buffer implemented as minimal in-memory index keyed by `(blockNumber, logIndex)`; flush per block, and use configured `overflowBackfillWindow` when pausing + backfilling after overflow.
 - Expose Effect services (`ConfigService`, `DbService`, `RpcService`, etc.) via dependency injection for unit tests.
 - Prefer viem batch RPC for block + transaction fetching to minimize HTTP round-trips.
 - Drizzle migrations manage enum/type creation and partition DDL; ensure forward-compatible schema evolution (online-safe `ALTER TABLE ... ATTACH PARTITION`).
