@@ -209,7 +209,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 ### 6.2 Keys, Partitions & Types
 
-- Natural unique index `(chain_id, tx_hash, log_index)` across `adfs_events`, cascaded via FKs to child tables.
+- Natural unique index `(chain_id, tx_hash, log_index)` across `adfs_events`; downstream tables rely on application-enforced integrity (no cross-table FKs due to partitioning constraints).
 - Secondary indices on `(chain_id, feed_id, stride)` for `feed_latest` and `feed_updates`.
 - LIST partitions by `chain_id`; RANGE (monthly) subpartitions by `block_timestamp` for `adfs_events`, `feed_updates`, `ring_buffer_updates`, and `tx_inputs`.
 - `feed_id`: `BIT(128)`; `rb_index`: `INTEGER CHECK (value >= 0 AND value < 8192)`; `ring_buffer_table_index`: `BIT(128)`.
@@ -773,6 +773,7 @@ WHERE chain_id = $1 AND block_timestamp >= now() - interval '$2 days';
 - When checksum enforcement is enabled, fetch runtime bytecode once per implementation (`eth_getCode`) and store `code_hash` (keccak) in `proxy_versions`.
 - Ordering buffer implemented as minimal in-memory index keyed by `(blockNumber, logIndex)`; flush per block, use configured `overflowBackfillWindow` when pausing + backfilling after overflow, and rely on advisory locks to coordinate finality across instances.
 - Finality evaluator reads `finality.mode` per chain; implement strategy interfaces so future modes (e.g., optimistic rollup finality) can be added without touching core pipeline.
+- Foreign keys between partitioned tables are omitted; enforce integrity via unique keys and application logic when inserting into `feed_updates`, `ring_buffer_updates`, and `feed_latest`.
 - Expose Effect services (`ConfigService`, `DbService`, `RpcService`, etc.) via dependency injection for unit tests.
 - Prefer viem batch RPC for block + transaction fetching to minimize HTTP round-trips.
 - Drizzle migrations manage enum/type creation and partition DDL; ensure forward-compatible schema evolution (online-safe `ALTER TABLE ... ATTACH PARTITION`).
