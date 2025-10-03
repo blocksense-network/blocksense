@@ -63,7 +63,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - `feedsLength` limit defaults to 10,000 (configurable); drop-or-alert if exceeded.
 - Maximum calldata size defaults to 128 KiB (configurable per chain).
 - In-memory ordering queue per chain with hard capacity (default 10,000); on overflow the chain pauses ingestion and schedules a catch-up backfill.
-- Decoder rejects malformed payloads or indices outside `0..8192`.
+- Decoder rejects malformed payloads or indices outside `[0, 8192)`.
 
 ---
 
@@ -141,7 +141,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 ### 5.1 VersionManager
 
 - On startup: scans `Upgraded(address)` events from `startBlock` to head; resolves implementation → version using `implVersionMap`. Unknown implementations trigger a chain-specific pause + alert.
-- Maintains in-memory map `chain_id → {version, decoderProfile, topic0, expectedExtraFields, impl, expectedCodeHash?}` derived from config `versions`, `topicNames`, and `implVersionMap`.
+- Maintains in-memory map `chain_id → {version, decoderProfile, topic0, expectedExtraFields, impl, expectedCodeHash?}` derived from config `versions`, `topicNames`, and `implVersionMap`; `hasBlockNumber` is derived from decoder profile, not stored per event.
 - Live subscription bumps version, recalculates `topic0` from config, stores `(chain_id, version, implementation, topic_hash, code_hash)` in DB, and resumes only after config contains the mapping.
 - Decoder profiles come directly from config:
   - Example: Version 1 → `{ hasBlockNumber: true, extraFields: [] }`.
@@ -204,15 +204,15 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - `tx_inputs`: optional normalized transaction input archive storing selector, decoded JSON, status, and version for auditing.
 - `feed_updates`: normalized feed entries with `feed_id` as `BIT(128)`, `stride`, `rb_index`, payload bytes, status, version.
 - `ring_buffer_updates`: table writes keyed by `table_index` stored as `BIT(128)` plus payload bytes, status, version.
-- `feed_latest`: confirmed-only latest pointer per `(chain_id, feed_id, stride)` including pointer back to canonical event.
-- `processing_state`: per-chain cursors (`last_seen_block`, `last_safe_block`, `backfill_cursor`).
+- `feed_latest`: confirmed-only latest pointer per `(chain_id, feed_id, stride)` including pointer back to canonical event and `extra` metadata JSON.
+- `processing_state`: per-chain cursors (`last_seen_block`, `last_safe_block`, `last_backfill_block`).
 
 ### 6.2 Keys, Partitions & Types
 
 - Natural unique index `(chain_id, tx_hash, log_index)` across `adfs_events`, cascaded via FKs to child tables.
 - Secondary indices on `(chain_id, feed_id, stride)` for `feed_latest` and `feed_updates`.
 - LIST partitions by `chain_id`; RANGE (monthly) subpartitions by `block_timestamp` for `adfs_events`, `feed_updates`, `ring_buffer_updates`, and `tx_inputs`.
-- `feed_id`: `BIT(128)`; `rb_index`: `INTEGER CHECK (0 <= value AND value <= 65535)`; `ring_buffer_table_index`: `BIT(128)`.
+- `feed_id`: `BIT(128)`; `rb_index`: `INTEGER CHECK (value >= 0 AND value < 8192)`; `ring_buffer_table_index`: `BIT(128)`.
 - Enum `adfs_state` = `('pending','confirmed','dropped')` shared across partitioned tables.
 
 ### 6.3 Helper Functions
@@ -227,8 +227,8 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 ```sql
 INSERT INTO feed_latest AS fl
-(chain_id, feed_id, stride, block_number, block_timestamp, block_hash, tx_hash, log_index, rb_index, data, version)
-VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+(chain_id, feed_id, stride, block_number, block_timestamp, block_hash, tx_hash, log_index, rb_index, data, version, extra)
+VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
 ON CONFLICT (chain_id, feed_id, stride)
 DO UPDATE SET
   block_number = EXCLUDED.block_number,
@@ -238,7 +238,8 @@ DO UPDATE SET
   log_index    = EXCLUDED.log_index,
   rb_index     = EXCLUDED.rb_index,
   data         = EXCLUDED.data,
-  version      = EXCLUDED.version
+  version      = EXCLUDED.version,
+  extra        = EXCLUDED.extra
 WHERE (fl.block_number, fl.log_index, fl.rb_index)
     < (EXCLUDED.block_number, EXCLUDED.log_index, EXCLUDED.rb_index);
 ```
@@ -295,7 +296,6 @@ CREATE TABLE chains (
 CREATE TABLE contracts (
   chain_id            INTEGER REFERENCES chains(chain_id),
   proxy_address       BYTEA  NOT NULL,
-  contract_address    BYTEA  NOT NULL,
   initial_topic_hash  BYTEA  NOT NULL,
   start_block         BIGINT NOT NULL,
   UNIQUE (chain_id)
@@ -322,7 +322,6 @@ CREATE TABLE adfs_events (
   status          adfs_state NOT NULL,
   version         INTEGER NOT NULL,
   calldata        BYTEA   NOT NULL,
-  has_block_number BOOLEAN NOT NULL,
   extra           JSONB   NOT NULL DEFAULT '{}'::jsonb,
   PRIMARY KEY (chain_id, tx_hash, log_index)
 ) PARTITION BY LIST (chain_id);
@@ -338,13 +337,13 @@ CREATE TABLE feed_updates (
   version         INTEGER NOT NULL,
   stride          SMALLINT NOT NULL,
   feed_id         BIT(128) NOT NULL,
-  rb_index        SMALLINT NOT NULL,
+  rb_index        SMALLINT NOT NULL CHECK (rb_index >= 0 AND rb_index < 8192),
   data            BYTEA    NOT NULL,
   extra           JSONB    NOT NULL DEFAULT '{}'::jsonb,
   PRIMARY KEY (chain_id, tx_hash, log_index, feed_id, stride, rb_index)
 ) PARTITION BY LIST (chain_id);
 
-CREATE TABLE ring_buffer_writes (
+CREATE TABLE ring_buffer_updates (
   chain_id        INTEGER NOT NULL,
   block_number    BIGINT  NOT NULL,
   block_hash      BYTEA   NOT NULL,
@@ -371,6 +370,7 @@ CREATE TABLE feed_latest (
   rb_index        SMALLINT NOT NULL,
   data            BYTEA    NOT NULL,
   version         INTEGER  NOT NULL,
+  extra           JSONB    NOT NULL DEFAULT '{}'::jsonb,
   PRIMARY KEY (chain_id, feed_id, stride)
 );
 
@@ -378,7 +378,7 @@ CREATE TABLE processing_state (
   chain_id             INTEGER PRIMARY KEY,
   last_seen_block      BIGINT NOT NULL DEFAULT 0,
   last_safe_block      BIGINT NOT NULL DEFAULT 0,
-  backfill_cursor      BIGINT NOT NULL DEFAULT 0
+  last_backfill_block  BIGINT NOT NULL DEFAULT 0
 );
 ```
 
@@ -502,30 +502,30 @@ CREATE TABLE processing_state (
 
 ### 10.1 Metrics (Prometheus)
 
-- `events_processed_total{chain,status}` (pending/confirmed/dropped).
-- `events_lag_blocks{chain}` and `finality_lag_blocks{chain}`.
-- `rpc_requests_total{chain,method,outcome}` and `rpc_latency_ms_bucket`.
-- `db_ops_total{op,status}` and latency histograms.
-- `bytes_ingested_total{chain}`.
-- `backfill_progress{chain}` (ratio of `last_backfill_block` to head).
-- `queue_depth{chain}`.
-- `reorgs_pending_dropped_total{chain}`.
-- `version_paused{chain}` (1 when ingestion paused due to unknown implementation or failed checksum).
-- `queue_overflow_total{chain}` and `queue_overflow_backfill_height{chain}` to track pauses triggered by buffer saturation and the block height of the auto-backfill.
-- `finality_lock_contention{chain}` counting failed advisory lock attempts.
+- `adfs_events_processed_total{chain,status}` (pending/confirmed/dropped).
+- `adfs_events_lag_blocks{chain}` and `adfs_finality_lag_blocks{chain}`.
+- `adfs_rpc_requests_total{chain,method,outcome}` and `adfs_rpc_latency_ms_bucket{chain,method}`; `outcome` ∈ {success,error}.
+- `adfs_db_ops_total{chain,op,outcome}` with `adfs_db_latency_ms_bucket{chain,op}`.
+- `adfs_bytes_ingested_total{chain}`.
+- `adfs_backfill_progress{chain}` (ratio of `last_backfill_block` to head).
+- `adfs_queue_depth{chain}`.
+- `adfs_reorgs_total{chain,status}` (status ∈ {dropped}).
+- `adfs_version_paused{chain}` (1 when ingestion paused due to unknown implementation or failed checksum).
+- `adfs_queue_overflow_total{chain}` and `adfs_queue_overflow_backfill_height{chain}` to track pauses triggered by buffer saturation and the block height of the auto-backfill.
+- `adfs_finality_lock_contention_total{chain}` counting failed advisory lock attempts.
 
 Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSeconds` feeds the "no events" alert window, while `maxLagBlocks` caps acceptable lag before paging.
 
 ### 10.2 Alerts
 
 - No events on a chain for longer than `alertsConfig.noEventsSeconds`.
-- `events_lag_blocks` or `finality_lag_blocks` above `alertsConfig.maxLagBlocks`.
-- RPC error rate >2% for 5 minutes.
-- `backfill_progress` flat for >10 minutes.
-- `version_paused{chain}` = 1 for > 1 minute (unknown implementation or checksum mismatch).
-- `queue_overflow_total{chain}` increments → trigger immediate page; verify auto backfill kicked off.
-- Queue depth exceeding 80% of `queue.maxItems` for >5 minutes.
-- Sustained `finality_lock_contention{chain}` > 0 for 5 minutes (investigate competing instances).
+- `adfs_events_lag_blocks{chain}` or `adfs_finality_lag_blocks{chain}` above `alertsConfig.maxLagBlocks`.
+- `adfs_rpc_errors_total{chain}` / `adfs_rpc_requests_total{chain}` > 2% for 5 minutes.
+- `adfs_backfill_progress{chain}` flat for >10 minutes.
+- `adfs_version_paused{chain}` = 1 for > 1 minute (unknown implementation or checksum mismatch).
+- `adfs_queue_overflow_total{chain}` increments → trigger immediate page; verify auto backfill kicked off.
+- `adfs_queue_depth{chain}` exceeding 80% of `queue.maxItems` for >5 minutes.
+- Sustained `adfs_finality_lock_contention_total{chain}` > 0 for 5 minutes (investigate competing instances).
 
 ### 10.3 Logging & Tracing
 
@@ -556,12 +556,12 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 
 1. **RPC Outage**
 
-   - Symptoms: rising `adfs_rpc_errors_total`, queue growth, backfill stalls.
+   - Symptoms: rising `adfs_rpc_errors_total{chain}`, queue growth, backfill stalls.
    - Actions: switch provider URL, reduce backfill range, restart worker; ensure WS reconnects.
 
 2. **DB Saturation**
 
-   - Symptoms: elevated `adfs_db_latency_ms`, queue depth increases.
+   - Symptoms: elevated `adfs_db_latency_ms_bucket{chain}` (p99), queue depth increases.
    - Actions: tune `db.write.batchRows`, scale DB resources, consider per-chain deployment, add missing indices.
 
 3. **Stuck Backfill**
@@ -571,12 +571,12 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 
 4. **Unknown Implementation / Version Pause**
 
-   - Symptoms: `version_paused{chain}` remains 1, alerts firing, ingestion halted for that chain.
+   - Symptoms: `adfs_version_paused{chain}` remains 1, alerts firing, ingestion halted for that chain.
    - Actions: inspect `proxy_versions` to identify new implementation; update `implVersionMap`, `versions`, and `topicNames` in config (including optional `code_hash`), redeploy/restart service to resume ingestion.
 
 5. **Queue Overflow Pause**
 
-   - Symptoms: `queue_overflow_total{chain}` increments, ingestion auto-paused for that chain, catch-up backfill scheduled from `overflowBackfillWindow`.
+   - Symptoms: `adfs_queue_overflow_total{chain}` increments, ingestion auto-paused for that chain, catch-up backfill scheduled from `overflowBackfillWindow`.
    - Actions: confirm RPC health and consumer load, adjust `queue.maxItems` or throughput if necessary, monitor backfill completion, then resume ingestion once backlog clears.
 
 ---
@@ -612,7 +612,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 
 - Proxy follows ERC-1967 upgrade event signature; alternate topics can be configured if needed.
 - `DataFeedsUpdated` signature remains stable; service supports multiple signatures if configured.
-- `stride` is non-negative; ring buffer indices stay within `0..65535`.
+- `stride` is non-negative; ring buffer indices stay within `[0, 8192)`.
 - `db_write_batch_rows` default 200; `queue_max_items` default 10,000.
 - Metrics endpoint exposed at `http://0.0.0.0:${metricsPort}/metrics` (defaults to `:9464/metrics`).
 - Logs default to `info`; tracing enabled when `OTEL_EXPORTER_OTLP_ENDPOINT` is provided.
@@ -664,9 +664,10 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 
 ## 20) Backpressure, Limits & Failure Policy
 
-- Per-chain bounded queue has hard capacity; on overflow, pause ingestion for that chain, emit `queue_overflow_total`, and enqueue mandatory backfill before resuming.
+- Per-chain bounded queue has hard capacity; on overflow, pause ingestion for that chain, emit `adfs_queue_overflow_total`, and enqueue mandatory backfill before resuming.
 - Queue depth exported via metrics; alert when >80% capacity for >5 minutes.
 - `feedsLength` guard defaults to 10,000 entries; payloads exceeding limit trigger warn-level log, metrics increment, and request drop (pending row omitted) to preserve memory.
+- `rb_index` guard enforces values in `[0, 8192)` and rejects out-of-range indices.
 - Calldata limit 128 KiB prevents oversized RPC payloads from stalling decoding; configurable per chain.
 - RPC retries use exponential backoff with jitter and rotate across configured endpoints.
 - Persistent RPC failure escalates via runbook instructions (Section 12).
@@ -791,7 +792,6 @@ interface InsertEvent {
   status: Status;
   version: number;
   calldata: `0x${string}`;
-  hasBlockNumber: boolean;
   extra: Record<string, unknown>;
 }
 
@@ -806,7 +806,7 @@ interface FeedUpdateRow {
   version: number;
   stride: number;
   feedId: bigint; // convert to BIT(128) on insert
-  rbIndex: number; // 0..65535
+  rbIndex: number; // 0..8191
   data: `0x${string}`;
   extra: Record<string, unknown>;
 }
@@ -832,11 +832,11 @@ interface RingBufferWriteRow {
 
 ```sql
 -- LIST partition for chain 1
-CREATE TABLE events_adfs_c1 PARTITION OF events_adfs
+CREATE TABLE adfs_events_c1 PARTITION OF adfs_events
   FOR VALUES IN (1)
   PARTITION BY RANGE (block_timestamp);
 
 -- Subpartition for September 2025
-CREATE TABLE events_adfs_c1_2025_09 PARTITION OF events_adfs_c1
+CREATE TABLE adfs_events_c1_2025_09 PARTITION OF adfs_events_c1
   FOR VALUES FROM ('2025-09-01') TO ('2025-10-01');
 ```
