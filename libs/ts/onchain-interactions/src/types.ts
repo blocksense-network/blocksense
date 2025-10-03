@@ -72,6 +72,7 @@ export const deployedTestnets = [
   'unichain-sepolia',
   'world-chain-sepolia',
   'zephyr-testnet',
+  'zilliqa-testnet',
   'zksync-sepolia',
 ] satisfies NetworkName[];
 
