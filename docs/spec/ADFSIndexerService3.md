@@ -60,9 +60,9 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 ### 2.4 Guardrails & Limits
 
-- `feedsLength` limit defaults to 10,000 (configurable); drop-or-alert if exceeded.
-- Maximum calldata size defaults to 128 KiB (configurable per chain).
-- In-memory ordering queue per chain with hard capacity (default 10,000); on overflow the chain pauses ingestion and schedules a catch-up backfill.
+- `feedsLength` limit defaults to 10,000 (configurable); exceeding the limit pauses the chain, raises a P1 alert, records `adfs_guard_dropped_total{reason="feedsLength"}`, and schedules an automatic backfill starting `guardBackfillWindow` blocks before the last persisted block.
+- Maximum calldata size defaults to 128 KiB (configurable per chain); oversized calldata follows the same pause + alert + backfill policy as above (reason=`calldataSize`).
+- In-memory ordering queue per chain with hard capacity (default 10,000); on overflow the chain pauses ingestion, emits `adfs_queue_overflow_total`, and schedules a catch-up backfill using `overflowBackfillWindow`.
 - Decoder rejects malformed payloads or indices outside `[0, 8192)`.
 
 ---
@@ -164,7 +164,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 ### 5.4 OrderingBuffer & Writer
 
 - Buffer keyed by `(blockNumber, logIndex)`; per-chain single writer fiber.
-- Maintains bounded capacity; on overflow it pauses the chain, emits `queue_overflow` alert, and triggers a catch-up backfill covering the recent unpersisted range.
+- Maintains bounded capacity; on overflow it pauses the chain, emits `adfs_queue_overflow_total`/P1 alert, and triggers a catch-up backfill covering the recent unpersisted range.
 - Flushes one block at a time inside a DB transaction: insert pending events, updates, ring buffer writes, raw calldata.
 - Applies UPSERT on natural keys and writes to latest table on confirmation.
 - Deployments should run one writer per chain per process; if multiple processes contend, adopt the same advisory-lock strategy (`pg_try_advisory_lock(hashtext('writer:' || chain_id))`) to ensure a single leader drains the queue.
@@ -455,6 +455,7 @@ CREATE TABLE processing_state (
 - `db.write.batchRows`: default 200 rows per insert batch.
 - `queue.maxItems`: default 10,000 pending items per chain; on overflow pause the chain and initiate backfill.
 - `overflowBackfillWindow`: blocks to rewind when queue overflow occurs (default 2,000).
+- `guardBackfillWindow`: blocks to rewind when guards drop a payload (default 2,000).
 - `alertsConfig`: `noEventsSeconds` default 300, `maxLagBlocks` default 64 per chain.
 - Optional knobs: RPC rate limits, queue sizing, backfill range bounds, and finality windows.
 - `versions`: mapping from version → decoder profile (hasBlockNumber, expected extra fields, optional guards).
@@ -471,7 +472,9 @@ CREATE TABLE processing_state (
   "service": {
     "queueMaxItems": 10000,
     "dbWriteBatchRows": 200,
-    "metricsPort": 9464
+    "metricsPort": 9464,
+    "overflowBackfillWindow": 2000,
+    "guardBackfillWindow": 2000
   },
   "versions": {
     "1": { "hasBlockNumber": true, "extraFields": [] },
@@ -503,8 +506,7 @@ CREATE TABLE processing_state (
       },
       "startBlock": 19000000,
       "alertsConfig": { "noEventsSeconds": 300, "maxLagBlocks": 64 },
-      "backfill": { "initialRange": 10000, "minRange": 256, "maxRange": 20000 },
-      "overflowBackfillWindow": 2000
+      "backfill": { "initialRange": 10000, "minRange": 256, "maxRange": 20000 }
     }
   ]
 }
@@ -540,6 +542,7 @@ CREATE TABLE processing_state (
 - `adfs_version_paused{chain}` (1 when ingestion paused due to unknown implementation or failed checksum).
 - `adfs_queue_overflow_total{chain}` and `adfs_queue_overflow_backfill_height{chain}` to track pauses triggered by buffer saturation and the block height of the auto-backfill.
 - `adfs_finality_lock_contention_total{chain}` counting failed advisory lock attempts.
+- `adfs_guard_dropped_total{chain,reason}` for payloads rejected by guardrails (feedsLength, calldataSize, etc.).
 
 Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSeconds` feeds the "no events" alert window, while `maxLagBlocks` caps acceptable lag before paging.
 
@@ -553,6 +556,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 - `adfs_queue_overflow_total{chain}` increments → trigger immediate page; verify auto backfill kicked off.
 - `adfs_queue_depth{chain}` exceeding 80% of `queue.maxItems` for >5 minutes.
 - Sustained `adfs_finality_lock_contention_total{chain}` > 0 for 5 minutes (investigate competing instances).
+- `adfs_guard_dropped_total{chain,reason}` increments → P1 page; ensure guardBackfillWindow backfill completed and root cause mitigated.
 
 ### 10.3 Logging & Tracing
 
@@ -605,6 +609,11 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 
    - Symptoms: `adfs_queue_overflow_total{chain}` increments, ingestion auto-paused for that chain, catch-up backfill scheduled from `overflowBackfillWindow`.
    - Actions: confirm RPC health and consumer load, adjust `queue.maxItems` or throughput if necessary, monitor backfill completion, then resume ingestion once backlog clears.
+
+6. **Guardrail Drop (feeds/calldata)**
+
+   - Symptoms: `adfs_guard_dropped_total{chain,reason}` increments, chain auto-paused, backfill scheduled from `guardBackfillWindow`.
+   - Actions: inspect offending transactions, adjust guard thresholds if appropriate, confirm auto backfill completion before resuming ingestion; treat as P1.
 
 ---
 
@@ -693,8 +702,8 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 
 - Per-chain bounded queue has hard capacity; on overflow, pause ingestion for that chain, emit `adfs_queue_overflow_total`, and enqueue mandatory backfill before resuming.
 - Queue depth exported via metrics; alert when >80% capacity for >5 minutes.
-- `feedsLength` guard defaults to 10,000 entries; payloads exceeding limit trigger warn-level log, metrics increment, and request drop (pending row omitted) to preserve memory.
-- `rb_index` guard enforces values in `[0, 8192)` and rejects out-of-range indices.
+- `feedsLength` guard defaults to 10,000 entries; payloads exceeding limit trigger warn-level log, increment `adfs_guard_dropped_total`, pause the chain, and auto backfill from `guardBackfillWindow` before resuming.
+- `rb_index` guard enforces values in `[0, 8192)` and rejects out-of-range indices (same pause/alert/backfill policy).
 - Calldata limit 128 KiB prevents oversized RPC payloads from stalling decoding; configurable per chain.
 - RPC retries use exponential backoff with jitter and rotate across configured endpoints.
 - Persistent RPC failure escalates via runbook instructions (Section 12).
