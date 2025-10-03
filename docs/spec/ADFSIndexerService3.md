@@ -45,7 +45,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 - `topicNames` config maps contract `version` → event signature (e.g. `{ "1": "DataFeedsUpdated(uint256)" }`); the service derives `topic0 = keccak256(topicNames[version])` for the active version and subscribes to that topic per chain.
 - For each matched log: fetch transaction, receipt, and input data; decode with `decodeADFSCalldata(calldata, hasBlockNumber)` where `hasBlockNumber` is dictated by the active contract version.
-- Decoder yields `feeds[]` (exposes `stride`, `feedId` as u128, `index` as u16, and `data` bytes) and `ringBufferTable[]` (global `table_index`, `data`).
+- Decoder yields `feeds[]` (exposes `stride`, `feedId` as u128, `index` as u16, and `data` bytes) and `ringBufferTable[]` (global `table_index` as u128`, plus `data`).
 - Version-specific extras (e.g., `sourceAccumulator`, `destinationAccumulator`) are persisted in a JSONB `extra` column.
 - Event block metadata remains the source of truth for `blockNumber` and `blockTimestamp`.
 
@@ -194,7 +194,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - `adfs_events`: partitioned by chain/timestamp; raw event metadata, status enum, calldata, version, `topic0`.
 - `tx_inputs`: optional normalized transaction input archive storing selector, decoded JSON, status, and version for auditing.
 - `feed_updates`: normalized feed entries with `feed_id` as `BIT(128)`, `stride`, `rb_index`, payload bytes, status, version.
-- `ring_buffer_updates`: table writes keyed by `table_index` (`BIGINT`) plus payload bytes, status, version.
+- `ring_buffer_updates`: table writes keyed by `table_index` stored as `BIT(128)` plus payload bytes, status, version.
 - `feed_latest`: confirmed-only latest pointer per `(chain_id, feed_id, stride)` including pointer back to canonical event.
 - `processing_state`: per-chain cursors (`last_seen_block`, `last_safe_block`, `backfill_cursor`).
 
@@ -203,14 +203,14 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - Natural unique index `(chain_id, tx_hash, log_index)` across `adfs_events`, cascaded via FKs to child tables.
 - Secondary indexes on `(chain_id, feed_id, stride)` for `feed_latest` and `feed_updates`.
 - LIST partitions by `chain_id`; RANGE (monthly) subpartitions by `block_timestamp` for `adfs_events`, `feed_updates`, `ring_buffer_updates`, and `tx_inputs`.
-- `feed_id`: `BIT(128)`; `rb_index`: `INTEGER CHECK (0 <= value AND value <= 65535)`; `ring_buffer_table_index`: `BIGINT`.
+- `feed_id`: `BIT(128)`; `rb_index`: `INTEGER CHECK (0 <= value AND value <= 65535)`; `ring_buffer_table_index`: `BIT(128)`.
 - Enum `adfs_state` = `('pending','confirmed','dropped')` shared across partitioned tables.
 
 ### 6.3 Helper Functions
 
 - SQL helper `hex_to_bit128(hex TEXT) RETURNS BIT(128)` for ergonomic inserts.
 - Views to expose BIT columns as hex to consumers (open task).
-- Stored function to compute `table_index` from `(feed_id, stride)` available to analytics clients.
+- Stored function to compute `table_index` from `(feed_id, stride)` available to analytics clients, returning `BIT(128)`.
 
 ### 6.4 Materializations & Constraints
 
@@ -343,7 +343,7 @@ CREATE TABLE ring_buffer_writes (
   log_index       INTEGER NOT NULL,
   status          adfs_state NOT NULL,
   version         INTEGER NOT NULL,
-  table_index     BIGINT  NOT NULL,
+  table_index     BIT(128) NOT NULL,
   data            BYTEA   NOT NULL,
   extra           JSONB   NOT NULL DEFAULT '{}'::jsonb,
   PRIMARY KEY (chain_id, tx_hash, log_index, table_index)
@@ -687,7 +687,7 @@ WHERE chain_id = $1 AND block_timestamp >= now() - interval '$2 days';
 
 - `decodeADFSCalldata(calldata, hasBlockNumber)` returns version-specific extras; persist accumulator fields when `hasBlockNumber=false`.
 - Maintain a `topicNames: Record<number, string>` map after config parsing; fail fast if a required version lacks a signature before subscribing or writing rows.
-- Convert 0x addresses to `BYTEA` before inserting; provide helpers for hex ↔ BIT(128) conversions.
+- Convert 0x addresses to `BYTEA` before inserting; provide helpers for hex ↔ BIT(128) conversions, and convert u128`tableIndex`values into`BIT(128)` before persistence.
 - Ordering buffer implemented as minimal in-memory index keyed by `(blockNumber, logIndex)`; flush per block.
 - Expose Effect services (`ConfigService`, `DbService`, `RpcService`, etc.) via dependency injection for unit tests.
 - Prefer viem batch RPC for block + transaction fetching to minimize HTTP round-trips.
@@ -762,7 +762,7 @@ interface RingBufferWriteRow {
   logIndex: number;
   status: Status;
   version: number;
-  tableIndex: bigint;
+  tableIndex: bigint; // convert to BIT(128) on insert
   data: `0x${string}`;
   extra: Record<string, unknown>;
 }
