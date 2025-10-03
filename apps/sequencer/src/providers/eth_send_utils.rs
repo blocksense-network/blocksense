@@ -6,6 +6,7 @@ use alloy::{
     providers::{Provider, ProviderBuilder},
     rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
+use alloy_primitives::FixedBytes;
 use blocksense_config::{FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
@@ -24,6 +25,7 @@ use crate::{
     },
     sequencer_state::SequencerState,
 };
+use blocksense_feed_registry::registry::await_time;
 use blocksense_feeds_processing::adfs_gen_calldata::{
     adfs_serialize_updates, get_neighbour_feed_ids, RoundBufferIndices,
 };
@@ -603,59 +605,26 @@ pub async fn eth_batch_send_to_contract(
 
             let tx_hash = *tx_hash_result.tx_hash();
 
-            let tx_receipt = match actix_web::rt::time::timeout(
-                Duration::from_secs(transaction_retry_timeout_secs),
-                rpc_handle.raw_request("eth_getTransactionReceipt".into(), (tx_hash,)),
+            info!("Successfully posted tx to RPC and got tx_hash in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash}");
+
+            let tx_get_receipt_start_time = Instant::now();
+            let tx_receipt = match await_receipt(
+                net.as_str(),
+                rpc_handle,
+                transaction_retry_timeout_secs,
+                &tx_hash,
+                block_height,
+                &sender_address,
+                tx_get_receipt_start_time,
             )
             .await
             {
-                Ok(res) => match res {
-                    Ok(v) => match get_receipt_with_default_type(v) {
-                        Ok(Some(v)) => {
-                            debug!("Successfully got receipt from RPC in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash} receipt = {v:?}");
-                            inc_metric!(provider_metrics, net, success_get_receipt);
-                            v
-                        }
-                        Ok(None) => {
-                            warn!("Get tx_receipt returned None in network `{net}` block height {block_height}");
-                            inc_metric!(provider_metrics, net, failed_get_receipt);
-                            inc_retries_with_backoff(
-                                net.as_str(),
-                                &mut transaction_retries_count,
-                                provider_metrics,
-                                BACKOFF_SECS,
-                            )
-                            .await;
-                            continue;
-                        }
-                        Err(e) => {
-                            warn!("Get tx_receipt returned Error Report: {e:?} in network `{net}` block height {block_height}");
-                            inc_metric!(provider_metrics, net, failed_get_receipt);
-                            inc_retries_with_backoff(
-                                net.as_str(),
-                                &mut transaction_retries_count,
-                                provider_metrics,
-                                BACKOFF_SECS,
-                            )
-                            .await;
-                            continue;
-                        }
-                    },
-                    Err(e) => {
-                        warn!("Get tx_receipt returned RpcError: {e:?} in network `{net}` block height {block_height}");
-                        inc_metric!(provider_metrics, net, failed_get_receipt);
-                        inc_retries_with_backoff(
-                            net.as_str(),
-                            &mut transaction_retries_count,
-                            provider_metrics,
-                            BACKOFF_SECS,
-                        )
-                        .await;
-                        continue;
-                    }
-                },
+                Ok(receipt) => {
+                    inc_metric!(provider_metrics, net, success_get_receipt);
+                    receipt
+                }
                 Err(e) => {
-                    warn!("Error getting tx_receipt in network `{net}` block height {block_height}: {e}");
+                    warn!("await_receipt: {e}");
                     inc_metric!(provider_metrics, net, failed_get_receipt);
                     inc_retries_with_backoff(
                         net.as_str(),
@@ -668,13 +637,8 @@ pub async fn eth_batch_send_to_contract(
                 }
             };
 
-            info!("Successfully posted tx to RPC and got tx_hash in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash}");
-
             tx_receipt
         };
-
-        let tx_result_str = format!("{tx_receipt:?}");
-        debug!("tx_result_str={tx_result_str} in network `{net}` block height {block_height}");
 
         receipt = tx_receipt;
 
@@ -683,8 +647,7 @@ pub async fn eth_batch_send_to_contract(
 
     let transaction_time = tx_time.elapsed().as_millis();
     info!(
-        "Recvd transaction receipt that took {}ms for {transaction_retries_count} retries in network `{}` block height {}: {:?}",
-        transaction_time, net, block_height, receipt
+        "Successfully recvd transaction receipt that took {transaction_time}ms for {transaction_retries_count} retries in network `{net}` block height {block_height} and sender_address {sender_address}: {receipt:?}"
     );
 
     log_gas_used(&net, &receipt, transaction_time, provider_metrics).await;
@@ -694,6 +657,54 @@ pub async fn eth_batch_send_to_contract(
     debug!("Released a read/write lock on provider state in network `{net}` block height {block_height}");
 
     Ok((receipt.status().to_string(), feeds_to_update_ids))
+}
+
+async fn await_receipt(
+    net: &str,
+    rpc_handle: &ProviderType,
+    transaction_retry_timeout_secs: u64,
+    tx_hash: &FixedBytes<32>,
+    block_height: u64,
+    sender_address: &Address,
+    start_time_point: Instant,
+) -> eyre::Result<TransactionReceipt> {
+    loop {
+        match actix_web::rt::time::timeout(
+            Duration::from_secs(transaction_retry_timeout_secs),
+            rpc_handle.raw_request("eth_getTransactionReceipt".into(), (tx_hash,)),
+        )
+        .await
+        {
+            Ok(res) => match res {
+                Ok(v) => match get_receipt_with_default_type(v) {
+                    Ok(Some(v)) => {
+                        debug!("Successfully got receipt from RPC in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash} receipt = {v:?}");
+                        return Ok(v);
+                    }
+                    Ok(None) => {
+                        let deadline =
+                            start_time_point + Duration::from_secs(transaction_retry_timeout_secs);
+                        if Instant::now() > deadline {
+                            eyre::bail!("Get tx_receipt returned None and deadline for getting it elapsed in network `{net}` block height {block_height}");
+                        }
+                        await_time(1000).await;
+                        continue;
+                    }
+                    Err(e) => {
+                        eyre::bail!("Get tx_receipt returned Error Report: {e:?} in network `{net}` block height {block_height}");
+                    }
+                },
+                Err(e) => {
+                    eyre::bail!("Get tx_receipt returned RpcError: {e:?} in network `{net}` block height {block_height}");
+                }
+            },
+            Err(e) => {
+                eyre::bail!(
+                    "Error getting tx_receipt in network `{net}` block height {block_height}: {e}"
+                )
+            }
+        }
+    }
 }
 
 fn get_receipt_with_default_type(
