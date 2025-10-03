@@ -153,6 +153,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - Uses adaptive range: initial 10,000 blocks; halves to minimum 256 on RPC failures.
 - Writes pending rows; relies on Writer for batching.
 - Resumable via per-chain cursors stored in DB.
+- Optionally acquires advisory lock (`pg_try_advisory_lock(hashtext('backfill:' || chain_id))`) when running multiple indexer instances to ensure only one backfill worker operates per chain; non-lock holders skip backfill and rely on live tail.
 
 ### 5.3 LiveTailWorker
 
@@ -166,6 +167,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - Maintains bounded capacity; on overflow it pauses the chain, emits `queue_overflow` alert, and triggers a catch-up backfill covering the recent unpersisted range.
 - Flushes one block at a time inside a DB transaction: insert pending events, updates, ring buffer writes, raw calldata.
 - Applies UPSERT on natural keys and writes to latest table on confirmation.
+- Deployments should run one writer per chain per process; if multiple processes contend, adopt the same advisory-lock strategy (`pg_try_advisory_lock(hashtext('writer:' || chain_id))`) to ensure a single leader drains the queue.
 
 ### 5.5 Finality Processor
 
