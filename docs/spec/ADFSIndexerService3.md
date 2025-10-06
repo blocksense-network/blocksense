@@ -221,25 +221,9 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 ### 6.3 Helper Functions
 
-- Provide canonical conversion helpers **(big-endian byte layout)** so app/DB stay in sync:
-
-  ```sql
-  CREATE OR REPLACE FUNCTION hex_to_bytea16(hex TEXT)
-  RETURNS BYTEA
-  LANGUAGE SQL IMMUTABLE AS $$
-    SELECT decode(lpad(regexp_replace(lower($1), '^0x', ''), 32, '0'), 'hex')
-  $$;
-
-  CREATE OR REPLACE FUNCTION bytea16_to_hex(val BYTEA)
-  RETURNS TEXT
-  LANGUAGE SQL IMMUTABLE AS $$
-    SELECT '0x' || encode(val, 'hex')
-  $$;
-  ```
-
-- Create views exposing `feed_updates`/`feed_latest` with hex-form `feed_id` and `table_index` for analytics use via `bytea16_to_hex`.
-- Stored function `compute_table_index(feed_id BYTEA, stride SMALLINT)` returns `BYTEA(16)` and mirrors on-chain addressing (treating bytes as big-endian u128).
 - Document endianness & timestamps: bytes are stored big-endian, matching the on-chain u128 encoding; block timestamps (EVM seconds) convert to `TIMESTAMPTZ` via `to_timestamp` (UTC semantics).
+- Application layer provides hex ↔ `BYTEA(16)` conversion helpers; the database stores raw bytes only.
+- Stored function `compute_table_index(feed_id BYTEA, stride SMALLINT)` returns `BYTEA(16)` and mirrors on-chain addressing (treating bytes as big-endian u128).
 
 ### 6.4 Materializations & Constraints
 
