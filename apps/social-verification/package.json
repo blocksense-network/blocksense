@@ -22,19 +22,19 @@
     "ts": "yarn node --import tsx"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.7.5",
-    "@cloudflare/workers-types": "^4.20250423.0",
-    "tsx": "^4.20.5",
+    "@cloudflare/vitest-pool-workers": "^0.9.10",
+    "@cloudflare/workers-types": "^4.20251004.0",
+    "tsx": "^4.20.6",
     "typescript": "5.9.2",
     "vitest": "^3.2.4",
-    "wrangler": "^4.15.2"
+    "wrangler": "^4.42.0"
   },
   "dependencies": {
     "@blocksense/base-utils": "workspace:*",
     "@blocksense/ui": "workspace:*",
-    "@effect/platform": "^0.90.7",
-    "effect": "^3.17.13",
-    "thirdweb": "^5.95.3",
+    "@effect/platform": "^0.92.1",
+    "effect": "^3.18.2",
+    "thirdweb": "^5.108.8",
     "web3": "^4.16.0"
   }
 }
