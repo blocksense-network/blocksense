@@ -149,7 +149,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 ### 5.2 BackfillWorker
 
-- Iterates `getLogs` batches from `startBlock` up to the chain's configured finality horizon (e.g., `head - confirmations` for L1 or L2-specific depth for dual-source), partitioning ranges by `proxy_versions` epochs to apply the correct topic filters per segment.
+- Iterates `getLogs` batches from `startBlock` up to the chain's configured finality horizon (e.g., `head - confirmations` for L1 or L2-specific depth for dual-source), partitioning ranges by `proxy_versions` epochs so each chunk uses the matching `(topic0 set, decoderProfile)` and recording L1 inclusion metadata when dual-source mode is active.
 - Uses adaptive range: initial 10,000 blocks; halves to minimum 256 on RPC failures.
 - Writes pending rows; relies on Writer for batching.
 - Resumable via per-chain cursors stored in DB.
@@ -201,7 +201,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 - `chains`: chain metadata (chain_id, name); finality modes and depths live in JSON config.
 - `contracts`: proxy address, deployment `start_block`, and initial `topic_hash` (derived from the version-to-signature map) per chain.
-- `proxy_versions`: `(chain_id, version, implementation, topic_hash, activated_block, code_hash)`; append-only and sourced from config mapping at activation time, with optional runtime code hash for auditing.
+- `proxy_versions`: `(chain_id, version, implementation, topic_hash, activated_block, code_hash)`; append-only and sourced from config mapping at activation time, with optional runtime code hash for auditing. Backfill uses these epochs to select the correct `(topicSet, decoderProfile)` per range.
 - `adfs_events`: partitioned by chain/timestamp; raw event metadata, status enum, calldata, version, `topic0`.
 - `tx_inputs`: optional normalized transaction input archive storing selector, decoded JSON, status, and version for auditing.
 - `feed_updates`: normalized feed entries with `feed_id` stored as `BYTEA(16)`, `stride`, `rb_index`, payload bytes, status, version.
@@ -556,6 +556,7 @@ CREATE TABLE processing_state (
 - `adfs_bytes_ingested_total{chain}`.
 - `adfs_backfill_progress{chain}` (ratio of `last_backfill_block` to head).
 - `adfs_queue_depth{chain}`.
+- `adfs_out_of_order_wait_seconds{chain}` histogram tracking gap wait durations in the ordering buffer.
 - `adfs_reorgs_total{chain,status}` (status ∈ {dropped}).
 - `adfs_version_paused{chain}` (1 when ingestion paused due to unknown implementation or failed checksum).
 - `adfs_queue_overflow_total{chain}` and `adfs_queue_overflow_backfill_height{chain}` to track pauses triggered by buffer saturation and the block height of the auto-backfill.
@@ -574,6 +575,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 - `adfs_version_paused{chain}` = 1 for > 1 minute (unknown implementation or checksum mismatch).
 - `adfs_queue_overflow_total{chain}` increments → trigger immediate page; verify auto backfill kicked off.
 - `adfs_queue_depth{chain}` exceeding 80% of `queue.maxItems` for >5 minutes.
+- `adfs_out_of_order_wait_seconds{chain}` p95 above `ordering.maxOutOfOrderWaitMs` for 5 minutes (investigate missing logs or RPC gaps).
 - Sustained `adfs_finality_lock_contention_total{chain}` > 0 for 5 minutes (investigate competing instances).
 - `adfs_guard_dropped_total{chain,reason}` increments → P1 page; ensure guardBackfillWindow backfill completed and root cause mitigated.
 - `adfs_lock_age_seconds{chain,lock}` exceeding 300 seconds (stale advisory lock) → investigate stuck process and release if necessary.
@@ -821,7 +823,7 @@ WHERE chain_id = $1
 ## 24) Implementation Notes (TS/Effect)
 
 - `decodeADFSCalldata(calldata, hasBlockNumber)` returns version-specific extras; persist accumulator fields when `hasBlockNumber=false` and validate `extraFields` align with `versions[version].extraFields`.
-- Maintain `versions: Record<number, VersionProfile>`, `implVersionMap: Record<string, ImplVersionConfig>`, and `topicNames: Record<number, string>` after config parsing; fail fast if any required mapping is missing before subscribing or writing rows.
+- Maintain `versions: Record<number, VersionProfile>`, `implVersionMap: Record<string, ImplVersionConfig>`, and `topicNames: Record<number, string>` after config parsing; fail fast if any required mapping is missing before subscribing or writing rows. Precompute `proxy_versions` epochs to drive backfill chunking with matching topic/decoder profiles.
 - Convert 0x addresses to `BYTEA` before inserting; provide helpers for hex ↔ `BYTEA(16)` conversions, and convert u128 `tableIndex` values into `BYTEA(16)` before persistence.
 - When checksum enforcement is enabled, fetch runtime bytecode once per implementation (`eth_getCode`) and store `code_hash` (keccak) in `proxy_versions`.
 - Ordering buffer implemented as minimal in-memory index keyed by `(blockNumber, logIndex)`; flush per block, use configured `overflowBackfillWindow` when pausing + backfilling after overflow, and rely on advisory locks to coordinate finality across instances.
