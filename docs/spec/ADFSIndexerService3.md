@@ -60,9 +60,9 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 ### 2.4 Guardrails & Limits
 
-- `feedsLength` limit defaults to 10,000 (configurable); exceeding the limit pauses the chain, raises a P1 alert, records `adfs_guard_dropped_total{reason="feedsLength"}`, and schedules an automatic backfill starting `guardBackfillWindow` blocks before the last persisted block.
+- `feedsLength` limit defaults to 10,000 (configurable); exceeding the limit pauses the chain, raises a P1 alert, records `adfs_indexer_guard_dropped_total{reason="feedsLength"}`, and schedules an automatic backfill starting `guardBackfillWindow` blocks before the last persisted block.
 - Maximum calldata size defaults to 128 KiB (configurable per chain); oversized calldata follows the same pause + alert + backfill policy as above (reason=`calldataSize`).
-- In-memory ordering queue per chain with hard capacity (default 10,000); on overflow the chain pauses ingestion, emits `adfs_queue_overflow_total`, and schedules a catch-up backfill using `overflowBackfillWindow`. Gaps wait up to `ordering.maxOutOfOrderWaitMs` before partial flush occurs.
+- In-memory ordering queue per chain with hard capacity (default 10,000); on overflow the chain pauses ingestion, emits `adfs_indexer_queue_overflow_total`, and schedules a catch-up backfill using `overflowBackfillWindow`. Gaps wait up to `ordering.maxOutOfOrderWaitMs` before partial flush occurs.
 - Decoder rejects malformed payloads or indices outside `[0, 8192)`.
 
 ---
@@ -141,8 +141,8 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 ### 5.1 VersionManager
 
 - On startup: scans `Upgraded(address)` events from `startBlock` to head; resolves implementation → version using `implVersionMap`. Unknown implementations trigger a chain-specific pause + alert.
-- Maintains in-memory map `chain_id → {version, decoderProfile, topic0, topicSet, expectedExtraFields, impl, expectedCodeHash?}` derived from config `versions`, `topicNames`, and `implVersionMap`; `topicSet` is the union of all known topic hashes used for filtering; `hasBlockNumber` is derived from decoder profile, not stored per event.
-- Live subscription bumps version, recalculates `topic0` from config, stores `(chain_id, version, implementation, topic_hash, code_hash)` in DB, and resumes only after config contains the mapping.
+- Maintains in-memory map `chain_id → {version, decoderProfile, topic0, topicSet, expectedExtraFields, impl, expectedBytecodeHash?}` derived from config `versions`, `topicNames`, and `implVersionMap`; `topicSet` is the union of all known topic hashes used for filtering; `hasBlockNumber` is derived from decoder profile, not stored per event.
+- Live subscription bumps version, recalculates `topic0` from config, stores `(chain_id, version, implementation, topic_hash, bytecode_hash)` in DB, and resumes only after config contains the mapping.
 - Decoder profiles come directly from config:
   - Example: Version 1 → `{ hasBlockNumber: true, extraFields: [] }`.
   - Example: Version 2 → `{ hasBlockNumber: false, extraFields: ['sourceAccumulator','destinationAccumulator'] }`.
@@ -153,7 +153,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - Uses adaptive range: initial 10,000 blocks; halves to minimum 256 on RPC failures.
 - Writes pending rows; relies on Writer for batching.
 - Resumable via per-chain cursors stored in DB.
-- Optionally acquires advisory lock (`pg_try_advisory_lock(hashtext('backfill:' || chain_id))`) when running multiple indexer instances to ensure only one backfill worker operates per chain; non-lock holders skip backfill and rely on live tail. Emit lock-age metrics (`adfs_lock_age_seconds`) when holding the lock for monitoring.
+- Optionally acquires advisory lock (`pg_try_advisory_lock(hashtext('backfill:' || chain_id))`) when running multiple indexer instances to ensure only one backfill worker operates per chain; non-lock holders skip backfill and rely on live tail. Emit lock-age metrics (`adfs_indexer_lock_age_seconds`) when holding the lock for monitoring.
 
 ### 5.3 LiveTailWorker
 
@@ -164,10 +164,10 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 ### 5.4 OrderingBuffer & Writer
 
 - Buffer keyed by `(blockNumber, logIndex)`; per-chain single writer fiber.
-- Maintains bounded capacity; on overflow it pauses the chain, emits `adfs_queue_overflow_total`/P1 alert, and triggers a catch-up backfill covering the recent unpersisted range. Gaps wait up to `ordering.maxOutOfOrderWaitMs`; beyond that the buffer flushes available items and logs a warning.
+- Maintains bounded capacity; on overflow it pauses the chain, emits `adfs_indexer_queue_overflow_total`/P1 alert, and triggers a catch-up backfill covering the recent unpersisted range. Gaps wait up to `ordering.maxOutOfOrderWaitMs`; beyond that the buffer flushes available items and logs a warning.
 - Flushes one block at a time inside a DB transaction: insert pending events, updates, ring buffer writes, raw calldata.
 - Applies UPSERT on natural keys and writes to latest table on confirmation.
-- Deployments should run one writer per chain per process; if multiple processes contend, adopt the same advisory-lock strategy (`pg_try_advisory_lock(hashtext('writer:' || chain_id))`) to ensure a single leader drains the queue and emit `adfs_lock_age_seconds` for visibility.
+- Deployments should run one writer per chain per process; if multiple processes contend, adopt the same advisory-lock strategy (`pg_try_advisory_lock(hashtext('writer:' || chain_id))`) to ensure a single leader drains the queue and emit `adfs_indexer_lock_age_seconds` for visibility.
 - Writer only persists `pending` rows; FinalityProcessor alone flips states and updates `feed_latest`.
 
 ### 5.5 Finality Processor
@@ -185,7 +185,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - Watches proxy `Upgraded(address implementation)` topic over WS and scheduled HTTP catch-up.
 - Uses `implVersionMap` to resolve version; if the implementation is unknown, raises alert and pauses ingestion for that chain until operators update config.
 - When checksum guard enabled, fetches runtime bytecode once, compares keccak hash to expected value (if provided), and pauses ingestion on mismatch.
-- Persists `(chain_id, version, implementation, topic_hash, activated_block, code_hash)` to `proxy_versions`, where `topic_hash = keccak256(topicNames[version])` and `code_hash` is optional keccak of runtime bytecode for guardrails.
+- Persists `(chain_id, version, implementation, topic_hash, activated_block, bytecode_hash)` to `proxy_versions`, where `topic_hash = keccak256(topicNames[version])` and `bytecode_hash` is optional keccak of runtime bytecode for guardrails.
 - Notifies VersionManager to reload decoder profile, `topic0`, expected extra fields, and re-evaluate `hasBlockNumber` once configuration is redeployed (service restart required for updates).
 
 ### 5.7 BlockHeaderCache & Metadata Fetchers
@@ -202,7 +202,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 - `chains`: chain metadata (chain_id, name); finality modes and depths live in JSON config.
 - `contracts`: proxy address, deployment `start_block`, and initial `topic_hash` (derived from the version-to-signature map) per chain.
-- `proxy_versions`: `(chain_id, version, implementation, topic_hash, activated_block, code_hash)`; append-only and sourced from config mapping at activation time, with optional runtime code hash for auditing. Backfill uses these epochs to select the correct `(topicSet, decoderProfile)` per range.
+- `proxy_versions`: `(chain_id, version, implementation, topic_hash, activated_block, bytecode_hash)`; append-only and sourced from config mapping at activation time, with optional runtime bytecode hash for auditing. Backfill uses these epochs to select the correct `(topicSet, decoderProfile)` per range.
 - `adfs_events`: partitioned by chain/timestamp; raw event metadata, status enum, calldata, version, `topic0`.
 - `tx_inputs`: optional normalized transaction input archive storing selector, decoded JSON, status, and version for auditing.
 - `feed_updates`: normalized feed entries with `feed_id` stored as `BYTEA(16)`, `stride`, `rb_index`, payload bytes, status, version.
@@ -332,7 +332,7 @@ CREATE TABLE proxy_versions (
   version         INTEGER NOT NULL,
   implementation  BYTEA   NOT NULL CHECK (octet_length(implementation) = 20),
   topic_hash      BYTEA   NOT NULL CHECK (octet_length(topic_hash) = 32),
-  code_hash       BYTEA   NULL CHECK (octet_length(code_hash) = 32),
+  bytecode_hash   BYTEA   NULL CHECK (octet_length(bytecode_hash) = 32),
   activated_block BIGINT  NOT NULL,
   PRIMARY KEY (chain_id, version)
 );
@@ -448,7 +448,7 @@ CREATE TABLE processing_state (
 ### 7.1 Event Processing Flow
 
 1. Detect matching log (`topic0`, proxy address).
-2. Resolve active version at `block_number` from `proxy_versions`; verify the recorded implementation exists in `implVersionMap`, check optional `expectedCodeHash` when provided, and fetch the corresponding signature `topic0` from config (fallback to DB hash if config lacks entry).
+2. Resolve active version at `block_number` from `proxy_versions`; verify the recorded implementation exists in `implVersionMap`, check optional `expectedBytecodeHash` when provided, and fetch the corresponding signature `topic0` from config (fallback to DB hash if config lacks entry).
 3. Fetch transaction calldata and receipt (`eth_getTransactionByHash`).
 4. Decode calldata via `decodeADFSCalldata(calldata, versionsConfig[version].hasBlockNumber)`; validate that `extra` payload matches `versionsConfig[version].extraFields` when present.
 5. Assemble rows for `adfs_events`, `tx_inputs`, `feed_updates`, `ring_buffer_updates` (topic selection splits backfill ranges at `proxy_versions` boundaries to use the right hash set).
@@ -483,7 +483,7 @@ CREATE TABLE processing_state (
 - `alertsConfig`: `noEventsSeconds` default 300, `maxLagBlocks` default 64 per chain.
 - Optional knobs: RPC rate limits, queue sizing, backfill range bounds, finality windows, and `ordering.maxOutOfOrderWaitMs` (default 1000 ms).
 - `versions`: mapping from version → decoder profile (hasBlockNumber, expected extra fields, optional guards).
-- `implVersionMap`: mapping from implementation address → `{ version, expectedCodeHash? }`; every deployed implementation must be listed and may optionally include a runtime code checksum.
+- `implVersionMap`: mapping from implementation address → `{ version, expectedBytecodeHash? }`; every deployed implementation must be listed and may optionally include a runtime bytecode checksum.
 - `topicNames`: mapping from version → event signature; every active version must have a configured signature.
 - `metrics.port`: default `9464` (`/metrics`).
 - `LOG_LEVEL`: default `info`; structured JSON logs.
@@ -509,7 +509,7 @@ CREATE TABLE processing_state (
     }
   },
   "implVersionMap": {
-    "0xabc...implA": { "version": 1, "expectedCodeHash": "0xhash1" },
+    "0xabc...implA": { "version": 1, "expectedBytecodeHash": "0xhash1" },
     "0xdef...implB": { "version": 2 }
   },
   "chains": [
@@ -556,36 +556,36 @@ CREATE TABLE processing_state (
 
 ### 10.1 Metrics (Prometheus)
 
-- `adfs_events_processed_total{chain,status}` (pending/confirmed/dropped).
-- `adfs_events_lag_blocks{chain}` and `adfs_finality_lag_blocks{chain}`.
-- `adfs_rpc_requests_total{chain,method,outcome}` and `adfs_rpc_latency_ms_bucket{chain,method}`; `outcome` ∈ {success,error}.
-- `adfs_db_ops_total{chain,op,outcome}` with `adfs_db_latency_ms_bucket{chain,op}`.
-- `adfs_bytes_ingested_total{chain}`.
-- `adfs_backfill_progress{chain}` (ratio of `last_backfill_block` to head).
-- `adfs_queue_depth{chain}`.
-- `adfs_out_of_order_wait_seconds{chain}` histogram tracking gap wait durations in the ordering buffer.
-- `adfs_reorgs_total{chain,status}` (status ∈ {dropped}).
-- `adfs_version_paused{chain}` (1 when ingestion paused due to unknown implementation or failed checksum).
-- `adfs_queue_overflow_total{chain}` and `adfs_queue_overflow_backfill_height{chain}` to track pauses triggered by buffer saturation and the block height of the auto-backfill.
-- `adfs_finality_lock_contention_total{chain}` counting failed advisory lock attempts.
-- `adfs_lock_age_seconds{chain,lock}` tracking how long backfill/finality writer locks have been held.
-- `adfs_guard_dropped_total{chain,reason}` for payloads rejected by guardrails (feedsLength, calldataSize, etc.).
+- `adfs_indexer_events_processed_total{chain,status}` (pending/confirmed/dropped).
+- `adfs_indexer_events_lag_blocks{chain}` and `adfs_indexer_finality_lag_blocks{chain}`.
+- `adfs_indexer_rpc_requests_total{chain,method,outcome}` and `adfs_indexer_rpc_latency_ms_bucket{chain,method}`; `outcome` ∈ {success,error}.
+- `adfs_indexer_db_ops_total{chain,op,outcome}` with `adfs_indexer_db_latency_ms_bucket{chain,op}`.
+- `adfs_indexer_bytes_ingested_total{chain}`.
+- `adfs_indexer_backfill_progress{chain}` (ratio of `last_backfill_block` to head).
+- `adfs_indexer_queue_depth{chain}`.
+- `adfs_indexer_out_of_order_wait_seconds{chain}` histogram tracking gap wait durations in the ordering buffer.
+- `adfs_indexer_reorgs_total{chain,status}` (status ∈ {dropped}).
+- `adfs_indexer_version_paused{chain}` (1 when ingestion paused due to unknown implementation or failed checksum).
+- `adfs_indexer_queue_overflow_total{chain}` and `adfs_indexer_queue_overflow_backfill_height{chain}` to track pauses triggered by buffer saturation and the block height of the auto-backfill.
+- `adfs_indexer_finality_lock_contention_total{chain}` counting failed advisory lock attempts.
+- `adfs_indexer_lock_age_seconds{chain,lock}` tracking how long backfill/finality writer locks have been held.
+- `adfs_indexer_guard_dropped_total{chain,reason}` for payloads rejected by guardrails (feedsLength, calldataSize, etc.).
 
 Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSeconds` feeds the "no events" alert window, while `maxLagBlocks` caps acceptable lag before paging.
 
 ### 10.2 Alerts
 
 - No events on a chain for longer than `alertsConfig.noEventsSeconds`.
-- `adfs_events_lag_blocks{chain}` or `adfs_finality_lag_blocks{chain}` above `alertsConfig.maxLagBlocks`.
-- `adfs_rpc_errors_total{chain}` / `adfs_rpc_requests_total{chain}` > 2% for 5 minutes.
-- `adfs_backfill_progress{chain}` flat for >10 minutes.
-- `adfs_version_paused{chain}` = 1 for > 1 minute (unknown implementation or checksum mismatch).
-- `adfs_queue_overflow_total{chain}` increments → trigger immediate page; verify auto backfill kicked off.
-- `adfs_queue_depth{chain}` exceeding 80% of `queue.maxItems` for >5 minutes.
-- `adfs_out_of_order_wait_seconds{chain}` p95 above `ordering.maxOutOfOrderWaitMs` for 5 minutes (investigate missing logs or RPC gaps).
-- Sustained `adfs_finality_lock_contention_total{chain}` > 0 for 5 minutes (investigate competing instances).
-- `adfs_guard_dropped_total{chain,reason}` increments → P1 page; ensure guardBackfillWindow backfill completed and root cause mitigated.
-- `adfs_lock_age_seconds{chain,lock}` exceeding 300 seconds (stale advisory lock) → investigate stuck process and release if necessary.
+- `adfs_indexer_events_lag_blocks{chain}` or `adfs_indexer_finality_lag_blocks{chain}` above `alertsConfig.maxLagBlocks`.
+- `adfs_indexer_rpc_errors_total{chain}` / `adfs_indexer_rpc_requests_total{chain}` > 2% for 5 minutes.
+- `adfs_indexer_backfill_progress{chain}` flat for >10 minutes.
+- `adfs_indexer_version_paused{chain}` = 1 for > 1 minute (unknown implementation or checksum mismatch).
+- `adfs_indexer_queue_overflow_total{chain}` increments → trigger immediate page; verify auto backfill kicked off.
+- `adfs_indexer_queue_depth{chain}` exceeding 80% of `queueMaxItems` for >5 minutes.
+- `adfs_indexer_out_of_order_wait_seconds{chain}` p95 above `ordering.maxOutOfOrderWaitMs` for 5 minutes (investigate missing logs or RPC gaps).
+- Sustained `adfs_indexer_finality_lock_contention_total{chain}` > 0 for 5 minutes (investigate competing instances).
+- `adfs_indexer_guard_dropped_total{chain,reason}` increments → P1 page; ensure guardBackfillWindow backfill completed and root cause mitigated.
+- `adfs_indexer_lock_age_seconds{chain,lock}` exceeding 300 seconds (stale advisory lock) → investigate stuck process and release if necessary.
 
 ### 10.3 Logging & Tracing
 
@@ -617,37 +617,37 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 
 1. **RPC Outage**
 
-   - Symptoms: rising `adfs_rpc_errors_total{chain}`, queue growth, backfill stalls.
+   - Symptoms: rising `adfs_indexer_rpc_errors_total{chain}`, queue growth, backfill stalls.
    - Actions: switch provider URL, reduce backfill range, restart worker; ensure WS reconnects.
 
 2. **DB Saturation**
 
-   - Symptoms: elevated `adfs_db_latency_ms_bucket{chain}` (p99), queue depth increases.
+   - Symptoms: elevated `adfs_indexer_db_latency_ms_bucket{chain}` (p99), queue depth increases.
    - Actions: tune `db.write.batchRows`, scale DB resources, consider per-chain deployment, add missing indices.
 
 3. **Stuck Backfill**
 
-   - Symptoms: `adfs_backfill_progress` flat for >10 minutes.
+   - Symptoms: `adfs_indexer_backfill_progress{chain}` flat for >10 minutes.
    - Actions: inspect RPC rate limits, narrow block ranges, restart targeted backfill.
 
 4. **Unknown Implementation / Version Pause**
 
-   - Symptoms: `adfs_version_paused{chain}` remains 1, alerts firing, ingestion halted for that chain.
-   - Actions: inspect `proxy_versions` to identify new implementation; update `implVersionMap`, `versions`, and `topicNames` in config (including optional `code_hash`), redeploy/restart service (no hot-reload) to resume ingestion; verify `adfs_version_paused{chain}` returns to 0.
+   - Symptoms: `adfs_indexer_version_paused{chain}` remains 1, alerts firing, ingestion halted for that chain.
+   - Actions: inspect `proxy_versions` to identify new implementation; update `implVersionMap`, `versions`, and `topicNames` in config (including optional `bytecodeHash`), redeploy/restart service (no hot-reload) to resume ingestion; verify `adfs_indexer_version_paused{chain}` returns to 0.
 
 5. **Queue Overflow Pause**
 
-   - Symptoms: `adfs_queue_overflow_total{chain}` increments, ingestion auto-paused for that chain, catch-up backfill scheduled from `overflowBackfillWindow`.
+   - Symptoms: `adfs_indexer_queue_overflow_total{chain}` increments, ingestion auto-paused for that chain, catch-up backfill scheduled from `overflowBackfillWindow`.
    - Actions: confirm RPC health and consumer load, adjust `queue.maxItems` or throughput if necessary, monitor backfill completion, then resume ingestion once backlog clears.
 
 6. **Guardrail Drop (feeds/calldata)**
 
-   - Symptoms: `adfs_guard_dropped_total{chain,reason}` increments, chain auto-paused, backfill scheduled from `guardBackfillWindow`.
+   - Symptoms: `adfs_indexer_guard_dropped_total{chain,reason}` increments, chain auto-paused, backfill scheduled from `guardBackfillWindow`.
    - Actions: inspect offending transactions, adjust guard thresholds if appropriate, confirm auto backfill completion before resuming ingestion; treat as P1.
 
 7. **Stale Advisory Lock**
 
-   - Symptoms: `adfs_lock_age_seconds{chain,lock}` exceeds threshold, and `pg_stat_activity` shows idle holder.
+   - Symptoms: `adfs_indexer_lock_age_seconds{chain,lock}` exceeds threshold, and `pg_stat_activity` shows idle holder.
    - Actions: investigate stuck worker, restart if necessary, and use `locks release --chain` admin command (invokes `pg_advisory_unlock`) to free the lock when safe.
 
 ---
@@ -734,9 +734,9 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 
 ## 20) Backpressure, Limits & Failure Policy
 
-- Per-chain bounded queue has hard capacity; on overflow, pause ingestion for that chain, emit `adfs_queue_overflow_total`, and enqueue mandatory backfill before resuming.
+- Per-chain bounded queue has hard capacity; on overflow, pause ingestion for that chain, emit `adfs_indexer_queue_overflow_total`, and enqueue mandatory backfill before resuming.
 - Queue depth exported via metrics; alert when >80% capacity for >5 minutes.
-- `feedsLength` guard defaults to 10,000 entries; payloads exceeding limit trigger warn-level log, increment `adfs_guard_dropped_total`, pause the chain, and auto backfill from `guardBackfillWindow` before resuming.
+- `feedsLength` guard defaults to 10,000 entries; payloads exceeding limit trigger warn-level log, increment `adfs_indexer_guard_dropped_total`, pause the chain, and auto backfill from `guardBackfillWindow` before resuming.
 - `rb_index` guard enforces values in `[0, 8192)` and rejects out-of-range indices (same pause/alert/backfill policy).
 - Calldata limit 128 KiB prevents oversized RPC payloads from stalling decoding; configurable per chain.
 - RPC retries use exponential backoff with jitter and rotate across configured endpoints.
