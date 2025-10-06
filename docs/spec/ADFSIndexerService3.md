@@ -204,19 +204,18 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - `contracts`: proxy address, deployment `start_block`, and initial `topic_hash` (derived from the version-to-signature map) per chain.
 - `proxy_versions`: `(chain_id, version, implementation, topic_hash, activated_block, bytecode_hash)`; append-only and sourced from config mapping at activation time, with optional runtime bytecode hash for auditing. Backfill uses these epochs to select the correct `(topicSet, decoderProfile)` per range.
 - `adfs_events`: partitioned by chain/timestamp; raw event metadata, status enum, calldata, version, `topic0`.
-- `tx_inputs`: optional normalized transaction input archive storing selector, decoded JSON, status, and version for auditing.
 - `feed_updates`: normalized feed entries with `feed_id` stored as `BYTEA(16)`, `stride`, `rb_index`, payload bytes, status, version.
 - `ring_buffer_updates`: table writes keyed by `table_index` stored as `BYTEA(16)` plus payload bytes, status, version.
 - `feed_latest`: confirmed-only latest pointer per `(chain_id, feed_id, stride)` including pointer back to canonical event and `extra` metadata JSON.
 - `processing_state`: per-chain cursors (`last_seen_block`, `last_safe_block`, `last_backfill_block`).
-- Retention: keep full history partitions for 6 months; drop older `tx_inputs` and `adfs_events` partitions containing only `dropped` rows via scheduled maintenance.
+- Retention: keep full history partitions for 6 months; drop older `adfs_events` partitions containing only `dropped` rows via scheduled maintenance.
 
 ### 6.2 Keys, Partitions & Types
 
 - Natural unique index `(chain_id, tx_hash, log_index)` across `adfs_events`; downstream tables rely on application-enforced integrity (no cross-table FKs due to partitioning constraints).
 - Secondary indices on `(chain_id, feed_id, stride)` for `feed_latest` and `feed_updates`.
-- LIST partitions by `chain_id`; RANGE (monthly) subpartitions by `block_timestamp` for `adfs_events`, `feed_updates`, `ring_buffer_updates`, and `tx_inputs`.
-- Monthly partitions support retention: drop partitions older than 6 months for `tx_inputs` and `adfs_events` (only `dropped` rows) using scheduled jobs.
+- LIST partitions by `chain_id`; RANGE (monthly) subpartitions by `block_timestamp` for `adfs_events`, `feed_updates`, and `ring_buffer_updates`.
+- Monthly partitions support retention: drop partitions older than 6 months for `adfs_events` (only `dropped` rows) using scheduled jobs.
 - `feed_id`: `BYTEA` (16 bytes); `rb_index`: `INTEGER CHECK (value >= 0 AND value < 8192)`; `ring_buffer_table_index`: `BYTEA` (16 bytes).
 - Enum `adfs_state` = `('pending','confirmed','dropped')` shared across partitioned tables.
 
@@ -358,16 +357,6 @@ CREATE INDEX adfs_events_block_idx
 CREATE INDEX adfs_events_topic_idx
   ON adfs_events (chain_id, topic0, block_number);
 
-CREATE TABLE tx_inputs (
-  chain_id        INTEGER NOT NULL,
-  tx_hash         BYTEA   NOT NULL CHECK (octet_length(tx_hash) = 32),
-  status          adfs_state NOT NULL,
-  version         INTEGER NOT NULL,
-  selector        BYTEA   NOT NULL,
-  decoded         JSONB   NOT NULL,
-  PRIMARY KEY (chain_id, tx_hash)
-) PARTITION BY LIST (chain_id);
-
 CREATE TABLE feed_updates (
   chain_id        INTEGER NOT NULL,
   block_number    BIGINT  NOT NULL,
@@ -451,7 +440,7 @@ CREATE TABLE processing_state (
 2. Resolve active version at `block_number` from `proxy_versions`; verify the recorded implementation exists in `implVersionMap`, check optional `expectedBytecodeHash` when provided, and fetch the corresponding signature `topic0` from config (fallback to DB hash if config lacks entry).
 3. Fetch transaction calldata and receipt (`eth_getTransactionByHash`).
 4. Decode calldata via `decodeADFSCalldata(calldata, versionsConfig[version].hasBlockNumber)`; validate that `extra` payload matches `versionsConfig[version].extraFields` when present.
-5. Assemble rows for `adfs_events`, `tx_inputs`, `feed_updates`, `ring_buffer_updates` (topic selection splits backfill ranges at `proxy_versions` boundaries to use the right hash set).
+5. Assemble rows for `adfs_events`, `feed_updates`, `ring_buffer_updates` (topic selection splits backfill ranges at `proxy_versions` boundaries to use the right hash set).
 6. Upsert pending rows within a single DB transaction per block.
 7. Separate finality loop computes `last_finalized_block` according to the configured finality mode (simple confirmations vs. dual-source) and flips eligible rows to `confirmed`, upserting `feed_latest`. Pending rows orphaned by reorgs flip to `dropped` (no replay).
 
@@ -749,7 +738,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 - Supports containerized deployments (Docker/Kubernetes) and bare-metal supervisors; the same service binary can ingest multiple chains as defined in config, or multiple instances can be run with filtered configs for isolation.
 - Recommended pattern: one deployment per environment (devnet/testnet/mainnet) pointing to dedicated Postgres instances.
 - Partition creation can be automated via scheduled job invoking `partitions create --month <YYYY-MM>` for current + next 3 months.
-- Schedule monthly jobs to detach/drop partitions older than retention (e.g., 6 months) for `tx_inputs` and `adfs_events` (dropped-only), followed by `VACUUM ANALYZE` on parent tables.
+- Schedule monthly jobs to detach/drop partitions older than retention (e.g., 6 months) for `adfs_events` (dropped-only), followed by `VACUUM ANALYZE` on parent tables.
 - Rolling upgrades: drain queue by pausing LiveTailWorker, allow Writer to flush, then restart with new version; resume tailing.
 - Service startup validates `schema_version` in the database (e.g., `SELECT version FROM metadata.schema_version`) and aborts if it doesn't match the expected migration level.
 - Include health endpoints exposing liveness/readiness with JSON payload:
@@ -822,7 +811,7 @@ WHERE chain_id = $1
 - OrderingBuffer enforces strict `(block_number, log_index)` ordering; gaps wait up to `ordering.maxOutOfOrderWaitMs` before logging and partially flushing available logs.
 - On queue overflow, emit critical alert, pause the chain, and enqueue a mandatory catch-up backfill covering the window since the last persisted block.
 - Finality processing uses advisory locks (`pg_try_advisory_lock`) to ensure only one instance per chain flips states.
-- Writer executes one transaction per block per chain, batching inserts into `adfs_events`, `tx_inputs`, `feed_updates`, and `ring_buffer_updates`; state transitions and `feed_latest` UPSERTs happen in the Finality processor.
+- Writer executes one transaction per block per chain, batching inserts into `adfs_events`, `feed_updates`, and `ring_buffer_updates`; state transitions and `feed_latest` UPSERTs happen in the Finality processor.
 - FinalityManager maintains `last_safe_block` computed from latest head; confirmed rows never revert.
 - Processing cursors (`processing_state`) allow resumable restarts without replaying confirmed data.
 
