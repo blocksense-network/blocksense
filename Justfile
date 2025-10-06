@@ -23,7 +23,7 @@ list-devshells:
 list-environments:
   #!/usr/bin/env bash
   nix eval -L --json --apply builtins.attrNames \
-    .#legacyPackages.${system}.process-compose-environments \
+    .#legacyPackages.${system}.process-compose-environments.with-local-cargo-artifacts \
     2>/dev/null \
     | jq -r '.[]'
 
