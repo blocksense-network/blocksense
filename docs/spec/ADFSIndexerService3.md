@@ -204,8 +204,8 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - `proxy_versions`: `(chain_id, version, implementation, topic_hash, activated_block, code_hash)`; append-only and sourced from config mapping at activation time, with optional runtime code hash for auditing.
 - `adfs_events`: partitioned by chain/timestamp; raw event metadata, status enum, calldata, version, `topic0`.
 - `tx_inputs`: optional normalized transaction input archive storing selector, decoded JSON, status, and version for auditing.
-- `feed_updates`: normalized feed entries with `feed_id` as `BIT(128)`, `stride`, `rb_index`, payload bytes, status, version.
-- `ring_buffer_updates`: table writes keyed by `table_index` stored as `BIT(128)` plus payload bytes, status, version.
+- `feed_updates`: normalized feed entries with `feed_id` stored as `BYTEA(16)`, `stride`, `rb_index`, payload bytes, status, version.
+- `ring_buffer_updates`: table writes keyed by `table_index` stored as `BYTEA(16)` plus payload bytes, status, version.
 - `feed_latest`: confirmed-only latest pointer per `(chain_id, feed_id, stride)` including pointer back to canonical event and `extra` metadata JSON.
 - `processing_state`: per-chain cursors (`last_seen_block`, `last_safe_block`, `last_backfill_block`).
 
@@ -214,14 +214,30 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - Natural unique index `(chain_id, tx_hash, log_index)` across `adfs_events`; downstream tables rely on application-enforced integrity (no cross-table FKs due to partitioning constraints).
 - Secondary indices on `(chain_id, feed_id, stride)` for `feed_latest` and `feed_updates`.
 - LIST partitions by `chain_id`; RANGE (monthly) subpartitions by `block_timestamp` for `adfs_events`, `feed_updates`, `ring_buffer_updates`, and `tx_inputs`.
-- `feed_id`: `BIT(128)`; `rb_index`: `INTEGER CHECK (value >= 0 AND value < 8192)`; `ring_buffer_table_index`: `BIT(128)`.
+- `feed_id`: `BYTEA` (16 bytes); `rb_index`: `INTEGER CHECK (value >= 0 AND value < 8192)`; `ring_buffer_table_index`: `BYTEA` (16 bytes).
 - Enum `adfs_state` = `('pending','confirmed','dropped')` shared across partitioned tables.
 
 ### 6.3 Helper Functions
 
-- SQL helper `hex_to_bit128(hex TEXT) RETURNS BIT(128)` for ergonomic inserts.
-- Views to expose BIT columns as hex to consumers (open task).
-- Stored function to compute `table_index` from `(feed_id, stride)` available to analytics clients, returning `BIT(128)`.
+- Provide canonical conversion helpers **(big-endian byte layout)** so app/DB stay in sync:
+
+  ```sql
+  CREATE OR REPLACE FUNCTION hex_to_bytea16(hex TEXT)
+  RETURNS BYTEA
+  LANGUAGE SQL IMMUTABLE AS $$
+    SELECT decode(lpad(regexp_replace(lower($1), '^0x', ''), 32, '0'), 'hex')
+  $$;
+
+  CREATE OR REPLACE FUNCTION bytea16_to_hex(val BYTEA)
+  RETURNS TEXT
+  LANGUAGE SQL IMMUTABLE AS $$
+    SELECT '0x' || encode(val, 'hex')
+  $$;
+  ```
+
+- Create views exposing `feed_updates`/`feed_latest` with hex-form `feed_id` and `table_index` for analytics use via `bytea16_to_hex`.
+- Stored function `compute_table_index(feed_id BYTEA, stride SMALLINT)` returns `BYTEA(16)` and mirrors on-chain addressing (treating bytes as big-endian u128).
+- Document endianness: bytes are stored big-endian, matching the on-chain u128 encoding.
 
 ### 6.4 Materializations & Constraints
 
@@ -353,7 +369,7 @@ CREATE TABLE feed_updates (
   status          adfs_state NOT NULL,
   version         INTEGER NOT NULL,
   stride          SMALLINT NOT NULL,
-  feed_id         BIT(128) NOT NULL,
+  feed_id         BYTEA    NOT NULL CHECK (octet_length(feed_id) = 16),
   rb_index        SMALLINT NOT NULL CHECK (rb_index >= 0 AND rb_index < 8192),
   data            BYTEA    NOT NULL,
   extra           JSONB    NOT NULL DEFAULT '{}'::jsonb,
@@ -372,7 +388,7 @@ CREATE TABLE ring_buffer_updates (
   log_index       INTEGER NOT NULL,
   status          adfs_state NOT NULL,
   version         INTEGER NOT NULL,
-  table_index     BIT(128) NOT NULL,
+  table_index     BYTEA    NOT NULL CHECK (octet_length(table_index) = 16),
   data            BYTEA   NOT NULL,
   extra           JSONB   NOT NULL DEFAULT '{}'::jsonb,
   PRIMARY KEY (chain_id, tx_hash, log_index, table_index)
@@ -383,7 +399,7 @@ CREATE INDEX ring_buffer_updates_slot_latest_idx
 
 CREATE TABLE feed_latest (
   chain_id        INTEGER NOT NULL,
-  feed_id         BIT(128) NOT NULL,
+  feed_id         BYTEA    NOT NULL CHECK (octet_length(feed_id) = 16),
   stride          SMALLINT NOT NULL,
   block_number    BIGINT   NOT NULL,
   block_timestamp TIMESTAMPTZ NOT NULL,
@@ -678,7 +694,6 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 
 ## 18) Open Implementation Tasks
 
-- Helper SQL functions and views for BIT(128) ergonomics (hex in/out).
 - Optional materialized views for recent updates to support dashboards.
 - Toggle for HTTP polling fallback thresholds and alerting when WS unavailable beyond SLA.
 - Post-launch enhancement: consider admin tooling to update `implVersionMap` entries without restart (current flow requires redeploy).
@@ -791,7 +806,7 @@ WHERE chain_id = $1
 
 - `decodeADFSCalldata(calldata, hasBlockNumber)` returns version-specific extras; persist accumulator fields when `hasBlockNumber=false` and validate `extraFields` align with `versions[version].extraFields`.
 - Maintain `versions: Record<number, VersionProfile>`, `implVersionMap: Record<string, ImplVersionConfig>`, and `topicNames: Record<number, string>` after config parsing; fail fast if any required mapping is missing before subscribing or writing rows.
-- Convert 0x addresses to `BYTEA` before inserting; provide helpers for hex ↔ `BIT(128)` conversions, and convert u128 `tableIndex` values into `BIT(128)` before persistence.
+- Convert 0x addresses to `BYTEA` before inserting; provide helpers for hex ↔ `BYTEA(16)` conversions, and convert u128 `tableIndex` values into `BYTEA(16)` before persistence.
 - When checksum enforcement is enabled, fetch runtime bytecode once per implementation (`eth_getCode`) and store `code_hash` (keccak) in `proxy_versions`.
 - Ordering buffer implemented as minimal in-memory index keyed by `(blockNumber, logIndex)`; flush per block, use configured `overflowBackfillWindow` when pausing + backfilling after overflow, and rely on advisory locks to coordinate finality across instances.
 - Finality evaluator reads `finality.mode` per chain; implement strategy interfaces so future modes (e.g., optimistic rollup finality) can be added without touching core pipeline.
@@ -853,7 +868,7 @@ interface FeedUpdateRow {
   status: Status;
   version: number;
   stride: number;
-  feedId: bigint; // convert to BIT(128) on insert
+  feedId: bigint; // convert to BYTEA(16) on insert
   rbIndex: number; // 0..8191
   data: `0x${string}`;
   extra: Record<string, unknown>;
@@ -868,7 +883,7 @@ interface RingBufferWriteRow {
   logIndex: number;
   status: Status;
   version: number;
-  tableIndex: bigint; // convert to BIT(128) on insert
+  tableIndex: bigint; // convert to BYTEA(16) on insert
   data: `0x${string}`;
   extra: Record<string, unknown>;
 }
