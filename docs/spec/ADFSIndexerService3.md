@@ -747,7 +747,10 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
     "chain": 1,
     "version": 2,
     "topicsWatching": ["0xabc…", "0xdef…"],
-    "rpc": { "http": "healthy", "ws": "connecting" },
+    "rpc": {
+      "http": { "status": "connected", "lastError": null },
+      "ws": { "status": "connecting", "lastError": "dial timeout" }
+    },
     "queueDepth": 123,
     "paused": false,
     "pausedReason": null,
@@ -756,7 +759,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
     "lastBackfillBlock": 19_340_000
   }
   ```
-  Expose both aggregated status and per-chain entries so operators can monitor RPC/WS connectivity, topic subscriptions, active version, and ingestion progress.
+  `status` ∈ {`connected`, `connecting`, `disconnected`}; treat `disconnected` as needing operator attention. Populate `lastError` from the most recent RPC failure (e.g., store the last error string in the reconnect handler for WS, use HTTP client middleware to record request failures). Expose both aggregated status and per-chain entries so operators can monitor RPC/WS connectivity, topic subscriptions, active version, and ingestion progress.
 
 ---
 
