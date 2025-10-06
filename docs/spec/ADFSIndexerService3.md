@@ -62,7 +62,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 - `feedsLength` limit defaults to 10,000 (configurable); exceeding the limit pauses the chain, raises a P1 alert, records `adfs_guard_dropped_total{reason="feedsLength"}`, and schedules an automatic backfill starting `guardBackfillWindow` blocks before the last persisted block.
 - Maximum calldata size defaults to 128 KiB (configurable per chain); oversized calldata follows the same pause + alert + backfill policy as above (reason=`calldataSize`).
-- In-memory ordering queue per chain with hard capacity (default 10,000); on overflow the chain pauses ingestion, emits `adfs_queue_overflow_total`, and schedules a catch-up backfill using `overflowBackfillWindow`.
+- In-memory ordering queue per chain with hard capacity (default 10,000); on overflow the chain pauses ingestion, emits `adfs_queue_overflow_total`, and schedules a catch-up backfill using `overflowBackfillWindow`. Gaps wait up to `ordering.maxOutOfOrderWaitMs` before partial flush occurs.
 - Decoder rejects malformed payloads or indices outside `[0, 8192)`.
 
 ---
@@ -164,7 +164,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 ### 5.4 OrderingBuffer & Writer
 
 - Buffer keyed by `(blockNumber, logIndex)`; per-chain single writer fiber.
-- Maintains bounded capacity; on overflow it pauses the chain, emits `adfs_queue_overflow_total`/P1 alert, and triggers a catch-up backfill covering the recent unpersisted range.
+- Maintains bounded capacity; on overflow it pauses the chain, emits `adfs_queue_overflow_total`/P1 alert, and triggers a catch-up backfill covering the recent unpersisted range. Gaps wait up to `ordering.maxOutOfOrderWaitMs`; beyond that the buffer flushes available items and logs a warning.
 - Flushes one block at a time inside a DB transaction: insert pending events, updates, ring buffer writes, raw calldata.
 - Applies UPSERT on natural keys and writes to latest table on confirmation.
 - Deployments should run one writer per chain per process; if multiple processes contend, adopt the same advisory-lock strategy (`pg_try_advisory_lock(hashtext('writer:' || chain_id))`) to ensure a single leader drains the queue and emit `adfs_lock_age_seconds` for visibility.
@@ -474,7 +474,7 @@ CREATE TABLE processing_state (
 - `overflowBackfillWindow`: blocks to rewind when queue overflow occurs (default 2,000).
 - `guardBackfillWindow`: blocks to rewind when guards drop a payload (default 2,000).
 - `alertsConfig`: `noEventsSeconds` default 300, `maxLagBlocks` default 64 per chain.
-- Optional knobs: RPC rate limits, queue sizing, backfill range bounds, and finality windows.
+- Optional knobs: RPC rate limits, queue sizing, backfill range bounds, finality windows, and `ordering.maxOutOfOrderWaitMs` (default 1000 ms).
 - `versions`: mapping from version → decoder profile (hasBlockNumber, expected extra fields, optional guards).
 - `implVersionMap`: mapping from implementation address → `{ version, expectedCodeHash? }`; every deployed implementation must be listed and may optionally include a runtime code checksum.
 - `topicNames`: mapping from version → event signature; every active version must have a configured signature.
@@ -491,7 +491,8 @@ CREATE TABLE processing_state (
     "dbWriteBatchRows": 200,
     "metricsPort": 9464,
     "overflowBackfillWindow": 2000,
-    "guardBackfillWindow": 2000
+    "guardBackfillWindow": 2000,
+    "ordering": { "maxOutOfOrderWaitMs": 1000 }
   },
   "versions": {
     "1": { "hasBlockNumber": true, "extraFields": [] },
@@ -808,7 +809,7 @@ WHERE chain_id = $1
 ## 23) Idempotency, Ordering & Transactions
 
 - Unique natural key `(chain_id, tx_hash, log_index)` ensures deduplication across backfill/live overlap.
-- OrderingBuffer enforces strict `(block_number, log_index)` ordering; gaps trigger bounded waiting until missing logs arrive or timeout leads to warning + partial flush.
+- OrderingBuffer enforces strict `(block_number, log_index)` ordering; gaps wait up to `ordering.maxOutOfOrderWaitMs` before logging and partially flushing available logs.
 - On queue overflow, emit critical alert, pause the chain, and enqueue a mandatory catch-up backfill covering the window since the last persisted block.
 - Finality processing uses advisory locks (`pg_try_advisory_lock`) to ensure only one instance per chain flips states.
 - Writer executes one transaction per block per chain, batching inserts into `adfs_events`, `tx_inputs`, `feed_updates`, and `ring_buffer_updates`; state transitions and `feed_latest` UPSERTs happen in the Finality processor.
