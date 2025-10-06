@@ -151,6 +151,66 @@ stride = 0
 decimals = 18
 data = '{"pair":{"base":"USDC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","marketplace":"Aave","network":"ethereum-mainnet"}}'
 
+[[trigger.oracle.data_feeds]]
+id = "102251"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"cbBTC / USDC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","market_id":"0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64","marketplace":"Morpho","morpho_core_address":"0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb","network":"ethereum-mainnet"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102252"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"srUSD / USDC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","market_id":"0xbfed072faee09b963949defcdb91094465c34c6c62d798b906274ef3563c9cac","marketplace":"Morpho","morpho_core_address":"0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb","network":"ethereum-mainnet"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102253"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"WBTC / USDC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","market_id":"0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49","marketplace":"Morpho","morpho_core_address":"0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb","network":"ethereum-mainnet"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102254"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"ETH+ / WETH","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","market_id":"0x5f8a138ba332398a9116910f4d5e5dcd9b207024c5290ce5bc87bc2dbd8e4a86","marketplace":"Morpho","morpho_core_address":"0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb","network":"ethereum-mainnet"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102255"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"wstETH / WETH","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","market_id":"0xb8fc70e82bc5bb53e773626fcc6a23f7eefa036918d7ef216ecfb1950a94a85e","marketplace":"Morpho","morpho_core_address":"0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb","network":"ethereum-mainnet"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102256"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"weETH / WETH","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","market_id":"0x37e7484d642d90f14451f1910ba4b7b8e4c3ccdd0ec28f8b2bdb35479e472ba7","marketplace":"Morpho","morpho_core_address":"0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb","network":"ethereum-mainnet"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102257"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"mHYPER / USDC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","market_id":"0x95c28d447950ca6c8bbfd25fc05b80b1fd7a1cdd17a3610b4b3f1ffc8dc2e2ed","marketplace":"Morpho","morpho_core_address":"0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb","network":"ethereum-mainnet"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102258"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"PT-cUSDO-20NOV2025 / USDC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","market_id":"0x8a71a66ac828c2b6d4f8accce5859aba0822b502f3833bec4aff09479affffdb","marketplace":"Morpho","morpho_core_address":"0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb","network":"ethereum-mainnet"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102259"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"WBTC / USDT","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","market_id":"0xa921ef34e2fc7a27ccc50ae7e4b154e16c9799d3387076c421423ef52ac4df99","marketplace":"Morpho","morpho_core_address":"0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb","network":"ethereum-mainnet"}}'
+
+[[trigger.oracle.data_feeds]]
+id = "102260"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"wstETH / USDC","quote":""},"decimals":18,"category":"Rates","market_hours":"","arguments":{"kind":"borrow-rates","market_id":"0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc","marketplace":"Morpho","morpho_core_address":"0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb","network":"ethereum-mainnet"}}'
+
 [component.borrow-rates]
 source = "../target/wasm32-wasip1/release/borrow_rates.wasm"
 allowed_outbound_hosts = [
