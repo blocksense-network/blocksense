@@ -43,7 +43,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 ### 2.2 Events & Decoding
 
-- `topicNames` config maps contract `version` → event signature (e.g. `{ "1": "DataFeedsUpdated(uint256)" }`); the service derives `topic0 = keccak256(topicNames[version])` for the active version and subscribes to that topic per chain.
+- `topicNames` config maps contract `version` → event signature (e.g. `{ "1": "DataFeedsUpdated(uint256)" }`); the service derives `topic0 = keccak256(topicNames[version])` for the active version and subscribes to the union of all known topics per chain so upgrades don't miss logs.
 - `versions` config maps version → decoder profile (`hasBlockNumber`, expected `extraFields[]`, optional guards).
 - `implVersionMap` config maps proxy implementation address → version; unknown implementations pause ingestion for that chain and raise an alert.
 - For each matched log: fetch transaction, receipt, and input data; decode with `decodeADFSCalldata(calldata, hasBlockNumber)` where `hasBlockNumber` is dictated by the active contract version.
@@ -56,7 +56,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - Fetch latest confirmed value for `(chain_id, feed_id, stride)`.
 - Fetch confirmed updates for `(chain_id, feed_id)` within block range `[A, B]`.
 - Fetch ring buffer slot by `(chain_id, feed_id, rb_index, stride)`.
-- List active feeds per chain filtered by `block_timestamp >= now() - interval 'X days'`.
+- List active feeds per chain filtered by `block_timestamp >= now() - make_interval(days => X)`.
 
 ### 2.4 Guardrails & Limits
 
@@ -141,7 +141,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 ### 5.1 VersionManager
 
 - On startup: scans `Upgraded(address)` events from `startBlock` to head; resolves implementation → version using `implVersionMap`. Unknown implementations trigger a chain-specific pause + alert.
-- Maintains in-memory map `chain_id → {version, decoderProfile, topic0, expectedExtraFields, impl, expectedCodeHash?}` derived from config `versions`, `topicNames`, and `implVersionMap`; `hasBlockNumber` is derived from decoder profile, not stored per event.
+- Maintains in-memory map `chain_id → {version, decoderProfile, topic0, topicSet, expectedExtraFields, impl, expectedCodeHash?}` derived from config `versions`, `topicNames`, and `implVersionMap`; `topicSet` is the union of all known topic hashes used for filtering; `hasBlockNumber` is derived from decoder profile, not stored per event.
 - Live subscription bumps version, recalculates `topic0` from config, stores `(chain_id, version, implementation, topic_hash, code_hash)` in DB, and resumes only after config contains the mapping.
 - Decoder profiles come directly from config:
   - Example: Version 1 → `{ hasBlockNumber: true, extraFields: [] }`.
@@ -149,7 +149,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 ### 5.2 BackfillWorker
 
-- Iterates `getLogs` batches from `startBlock` up to the chain's configured finality horizon (e.g., `head - confirmations` for L1 or L2-specific depth for dual-source).
+- Iterates `getLogs` batches from `startBlock` up to the chain's configured finality horizon (e.g., `head - confirmations` for L1 or L2-specific depth for dual-source), partitioning ranges by `proxy_versions` epochs to apply the correct topic filters per segment.
 - Uses adaptive range: initial 10,000 blocks; halves to minimum 256 on RPC failures.
 - Writes pending rows; relies on Writer for batching.
 - Resumable via per-chain cursors stored in DB.
@@ -157,7 +157,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 ### 5.3 LiveTailWorker
 
-- WS subscription filtered by proxy address + the current `topic0` supplied by VersionManager (updates after each version change).
+- WS subscription filtered by proxy address + the union of all known topic hashes (`topicSet`) supplied by VersionManager so upgrades do not miss logs.
 - For each log: fetches transaction & receipt via HTTP client, decodes calldata via VersionManager, enqueues event.
 - Reconnect strategy with exponential backoff; HTTP polling fallback when WS unreachable.
 
@@ -185,7 +185,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - Uses `implVersionMap` to resolve version; if the implementation is unknown, raises alert and pauses ingestion for that chain until operators update config.
 - When checksum guard enabled, fetches runtime bytecode once, compares keccak hash to expected value (if provided), and pauses ingestion on mismatch.
 - Persists `(chain_id, version, implementation, topic_hash, activated_block, code_hash)` to `proxy_versions`, where `topic_hash = keccak256(topicNames[version])` and `code_hash` is optional keccak of runtime bytecode for guardrails.
-- Notifies VersionManager to reload decoder profile, `topic0`, expected extra fields, and re-evaluate `hasBlockNumber`.
+- Notifies VersionManager to reload decoder profile, `topic0`, expected extra fields, and re-evaluate `hasBlockNumber` once configuration is redeployed (service restart required for updates).
 
 ### 5.7 BlockHeaderCache & Metadata Fetchers
 
@@ -199,7 +199,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 ### 6.1 Tables
 
-- `chains`: chain metadata and default finality configuration (mode, depths, windows).
+- `chains`: chain metadata (chain_id, name); finality modes and depths live in JSON config.
 - `contracts`: proxy address, deployment `start_block`, and initial `topic_hash` (derived from the version-to-signature map) per chain.
 - `proxy_versions`: `(chain_id, version, implementation, topic_hash, activated_block, code_hash)`; append-only and sourced from config mapping at activation time, with optional runtime code hash for auditing.
 - `adfs_events`: partitioned by chain/timestamp; raw event metadata, status enum, calldata, version, `topic0`.
@@ -297,8 +297,7 @@ CREATE TYPE adfs_state AS ENUM ('pending', 'confirmed', 'dropped');
 
 CREATE TABLE chains (
   chain_id       INTEGER PRIMARY KEY,
-  name           TEXT    NOT NULL,
-  finality_conf  INTEGER NOT NULL
+  name           TEXT    NOT NULL
 );
 
 CREATE TABLE contracts (
@@ -427,7 +426,7 @@ CREATE TABLE processing_state (
 2. Resolve active version at `block_number` from `proxy_versions`; verify the recorded implementation exists in `implVersionMap`, check optional `expectedCodeHash` when provided, and fetch the corresponding signature `topic0` from config (fallback to DB hash if config lacks entry).
 3. Fetch transaction calldata and receipt (`eth_getTransactionByHash`).
 4. Decode calldata via `decodeADFSCalldata(calldata, versionsConfig[version].hasBlockNumber)`; validate that `extra` payload matches `versionsConfig[version].extraFields` when present.
-5. Assemble rows for `adfs_events`, `tx_inputs`, `feed_updates`, `ring_buffer_updates`.
+5. Assemble rows for `adfs_events`, `tx_inputs`, `feed_updates`, `ring_buffer_updates` (topic selection splits backfill ranges at `proxy_versions` boundaries to use the right hash set).
 6. Upsert pending rows within a single DB transaction per block.
 7. Separate finality loop computes `last_finalized_block` according to the configured finality mode (simple confirmations vs. dual-source) and flips eligible rows to `confirmed`, upserting `feed_latest`. Pending rows orphaned by reorgs flip to `dropped` (no replay).
 
@@ -603,7 +602,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 4. **Unknown Implementation / Version Pause**
 
    - Symptoms: `adfs_version_paused{chain}` remains 1, alerts firing, ingestion halted for that chain.
-   - Actions: inspect `proxy_versions` to identify new implementation; update `implVersionMap`, `versions`, and `topicNames` in config (including optional `code_hash`), redeploy/restart service to resume ingestion.
+   - Actions: inspect `proxy_versions` to identify new implementation; update `implVersionMap`, `versions`, and `topicNames` in config (including optional `code_hash`), redeploy/restart service (no hot-reload) to resume ingestion; verify `adfs_version_paused{chain}` returns to 0.
 
 5. **Queue Overflow Pause**
 
@@ -682,7 +681,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 - Helper SQL functions and views for BIT(128) ergonomics (hex in/out).
 - Optional materialized views for recent updates to support dashboards.
 - Toggle for HTTP polling fallback thresholds and alerting when WS unavailable beyond SLA.
-- Admin tooling to update `implVersionMap` entries and reload config without restart (future work).
+- Post-launch enhancement: consider admin tooling to update `implVersionMap` entries without restart (current flow requires redeploy).
 
 ---
 
@@ -770,7 +769,8 @@ ORDER BY block_number, log_index;
 ```sql
 SELECT chain_id, feed_id, stride, block_timestamp
 FROM feed_latest
-WHERE chain_id = $1 AND block_timestamp >= now() - interval '$2 days';
+WHERE chain_id = $1
+  AND block_timestamp >= now() - make_interval(days => $2::int);
 ```
 
 ---
@@ -781,7 +781,7 @@ WHERE chain_id = $1 AND block_timestamp >= now() - interval '$2 days';
 - OrderingBuffer enforces strict `(block_number, log_index)` ordering; gaps trigger bounded waiting until missing logs arrive or timeout leads to warning + partial flush.
 - On queue overflow, emit critical alert, pause the chain, and enqueue a mandatory catch-up backfill covering the window since the last persisted block.
 - Finality processing uses advisory locks (`pg_try_advisory_lock`) to ensure only one instance per chain flips states.
-- Writer executes one transaction per block per chain, batching inserts into `adfs_events`, `tx_inputs`, `feed_updates`, and `ring_buffer_updates`, followed by state transitions and `feed_latest` UPSERTs.
+- Writer executes one transaction per block per chain, batching inserts into `adfs_events`, `tx_inputs`, `feed_updates`, and `ring_buffer_updates`; state transitions and `feed_latest` UPSERTs happen in the Finality processor.
 - FinalityManager maintains `last_safe_block` computed from latest head; confirmed rows never revert.
 - Processing cursors (`processing_state`) allow resumable restarts without replaying confirmed data.
 
