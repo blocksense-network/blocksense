@@ -153,7 +153,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - Uses adaptive range: initial 10,000 blocks; halves to minimum 256 on RPC failures.
 - Writes pending rows; relies on Writer for batching.
 - Resumable via per-chain cursors stored in DB.
-- Optionally acquires advisory lock (`pg_try_advisory_lock(hashtext('backfill:' || chain_id))`) when running multiple indexer instances to ensure only one backfill worker operates per chain; non-lock holders skip backfill and rely on live tail.
+- Optionally acquires advisory lock (`pg_try_advisory_lock(hashtext('backfill:' || chain_id))`) when running multiple indexer instances to ensure only one backfill worker operates per chain; non-lock holders skip backfill and rely on live tail. Emit lock-age metrics (`adfs_lock_age_seconds`) when holding the lock for monitoring.
 
 ### 5.3 LiveTailWorker
 
@@ -167,14 +167,14 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - Maintains bounded capacity; on overflow it pauses the chain, emits `adfs_queue_overflow_total`/P1 alert, and triggers a catch-up backfill covering the recent unpersisted range.
 - Flushes one block at a time inside a DB transaction: insert pending events, updates, ring buffer writes, raw calldata.
 - Applies UPSERT on natural keys and writes to latest table on confirmation.
-- Deployments should run one writer per chain per process; if multiple processes contend, adopt the same advisory-lock strategy (`pg_try_advisory_lock(hashtext('writer:' || chain_id))`) to ensure a single leader drains the queue.
+- Deployments should run one writer per chain per process; if multiple processes contend, adopt the same advisory-lock strategy (`pg_try_advisory_lock(hashtext('writer:' || chain_id))`) to ensure a single leader drains the queue and emit `adfs_lock_age_seconds` for visibility.
 
 ### 5.5 Finality Processor
 
 - Periodically evaluates per-chain finality mode from config:
   - `l1_confirmations`: compute `last_safe_block = head - confirmations`.
   - `dual_source`: require both L2 head depth and L1 inclusion (timestamped) thresholds before advancing `last_safe_block`.
-- Acquires a per-chain Postgres advisory lock (`pg_try_advisory_lock(hashtext('finality:' || chain_id))`); only the lock holder executes finality for that chain.
+- Acquires a per-chain Postgres advisory lock (`pg_try_advisory_lock(hashtext('finality:' || chain_id))`); only the lock holder executes finality for that chain and records lock age for observability.
 - Transitions pending rows at or below safe block to `confirmed` and updates latest table with upsert semantics.
 - Marks pending rows as `dropped` when replaced by competing fork before confirmation.
 - If lock acquisition fails, log at debug and retry on next cycle without performing state transitions.
@@ -559,6 +559,7 @@ CREATE TABLE processing_state (
 - `adfs_version_paused{chain}` (1 when ingestion paused due to unknown implementation or failed checksum).
 - `adfs_queue_overflow_total{chain}` and `adfs_queue_overflow_backfill_height{chain}` to track pauses triggered by buffer saturation and the block height of the auto-backfill.
 - `adfs_finality_lock_contention_total{chain}` counting failed advisory lock attempts.
+- `adfs_lock_age_seconds{chain,lock}` tracking how long backfill/finality writer locks have been held.
 - `adfs_guard_dropped_total{chain,reason}` for payloads rejected by guardrails (feedsLength, calldataSize, etc.).
 
 Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSeconds` feeds the "no events" alert window, while `maxLagBlocks` caps acceptable lag before paging.
@@ -574,6 +575,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 - `adfs_queue_depth{chain}` exceeding 80% of `queue.maxItems` for >5 minutes.
 - Sustained `adfs_finality_lock_contention_total{chain}` > 0 for 5 minutes (investigate competing instances).
 - `adfs_guard_dropped_total{chain,reason}` increments → P1 page; ensure guardBackfillWindow backfill completed and root cause mitigated.
+- `adfs_lock_age_seconds{chain,lock}` exceeding 300 seconds (stale advisory lock) → investigate stuck process and release if necessary.
 
 ### 10.3 Logging & Tracing
 
@@ -594,6 +596,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
   - `backfill --chain <id> --from <block> --to <block>` for ad-hoc replays.
   - `state --chain <id>` showing cursors, lag, active version.
   - `partitions create --month <YYYY-MM>` to pre-create monthly partitions.
+  - `locks release --chain <id> --type <backfill|finality|writer>` executes `SELECT pg_advisory_unlock(...)` with safeguards/logging.
 - Commands emit structured JSON output suitable for automation.
 - Read-only DB role for downstream consumers; separate write role for indexer.
 - Runbooks stored with repo referencing Section 12 metrics.
@@ -631,6 +634,11 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 
    - Symptoms: `adfs_guard_dropped_total{chain,reason}` increments, chain auto-paused, backfill scheduled from `guardBackfillWindow`.
    - Actions: inspect offending transactions, adjust guard thresholds if appropriate, confirm auto backfill completion before resuming ingestion; treat as P1.
+
+7. **Stale Advisory Lock**
+
+   - Symptoms: `adfs_lock_age_seconds{chain,lock}` exceeds threshold, and `pg_stat_activity` shows idle holder.
+   - Actions: investigate stuck worker, restart if necessary, and use `locks release --chain` admin command (invokes `pg_advisory_unlock`) to free the lock when safe.
 
 ---
 
