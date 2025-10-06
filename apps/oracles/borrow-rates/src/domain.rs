@@ -43,6 +43,7 @@ pub enum Marketplace {
     HyperLend(HyperLendArgs),
     HyperDrive(HyperDriveArgs),
     EulerFinance(EulerFinanceArgs),
+    Morpho(MorphoArgs),
 }
 
 impl Marketplace {
@@ -52,6 +53,7 @@ impl Marketplace {
             Marketplace::HypurrFi(args) => Some(args.network),
             Marketplace::HyperLend(args) => Some(args.network),
             Marketplace::EulerFinance(args) => Some(args.network),
+            Marketplace::Morpho(args) => Some(args.network),
             Marketplace::HyperDrive(_) => None,
         }
     }
@@ -82,6 +84,13 @@ pub struct EulerFinanceArgs {
     pub network: SupportedNetworks,
     pub utils_lens_address: Address,
     pub vault_address: Address,
+}
+
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash, Clone)]
+pub struct MorphoArgs {
+    pub network: SupportedNetworks,
+    pub market_id: String, // We'll treat this as a hex string that gets converted to bytes32
+    pub morpho_core_address: Address, // Morpho Core contract address
 }
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
@@ -137,6 +146,7 @@ pub enum MarketplaceType {
     UIPoolMarketplace(UIPoolMarketplaceType),
     HyperDrive,
     EulerFinance,
+    Morpho,
 }
 
 impl From<&Marketplace> for MarketplaceType {
@@ -151,6 +161,7 @@ impl From<&Marketplace> for MarketplaceType {
             }
             Marketplace::HyperDrive(_) => MarketplaceType::HyperDrive,
             Marketplace::EulerFinance(_) => MarketplaceType::EulerFinance,
+            Marketplace::Morpho(_) => MarketplaceType::Morpho,
         }
     }
 }
