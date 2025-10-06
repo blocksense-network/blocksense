@@ -8,40 +8,68 @@
       ...
     }:
     let
-      allEnvironmentNames =
-        lib.pipe (builtins.readDir (lib.path.append ./../.. "nix/test-environments"))
-          [
-            (lib.filterAttrs (
-              name: value: (lib.hasSuffix ".nix" name) && name != "default.nix" && value == "regular"
-            ))
-            builtins.attrNames
-            (builtins.map (name: lib.removeSuffix ".nix" name))
-          ];
+      debugEnvironments =
+        let
+          basePath = lib.path.append ./../.. "nix/test-environments";
+        in
+        lib.pipe basePath [
+          builtins.readDir
+          (lib.filterAttrs (
+            name: value: (lib.hasSuffix ".nix" name) && name != "default.nix" && value == "regular"
+          ))
+          builtins.attrNames
+          (builtins.map (name: {
+            name = lib.removeSuffix ".nix" name;
+            path = lib.path.append basePath name;
+          }))
+        ];
+
+      e2eEnvironments =
+        let
+          basePath = lib.path.append ./../.. "apps/e2e-tests/src/test-scenarios";
+        in
+        lib.pipe basePath [
+          builtins.readDir
+          (lib.filterAttrs (_: value: value == "directory"))
+          builtins.attrNames
+          (builtins.filter (
+            name: builtins.pathExists (lib.path.append basePath "${name}/environment-setup.nix")
+          ))
+          (builtins.map (name: {
+            name = "e2e-${name}";
+            path = lib.path.append basePath "${name}/environment-setup.nix";
+          }))
+        ];
+
+      allEnvironments = debugEnvironments ++ e2eEnvironments;
 
       getShellName =
         name: use-local-cargo-result:
         if use-local-cargo-result then "${name}-use-local-cargo-result" else name;
 
-      allEnvironments =
+      generateAllEnvironments =
         { local }:
-        lib.pipe allEnvironmentNames [
-          (builtins.map (name: {
-            inherit name;
-            value =
-              let
-                shell-name = getShellName name local;
-              in
-              pkgs.runCommand "process-compose-${name}" { } ''
-                mkdir -p "$out"
-                ln -s ${
-                  config.devenv.shells.${shell-name}.process.managers.process-compose.configFile
-                } "$out/process-compose.yaml"
+        lib.pipe allEnvironments [
+          (builtins.map (
+            { name, ... }:
+            {
+              inherit name;
+              value =
+                let
+                  shell-name = getShellName name local;
+                in
+                pkgs.runCommand "process-compose-${name}" { } ''
+                  mkdir -p "$out"
+                  ln -s ${
+                    config.devenv.shells.${shell-name}.process.managers.process-compose.configFile
+                  } "$out/process-compose.yaml"
 
-                for file in ${config.devenv.shells.${shell-name}.services.blocksense.config-dir}/*; do
-                  ln -s "$file" "$out/$(basename $file)"
-                done
-              '';
-          }))
+                  for file in ${config.devenv.shells.${shell-name}.services.blocksense.config-dir}/*; do
+                    ln -s "$file" "$out/$(basename $file)"
+                  done
+                '';
+            }
+          ))
         ];
 
       allProcessComposeFiles =
@@ -50,9 +78,11 @@
           mkdir "$out"
           (
             set -x
-            ${lib.concatMapStringsSep "\n" (x: "cp -r ${x.value} \"$out/${x.name}\"") (allEnvironments {
-              inherit local;
-            })}
+            ${lib.concatMapStringsSep "\n" (x: "cp -r ${x.value} \"$out/${x.name}\"")
+              (generateAllEnvironments {
+                inherit local;
+              })
+            }
           )
         '';
     in
@@ -60,27 +90,26 @@
       legacyPackages = {
         process-compose-environments = {
           hermetic =
-            (lib.listToAttrs (allEnvironments {
+            (lib.listToAttrs (generateAllEnvironments {
               local = false;
             }))
             // {
               all = allProcessComposeFiles { local = false; };
             };
           with-local-cargo-artifacts =
-            (lib.listToAttrs (allEnvironments {
+            (lib.listToAttrs (generateAllEnvironments {
               local = true;
             }))
             // {
               all = allProcessComposeFiles { local = true; };
             };
         };
-
       };
 
       devenv.shells =
         let
           shellCombinations = lib.cartesianProduct {
-            name = allEnvironmentNames;
+            environment = allEnvironments;
             local = [
               false
               true
@@ -89,11 +118,11 @@
         in
         lib.pipe shellCombinations [
           (builtins.map (
-            { name, local }:
-            lib.nameValuePair (getShellName name local) {
+            { environment, local }:
+            lib.nameValuePair (getShellName environment.name local) {
               imports = [
                 self.nixosModules.blocksense-process-compose
-                ./${name}.nix
+                environment.path
                 {
                   services.blocksense.process-compose.use-local-cargo-result = local;
                 }
