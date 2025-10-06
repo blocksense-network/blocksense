@@ -208,12 +208,14 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - `ring_buffer_updates`: table writes keyed by `table_index` stored as `BYTEA(16)` plus payload bytes, status, version.
 - `feed_latest`: confirmed-only latest pointer per `(chain_id, feed_id, stride)` including pointer back to canonical event and `extra` metadata JSON.
 - `processing_state`: per-chain cursors (`last_seen_block`, `last_safe_block`, `last_backfill_block`).
+- Retention: keep full history partitions for 6 months; drop older `tx_inputs` and `adfs_events` partitions containing only `dropped` rows via scheduled maintenance.
 
 ### 6.2 Keys, Partitions & Types
 
 - Natural unique index `(chain_id, tx_hash, log_index)` across `adfs_events`; downstream tables rely on application-enforced integrity (no cross-table FKs due to partitioning constraints).
 - Secondary indices on `(chain_id, feed_id, stride)` for `feed_latest` and `feed_updates`.
 - LIST partitions by `chain_id`; RANGE (monthly) subpartitions by `block_timestamp` for `adfs_events`, `feed_updates`, `ring_buffer_updates`, and `tx_inputs`.
+- Monthly partitions support retention: drop partitions older than 6 months for `tx_inputs` and `adfs_events` (only `dropped` rows) using scheduled jobs.
 - `feed_id`: `BYTEA` (16 bytes); `rb_index`: `INTEGER CHECK (value >= 0 AND value < 8192)`; `ring_buffer_table_index`: `BYTEA` (16 bytes).
 - Enum `adfs_state` = `('pending','confirmed','dropped')` shared across partitioned tables.
 
@@ -729,6 +731,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 - Supports containerized deployments (Docker/Kubernetes) and bare-metal supervisors; the same service binary can ingest multiple chains as defined in config, or multiple instances can be run with filtered configs for isolation.
 - Recommended pattern: one deployment per environment (devnet/testnet/mainnet) pointing to dedicated Postgres instances.
 - Partition creation can be automated via scheduled job invoking `partitions create --month <YYYY-MM>` for current + next 3 months.
+- Schedule monthly jobs to detach/drop partitions older than retention (e.g., 6 months) for `tx_inputs` and `adfs_events` (dropped-only), followed by `VACUUM ANALYZE` on parent tables.
 - Rolling upgrades: drain queue by pausing LiveTailWorker, allow Writer to flush, then restart with new version; resume tailing.
 - Include health endpoints exposing liveness/readiness with JSON payload:
   ```json
