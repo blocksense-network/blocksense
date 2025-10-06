@@ -198,6 +198,11 @@ pub async fn loop_tracking_for_reorg_in_network(
                 {
                     let (rpc_handle, observed_block_hashes, provider_metrics) = {
                         let provider = provider_mutex.lock().await;
+
+                        for (k, v) in provider.inflight.non_finalized_updates.iter() {
+                            info!("DEBUG: inflight[{k}] = {:?}", v.updates);
+                        }
+
                         (
                             provider.provider.clone(),
                             provider.inflight.observed_block_hashes.clone(),
@@ -814,12 +819,24 @@ mod tests {
                 .expect("failed to pre-mine blocks");
         }
 
-        // Snapshot the chain at T0
+        // Query current tip height as T0, then snapshot the chain at T0
+        let t0_height = {
+            let provider = provider_mutex.lock().await;
+            provider
+                .provider
+                .get_block_by_number(BlockNumberOrTag::Latest)
+                .await
+                .unwrap()
+                .unwrap()
+                .header
+                .inner
+                .number
+        };
         let snapshot_id = anvil_snapshot(anvil.endpoint().as_str())
             .await
             .expect("snapshot should succeed");
 
-        let (feed_updates_send, _feed_updates_recv) = counted_unbounded_channel();
+        let (feed_updates_send, mut feed_updates_recv) = counted_unbounded_channel();
 
         // 4) Start the reorg tracking loop in background
         let loop_handle = tokio::spawn(super::loop_tracking_for_reorg_in_network(
@@ -872,36 +889,47 @@ mod tests {
             tokio::time::sleep(std::time::Duration::from_millis(200)).await;
         }
 
-        // Inject non-finalized updates at heights >= fork_height (which will be T0 + 1)
-        // We cannot know T0 precisely here, but using T1 and T1-1 guarantees >= fork.
+        // Inject non-finalized updates: one before the fork (<= T0), and two after the fork (T1-1, T1)
         {
             let mut provider = provider_mutex.lock().await;
             let enc = EncodedFeedId::new(13u128, 0);
             let provider_settings = cfg.providers.get(net).unwrap().clone();
             let feeds_map: Arc<RwLock<HashMap<EncodedFeedId, FeedConfig>>> =
                 Arc::new(RwLock::new(HashMap::new()));
-            let dummy_updates = BatchedAggregatesToSend {
-                block_height: 0,
-                updates: vec![],
-            };
-            let batch = BatchOfUpdatesToProcess {
+            // Prepare three batches with block_height set to the intended heights
+            let mk_batch = |bh: u64| BatchOfUpdatesToProcess {
                 net: net.to_string(),
                 provider: provider_mutex.clone(),
                 provider_settings: provider_settings.clone(),
-                updates: dummy_updates.clone(),
+                updates: BatchedAggregatesToSend {
+                    block_height: 0, // cross-chain height; not used for asserting network key
+                    updates: vec![
+                        blocksense_data_feeds::feeds_processing::VotedFeedUpdate {
+                            encoded_feed_id: EncodedFeedId::new(bh as u128, 0),
+                            value: blocksense_feed_registry::types::FeedType::Text(
+                                format!("marker_for_height_{bh}")
+                            ),
+                            end_slot_timestamp: 0u128,
+                        },
+                    ],
+                },
                 feeds_config: feeds_map.clone(),
                 transaction_retry_timeout_secs: 3,
                 transaction_retries_count_limit: 1,
                 retry_fee_increment_fraction: 0.1,
             };
-            // Insert at T1 and T1-1
+            // Insert at T0 (pre-fork, should NOT be reintroduced)
             provider
                 .inflight
-                .insert_non_finalized_update(t1_height, batch.clone());
+                .insert_non_finalized_update(t0_height, mk_batch(t0_height));
+            // Insert at T1 and T1-1 (post-fork, should be reintroduced)
+            provider
+                .inflight
+                .insert_non_finalized_update(t1_height, mk_batch(t1_height));
             if t1_height > 0 {
                 provider
                     .inflight
-                    .insert_non_finalized_update(t1_height - 1, batch);
+                    .insert_non_finalized_update(t1_height - 1, mk_batch(t1_height - 1));
             }
             // Also ensure the feed index map has our key
             provider.rb_indices.insert(enc, 7);
@@ -920,8 +948,9 @@ mod tests {
             mine_varied_txs(&provider.provider, &provider.signer, 10, 2_000_000_000u128)
                 .await
                 .expect("failed to mine on new branch (differing blocks)");
-            // Then mine additional blocks to move the tip clearly beyond T1
-            mine_self_txs(&provider.provider, &provider.signer, 70)
+            // Then mine additional blocks to move the tip clearly beyond T1, but keep
+            // total < 64 so finalized (latest-64) remains below ~110
+            mine_self_txs(&provider.provider, &provider.signer, 40)
                 .await
                 .expect("failed to mine on new branch");
         }
@@ -1015,6 +1044,69 @@ mod tests {
             let metrics = provider_metrics.read().await;
             let count = metrics.observed_reorgs.with_label_values(&[net]).get();
             assert!(count > 0, "Expected at least one reorg to be detected");
+        }
+
+        // 8) Drain relayer channel and assert only post-fork updates were reintroduced
+        // Expect exactly the two batches for heights T1-1 and T1, none for T0.
+        let mut received_heights = Vec::new();
+        // Allow generous time for messages to arrive to avoid flakiness
+        for _ in 0..20 {
+            if let Ok(batch) = tokio::time::timeout(std::time::Duration::from_secs(1), feed_updates_recv.recv()).await {
+                if let Some(batch) = batch {
+                    // Decode the marker we embedded via encoded_feed_id = height
+                    if let Some(vu) = batch.updates.updates.first() {
+                        received_heights.push(vu.encoded_feed_id.get_id());
+                    }
+                    if received_heights.len() >= 2 { break; }
+                } else {
+                    break;
+                }
+            } else {
+                break;
+            }
+        }
+        received_heights.sort_unstable();
+        let expected: Vec<u128> = if t1_height > 0 { vec![(t1_height - 1) as u128, t1_height as u128] } else { vec![t1_height as u128] };
+        assert_eq!(received_heights, expected, "Expected only post-fork updates to be reintroduced");
+        assert!(!received_heights.contains(&(t0_height as u128)), "Did not expect pre-fork update to be reintroduced");
+
+        // 9) Assert pre-fork update remains in inflight map
+        {
+            let provider = provider_mutex.lock().await;
+            assert!(provider.inflight.non_finalized_updates.contains_key(&t0_height),
+                "Expected pre-fork non-finalized update at T0 to remain in inflight.NON-finalized");
+        }
+
+        // 10) Mine 30 more blocks so finalized surpasses 110 and ensure the pre-fork update is pruned
+        {
+            let provider = provider_mutex.lock().await;
+            mine_self_txs(&provider.provider, &provider.signer, 30)
+                .await
+                .expect("failed to mine additional blocks to advance finalization");
+        }
+        // Allow the loop to observe new finalized height and perform pruning
+        for _ in 0..20 {
+            {
+                let provider = provider_mutex.lock().await;
+                if !provider
+                    .inflight
+                    .non_finalized_updates
+                    .contains_key(&t0_height)
+                {
+                    break;
+                }
+            }
+            tokio::time::sleep(std::time::Duration::from_millis(200)).await;
+        }
+        {
+            let provider = provider_mutex.lock().await;
+            assert!(
+                !provider
+                    .inflight
+                    .non_finalized_updates
+                    .contains_key(&t0_height),
+                "Expected pre-fork non-finalized update at T0 to be pruned once finalized surpassed it"
+            );
         }
 
         // Abort the loop to finish the test

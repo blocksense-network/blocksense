@@ -31,6 +31,7 @@ impl InflightObservations {
             .collect();
         let removed = keys_to_remove.len();
         for height in keys_to_remove {
+            tracing::info!("Pruning observed non_finalized_updates for block_height = {height}; finalized_block = {finalized_block}");
             self.non_finalized_updates.remove(&height);
         }
 
@@ -41,6 +42,7 @@ impl InflightObservations {
             .filter(|height| *height <= finalized_block)
             .collect();
         for height in hash_keys_to_remove {
+            tracing::info!("Pruning observed block hash for block_height = {height}; finalized_block = {finalized_block}");
             self.observed_block_hashes.remove(&height);
         }
 
