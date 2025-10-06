@@ -327,9 +327,9 @@ CREATE TABLE contracts (
 CREATE TABLE proxy_versions (
   chain_id        INTEGER NOT NULL REFERENCES chains(chain_id),
   version         INTEGER NOT NULL,
-  implementation  BYTEA   NOT NULL,
-  topic_hash      BYTEA   NOT NULL,
-  code_hash       BYTEA   NULL,
+  implementation  BYTEA   NOT NULL CHECK (octet_length(implementation) = 20),
+  topic_hash      BYTEA   NOT NULL CHECK (octet_length(topic_hash) = 32),
+  code_hash       BYTEA   NULL CHECK (octet_length(code_hash) = 32),
   activated_block BIGINT  NOT NULL,
   PRIMARY KEY (chain_id, version)
 );
@@ -337,11 +337,11 @@ CREATE TABLE proxy_versions (
 CREATE TABLE adfs_events (
   chain_id        INTEGER NOT NULL,
   block_number    BIGINT  NOT NULL,
-  block_hash      BYTEA   NOT NULL,
+  block_hash      BYTEA   NOT NULL CHECK (octet_length(block_hash) = 32),
   block_timestamp TIMESTAMPTZ NOT NULL,
-  tx_hash         BYTEA   NOT NULL,
+  tx_hash         BYTEA   NOT NULL CHECK (octet_length(tx_hash) = 32),
   log_index       INTEGER NOT NULL,
-  topic0          BYTEA   NOT NULL,
+  topic0          BYTEA   NOT NULL CHECK (octet_length(topic0) = 32),
   status          adfs_state NOT NULL,
   version         INTEGER NOT NULL,
   calldata        BYTEA   NOT NULL,
@@ -351,7 +351,7 @@ CREATE TABLE adfs_events (
 
 CREATE TABLE tx_inputs (
   chain_id        INTEGER NOT NULL,
-  tx_hash         BYTEA   NOT NULL,
+  tx_hash         BYTEA   NOT NULL CHECK (octet_length(tx_hash) = 32),
   status          adfs_state NOT NULL,
   version         INTEGER NOT NULL,
   selector        BYTEA   NOT NULL,
@@ -362,9 +362,9 @@ CREATE TABLE tx_inputs (
 CREATE TABLE feed_updates (
   chain_id        INTEGER NOT NULL,
   block_number    BIGINT  NOT NULL,
-  block_hash      BYTEA   NOT NULL,
+  block_hash      BYTEA   NOT NULL CHECK (octet_length(block_hash) = 32),
   block_timestamp TIMESTAMPTZ NOT NULL,
-  tx_hash         BYTEA   NOT NULL,
+  tx_hash         BYTEA   NOT NULL CHECK (octet_length(tx_hash) = 32),
   log_index       INTEGER NOT NULL,
   status          adfs_state NOT NULL,
   version         INTEGER NOT NULL,
@@ -382,9 +382,9 @@ CREATE INDEX feed_updates_range_q_idx
 CREATE TABLE ring_buffer_updates (
   chain_id        INTEGER NOT NULL,
   block_number    BIGINT  NOT NULL,
-  block_hash      BYTEA   NOT NULL,
+  block_hash      BYTEA   NOT NULL CHECK (octet_length(block_hash) = 32),
   block_timestamp TIMESTAMPTZ NOT NULL,
-  tx_hash         BYTEA   NOT NULL,
+  tx_hash         BYTEA   NOT NULL CHECK (octet_length(tx_hash) = 32),
   log_index       INTEGER NOT NULL,
   status          adfs_state NOT NULL,
   version         INTEGER NOT NULL,
@@ -403,8 +403,8 @@ CREATE TABLE feed_latest (
   stride          SMALLINT NOT NULL,
   block_number    BIGINT   NOT NULL,
   block_timestamp TIMESTAMPTZ NOT NULL,
-  block_hash      BYTEA    NOT NULL,
-  tx_hash         BYTEA    NOT NULL,
+  block_hash      BYTEA    NOT NULL CHECK (octet_length(block_hash) = 32),
+  tx_hash         BYTEA    NOT NULL CHECK (octet_length(tx_hash) = 32),
   log_index       INTEGER  NOT NULL,
   rb_index        SMALLINT NOT NULL,
   data            BYTEA    NOT NULL,
