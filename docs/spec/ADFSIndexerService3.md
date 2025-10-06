@@ -168,6 +168,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - Flushes one block at a time inside a DB transaction: insert pending events, updates, ring buffer writes, raw calldata.
 - Applies UPSERT on natural keys and writes to latest table on confirmation.
 - Deployments should run one writer per chain per process; if multiple processes contend, adopt the same advisory-lock strategy (`pg_try_advisory_lock(hashtext('writer:' || chain_id))`) to ensure a single leader drains the queue and emit `adfs_lock_age_seconds` for visibility.
+- Writer only persists `pending` rows; FinalityProcessor alone flips states and updates `feed_latest`.
 
 ### 5.5 Finality Processor
 
@@ -239,7 +240,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 - Create views exposing `feed_updates`/`feed_latest` with hex-form `feed_id` and `table_index` for analytics use via `bytea16_to_hex`.
 - Stored function `compute_table_index(feed_id BYTEA, stride SMALLINT)` returns `BYTEA(16)` and mirrors on-chain addressing (treating bytes as big-endian u128).
-- Document endianness: bytes are stored big-endian, matching the on-chain u128 encoding.
+- Document endianness & timestamps: bytes are stored big-endian, matching the on-chain u128 encoding; block timestamps (EVM seconds) convert to `TIMESTAMPTZ` via `to_timestamp` (UTC semantics).
 
 ### 6.4 Materializations & Constraints
 
@@ -350,6 +351,12 @@ CREATE TABLE adfs_events (
   extra           JSONB   NOT NULL DEFAULT '{}'::jsonb,
   PRIMARY KEY (chain_id, tx_hash, log_index)
 ) PARTITION BY LIST (chain_id);
+
+CREATE INDEX adfs_events_block_idx
+  ON adfs_events (chain_id, block_number, log_index);
+
+CREATE INDEX adfs_events_topic_idx
+  ON adfs_events (chain_id, topic0, block_number);
 
 CREATE TABLE tx_inputs (
   chain_id        INTEGER NOT NULL,
@@ -677,7 +684,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 - Proxy follows ERC-1967 upgrade event signature; alternate topics can be configured if needed.
 - `DataFeedsUpdated` signature remains stable; service supports multiple signatures if configured.
 - `stride` is non-negative; ring buffer indices stay within `[0, 8192)`.
-- `db_write_batch_rows` default 200; `queue_max_items` default 10,000.
+- `db.write.batchRows` default 200; `queue.maxItems` default 10,000.
 - Metrics endpoint exposed at `http://0.0.0.0:${metricsPort}/metrics` (defaults to `:9464/metrics`).
 - Logs default to `info`; tracing enabled when `OTEL_EXPORTER_OTLP_ENDPOINT` is provided.
 - Consumers rely on read-only DB credentials and must not modify ingestion tables.
@@ -744,6 +751,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 - Partition creation can be automated via scheduled job invoking `partitions create --month <YYYY-MM>` for current + next 3 months.
 - Schedule monthly jobs to detach/drop partitions older than retention (e.g., 6 months) for `tx_inputs` and `adfs_events` (dropped-only), followed by `VACUUM ANALYZE` on parent tables.
 - Rolling upgrades: drain queue by pausing LiveTailWorker, allow Writer to flush, then restart with new version; resume tailing.
+- Service startup validates `schema_version` in the database (e.g., `SELECT version FROM metadata.schema_version`) and aborts if it doesn't match the expected migration level.
 - Include health endpoints exposing liveness/readiness with JSON payload:
   ```json
   {
@@ -828,6 +836,7 @@ WHERE chain_id = $1
 - When checksum enforcement is enabled, fetch runtime bytecode once per implementation (`eth_getCode`) and store `code_hash` (keccak) in `proxy_versions`.
 - Ordering buffer implemented as minimal in-memory index keyed by `(blockNumber, logIndex)`; flush per block, use configured `overflowBackfillWindow` when pausing + backfilling after overflow, and rely on advisory locks to coordinate finality across instances.
 - Finality evaluator reads `finality.mode` per chain; implement strategy interfaces so future modes (e.g., optimistic rollup finality) can be added without touching core pipeline.
+- Validate `schema_version` in the database at startup and abort if migrations are missing.
 - Foreign keys between partitioned tables are omitted; enforce integrity via unique keys and application logic when inserting into `feed_updates`, `ring_buffer_updates`, and `feed_latest`.
 - Expose Effect services (`ConfigService`, `DbService`, `RpcService`, etc.) via dependency injection for unit tests.
 - Prefer viem batch RPC for block + transaction fetching to minimize HTTP round-trips.
