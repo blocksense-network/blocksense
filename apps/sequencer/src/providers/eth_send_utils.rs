@@ -673,42 +673,32 @@ async fn await_receipt(
     start_time_point: Instant,
     receipt_polling_back_off_period_ms: u64,
 ) -> eyre::Result<TransactionReceipt> {
+    use eyre::WrapErr;
     loop {
-        match actix_web::rt::time::timeout(
+        let req = actix_web::rt::time::timeout(
             Duration::from_secs(transaction_retry_timeout_secs),
-            rpc_handle.raw_request("eth_getTransactionReceipt".into(), (tx_hash,)),
+            async {
+                rpc_handle.raw_request("eth_getTransactionReceipt".into(), (tx_hash,)).await.wrap_err_with(|| {
+                    format!("Get tx_receipt errored out in network `{net}` block height {block_height}")
+                })
+            }
         )
         .await
-        {
-            Ok(res) => match res {
-                Ok(v) => match get_receipt_with_default_type(v) {
-                    Ok(Some(v)) => {
-                        debug!("Successfully got receipt from RPC in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash} receipt = {v:?}");
-                        return Ok(v);
-                    }
-                    Ok(None) => {
-                        let deadline =
-                            start_time_point + Duration::from_secs(transaction_retry_timeout_secs);
-                        if Instant::now() > deadline {
-                            eyre::bail!("Get tx_receipt returned None and deadline for getting it elapsed in network `{net}` block height {block_height}");
-                        }
-                        await_time(receipt_polling_back_off_period_ms).await;
-                        continue;
-                    }
-                    Err(e) => {
-                        eyre::bail!("Get tx_receipt returned Error Report: {e:?} in network `{net}` block height {block_height}");
-                    }
-                },
-                Err(e) => {
-                    eyre::bail!("Get tx_receipt returned RpcError: {e:?} in network `{net}` block height {block_height}");
-                }
-            },
-            Err(e) => {
-                eyre::bail!(
-                    "Error getting tx_receipt in network `{net}` block height {block_height}: {e}"
-                )
-            }
+        .wrap_err_with(|| {
+            format!("Timeout getting tx_receipt in network `{net}` block height {block_height}")
+        })??;
+        let receipt_opt = get_receipt_with_default_type(req).wrap_err_with(|| {
+            format!("Failed to parse tx_receipt in network `{net}` block height {block_height}")
+        })?;
+        if let Some(receipt) = receipt_opt {
+            debug!("Successfully got receipt from RPC in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash} receipt = {receipt:?}");
+            return Ok(receipt);
         }
+        let total_timeout = Duration::from_secs(transaction_retry_timeout_secs);
+        if start_time_point.elapsed() > total_timeout {
+            eyre::bail!("Get tx_receipt returned None and deadline for getting it elapsed in network `{net}` block height {block_height}");
+        }
+        await_time(receipt_polling_back_off_period_ms).await;
     }
 }
 
