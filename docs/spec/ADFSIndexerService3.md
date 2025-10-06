@@ -745,14 +745,18 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
   ```json
   {
     "chain": 1,
+    "version": 2,
+    "topicsWatching": ["0xabc…", "0xdef…"],
     "rpc": { "http": "healthy", "ws": "connecting" },
     "queueDepth": 123,
+    "paused": false,
+    "pausedReason": null,
     "lastSeenBlock": 19_345_678,
     "lastSafeBlock": 19_345_600,
     "lastBackfillBlock": 19_340_000
   }
   ```
-  Expose both aggregated status and per-chain entries so operators can monitor RPC/WS connectivity and ingestion progress.
+  Expose both aggregated status and per-chain entries so operators can monitor RPC/WS connectivity, topic subscriptions, active version, and ingestion progress.
 
 ---
 
