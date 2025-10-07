@@ -444,4 +444,39 @@ describe('Template Multi Decoder', () => {
 
     await testDecoder(fields, values);
   });
+
+  it('should test nested union', async () => {
+    const fields: TupleField = {
+      name: 'Test',
+      type: 'tuple',
+      components: [
+        {
+          name: 'union',
+          type: 'union',
+          components: [
+            { name: 'none', type: 'none', size: 0 },
+            { name: 'integer', type: 'uint32', size: 32 },
+          ],
+        },
+        {
+          name: 'str',
+          type: 'tuple',
+          components: [
+            {
+              name: 'union',
+              type: 'union',
+              components: [
+                { name: 'none', type: 'none', size: 0 },
+                { name: 'integer', type: 'uint32', size: 32 },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+
+    const values = [{ selector: 0, value: null }, [{ selector: 1, value: 4 }]];
+
+    await testDecoder(fields, values);
+  });
 });
