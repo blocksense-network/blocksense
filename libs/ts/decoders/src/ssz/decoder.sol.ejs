@@ -84,7 +84,7 @@ pragma solidity ^0.8.28;
               if (curr.type.includes('union')) {
                 loopCode += generateSubDecoders(`${curr.fieldName}Selector`, curr, curr.fieldName)
               } else {
-                loopCode += '// Write logic here\n'
+                loopCode += '\n// Write logic here\n'
               }
               loopCode += '}'
             }
