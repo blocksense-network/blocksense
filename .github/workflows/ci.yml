@@ -163,6 +163,31 @@ jobs:
             ']}' >> $GITHUB_OUTPUT
           fi
 
+  build-nix-environments-and-push-to-cachix:
+    name: Build Nix Environments and push to Cachix
+    needs: set-runner-system-matrix
+    timeout-minutes: 60
+    strategy:
+      matrix: ${{ fromJson(needs.set-runner-system-matrix.outputs.matrix) }}
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: metacraft-labs/nixos-modules/.github/install-nix@main
+        with:
+          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          cachix-cache: ${{ vars.CACHIX_CACHE }}
+          trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
+          substituters: ${{ vars.SUBSTITUTERS }}
+
+      - name: Build Nix Environments and push to Cachix
+        run: |
+          nix build --impure -L --print-out-paths \
+            .#{spin,spinWrapped,process-compose-environments.hermetic.all,process-compose-environments.with-local-cargo-artifacts.all,devShells.${{ matrix.system }}.default} | \
+          cachix push blocksense
+
   rust:
     needs: set-runner-system-matrix
     timeout-minutes: 360
