@@ -144,7 +144,7 @@ jobs:
       - name: Measure contract size
         run: yarn workspace @blocksense/contracts size
 
-  set-runner-matrix-for-rust:
+  set-runner-system-matrix:
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set.outputs.matrix }}
@@ -164,10 +164,10 @@ jobs:
           fi
 
   rust:
-    needs: set-runner-matrix-for-rust
+    needs: set-runner-system-matrix
     timeout-minutes: 360
     strategy:
-      matrix: ${{ fromJson(needs.set-runner-matrix-for-rust.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.set-runner-system-matrix.outputs.matrix) }}
     runs-on: ${{ matrix.runner }}
 
     steps:
