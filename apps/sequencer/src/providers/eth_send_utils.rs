@@ -280,13 +280,14 @@ pub async fn create_per_network_reorg_trackers(
         let net_clone = net.clone();
         let sequencer_state_providers_clone = sequencer_state.providers.clone();
         let sequencer_config = sequencer_state.sequencer_config.read().await;
-        let reorg_tracker_config = match sequencer_config.providers.get(net.as_str()) {
-            Some(c) => c.reorg.clone(),
-            None => {
-                error!("No config for provider for network {net} will set to default!");
-                ReorgConfig::default()
-            }
-        };
+        let (reorg_tracker_config, websocket_url_opt) =
+            match sequencer_config.providers.get(net.as_str()) {
+                Some(c) => (c.reorg.clone(), c.websocket_url.clone()),
+                None => {
+                    error!("No config for provider for network {net} will set to default!");
+                    (ReorgConfig::default(), None)
+                }
+            };
         let relayer_send_channel = match sequencer_state
             .relayers_send_channels
             .read()
@@ -306,6 +307,7 @@ pub async fn create_per_network_reorg_trackers(
                         net_clone,
                         sequencer_state_providers_clone,
                         reorg_tracker_config,
+                        websocket_url_opt,
                         relayer_send_channel,
                     )
                     .await;

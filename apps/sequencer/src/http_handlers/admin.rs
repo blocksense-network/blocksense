@@ -951,6 +951,7 @@ mod tests {
                 *provider = blocksense_config::Provider {
                     private_key_path: key_path.to_str().unwrap().to_owned(),
                     url,
+                    websocket_url: None,
                     transaction_retries_count_limit: 42,
                     transaction_retry_timeout_secs: 20,
                     retry_fee_increment_fraction: 0.1,
