@@ -1,5 +1,5 @@
-import { Command, Options } from '@effect/cli';
 import { Effect, Option, Schema as S } from 'effect';
+import { Command, Options } from '@effect/cli';
 
 import { skip0x } from '@blocksense/base-utils/buffer-and-hex';
 import {

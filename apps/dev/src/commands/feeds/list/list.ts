@@ -1,5 +1,5 @@
-import { Command, Options } from '@effect/cli';
 import { Effect, Option } from 'effect';
+import { Command, Options } from '@effect/cli';
 
 import { getAddressExplorerUrl } from '@blocksense/base-utils/evm';
 import { drawTable, renderTui } from '@blocksense/base-utils/tty';

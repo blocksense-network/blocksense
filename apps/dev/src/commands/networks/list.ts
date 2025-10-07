@@ -1,7 +1,7 @@
 import { join } from 'node:path';
 
-import { Command, Options } from '@effect/cli';
 import { Effect } from 'effect';
+import { Command, Options } from '@effect/cli';
 
 import { valuesOf } from '@blocksense/base-utils/array-iter';
 import type { NetworkName } from '@blocksense/base-utils/evm';

@@ -1,6 +1,6 @@
+import { Effect, ParseResult, Schema as S } from 'effect';
 import { Command } from '@effect/platform';
 import { NodeContext } from '@effect/platform-node';
-import { Effect, ParseResult, Schema as S } from 'effect';
 import { $, execa } from 'execa';
 
 import { arrayToObject } from '@blocksense/base-utils/array-iter';

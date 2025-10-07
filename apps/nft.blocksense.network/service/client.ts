@@ -1,5 +1,7 @@
 'use client';
 
+import { Effect } from 'effect';
+import type { ParseError } from 'effect/Cron';
 import {
   FetchHttpClient,
   HttpApiClient,
@@ -11,8 +13,6 @@ import type {
   Unauthorized,
 } from '@effect/platform/HttpApiError';
 import type { HttpClientError } from '@effect/platform/HttpClientError';
-import { Effect } from 'effect';
-import type { ParseError } from 'effect/Cron';
 
 import { assertNotNull } from '@blocksense/base-utils/assert';
 import { verifyApi } from '@blocksense/social-verification/api';

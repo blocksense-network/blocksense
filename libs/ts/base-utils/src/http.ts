@@ -1,8 +1,8 @@
+import { Effect, Schema as S } from 'effect';
+import type { ParseError } from 'effect/ParseResult';
 import { HttpClientRequest } from '@effect/platform';
 import { HttpClient } from '@effect/platform/HttpClient';
 import type { HttpClientError } from '@effect/platform/HttpClientError';
-import { Effect, Schema as S } from 'effect';
-import type { ParseError } from 'effect/ParseResult';
 
 /**
  * Fetches JSON from the specified URL and decodes it using the provided schema.

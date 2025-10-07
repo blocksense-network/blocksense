@@ -1,6 +1,6 @@
+import { Effect } from 'effect';
 import { FileSystem, Path } from '@effect/platform';
 import { NodeContext } from '@effect/platform-node';
-import { Effect } from 'effect';
 
 const program = Effect.gen(function* () {
   const fs = yield* FileSystem.FileSystem;

@@ -1,9 +1,9 @@
-import { HttpApiBuilder } from '@effect/platform';
-import { NotFound, Unauthorized } from '@effect/platform/HttpApiError';
-import type { HttpMethod } from '@effect/platform/HttpMethod';
 import type { Effect as E, Schema as S } from 'effect';
 import { Context, Effect, Layer, Redacted, Schedule } from 'effect';
 import type { Tag } from 'effect/Context';
+import { HttpApiBuilder } from '@effect/platform';
+import { NotFound, Unauthorized } from '@effect/platform/HttpApiError';
+import type { HttpMethod } from '@effect/platform/HttpMethod';
 import { createThirdwebClient, getContract } from 'thirdweb';
 import { arbitrum } from 'thirdweb/chains';
 import { balanceOf, generateMintSignature } from 'thirdweb/extensions/erc721';

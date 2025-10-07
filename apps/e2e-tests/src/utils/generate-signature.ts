@@ -1,5 +1,5 @@
-import bls from '@chainsafe/bls';
 import { Effect, Schema as S } from 'effect';
+import bls from '@chainsafe/bls';
 
 import { bigIntToBytesBE, powerOf10BigInt, truncate } from './utilities';
 

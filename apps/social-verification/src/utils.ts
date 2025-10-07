@@ -1,5 +1,5 @@
-import { HttpApiSchema } from '@effect/platform';
 import { Schema as S } from 'effect';
+import { HttpApiSchema } from '@effect/platform';
 
 import type { RetweetCheckPayload } from './types';
 import { TweetsResponseSchema } from './types';

@@ -1,3 +1,5 @@
+import { Effect, Layer, Schema as S } from 'effect';
+import { ParseError } from 'effect/ParseResult';
 import {
   HttpClient,
   HttpClientError,
@@ -12,8 +14,6 @@ import {
   it,
   vi,
 } from '@effect/vitest';
-import { Effect, Layer, Schema as S } from 'effect';
-import { ParseError } from 'effect/ParseResult';
 
 import { fetchAndDecodeJSON, fetchAndDecodeJSONEffect } from './http';
 
