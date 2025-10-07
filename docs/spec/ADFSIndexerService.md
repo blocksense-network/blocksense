@@ -1,6 +1,6 @@
 # EVM Multichain Indexing Service — Software Specification
 
-_Target stack: Node.js, TypeScript, Effect (v3+), viem, PostgreSQL. Revision: 2025-09-02._
+_Target stack: Node.js, TypeScript, Effect (v3+), viem, PostgreSQL. Revision: 2025-10-07._
 
 ---
 
@@ -17,7 +17,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - Multichain ingestion with parallelism by chain and strict ordering within each chain.
 - Historical backfill from contract deployment block, followed by live tail.
 - Decode calldata using `decodeADFSCalldata(calldata, hasBlockNumber)` with version-driven semantics.
-- Persist raw transaction input, decoded JSON, normalized feed updates, ring buffer writes, and a latest materialization.
+- Persist raw transaction input, decoded JSON, normalized feed updates, ring buffer writes, and latest materialization.
 - Maintain `pending → confirmed → dropped` state machine for reorg resilience and split confirmed/latest materializations.
 - Provide admin surfaces for targeted backfill, health inspection, and partition management.
 - Supply observability (metrics, logs, tracing) and documented runbooks for common incidents.
@@ -39,30 +39,31 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - Monitor the proxy address; derive implementation changes via `Upgraded(address)`.
 - Backfill from each contract’s deployment `startBlock` including the block itself.
 - Run live tail via WebSocket subscriptions, maintaining block-number and log-index ordering per chain.
-- Finality mode is per-chain configurable (e.g., simple confirmations vs. dual-source L2 finality) and persisted in config.
+- Per-chain finality (simple confirmations or dual-source/L2) is configured in JSON and persisted with other chain settings.
 
 ### 2.2 Events & Decoding
 
-- `topicNames` config maps contract `version` → event signature (e.g. `{ "1": "DataFeedsUpdated(uint256)" }`); the service derives `topic0 = keccak256(topicNames[version])` for the active version and subscribes to the union of all known topics per chain so upgrades don't miss logs.
-- `versions` config maps version → decoder profile (`hasBlockNumber`, expected `extraFields[]`, optional guards).
-- `implVersionMap` config maps proxy implementation address → version; unknown implementations pause ingestion for that chain and raise an alert.
-- For each matched log: fetch transaction, receipt, and input data; decode with `decodeADFSCalldata(calldata, hasBlockNumber)` where `hasBlockNumber` is dictated by the active contract version.
-- Decoder yields `feeds[]` (exposes `stride`, `feedId` as u128, `index` as u16 - `rb_index`, and `data` bytes) and `ringBufferTable[]` (global `table_index` as u128`, plus `data`).
-- Version-specific extras (e.g., `sourceAccumulator`, `destinationAccumulator`) are persisted in a JSONB `extra` column.
+- `topicNames` config maps contract `version` → event signature (e.g. `{ "1": "DataFeedsUpdated(uint256)" }`); the service derives `topic0 = keccak256(signature)` for each entry.
+- **Union-of-topics policy**: live tail subscribes to the union of all known topic hashes for the chain. Historical backfill splits ranges on `proxy_versions` epochs and applies that epoch’s topic set + decoder profile so upgrades cannot drop logs.
+- `versions` config maps version → decoder profile (`hasBlockNumber`, expected `extraFields[]`, optional guards) consumed by the runtime decoder.
+- `implVersionMap` config maps proxy implementation address → `{ version, expectedBytecodeHash? }`; unknown implementations pause ingestion for that chain, raise an alert, and stay paused until config is updated and the service is restarted.
+- For each matched log: fetch transaction, receipt, and input data; decode with `decodeADFSCalldata(calldata, hasBlockNumber)` where `hasBlockNumber` is sourced from the active version profile.
+- Decoder yields `feeds[]` (`stride`, `feedId` as u128, `index` (`rb_index`) as u16, `data` bytes) and ring buffer payloads (`table_index` as u128, payload bytes) `ringBufferTable[]` (global `table_index` as u128`, plus `data`).
+- Version-specific extras (e.g., `sourceAccumulator`, `destinationAccumulator`) are persisted in a JSONB `extra` column for both normalized and latest tables.
 - Event block metadata remains the source of truth for `blockNumber` and `blockTimestamp`.
 
 ### 2.3 Consumer Queries (Day 1)
 
 - Fetch latest confirmed value for `(chain_id, feed_id, stride)`.
-- Fetch confirmed updates for `(chain_id, feed_id)` within block range `[A, B]`.
+- Fetch confirmed updates for `(chain_id, feed_id, stride)` within block range `[A, B]`.
 - Fetch ring buffer slot by `(chain_id, feed_id, rb_index, stride)`.
 - List active feeds per chain filtered by `block_timestamp >= now() - make_interval(days => X)`.
 
 ### 2.4 Guardrails & Limits
 
-- `feedsLength` limit defaults to 10,000 (configurable); exceeding the limit pauses the chain, raises a P1 alert, records `adfs_indexer_guard_dropped_total{reason="feedsLength"}`, and schedules an automatic backfill starting `guardBackfillWindow` blocks before the last persisted block.
-- Maximum calldata size defaults to 128 KiB (configurable per chain); oversized calldata follows the same pause + alert + backfill policy as above (reason=`calldataSize`).
-- In-memory ordering queue per chain with hard capacity (default 10,000); on overflow the chain pauses ingestion, emits `adfs_indexer_queue_overflow_total`, and schedules a catch-up backfill using `overflowBackfillWindow`. Gaps wait up to `ordering.maxOutOfOrderWaitMs` before partial flush occurs.
+- `feedsLength` limit defaults to 10,000 (configurable); exceeding the limit pauses the chain, raises a P1 alert, increments `adfs_indexer_guard_dropped_total{reason="feedsLength"}`, and schedules an automatic backfill starting `guardBackfillWindow` blocks before the last persisted block.
+- Maximum calldata size defaults to 128 KiB (configurable per chain); oversized calldata follows the same pause + alert + backfill policy as above (`reason="calldataSize"`).
+- In-memory ordering queue per chain with hard capacity (default 10,000); on overflow the chain pauses ingestion, emits `adfs_indexer_queue_overflow_total`, and schedules a catch-up backfill via `overflowBackfillWindow`. Gaps wait up to `ordering.maxOutOfOrderWaitMs` before a partial flush proceeds with warning log entries.
 - Decoder rejects malformed payloads or indices outside `[0, 8192)`.
 
 ---
@@ -192,7 +193,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 - Maintains bounded LRU per chain containing `block_hash`, `timestamp`, and `transactions` metadata.
 - Ensures Writer operates with consistent header data even during RPC retries.
-- Provides helpers for ring-buffer stride math reused by consumer APIs.
+- Provides helpers for ring buffer stride math reused by consumer APIs.
 
 ---
 
@@ -204,11 +205,11 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - `contracts`: proxy address, deployment `start_block`, and initial `topic_hash` (derived from the version-to-signature map) per chain.
 - `proxy_versions`: `(chain_id, version, implementation, topic_hash, activated_block, bytecode_hash)`; append-only and sourced from config mapping at activation time, with optional runtime bytecode hash for auditing. Backfill uses these epochs to select the correct `(topicSet, decoderProfile)` per range.
 - `adfs_events`: partitioned by chain/timestamp; raw event metadata, status enum, calldata, version, `topic0`.
-- `feed_updates`: normalized feed entries with `feed_id` stored as `BYTEA(16)`, `stride`, `rb_index`, payload bytes, status, version.
-- `ring_buffer_updates`: table writes keyed by `table_index` stored as `BYTEA(16)` plus payload bytes, status, version.
-- `feed_latest`: confirmed-only latest pointer per `(chain_id, feed_id, stride)` including pointer back to canonical event and `extra` metadata JSON.
+- `feed_updates`: normalized feed entries with `feed_id` stored as `BYTEA(16)`, `stride`, `rb_index`, payload bytes, status, version, and decoded extras.
+- `ring_buffer_updates`: ring buffer writes keyed by `table_index BYTEA(16)` with payload bytes, status, version.
+- `feed_latest`: confirmed-only latest per `(chain_id, feed_id, stride)` including pointer back to canonical event plus `extra` metadata JSON.
 - `processing_state`: per-chain cursors (`last_seen_block`, `last_safe_block`, `last_backfill_block`).
-- Retention: keep full history partitions for 6 months; drop older `adfs_events` partitions containing only `dropped` rows via scheduled maintenance.
+- Retention: keep full history partitions for 6 months; drop older partitions per policy (e.g., `adfs_events` containing only `dropped` rows).
 
 ### 6.2 Keys, Partitions & Types
 
@@ -216,7 +217,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 - Secondary indices on `(chain_id, feed_id, stride)` for `feed_latest` and `feed_updates`.
 - LIST partitions by `chain_id`; RANGE (monthly) subpartitions by `block_timestamp` for `adfs_events`, `feed_updates`, and `ring_buffer_updates`.
 - Monthly partitions support retention: drop partitions older than 6 months for `adfs_events` (only `dropped` rows) using scheduled jobs.
-- `feed_id`: `BYTEA` (16 bytes); `rb_index`: `INTEGER CHECK (value >= 0 AND value < 8192)`; `ring_buffer_table_index`: `BYTEA` (16 bytes).
+- `feed_id BYTEA(16)` (big-endian u128); `table_index BYTEA(16)` (big-endian u128); `rb_index SMALLINT CHECK (rb_index >= 0 AND rb_index < 8192)`.
 - Enum `adfs_state` = `('pending','confirmed','dropped')` shared across partitioned tables.
 
 ### 6.3 Helper Functions
@@ -250,9 +251,9 @@ WHERE (fl.block_number, fl.log_index, fl.rb_index)
 
 - Indexes supporting day-1 queries:
 
-  - `feed_latest_point_lookup_idx` on `(chain_id, feed_id, stride)`.
-  - `feed_updates_range_q_idx` on `(chain_id, feed_id, stride, block_number, log_index)`.
-  - `ring_buffer_updates_slot_latest_idx` on `(chain_id, table_index, block_number DESC, log_index DESC)`.
+  - `feed_latest_point_lookup_idx(chain_id, feed_id, stride)`.
+  - `feed_updates_range_q_idx(chain_id, feed_id, stride, block_number, log_index) WHERE status = 'confirmed'` (partial index).
+  - `ring_buffer_updates_slot_latest_idx(chain_id, table_index, block_number DESC, log_index DESC) WHERE status = 'confirmed'` (partial index).
 
 - Composite PKs:
   - `adfs_events (chain_id, tx_hash, log_index)`
@@ -288,7 +289,7 @@ SELECT block_number, block_timestamp, data
 FROM   ring_buffer_updates
 WHERE  chain_id = $1 AND table_index = $2
   AND  status = 'confirmed'
-ORDER BY block_number DESC
+ORDER BY block_number DESC, log_index DESC
 LIMIT 1;
 ```
 
@@ -303,10 +304,10 @@ CREATE TABLE chains (
 );
 
 CREATE TABLE contracts (
-  chain_id            INTEGER REFERENCES chains(chain_id),
-  proxy_address       BYTEA  NOT NULL,
-  initial_topic_hash  BYTEA  NOT NULL,
-  start_block         BIGINT NOT NULL,
+  chain_id           INTEGER REFERENCES chains(chain_id),
+  proxy_address      BYTEA  NOT NULL CHECK (octet_length(proxy_address) = 20),
+  initial_topic_hash BYTEA  NOT NULL CHECK (octet_length(initial_topic_hash) = 32),
+  start_block        BIGINT NOT NULL,
   UNIQUE (chain_id)
 );
 
@@ -317,21 +318,22 @@ CREATE TABLE proxy_versions (
   topic_hash      BYTEA   NOT NULL CHECK (octet_length(topic_hash) = 32),
   bytecode_hash   BYTEA   NULL CHECK (octet_length(bytecode_hash) = 32),
   activated_block BIGINT  NOT NULL,
-  PRIMARY KEY (chain_id, version)
+  PRIMARY KEY (chain_id, version),
+  UNIQUE (chain_id, activated_block)
 );
 
 CREATE TABLE adfs_events (
-  chain_id        INTEGER NOT NULL,
-  block_number    BIGINT  NOT NULL,
-  block_hash      BYTEA   NOT NULL CHECK (octet_length(block_hash) = 32),
+  chain_id        INTEGER     NOT NULL,
+  block_number    BIGINT      NOT NULL,
+  block_hash      BYTEA       NOT NULL CHECK (octet_length(block_hash) = 32),
   block_timestamp TIMESTAMPTZ NOT NULL,
-  tx_hash         BYTEA   NOT NULL CHECK (octet_length(tx_hash) = 32),
-  log_index       INTEGER NOT NULL,
-  topic0          BYTEA   NOT NULL CHECK (octet_length(topic0) = 32),
-  status          adfs_state NOT NULL,
-  version         INTEGER NOT NULL,
-  calldata        BYTEA   NOT NULL,
-  extra           JSONB   NOT NULL DEFAULT '{}'::jsonb,
+  tx_hash         BYTEA       NOT NULL CHECK (octet_length(tx_hash) = 32),
+  log_index       INTEGER     NOT NULL,
+  topic0          BYTEA       NOT NULL CHECK (octet_length(topic0) = 32),
+  status          adfs_state  NOT NULL,
+  version         INTEGER     NOT NULL,
+  calldata        BYTEA       NOT NULL,
+  extra           JSONB       NOT NULL DEFAULT '{}'::jsonb,
   PRIMARY KEY (chain_id, tx_hash, log_index)
 ) PARTITION BY LIST (chain_id);
 
@@ -359,25 +361,27 @@ CREATE TABLE feed_updates (
 ) PARTITION BY LIST (chain_id);
 
 CREATE INDEX feed_updates_range_q_idx
-  ON feed_updates (chain_id, feed_id, stride, block_number, log_index);
+  ON feed_updates (chain_id, feed_id, stride, block_number, log_index)
+  WHERE status = 'confirmed';
 
 CREATE TABLE ring_buffer_updates (
-  chain_id        INTEGER NOT NULL,
-  block_number    BIGINT  NOT NULL,
-  block_hash      BYTEA   NOT NULL CHECK (octet_length(block_hash) = 32),
+  chain_id        INTEGER     NOT NULL,
+  block_number    BIGINT      NOT NULL,
+  block_hash      BYTEA       NOT NULL CHECK (octet_length(block_hash) = 32),
   block_timestamp TIMESTAMPTZ NOT NULL,
-  tx_hash         BYTEA   NOT NULL CHECK (octet_length(tx_hash) = 32),
-  log_index       INTEGER NOT NULL,
-  status          adfs_state NOT NULL,
-  version         INTEGER NOT NULL,
-  table_index     BYTEA    NOT NULL CHECK (octet_length(table_index) = 16),
-  data            BYTEA   NOT NULL,
-  extra           JSONB   NOT NULL DEFAULT '{}'::jsonb,
+  tx_hash         BYTEA       NOT NULL CHECK (octet_length(tx_hash) = 32),
+  log_index       INTEGER     NOT NULL,
+  status          adfs_state  NOT NULL,
+  version         INTEGER     NOT NULL,
+  table_index     BYTEA       NOT NULL CHECK (octet_length(table_index) = 16),
+  data            BYTEA       NOT NULL,
+  extra           JSONB       NOT NULL DEFAULT '{}'::jsonb,
   PRIMARY KEY (chain_id, tx_hash, log_index, table_index)
 ) PARTITION BY LIST (chain_id);
 
 CREATE INDEX ring_buffer_updates_slot_latest_idx
-  ON ring_buffer_updates (chain_id, table_index, block_number DESC, log_index DESC);
+  ON ring_buffer_updates (chain_id, table_index, block_number DESC, log_index DESC)
+  WHERE status = 'confirmed';
 
 CREATE TABLE feed_latest (
   chain_id        INTEGER NOT NULL,
@@ -413,7 +417,7 @@ CREATE TABLE processing_state (
 1. Startup loads config, establishes DB/RPC clients, runs migrations, initializes metrics/logging.
 2. VersionManager backfills upgrade events and seeds `version` map.
 3. BackfillWorker and LiveTailWorker emit decoded payloads into OrderingBuffer.
-4. OrderingBuffer ensures ordered batches; on overflow, it pauses the chain and enqueues a catch-up backfill starting `overflowBackfillWindow` blocks before the last persisted block.
+4. OrderingBuffer ensures ordered batches; on overflow or guardrail trigger it pauses the chain, raises telemetry, and enqueues auto backfill from `overflowBackfillWindow`/`guardBackfillWindow` blocks before the last persisted block.
 5. Writer persists pending rows in per-block transactions.
 6. Finality processor acquires advisory lock per chain; if held, promotes rows to `confirmed`, updates `feed_latest`, and soft deletes (`dropped`) orphaned pending rows.
 7. Downstream consumers read confirmed and latest tables with read-only credentials.
@@ -424,7 +428,7 @@ CREATE TABLE processing_state (
 2. Resolve active version at `block_number` from `proxy_versions`; verify the recorded implementation exists in `implVersionMap`, check optional `expectedBytecodeHash` when provided, and fetch the corresponding signature `topic0` from config (fallback to DB hash if config lacks entry).
 3. Fetch transaction calldata and receipt (`eth_getTransactionByHash`).
 4. Decode calldata via `decodeADFSCalldata(calldata, versionsConfig[version].hasBlockNumber)`; validate that `extra` payload matches `versionsConfig[version].extraFields` when present.
-5. Assemble rows for `adfs_events`, `feed_updates`, `ring_buffer_updates` (topic selection splits backfill ranges at `proxy_versions` boundaries to use the right hash set).
+5. Assemble rows for `adfs_events`, `feed_updates`, and `ring_buffer_updates` (topic selection splits backfill ranges at `proxy_versions` boundaries to use the right hash set).
 6. Upsert pending rows within a single DB transaction per block.
 7. Separate finality loop computes `last_finalized_block` according to the configured finality mode (simple confirmations vs. dual-source) and flips eligible rows to `confirmed`, upserting `feed_latest`. Pending rows orphaned by reorgs flip to `dropped` (no replay).
 
@@ -449,8 +453,8 @@ CREATE TABLE processing_state (
 - `finality.mode`: `"l1_confirmations"` (default) uses simple confirmation depth; `"dual_source"` requires both L2 head depth and L1 inclusion windows.
 - `finality.confirmations`/`l1Confirmations`: integer depth used for L1 safety.
 - `finality.l2Depth` & `finality.maxL1DelaySeconds`: parameters for dual-source/L2 chains.
-- `db.write.batchRows`: default 200 rows per insert batch.
-- `queue.maxItems`: default 10,000 pending items per chain; on overflow pause the chain and initiate backfill.
+- `dbWriteBatchRows`: default 200 rows per insert batch.
+- `queueMaxItems`: default 10,000 pending items per chain; on overflow pause the chain and initiate backfill.
 - `overflowBackfillWindow`: blocks to rewind when queue overflow occurs (default 2,000).
 - `guardBackfillWindow`: blocks to rewind when guards drop a payload (default 2,000).
 - `alertsConfig`: `noEventsSeconds` default 300, `maxLagBlocks` default 64 per chain.
@@ -497,7 +501,7 @@ CREATE TABLE processing_state (
         "l1Confirmations": 12,
         "maxL1DelaySeconds": 180
       },
-      "contractAddress": "0xProxyAddress",
+      "proxyAddress": "0xProxyAddress",
       "topicNames": {
         "1": "DataFeedsUpdated(uint256)",
         "2": "DataFeedsUpdated(uint256,address)"
@@ -568,8 +572,8 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 
 ### 10.4 Dashboards
 
-- Grafana panels: ingest throughput, queue depth, RPC error budget, DB latency, confirmation lag, per-chain backfill progress.
-- Annotated runbook links embedded in panels for fast incident response.
+- Grafana dashboards cover throughput, queue/backfill depth, RPC health, DB latency, confirmation lag, and finality metrics.
+- Panels embed runbook links and surface guardrail/lock states for quick operator response.
 
 ---
 
@@ -657,7 +661,7 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 - Proxy follows ERC-1967 upgrade event signature; alternate topics can be configured if needed.
 - `DataFeedsUpdated` signature remains stable; service supports multiple signatures if configured.
 - `stride` is non-negative; ring buffer indices stay within `[0, 8192)`.
-- `db.write.batchRows` default 200; `queue.maxItems` default 10,000.
+- `dbWriteBatchRows` default 200; `queueMaxItems` default 10,000.
 - Metrics endpoint exposed at `http://0.0.0.0:${metricsPort}/metrics` (defaults to `:9464/metrics`).
 - Logs default to `info`; tracing enabled when `OTEL_EXPORTER_OTLP_ENDPOINT` is provided.
 - Consumers rely on read-only DB credentials and must not modify ingestion tables.
@@ -775,10 +779,10 @@ ORDER BY block_number, log_index;
 ```sql
 SELECT *
 FROM ring_buffer_updates
-WHERE chain_id   = $1
+WHERE chain_id = $1
   AND table_index = $2
-  AND status      = 'confirmed'
-ORDER BY block_number, log_index;
+  AND status = 'confirmed'
+ORDER BY block_number DESC, log_index DESC;
 ```
 
 - **Active feeds since X days**:
@@ -796,7 +800,7 @@ WHERE chain_id = $1
 
 - Unique natural key `(chain_id, tx_hash, log_index)` ensures deduplication across backfill/live overlap.
 - OrderingBuffer enforces strict `(block_number, log_index)` ordering; gaps wait up to `ordering.maxOutOfOrderWaitMs` before logging and partially flushing available logs.
-- On queue overflow, emit critical alert, pause the chain, and enqueue a mandatory catch-up backfill covering the window since the last persisted block.
+- Queue overflow increments `adfs_indexer_queue_overflow_total{chain}`; pause the chain and schedule auto backfill covering blocks since the last persisted height before resuming.
 - Finality processing uses advisory locks (`pg_try_advisory_lock`) to ensure only one instance per chain flips states.
 - Writer executes one transaction per block per chain, batching inserts into `adfs_events`, `feed_updates`, and `ring_buffer_updates`; state transitions and `feed_latest` UPSERTs happen in the Finality processor.
 - FinalityManager maintains `last_safe_block` computed from latest head; confirmed rows never revert.
@@ -808,8 +812,8 @@ WHERE chain_id = $1
 
 - `decodeADFSCalldata(calldata, hasBlockNumber)` returns version-specific extras; persist accumulator fields when `hasBlockNumber=false` and validate `extraFields` align with `versions[version].extraFields`.
 - Maintain `versions: Record<number, VersionProfile>`, `implVersionMap: Record<string, ImplVersionConfig>`, and `topicNames: Record<number, string>` after config parsing; fail fast if any required mapping is missing before subscribing or writing rows. Precompute `proxy_versions` epochs to drive backfill chunking with matching topic/decoder profiles.
-- Convert 0x addresses to `BYTEA` before inserting; provide helpers for hex ↔ `BYTEA(16)` conversions, and convert u128 `tableIndex` values into `BYTEA(16)` before persistence.
-- When checksum enforcement is enabled, fetch runtime bytecode once per implementation (`eth_getCode`) and store `code_hash` (keccak) in `proxy_versions`.
+- Convert 0x addresses to `BYTEA` before inserting; provide helpers for hex ↔ `BYTEA(16)` conversions, and convert u128 `table_index` values into `BYTEA(16)` before persistence.
+- When checksum enforcement is enabled, fetch runtime bytecode once per implementation (`eth_getCode`) and store `bytecode_hash` (keccak) in `proxy_versions`.
 - Ordering buffer implemented as minimal in-memory index keyed by `(blockNumber, logIndex)`; flush per block, use configured `overflowBackfillWindow` when pausing + backfilling after overflow, and rely on advisory locks to coordinate finality across instances.
 - Finality evaluator reads `finality.mode` per chain; implement strategy interfaces so future modes (e.g., optimistic rollup finality) can be added without touching core pipeline.
 - Validate `schema_version` in the database at startup and abort if migrations are missing.
