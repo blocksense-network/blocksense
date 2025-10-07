@@ -189,11 +189,8 @@ jobs:
           cachix push blocksense
 
   rust:
-    needs: set-runner-system-matrix
     timeout-minutes: 360
-    strategy:
-      matrix: ${{ fromJson(needs.set-runner-system-matrix.outputs.matrix) }}
-    runs-on: ${{ matrix.runner }}
+    runs-on: [self-hosted, nixos, x86-64-v3]
 
     steps:
       - uses: actions/checkout@v4
@@ -206,21 +203,15 @@ jobs:
           trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
           substituters: ${{ vars.SUBSTITUTERS }}
 
-      - name: Install current Bash on macOS
-        if: runner.os == 'macOS'
-        run: brew install bash
-
       - name: Build & activate the Nix Dev Shell
         run: |
-          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.${{ matrix.system }}.default || echo exit 1)"
+          eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.default || echo exit 1)"
           env >> "$GITHUB_ENV"
 
       - name: Build Rust workspace
-        if: ${{ runner.environment == 'self-hosted' }}
         run: cargo build
 
       - name: Test Rust workspace
-        if: ${{ runner.environment == 'self-hosted' }}
         run: cargo test
 
   deploy_websites:
