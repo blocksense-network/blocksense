@@ -1,5 +1,5 @@
-import { Command, Options } from '@effect/cli';
 import { Data, Effect, Option, Schema as S } from 'effect';
+import { Command, Options } from '@effect/cli';
 
 import {
   getAddressExplorerUrl,

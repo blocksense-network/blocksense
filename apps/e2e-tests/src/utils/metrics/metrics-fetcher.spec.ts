@@ -1,6 +1,6 @@
+import { Effect } from 'effect';
 import { FetchHttpClient, HttpClientError } from '@effect/platform';
 import { afterAll, expect, it, vi } from '@effect/vitest';
-import { Effect } from 'effect';
 
 import { getMetrics } from './metrics-fetcher';
 import { ParseMetricsError } from './types';

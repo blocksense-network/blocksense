@@ -1,8 +1,8 @@
+import { Config, DateTime, Duration, Effect, Schema as S } from 'effect';
+import { toMillis } from 'effect/Duration';
 import { HttpClient, HttpClientRequest } from '@effect/platform';
 import { NodeHttpClient } from '@effect/platform-node';
 import { runMain } from '@effect/platform-node/NodeRuntime';
-import { Config, DateTime, Duration, Effect, Schema as S } from 'effect';
-import { toMillis } from 'effect/Duration';
 
 import type { NewFeed } from '@blocksense/config-types';
 import { readConfig, writeConfig } from '@blocksense/config-types';

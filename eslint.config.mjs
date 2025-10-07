@@ -98,8 +98,8 @@ export default [
             [
               '^(node:)?(assert|buffer|child_process|cluster|crypto|dgram|dns|domain|events|fs|http|http2|https|inspector|module|net|os|path|perf_hooks|process|punycode|querystring|readline|repl|stream|string_decoder|timers|tls|trace_events|tty|url|util|v8|vm|worker_threads|zlib)(/|$)',
             ],
-            // 3. External packages (react related first)
-            ['^react$', '^react-dom$', '^@?\\w'],
+            // 3. External packages (react and effect-related first)
+            ['^react$', '^react-dom$', '^effect', '^@effect/', '^@?\\w'],
             // 4. Internal monorepo packages (adjust these aliases if needed)
             ['^@blocksense/', '^@apps/', '^@libs/', '^@/'],
             // 5. Absolute imports (capitalized or other root based)

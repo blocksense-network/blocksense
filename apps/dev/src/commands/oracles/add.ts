@@ -2,10 +2,10 @@ import { constants as fsConstants } from 'fs';
 import { access, mkdir, readFile, rm, writeFile } from 'fs/promises';
 import { join } from 'path';
 
+import { Effect, Option } from 'effect';
 import { Command, Options } from '@effect/cli';
 import { Command as PlatformCommand } from '@effect/platform';
 import * as NodeContext from '@effect/platform-node/NodeContext';
-import { Effect, Option } from 'effect';
 import ejs from 'ejs';
 import { parse as parseToml } from 'toml';
 

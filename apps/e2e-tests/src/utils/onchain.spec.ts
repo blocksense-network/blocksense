@@ -1,3 +1,4 @@
+import { Effect } from 'effect';
 import {
   afterEach,
   beforeEach,
@@ -6,7 +7,6 @@ import {
   it,
   vi,
 } from '@effect/vitest';
-import { Effect } from 'effect';
 
 import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
 

@@ -1,8 +1,8 @@
 import { stat } from 'fs/promises';
 import { join } from 'path';
 
-import { Command, Options } from '@effect/cli';
 import { Effect } from 'effect';
+import { Command, Options } from '@effect/cli';
 import { parse } from 'toml';
 
 import { rootDir } from '@blocksense/base-utils/env';

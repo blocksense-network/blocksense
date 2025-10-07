@@ -1,7 +1,7 @@
 import { deepStrictEqual } from 'assert';
 
-import { afterAll, beforeAll, describe, expect, it } from '@effect/vitest';
 import { Effect, Exit, Layer, pipe, Schedule } from 'effect';
+import { afterAll, beforeAll, describe, expect, it } from '@effect/vitest';
 
 import {
   entriesOf,

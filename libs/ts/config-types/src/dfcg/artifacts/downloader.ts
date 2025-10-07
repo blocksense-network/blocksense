@@ -1,6 +1,6 @@
+import type { Schema as S } from 'effect';
 import { RequestError } from '@octokit/request-error';
 import { Octokit } from '@octokit/rest';
-import type { Schema as S } from 'effect';
 
 import { mapValuePromises } from '@blocksense/base-utils/array-iter';
 import { getOptionalEnvString } from '@blocksense/base-utils/env';

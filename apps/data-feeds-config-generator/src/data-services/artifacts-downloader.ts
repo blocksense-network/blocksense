@@ -1,5 +1,5 @@
-import { Octokit } from '@octokit/rest';
 import { ParseResult, Schema as S } from 'effect';
+import { Octokit } from '@octokit/rest';
 
 import { getEnvString } from '@blocksense/base-utils/env';
 
