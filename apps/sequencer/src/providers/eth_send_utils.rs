@@ -1262,10 +1262,16 @@ mod tests {
     use blocksense_config::{AllFeedsConfig, PublishCriteria};
     use blocksense_data_feeds::feeds_processing::VotedFeedUpdate;
 
+    use alloy::network::EthereumWallet;
+    use alloy::signers::local::PrivateKeySigner;
     use blocksense_utils::test_env::get_test_private_key_path;
     use rdkafka::message::ToBytes;
     use regex::Regex;
+    use std::fs;
     use std::str::FromStr;
+    // New imports for receipt parsing / provider construction
+    use alloy::primitives::address;
+    use alloy::providers::ProviderBuilder;
 
     fn extract_address(message: &str) -> Option<String> {
         let re = Regex::new(r"0x[a-fA-F0-9]{40}").expect("Invalid regex");
@@ -1360,6 +1366,135 @@ mod tests {
             },
         );
         (rb_indices, strides_and_decimals)
+    }
+
+    #[tokio::test]
+    async fn test_get_receipt_with_default_type_paths() {
+        // Spin up local Anvil and a provider with wallet
+        let provider = ProviderBuilder::new().connect_anvil_with_wallet();
+
+        // Send a simple EIP-1559 tx so we can fetch a real receipt from the node
+        let tx = TransactionRequest {
+            value: Some(U256::from(1u64)),
+            to: Some(address!("d8dA6BF26964aF9D7eEd9e03E53415D37aA96045").into()),
+            chain_id: Some(31337),
+            ..Default::default()
+        };
+
+        let sent = provider.send_transaction(tx).await.unwrap();
+        let tx_hash = *sent.tx_hash();
+
+        // Fetch the raw JSON receipt from the node
+        let receipt_json: Option<serde_json::Value> = provider
+            .raw_request("eth_getTransactionReceipt".into(), (tx_hash,))
+            .await
+            .unwrap();
+        assert!(receipt_json.is_some(), "node should return a receipt JSON");
+
+        // 1) Happy path: parse the object as-is
+        let parsed = get_receipt_with_default_type(receipt_json.clone())
+            .expect("parsing receipt should succeed")
+            .expect("receipt should not be None");
+        assert_eq!(parsed.transaction_hash, tx_hash);
+
+        // 2) Missing `type`: remove it and ensure we still parse (default to legacy)
+        let mut without_type = receipt_json.unwrap();
+        if let Some(obj) = without_type.as_object_mut() {
+            obj.remove("type");
+        } else {
+            panic!("unexpected non-object receipt returned by node");
+        }
+
+        let parsed_defaulted = get_receipt_with_default_type(Some(without_type))
+            .expect("parsing with defaulted type should succeed")
+            .expect("receipt should not be None");
+        assert_eq!(parsed_defaulted.transaction_hash, tx_hash);
+
+        // 3) Non-object value should error
+        let err = get_receipt_with_default_type(Some(serde_json::Value::String("bad".into())));
+        assert!(err.is_err(), "non-object receipt JSON must error");
+
+        // 4) None maps to Ok(None)
+        let none_ok = get_receipt_with_default_type(None).expect("None should parse ok");
+        assert!(none_ok.is_none());
+    }
+
+    #[tokio::test]
+    async fn test_await_receipt_success() {
+        // Build ProviderType-compatible provider (Identity + WalletFiller over HTTP)
+        let anvil = Anvil::new().try_spawn().unwrap();
+
+        let key_path = get_test_private_key_path();
+        let priv_key = fs::read_to_string(key_path).expect("read test key");
+        let signer: PrivateKeySigner = priv_key.trim().parse().unwrap();
+
+        let provider: ProviderType = ProviderBuilder::new()
+            .disable_recommended_fillers()
+            .wallet(EthereumWallet::from(signer.clone()))
+            .connect_http(reqwest::Url::parse(&anvil.endpoint()).unwrap());
+
+        let from = signer.address();
+        let to = from;
+        let tx = TransactionRequest::default()
+            .with_from(from)
+            .with_to(to)
+            .with_value(U256::from(1))
+            .with_gas_limit(10_000_000)
+            .with_max_fee_per_gas(30_000_000_000)
+            .with_max_priority_fee_per_gas(2_000_000_000)
+            .with_nonce(0)
+            .with_chain_id(anvil.chain_id());
+
+        let sent = provider.send_transaction(tx).await.unwrap();
+        let tx_hash = *sent.tx_hash();
+
+        // Call await_receipt with a small backoff; should return quickly
+        let receipt = await_receipt(
+            "anvil",
+            &provider,
+            5, // seconds total timeout and per-RPC timeout
+            &tx_hash,
+            0,
+            &from,
+            Instant::now(),
+            10, // poll backoff ms
+        )
+        .await
+        .expect("await_receipt should return Ok for mined tx");
+
+        assert_eq!(receipt.transaction_hash, tx_hash);
+    }
+
+    #[tokio::test]
+    async fn test_await_receipt_times_out_on_missing_receipt() {
+        let anvil = Anvil::new().try_spawn().unwrap();
+        let key_path = get_test_private_key_path();
+        let priv_key = fs::read_to_string(key_path).expect("read test key");
+        let signer: PrivateKeySigner = priv_key.trim().parse().unwrap();
+        let provider: ProviderType = ProviderBuilder::new()
+            .disable_recommended_fillers()
+            .wallet(EthereumWallet::from(signer.clone()))
+            .connect_http(reqwest::Url::parse(&anvil.endpoint()).unwrap());
+
+        let bogus_tx_hash = FixedBytes::<32>::ZERO;
+        let sender = signer.address();
+
+        let result = await_receipt(
+            "anvil",
+            &provider,
+            1, // 1s timeout
+            &bogus_tx_hash,
+            0,
+            &sender,
+            Instant::now(),
+            50, // backoff ms between polls
+        )
+        .await;
+
+        assert!(
+            result.is_err(),
+            "should error on deadline elapsed with None receipts"
+        );
     }
 
     #[tokio::test]
