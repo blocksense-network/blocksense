@@ -52,12 +52,14 @@ export async function sendTx({
     txRequest.gasLimit = config.txGasLimit;
   }
 
-  const signedTx = await config.deployer.signTransaction(txRequest);
+  const tx = await config.deployer.sendTransaction(txRequest);
 
-  const txHash = await config.provider.send('eth_sendRawTransaction', [
-    signedTx,
-  ]);
-
-  const transaction = await config.provider.getTransaction(txHash);
-  return transaction!.wait();
+  // On some networks, `tx.wait()` is not enough to ensure the transaction is mined.
+  // On others, `waitForTransaction` is not enough.
+  // We use both to ensure the transaction is mined.
+  // These measures are taken to avoid `nonce too low` errors in subsequent transactions
+  // mainly for local deployments and rarely on some chains.
+  await config.provider.waitForTransaction(tx.hash);
+  await tx.wait();
+  return config.provider.getTransactionReceipt(tx.hash);
 }
