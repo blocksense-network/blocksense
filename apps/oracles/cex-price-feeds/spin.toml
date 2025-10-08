@@ -4423,6 +4423,12 @@ decimals = 18
 data = '{"pair":{"base":"SOMI","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{"Binance":{"symbol":["SOMIUSDC","SOMIUSDT"]},"Bitget":{"symbol":["SOMIUSDT"]},"Bybit":{"symbol":["SOMIUSDT"]},"GateIo":{"id":["SOMI_USDT"]},"KuCoin":{"symbol":["SOMI-USDT"]},"MEXC":{"symbol":["SOMIUSDC","SOMIUSDT"]},"Upbit":{"market":["USDT-SOMI"]}},"kind":"cex-price-feeds"}}'
 
 [[trigger.oracle.data_feeds]]
+id = "734"
+stride = 0
+decimals = 18
+data = '{"pair":{"base":"MON","quote":"USD"},"decimals":18,"category":"Crypto","market_hours":"Crypto","arguments":{"exchanges":{},"kind":"cex-price-feeds"}}'
+
+[[trigger.oracle.data_feeds]]
 id = "50000"
 stride = 0
 decimals = 8
