@@ -105,6 +105,7 @@ export const types = [
   ...fixedBytes,
   'tuple',
   'union',
+  'none',
 ];
 
 /* Helper types */
