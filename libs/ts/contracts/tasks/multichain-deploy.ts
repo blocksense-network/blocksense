@@ -1,3 +1,6 @@
+import { readFile, writeFile } from 'node:fs/promises';
+import * as prettier from 'prettier';
+
 import { AbiCoder, formatEther, id, ZeroAddress } from 'ethers';
 import { task } from 'hardhat/config';
 
@@ -319,6 +322,18 @@ async function saveDeployment(
   chainsDeployment: Record<NetworkName, DeploymentConfigV2>,
 ) {
   for (const { networkName } of configs) {
-    await writeEvmDeployment(networkName, chainsDeployment[networkName]);
+    const filePath = await writeEvmDeployment(
+      networkName,
+      chainsDeployment[networkName],
+    );
+
+    const source = await readFile(filePath, 'utf8');
+    const options = await prettier.resolveConfig(filePath);
+    const formatted = await prettier.format(source, {
+      ...options,
+      parser: 'json',
+      filepath: filePath,
+    });
+    await writeFile(filePath, formatted, 'utf8');
   }
 }
