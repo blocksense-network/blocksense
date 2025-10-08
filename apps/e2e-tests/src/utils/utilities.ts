@@ -1,14 +1,8 @@
-import { Effect, ParseResult } from 'effect';
+import { Data, Effect } from 'effect';
 import { Command } from '@effect/platform';
 import { NodeContext } from '@effect/platform-node';
 
-import { arrayToObject } from '@blocksense/base-utils';
-import { rootDir } from '@blocksense/base-utils/env';
-
 import { logMessage } from './logs';
-import { ProcessComposeStatusSchema, RGLogCheckerError } from './types';
-
-export const E2E_TESTS_FEEDS_CONFIG_DIR = `${rootDir}/apps/e2e-tests/src/test-scenarios/general`;
 
 export function logTestEnvironmentInfo(
   status: 'Starting' | 'Stopping',
@@ -23,6 +17,12 @@ export function logTestEnvironmentInfo(
     );
   });
 }
+
+export class RGLogCheckerError extends Data.TaggedError(
+  '@e2e-tests/RGLogCheckerError',
+)<{
+  cause: unknown;
+}> {}
 
 export const rgSearchPattern = ({
   caseInsensitive = true,
@@ -61,32 +61,6 @@ export const rgSearchPattern = ({
     Effect.provide(NodeContext.layer),
   );
 };
-
-// TODO: (danielstoyanov) Once we introduce new environment manager(docker/systemd), we have to make method generic
-export function parseProcessesStatus(): Effect.Effect<
-  Record<string, (typeof ProcessComposeStatusSchema.Type)[number]>,
-  Error
-> {
-  return Effect.gen(function* () {
-    const command = Command.make(
-      'process-compose',
-      'process',
-      'list',
-      '-o',
-      'json',
-    );
-    const result = yield* command.pipe(
-      Command.string,
-      Effect.provide(NodeContext.layer),
-    );
-    return arrayToObject(
-      ParseResult.decodeUnknownSync(ProcessComposeStatusSchema)(
-        JSON.parse(result),
-      ),
-      'name',
-    );
-  });
-}
 
 export function truncate(str: string, maxLen: number): string {
   return str.length > maxLen ? str.slice(0, maxLen) : str;
