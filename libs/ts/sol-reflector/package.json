@@ -20,7 +20,7 @@
     "@blocksense/base-utils": "workspace:*",
     "@types/mocha": "^10.0.10",
     "@types/node": "^24.3.1",
-    "hardhat": "^2.22.17",
+    "hardhat": "^2.26.3",
     "prettier": "^3.4.2",
     "prettier-plugin-solidity": "^1.4.1",
     "solidity-ast": "^0.4.59",
