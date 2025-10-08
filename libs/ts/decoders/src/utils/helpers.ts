@@ -1,3 +1,4 @@
+import { toLowerFirstLetter } from '../ssz/utils';
 import * as Types from './types';
 
 export const checkPrimitiveField = (
@@ -23,7 +24,10 @@ export const expandJsonFields = (
     }
 
     if (isFieldType(data.type)) {
-      return data;
+      if (data.name === mainStructName) {
+        return data;
+      }
+      return { ...data, name: toLowerFirstLetter(data.name) };
     } else {
       let bracketIndex = data.type.indexOf('[');
       if (bracketIndex === -1) {
@@ -33,6 +37,10 @@ export const expandJsonFields = (
       const arrayPart = data.type.slice(bracketIndex);
       return {
         ...inputData[baseType],
+        name:
+          data.name === mainStructName
+            ? inputData[baseType].name
+            : toLowerFirstLetter(inputData[baseType].name),
         type: inputData[baseType].type + arrayPart,
       };
     }

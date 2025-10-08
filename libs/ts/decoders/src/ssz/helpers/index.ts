@@ -127,7 +127,7 @@ export const generateDecoderLines = (
       } else if (schema.typeName.startsWith('List')) {
         if (
           schema.types[1] &&
-          !['Vector', 'List', 'ByteList', 'union'].includes(
+          !['Vector', 'List', 'ByteList', 'Union'].includes(
             schema.types[1].type,
           )
         ) {
