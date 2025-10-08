@@ -57,7 +57,7 @@ impl SymbolsData {
 }
 
 pub async fn get_prices(resources: &ResourceData, timeout_secs: u64) -> Result<PairsToResults> {
-    let symbols = SymbolsData::from_resources(&resources.symbols)?;
+    let symbols = SymbolsData::from_resources(&resources.all_symbols)?;
 
     let futures_set = FuturesUnordered::from_iter([
         fetch::<BinancePriceFetcher>(&symbols.binance, None, timeout_secs),
@@ -95,24 +95,22 @@ fn fill_results(
     results: &mut PairsToResults,
 ) {
     for resource in resources {
-        let quote = [resource.pair.quote.as_str()];
-        let quote_alternatives = get_alternative_quotes_for_quote(&resource.pair.quote);
-        let quote_variants = quote.iter().chain(&quote_alternatives);
-
         let trading_pair = format!("{} / {}", resource.pair.base, resource.pair.quote);
+
+        let provider_name = &prices_per_exchange.name;
+        let feed_provider_symbols = resource
+            .symbols_per_exchange
+            .get(provider_name)
+            .cloned()
+            .unwrap_or_default();
 
         let res = results.entry(resource.id.clone()).or_default();
         res.symbol = trading_pair.clone();
 
-        for quote in quote_variants {
-            let symbol = format!(
-                "{}{}",
-                resource.pair.base.to_uppercase(),
-                quote.to_uppercase()
-            );
+        for symbol in feed_provider_symbols {
             if let Some(price_point) = prices_per_exchange.data.get(&symbol) {
                 res.providers_data.insert(
-                    format!("{} {} price", prices_per_exchange.name, quote),
+                    format!("{} {} price", prices_per_exchange.name, symbol),
                     price_point.clone(),
                 );
             }
@@ -121,13 +119,5 @@ fn fill_results(
         if res.providers_data.is_empty() {
             results.remove(&resource.id);
         }
-    }
-}
-
-fn get_alternative_quotes_for_quote(quote: &str) -> Vec<&str> {
-    if quote == "USD" {
-        vec!["USDT", "USDC"]
-    } else {
-        Vec::new()
     }
 }
