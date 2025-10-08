@@ -4,12 +4,11 @@ use alloy::hex;
 use alloy::{eips::BlockNumberOrTag, providers::Provider};
 use alloy_primitives::B256;
 use blocksense_utils::counter_unbounded_channel::CountedSender;
-use chrono::Local;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::time::Duration;
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info, trace, warn};
 
 use blocksense_metrics::{inc_metric, inc_vec_metric};
 use blocksense_utils::await_time;
@@ -19,12 +18,15 @@ use crate::providers::eth_send_utils::{try_to_sync, BatchOfUpdatesToProcess};
 
 // Helper to handle reorg once already detected. Finds fork point and prints
 // discarded observations, mirroring the existing log messages and structure.
+#[allow(clippy::too_many_arguments)]
 pub(crate) async fn handle_reorg(
     net: &str,
     rpc_handle: &ProviderType,
     provider_mutex: &Arc<Mutex<RpcProvider>>,
     observed_block_hashes: &HashMap<u64, B256>,
     observed_latest_height: u64,
+    observer_finalized_height: u64,
+    loop_count: u64,
     rpc_timeout: Duration,
     updates_relayer_send_chan: &CountedSender<BatchOfUpdatesToProcess>,
 ) -> Option<u64> {
@@ -62,12 +64,18 @@ pub(crate) async fn handle_reorg(
                     diverged_blocks.push((height, chain_hash, stored_hash));
                 }
             }
-            Ok(Ok(None)) => warn!("Block {height} missing while inspecting reorg in network {net}"),
+            Ok(Ok(None)) => warn!(
+                "Block {height} missing while inspecting reorg in network {net} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})"
+            ),
             Ok(Err(e)) => {
-                warn!("Failed to get block {height} in network {net} while inspecting reorg: {e:?}")
+                warn!(
+                    "Failed to get block {height} in network {net} while inspecting reorg: {e:?} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})"
+                )
             }
             Err(_) => {
-                warn!("Timed out getting block {height} in network {net} while inspecting reorg")
+                warn!(
+                    "Timed out getting block {height} in network {net} while inspecting reorg (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})"
+                )
             }
         }
     }
@@ -84,18 +92,18 @@ pub(crate) async fn handle_reorg(
             })
             .collect();
         warn!(
-            "Diverged blocks observed in network {net}: {}",
+            "Diverged blocks observed in network {net}: {} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})",
             diverged_description.join("; ")
         );
     }
 
     if let Some((common_height, common_hash)) = first_common {
         info!(
-            "First common ancestor for reorg in network {net} at height {common_height} with hash {}",
+            "First common ancestor for reorg in network {net} at height {common_height} with hash {} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})",
             fmt_hash(&common_hash)
         );
         let fork_height = common_height + 1;
-        info!("Fork point for reorg in network {net} is at height {fork_height}");
+        info!("Fork point for reorg in network {net} is at height {fork_height} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})");
 
         // Print all non-finalized updates at or above the fork height
         {
@@ -111,14 +119,14 @@ pub(crate) async fn handle_reorg(
 
             if heights.is_empty() {
                 info!(
-                    "No non_finalized_updates at or above fork height {fork_height} in network {net}"
+                    "No non_finalized_updates at or above fork height {fork_height} in network {net} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})"
                 );
             } else {
                 for h in heights {
                     if let Some(batch) = provider.inflight.non_finalized_updates.remove(&h) {
                         let updates_count = batch.updates.updates.len();
                         info!(
-                            "non_finalized_update >= fork: height={h}, batch_block_height={}, updates_count={}, net={}",
+                            "non_finalized_update >= fork: height {h}, batch_block_height {}, updates_count {}, network {} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})",
                             batch.updates.block_height,
                             updates_count,
                             batch.net,
@@ -128,11 +136,11 @@ pub(crate) async fn handle_reorg(
                         let provider_metrics = &provider.provider_metrics;
                         match updates_relayer_send_chan.send(batch) {
                             Ok(()) => {
-                                debug!("Resent updates to relayer for network {net} and block height {block_height}, messages in queue = {msgs_in_queue}");
+                                debug!("Resent updates to relayer for network {net} and block height {block_height}, messages in queue = {msgs_in_queue} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})");
                                 inc_metric!(provider_metrics, net, num_transactions_in_queue);
                             }
                             Err(e) => {
-                                error!("Error while sending updates to relayer for network {net} and block height {block_height}, messages in queue = {msgs_in_queue}: {e}")
+                                error!("Error while sending updates to relayer for network {net} and block height {block_height}, messages in queue = {msgs_in_queue}: {e} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})")
                             }
                         };
                     }
@@ -143,7 +151,7 @@ pub(crate) async fn handle_reorg(
         Some(fork_height)
     } else {
         warn!(
-            "Failed to find a common ancestor within stored block hashes for reorg in network {net}"
+            "Failed to find a common ancestor within stored block hashes for reorg in network {net} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})"
         );
         None
     }
@@ -157,7 +165,7 @@ pub async fn loop_tracking_for_reorg_in_network(
 ) {
     tracing::info!("Starting tracker for reorgs in network {net} loop...");
 
-    let mut finalized_height = 0;
+    let mut observer_finalized_height = 0;
     let mut observed_latest_height = 0;
     let mut loop_count: u64 = 0;
     let rpc_timeout = Duration::from_secs(reorg_config.rpc_timeout_secs);
@@ -175,7 +183,7 @@ pub async fn loop_tracking_for_reorg_in_network(
         {
             break t;
         } else {
-            warn!("Could not determine block generation time for network: {net}. Will retry in {poll_period}ms")
+            warn!("Could not determine block generation time for network: {net}. Will retry in {poll_period}ms (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})")
         }
         await_time(poll_period).await;
     };
@@ -185,10 +193,7 @@ pub async fn loop_tracking_for_reorg_in_network(
         await_time(average_block_generation_time).await;
 
         loop_count += 1;
-        {
-            let now = Local::now();
-            info!("DEBUG: BEGIN loop_tracking_for_reorg_in_network for {net} loop_count: {loop_count}: {} finalized_height={finalized_height} observed_latest_height={observed_latest_height}!", now.format("%Y-%m-%d %H:%M:%S%.3f"));
-        }
+        debug!("BEGIN loop_tracking_for_reorg_in_network for {net} loop_count: {loop_count}: observer_finalized_height={observer_finalized_height} observed_latest_height={observed_latest_height}!");
         // Scope the lock on providers so we don't hold it across awaits/sleeps
         {
             let providers = providers_mutex.read().await;
@@ -200,7 +205,7 @@ pub async fn loop_tracking_for_reorg_in_network(
                         let provider = provider_mutex.lock().await;
 
                         for (k, v) in provider.inflight.non_finalized_updates.iter() {
-                            info!("DEBUG: inflight[{k}] = {:?}", v.updates);
+                            trace!("We have stored the following observations for network {net} inflight[{k}] = {:?} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})", v.updates);
                         }
 
                         (
@@ -216,7 +221,6 @@ pub async fn loop_tracking_for_reorg_in_network(
                     )
                     .await;
                     if let Ok(Ok(Some(b))) = latest_res {
-                        let _latest_hash = b.header.hash;
                         let latest_height = b.header.inner.number;
                         if latest_height > observed_latest_height {
                             // Before proceeding, verify whether the block at our observed tip
@@ -236,7 +240,7 @@ pub async fn loop_tracking_for_reorg_in_network(
                                         let chain_hash = chain_block.header.hash;
                                         if chain_hash != *stored_hash {
                                             warn!(
-                                                "Reorg detected in network {net} at observed tip before processing new blocks"
+                                                "Reorg detected in network {net} at observed tip before processing new blocks (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})"
                                             );
                                             // Increment reorg metric for this network
                                             inc_vec_metric!(provider_metrics, observed_reorgs, net);
@@ -246,6 +250,8 @@ pub async fn loop_tracking_for_reorg_in_network(
                                                 provider_mutex,
                                                 &observed_block_hashes,
                                                 observed_latest_height,
+                                                observer_finalized_height,
+                                                loop_count,
                                                 rpc_timeout,
                                                 &updates_relayer_send_chan,
                                             )
@@ -253,17 +259,17 @@ pub async fn loop_tracking_for_reorg_in_network(
                                         }
                                     }
                                     Ok(Ok(None)) => warn!(
-                                        "Could not get block {observed_latest_height} in network {net} while pre-checking for reorg"
+                                        "Could not get block {observed_latest_height} in network {net} while pre-checking for reorg (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})"
                                     ),
                                     Ok(Err(e)) => warn!(
-                                        "Failed to get block {observed_latest_height} in network {net} while pre-checking for reorg: {e:?}"
+                                        "Failed to get block {observed_latest_height} in network {net} while pre-checking for reorg: {e:?} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})"
                                     ),
                                     Err(_) => warn!(
-                                        "Timed out getting block {observed_latest_height} in network {net} while pre-checking for reorg"
+                                        "Timed out getting block {observed_latest_height} in network {net} while pre-checking for reorg (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})"
                                     ),
                                 }
                             }
-                            info!("Found new blocks in {net} loop_count = {loop_count} latest_height = {latest_height} {}", latest_height - observed_latest_height);
+                            info!("Found new blocks in {net} loop_count = {loop_count} latest_height = {latest_height} old value {} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height})", observed_latest_height);
 
                             // Check for reorg via parent mismatch
                             let first_new_block_height = observed_latest_height + 1;
@@ -281,7 +287,7 @@ pub async fn loop_tracking_for_reorg_in_network(
                                     if first_new_block.header.parent_hash
                                         != *observed_latest_block_hash
                                     {
-                                        warn!("Reorg detected in network {net}");
+                                        warn!("Reorg detected in network {net} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})");
 
                                         // Increment reorg metric for this network
                                         inc_vec_metric!(provider_metrics, observed_reorgs, net);
@@ -291,17 +297,19 @@ pub async fn loop_tracking_for_reorg_in_network(
                                             provider_mutex,
                                             &observed_block_hashes,
                                             observed_latest_height,
+                                            observer_finalized_height,
+                                            loop_count,
                                             rpc_timeout,
                                             &updates_relayer_send_chan,
                                         )
                                         .await;
                                     } else {
                                         info!(
-                                            "Chain goes on in {net}, loop {loop_count} ... need to add {} new blocks",
+                                            "Chain goes on in {net}, loop {loop_count} ... need to add {} new blocks (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height})",
                                             latest_height - observed_latest_height
                                         );
                                         let mut provider = provider_mutex.lock().await;
-                                        info!("DEBUG: Adding block with height {first_new_block_height}");
+                                        info!("Adding block with height {first_new_block_height} in network {net} loop_count {loop_count} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height})");
                                         provider.insert_observed_block_hash(
                                             first_new_block_height,
                                             first_new_block.header.hash,
@@ -317,28 +325,28 @@ pub async fn loop_tracking_for_reorg_in_network(
                                             )
                                             .await
                                             {
-                                                info!("DEBUG: Further adding block with height {block_height}");
+                                                info!("Further adding block with height {block_height} in network {net} loop_count {loop_count} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height})");
                                                 provider.insert_observed_block_hash(
                                                     block_height,
                                                     new_block.header.hash,
                                                 );
                                             } else {
-                                                warn!("DEBUG: Could not get block {block_height}");
+                                                warn!("Could not get block {block_height} in network {net} loop_count {loop_count} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height})");
                                             }
                                         }
                                     }
                                 } else {
-                                    error!("No observed block hash for observed_latest_height = {observed_latest_height}!");
+                                    error!("No observed block hash for observed_latest_height = {observed_latest_height} in network {net} loop_count {loop_count}! (observer_finalized_height={observer_finalized_height})");
                                 }
                             } else {
-                                warn!("DEBUG: Could not get block {first_new_block_height}");
+                                warn!("Could not get block {first_new_block_height} in network {net} loop_count {loop_count} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height})");
                             }
                             observed_latest_height = latest_height;
                         } else if latest_height < observed_latest_height {
-                            info!("Chain went back");
-                        } else {
+                            info!("Chain went back in network {net} loop_count {loop_count} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height})");
+                        } else if latest_height == observed_latest_height {
                             info!(
-                                "No new blocks in {net} loop_count = {loop_count} latest_height = {latest_height}"
+                                "No new blocks in {net} loop_count {loop_count} latest_height = {latest_height} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height})"
                             );
                             // Even if there are no new blocks, a reorg could have occurred if
                             // the block at our observed_latest_height now has a different hash.
@@ -349,8 +357,8 @@ pub async fn loop_tracking_for_reorg_in_network(
                                 let chain_hash = chain_block.header.hash;
                                 if chain_hash != *stored_hash {
                                     warn!(
-                                        "Reorg detected in network {net} without new tip advancement"
-                                    );
+                                                "Reorg detected in network {net} without new tip advancement loop_count {loop_count} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height})"
+                                            );
                                     // Increment reorg metric for this network
                                     inc_vec_metric!(provider_metrics, observed_reorgs, net);
                                     let _ = handle_reorg(
@@ -359,6 +367,8 @@ pub async fn loop_tracking_for_reorg_in_network(
                                         provider_mutex,
                                         &observed_block_hashes,
                                         observed_latest_height,
+                                        observer_finalized_height,
+                                        loop_count,
                                         rpc_timeout,
                                         &updates_relayer_send_chan,
                                     )
@@ -397,7 +407,7 @@ pub async fn loop_tracking_for_reorg_in_network(
 
                                         if differs_from_local {
                                             info!(
-                                                "Detected state change on-chain for `{net}`. Updating tracked contract root from {:?} / local {:?} to {:?}",
+                                                "Detected state change on-chain for network {net} loop_count {loop_count}. Updating tracked contract root from {:?} / local {:?} to {:?} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height})",
                                                 tracked_contract_root, local_frontier_root, chain_root_h
                                             );
                                             provider.merkle_root_in_contract = Some(chain_root_h);
@@ -405,17 +415,17 @@ pub async fn loop_tracking_for_reorg_in_network(
                                         }
                                     }
                                     Ok(Err(e)) => warn!(
-                                        "Failed to read ADFS root from network `{net}`: {e:?}"
+                                        "Failed to read ADFS root from network `{net}`: {e:?} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})"
                                     ),
                                     Err(_) => {
-                                        warn!("Timed out reading ADFS root from network `{net}`")
+                                        warn!("Timed out reading ADFS root from network `{net}` (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})")
                                     }
                                 }
                             } else {
-                                warn!("Could not get contract's address for network: {net}");
+                                warn!("Could not get contract's address for network: {net} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})");
                             }
                         } else {
-                            warn!("No ADFS contract set for network: {net}");
+                            warn!("No ADFS contract set for network: {net} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})");
                         }
                     }
 
@@ -431,19 +441,19 @@ pub async fn loop_tracking_for_reorg_in_network(
                                 let mut provider = provider_mutex.lock().await;
 
                                 // Prune non-finalized updates up to finalized height
-                                if finalized_height < eth_finalized_block.header.inner.number {
-                                    info!("Last finalized block in network {net} = {eth_finalized_block:?}");
+                                if observer_finalized_height < eth_finalized_block.header.inner.number {
+                                    info!("Last finalized block in network {net} = {eth_finalized_block:?} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})");
 
-                                    finalized_height = eth_finalized_block.header.inner.number;
-                                    let removed = provider.prune_observed_up_to(finalized_height);
+                                    observer_finalized_height = eth_finalized_block.header.inner.number;
+                                    let removed = provider.prune_observed_up_to(observer_finalized_height);
                                     if removed > 0 {
-                                        info!("Pruned {removed} non-finalized updates up to finalized height {finalized_height} in `{net}`");
+                                        info!("Pruned {removed} non-finalized updates up to finalized height {observer_finalized_height} in `{net}` (observed_latest_height={observed_latest_height}, loop_count={loop_count})");
                                     }
                                 }
-                                if observed_latest_height < finalized_height {
-                                    warn!("Lost track of chain in network {net} beyond a finalized checkpoint: {finalized_height}, last observed block at height: {observed_latest_height}");
+                                if observed_latest_height < observer_finalized_height {
+                                    warn!("Lost track of chain in network {net} beyond a finalized checkpoint: {observer_finalized_height}, last observed block at height: {observed_latest_height} (loop_count={loop_count})");
 
-                                    observed_latest_height = finalized_height;
+                                    observed_latest_height = observer_finalized_height;
                                     // Insert current hash into provider cache
                                     provider.insert_observed_block_hash(
                                         observed_latest_height,
@@ -453,13 +463,13 @@ pub async fn loop_tracking_for_reorg_in_network(
                                 }
                             }
                             None => {
-                                warn!("Could not get finalized block in network {net}, got None!")
+                                warn!("Could not get finalized block in network {net}, got None! (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})")
                             }
                         },
                         Ok(Err(e)) => {
-                            warn!("Could not get finalized block in network {net}: {e:?}!")
+                            warn!("Could not get finalized block in network {net}: {e:?}! (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})")
                         }
-                        Err(_) => warn!("Timed out getting finalized block in network {net}"),
+                        Err(_) => warn!("Timed out getting finalized block in network {net} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})"),
                     };
                 };
 
@@ -473,13 +483,10 @@ pub async fn loop_tracking_for_reorg_in_network(
                     }
                 }
             } else {
-                info!("Terminating reorg tracker for network {net} since it no longer has an active provider!");
+                info!("Terminating reorg tracker for network {net} since it no longer has an active provider! (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})");
                 break;
             }
-            {
-                let now = Local::now();
-                info!("DEBUG: END loop_tracking_for_reorg_in_network for {net} loop_count: {loop_count}: {} finalized_height={finalized_height} observed_latest_height={observed_latest_height}!", now.format("%Y-%m-%d %H:%M:%S%.3f"));
-            }
+            debug!("END loop_tracking_for_reorg_in_network for {net} loop_count: {loop_count}: observer_finalized_height={observer_finalized_height} observed_latest_height={observed_latest_height}!");
         }
     }
 }
