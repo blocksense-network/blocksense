@@ -345,43 +345,24 @@ pub async fn loop_tracking_for_reorg_in_network(
                             if let Some(stored_hash) =
                                 observed_block_hashes.get(&observed_latest_height)
                             {
-                                match timeout(
-                                    rpc_timeout,
-                                    rpc_handle.get_block_by_number(BlockNumberOrTag::Number(
+                                let chain_block = &b;
+                                let chain_hash = chain_block.header.hash;
+                                if chain_hash != *stored_hash {
+                                    warn!(
+                                        "Reorg detected in network {net} without new tip advancement"
+                                    );
+                                    // Increment reorg metric for this network
+                                    inc_vec_metric!(provider_metrics, observed_reorgs, net);
+                                    let _ = handle_reorg(
+                                        net.as_str(),
+                                        &rpc_handle,
+                                        provider_mutex,
+                                        &observed_block_hashes,
                                         observed_latest_height,
-                                    )),
-                                )
-                                .await
-                                {
-                                    Ok(Ok(Some(chain_block))) => {
-                                        let chain_hash = chain_block.header.hash;
-                                        if chain_hash != *stored_hash {
-                                            warn!(
-                                                "Reorg detected in network {net} without new tip advancement"
-                                            );
-                                            // Increment reorg metric for this network
-                                            inc_vec_metric!(provider_metrics, observed_reorgs, net);
-                                            let _ = handle_reorg(
-                                                net.as_str(),
-                                                &rpc_handle,
-                                                provider_mutex,
-                                                &observed_block_hashes,
-                                                observed_latest_height,
-                                                rpc_timeout,
-                                                &updates_relayer_send_chan,
-                                            )
-                                            .await;
-                                        }
-                                    }
-                                    Ok(Ok(None)) => warn!(
-                                        "Could not get block {observed_latest_height} in network {net} (None) while checking for reorg without tip advancement"
-                                    ),
-                                    Ok(Err(e)) => warn!(
-                                        "Failed to get block {observed_latest_height} in network {net} while checking for reorg (no tip advance): {e:?}"
-                                    ),
-                                    Err(_) => warn!(
-                                        "Timed out getting block {observed_latest_height} in network {net} while checking for reorg (no tip advance)"
-                                    ),
+                                        rpc_timeout,
+                                        &updates_relayer_send_chan,
+                                    )
+                                    .await;
                                 }
                             }
                         }
