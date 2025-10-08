@@ -2,6 +2,7 @@ import type { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 
 export const deployedTestnets = [
   'abstract-testnet',
+  'apechain-curtis',
   'arbitrum-sepolia',
   'aurora-testnet',
   'avalanche-fuji',
