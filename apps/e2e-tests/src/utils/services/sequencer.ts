@@ -15,16 +15,16 @@ import { NewFeedsConfigSchema } from '@blocksense/config-types';
 import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
 import { SequencerConfigV2Schema } from '@blocksense/config-types/node-config';
 
-import { getMetrics,ParseMetricsError } from '../metrics';
+import { getMetrics, ParseMetricsError } from '../metrics';
+
+import { generateSignature } from './generate-signature';
 import type {
   FeedAggregateHistory,
   ReportData,
   ReportPayload,
   UpdatesToNetwork,
-} from '../types';
-import { FeedAggregateHistorySchema, UpdatesToNetworkMetric } from '../types';
-
-import { generateSignature } from './generate-signature';
+} from './types';
+import { FeedAggregateHistorySchema, UpdatesToNetworkMetric } from './types';
 
 export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
   Sequencer,

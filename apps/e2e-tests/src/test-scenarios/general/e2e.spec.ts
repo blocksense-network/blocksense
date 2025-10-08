@@ -18,19 +18,19 @@ import {
 import type { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
 
-import { ProcessComposeLive } from '../../utils/environment-managers/process-compose-manager';
-import type { FeedResult } from '../../utils/generate-signature';
-import type { FeedsValueAndRound } from '../../utils/onchain';
-import { getDataFeedsInfoFromNetwork } from '../../utils/onchain';
-import type { SequencerService } from '../../utils/sequencer';
-import { Sequencer } from '../../utils/sequencer';
-import type {
-  EnvironmentManagerService,
-  ReportData,
-  UpdatesToNetwork,
-} from '../../utils/types';
-import { EnvironmentManager } from '../../utils/types';
-import { parseProcessesStatus, rgSearchPattern } from '../../utils/utilities';
+import {
+  parseProcessesStatus,
+  ProcessComposeLive,
+} from '../../utils/environment-managers/process-compose-manager';
+import type { EnvironmentManagerService } from '../../utils/environment-managers/types';
+import { EnvironmentManager } from '../../utils/environment-managers/types';
+import type { FeedResult } from '../../utils/services/generate-signature';
+import type { FeedsValueAndRound } from '../../utils/services/onchain';
+import { getDataFeedsInfoFromNetwork } from '../../utils/services/onchain';
+import type { SequencerService } from '../../utils/services/sequencer';
+import { Sequencer } from '../../utils/services/sequencer';
+import type { ReportData, UpdatesToNetwork } from '../../utils/services/types';
+import { rgSearchPattern } from '../../utils/utilities';
 
 import { expectedPCStatuses03 } from './expected-service-status';
 
