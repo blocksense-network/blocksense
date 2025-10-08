@@ -1,0 +1,17 @@
+package blocksense:oracle@2.0.0;
+
+world blocksense-oracle {
+  record test {
+    union: list<union1>,
+  }
+
+  variant union1 {
+    none,
+    struct2(list<struct2>),
+    uint8-var(u8),
+  }
+
+  record struct2 {
+    str2: list<string>,
+  }
+}
