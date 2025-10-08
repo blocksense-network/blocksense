@@ -9,7 +9,7 @@
         "salt": "0xac9b16bbc2aef49ecf589250324ab6467a1e372628bdd9a1c6f73ced045a22e1"
       },
       "AggregatedDataFeedStore": {
-        "address": "0x707bb37B703E4cf7C941bd57E90B16334714f887",
+        "address": "0xdcF5645deA66Ca31CB43CB702bF8a80ae6f37E1F",
         "constructorArgs": ["0xF1B62f07bEc1935ADACdeE5d12ccA0E90F9A108B"],
         "salt": "0x71b411ccc58b0bf522c76bab9a977992a03cfbc078d3852ee8ee8b6d5311a477"
       },
