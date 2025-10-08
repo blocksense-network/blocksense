@@ -127,9 +127,7 @@ export const createSchema = async (
       });
 
       if (isUnionType(field.type)) {
-        return new ssz.UnionType(Object.values(components), {
-          typeName: field.name,
-        });
+        return new ssz.UnionType(Object.values(components));
       }
       return new ssz.ContainerType(components);
     }
@@ -419,10 +417,9 @@ export const sszSchema = async (
       }
 
       if (field instanceof ssz.UnionType) {
-        data.fieldName = data.typeName;
         data.structNames = [
           ...(extraData?.upperLevelStructNames || []),
-          data.fieldName,
+          data.fieldName!,
         ];
         const unionType = findUnionNames(
           inputFields as TupleField,
@@ -439,7 +436,7 @@ export const sszSchema = async (
         data.fields = extractFieldsFromSchema(field.types, inputFields, {
           upperLevelStructNames: [
             ...(extraData?.upperLevelStructNames || []),
-            data.fieldName,
+            data.fieldName!,
           ],
         });
 
