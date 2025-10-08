@@ -1,5 +1,7 @@
 import fs from 'fs/promises';
+import { exec } from 'node:child_process';
 import path from 'node:path';
+import { promisify } from 'node:util';
 
 import { expect } from 'chai';
 import type { BaseContract } from 'ethers';
@@ -11,7 +13,7 @@ import { toUpperFirstLetter } from '../src/ssz/utils';
 import type { EvmVersion, PrimitiveField, TupleField } from '../src/utils';
 import { expandJsonFields } from '../src/utils';
 
-import data from './test.json';
+const execPromise = promisify(exec);
 
 describe('Template Multi Decoder', () => {
   const evmVersion = (process.env.EVM_VERSION || 'cancun') as EvmVersion;
@@ -74,7 +76,32 @@ describe('Template Multi Decoder', () => {
     };
   }
 
-  async function testDecoder(fields: TupleField, values: any[]) {
+  async function testDecoder(
+    fields: TupleField,
+    values: any[],
+    witOptions?: { witFile: string; jsonFile: string },
+  ) {
+    if (witOptions) {
+      // WIT to JSON conversion
+      await execPromise(
+        `cargo run --bin wit-converter -- -i ${__dirname}/${witOptions.witFile} -o ${__dirname}/${witOptions.jsonFile}`,
+        { cwd: path.join(__dirname, '../../../../apps/wit-converter') },
+      );
+
+      const data = await fs.readFile(
+        path.join(__dirname, witOptions.jsonFile),
+        'utf-8',
+      );
+
+      const jsonData = JSON.parse(data);
+      const witToJsonData = expandJsonFields(fields.name, jsonData)[
+        fields.name
+      ];
+
+      expect(witToJsonData).to.deep.equal(fields);
+    }
+
+    // SSZ multi decoder
     const sszData = await encodeSSZData(fields, values);
 
     const { decoderSSZ } = await generateAndDeployDecoders(fields);
@@ -136,16 +163,23 @@ describe('Template Multi Decoder', () => {
 
   afterEach(async () => {
     for (const contractPath of contractPaths) {
+      // Clean up generated contract files
       await fs.rm(contractPath, { force: true });
+
+      // Clean up WIT JSON files if they were created
+      const jsonFiles = await fs.readdir(path.join(__dirname, 'wit'));
+      await Promise.all(
+        jsonFiles
+          .filter(file => file.endsWith('.json'))
+          .map(
+            async file =>
+              await fs.rm(path.join(__dirname, 'wit', file), { force: true }),
+          ),
+      );
     }
   });
 
-  it('should expand JSON fields correctly', () => {
-    const res = expandJsonFields('payload', data);
-    console.log(JSON.stringify(res, null, 2));
-  });
-
-  it('should test union null value', async () => {
+  it('[WIT] should test union null value', async () => {
     const fields: TupleField = {
       name: 'Test',
       type: 'tuple',
@@ -169,10 +203,13 @@ describe('Template Multi Decoder', () => {
 
     const values = [{ selector: 0, value: null }];
 
-    await testDecoder(fields, values);
+    await testDecoder(fields, values, {
+      witFile: 'wit/union-null-value.wit',
+      jsonFile: 'wit/union-null-value.json',
+    });
   });
 
-  it('should test union uint32 value', async () => {
+  it('[WIT] should test union uint32 value', async () => {
     const fields: TupleField = {
       name: 'Test',
       type: 'tuple',
@@ -196,16 +233,19 @@ describe('Template Multi Decoder', () => {
 
     const values = [{ selector: 1, value: 4 }];
 
-    await testDecoder(fields, values);
+    await testDecoder(fields, values, {
+      witFile: 'wit/union-null-value.wit',
+      jsonFile: 'wit/union-null-value.json',
+    });
   });
 
-  it('should test union string value', async () => {
+  it('[WIT] should test union string value', async () => {
     const fields: TupleField = {
       name: 'Test',
       type: 'tuple',
       components: [
         {
-          name: 'union2',
+          name: 'union',
           type: 'union',
           components: [
             { name: 'none', type: 'none', size: 0 },
@@ -223,16 +263,19 @@ describe('Template Multi Decoder', () => {
 
     const values = [{ selector: 2, value: 'abc' }];
 
-    await testDecoder(fields, values);
+    await testDecoder(fields, values, {
+      witFile: 'wit/union-null-value.wit',
+      jsonFile: 'wit/union-null-value.json',
+    });
   });
 
-  it('should test union tuple value', async () => {
+  it('[WIT] should test union tuple value', async () => {
     const fields: TupleField = {
       name: 'Test',
       type: 'tuple',
       components: [
         {
-          name: 'union2',
+          name: 'union',
           type: 'union',
           components: [
             { name: 'none', type: 'none', size: 0 },
@@ -250,10 +293,13 @@ describe('Template Multi Decoder', () => {
 
     const values = [{ selector: 3, value: [['abc', 'yabadabadu']] }];
 
-    await testDecoder(fields, values);
+    await testDecoder(fields, values, {
+      witFile: 'wit/union-null-value.wit',
+      jsonFile: 'wit/union-null-value.json',
+    });
   });
 
-  it('should test nested multidimensional union value', async () => {
+  it('[WIT] should test nested multidimensional union value', async () => {
     const fields: TupleField = {
       name: 'Test',
       type: 'tuple',
@@ -290,10 +336,13 @@ describe('Template Multi Decoder', () => {
       ],
     ];
 
-    await testDecoder(fields, values);
+    await testDecoder(fields, values, {
+      witFile: 'wit/nested-multidimensional-union.wit',
+      jsonFile: 'wit/nested-multidimensional-union.json',
+    });
   });
 
-  it('should test nested tuples union value with same name', async () => {
+  it('[WIT] should test nested tuples union value with same name', async () => {
     const fields: TupleField = {
       name: 'Test',
       type: 'tuple',
@@ -303,7 +352,7 @@ describe('Template Multi Decoder', () => {
           type: 'tuple',
           components: [
             {
-              name: 'tupl',
+              name: 'unionValue',
               type: 'union',
               components: [
                 { name: 'none', type: 'none', size: 0 },
@@ -322,7 +371,7 @@ describe('Template Multi Decoder', () => {
           type: 'tuple',
           components: [
             {
-              name: 'tupl',
+              name: 'unionValue',
               type: 'union',
               components: [
                 { name: 'integer', type: 'uint8', size: 8 },
@@ -341,7 +390,10 @@ describe('Template Multi Decoder', () => {
 
     const values = [[{ selector: 1, value: 2 }], [{ selector: 2, value: [9] }]];
 
-    await testDecoder(fields, values);
+    await testDecoder(fields, values, {
+      witFile: 'wit/nested-tuples-union-same-name.wit',
+      jsonFile: 'wit/nested-tuples-union-same-name.json',
+    });
   });
 
   it('should test dynamic nested array union', async () => {
@@ -410,7 +462,7 @@ describe('Template Multi Decoder', () => {
     await testDecoder(fields, values);
   });
 
-  it('should test nested union', async () => {
+  it('[WIT] should test nested union', async () => {
     const fields: TupleField = {
       name: 'Test',
       type: 'tuple',
@@ -442,16 +494,19 @@ describe('Template Multi Decoder', () => {
       ],
     ];
 
-    await testDecoder(fields, values);
+    await testDecoder(fields, values, {
+      witFile: 'wit/nested-union.wit',
+      jsonFile: 'wit/nested-union.json',
+    });
   });
 
-  it('should test nested union', async () => {
+  it('[WIT] should test same name union in nested tuples', async () => {
     const fields: TupleField = {
-      name: 'Test',
+      name: 'MainTuple',
       type: 'tuple',
       components: [
         {
-          name: 'union',
+          name: 'union1Value',
           type: 'union',
           components: [
             { name: 'none', type: 'none', size: 0 },
@@ -459,11 +514,11 @@ describe('Template Multi Decoder', () => {
           ],
         },
         {
-          name: 'str',
+          name: 'tupleValue',
           type: 'tuple',
           components: [
             {
-              name: 'union',
+              name: 'union2Value',
               type: 'union',
               components: [
                 { name: 'none', type: 'none', size: 0 },
@@ -477,6 +532,58 @@ describe('Template Multi Decoder', () => {
 
     const values = [{ selector: 0, value: null }, [{ selector: 1, value: 4 }]];
 
-    await testDecoder(fields, values);
+    await testDecoder(fields, values, {
+      witFile: 'wit/same-name-union-in-nested-tuples.wit',
+      jsonFile: 'wit/same-name-union-in-nested-tuples.json',
+    });
+  });
+
+  it('[WIT] should test dynamic union', async () => {
+    const fields: TupleField = {
+      name: 'Test',
+      type: 'tuple',
+      components: [
+        {
+          name: 'union1',
+          type: 'union[]',
+          components: [
+            {
+              name: 'none',
+              type: 'none',
+              size: 0,
+            },
+            {
+              name: 'struct2',
+              type: 'tuple[]',
+              components: [{ name: 'str2', type: 'string[]' }],
+            },
+            {
+              name: 'uint8Var',
+              type: 'uint8',
+              size: 8,
+            },
+          ],
+        },
+      ],
+    };
+
+    const values = [
+      [
+        { selector: 0, value: null },
+        {
+          selector: 1,
+          value: [[['a', 'b', 'c']], [['abc', 'def']]],
+        },
+        {
+          selector: 2,
+          value: 5,
+        },
+      ],
+    ];
+
+    await testDecoder(fields, values, {
+      witFile: 'wit/dynamic-union.wit',
+      jsonFile: 'wit/dynamic-union.json',
+    });
   });
 });

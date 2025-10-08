@@ -1,0 +1,17 @@
+package blocksense:oracle@2.0.0;
+
+world blocksense-oracle {
+  record main-tuple {
+    union1-value: union,
+    tuple-value: tuple1,
+  }
+
+  record tuple1 {
+    union2-value: union,
+  }
+
+  variant union {
+    none,
+    integer(u32),
+  }
+}
