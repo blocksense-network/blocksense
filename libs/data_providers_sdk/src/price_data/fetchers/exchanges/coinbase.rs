@@ -76,7 +76,7 @@ pub async fn fetch_price_for_symbol(
         http_get_json::<CoinbasePriceResponse>(&url, None, None, Some(timeout_secs)).await?;
 
     Ok((
-        symbol.to_string().replace("-", ""),
+        symbol.to_string(),
         PricePoint {
             price: response.price,
             volume: response.volume,

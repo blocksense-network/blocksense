@@ -33,7 +33,7 @@ pub struct CryptoComPriceResponse {
 pub struct CryptoComPriceFetcher;
 
 impl PricesFetcher<'_> for CryptoComPriceFetcher {
-    const NAME: &'static str = "Crypto.com";
+    const NAME: &'static str = "CryptoCom";
 
     fn new(_symbols: &[String], _api_keys: Option<HashMap<String, String>>) -> Self {
         Self
@@ -55,7 +55,7 @@ impl PricesFetcher<'_> for CryptoComPriceFetcher {
                 .into_iter()
                 .map(|value| {
                     (
-                        value.i.replace("_", ""),
+                        value.i,
                         PricePoint {
                             price: value.a,
                             volume: value.v,

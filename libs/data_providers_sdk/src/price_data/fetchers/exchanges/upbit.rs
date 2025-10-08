@@ -23,7 +23,7 @@ pub struct UpBitPriceFetcher<'a> {
 }
 
 impl<'a> PricesFetcher<'a> for UpBitPriceFetcher<'a> {
-    const NAME: &'static str = "UpBit";
+    const NAME: &'static str = "Upbit";
 
     fn new(symbols: &'a [String], _api_keys: Option<HashMap<String, String>>) -> Self {
         Self { symbols }
@@ -43,10 +43,8 @@ impl<'a> PricesFetcher<'a> for UpBitPriceFetcher<'a> {
             Ok(response
                 .into_iter()
                 .map(|data| {
-                    let parts: Vec<&str> = data.market.split('-').collect();
-                    let transformed_market = format!("{}{}", parts[1], parts[0]);
                     (
-                        transformed_market,
+                        data.market,
                         PricePoint {
                             price: data.trade_price,
                             volume: data.acc_trade_volume_24h,

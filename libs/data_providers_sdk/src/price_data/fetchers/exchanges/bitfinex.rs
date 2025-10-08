@@ -24,25 +24,6 @@ pub struct TradingPairTicker {
     pub low: f64,                   // 24h low price
 }
 
-impl TradingPairTicker {
-    fn symbol(&self) -> String {
-        // When the symbol ( label ) is with more than 3 characters,
-        // the API uses the format for the trading pair "t[Symbol1]:[Symbol2]"
-        let no_delimiter = self.symbol.replace(":", "");
-        // The API uses label `UST` for symbol `USDT` and `UDC` for symbol `USDC`
-        // ref: https://api-pub.bitfinex.com/v2/conf/pub:map:currency:label
-        no_delimiter.replace("UST", "USDT").replace("UDC", "USDC")
-    }
-
-    fn price(&self) -> f64 {
-        self.last_price
-    }
-
-    fn volume(&self) -> f64 {
-        self.volume
-    }
-}
-
 pub struct BitfinexPriceFetcher<'a> {
     pub symbols: &'a [String],
 }
@@ -70,15 +51,10 @@ impl<'a> PricesFetcher<'a> for BitfinexPriceFetcher<'a> {
                 .into_iter()
                 .map(|ticker| {
                     (
-                        // Remove 't' prefix from the symbol
-                        ticker
-                            .symbol()
-                            .strip_prefix("t")
-                            .unwrap_or(&ticker.symbol)
-                            .to_string(),
+                        ticker.symbol,
                         PricePoint {
-                            price: ticker.price(),
-                            volume: ticker.volume(),
+                            price: ticker.last_price,
+                            volume: ticker.volume,
                         },
                     )
                 })

@@ -28,7 +28,7 @@ pub struct BinanceUsPriceFetcher<'a> {
 }
 
 impl<'a> PricesFetcher<'a> for BinanceUsPriceFetcher<'a> {
-    const NAME: &'static str = "Binance US";
+    const NAME: &'static str = "BinanceUS";
 
     fn new(symbols: &'a [String], _api_keys: Option<HashMap<String, String>>) -> Self {
         Self { symbols }

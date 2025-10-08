@@ -50,7 +50,7 @@ impl PricesFetcher<'_> for OKXPriceFetcher {
                 .into_iter()
                 .map(|value| {
                     (
-                        value.inst_id.replace("-", ""),
+                        value.inst_id,
                         PricePoint {
                             price: value.last,
                             volume: value.vol24h,
