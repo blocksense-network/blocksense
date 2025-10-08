@@ -21,6 +21,7 @@ const networks = [
   'ethereum-holesky',
   'ethereum-hoodi',
   'abstract-testnet',
+  'apechain-curtis',
   'arbitrum-mainnet',
   'arbitrum-sepolia',
   'aurora-testnet',
@@ -148,7 +149,7 @@ const networks = [
 ] as const;
 
 const chainIds = [
-  99999999999, 1, 11155111, 17000, 560048, 11124, 1088, 42161, 421614,
+  99999999999, 1, 11155111, 17000, 560048, 11124, 33111, 1088, 42161, 421614,
   1313161555, 43114, 43113, 123420001114, 8453, 84532, 80094, 80069, 200901,
   200810, 81457, 168587773, 56288, 9728, 288, 28882, 56, 97, 325000, 42220,
   44787, 5115, 66665, 338, 111557560, 18880, 839999, 250, 4002, 114, 252, 2522,
@@ -205,6 +206,7 @@ export function getNetworkKind<N extends NetworkName>(
 
 export enum Currency {
   ETH = 'ETH',
+  APE = 'APE',
   AVAX = 'AVAX',
   BERA = 'BERA',
   BNB = 'BNB',
@@ -354,6 +356,18 @@ export const networkMetadata = {
       },
     ],
     currency: Currency.ETH,
+  },
+  'apechain-curtis': {
+    chainId: 33111,
+    isTestnet: true,
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://curtis.explorer.caldera.xyz',
+        apiUrl: 'https://curtis.explorer.caldera.xyz/api',
+      },
+    ],
+    currency: Currency.APE,
   },
   'arbitrum-mainnet': {
     chainId: 42161,
