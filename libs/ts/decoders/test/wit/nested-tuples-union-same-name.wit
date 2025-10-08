@@ -1,0 +1,36 @@
+package blocksense:oracle@2.0.0;
+
+world blocksense-oracle {
+  record test {
+    t1: t1,
+    t2: t2,
+  }
+
+  record t1 {
+    union-value: union1,
+  }
+
+  record t2 {
+    union-value: union2,
+  }
+
+  variant union1 {
+    none,
+    integer(u32),
+    tuple1(tuple1),
+  }
+
+  record tuple1 {
+    a: u8,
+  }
+
+  variant union2 {
+    integer(u8),
+    str(string),
+    tuple1(tuple2),
+  }
+
+  record tuple2 {
+    b: u32,
+  }
+}
