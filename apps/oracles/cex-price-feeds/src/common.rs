@@ -4,10 +4,11 @@ use blocksense_data_providers_sdk::price_data::types::{PricePair, ProvidersSymbo
 pub struct ResourcePairData {
     pub pair: PricePair,
     pub id: String,
+    pub symbols_per_exchange: ProvidersSymbols,
 }
 
 #[derive(Debug)]
 pub struct ResourceData {
     pub pairs: Vec<ResourcePairData>,
-    pub symbols: ProvidersSymbols,
+    pub all_symbols: ProvidersSymbols,
 }

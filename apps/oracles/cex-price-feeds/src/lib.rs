@@ -79,15 +79,21 @@ fn process_results(results: &PairsToResults) -> Result<Payload> {
 
 fn get_resources_from_settings(settings: &Settings) -> Result<ResourceData> {
     let mut price_feeds = Vec::new();
-    let mut exchanges_symbols: ProvidersSymbols = HashMap::new();
+    let mut all_symbols_per_provider: ProvidersSymbols = HashMap::new();
 
     for feed_setting in &settings.data_feeds {
+        let mut symbols_per_exchange: ProvidersSymbols = HashMap::new();
+
         let feed_config =
             serde_json::from_str::<Data>(&feed_setting.data).context("Couldn't parse data feed")?;
 
         if let Some(exchanges) = feed_config.arguments.exchanges {
             for (exchange, symbols) in exchanges {
-                let entry = exchanges_symbols.entry(exchange).or_default();
+                symbols_per_exchange.insert(
+                    exchange.clone(),
+                    symbols.values().flatten().cloned().collect(),
+                );
+                let entry = all_symbols_per_provider.entry(exchange).or_default();
                 let mut seen_symbols = entry.iter().cloned().collect::<HashSet<_>>();
 
                 for symbol in symbols.values().flatten().cloned() {
@@ -102,15 +108,17 @@ fn get_resources_from_settings(settings: &Settings) -> Result<ResourceData> {
         price_feeds.push(ResourcePairData {
             pair: feed_config.pair,
             id: feed_setting.id.clone(),
+            symbols_per_exchange,
         });
     }
 
     Ok(ResourceData {
         pairs: price_feeds,
-        symbols: exchanges_symbols,
+        all_symbols: all_symbols_per_provider,
     })
 }
 
+#[derive(Debug)]
 struct ResultInfo {
     pub id: i64,
     pub name: String,
