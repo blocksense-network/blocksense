@@ -69,7 +69,7 @@ impl PricesFetcher<'_> for KuCoinPriceFetcher {
                 .into_iter()
                 .filter_map(|value| match (value.last, value.vol) {
                     (Some(last_price), Some(volume)) => Some((
-                        value.symbol.replace("-", ""),
+                        value.symbol,
                         PricePoint {
                             price: last_price,
                             volume,

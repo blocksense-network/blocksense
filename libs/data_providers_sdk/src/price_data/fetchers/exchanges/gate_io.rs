@@ -24,7 +24,7 @@ type GateIoPriceResponse = Vec<GateIoPriceData>;
 pub struct GateIoPriceFetcher;
 
 impl PricesFetcher<'_> for GateIoPriceFetcher {
-    const NAME: &'static str = "Gate.io";
+    const NAME: &'static str = "GateIo";
 
     fn new(_symbols: &[String], _api_keys: Option<HashMap<String, String>>) -> Self {
         Self
@@ -44,7 +44,7 @@ impl PricesFetcher<'_> for GateIoPriceFetcher {
                 .into_iter()
                 .map(|value| {
                     (
-                        value.currency_pair.replace("_", ""),
+                        value.currency_pair,
                         PricePoint {
                             price: value.last,
                             volume: value.base_volume,
