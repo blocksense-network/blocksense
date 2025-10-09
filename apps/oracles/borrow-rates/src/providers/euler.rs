@@ -27,18 +27,15 @@ async fn fetch_borrow_rate(
     provider: &MyProvider,
     lens_address: Address,
     vault_address: Address,
+    rpc_url: &str,
 ) -> Result<U256> {
     let instance = euler::EulerUtilsLens::new(lens_address, provider);
 
     let call = instance.getAPYs(vault_address);
     let calldata = call.calldata();
-    let raw = eth_call(
-        RPC_URL_ETHEREUM_MAINNET,
-        &format!("{:?}", lens_address),
-        calldata,
-    )
-    .await
-    .map_err(|e| anyhow::Error::msg(format!("{:?}", e)))?;
+    let raw = eth_call(rpc_url, &format!("{:?}", lens_address), calldata)
+        .await
+        .map_err(|e| anyhow::Error::msg(format!("{:?}", e)))?;
 
     let ret = euler::EulerUtilsLens::getAPYsCall::abi_decode_returns(&raw)?;
 
@@ -67,13 +64,23 @@ pub async fn fetch_borrow_rates_from_euler(
     Ok(borrow_rates)
 }
 
+/// Fetch borrow rates for Euler on Ethereum Mainnet
 async fn fetch_borrow_rates_on_ethereum_mainnet(feeds: &[FeedConfig]) -> Result<RatesPerFeed> {
+    let rpc_url = RPC_URL_ETHEREUM_MAINNET;
+
+    fetch_borrow_rates_for_network(feeds, rpc_url).await
+}
+
+/// Generic function to fetch borrow rates for any network
+async fn fetch_borrow_rates_for_network(
+    feeds: &[FeedConfig],
+    rpc_url: &str,
+) -> Result<RatesPerFeed> {
     let mut borrow_rates: RatesPerFeed = RatesPerFeed::new();
-
-    let rpc_url = Url::parse(RPC_URL_ETHEREUM_MAINNET)?;
-    let provider = Arc::new(ProviderBuilder::new().connect_http(rpc_url.clone()));
-
     let mut futures = FuturesUnordered::new();
+
+    let url = Url::parse(rpc_url)?;
+    let provider = Arc::new(ProviderBuilder::new().connect_http(url));
 
     for feed in feeds {
         let (utils_lens_address, vault_address) = match &feed.arguments {
@@ -84,8 +91,11 @@ async fn fetch_borrow_rates_on_ethereum_mainnet(feeds: &[FeedConfig]) -> Result<
         let feed_id = feed.feed_id.clone();
         let asset = feed.pair.base.clone();
         let provider = provider.clone();
+        let rpc_url = rpc_url.to_string();
+
         let fut = async move {
-            let result = fetch_borrow_rate(&provider, utils_lens_address, vault_address).await;
+            let result =
+                fetch_borrow_rate(&provider, utils_lens_address, vault_address, &rpc_url).await;
             (feed_id, asset, result)
         };
 
@@ -98,7 +108,7 @@ async fn fetch_borrow_rates_on_ethereum_mainnet(feeds: &[FeedConfig]) -> Result<
                 borrow_rates.insert(
                     feed_id,
                     BorrowRateInfo {
-                        asset: asset,
+                        asset,
                         underlying_asset: None,
                         borrow_rate: apr_continuous(rate),
                     },

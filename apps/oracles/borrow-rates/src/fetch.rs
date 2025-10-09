@@ -5,12 +5,12 @@ use std::collections::{HashMap, HashSet};
 
 use crate::{
     domain::{
-        group_feeds_by_marketplace_type, map_assets_to_feeds, FeedConfig,
-        MarketplaceType, RatesPerFeed, RatesPerFeedPerMarket, SupportedNetworks,
+        group_feeds_by_marketplace_type, map_assets_to_feeds, FeedConfig, MarketplaceType,
+        RatesPerFeed, RatesPerFeedPerMarket, SupportedNetworks,
     },
     providers::{
         euler::fetch_borrow_rates_from_euler, hyperdrive::fetch_borrow_rates_from_hyperdrive,
-        pool_data_provider::fetch_reserves,
+        morpho::fetch_borrow_rates_from_morpho, pool_data_provider::fetch_reserves,
     },
     utils::logging::print_marketplace_data,
 };
@@ -49,6 +49,10 @@ async fn fetch_market(
         MarketplaceType::EulerFinance => Ok((
             marketplace_type,
             fetch_borrow_rates_from_euler(Some(&feeds_config)).await,
+        )),
+        MarketplaceType::Morpho => Ok((
+            marketplace_type,
+            fetch_borrow_rates_from_morpho(Some(&feeds_config)).await,
         )),
     }
 }
