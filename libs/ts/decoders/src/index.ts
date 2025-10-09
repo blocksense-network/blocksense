@@ -1,4 +1,4 @@
-import { TransactionResponse } from 'ethers';
+import type { TransactionResponse } from 'ethers';
 
 export { generateDecoder as generateEPDecoder } from './encode-packed';
 export { encodePackedData } from './encode-packed/utils';
