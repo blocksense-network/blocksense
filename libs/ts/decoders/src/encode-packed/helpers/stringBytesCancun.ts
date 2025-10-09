@@ -1,4 +1,4 @@
-import { DecoderData } from '../../utils';
+import type { DecoderData } from '../../utils';
 
 export const generateDecoderStringBytes = (
   data: DecoderData,

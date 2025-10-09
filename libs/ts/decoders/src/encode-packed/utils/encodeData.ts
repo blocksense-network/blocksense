@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
-import { TupleField, PrimitiveField } from '../../utils';
+
+import type { PrimitiveField, TupleField } from '../../utils';
 
 export const encodePackedData = (
   fields: PrimitiveField | TupleField,
@@ -16,9 +17,9 @@ export const encodePackedData = (
 };
 
 const processFieldsAndEncodeData = (
-  fields: (PrimitiveField | TupleField)[],
+  fields: Array<PrimitiveField | TupleField>,
   values: any[], // values can be of any type so it is not possible to specify the type
-): [(PrimitiveField | TupleField)[], any[]] => {
+): [Array<PrimitiveField | TupleField>, any[]] => {
   const processedFields = fields.map((field, i) => {
     if (field.type.includes('[')) {
       const dimensions = field.type

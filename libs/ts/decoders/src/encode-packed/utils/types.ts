@@ -1,4 +1,4 @@
-import { DecoderData } from '../../utils';
+import type { DecoderData } from '../../utils';
 
 export type DecoderLines = (data: DecoderData, parentIndex?: string) => string;
 

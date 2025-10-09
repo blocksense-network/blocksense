@@ -1,8 +1,8 @@
-import { ComponentField, Struct, TupleField } from '.';
+import type { ComponentField, Struct, TupleField } from '.';
 
 export const organizeFieldsIntoStructs = (fields: TupleField) => {
-  let structs: Struct[] = [];
-  let mainStruct = { name: fields.name, fields: [] };
+  const structs: Struct[] = [];
+  const mainStruct = { name: fields.name, fields: [] };
 
   fields.components.forEach(field => {
     structs.push(...processField(field, mainStruct));
@@ -21,7 +21,7 @@ export const organizeFieldsIntoStructs = (fields: TupleField) => {
 const processField = (field: ComponentField[number], parentStruct: any) => {
   const structs: Struct[] = [];
   if (field.type.includes('tuple')) {
-    let newStruct: Struct = {
+    const newStruct: Struct = {
       name: field.name.charAt(0).toUpperCase() + field.name.slice(1),
       fields: [],
     };
@@ -32,7 +32,7 @@ const processField = (field: ComponentField[number], parentStruct: any) => {
     }
     structs.push(newStruct);
 
-    let arrayDimensions = field.type.match(/(\[\d*\])+$/);
+    const arrayDimensions = field.type.match(/(\[\d*\])+$/);
     if (arrayDimensions) {
       parentStruct.fields.push({
         name: field.name,

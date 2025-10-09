@@ -1,5 +1,7 @@
 import { generateSwapEndianness32bit } from '../helpers/convertToBE';
-import { Schema, BytesRange, Offset, addOffsets } from '.';
+
+import type { BytesRange, Offset, Schema } from '.';
+import { addOffsets } from '.';
 
 export const handleFieldRanges = (
   schema: Schema,
@@ -74,7 +76,7 @@ const handleVariableOffsets = (
   start: Offset,
   variableOffsetsPosition: number[],
   shouldAppend: boolean = true,
-): { value: string; isGenerated: boolean }[] => {
+): Array<{ value: string; isGenerated: boolean }> => {
   const offsets = new Array<{ value: string; isGenerated: boolean }>(
     variableOffsetsPosition.length,
   );

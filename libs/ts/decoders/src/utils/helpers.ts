@@ -1,4 +1,4 @@
-import { PrimitiveField } from './types';
+import type { PrimitiveField } from './types';
 
 export const checkPrimitiveField = (field: any): field is PrimitiveField => {
   return (

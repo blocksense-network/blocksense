@@ -9,10 +9,10 @@ export type Schema = {
   fieldName?: string;
   fields?: Schema[];
   isFixedLen?: boolean[];
-  fieldRangesFixedLen?: { start: Offset; end: Offset }[];
+  fieldRangesFixedLen?: Array<{ start: Offset; end: Offset }>;
   variableOffsetsPosition?: number[];
   prevType?: { type: string; length?: number };
-  types: { type: string; length?: number }[];
+  types: Array<{ type: string; length?: number }>;
 };
 
 export type Offset = number | string;

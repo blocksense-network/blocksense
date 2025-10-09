@@ -1,4 +1,4 @@
-import { Schema, Offset } from '../utils';
+import type { Offset, Schema } from '../utils';
 
 export const generateDecoderStringBytes = (
   schema: Schema,
