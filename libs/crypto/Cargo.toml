@@ -6,6 +6,6 @@ license.workspace = true
 edition.workspace = true
 
 [dependencies]
-serde = { workspace = true, features = ["derive"] }
 blst = { workspace = true, features = ["serde"] }
 hex = { workspace = true }
+serde = { workspace = true, features = ["derive"] }

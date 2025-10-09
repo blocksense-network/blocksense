@@ -12,10 +12,10 @@ name = "blocksense_data_providers_sdk"
 blocksense-sdk = { workspace = true }
 
 anyhow = { workspace = true }
-serde_json = { workspace = true }
-serde-this-or-that = { workspace = true }
+futures = { workspace = true }
 itertools = { workspace = true }
 serde = { workspace = true }
-futures = { workspace = true }
-url = { workspace = true }
+serde-this-or-that = { workspace = true }
+serde_json = { workspace = true }
 tracing = "0.1"
+url = { workspace = true }

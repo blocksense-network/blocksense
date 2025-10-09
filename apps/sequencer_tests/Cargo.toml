@@ -6,29 +6,25 @@ license.workspace = true
 edition.workspace = true
 
 [dependencies]
-blocksense-data-feeds = { workspace = true }
-blocksense-utils = { workspace = true }
-blocksense-crypto = { workspace = true }
 blocksense-config = { workspace = true }
+blocksense-crypto = { workspace = true }
+blocksense-data-feeds = { workspace = true }
 blocksense-feed-registry = { workspace = true }
+blocksense-utils = { workspace = true }
 
 alloy = { workspace = true, features = ["sol-types", "contract", "network", "node-bindings", "providers", "rpc", "rpc-client", "rpc-types-eth", "rpc-types-trace", "signers", "signer-keystore", "signer-ledger", "signer-mnemonic", "signer-trezor", "signer-yubihsm", "transports", "transport-http", "transport-ipc", "transport-ws", "pubsub"] }
-
+curl = { workspace = true }
+eyre = { workspace = true }
+futures = { workspace = true }
+json-patch = { workspace = true }
+port_scanner = { workspace = true }
 regex = { workspace = true }
 reqwest = { workspace = true }
-# async
-tokio = { workspace = true }
-
-# misc
-eyre = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
-futures = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
 tracing = { workspace = true, features = ["async-await", "log"] }
 url = { workspace = true }
-port_scanner = { workspace = true }
-curl = { workspace = true }
-serde_json = { workspace = true }
-json-patch = { workspace = true }
 
 [[bin]]
 name = "sequencer_tests"

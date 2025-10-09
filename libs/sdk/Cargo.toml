@@ -1,10 +1,6 @@
 [workspace]
 resolver = "3"
-members = [
-  "sdk",
-  "macro",
-  "data_providers",
-]
+members = ["data_providers", "macro", "sdk"]
 
 [workspace.package]
 version = "0.1.1"
@@ -13,14 +9,14 @@ license = "MIT"
 edition = "2021"
 
 [workspace.dependencies]
-blocksense-sdk = { path = "./sdk" }
-blocksense-macro = { path = "./macro" }
 blocksense-data-providers-sdk = { path = "./data_providers" }
+blocksense-macro = { path = "./macro" }
+blocksense-sdk = { path = "./sdk" }
 
 anyhow = "1"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = { version = "1.0", features = ["float_roundtrip"] }
-serde-this-or-that = "0.5.0"
-itertools = "0.14.0"
 futures = "0.3"
+itertools = "0.14.0"
+serde = { version = "1.0", features = ["derive"] }
+serde-this-or-that = "0.5.0"
+serde_json = { version = "1.0", features = ["float_roundtrip"] }
 url = "2.5"

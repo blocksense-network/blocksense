@@ -1,4 +1,9 @@
-{ self', ... }:
+{
+  lib,
+  self',
+  inputs',
+  ...
+}:
 {
   # Libraries used when cargo-check builds libraries
   packages = self'.legacyPackages.commonLibDeps;
@@ -31,6 +36,26 @@
         extraArgs = "--tests";
         offline = false;
       };
+    };
+    cargo-sort = {
+      enable = true;
+      name = "cargo-sort";
+      entry =
+        let
+          exe = lib.getExe inputs'.nixpkgs-unstable.legacyPackages.cargo-sort;
+          cmd = workspace: "${exe} --grouped --workspace ${workspace}";
+          workspaces = [
+            "."
+            "apps/oracles"
+            "libs/sdk"
+          ];
+          fullCmd = lib.concatMapStringsSep "; " cmd workspaces;
+        in
+        "bash -c '${fullCmd}'";
+
+      files = "Cargo\\.toml";
+      pass_filenames = false;
+      types = [ "file" ];
     };
     statix = {
       enable = true;

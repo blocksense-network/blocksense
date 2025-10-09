@@ -6,19 +6,15 @@ license.workspace = true
 edition.workspace = true
 
 [dependencies]
-blocksense-registry = { workspace = true }
 blocksense-anomaly-detection = { workspace = true }
-blocksense-feed-registry = { workspace = true }
-blocksense-data-feeds = { workspace = true }
 blocksense-config = { workspace = true }
-blocksense-utils = { workspace = true }
-blocksense-gnosis-safe = { workspace = true }
 blocksense-crypto = { workspace = true }
-once_cell = { workspace = true }
-hex = { workspace = true }
-ringbuf = { workspace = true }
-tracing = { workspace = true }
-tokio = { workspace = true }
+blocksense-data-feeds = { workspace = true }
+blocksense-feed-registry = { workspace = true }
+blocksense-gnosis-safe = { workspace = true }
+blocksense-registry = { workspace = true }
+blocksense-utils = { workspace = true }
+
 alloy = { workspace = true, features = [
     "sol-types",
     "contract",
@@ -43,6 +39,11 @@ alloy = { workspace = true, features = [
 ] }
 alloy-primitives = { workspace = true }
 anyhow = { workspace = true }
-serde_json = { workspace = true }
-serde = { workspace = true }
+hex = { workspace = true }
 itertools = "0.14.0"
+once_cell = { workspace = true }
+ringbuf = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
