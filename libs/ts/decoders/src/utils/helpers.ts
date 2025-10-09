@@ -1,4 +1,5 @@
 import { toLowerFirstLetter } from '../ssz/utils';
+
 import * as Types from './types';
 
 export const checkPrimitiveField = (
