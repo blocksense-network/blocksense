@@ -150,8 +150,8 @@ describe('Template Multi Decoder', () => {
           type = toUpperFirstLetter(type.replace(arrayDimensions[0], ''));
         }
 
-        expect(event).to.not.be.undefined;
-        expect(event!.args).to.not.be.undefined;
+        expect(event).to.not.equal(undefined);
+        expect(event!.args).to.not.equal(undefined);
         if (type === '' && !vals![i].value) {
           expect(event!.args).to.deep.equal([]);
         } else {
