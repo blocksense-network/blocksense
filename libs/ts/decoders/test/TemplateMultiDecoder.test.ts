@@ -1,13 +1,17 @@
-import { exec } from 'node:child_process';
-import { promisify } from 'node:util';
-import { expect } from 'chai';
-import { BaseContract } from 'ethers';
-import path from 'node:path';
-import { generateSSZDecoder, DecoderContract, encodeSSZData } from '../src';
-import { expandJsonFields, PrimitiveField, TupleField } from '../src/utils';
-import hre, { run, ethers } from 'hardhat';
 import fs from 'fs/promises';
+import { exec } from 'node:child_process';
+import path from 'node:path';
+import { promisify } from 'node:util';
+
+import { expect } from 'chai';
+import type { BaseContract } from 'ethers';
+import hre, { ethers, run } from 'hardhat';
+
+import type { DecoderContract } from '../src';
+import { encodeSSZData, generateSSZDecoder } from '../src';
 import { toUpperFirstLetter } from '../src/ssz/utils';
+import type { PrimitiveField, TupleField } from '../src/utils';
+import { expandJsonFields } from '../src/utils';
 
 const execPromise = promisify(exec);
 
@@ -141,13 +145,13 @@ describe('Template Multi Decoder', () => {
     for (const [i, event] of events.entries()) {
       if (event) {
         let type = event.fragment.inputs[0]?.type || '';
-        let arrayDimensions = type.match(/(\[\d*\])+$/);
+        const arrayDimensions = type.match(/(\[\d*\])+$/);
         if (arrayDimensions) {
           type = toUpperFirstLetter(type.replace(arrayDimensions[0], ''));
         }
 
-        expect(event).to.not.be.undefined;
-        expect(event!.args).to.not.be.undefined;
+        expect(event).to.not.equal(undefined);
+        expect(event!.args).to.not.equal(undefined);
         if (type === '' && !vals![i].value) {
           expect(event!.args).to.deep.equal([]);
         } else {
