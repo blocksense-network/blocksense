@@ -83,6 +83,7 @@ mod tests {
         let provider_config = ProviderConfig {
             private_key_path: "dummy".to_string(),
             url: "http://localhost:8545".to_string(),
+            websocket_url: None,
             transaction_retries_count_limit: 3,
             transaction_retry_timeout_secs: 10,
             retry_fee_increment_fraction: 0.1,
