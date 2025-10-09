@@ -1,4 +1,4 @@
-import { ExpandedField, ExpandedFieldOrArray } from '../../utils';
+import type { ExpandedField, ExpandedFieldOrArray } from '../../utils';
 
 export const calculateFieldShift = (fields: ExpandedField[]) => {
   let prevSizeSum = 0;
@@ -30,7 +30,7 @@ export const calculateFieldShift = (fields: ExpandedField[]) => {
           field.type === 'bytes' ||
           field.type === 'string' ||
           field.type.endsWith('[]');
-        let fieldSize = field.size ?? 0;
+        const fieldSize = field.size ?? 0;
         field.size = fieldSize;
         // Handle bytes fields
         if (isBytes) {

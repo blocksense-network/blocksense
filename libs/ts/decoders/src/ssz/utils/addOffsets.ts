@@ -1,4 +1,4 @@
-import { Offset } from './types';
+import type { Offset } from './types';
 
 export const addOffsets = (
   lines: string[] | undefined,

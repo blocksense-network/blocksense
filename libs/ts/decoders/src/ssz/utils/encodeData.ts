@@ -1,7 +1,10 @@
+import type { ContainerType } from '@chainsafe/ssz';
 import { ethers } from 'ethers';
-import { checkPrimitiveField, PrimitiveField, TupleField } from '../../utils';
-import { ContainerType } from '@chainsafe/ssz';
-import { Schema } from './types';
+
+import type { PrimitiveField, TupleField } from '../../utils';
+import { checkPrimitiveField } from '../../utils';
+
+import type { Schema } from './types';
 
 const BYTES_LIMIT = 8192;
 const ARRAY_LIMIT = 1024;
@@ -431,8 +434,8 @@ const parseTypeName = (typeName: string) => {
     if (!params) return;
 
     let depth = 0,
-      part = '',
-      args: string[] = [];
+      part = '';
+    const args: string[] = [];
     for (let i = 0; i < params.length; i++) {
       const char = params[i];
       if (char === '[') depth++;
