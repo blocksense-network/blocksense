@@ -5,6 +5,6 @@
     "rootDir": "lib",
     "declarationDir": "dist/types"
   },
-  "include": ["lib/**/*.ts"],
+  "include": ["lib/**/*.ts", "test/utils/**/*.ts", "abis/**/*.json"],
   "exclude": ["**/*.spec.ts", "dist"]
 }

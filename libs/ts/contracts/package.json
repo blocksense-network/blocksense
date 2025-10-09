@@ -1,5 +1,6 @@
 {
   "name": "@blocksense/contracts",
+  "version": "1.0.0",
   "exports": {
     "./docs/*": {
       "require": "./artifacts/docs/*.json",
@@ -30,7 +31,13 @@
       "require": "./dist/cjs/utils/calldata-decoder.cjs",
       "import": "./dist/esm/utils/calldata-decoder.mjs",
       "types": "./lib/utils/calldata-decoder.ts"
-    }
+    },
+    "./utils/*": {
+      "require": "./test/utils/*.ts",
+      "types": "./test/utils/*.ts"
+    },
+    "./contracts/*": "./contracts/*",
+    "./artifacts/*": "./artifacts/*"
   },
   "scripts": {
     "clean": "git clean -fdx -e .env",
@@ -58,7 +65,6 @@
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@nomicfoundation/hardhat-verify": "^2.1.1",
     "@nomicfoundation/hardhat-viem": "^2.1.1",
-    "@nomiclabs/hardhat-ethers": "^2.2.3",
     "@openzeppelin/contracts": "^5.1.0",
     "@safe-global/api-kit": "^4.0.0",
     "@safe-global/protocol-kit": "^6.1.0",
