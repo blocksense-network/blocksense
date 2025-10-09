@@ -26,6 +26,7 @@ pub struct ReorgTracker {
     net: String,
     providers_mutex: SharedRpcProviders,
     updates_relayer_send_chan: CountedSender<BatchOfUpdatesToProcess>,
+    websocket_url: Option<String>,
 }
 
 impl ReorgTracker {
@@ -591,6 +592,7 @@ impl ReorgTracker {
         config: ReorgConfig,
         providers_mutex: SharedRpcProviders,
         updates_relayer_send_chan: CountedSender<BatchOfUpdatesToProcess>,
+        websocket_url: Option<String>,
     ) -> ReorgTracker {
         ReorgTracker {
             observer_finalized_height: 0,
@@ -600,6 +602,7 @@ impl ReorgTracker {
             net,
             providers_mutex,
             updates_relayer_send_chan,
+            websocket_url
         }
     }
     /// Calculates the average block generation time over the last `num_blocks`
