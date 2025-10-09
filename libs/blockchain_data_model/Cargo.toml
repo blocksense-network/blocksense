@@ -7,9 +7,10 @@ edition.workspace = true
 
 [dependencies]
 blocksense-utils = { workspace = true }
+
+anyhow = { workspace = true }
+hex = { workspace = true }
+hex-literal = { workspace = true }
 serde = { workspace = true, features = ["derive", "serde_derive"] }
 ssz_rs = { workspace = true }
-hex-literal = { workspace = true }
-hex = { workspace = true }
-anyhow = { workspace = true }
 tracing = { workspace = true, features = ["async-await", "log"] }

@@ -5,23 +5,22 @@ authors.workspace = true
 license.workspace = true
 edition.workspace = true
 
-
 [dependencies]
-blocksense-utils = { workspace = true }
+blocksense-config = { workspace = true }
 blocksense-crypto = { workspace = true }
 blocksense-feed-registry = { workspace = true }
-blocksense-config = { workspace = true }
+blocksense-utils = { workspace = true }
 
-log = { workspace = true }
 anyhow = { workspace = true }
+dirs = { workspace = true }
+http = { workspace = true }
+log = { workspace = true }
+rand = { workspace = true }
+ringbuf = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+strum = { workspace = true, features = ["derive"] }
 thiserror = { workspace = true }
+tokio = { workspace = true }
 tracing = { workspace = true, features = ["async-await", "log"] }
 tracing-subscriber = { workspace = true, features = ["json"] }
-serde_json = { workspace = true }
-serde = { workspace = true, features = ["derive"] }
-ringbuf = { workspace = true }
-rand = { workspace = true }
-dirs = { workspace = true }
-strum = { workspace = true, features = ["derive"] }
-http = { workspace = true }
-tokio = { workspace = true }

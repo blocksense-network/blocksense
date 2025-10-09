@@ -1,14 +1,14 @@
 [workspace]
 members = [
-  "cex-price-feeds",
-  "exsat-holdings",
-  "gecko-terminal",
-  "eth-rpc",
   "borrow-rates",
-  "stock-price-feeds",
-  "forex-price-feeds",
-  "spout-rwa",
+  "cex-price-feeds",
   "commodities-price-feeds",
+  "eth-rpc",
+  "exsat-holdings",
+  "forex-price-feeds",
+  "gecko-terminal",
+  "spout-rwa",
+  "stock-price-feeds",
 ]
 
 resolver = "2"
@@ -20,21 +20,21 @@ license = "to be decided"
 edition = "2021"
 
 [workspace.dependencies]
-blocksense-sdk = { path = "../../libs/sdk/sdk" }
 blocksense-data-providers-sdk = { path = "../../libs/sdk/data_providers" }
+blocksense-sdk = { path = "../../libs/sdk/sdk" }
 
+alloy = "1.0.9"
 anyhow = "1"
 futures = "0.3"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = { version = "1.0", features = ["float_roundtrip"] }
-url = "2.5"
 itertools = "0.14.0"
 prettytable-rs = "0.10"
+serde = { version = "1.0", features = ["derive"] }
 serde-this-or-that = "0.5.0"
 serde_derive = "1.0.210"
-wit-bindgen = "0.16.0"
-alloy = "1.0.9"
-tracing = "0.1"
-tracing-subscriber = "0.3"
+serde_json = { version = "1.0", features = ["float_roundtrip"] }
 strum = "0.27"
 strum_macros = "0.27"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+url = "2.5"
+wit-bindgen = "0.16.0"

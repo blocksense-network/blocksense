@@ -9,19 +9,20 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-wit-bindgen = { workspace = true }
-blocksense-sdk = { workspace = true }
 blocksense-data-providers-sdk = { workspace = true }
-anyhow = { workspace = true }
-serde_json = { workspace = true }
-serde-this-or-that = { workspace = true }
-futures = { workspace = true }
-url = { workspace = true }
-serde = { workspace = true }
-prettytable-rs = { workspace = true }
+blocksense-sdk = { workspace = true }
+
 alloy = { workspace = true }
+anyhow = { workspace = true }
+futures = { workspace = true }
 itertools = { workspace = true }
-tracing = { workspace = true }
-tracing-subscriber = { workspace = true }
+prettytable-rs = { workspace = true }
+serde = { workspace = true }
+serde-this-or-that = { workspace = true }
+serde_json = { workspace = true }
 strum = { workspace = true }
 strum_macros = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+url = { workspace = true }
+wit-bindgen = { workspace = true }
