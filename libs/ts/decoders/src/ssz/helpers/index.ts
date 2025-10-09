@@ -15,7 +15,6 @@ export const generateDecoderLines = (
   const { generateDecoderPrimitiveLines, generateDecoderStringBytes } =
     getDecoderImplementations(evmVersion);
 
-  let dynamicIndex = 0;
   const generateDecoderLines = (
     schema: Schema,
     location: string,
@@ -146,8 +145,6 @@ export const generateDecoderLines = (
             }
             `);
         }
-
-        dynamicIndex++;
       } else if (isVector(schema)) {
         // vector here
         if (schema.sszFixedSize) {

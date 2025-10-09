@@ -1,4 +1,4 @@
-import { Schema, Offset } from '../utils';
+import type { Offset, Schema } from '../utils';
 
 export const generateDecoderStringBytes = (
   schema: Schema,
@@ -8,7 +8,7 @@ export const generateDecoderStringBytes = (
   end: Offset,
   counter?: string,
 ) => {
-  let fieldName = '_' + schema.fieldName;
+  const fieldName = '_' + schema.fieldName;
 
   return `
     // String/Bytes for ${schema.fieldName}
