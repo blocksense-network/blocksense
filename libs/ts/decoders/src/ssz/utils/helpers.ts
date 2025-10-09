@@ -1,4 +1,5 @@
-import {
+/* eslint-disable @typescript-eslint/no-require-imports */
+import type {
   DecoderImplementations,
   DecoderPrimitiveLines,
   DecoderStringBytes,

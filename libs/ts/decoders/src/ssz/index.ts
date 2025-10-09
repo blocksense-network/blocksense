@@ -1,11 +1,15 @@
 import fs from 'fs/promises';
+
 import ejs from 'ejs';
 import * as prettier from 'prettier/standalone';
 import solidityPlugin from 'prettier-plugin-solidity';
 
-import { Schema, sszSchema } from './utils';
-import { TupleField, organizeFieldsIntoStructs } from '../utils';
+import type { TupleField } from '../utils';
+import { organizeFieldsIntoStructs } from '../utils';
+
 import { generateDecoderLines } from './helpers';
+import type { Schema } from './utils';
+import { sszSchema } from './utils';
 
 export const generateDecoder = async (
   template: string,

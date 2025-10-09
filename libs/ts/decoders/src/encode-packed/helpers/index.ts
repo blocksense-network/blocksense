@@ -1,10 +1,11 @@
-import {
+import type {
   DecoderData,
   ExpandedField,
   ExpandedFieldOrArray,
   GenerateDecoderConfig,
 } from '../../utils';
 import { getDecoderImplementations } from '../utils';
+
 import { generateDecoderDynamicDataLines } from './dynArrayStringBytes';
 import { generateDecoderFixedBytesLines } from './fixedBytesField';
 
@@ -33,7 +34,7 @@ export const generateDecoderLines = (
   ) => {
     const lines: string[] = [];
     let index = startIndex;
-    let location = name;
+    const location = name;
 
     for (let i = 0; i < expandedFields.length; i++) {
       const field = expandedFields[i];
@@ -184,7 +185,7 @@ export const generateDecoderLines = (
       currentLocation: string,
       depth = 0,
     ) {
-      const { config, field, location, index } = data;
+      const { config, field, index, location } = data;
       const lines: string[] = [];
       const innerType = type.slice(0, -2); // Remove last '[]'
       const innerIndex = `i_${location}_${depth}`;

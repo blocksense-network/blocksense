@@ -1,4 +1,4 @@
-import {
+import type {
   ComponentField,
   ExpandedField,
   ExpandedFieldOrArray,
@@ -56,7 +56,7 @@ export const expandArray = (
     lastDynamicDim = i;
   }
 
-  let changed = dimensions.length;
+  const changed = dimensions.length;
   if (lastDynamicDim > 0) {
     dimensions.splice(lastDynamicDim, dimensions.length - lastDynamicDim);
   }

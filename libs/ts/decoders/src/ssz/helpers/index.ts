@@ -1,7 +1,8 @@
-import { Schema, Offset, isVector, hasFields } from '../utils/';
+import type { Offset, Schema } from '../utils/';
+import { getDecoderImplementations, hasFields, isVector } from '../utils/';
 import { addOffsets } from '../utils/addOffsets';
 import { handleFieldRanges } from '../utils/container';
-import { getDecoderImplementations } from '../utils';
+
 import { generateNestedDynamic } from './nestedDynamic';
 
 export const generateDecoderLines = (
@@ -13,7 +14,6 @@ export const generateDecoderLines = (
   const { generateDecoderPrimitiveLines, generateDecoderStringBytes } =
     getDecoderImplementations(evmVersion);
 
-  let dynamicIndex = 0;
   const generateDecoderLines = (
     schema: Schema,
     location: string,
@@ -144,8 +144,6 @@ export const generateDecoderLines = (
             }
             `);
         }
-
-        dynamicIndex++;
       } else if (isVector(schema)) {
         // vector here
         if (schema.sszFixedSize) {

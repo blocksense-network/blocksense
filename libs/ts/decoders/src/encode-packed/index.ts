@@ -1,15 +1,18 @@
 import fs from 'fs/promises';
+
 import ejs from 'ejs';
 import * as prettier from 'prettier/standalone';
 import solidityPlugin from 'prettier-plugin-solidity';
 
+import type { TupleField } from '../utils';
+import { organizeFieldsIntoStructs } from '../utils';
+
+import { generateDecoderLines } from './helpers';
 import {
-  checkForDynamicData,
   calculateFieldShift,
+  checkForDynamicData,
   expandFields,
 } from './utils';
-import { TupleField, organizeFieldsIntoStructs } from '../utils';
-import { generateDecoderLines } from './helpers';
 
 export const generateDecoder = async (
   template: string,

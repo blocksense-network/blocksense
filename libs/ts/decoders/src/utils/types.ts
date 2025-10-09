@@ -10,7 +10,7 @@ export type TupleField = {
   components: ComponentField;
 };
 
-export type ComponentField = (PrimitiveField | TupleField)[];
+export type ComponentField = Array<PrimitiveField | TupleField>;
 
 export type ExpandedField = {
   name: string;

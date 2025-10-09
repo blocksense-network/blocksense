@@ -1,5 +1,7 @@
-import { ExpandedFieldOrArray } from '../../utils';
-import { DecoderImplementations, DecoderLines } from './types';
+/* eslint-disable @typescript-eslint/no-require-imports */
+import type { ExpandedFieldOrArray } from '../../utils';
+
+import type { DecoderImplementations, DecoderLines } from './types';
 
 export const checkForDynamicData = (fields: ExpandedFieldOrArray[]) => {
   let containsDynamicData = false;

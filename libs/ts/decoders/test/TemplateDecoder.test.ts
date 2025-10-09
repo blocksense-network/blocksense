@@ -1,17 +1,16 @@
-import path from 'node:path';
 import fs from 'node:fs/promises';
+import path from 'node:path';
 
 import { expect } from 'chai';
+import type { BaseContract } from 'ethers';
 import hre, { ethers, run } from 'hardhat';
-import { BaseContract } from 'ethers';
 
+import type { DecoderContract, TupleField } from '../src';
 import {
-  generateEPDecoder,
-  generateSSZDecoder,
   encodePackedData,
   encodeSSZData,
-  TupleField,
-  DecoderContract,
+  generateEPDecoder,
+  generateSSZDecoder,
 } from '../src';
 
 describe('Template Decoder', function () {
