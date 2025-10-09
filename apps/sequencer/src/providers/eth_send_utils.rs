@@ -24,7 +24,7 @@ use crate::{
             parse_eth_address, HashValue, LatestRBIndex, ProviderStatus, ProviderType,
             ProvidersMetrics, RpcProvider, SharedRpcProviders,
         },
-        reorg_tracking::loop_tracking_for_reorg_in_network,
+        reorg_tracking::ReorgTracker,
     },
     sequencer_state::SequencerState,
 };
@@ -349,17 +349,17 @@ pub async fn create_per_network_reorg_trackers(
                 panic!("Failed to spawn tracker for reorgs loop in network {net} because no updates sending relayer exists for it!");
             }
         };
+        let mut reorg_tracker = ReorgTracker::new(
+            net_clone,
+            reorg_tracker_config,
+            sequencer_state_providers_clone,
+            relayer_send_channel,
+        );
         collected_futures.push(
             tokio::task::Builder::new()
                 .name(reorg_trackers_name.clone().as_str())
                 .spawn(async move {
-                    loop_tracking_for_reorg_in_network(
-                        net_clone,
-                        sequencer_state_providers_clone,
-                        reorg_tracker_config,
-                        relayer_send_channel,
-                    )
-                    .await;
+                    reorg_tracker.loop_tracking_for_reorg_in_network().await;
                     Ok(())
                 })
                 .expect("Failed to spawn tracker for reorgs loop in network {net}!"),
