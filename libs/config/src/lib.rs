@@ -201,6 +201,9 @@ pub struct ContractConfig {
 pub struct Provider {
     pub private_key_path: String,
     pub url: String,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub websocket_url: Option<String>,
     pub transaction_retries_count_limit: u32,
     pub transaction_retry_timeout_secs: u32,
     pub retry_fee_increment_fraction: f64,
@@ -330,6 +333,16 @@ impl Validated for Provider {
                 "{}: transaction_retry_back_off_ms must be > 0 and < 12000 ms",
                 context
             );
+        }
+        if let Some(ws) = &self.websocket_url {
+            let is_ws = ws.starts_with("ws://") || ws.starts_with("wss://");
+            if !is_ws {
+                anyhow::bail!(
+                    "{}: websocket_url must start with ws:// or wss:// (got: {})",
+                    context,
+                    ws
+                );
+            }
         }
         Ok(())
     }
@@ -598,6 +611,7 @@ pub fn get_test_config_with_multiple_providers(
                     .expect("Error in private_key_path: ")
                     .to_string(),
                 url: url.to_string(),
+                websocket_url: None,
                 transaction_retries_count_limit: 10,
                 transaction_retry_timeout_secs: 24,
                 retry_fee_increment_fraction: 0.1,

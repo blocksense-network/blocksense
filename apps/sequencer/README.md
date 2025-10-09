@@ -37,6 +37,14 @@ therefore this file needs to be created with the following command:
 echo -n 0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a > /tmp/priv_key_test
 ```
 
+### Optional WebSocket newHeads subscription
+
+- Provider field: add `websocket_url` (optional) under each provider in `SequencerConfig.providers.<name>`.
+- Format: must start with `ws://` or `wss://` (validated at startup).
+- Behavior: when set, the reorg tracker subscribes to `newHeads` over WS to trigger checks; all reads (blocks, receipts, finalized blocks, contract state) remain over HTTP.
+- Fallback: if WS connect/subscribe fails or drops, the tracker falls back to polling with exponential backoff (1s → 30s cap, ±10% jitter) and periodically retries WS.
+- Startup: even with WS enabled, the tracker performs a one-time HTTP fetch to seed local observed tip before listening.
+
 ## How to run the sequencer
 
 ```

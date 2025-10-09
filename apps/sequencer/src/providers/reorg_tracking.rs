@@ -1,6 +1,7 @@
 use crate::providers::provider::{ProviderType, RpcProvider, SharedRpcProviders};
 use actix_web::rt::time::timeout;
 use alloy::hex;
+use alloy::providers::ProviderBuilder;
 use alloy::rpc::types::Block;
 use alloy::{eips::BlockNumberOrTag, providers::Provider};
 use alloy_primitives::B256;
@@ -11,6 +12,7 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::time::Duration;
 use tracing::{debug, error, info, trace, warn};
+// TODO: use futures_util::StreamExt;
 
 use blocksense_metrics::{inc_metric, inc_vec_metric, metrics::ProviderMetrics};
 use blocksense_utils::await_time;
@@ -26,6 +28,7 @@ pub struct ReorgTracker {
     net: String,
     providers_mutex: SharedRpcProviders,
     updates_relayer_send_chan: CountedSender<BatchOfUpdatesToProcess>,
+    websocket_url: Option<String>,
 }
 
 impl ReorgTracker {
@@ -175,6 +178,47 @@ impl ReorgTracker {
         let net = self.net.clone();
         let providers_mutex = self.providers_mutex.clone();
         tracing::info!("Starting tracker for reorgs in network {net} loop...");
+
+        let mut provider_ws_opt = None;
+        let mut sub_opt = None;
+
+        if let Some(ws_url) = self.websocket_url.clone() {
+            info!("Attempting WS connect for {net} to {ws_url}");
+            let provider_ws = match ProviderBuilder::new().connect(&ws_url).await {
+                Ok(p) => p,
+                Err(e) => {
+                    warn!("WS connect failed for {net}: {e:?}");
+                    return;
+                }
+            };
+
+            info!("WS connected for {net}; subscribing to newHeads");
+            let sub = match provider_ws.subscribe_blocks().await {
+                Ok(s) => s,
+                Err(e) => {
+                    warn!("WS subscribe_blocks failed for {net}: {e:?}");
+                    return;
+                }
+            };
+
+            // TODO: let mut stream = sub.into_stream();
+
+            provider_ws_opt = Some(provider_ws);
+            sub_opt = Some(sub);
+            // while let Some(b) = stream.next().await {
+            //     process_tracker_iteration(
+            //         net.as_str(),
+            //         &providers_mutex,
+            //         rpc_timeout,
+            //         &mut observed_latest_height,
+            //         &mut finalized_height,
+            //         &updates_relayer_send_chan,
+            //         loop_count,
+            //     )
+            //     .await;
+            //     info!("hurray");
+            // }
+        }
 
         // Loop until block generation time is determined
         let average_block_generation_time: u64 = loop {
@@ -591,6 +635,7 @@ impl ReorgTracker {
         config: ReorgConfig,
         providers_mutex: SharedRpcProviders,
         updates_relayer_send_chan: CountedSender<BatchOfUpdatesToProcess>,
+        websocket_url: Option<String>,
     ) -> ReorgTracker {
         ReorgTracker {
             observer_finalized_height: 0,
@@ -600,6 +645,7 @@ impl ReorgTracker {
             net,
             providers_mutex,
             updates_relayer_send_chan,
+            websocket_url
         }
     }
     /// Calculates the average block generation time over the last `num_blocks`
@@ -949,6 +995,7 @@ mod tests {
                     },
                     providers_clone,
                     feed_updates_send,
+                    None
                 );
                 reorg_tracker.loop_tracking_for_reorg_in_network().await;
             })
