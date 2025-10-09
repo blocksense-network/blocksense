@@ -1,4 +1,4 @@
-import { Schema, Offset } from '../utils';
+import type { Offset, Schema } from '../utils';
 
 // primitive types that are not bytes<num> are shifted to the right for Solidity to read
 export const generateDecoderPrimitiveLines = (

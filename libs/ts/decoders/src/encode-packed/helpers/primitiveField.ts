@@ -1,4 +1,5 @@
-import { DecoderData } from '../../utils';
+import type { DecoderData } from '../../utils';
+
 import { generateMemoryAssignment } from './memoryAssignment';
 import { generateSwitchCase } from './switchCase';
 

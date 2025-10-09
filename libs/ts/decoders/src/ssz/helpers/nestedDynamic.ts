@@ -1,4 +1,5 @@
-import { Schema, Offset } from '../utils';
+import type { Offset, Schema } from '../utils';
+
 import { generateSwapEndianness32bit } from './convertToBE';
 
 export const generateNestedDynamic = (

@@ -1,8 +1,11 @@
-import { ethers } from 'hardhat';
-import { ADFSWrapper } from '@blocksense/contracts/utils/wrappers/adfs/ADFS';
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
-import { encodePackedData, encodeSSZData, TupleField } from '../src';
+import type { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
+import { ethers } from 'hardhat';
+
+import { ADFSWrapper } from '@blocksense/contracts/utils/wrappers/adfs/ADFS';
+
+import type { TupleField } from '../src';
+import { encodePackedData, encodeSSZData } from '../src';
 
 describe('Example: Sports Decoder', function () {
   let adfs: ADFSWrapper;

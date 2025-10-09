@@ -1,5 +1,6 @@
-import { DecoderData } from '../../utils';
-import { DecoderLines } from '../utils/types';
+import type { DecoderData } from '../../utils';
+import type { DecoderLines } from '../utils/types';
+
 import { generateMemoryAssignment } from './memoryAssignment';
 
 // dynamic array of bytes or string data
