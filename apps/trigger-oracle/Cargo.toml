@@ -27,7 +27,7 @@ http-body-util = "0.1.3"
 hyper = { workspace = true }
 log = { workspace = true }
 outbound-http = { workspace = true }
-rdkafka = { version = "0.37.0", features = ["dynamic-linking"] }
+rdkafka = { version = "0.38.0", features = ["dynamic-linking"] }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
