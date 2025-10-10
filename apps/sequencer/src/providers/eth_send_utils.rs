@@ -25,7 +25,7 @@ use crate::{
     sequencer_state::SequencerState,
 };
 use blocksense_feeds_processing::adfs_gen_calldata::{
-    adfs_serialize_updates, get_neighbour_feed_ids, RoundCounters,
+    adfs_serialize_updates, get_neighbour_feed_ids, RoundBufferIndices,
 };
 use blocksense_metrics::{
     dec_metric, inc_metric, inc_vec_metric,
@@ -83,7 +83,7 @@ pub async fn get_serialized_updates_for_network(
     updates: &mut BatchedAggregatesToSend,
     provider_settings: &blocksense_config::Provider,
     feeds_config: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
-    feeds_rounds: &mut HashMap<FeedId, u64>,
+    feeds_rb_indices: &mut HashMap<FeedId, u64>,
 ) -> Result<Vec<u8>> {
     debug!("Acquiring a read lock on provider config for `{net}`");
     let provider = provider_mutex.lock().await;
@@ -125,9 +125,9 @@ pub async fn get_serialized_updates_for_network(
         match adfs_serialize_updates(
             net,
             updates,
-            Some(&provider.round_counters),
+            Some(&provider.rb_indices),
             strides_and_decimals,
-            feeds_rounds,
+            feeds_rb_indices,
         )
         .await
         {
@@ -228,7 +228,7 @@ pub async fn loop_processing_batch_of_updates(
                         result_str += &format!("result from network {net} and block height {block_height}: Ok -> status: {status}");
                         if status == "true" {
                             result_str += &format!(", updated_feeds: {updated_feeds:?}");
-                            increment_feeds_round_metrics(
+                            increment_feeds_rb_metrics(
                                 &updated_feeds,
                                 Some(feeds_metrics.clone()),
                                 net.as_str(),
@@ -246,12 +246,8 @@ pub async fn loop_processing_batch_of_updates(
                             result_str += &format!(
                                 ", failed to update feeds: {updated_feeds:?} due to {status}"
                             );
-                            decrement_feeds_round_indexes(
-                                &updated_feeds,
-                                net.as_str(),
-                                &mut provider,
-                            )
-                            .await;
+                            decrement_feed_rb_indices(&updated_feeds, net.as_str(), &mut provider)
+                                .await;
 
                             let provider_metrics = &provider.provider_metrics;
                             if status == "timeout" {
@@ -287,14 +283,14 @@ pub async fn eth_batch_send_to_contract(
     transaction_retries_count_limit: u64,
     retry_fee_increment_fraction: f64,
 ) -> Result<(String, Vec<FeedId>)> {
-    let mut feeds_rounds = HashMap::new();
+    let mut feeds_rb_indices = HashMap::new();
     let serialized_updates = get_serialized_updates_for_network(
         net.as_str(),
         &provider_mutex,
         &mut updates,
         &provider_settings,
         feeds_config,
-        &mut feeds_rounds,
+        &mut feeds_rb_indices,
     )
     .await?;
 
@@ -323,7 +319,7 @@ pub async fn eth_batch_send_to_contract(
         .map(|update| update.feed_id)
         .collect();
 
-    increment_feeds_round_indexes(&feeds_to_update_ids, net.as_str(), &mut provider).await;
+    increment_feeds_rb_indices(&feeds_to_update_ids, net.as_str(), &mut provider).await;
 
     let signer = &provider.signer;
     let contract_address = if let Some(contract) = provider.get_latest_contract() {
@@ -1140,86 +1136,86 @@ pub async fn eth_batch_send_to_all_contracts(
     Ok(())
 }
 
-async fn log_round_counters(
+async fn log_rb_indices(
     prefix: &str,
     updated_feeds: &Vec<FeedId>,
-    round_counters: &mut RoundCounters,
+    rb_indices: &mut RoundBufferIndices,
     net: &str,
 ) {
     let mut debug_string =
         format!("{prefix} for net = {net} and updated_feeds = {updated_feeds:?} ");
     for feed in updated_feeds {
-        let round_index = round_counters.get(feed).unwrap_or(&0);
+        let round_index = rb_indices.get(feed).unwrap_or(&0);
         debug_string.push_str(format!("{feed} = {round_index}; ").as_str());
     }
     debug!(debug_string);
 }
 
-pub async fn increment_feeds_round_indexes(
+pub async fn increment_feeds_rb_indices(
     updated_feeds: &Vec<FeedId>,
     net: &str,
     provider: &mut RpcProvider,
 ) {
-    log_round_counters(
-        "increment_feeds_round_indexes before update",
+    log_rb_indices(
+        "increment_feeds_rb_indices before update",
         updated_feeds,
-        &mut provider.round_counters,
+        &mut provider.rb_indices,
         net,
     )
     .await;
 
     for feed in updated_feeds {
-        let round_counter = provider.round_counters.entry(*feed).or_insert(0);
-        *round_counter += 1;
+        let round_buffer_index = provider.rb_indices.entry(*feed).or_insert(0);
+        *round_buffer_index += 1;
     }
 
-    log_round_counters(
-        "increment_feeds_round_indexes after update",
+    log_rb_indices(
+        "increment_feeds_rb_indices after update",
         updated_feeds,
-        &mut provider.round_counters,
+        &mut provider.rb_indices,
         net,
     )
     .await;
 }
-// Since we update the round counters when we post the tx and before we
-// receive its receipt if the tx fails we need to decrease the round indexes.
-pub async fn decrement_feeds_round_indexes(
+// Since we update the round buffer index when we post the tx and before we
+// receive its receipt if the tx fails we need to decrease the round indices.
+pub async fn decrement_feed_rb_indices(
     updated_feeds: &Vec<FeedId>,
     net: &str,
     provider: &mut RpcProvider,
 ) {
-    log_round_counters(
-        "decrement_feeds_round_indexes before update",
+    log_rb_indices(
+        "decrement_feed_rb_indices before update",
         updated_feeds,
-        &mut provider.round_counters,
+        &mut provider.rb_indices,
         net,
     )
     .await;
 
     for feed in updated_feeds {
-        let round_counter = provider.round_counters.entry(*feed).or_insert(0);
-        if *round_counter > 0 {
-            *round_counter -= 1;
+        let round_buffer_index = provider.rb_indices.entry(*feed).or_insert(0);
+        if *round_buffer_index > 0 {
+            *round_buffer_index -= 1;
         }
     }
 
-    log_round_counters(
-        "decrement_feeds_round_indexes after update",
+    log_rb_indices(
+        "decrement_feed_rb_indices after update",
         updated_feeds,
-        &mut provider.round_counters,
+        &mut provider.rb_indices,
         net,
     )
     .await;
 }
 
-async fn increment_feeds_round_metrics(
+async fn increment_feeds_rb_metrics(
     updated_feeds: &Vec<FeedId>,
     feeds_metrics: Option<Arc<RwLock<FeedsMetrics>>>,
     net: &str,
 ) {
     if let Some(ref fm) = feeds_metrics {
         for feed in updated_feeds {
-            // update the round counters' metrics accordingly
+            // update the count of updates to the network metrics accordingly
             inc_vec_metric!(fm, updates_to_networks, feed, net);
         }
     }
@@ -1314,13 +1310,13 @@ mod tests {
         }
     }
 
-    fn create_round_counters_strides_and_decimals() -> (
+    fn create_rb_index_strides_and_decimals() -> (
         std::collections::HashMap<FeedId, u64>,
         std::collections::HashMap<FeedId, blocksense_config::FeedStrideAndDecimals>,
     ) {
-        let mut round_counters = RoundCounters::new();
-        round_counters.insert(0x1F as FeedId, 7);
-        round_counters.insert(0x0FFF as FeedId, 8);
+        let mut rb_indices = RoundBufferIndices::new();
+        rb_indices.insert(0x1F as FeedId, 7);
+        rb_indices.insert(0x0FFF as FeedId, 8);
         let mut strides_and_decimals = HashMap::new();
         strides_and_decimals.insert(
             0x1F,
@@ -1336,7 +1332,7 @@ mod tests {
                 decimals: 8,
             },
         );
-        (round_counters, strides_and_decimals)
+        (rb_indices, strides_and_decimals)
     }
 
     #[tokio::test]
@@ -1347,16 +1343,16 @@ mod tests {
             updates: get_updates_test_data(),
         };
 
-        let (round_counters, strides_and_decimals) = create_round_counters_strides_and_decimals();
-        let mut stored_round_counters = HashMap::new();
+        let (rb_indices, strides_and_decimals) = create_rb_index_strides_and_decimals();
+        let mut stored_rb_indices = HashMap::new();
 
         filter_allowed_feeds(network, &mut updates, &None);
         let serialized_updates = adfs_serialize_updates(
             network,
             &updates,
-            Some(&round_counters),
+            Some(&rb_indices),
             strides_and_decimals,
-            &mut stored_round_counters,
+            &mut stored_rb_indices,
         )
         .await
         .expect("Could not serialize updates!");
@@ -1409,15 +1405,15 @@ mod tests {
             ]),
         );
 
-        let (round_counters, strides_and_decimals) = create_round_counters_strides_and_decimals();
-        let mut stored_round_counters = HashMap::new();
+        let (rb_indices, strides_and_decimals) = create_rb_index_strides_and_decimals();
+        let mut stored_rb_indices = HashMap::new();
 
         let serialized_updates = adfs_serialize_updates(
             network,
             &updates,
-            Some(&round_counters),
+            Some(&rb_indices),
             strides_and_decimals.clone(),
-            &mut stored_round_counters,
+            &mut stored_rb_indices,
         )
         .await
         .expect("Could not serialize updates!");
@@ -1447,9 +1443,9 @@ mod tests {
         let serialized_updates = adfs_serialize_updates(
             network,
             &updates,
-            Some(&round_counters),
+            Some(&rb_indices),
             strides_and_decimals.clone(),
-            &mut stored_round_counters,
+            &mut stored_rb_indices,
         )
         .await
         .expect("Could not serialize updates!");
@@ -1477,9 +1473,9 @@ mod tests {
         let serialized_updates = adfs_serialize_updates(
             network,
             &updates,
-            Some(&round_counters),
+            Some(&rb_indices),
             strides_and_decimals,
-            &mut stored_round_counters,
+            &mut stored_rb_indices,
         )
         .await
         .expect("Could not serialize updates!");
