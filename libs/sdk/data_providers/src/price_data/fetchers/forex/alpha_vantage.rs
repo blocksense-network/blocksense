@@ -10,10 +10,29 @@ use tracing::warn;
 
 use crate::price_data::traits::prices_fetcher::{PairPriceData, PricePoint, PricesFetcher};
 
+#[derive(Debug, Clone)]
+pub struct SymbolError {
+    pub symbol: String,
+    pub error: String,
+}
+
 #[derive(Debug, Deserialize)]
 pub struct AlphaVantageResponse {
     #[serde(rename = "Realtime Currency Exchange Rate")]
     pub realtime_currency_exchange_rate: RealtimeCurrencyExchangeRate,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct AlphaVantageErrorResponse {
+    #[serde(rename = "Information")]
+    pub information: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(untagged)]
+pub enum AlphaVantageApiResponse {
+    Success(AlphaVantageResponse),
+    Error(AlphaVantageErrorResponse),
 }
 
 #[derive(Debug, Deserialize)]
@@ -62,14 +81,35 @@ impl<'a> PricesFetcher<'a> for AlphaVantagePriceFetcher<'a> {
             let mut futures = FuturesUnordered::from_iter(prices_futures);
             let mut prices = PairPriceData::new();
 
+            let mut errors = Vec::new();
             while let Some(result) = futures.next().await {
                 match result {
                     Ok((symbol, price_point)) => {
                         prices.insert(symbol, price_point);
                     }
-                    Err(err) => {
-                        warn!("Error processing future in AlphaVantagePriceFetcher {err:?}")
+                    Err(symbol_error) => {
+                        errors.push(symbol_error);
                     }
+                }
+            }
+
+            // Log errors if any occurred
+            if !errors.is_empty() {
+                let (rate_limited, other_errors): (Vec<_>, Vec<_>) = errors
+                    .into_iter()
+                    .partition(|e| e.error.to_lowercase().contains("higher api call volume"));
+
+                if !rate_limited.is_empty() {
+                    let symbols: Vec<_> = rate_limited.iter().map(|e| e.symbol.as_str()).collect();
+                    warn!("AlphaVantage rate limits: [{}]", symbols.join(", "));
+                }
+
+                if !other_errors.is_empty() {
+                    let symbol_errors: Vec<_> = other_errors
+                        .iter()
+                        .map(|e| format!("{}: {}", e.symbol, e.error))
+                        .collect();
+                    warn!("AlphaVantage errors: [{}]", symbol_errors.join(", "));
                 }
             }
 
@@ -88,8 +128,10 @@ pub async fn fetch_price_for_pair(
     to_currency: &str,
     apikey: &str,
     timeout_secs: u64,
-) -> Result<(String, PricePoint)> {
-    let response = http_get_json::<AlphaVantageResponse>(
+) -> Result<(String, PricePoint), SymbolError> {
+    let symbol = format!("{}:{}", from_currency, to_currency);
+
+    let response = match http_get_json::<AlphaVantageApiResponse>(
         "https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE",
         Some(&[
             ("from_currency", from_currency),
@@ -99,13 +141,27 @@ pub async fn fetch_price_for_pair(
         None,
         Some(timeout_secs),
     )
-    .await?;
+    .await {
+        Ok(resp) => resp,
+        Err(e) => {
+            return Err(SymbolError {
+                symbol,
+                error: e.to_string(),
+            });
+        }
+    };
 
-    Ok((
-        format!("{from_currency}{to_currency}"),
-        PricePoint {
-            price: response.realtime_currency_exchange_rate.exchange_rate,
-            volume: 1.0,
-        },
-    ))
+    match response {
+        AlphaVantageApiResponse::Success(price_data) => Ok((
+            symbol,
+            PricePoint {
+                price: price_data.realtime_currency_exchange_rate.exchange_rate,
+                volume: 1.0,
+            },
+        )),
+        AlphaVantageApiResponse::Error(error) => Err(SymbolError {
+            symbol,
+            error: error.information,
+        }),
+    }
 }
