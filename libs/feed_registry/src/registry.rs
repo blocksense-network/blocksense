@@ -6,7 +6,7 @@ use std::{
 
 use crate::types::{DataFeedPayload, FeedMetaData, FeedType, Repeatability, Timestamp};
 use blocksense_config::AllFeedsConfig;
-use blocksense_utils::{time::current_unix_time, FeedId};
+use blocksense_utils::{time::current_unix_time, EncodedFeedId};
 use chrono::{DateTime, TimeZone, Utc};
 use ringbuf::{
     storage::Heap,
@@ -21,7 +21,7 @@ use tracing::{debug, info};
 /// Map representing feed_id -> FeedMetaData
 #[derive(Debug)]
 pub struct FeedMetaDataRegistry {
-    registered_feeds: HashMap<FeedId, Arc<RwLock<FeedMetaData>>>,
+    registered_feeds: HashMap<EncodedFeedId, Arc<RwLock<FeedMetaData>>>,
 }
 
 impl Default for FeedMetaDataRegistry {
@@ -36,17 +36,17 @@ impl FeedMetaDataRegistry {
             registered_feeds: HashMap::new(),
         }
     }
-    pub fn push(&mut self, id: FeedId, fd: FeedMetaData) {
-        self.registered_feeds.insert(id, Arc::new(RwLock::new(fd)));
+    pub fn push(&mut self, key: EncodedFeedId, fd: FeedMetaData) {
+        self.registered_feeds.insert(key, Arc::new(RwLock::new(fd)));
     }
-    pub fn get(&self, id: FeedId) -> Option<Arc<RwLock<FeedMetaData>>> {
-        self.registered_feeds.get(&id).cloned()
+    pub fn get(&self, key: &EncodedFeedId) -> Option<Arc<RwLock<FeedMetaData>>> {
+        self.registered_feeds.get(key).cloned()
     }
-    pub fn get_keys(&self) -> Vec<FeedId> {
+    pub fn get_keys(&self) -> Vec<EncodedFeedId> {
         self.registered_feeds.keys().copied().collect()
     }
-    pub fn remove(&mut self, id: FeedId) {
-        self.registered_feeds.remove(&id);
+    pub fn remove(&mut self, key: EncodedFeedId) {
+        self.registered_feeds.remove(&key);
     }
 }
 
@@ -90,9 +90,9 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
 
     let mut fmdr = FeedMetaDataRegistry::new();
 
-    fmdr.push(0, fmd1);
-    fmdr.push(1, fmd2);
-    fmdr.push(2, fmd3);
+    fmdr.push(EncodedFeedId::new(0, 0), fmd1);
+    fmdr.push(EncodedFeedId::new(1, 0), fmd2);
+    fmdr.push(EncodedFeedId::new(2, 0), fmd3);
 
     fmdr
 }
@@ -102,7 +102,7 @@ pub fn new_feeds_meta_data_reg_from_config(conf: &AllFeedsConfig) -> FeedMetaDat
 
     for feed in &conf.feeds {
         fmdr.push(
-            feed.id,
+            EncodedFeedId::new(feed.id, feed.stride),
             FeedMetaData::new(
                 feed.full_name.clone(),
                 feed.schedule.interval_ms,
@@ -149,23 +149,23 @@ impl HistoryEntry {
 #[derive(Serialize)]
 pub struct FeedAggregateHistory {
     #[serde(serialize_with = "serialize_aggregate_history")]
-    pub aggregate_history: HashMap<FeedId, HeapRb<HistoryEntry>>,
+    pub aggregate_history: HashMap<EncodedFeedId, HeapRb<HistoryEntry>>,
 }
 
 fn serialize_aggregate_history<S>(
-    aggregate_history: &HashMap<FeedId, HeapRb<HistoryEntry>>,
+    aggregate_history: &HashMap<EncodedFeedId, HeapRb<HistoryEntry>>,
     s: S,
 ) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
-    let mut feed_ids: Vec<&FeedId> = aggregate_history.keys().collect();
-    feed_ids.sort();
+    let mut encoded_feed_ids: Vec<&EncodedFeedId> = aggregate_history.keys().collect();
+    encoded_feed_ids.sort();
 
-    let mut serialize_map = s.serialize_map(Some(feed_ids.len()))?;
-    for feed_id in feed_ids {
+    let mut serialize_map = s.serialize_map(Some(encoded_feed_ids.len()))?;
+    for encoded_feed_id in encoded_feed_ids {
         let mut updates = vec![];
-        let ring_buffer = &aggregate_history[feed_id];
+        let ring_buffer = &aggregate_history[encoded_feed_id];
         let (slice_a, slice_b) = ring_buffer.as_slices();
         for value in slice_a {
             updates.push(value);
@@ -173,7 +173,7 @@ where
         for value in slice_b {
             updates.push(value);
         }
-        serialize_map.serialize_key(feed_id)?;
+        serialize_map.serialize_key(&encoded_feed_id.data)?;
         serialize_map.serialize_value(&updates)?;
     }
     serialize_map.end()
@@ -192,30 +192,33 @@ impl FeedAggregateHistory {
         }
     }
 
-    pub fn register_feed(&mut self, feed_id: FeedId, buf_size: usize) {
+    pub fn register_feed(&mut self, encoded_feed_id: EncodedFeedId, buf_size: usize) {
         let shared_rb = SharedRb::new(buf_size);
 
-        self.aggregate_history.insert(feed_id, shared_rb);
+        self.aggregate_history.insert(encoded_feed_id, shared_rb);
     }
 
-    pub fn deregister_feed(&mut self, feed_id: FeedId) {
-        self.aggregate_history.remove(&feed_id);
+    pub fn deregister_feed(&mut self, encoded_feed_id: EncodedFeedId) {
+        self.aggregate_history.remove(&encoded_feed_id);
     }
 
-    pub fn is_registered_feed(&self, feed_id: FeedId) -> bool {
-        self.aggregate_history.contains_key(&feed_id)
+    pub fn is_registered_feed(&self, encoded_feed_id: EncodedFeedId) -> bool {
+        self.aggregate_history.contains_key(&encoded_feed_id)
     }
 
-    pub fn get(&self, feed_id: FeedId) -> Option<&SharedRb<Heap<HistoryEntry>>> {
-        self.aggregate_history.get(&feed_id)
+    pub fn get(&self, encoded_feed_id: EncodedFeedId) -> Option<&SharedRb<Heap<HistoryEntry>>> {
+        self.aggregate_history.get(&encoded_feed_id)
     }
 
-    pub fn get_mut(&mut self, feed_id: FeedId) -> Option<&mut SharedRb<Heap<HistoryEntry>>> {
-        self.aggregate_history.get_mut(&feed_id)
+    pub fn get_mut(
+        &mut self,
+        encoded_feed_id: EncodedFeedId,
+    ) -> Option<&mut SharedRb<Heap<HistoryEntry>>> {
+        self.aggregate_history.get_mut(&encoded_feed_id)
     }
 
-    pub fn clear(&mut self, feed_id: FeedId) -> usize {
-        match self.aggregate_history.get_mut(&feed_id) {
+    pub fn clear(&mut self, encoded_feed_id: EncodedFeedId) -> usize {
+        match self.aggregate_history.get_mut(&encoded_feed_id) {
             Some(feed) => feed.clear(),
             _ => 0_usize,
         }
@@ -223,11 +226,11 @@ impl FeedAggregateHistory {
 
     pub fn push_next(
         &mut self,
-        feed_id: FeedId,
+        encoded_feed_id: EncodedFeedId,
         aggregate_result: FeedType,
         end_slot_timestamp: Timestamp,
     ) {
-        if let Some(ring_buffer) = self.aggregate_history.get_mut(&feed_id) {
+        if let Some(ring_buffer) = self.aggregate_history.get_mut(&encoded_feed_id) {
             // Push the aggregate_result into the ring buffer
             let update_number = ring_buffer.last().map_or(0, |x| x.update_number + 1);
             ring_buffer.push_overwrite(HistoryEntry {
@@ -238,32 +241,32 @@ impl FeedAggregateHistory {
         } else {
             info!(
                 "Feed Id: {}, not registered in FeedAggregateHistory!",
-                feed_id
+                encoded_feed_id
             );
         }
     }
 
-    pub fn last(&self, feed_id: FeedId) -> Option<&HistoryEntry> {
-        if let Some(ring_buffer) = self.aggregate_history.get(&feed_id) {
+    pub fn last(&self, encoded_feed_id: EncodedFeedId) -> Option<&HistoryEntry> {
+        if let Some(ring_buffer) = self.aggregate_history.get(&encoded_feed_id) {
             ring_buffer.last()
         } else {
             info!(
                 "Feed Id: {}, not registered in FeedAggregateHistory!",
-                feed_id
+                encoded_feed_id
             );
             None
         }
     }
 
-    pub fn last_value(&self, feed_id: FeedId) -> Option<&FeedType> {
-        self.last(feed_id).map(|h| &h.value)
+    pub fn last_value(&self, encoded_feed_id: EncodedFeedId) -> Option<&FeedType> {
+        self.last(encoded_feed_id).map(|h| &h.value)
     }
 }
 
 // This struct holds all the Feeds by ID (the key in the map) and the received votes for them
 #[derive(Debug)]
 pub struct AllFeedsReports {
-    reports: HashMap<FeedId, Arc<RwLock<FeedReports>>>,
+    reports: HashMap<EncodedFeedId, Arc<RwLock<FeedReports>>>,
 }
 
 impl Default for AllFeedsReports {
@@ -285,11 +288,11 @@ impl AllFeedsReports {
     }
     pub async fn push(
         &mut self,
-        feed_id: FeedId,
+        encoded_feed_id: EncodedFeedId,
         reporter_id: u64,
         data: DataFeedPayload,
     ) -> VoteStatus {
-        let res = self.reports.entry(feed_id).or_insert_with(|| {
+        let res = self.reports.entry(encoded_feed_id).or_insert_with(|| {
             Arc::new(RwLock::new(FeedReports {
                 report: HashMap::new(),
             }))
@@ -301,8 +304,8 @@ impl AllFeedsReports {
             None => VoteStatus::FirstVoteForSlot,
         }
     }
-    pub fn get(&self, feed_id: FeedId) -> Option<Arc<RwLock<FeedReports>>> {
-        self.reports.get(&feed_id).cloned()
+    pub fn get(&self, encoded_feed_id: EncodedFeedId) -> Option<Arc<RwLock<FeedReports>>> {
+        self.reports.get(&encoded_feed_id).cloned()
     }
 }
 
@@ -404,6 +407,7 @@ pub async fn await_time(time_to_await_ms: u64) {
 #[cfg(test)]
 mod tests {
     use blocksense_utils::time::current_unix_time;
+    use blocksense_utils::EncodedFeedId;
     use blocksense_utils::FeedId;
 
     use crate::registry::new_feeds_meta_data_reg_with_test_data;
@@ -424,7 +428,11 @@ mod tests {
     async fn basic_test() {
         let fmdr = new_feeds_meta_data_reg_with_test_data();
 
-        let mut expected_keys_vec = vec![0, 1, 2];
+        let mut expected_keys_vec = vec![
+            EncodedFeedId::new(0, 0),
+            EncodedFeedId::new(1, 0),
+            EncodedFeedId::new(2, 0),
+        ];
         let mut actual_keys_vec = fmdr.get_keys().clone();
 
         expected_keys_vec.sort();
@@ -435,7 +443,7 @@ mod tests {
 
         println!("fmdr.get_keys()={fmdr:?}");
         assert!(
-            fmdr.get(0)
+            fmdr.get(&EncodedFeedId::new(0, 0))
                 .expect("ID not present in registry")
                 .read()
                 .await
@@ -443,7 +451,7 @@ mod tests {
                 == 0
         );
         assert!(
-            fmdr.get(1)
+            fmdr.get(&EncodedFeedId::new(1, 0))
                 .expect("ID not present in registry")
                 .read()
                 .await
@@ -452,20 +460,20 @@ mod tests {
         );
 
         assert!(
-            fmdr.get(0).expect("ID not present in registry").read().await.get_report_interval_ms() as u128 ==
-            fmdr.get(1).expect("ID not present in registry").read().await.get_report_interval_ms() as u128 * 2,
+            fmdr.get(&EncodedFeedId::new(0, 0)).expect("ID not present in registry").read().await.get_report_interval_ms() as u128 ==
+            fmdr.get(&EncodedFeedId::new(1, 0)).expect("ID not present in registry").read().await.get_report_interval_ms() as u128 * 2,
             "The test expects that Feed ID 0 has twice longer report interval compared to Feed ID 1"
         );
 
         current_time_as_ms += fmdr
-            .get(1)
+            .get(&EncodedFeedId::new(1, 0))
             .expect("ID not present in registry")
             .read()
             .await
             .get_report_interval_ms() as u128
             + 1u128;
         assert!(
-            fmdr.get(0)
+            fmdr.get(&EncodedFeedId::new(0, 0))
                 .expect("ID not present in registry")
                 .read()
                 .await
@@ -473,7 +481,7 @@ mod tests {
                 == 0
         );
         assert!(
-            fmdr.get(1)
+            fmdr.get(&EncodedFeedId::new(1, 0))
                 .expect("ID not present in registry")
                 .read()
                 .await
@@ -481,7 +489,7 @@ mod tests {
                 == 1
         );
         current_time_as_ms += fmdr
-            .get(1)
+            .get(&EncodedFeedId::new(1, 0))
             .expect("ID not present in registry")
             .read()
             .await
@@ -489,7 +497,7 @@ mod tests {
             + 1u128;
 
         assert!(
-            fmdr.get(0)
+            fmdr.get(&EncodedFeedId::new(0, 0))
                 .expect("ID not present in registry")
                 .read()
                 .await
@@ -497,7 +505,7 @@ mod tests {
                 == 1
         );
         assert!(
-            fmdr.get(1)
+            fmdr.get(&EncodedFeedId::new(1, 0))
                 .expect("ID not present in registry")
                 .read()
                 .await
@@ -516,7 +524,9 @@ mod tests {
 
         let mut msg_timestamp = current_time_as_ms;
 
-        let feed = fmdr.get(DATA_FEED_ID).expect("ID not present in registry");
+        let feed = fmdr
+            .get(&EncodedFeedId::new(DATA_FEED_ID, 0))
+            .expect("ID not present in registry");
 
         println!("fmdr.get_keys()={fmdr:?}");
         assert!(
@@ -729,7 +739,7 @@ mod tests {
                 let feed = fmdr
                     .read()
                     .await
-                    .get(0)
+                    .get(&EncodedFeedId::new(0, 0))
                     .expect("ID not present in registry");
 
                 let current_time_as_ms = msg_timestamp + i as u128;
@@ -745,7 +755,7 @@ mod tests {
                     .write()
                     .await
                     .push(
-                        DATA_FEED_ID,
+                        EncodedFeedId::new(DATA_FEED_ID, 0),
                         i.into(),
                         test_payload_from_result(Ok(FeedType::Numerical(0.1))),
                     )
@@ -759,7 +769,7 @@ mod tests {
 
         let reports = reports.write().await;
         let reports = reports
-            .get(DATA_FEED_ID)
+            .get(EncodedFeedId::new(DATA_FEED_ID, 0))
             .expect("ID not present in registry");
         let reports = reports.read().await;
         // Process the reports:

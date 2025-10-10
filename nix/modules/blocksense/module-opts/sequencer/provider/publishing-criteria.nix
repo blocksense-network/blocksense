@@ -1,6 +1,6 @@
 lib: with lib; {
   options = {
-    feed-id = mkOption {
+    encoded-feed-id = mkOption {
       type = types.int;
       description = mdDoc "Feed id";
     };
