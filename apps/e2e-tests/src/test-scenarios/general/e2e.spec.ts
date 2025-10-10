@@ -30,11 +30,15 @@ import { getDataFeedsInfoFromNetwork } from '../../utils/services/onchain';
 import type { SequencerService } from '../../utils/services/sequencer';
 import { Sequencer } from '../../utils/services/sequencer';
 import type { ReportData, UpdatesToNetwork } from '../../utils/services/types';
+import { installSkipAfterSpecificFailure } from '../../utils/testing/gateway';
 import { rgSearchPattern } from '../../utils/utilities';
 
 import { expectedPCStatuses03 } from './expected-service-status';
 
 describe.sequential('E2E Tests with process-compose', () => {
+  installSkipAfterSpecificFailure(
+    'Test sequencer configs are available and in correct format',
+  );
   const network = 'ink_sepolia';
   const MAX_HISTORY_ELEMENTS_PER_FEED = 8192;
   const testEnvironment = 'e2e-general';
@@ -119,7 +123,7 @@ describe.sequential('E2E Tests with process-compose', () => {
       sequencerConfig = yield* sequencer.getConfig();
       feedsConfig = yield* sequencer.getFeedsConfig();
       expect(sequencerConfig).toBeTypeOf('object');
-      expect(feedsConfig).toBeTypeOf('object');
+      expect(feedsConfig).not.toBeTypeOf('object');
 
       contractAddress = parseEthereumAddress(
         sequencerConfig.providers[network].contracts.find(
