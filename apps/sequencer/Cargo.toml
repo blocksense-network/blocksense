@@ -46,6 +46,9 @@ alloy = { workspace = true, features = [
 ] }
 alloy-primitives = { workspace = true }
 alloy-u256-literal = { workspace = true }
+
+bridgetree = { git = "https://github.com/zcash/incrementalmerkletree", package = "bridgetree" }
+incrementalmerkletree = { git = "https://github.com/zcash/incrementalmerkletree", package = "incrementalmerkletree" }
 anyhow = { workspace = true }
 bytes = { workspace = true }
 chrono = { workspace = true }
