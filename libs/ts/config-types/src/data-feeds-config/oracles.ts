@@ -120,3 +120,11 @@ export const hyperBorrowRatesArgsSchema = S.Struct({
   identifier: 'HyperBorrowRatesOracleArgs',
   description: 'Arguments for the Hyper Borrow Rates Oracle',
 });
+
+// `eth-gas-info` Oracle related Types
+export const ethGasInfoArgsSchema = S.mutable(
+  S.Struct({
+    kind: S.Literal('eth-gas-info'),
+    metric: S.String,
+  }),
+);

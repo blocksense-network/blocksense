@@ -1,0 +1,25 @@
+[package]
+name = "eth-gas-info"
+authors = ["Mila Genova, Emil Ivanichkov"]
+description = ""
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+blocksense-data-providers-sdk = { workspace = true }
+blocksense-sdk = { workspace = true }
+
+anyhow = { workspace = true }
+futures = { workspace = true }
+itertools = { workspace = true }
+prettytable-rs = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde-this-or-that = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+url = { workspace = true }
+wit-bindgen = { workspace = true }
