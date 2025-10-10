@@ -2,6 +2,8 @@
   lib,
   self',
   config,
+  pkgs,
+  name,
   ...
 }:
 with lib;
@@ -63,12 +65,12 @@ in
       description = "Interval in seconds at which to dump state to disk periodically.";
     };
 
-    command = mkOption {
-      type = types.str;
+    drv = mkOption {
+      type = types.package;
       readOnly = true;
-      default =
+      default = pkgs.writeShellScriptBin "anvil-${name}" (
         lib.optionalString (config.state != null) ''
-          mkdir -p "$(dirname ${config.state})" &&
+          mkdir -p "$(dirname ${config.state})"
         ''
         + ''
           ${config.package}/bin/anvil \
@@ -81,6 +83,12 @@ in
         ''
         + lib.optionalString (config.fork-url != null) ''
           --fork-url ${config.fork-url} \
+          --fork-url ${
+            if builtins.substring 0 1 config.fork-url == "$" then
+              "$(cat ${../../../test-environments/test-keys}/${builtins.substring 1 (-1) config.fork-url})"
+            else
+              config.fork-url
+          } \
         ''
         + lib.optionalString (config.fork-block-number != null) ''
           --fork-block-number ${toString config.fork-block-number} \
@@ -93,7 +101,8 @@ in
         ''
         + lib.optionalString (config.state != null) ''
           --state ${config.state}
-        '';
+        ''
+      );
     };
   };
 }
