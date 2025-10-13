@@ -436,6 +436,136 @@
         "feedId": "102205",
         "base": null,
         "quote": null
+      },
+      "102251": {
+        "address": "0x04c94D2562694EA2562D5A70156ED5335905BD53",
+        "constructorArgs": [
+          "cbBTC / USDC Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102251",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102251",
+        "base": null,
+        "quote": null
+      },
+      "102252": {
+        "address": "0xBdF1A08f2be366A08461e56f64ddF2c66ff97Bf2",
+        "constructorArgs": [
+          "srUSD / USDC Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102252",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102252",
+        "base": null,
+        "quote": null
+      },
+      "102253": {
+        "address": "0x161B0B5C350bA3848D8D7E887aB8De956FA4747b",
+        "constructorArgs": [
+          "WBTC / USDC Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102253",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102253",
+        "base": null,
+        "quote": null
+      },
+      "102254": {
+        "address": "0xf4fC4F18B63d05f25F375a167C1829438dE1fD68",
+        "constructorArgs": [
+          "ETH+ / WETH Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102254",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102254",
+        "base": null,
+        "quote": null
+      },
+      "102255": {
+        "address": "0x8F2a1DB66083943aB61FFc10f912BbF01cEDcb99",
+        "constructorArgs": [
+          "wstETH / WETH Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102255",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102255",
+        "base": null,
+        "quote": null
+      },
+      "102256": {
+        "address": "0x7DdB9DCdC1d937A37120A6fD50092872e6c481C5",
+        "constructorArgs": [
+          "weETH / WETH Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102256",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102256",
+        "base": null,
+        "quote": null
+      },
+      "102257": {
+        "address": "0xd67E54Cc63C76ECbD3bf6fBe5C24cC3Cf3058704",
+        "constructorArgs": [
+          "mHYPER / USDC Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102257",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102257",
+        "base": null,
+        "quote": null
+      },
+      "102258": {
+        "address": "0x4d1690C404e6E528e28B94C547648e52f65c2C42",
+        "constructorArgs": [
+          "PT-cUSDO-20NOV2025 / USDC Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102258",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102258",
+        "base": null,
+        "quote": null
+      },
+      "102259": {
+        "address": "0x94E98BF34B562AEbDD675422682629d92b7B784a",
+        "constructorArgs": [
+          "WBTC / USDT Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102259",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102259",
+        "base": null,
+        "quote": null
+      },
+      "102260": {
+        "address": "0xfa70bAA5D0Cf410377d45206C1398CF148F02755",
+        "constructorArgs": [
+          "wstETH / USDC Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102260",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102260",
+        "base": null,
+        "quote": null
       }
     }
   }
