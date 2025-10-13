@@ -24,6 +24,11 @@ import {
 } from '../../utils/environment-managers/process-compose-manager';
 import type { EnvironmentManagerService } from '../../utils/environment-managers/types';
 import { EnvironmentManager } from '../../utils/environment-managers/types';
+import {
+  createGatewayController,
+  gateEffect,
+  installGateway,
+} from '../../utils/services/gateway';
 import type { FeedResult } from '../../utils/services/generate-signature';
 import type { FeedsValueAndRound } from '../../utils/services/onchain';
 import { getDataFeedsInfoFromNetwork } from '../../utils/services/onchain';
@@ -38,6 +43,12 @@ describe.sequential('E2E Tests with process-compose', () => {
   const testEnvironment = `e2e-general`;
   const network = 'ink_sepolia';
   const MAX_HISTORY_ELEMENTS_PER_FEED = 8192;
+
+  const failFastGateway = createGatewayController();
+  installGateway(
+    failFastGateway,
+    'Skipping remaining tests because the gate test failed',
+  );
 
   let sequencer: SequencerService;
   let processCompose: EnvironmentManagerService;
@@ -93,25 +104,29 @@ describe.sequential('E2E Tests with process-compose', () => {
   });
 
   it.live('Test processes state shortly after start', () =>
-    Effect.gen(function* () {
-      const equal = yield* Effect.retry(
-        processCompose
-          .getProcessesStatus()
-          .pipe(
-            Effect.tap(processes =>
-              Effect.try(() =>
-                deepStrictEqual(processes, expectedPCStatuses03),
+    gateEffect(
+      failFastGateway,
+      Effect.gen(function* () {
+        const equal = yield* Effect.retry(
+          processCompose
+            .getProcessesStatus()
+            .pipe(
+              Effect.tap(processes =>
+                Effect.try(() =>
+                  deepStrictEqual(processes, expectedPCStatuses03),
+                ),
               ),
             ),
-          ),
-        {
-          schedule: Schedule.fixed(1000),
-          times: 90,
-        },
-      );
-      // still validate the result
-      expect(equal).toBeTruthy();
-    }).pipe(Effect.provide(ProcessComposeLive)),
+          {
+            schedule: Schedule.fixed(1000),
+            times: 90,
+          },
+        );
+        // still validate the result
+        expect(equal).toBeTruthy();
+      }).pipe(Effect.provide(ProcessComposeLive)),
+      'Gate test failed: processes are not in expected state',
+    ),
   );
 
   it.live('Test sequencer configs are available and in correct format', () =>
