@@ -18,6 +18,7 @@ futures = { workspace = true }
 itertools = { workspace = true }
 prettytable-rs = { workspace = true }
 serde = { workspace = true }
+serde-hex = { workspace = true }
 serde-this-or-that = { workspace = true }
 serde_json = { workspace = true }
 strum = { workspace = true }
