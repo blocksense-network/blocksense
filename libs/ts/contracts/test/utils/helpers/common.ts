@@ -9,6 +9,8 @@ export const setFeeds = async (
   genericContractWrappers: IADFSWrapper[] | IUpgradeableProxyADFSWrapper[],
   contractWrappers: IADFSWrapper[] | IUpgradeableProxyADFSWrapper[],
   valuesCount: number,
+  sourceAccumulator: string,
+  destinationAccumulator: string,
   adfsData?: {
     skip?: number; // used to skip feeds so to make testing ring buffer index table write
     index?: bigint;
@@ -31,10 +33,22 @@ export const setFeeds = async (
   for (const contract of contractWrappers) {
     if (isUpgradeableProxy(contract)) {
       receipts.push(
-        await (await contract.proxyCall('setFeeds', sequencer, feeds)).wait(),
+        await (
+          await contract.proxyCall('setFeeds', sequencer, feeds, {
+            sourceAccumulator,
+            destinationAccumulator,
+          })
+        ).tx.wait(),
       );
     } else {
-      receipts.push(await (await contract.setFeeds(sequencer, feeds)).wait());
+      receipts.push(
+        await (
+          await contract.setFeeds(sequencer, feeds, {
+            sourceAccumulator,
+            destinationAccumulator,
+          })
+        ).tx.wait(),
+      );
     }
   }
 
@@ -42,11 +56,21 @@ export const setFeeds = async (
   for (const contract of genericContractWrappers) {
     if (isUpgradeableProxy(contract)) {
       receiptsGeneric.push(
-        await (await contract.proxyCall('setFeeds', sequencer, feeds)).wait(),
+        await (
+          await contract.proxyCall('setFeeds', sequencer, feeds, {
+            sourceAccumulator,
+            destinationAccumulator,
+          })
+        ).tx.wait(),
       );
     } else {
       receiptsGeneric.push(
-        await (await contract.setFeeds(sequencer, feeds)).wait(),
+        await (
+          await contract.setFeeds(sequencer, feeds, {
+            sourceAccumulator,
+            destinationAccumulator,
+          })
+        ).tx.wait(),
       );
     }
   }
