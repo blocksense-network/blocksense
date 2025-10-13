@@ -1,17 +1,13 @@
-import { Schema as S, Either, Pretty } from 'effect';
+import { Either, Pretty, Schema as S } from 'effect';
 
-import { fromEntries, entriesOf, keysOf } from '../array-iter';
+import { entriesOf, fromEntries, keysOf } from '../array-iter';
 import { assert, assertNotNull } from '../assert';
 import { envVarNameJoin } from '../string';
-import { RenderArgs, alignRight, color, renderToString, drawBox } from '../tty';
-import { UnionToIntersection } from '../type-level';
+import { alignRight, color, drawBox, renderToString } from '../tty';
+import type { UnionToIntersection } from '../type-level';
 
-import {
-  EnvSchema,
-  EnvTypeFromSchema,
-  parseEnvConfig,
-  VarSchema,
-} from './functions';
+import type { EnvSchema, EnvTypeFromSchema, VarSchema } from './functions';
+import { parseEnvConfig } from './functions';
 
 export type { EnvSchema, VarSchema, EnvTypeFromSchema } from './functions';
 
@@ -191,10 +187,10 @@ export function reportParsedEnvConfig<
   const columnWidth = Math.max(longestKeyLength, longestLayerLength);
 
   const missingEnvVariables: string[] = [];
-  const formatLayerKeys = (layerKeys: string[]) => (args: RenderArgs) => {
-    let layerText = [];
+  const formatLayerKeys = (layerKeys: string[]) => () => {
+    const layerText = [];
     for (const key of layerKeys) {
-      const { envVarName, value, layer, schema } = getVarInfo(key);
+      const { envVarName, layer, schema, value } = getVarInfo(key);
       const keyFormatted = `${alignRight(key, columnWidth + 2, ' ')}: `;
       const envVarFormatted = color`({bold ${layer}} env var {bold ${envVarName}})`;
 

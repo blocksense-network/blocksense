@@ -1,8 +1,7 @@
 'use client';
 
-import Link from 'next/link';
-
 import { Button } from 'components/Button';
+import Link from 'next/link';
 
 const ErrorPage = () => {
   return (

@@ -5,6 +5,9 @@ process-compose-artifacts-dir := root-dir + "/config/generated/process-compose"
 default:
   @just --list
 
+dev *args:
+  @yarn workspace @blocksense/dev run start {{args}}
+
 [group('Working with devshells')]
 [doc('Switch to a different dev shell environment')]
 change-devshell shell="default":
@@ -20,7 +23,7 @@ list-devshells:
 list-environments:
   #!/usr/bin/env bash
   nix eval -L --json --apply builtins.attrNames \
-    .#legacyPackages.${system}.process-compose-environments \
+    .#legacyPackages.${system}.process-compose-environments.with-local-cargo-artifacts \
     2>/dev/null \
     | jq -r '.[]'
 
@@ -101,7 +104,7 @@ test-ts:
   yarn workspace @blocksense/e2e-tests run test:unit
 
 test-e2e:
-  yarn workspace @blocksense/e2e-tests run test:process-compose-e2e
+  yarn workspace @blocksense/e2e-tests run test:scenarios
 
 [group('Working with oracles')]
 [doc('Build a specific oracle')]

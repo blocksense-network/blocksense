@@ -1,5 +1,6 @@
 import 'hardhat/types/config';
-import { Config, ReflectConfig } from '../config';
+
+import type { Config, ReflectConfig } from '../config';
 
 declare module 'hardhat/types/config' {
   export interface HardhatUserConfig {

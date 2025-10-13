@@ -12,7 +12,7 @@ export async function isFeedSupportedByYF(symbol: string) {
       return false;
     }
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 }

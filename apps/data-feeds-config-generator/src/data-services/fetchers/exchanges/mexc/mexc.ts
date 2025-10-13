@@ -1,18 +1,15 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
-import {
-  MEXCAssetInfo,
-  MEXCInfoResp,
-  MEXCInfoRespSchema,
-  MEXCPrice,
-  MEXCPriceSchema,
-} from './types';
+
+import type { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
+
+import type { MEXCAssetInfo, MEXCInfoResp, MEXCPrice } from './types';
+import { MEXCInfoRespSchema, MEXCPriceSchema } from './types';
 
 /**
  * Class to fetch assets information from MEXC Exchange.
  */
 export class MEXCAssetsFetcher implements ExchangeAssetsFetcher<MEXCAssetInfo> {
-  async fetchAssets(): Promise<AssetInfo<MEXCAssetInfo>[]> {
+  async fetchAssets(): Promise<Array<AssetInfo<MEXCAssetInfo>>> {
     const assets = (await fetchMEXCInfo()).symbols;
     const prices = await fetchMEXCPricesInfo();
     return assets.map(asset => {

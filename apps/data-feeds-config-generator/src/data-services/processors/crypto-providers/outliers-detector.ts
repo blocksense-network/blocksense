@@ -1,5 +1,5 @@
 export function detectPriceOutliers(
-  pricesArray: Record<string, number>[],
+  pricesArray: Array<Record<string, number>>,
   onOutlierCb: (params: { dataSourceName: string; price: number }) => void,
 ): string[] {
   const outliers: string[] = [];

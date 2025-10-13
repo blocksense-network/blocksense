@@ -6,7 +6,7 @@
     "ts": "yarn node --import tsx",
     "test": "vitest run --typecheck --coverage",
     "test:unit": "yarn vitest -w false src/utils",
-    "test:process-compose-e2e": "yarn test src/process-compose/e2e.spec.ts"
+    "test:scenarios": "yarn test src/test-scenarios/**/e2e.spec.ts"
   },
   "dependencies": {
     "@blocksense/base-utils": "workspace:*",
@@ -23,7 +23,6 @@
     "@effect/vitest": "^0.25.1",
     "@types/node": "^24.3.1",
     "effect": "^3.17.13",
-    "execa": "^9.6.0",
     "parse-prometheus-text-format": "^1.1.1",
     "tsx": "^4.20.5",
     "typescript": "5.9.2",

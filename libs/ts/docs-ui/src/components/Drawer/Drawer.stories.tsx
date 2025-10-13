@@ -4,19 +4,20 @@ import { Button } from '@blocksense/docs-ui/Button';
 import { Input } from '@blocksense/docs-ui/Input';
 
 import {
-  Drawer,
-  DrawerTrigger,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerDescription,
-} from './Drawer';
-import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuTrigger,
 } from '../DropdownMenu';
+
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from './Drawer';
 
 export default {
   title: 'Components/Drawer',

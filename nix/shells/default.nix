@@ -21,7 +21,8 @@
               };
             }
             module
-          ] ++ extraImports;
+          ]
+          ++ extraImports;
         };
     in
     {

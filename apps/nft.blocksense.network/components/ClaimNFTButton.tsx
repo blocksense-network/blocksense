@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { MouseEvent } from 'react';
+import type { MouseEvent } from 'react';
 
 import { Button } from './Button';
 

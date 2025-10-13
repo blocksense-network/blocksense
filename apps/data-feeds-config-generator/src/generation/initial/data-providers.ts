@@ -1,6 +1,7 @@
-import { SimplifiedFeed } from './types';
 import { getAllProvidersForPair } from '../../data-services/processors/crypto-providers/data-transformers';
-import { CryptoProviderData } from '../../data-services/processors/crypto-providers/types';
+import type { CryptoProviderData } from '../../data-services/processors/crypto-providers/types';
+
+import type { SimplifiedFeed } from './types';
 
 export async function addDataProviders(
   dataFeeds: SimplifiedFeed[],

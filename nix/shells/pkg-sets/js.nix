@@ -1,4 +1,9 @@
-{ pkgs, lib, ... }:
+{
+  pkgs,
+  lib,
+  inputs',
+  ...
+}:
 let
   nodejs = pkgs.nodejs_24;
   corepack = pkgs.corepack.override { inherit nodejs; };
@@ -8,13 +13,13 @@ in
     ./anvil.nix
   ];
 
-  packages =
-    [
-      nodejs
-      corepack
-      pkgs.python3
-    ]
-    ++ lib.optionals pkgs.stdenv.isLinux [
-      pkgs.udev
-    ];
+  packages = [
+    nodejs
+    corepack
+    pkgs.python3
+    inputs'.mcl-blockchain.packages.eradicate2
+  ]
+  ++ lib.optionals pkgs.stdenv.isLinux [
+    pkgs.udev
+  ];
 }

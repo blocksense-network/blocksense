@@ -1,7 +1,6 @@
 import type { ShikiTransformer } from 'shiki';
 
-import { ContractDocItem } from '@blocksense/sol-reflector';
-
+import type { ContractDocItem } from '@blocksense/sol-reflector';
 import { filterConstants, filterVariables } from '@/src/utils';
 
 /**
@@ -36,7 +35,7 @@ function formatComponentData(
  * @returns The generated overview code content as a string.
  */
 export function getOverviewCodeContent(contract: ContractDocItem): string {
-  let content = ''
+  const content = ''
     .concat(formatComponentData('Enums', contract.enums))
     .concat(formatComponentData('Structs', contract.structs))
     .concat(
@@ -54,7 +53,7 @@ export function getOverviewCodeContent(contract: ContractDocItem): string {
     ? ` is ${contract._baseContracts.join(', ')}`
     : '';
 
-  let contractData = `${contract.signature?.codeSnippet}${parentContractsData} {\n${content}}`;
+  const contractData = `${contract.signature?.codeSnippet}${parentContractsData} {\n${content}}`;
 
   return contractData;
 }

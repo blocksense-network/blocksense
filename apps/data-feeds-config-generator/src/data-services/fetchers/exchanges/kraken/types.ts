@@ -6,7 +6,7 @@ import { Schema as S } from 'effect';
  * Ref: https://docs.kraken.com/api/docs/rest-api/get-ticker-information/
  * Ref: https://docs.kraken.com/api/docs/websocket-v2/ticker ( note that wsname match with symbol in their doc
  */
-const KrakenAssetInfoSchema = S.mutable(
+const _KrakenAssetInfoSchema = S.mutable(
   S.Struct({
     pair: S.String,
     wsname: S.String,
@@ -17,7 +17,7 @@ const KrakenAssetInfoSchema = S.mutable(
 /**
  * Type for the information about symbols received from Kraken.
  */
-export type KrakenAssetInfo = typeof KrakenAssetInfoSchema.Type;
+export type KrakenAssetInfo = typeof _KrakenAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about assets received from Kraken.

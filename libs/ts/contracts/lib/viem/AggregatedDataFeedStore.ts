@@ -1,8 +1,9 @@
-import { PublicClient, Hex, encodePacked } from 'viem';
+import { PublicClient, encodePacked } from 'viem';
 import { ContractConsumerBase } from './ContractConsumerBase';
 import { EthereumAddress } from '@blocksense/base-utils/evm';
+import { HexDataString } from '@blocksense/base-utils/buffer-and-hex';
 
-type DataAndIndex = { data: Hex | Hex[]; index: number };
+type DataAndIndex = { data: HexDataString | HexDataString[]; index: number };
 
 export class AggregatedDataFeedStoreConsumer extends ContractConsumerBase {
   private selectors = {
@@ -24,7 +25,7 @@ export class AggregatedDataFeedStoreConsumer extends ContractConsumerBase {
     super(contractAddress, client);
   }
 
-  private async call(encodedParams: Hex): Promise<Hex> {
+  private async call(encodedParams: HexDataString): Promise<HexDataString> {
     const { data: returnData } = await this.client.call({
       to: this.contractAddress,
       data: encodedParams,
@@ -38,7 +39,7 @@ export class AggregatedDataFeedStoreConsumer extends ContractConsumerBase {
     return returnData;
   }
 
-  async getLatestSingleData(feedId: bigint): Promise<Hex> {
+  async getLatestSingleData(feedId: bigint): Promise<HexDataString> {
     const encoded = encodePacked(
       ['bytes1', 'uint128'],
       [this.selectors.getLatestSingleData, feedId],
@@ -46,7 +47,7 @@ export class AggregatedDataFeedStoreConsumer extends ContractConsumerBase {
     return await this.call(encoded);
   }
 
-  async getLatestData(feedId: bigint): Promise<Hex[]> {
+  async getLatestData(feedId: bigint): Promise<HexDataString[]> {
     const encoded = encodePacked(
       ['bytes1', 'uint128'],
       [this.selectors.getLatestData, feedId],
@@ -59,7 +60,7 @@ export class AggregatedDataFeedStoreConsumer extends ContractConsumerBase {
     feedId: bigint,
     startSlot: number,
     slots: number = 0,
-  ): Promise<Hex[]> {
+  ): Promise<HexDataString[]> {
     const encoded = encodePacked(
       ['bytes1', 'uint128', 'uint32', 'uint32'],
       [this.selectors.getLatestData, feedId, startSlot, slots],
@@ -68,7 +69,10 @@ export class AggregatedDataFeedStoreConsumer extends ContractConsumerBase {
     return this.splitInto32bChunks(res);
   }
 
-  async getSingleDataAtIndex(feedId: bigint, index: number): Promise<Hex> {
+  async getSingleDataAtIndex(
+    feedId: bigint,
+    index: number,
+  ): Promise<HexDataString> {
     const encoded = encodePacked(
       ['bytes1', 'uint128', 'uint16'],
       [this.selectors.getFeedAtIndex, feedId, index],
@@ -76,7 +80,10 @@ export class AggregatedDataFeedStoreConsumer extends ContractConsumerBase {
     return await this.call(encoded);
   }
 
-  async getDataAtIndex(feedId: bigint, index: number): Promise<Hex[]> {
+  async getDataAtIndex(
+    feedId: bigint,
+    index: number,
+  ): Promise<HexDataString[]> {
     const encoded = encodePacked(
       ['bytes1', 'uint128', 'uint16'],
       [this.selectors.getFeedAtIndex, feedId, index],
@@ -90,7 +97,7 @@ export class AggregatedDataFeedStoreConsumer extends ContractConsumerBase {
     index: number,
     startSlot: number,
     slots: number = 0,
-  ): Promise<Hex[]> {
+  ): Promise<HexDataString[]> {
     const encoded = encodePacked(
       ['bytes1', 'uint128', 'uint16', 'uint32', 'uint32'],
       [this.selectors.getFeedAtIndex, feedId, index, startSlot, slots],
@@ -114,7 +121,7 @@ export class AggregatedDataFeedStoreConsumer extends ContractConsumerBase {
     );
     const res = await this.call(encoded);
     const index = Number(res.slice(0, 66));
-    const data = `0x${res.slice(66)}` as Hex;
+    const data = `0x${res.slice(66)}` as HexDataString;
 
     return { data, index };
   }
@@ -147,12 +154,12 @@ export class AggregatedDataFeedStoreConsumer extends ContractConsumerBase {
     return { data, index };
   }
 
-  private splitInto32bChunks(value: Hex): Hex[] {
+  private splitInto32bChunks(value: HexDataString): HexDataString[] {
     const regex = new RegExp(`(.{1,${64}})`, 'g');
     return value
       .slice(2)
       .split(regex)
       .filter(chunk => chunk.length > 0)
-      .map(chunk => ('0x' + chunk) as Hex);
+      .map(chunk => ('0x' + chunk) as HexDataString);
   }
 }

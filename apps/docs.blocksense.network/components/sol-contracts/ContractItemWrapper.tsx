@@ -1,4 +1,5 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
+import type { ReactNode } from 'react';
 
 import { AnchorLinkTitle } from '@/sol-contracts-components/AnchorLinkTitle';
 
@@ -11,11 +12,11 @@ type ContractItemWrapperProps = {
 };
 
 export const ContractItemWrapper = ({
-  nonEmpty: nonEmpty,
-  title,
-  parentTitle,
-  titleLevel,
   children,
+  nonEmpty: nonEmpty,
+  parentTitle,
+  title,
+  titleLevel,
 }: ContractItemWrapperProps) => {
   return (
     nonEmpty && (

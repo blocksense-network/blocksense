@@ -1,9 +1,11 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
+import type { ReactNode } from 'react';
+
 import {
   Card,
+  CardDescription,
   CardHeader,
   CardTitle,
-  CardDescription,
 } from '@blocksense/docs-ui/Card';
 import { DataFeedCardContent } from '@/components/DataFeeds/DataFeedCardContent';
 
@@ -14,9 +16,9 @@ type DataFeedCardProps = {
 };
 
 export const DataFeedCard = ({
-  title,
-  description,
   children,
+  description,
+  title,
 }: DataFeedCardProps) => {
   return (
     <Card className="data-feed-card px-2 py-2">

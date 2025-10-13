@@ -10,9 +10,10 @@ edition.workspace = true
 [dependencies]
 blocksense-registry = { workspace = true }
 blocksense-utils = { workspace = true }
-dirs = { workspace = true }
-serde = { workspace = true, features = ["derive"] }
+
 anyhow = { workspace = true }
-serde_json = { workspace = true }
+dirs = { workspace = true }
 hex = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
 tracing = { workspace = true, features = ["log"] }

@@ -1,13 +1,15 @@
+import { Schema as S } from 'effect';
 import { describe, expect, test } from 'vitest';
 
-import { Schema as S } from 'effect';
-
-import { EnvSchema, asVarSchema, parseEnvConfig } from '../env/functions';
+import type { EnvSchema } from '../env/functions';
+import { asVarSchema, parseEnvConfig } from '../env/functions';
 import { fromCommaSeparatedString } from '../schemas';
-import { ethereumAddress } from './hex-types';
-import { NetworkName } from './networks';
-import { DeploymentEnvSchema, parseDeploymentEnvConfig } from './functions';
 import { kebabToScreamingSnakeCase } from '../string';
+
+import type { DeploymentEnvSchema } from './functions';
+import { parseDeploymentEnvConfig } from './functions';
+import { ethereumAddress } from './hex-types';
+import type { NetworkName } from './networks';
 
 describe('evm/functions', () => {
   describe('parseNetworkEnvConfig', () => {

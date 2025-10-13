@@ -1,27 +1,35 @@
+import client from 'prom-client';
 import Web3 from 'web3';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import client from 'prom-client';
-import { color as c } from '@blocksense/base-utils/tty';
 
+import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
+import type { EthereumAddress } from '@blocksense/base-utils/evm';
 import {
   getOptionalRpcUrl,
+  isTestnet,
   parseEthereumAddress,
+  parseNetworkName,
 } from '@blocksense/base-utils/evm';
-import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
+import { color as c } from '@blocksense/base-utils/tty';
 
-import { deployedNetworks } from '../types';
+import { deployedMainnets, deployedTestnets } from '../types';
 import { startPrometheusServer } from '../utils';
 
 const main = async (): Promise<void> => {
-  const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
   const argv = await yargs(hideBin(process.argv))
     .usage('Usage: $0 [--address <ethereum address>]')
     .option('address', {
       alias: 'a',
       describe: 'Ethereum address to fetch transactions for',
       type: 'string',
-      default: sequencerAddress,
+      default: '',
+    })
+    .option('network', {
+      alias: 'n',
+      describe: 'Check pending tx only for this network',
+      type: 'string',
+      default: '',
     })
     .option('prometheus', {
       alias: 'p',
@@ -39,11 +47,29 @@ const main = async (): Promise<void> => {
       type: 'number',
       default: 9100,
     })
+    .option('mainnet', {
+      alias: 'm',
+      describe: 'Show mainnet pending transactions',
+      type: 'boolean',
+      default: false,
+    })
     .help()
     .alias('help', 'h')
     .parse();
 
-  const address = parseEthereumAddress(argv.address);
+  const parsedNetwork = argv.network ? parseNetworkName(argv.network) : null;
+  const shouldUseMainnetSequencer =
+    argv.mainnet || (parsedNetwork !== null && !isTestnet(parsedNetwork));
+
+  const sequencerAddress = parseEthereumAddress(
+    getEnvStringNotAssert(
+      shouldUseMainnetSequencer
+        ? 'SEQUENCER_ADDRESS_MAINNET'
+        : 'SEQUENCER_ADDRESS_TESTNET',
+    ),
+  );
+  const address: EthereumAddress = sequencerAddress;
+
   let pendingGauge: client.Gauge | null = null;
 
   if (argv.prometheus) {
@@ -60,8 +86,14 @@ const main = async (): Promise<void> => {
       address === sequencerAddress
     })}\n`,
   );
+  const networks =
+    argv.network == ''
+      ? argv.mainnet
+        ? deployedMainnets
+        : deployedTestnets
+      : [parseNetworkName(argv.network)];
 
-  for (const networkName of deployedNetworks) {
+  for (const networkName of networks) {
     const rpcUrl = getOptionalRpcUrl(networkName);
     if (rpcUrl === '') {
       console.log(c`{red No rpc url for network ${networkName}. Skipping.}`);

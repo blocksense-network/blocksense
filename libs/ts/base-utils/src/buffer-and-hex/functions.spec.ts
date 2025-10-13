@@ -5,34 +5,30 @@
  * SPDX-License-Identifier: MIT
  */
 
-import { describe, expect, test } from 'vitest';
 import { Buffer } from 'buffer';
 
-import {
-  HexDataString,
-  parseHexDataString,
-  parseHexString,
-  byteLength,
-} from './types';
+import { describe, expect, test } from 'vitest';
 
 import {
   addHexPrefix,
+  appendHex,
   arrayToHex,
   checkedHexToArray,
   hexToArray,
   hexToBuffer,
   isValidInteger,
   littleEndianBytesToBigInt,
+  padHex,
+  previewHexString,
   replaceHexString,
   replaceUint8Array,
   skip0x,
   splitHexString,
   splitHexStringEqually,
   toHexData,
-  padHex,
-  appendHex,
-  previewHexString,
 } from './functions';
+import type { HexDataString } from './types';
+import { byteLength, parseHexDataString, parseHexString } from './types';
 
 describe('`buffer-and-hex-utils` tests', () => {
   test(`'replaceUint8Array' should replace Uint8Array with string in the object`, () => {
@@ -77,13 +73,13 @@ describe('`buffer-and-hex-utils` tests', () => {
   });
 
   test(`'hexToBuffer' should convert hexadecimal string to Buffer`, () => {
-    const hex = parseHexDataString('010203');
+    const hex = parseHexDataString('0x010203');
     const result = hexToBuffer(hex);
     expect(result).toEqual(Buffer.from([1, 2, 3]));
   });
 
   test(`'hexToArray' should convert hexadecimal string to Uint8Array`, () => {
-    const hex = parseHexDataString('010203');
+    const hex = parseHexDataString('0x010203');
     const result = hexToArray(hex);
     expect(result).toEqual(Uint8Array.from([1, 2, 3]));
   });
@@ -125,21 +121,21 @@ describe('`buffer-and-hex-utils` tests', () => {
   });
 
   test(`'addHexPrefix' should add the "0x" prefix to a string without it`, () => {
-    const input = parseHexDataString('123abc');
+    const input = parseHexString('123abc');
     const expected = '0x123abc';
     const result = addHexPrefix(input);
     expect(result).toBe(expected);
   });
 
   test(`'addHexPrefix' should not modify a string with the "0x" prefix`, () => {
-    const input = parseHexDataString('0x456def');
+    const input = parseHexString('0x456def');
     const expected = '0x456def';
     const result = addHexPrefix(input);
     expect(result).toBe(expected);
   });
 
   test(`'littleEndianBytesToBigInt' should convert little-endian bytes to BigInt`, () => {
-    const hex = parseHexDataString('0102');
+    const hex = parseHexDataString('0x0102');
     const result = littleEndianBytesToBigInt(hex);
     expect(result).toBe(BigInt(513));
   });
@@ -263,21 +259,18 @@ describe('`buffer-and-hex-utils` tests', () => {
   });
 
   test(`'appendHex' should append hex strings`, () => {
-    expect(appendHex(parseHexDataString(''), parseHexDataString(''))).toBe(
+    expect(appendHex(parseHexDataString('0x'), parseHexDataString('0x'))).toBe(
       '0x',
     );
-    expect(appendHex(parseHexDataString('12'), parseHexDataString('34'))).toBe(
-      '0x1234',
-    );
     expect(
-      appendHex(parseHexDataString('0x12'), parseHexDataString('34')),
-    ).toBe('0x1234');
-    expect(
-      appendHex(parseHexDataString('12'), parseHexDataString('0x34')),
-    ).toBe('0x1234');
+      appendHex(parseHexDataString('0x'), parseHexDataString('0x12')),
+    ).toBe('0x12');
     expect(
       appendHex(parseHexDataString('0x12'), parseHexDataString('0x34')),
     ).toBe('0x1234');
+    expect(
+      appendHex(parseHexDataString('0x1234'), parseHexDataString('0x5678')),
+    ).toBe('0x12345678');
   });
 
   test(`'toHexData' should convert a number to a HexDataString with padding (if needed)`, () => {

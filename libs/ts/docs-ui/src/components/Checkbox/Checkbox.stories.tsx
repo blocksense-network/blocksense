@@ -1,6 +1,8 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState } from 'react';
+import type { ChangeEvent } from 'react';
 
 import { Button } from '@blocksense/docs-ui/Button';
+
 import { Checkbox, CheckboxGroup } from './Checkbox';
 
 export default {

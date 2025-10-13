@@ -1,8 +1,8 @@
 import {
-  Effect as E,
-  Schema as S,
-  ParseResult,
   BigInt as EFBigInt,
+  Effect as E,
+  ParseResult,
+  Schema as S,
 } from 'effect';
 
 export class NumberFromSelfBigIntOrString extends S.transformOrFail(
@@ -65,7 +65,7 @@ export class NumberFromSelfBigIntOrString extends S.transformOrFail(
  */
 export const fromCommaSeparatedString = <T, S extends string>(
   itemSchema: S.Schema<T, S>,
-): S.Schema<ReadonlyArray<T>, string> =>
+): S.Schema<readonly T[], string> =>
   S.transformOrFail(
     // from: string
     S.String,
@@ -75,10 +75,10 @@ export const fromCommaSeparatedString = <T, S extends string>(
     {
       strict: true,
 
-      decode: (s: string, options, ast) => {
+      decode: (s: string, options) => {
         const trimmed = s.trim();
         if (trimmed === '') {
-          return ParseResult.succeed([] as ReadonlyArray<T>);
+          return ParseResult.succeed([] as readonly T[]);
         }
         const parts = trimmed.split(',').map(part => part.trim());
 
@@ -87,7 +87,7 @@ export const fromCommaSeparatedString = <T, S extends string>(
         );
       },
 
-      encode: (items: ReadonlyArray<T>, options) => {
+      encode: (items: readonly T[], options) => {
         // Encode the array of T back into an array of strings using itemSchema's encoder
         return S.encode(S.Array(itemSchema))(items, options).pipe(
           // Then join the encoded strings with a comma

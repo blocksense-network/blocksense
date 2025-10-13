@@ -5,14 +5,14 @@ import { Schema as S } from 'effect';
  *
  * Ref: https://docs.cdp.coinbase.com/exchange/reference/exchangerestapi_getproductticker
  */
-const CoinbaseAssetInfoSchema = S.mutable(
+const _CoinbaseAssetInfoSchema = S.mutable(
   S.Struct({
     id: S.String,
     price: S.Number,
   }),
 );
 
-export type CoinbaseAssetInfo = typeof CoinbaseAssetInfoSchema.Type;
+export type CoinbaseAssetInfo = typeof _CoinbaseAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from Coinbase Exchange.

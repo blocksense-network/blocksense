@@ -32,7 +32,7 @@ data = '{"pair":{"base":"EUR","quote":"USD"},"decimals":8,"category":"Forex","ma
 id = "10002"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"XAU","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage","FMP"]}}'
+data = '{"pair":{"base":"XAU","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","FMP"]}}'
 
 [[trigger.oracle.data_feeds]]
 id = "10003"
@@ -44,7 +44,7 @@ data = '{"pair":{"base":"AUD","quote":"USD"},"decimals":8,"category":"Forex","ma
 id = "10004"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"XAG","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage","FMP"]}}'
+data = '{"pair":{"base":"XAG","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","FMP"]}}'
 
 [[trigger.oracle.data_feeds]]
 id = "10005"
@@ -158,7 +158,7 @@ data = '{"pair":{"base":"TRY","quote":"USD"},"decimals":8,"category":"Forex","ma
 id = "10023"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"IDR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage","FMP"]}}'
+data = '{"pair":{"base":"IDR","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","FMP"]}}'
 
 [[trigger.oracle.data_feeds]]
 id = "10024"
@@ -188,7 +188,7 @@ data = '{"pair":{"base":"JPY","quote":"USD"},"decimals":8,"category":"Forex","ma
 id = "10028"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"RUB","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage","FMP"]}}'
+data = '{"pair":{"base":"RUB","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","FMP"]}}'
 
 [[trigger.oracle.data_feeds]]
 id = "10029"
@@ -200,7 +200,7 @@ data = '{"pair":{"base":"ARS","quote":"USD"},"decimals":8,"category":"Forex","ma
 id = "10030"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"COP","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage","FMP"]}}'
+data = '{"pair":{"base":"COP","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","FMP"]}}'
 
 [[trigger.oracle.data_feeds]]
 id = "10031"
@@ -464,7 +464,7 @@ data = '{"pair":{"base":"PGK","quote":"USD"},"decimals":8,"category":"Forex","ma
 id = "10074"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"SVC","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage","FMP"]}}'
+data = '{"pair":{"base":"SVC","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","FMP"]}}'
 
 [[trigger.oracle.data_feeds]]
 id = "10075"
@@ -512,7 +512,7 @@ data = '{"pair":{"base":"MAD","quote":"USD"},"decimals":8,"category":"Forex","ma
 id = "10082"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"NIO","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage","FMP"]}}'
+data = '{"pair":{"base":"NIO","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","FMP"]}}'
 
 [[trigger.oracle.data_feeds]]
 id = "10083"
@@ -632,7 +632,7 @@ data = '{"pair":{"base":"BDT","quote":"USD"},"decimals":8,"category":"Forex","ma
 id = "10102"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"CRC","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage","FMP"]}}'
+data = '{"pair":{"base":"CRC","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","FMP"]}}'
 
 [[trigger.oracle.data_feeds]]
 id = "10103"
@@ -800,7 +800,7 @@ data = '{"pair":{"base":"MMK","quote":"USD"},"decimals":8,"category":"Forex","ma
 id = "10130"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"MXV","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage","FMP"]}}'
+data = '{"pair":{"base":"MXV","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","FMP"]}}'
 
 [[trigger.oracle.data_feeds]]
 id = "10131"
@@ -830,7 +830,7 @@ data = '{"pair":{"base":"XOF","quote":"USD"},"decimals":8,"category":"Forex","ma
 id = "10135"
 stride = 0
 decimals = 8
-data = '{"pair":{"base":"ZAC","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","AlphaVantage","FMP"]}}'
+data = '{"pair":{"base":"ZAC","quote":"USD"},"decimals":8,"category":"Forex","market_hours":"Forex","arguments":{"kind":"forex-price-feeds","providers":["twelvedata","YahooFinance","FMP"]}}'
 
 [[trigger.oracle.capabilities]]
 data = "x"

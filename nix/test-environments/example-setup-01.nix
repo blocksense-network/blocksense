@@ -70,7 +70,6 @@ in
           private-key-path = "${testKeysDir}/sequencer-private-key";
           impersonated-anvil-account = impersonationAddress;
           should-load-round-counters = false;
-          should-load-historical-values = true;
           allow-feeds = [
             0 # BTC / USD
             3 # ETH / USD
@@ -121,35 +120,30 @@ in
               address = upgradeableProxyContractAddressSepolia;
               creation-byte-code = null;
               deployed-byte-code = null;
-              contract-version = 1;
             }
             {
               name = "multicall";
               address = "0xcA11bde05977b3631167028862bE2a173976CA11";
               creation-byte-code = null;
               deployed-byte-code = null;
-              contract-version = 3;
             }
           ];
         };
         ink-sepolia = {
           private-key-path = "${testKeysDir}/sequencer-private-key";
           should-load-round-counters = true;
-          should-load-historical-values = true;
           contracts = [
             {
               name = "AggregatedDataFeedStore";
               address = upgradeableProxyADFSContractAddressInk;
               creation-byte-code = null;
               deployed-byte-code = null;
-              contract-version = 2;
             }
             {
               name = "multicall";
               address = "0xcA11bde05977b3631167028862bE2a173976CA11";
               creation-byte-code = null;
               deployed-byte-code = null;
-              contract-version = 3;
             }
           ];
           transaction-gas-limit = 20000000;
@@ -263,6 +257,7 @@ in
           "FMP_API_KEY"
         ];
       };
+
       spout-rwa = {
         exec-interval = 60;
         allowed-outbound-hosts = [
@@ -272,6 +267,7 @@ in
           "SPOUT_RWA_API_KEY"
         ];
       };
+
       borrow-rates = {
         exec-interval = 10;
         allowed-outbound-hosts = [
@@ -281,6 +277,7 @@ in
           "https://eth.blockrazor.xyz"
         ];
       };
+
       forex-price-feeds = {
         exec-interval = 10;
         allowed-outbound-hosts = [
@@ -296,6 +293,7 @@ in
           "FMP_API_KEY"
         ];
       };
+
       commodities-price-feeds = {
         exec-interval = 60;
         allowed-outbound-hosts = [
@@ -303,6 +301,13 @@ in
         ];
         api-keys = [
           "METALS_API_KEY"
+        ];
+      };
+
+      eth-gas-info = {
+        exec-interval = 10;
+        allowed-outbound-hosts = [
+          "https://api.etherscan.io"
         ];
       };
     };

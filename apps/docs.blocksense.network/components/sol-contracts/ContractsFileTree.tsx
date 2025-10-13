@@ -1,7 +1,6 @@
 import React from 'react';
-
-import { FileTree } from 'nextra/components';
 import Link from 'next/link';
+import { FileTree } from 'nextra/components';
 
 import { ghContractFolder } from '@/src/constants';
 
@@ -12,7 +11,7 @@ type TreeNode = {
   path: string;
 };
 
-export const renderTree = ({ name, children, id, path }: TreeNode) => {
+export const renderTree = ({ children, id, name, path }: TreeNode) => {
   const constructedHref = `${ghContractFolder}contracts/${path}`;
 
   if (children) {

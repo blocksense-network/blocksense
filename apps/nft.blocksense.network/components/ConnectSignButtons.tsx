@@ -1,26 +1,28 @@
 'use client';
 
-import { MouseEvent } from 'react';
-import { ConnectButton, darkTheme, useActiveAccount } from 'thirdweb/react';
+import type { MouseEvent } from 'react';
 import { arbitrum } from 'thirdweb/chains';
+import { ConnectButton, darkTheme, useActiveAccount } from 'thirdweb/react';
 import { signMessage } from 'thirdweb/utils';
 import { createWallet } from 'thirdweb/wallets';
 
 import { getClient } from '@/mint';
 import { clearXHandle } from '@/utils';
+
 import { useMintFormContext } from '../app/contexts/MintFormContext';
+
 import { Button } from './Button';
 
 const wallets = [createWallet('io.metamask'), createWallet('walletConnect')];
 
 export const ConnectSignButtons = () => {
   const {
-    xHandle,
-    xStatus,
     discord,
     discordStatus,
-    setRetweetCode,
     setAlertMessage,
+    setRetweetCode,
+    xHandle,
+    xStatus,
   } = useMintFormContext();
   const account = useActiveAccount();
 

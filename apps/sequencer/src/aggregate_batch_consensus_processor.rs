@@ -1,5 +1,5 @@
 use crate::providers::eth_send_utils::{
-    decrement_feeds_round_indexes, get_nonce, get_tx_retry_params, inc_retries_with_backoff,
+    decrement_feed_rb_indices, get_nonce, get_tx_retry_params, inc_retries_with_backoff,
     log_gas_used, GasFees,
 };
 use crate::providers::provider::{parse_eth_address, RpcProvider};
@@ -61,8 +61,8 @@ pub async fn aggregation_batch_consensus_loop(
                             let providers = sequencer_state.providers.read().await;
                             let mut provider = providers.get(net.as_str()).unwrap().lock().await;
                             let ids_vec: Vec<_> = t.updated_feeds_ids.iter().copied().collect();
-                            warn!("Tiemed out batch {t:?} while collectiong reporters' signatures for net {net}. Decreasing the round counters for feed_ids: {ids_vec:?}");
-                            decrement_feeds_round_indexes(&ids_vec, net.as_str(), &mut provider).await
+                            warn!("Tiemed out batch {t:?} while collectiong reporters' signatures for net {net}. Decreasing the round buffer indices for feed_ids: {ids_vec:?}");
+                            decrement_feed_rb_indices(&ids_vec, net.as_str(), &mut provider).await
                         }
 
                         // Loop to process all completed futures for sending TX-s.
@@ -186,7 +186,7 @@ pub async fn aggregation_batch_consensus_loop(
                                     let mut provider = providers.get(net).unwrap().lock().await;
                                     let signer = &provider.signer;
 
-                                    let transaction_retries_count_before_give_up = provider.transaction_retries_count_before_give_up as u64;
+                                    let transaction_retries_count_limit = provider.transaction_retries_count_limit as u64;
                                     let transaction_retry_timeout_secs = provider.transaction_retry_timeout_secs as u64;
                                     let retry_fee_increment_fraction = provider.retry_fee_increment_fraction;
 
@@ -203,7 +203,7 @@ pub async fn aggregation_batch_consensus_loop(
                                     // First get the correct nonce
                                     let nonce = loop {
 
-                                        if nonce_get_retries_count > transaction_retries_count_before_give_up {
+                                        if nonce_get_retries_count > transaction_retries_count_limit {
                                             failed_tx(net, &ids_vec, &mut provider).await;
                                             eyre::bail!("Failed get the nonce for network {net}! Blocksense block height: {block_height}");
                                         }
@@ -230,7 +230,7 @@ pub async fn aggregation_batch_consensus_loop(
 
                                     let receipt = loop {
 
-                                        if transaction_retries_count > transaction_retries_count_before_give_up {
+                                        if transaction_retries_count > transaction_retries_count_limit {
                                             failed_tx(net, &ids_vec, &mut provider).await;
                                             inc_metric!(provider_metrics, net, total_timed_out_tx);
                                             eyre::bail!("Failed to post tx after {transaction_retries_count} retries for network {net}: (timed out)! Blocksense block height: {block_height}");
@@ -404,6 +404,6 @@ pub async fn aggregation_batch_consensus_loop(
 }
 
 async fn failed_tx(net: &str, ids_vec: &Vec<FeedId>, provider: &mut RpcProvider) {
-    decrement_feeds_round_indexes(ids_vec, net, provider).await;
+    decrement_feed_rb_indices(ids_vec, net, provider).await;
     provider.dec_num_tx_in_progress();
 }

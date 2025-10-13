@@ -2228,9 +2228,6 @@
             },
             "MEXC": {
               "symbol": ["WBTCUSDC", "WBTCUSDT"]
-            },
-            "OKX": {
-              "instId": ["WBTC-USD", "WBTC-USDT"]
             }
           },
           "aggregators": {
@@ -2291,9 +2288,6 @@
             },
             "MEXC": {
               "symbol": ["WBTCUSDT"]
-            },
-            "OKX": {
-              "instId": ["WBTC-USDT"]
             }
           }
         },
@@ -4349,6 +4343,9 @@
             "GateIo": {
               "id": ["TON_USDT"]
             },
+            "Gemini": {
+              "symbol": ["TONUSD"]
+            },
             "Kraken": {
               "pair": ["TONUSD", "TONUSDC", "TONUSDT"],
               "wsname": ["TON/USD", "TON/USDC", "TON/USDT"]
@@ -4944,6 +4941,9 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
+            "Binance": {
+              "symbol": ["USDEUSDC", "USDEUSDT"]
+            },
             "Bitget": {
               "symbol": ["USDEUSDC", "USDEUSDT"]
             },
@@ -4952,6 +4952,10 @@
             },
             "GateIo": {
               "id": ["USDE_USDT"]
+            },
+            "Kraken": {
+              "pair": ["USDEUSD", "USDEUSDC", "USDEUSDT"],
+              "wsname": ["USDE/USD", "USDE/USDC", "USDE/USDT"]
             },
             "KuCoin": {
               "symbol": ["USDE-USDT"]
@@ -5001,6 +5005,9 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
+            "Binance": {
+              "symbol": ["USDEUSDC", "USDEUSDT"]
+            },
             "Bitget": {
               "symbol": ["USDEUSDC", "USDEUSDT"]
             },
@@ -5009,6 +5016,10 @@
             },
             "GateIo": {
               "id": ["USDE_USDT"]
+            },
+            "Kraken": {
+              "pair": ["USDEUSD", "USDEUSDC", "USDEUSDT"],
+              "wsname": ["USDE/USD", "USDE/USDC", "USDE/USDT"]
             },
             "KuCoin": {
               "symbol": ["USDE-USDT"]
@@ -5058,6 +5069,9 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
+            "Binance": {
+              "symbol": ["USDEUSDT"]
+            },
             "Bitget": {
               "symbol": ["USDEUSDT"]
             },
@@ -5066,6 +5080,10 @@
             },
             "GateIo": {
               "id": ["USDE_USDT"]
+            },
+            "Kraken": {
+              "pair": ["USDEUSDT"],
+              "wsname": ["USDE/USDT"]
             },
             "KuCoin": {
               "symbol": ["USDE-USDT"]
@@ -5109,11 +5127,18 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
+            "Binance": {
+              "symbol": ["USDEUSDC"]
+            },
             "Bitget": {
               "symbol": ["USDEUSDC"]
             },
             "Bybit": {
               "symbol": ["USDEUSDC"]
+            },
+            "Kraken": {
+              "pair": ["USDEUSDC"],
+              "wsname": ["USDE/USDC"]
             }
           }
         },
@@ -5151,6 +5176,9 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
+            "Binance": {
+              "symbol": ["USDEUSDT"]
+            },
             "Bitget": {
               "symbol": ["USDEUSDT"]
             },
@@ -5159,6 +5187,10 @@
             },
             "GateIo": {
               "id": ["USDE_USDT"]
+            },
+            "Kraken": {
+              "pair": ["USDEUSDT"],
+              "wsname": ["USDE/USDT"]
             },
             "KuCoin": {
               "symbol": ["USDE-USDT"]
@@ -5202,11 +5234,18 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
+            "Binance": {
+              "symbol": ["USDEUSDC"]
+            },
             "Bitget": {
               "symbol": ["USDEUSDC"]
             },
             "Bybit": {
               "symbol": ["USDEUSDC"]
+            },
+            "Kraken": {
+              "pair": ["USDEUSDC"],
+              "wsname": ["USDE/USDC"]
             }
           }
         },
@@ -5467,6 +5506,9 @@
           "exchanges": {
             "BinanceUS": {
               "symbol": ["HYPEUSD", "HYPEUSDT"]
+            },
+            "Bitfinex": {
+              "symbol": ["tHYPE:USD"]
             },
             "Bitget": {
               "symbol": ["HYPEUSDT"]
@@ -8531,7 +8573,7 @@
               "symbol": ["FILUSDC", "FILUSDT"]
             },
             "OKX": {
-              "instId": ["FIL-USD", "FIL-USDT"]
+              "instId": ["FIL-USD", "FIL-USDC", "FIL-USDT"]
             },
             "Upbit": {
               "market": ["USDT-FIL"]
@@ -8710,6 +8752,9 @@
             },
             "MEXC": {
               "symbol": ["FILUSDC"]
+            },
+            "OKX": {
+              "instId": ["FIL-USDC"]
             }
           }
         },
@@ -8746,6 +8791,14 @@
         "market_hours": "Crypto",
         "arguments": {
           "kind": "cex-price-feeds",
+          "exchanges": {
+            "Bybit": {
+              "symbol": ["LBTCUSDT"]
+            },
+            "MEXC": {
+              "symbol": ["LBTCUSDC", "LBTCUSDT"]
+            }
+          },
           "aggregators": {
             "CoinMarketCap": {
               "symbol": ["LBTC", "LBTC"],
@@ -8785,7 +8838,15 @@
         "category": "Crypto",
         "market_hours": "Crypto",
         "arguments": {
-          "kind": "cex-price-feeds"
+          "kind": "cex-price-feeds",
+          "exchanges": {
+            "Bybit": {
+              "symbol": ["LBTCUSDT"]
+            },
+            "MEXC": {
+              "symbol": ["LBTCUSDT"]
+            }
+          }
         },
         "compatibility_info": {
           "chainlink": "LBTC/USD-RefPrice-mainnet-production"
@@ -10456,6 +10517,9 @@
             "MEXC": {
               "symbol": ["ENAUSDC", "ENAUSDT"]
             },
+            "OKX": {
+              "instId": ["ENA-USDT"]
+            },
             "Upbit": {
               "market": ["USDT-ENA"]
             }
@@ -10524,6 +10588,9 @@
             },
             "MEXC": {
               "symbol": ["ENAUSDT"]
+            },
+            "OKX": {
+              "instId": ["ENA-USDT"]
             },
             "Upbit": {
               "market": ["USDT-ENA"]
@@ -10624,29 +10691,11 @@
             "BinanceUS": {
               "symbol": ["MKRUSD", "MKRUSDT"]
             },
-            "Bitfinex": {
-              "symbol": ["tMKRUSD"]
-            },
             "Coinbase": {
               "id": ["MKR-USD"]
             },
-            "CryptoCom": {
-              "symbol": ["MKR_USD", "MKR_USDT"]
-            },
             "GateIo": {
               "id": ["MKR_USDT"]
-            },
-            "Gemini": {
-              "symbol": ["MKRUSD", "MKRUSDC"]
-            },
-            "KuCoin": {
-              "symbol": ["MKR-USDT"]
-            },
-            "MEXC": {
-              "symbol": ["MKRUSDT"]
-            },
-            "OKX": {
-              "instId": ["MKR-USD", "MKR-USDT"]
             }
           },
           "aggregators": {
@@ -10688,12 +10737,7 @@
         "category": "Crypto",
         "market_hours": "Crypto",
         "arguments": {
-          "kind": "cex-price-feeds",
-          "exchanges": {
-            "KuCoin": {
-              "symbol": ["MKR-ETH"]
-            }
-          }
+          "kind": "cex-price-feeds"
         },
         "compatibility_info": {
           "chainlink": "MKR / ETH"
@@ -10735,20 +10779,8 @@
             "BinanceUS": {
               "symbol": ["MKRUSDT"]
             },
-            "CryptoCom": {
-              "symbol": ["MKR_USDT"]
-            },
             "GateIo": {
               "id": ["MKR_USDT"]
-            },
-            "KuCoin": {
-              "symbol": ["MKR-USDT"]
-            },
-            "MEXC": {
-              "symbol": ["MKRUSDT"]
-            },
-            "OKX": {
-              "instId": ["MKR-USDT"]
             }
           }
         },
@@ -10787,9 +10819,6 @@
           "kind": "cex-price-feeds",
           "exchanges": {
             "Binance": {
-              "symbol": ["MKRUSDC"]
-            },
-            "Gemini": {
               "symbol": ["MKRUSDC"]
             }
           }
@@ -11305,7 +11334,7 @@
           "kind": "cex-price-feeds",
           "exchanges": {
             "Binance": {
-              "symbol": ["IMXUSDT"]
+              "symbol": ["IMXUSDC", "IMXUSDT"]
             },
             "BinanceUS": {
               "symbol": ["IMXUSD", "IMXUSDT"]
@@ -11449,6 +11478,9 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
+            "Binance": {
+              "symbol": ["IMXUSDC"]
+            },
             "Gemini": {
               "symbol": ["IMXUSDC"]
             }
@@ -11660,6 +11692,9 @@
             },
             "OKX": {
               "instId": ["WLD-USD", "WLD-USDT"]
+            },
+            "Upbit": {
+              "market": ["USDT-WLD"]
             }
           },
           "aggregators": {
@@ -11729,6 +11764,9 @@
             },
             "OKX": {
               "instId": ["WLD-USDT"]
+            },
+            "Upbit": {
+              "market": ["USDT-WLD"]
             }
           }
         },
@@ -11833,7 +11871,7 @@
               "symbol": ["THETA-USDT"]
             },
             "OKX": {
-              "instId": ["THETA-USD", "THETA-USDT"]
+              "instId": ["THETA-USD", "THETA-USDC", "THETA-USDT"]
             }
           },
           "aggregators": {
@@ -11936,6 +11974,9 @@
           "exchanges": {
             "Binance": {
               "symbol": ["THETAUSDC"]
+            },
+            "OKX": {
+              "instId": ["THETA-USDC"]
             }
           }
         },
@@ -18739,7 +18780,7 @@
               "symbol": ["VIRTUALUSDT"]
             },
             "Bybit": {
-              "symbol": ["VIRTUALUSDT"]
+              "symbol": ["VIRTUALUSDC", "VIRTUALUSDT"]
             },
             "CryptoCom": {
               "symbol": ["VIRTUAL_USD", "VIRTUAL_USDT"]
@@ -18870,6 +18911,9 @@
           "kind": "cex-price-feeds",
           "exchanges": {
             "Binance": {
+              "symbol": ["VIRTUALUSDC"]
+            },
+            "Bybit": {
               "symbol": ["VIRTUALUSDC"]
             },
             "Kraken": {
@@ -19593,7 +19637,10 @@
               "symbol": ["SPXUSDT"]
             },
             "Bybit": {
-              "symbol": ["SPXUSDT"]
+              "symbol": ["SPXUSDC", "SPXUSDT"]
+            },
+            "Coinbase": {
+              "id": ["SPX-USD"]
             },
             "CryptoCom": {
               "symbol": ["SPX_USD"]
@@ -19816,6 +19863,9 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
+            "Binance": {
+              "symbol": ["MORPHOUSDC", "MORPHOUSDT"]
+            },
             "Bitget": {
               "symbol": ["MORPHOUSDT"]
             },
@@ -19886,6 +19936,9 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
+            "Binance": {
+              "symbol": ["MORPHOUSDT"]
+            },
             "Bitget": {
               "symbol": ["MORPHOUSDT"]
             },
@@ -19938,7 +19991,12 @@
         "category": "Crypto",
         "market_hours": "Crypto",
         "arguments": {
-          "kind": "cex-price-feeds"
+          "kind": "cex-price-feeds",
+          "exchanges": {
+            "Binance": {
+              "symbol": ["MORPHOUSDC"]
+            }
+          }
         },
         "compatibility_info": {
           "chainlink": "MORPHO/USD-RefPrice-mainnet-production"
@@ -20504,7 +20562,7 @@
           "kind": "cex-price-feeds",
           "exchanges": {
             "Binance": {
-              "symbol": ["SNXUSDT"]
+              "symbol": ["SNXUSDC", "SNXUSDT"]
             },
             "BinanceUS": {
               "symbol": ["SNXUSD", "SNXUSDT"]
@@ -20685,7 +20743,12 @@
         "category": "Crypto",
         "market_hours": "Crypto",
         "arguments": {
-          "kind": "cex-price-feeds"
+          "kind": "cex-price-feeds",
+          "exchanges": {
+            "Binance": {
+              "symbol": ["SNXUSDC"]
+            }
+          }
         },
         "compatibility_info": {
           "chainlink": "SNX / USD"
@@ -20735,6 +20798,9 @@
             },
             "GateIo": {
               "id": ["FARTCOIN_USDT"]
+            },
+            "Gemini": {
+              "symbol": ["FARTCOINUSD"]
             },
             "Kraken": {
               "pair": ["FARTCOINUSD", "FARTCOINUSDC", "FARTCOINUSDT"],
@@ -25824,6 +25890,9 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
+            "BinanceUS": {
+              "symbol": ["MEWUSDT"]
+            },
             "Bitfinex": {
               "symbol": ["tMEWUSD"]
             },
@@ -25897,6 +25966,9 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
+            "BinanceUS": {
+              "symbol": ["MEWUSDT"]
+            },
             "Bitget": {
               "symbol": ["MEWUSDT"]
             },
@@ -26373,6 +26445,9 @@
             },
             "OKX": {
               "instId": ["ETHFI-USD", "ETHFI-USDT"]
+            },
+            "Upbit": {
+              "market": ["USDT-ETHFI"]
             }
           },
           "aggregators": {
@@ -26436,6 +26511,9 @@
             },
             "OKX": {
               "instId": ["ETHFI-USDT"]
+            },
+            "Upbit": {
+              "market": ["USDT-ETHFI"]
             }
           }
         },
@@ -27442,6 +27520,10 @@
             "Coinbase": {
               "id": ["EURC-USDC"]
             },
+            "Kraken": {
+              "pair": ["EURCUSD", "EURCUSDC"],
+              "wsname": ["EURC/USD", "EURC/USDC"]
+            },
             "OKX": {
               "instId": ["EURC-USD"]
             }
@@ -27489,6 +27571,10 @@
           "exchanges": {
             "Coinbase": {
               "id": ["EURC-USDC"]
+            },
+            "Kraken": {
+              "pair": ["EURCUSDC"],
+              "wsname": ["EURC/USDC"]
             }
           }
         },
@@ -28115,6 +28201,9 @@
             },
             "KuCoin": {
               "symbol": ["POLYX-USDT"]
+            },
+            "MEXC": {
+              "symbol": ["POLYXUSDT"]
             }
           },
           "aggregators": {
@@ -28172,6 +28261,9 @@
             },
             "KuCoin": {
               "symbol": ["POLYX-USDT"]
+            },
+            "MEXC": {
+              "symbol": ["POLYXUSDT"]
             }
           }
         },
@@ -28768,7 +28860,7 @@
               "id": ["STORJ-USD"]
             },
             "CryptoCom": {
-              "symbol": ["STORJ_USD", "STORJ_USDT"]
+              "symbol": ["STORJ_USD"]
             },
             "GateIo": {
               "id": ["STORJ_USDT"]
@@ -28839,9 +28931,6 @@
             },
             "Bitget": {
               "symbol": ["STORJUSDT"]
-            },
-            "CryptoCom": {
-              "symbol": ["STORJ_USDT"]
             },
             "GateIo": {
               "id": ["STORJ_USDT"]
@@ -29251,7 +29340,7 @@
           "kind": "cex-price-feeds",
           "exchanges": {
             "Binance": {
-              "symbol": ["AEVOUSDT"]
+              "symbol": ["AEVOUSDC", "AEVOUSDT"]
             },
             "Bitget": {
               "symbol": ["AEVOUSDT"]
@@ -29375,7 +29464,12 @@
         "category": "Crypto",
         "market_hours": "Crypto",
         "arguments": {
-          "kind": "cex-price-feeds"
+          "kind": "cex-price-feeds",
+          "exchanges": {
+            "Binance": {
+              "symbol": ["AEVOUSDC"]
+            }
+          }
         },
         "compatibility_info": {
           "chainlink": "AEVO/USD-RefPrice-DS-Premium-Global-003"
@@ -29590,9 +29684,6 @@
             "Bybit": {
               "symbol": ["NEIROUSDT"]
             },
-            "GateIo": {
-              "id": ["NEIRO_USDT"]
-            },
             "Kraken": {
               "pair": ["NEIROUSD"],
               "wsname": ["NEIRO/USD"]
@@ -29671,9 +29762,6 @@
             },
             "Bybit": {
               "symbol": ["NEIROUSDT"]
-            },
-            "GateIo": {
-              "id": ["NEIRO_USDT"]
             },
             "KuCoin": {
               "symbol": ["NEIRO-USDT"]
@@ -30382,9 +30470,6 @@
               "pair": ["ALTUSD"],
               "wsname": ["ALT/USD"]
             },
-            "MEXC": {
-              "symbol": ["ALTUSDT"]
-            },
             "Upbit": {
               "market": ["USDT-ALT"]
             }
@@ -30438,9 +30523,6 @@
             },
             "GateIo": {
               "id": ["ALT_USDT"]
-            },
-            "MEXC": {
-              "symbol": ["ALTUSDT"]
             },
             "Upbit": {
               "market": ["USDT-ALT"]
@@ -34714,7 +34796,7 @@
               "symbol": ["MOVRUSDT"]
             },
             "CryptoCom": {
-              "symbol": ["MOVR_USD", "MOVR_USDT"]
+              "symbol": ["MOVR_USD"]
             },
             "GateIo": {
               "id": ["MOVR_USDT"]
@@ -34728,9 +34810,6 @@
             },
             "MEXC": {
               "symbol": ["MOVRUSDT"]
-            },
-            "OKX": {
-              "instId": ["MOVR-USD", "MOVR-USDT"]
             }
           },
           "aggregators": {
@@ -34783,9 +34862,6 @@
             "Bybit": {
               "symbol": ["MOVRUSDT"]
             },
-            "CryptoCom": {
-              "symbol": ["MOVR_USDT"]
-            },
             "GateIo": {
               "id": ["MOVR_USDT"]
             },
@@ -34794,9 +34870,6 @@
             },
             "MEXC": {
               "symbol": ["MOVRUSDT"]
-            },
-            "OKX": {
-              "instId": ["MOVR-USDT"]
             }
           }
         },
@@ -35096,27 +35169,12 @@
             "Binance": {
               "symbol": ["OMNIUSDC", "OMNIUSDT"]
             },
-            "Bybit": {
-              "symbol": ["OMNIUSDT"]
-            },
             "Coinbase": {
               "id": ["OMNI-USD"]
-            },
-            "CryptoCom": {
-              "symbol": ["OMNI_USD"]
-            },
-            "GateIo": {
-              "id": ["OMNI_USDC", "OMNI_USDT"]
             },
             "Kraken": {
               "pair": ["OMNIUSD"],
               "wsname": ["OMNI/USD"]
-            },
-            "KuCoin": {
-              "symbol": ["OMNI-USDT"]
-            },
-            "MEXC": {
-              "symbol": ["OMNIUSDT"]
             },
             "Upbit": {
               "market": ["USDT-OMNI"]
@@ -35166,18 +35224,6 @@
             "Binance": {
               "symbol": ["OMNIUSDT"]
             },
-            "Bybit": {
-              "symbol": ["OMNIUSDT"]
-            },
-            "GateIo": {
-              "id": ["OMNI_USDT"]
-            },
-            "KuCoin": {
-              "symbol": ["OMNI-USDT"]
-            },
-            "MEXC": {
-              "symbol": ["OMNIUSDT"]
-            },
             "Upbit": {
               "market": ["USDT-OMNI"]
             }
@@ -35219,9 +35265,6 @@
           "exchanges": {
             "Binance": {
               "symbol": ["OMNIUSDC"]
-            },
-            "GateIo": {
-              "id": ["OMNI_USDC"]
             }
           }
         },
@@ -36907,9 +36950,6 @@
             "Bitget": {
               "symbol": ["STGUSDT"]
             },
-            "Bybit": {
-              "symbol": ["STGUSDT"]
-            },
             "Coinbase": {
               "id": ["STG-USD"]
             },
@@ -36978,9 +37018,6 @@
               "symbol": ["STGUSDT"]
             },
             "Bitget": {
-              "symbol": ["STGUSDT"]
-            },
-            "Bybit": {
               "symbol": ["STGUSDT"]
             },
             "GateIo": {
@@ -37952,9 +37989,6 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
-            "GateIo": {
-              "id": ["AMPL_USDT"]
-            },
             "KuCoin": {
               "symbol": ["AMPL-USDT"]
             }
@@ -38000,9 +38034,6 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
-            "GateIo": {
-              "id": ["AMPL_USDT"]
-            },
             "KuCoin": {
               "symbol": ["AMPL-USDT"]
             }
@@ -38268,6 +38299,9 @@
             "Bybit": {
               "symbol": ["ORDERUSDT"]
             },
+            "CryptoCom": {
+              "symbol": ["ORDER_USD"]
+            },
             "GateIo": {
               "id": ["ORDER_USDT"]
             },
@@ -38280,6 +38314,9 @@
             },
             "MEXC": {
               "symbol": ["ORDERUSDT"]
+            },
+            "Upbit": {
+              "market": ["USDT-ORDER"]
             }
           },
           "aggregators": {
@@ -38337,6 +38374,9 @@
             },
             "MEXC": {
               "symbol": ["ORDERUSDT"]
+            },
+            "Upbit": {
+              "market": ["USDT-ORDER"]
             }
           }
         },
@@ -39311,9 +39351,6 @@
             "Binance": {
               "symbol": ["BSWUSDT"]
             },
-            "Bitget": {
-              "symbol": ["BSWUSDT"]
-            },
             "GateIo": {
               "id": ["BSW_USDT"]
             },
@@ -39368,9 +39405,6 @@
             "Binance": {
               "symbol": ["BSWUSDT"]
             },
-            "Bitget": {
-              "symbol": ["BSWUSDT"]
-            },
             "GateIo": {
               "id": ["BSW_USDT"]
             },
@@ -39418,9 +39452,6 @@
           "exchanges": {
             "Binance": {
               "symbol": ["NULSUSDT"]
-            },
-            "MEXC": {
-              "symbol": ["NULSUSDT"]
             }
           },
           "aggregators": {
@@ -39465,9 +39496,6 @@
           "kind": "cex-price-feeds",
           "exchanges": {
             "Binance": {
-              "symbol": ["NULSUSDT"]
-            },
-            "MEXC": {
               "symbol": ["NULSUSDT"]
             }
           }
@@ -40573,7 +40601,19 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
+            "Binance": {
+              "symbol": ["SKYUSDC", "SKYUSDT"]
+            },
+            "BinanceUS": {
+              "symbol": ["SKYUSDT"]
+            },
+            "Bitfinex": {
+              "symbol": ["tSKYUSD"]
+            },
             "Bitget": {
+              "symbol": ["SKYUSDT"]
+            },
+            "Bybit": {
               "symbol": ["SKYUSDT"]
             },
             "Coinbase": {
@@ -40582,12 +40622,24 @@
             "CryptoCom": {
               "symbol": ["SKY_USD"]
             },
+            "GateIo": {
+              "id": ["SKY_USDT"]
+            },
+            "Gemini": {
+              "symbol": ["SKYUSD", "SKYUSDC"]
+            },
             "Kraken": {
               "pair": ["SKYUSD"],
               "wsname": ["SKY/USD"]
             },
             "KuCoin": {
               "symbol": ["SKY-USDT"]
+            },
+            "MEXC": {
+              "symbol": ["SKYUSDT"]
+            },
+            "OKX": {
+              "instId": ["SKY-USD", "SKY-USDT"]
             }
           },
           "aggregators": {
@@ -40631,11 +40683,29 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
+            "Binance": {
+              "symbol": ["SKYUSDT"]
+            },
+            "BinanceUS": {
+              "symbol": ["SKYUSDT"]
+            },
             "Bitget": {
               "symbol": ["SKYUSDT"]
             },
+            "Bybit": {
+              "symbol": ["SKYUSDT"]
+            },
+            "GateIo": {
+              "id": ["SKY_USDT"]
+            },
             "KuCoin": {
               "symbol": ["SKY-USDT"]
+            },
+            "MEXC": {
+              "symbol": ["SKYUSDT"]
+            },
+            "OKX": {
+              "instId": ["SKY-USDT"]
             }
           }
         },
@@ -40673,9 +40743,6 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
-            "Bitget": {
-              "symbol": ["WELLUSDT"]
-            },
             "Coinbase": {
               "id": ["WELL-USD"]
             },
@@ -40731,9 +40798,6 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
-            "Bitget": {
-              "symbol": ["WELLUSDT"]
-            },
             "GateIo": {
               "id": ["WELL_USDT"]
             },
@@ -41140,9 +41204,6 @@
         "arguments": {
           "kind": "cex-price-feeds",
           "exchanges": {
-            "CryptoCom": {
-              "symbol": ["NEIROETH_USD"]
-            },
             "GateIo": {
               "id": ["NEIROETH_USDT"]
             },
@@ -41807,8 +41868,43 @@
             },
             "MEXC": {
               "symbol": ["SOMIUSDC", "SOMIUSDT"]
+            },
+            "Upbit": {
+              "market": ["USDT-SOMI"]
             }
           }
+        }
+      }
+    },
+    {
+      "id": "734",
+      "full_name": "MON / USD",
+      "description": "Price of Monad (MON) in USD",
+      "type": "price-feed",
+      "oracle_id": "cex-price-feeds",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 60000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "MON",
+          "quote": "USD"
+        },
+        "decimals": 18,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "kind": "cex-price-feeds",
+          "exchanges": {}
         }
       }
     },
@@ -41904,7 +42000,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
+          "providers": ["twelvedata", "YahooFinance", "FMP"]
         }
       }
     },
@@ -41968,7 +42064,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
+          "providers": ["twelvedata", "YahooFinance", "FMP"]
         }
       }
     },
@@ -42576,7 +42672,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
+          "providers": ["twelvedata", "YahooFinance", "FMP"]
         }
       }
     },
@@ -42736,7 +42832,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
+          "providers": ["twelvedata", "YahooFinance", "FMP"]
         }
       }
     },
@@ -42800,7 +42896,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
+          "providers": ["twelvedata", "YahooFinance", "FMP"]
         }
       }
     },
@@ -44208,7 +44304,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
+          "providers": ["twelvedata", "YahooFinance", "FMP"]
         }
       }
     },
@@ -44464,7 +44560,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
+          "providers": ["twelvedata", "YahooFinance", "FMP"]
         }
       }
     },
@@ -45104,7 +45200,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
+          "providers": ["twelvedata", "YahooFinance", "FMP"]
         }
       }
     },
@@ -46000,7 +46096,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
+          "providers": ["twelvedata", "YahooFinance", "FMP"]
         }
       }
     },
@@ -46160,7 +46256,7 @@
         "market_hours": "Forex",
         "arguments": {
           "kind": "forex-price-feeds",
-          "providers": ["twelvedata", "YahooFinance", "AlphaVantage", "FMP"]
+          "providers": ["twelvedata", "YahooFinance", "FMP"]
         }
       }
     },
@@ -47286,6 +47382,484 @@
           "kind": "borrow-rates",
           "marketplace": "Aave",
           "network": "ethereum-mainnet"
+        }
+      }
+    },
+    {
+      "id": "102251",
+      "full_name": "cbBTC / USDC Morpho Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time cbBTC/USDC borrow rate (APR) from Morpho on Ethereum Mainnet Market. ref: https://app.morpho.org/ethereum/market/0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64/cbbtc-usdc",
+      "type": "price-feed",
+      "oracle_id": "borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "cbBTC / USDC",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "borrow-rates",
+          "marketplace": "Morpho",
+          "network": "ethereum-mainnet",
+          "market_id": "0x64d65c9a2d91c36d56fbc42d69e979335320169b3df63bf92789e2c8883fcc64",
+          "morpho_core_address": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+        }
+      }
+    },
+    {
+      "id": "102252",
+      "full_name": "srUSD / USDC Morpho Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time srUSD/USDC borrow rate (APR) from Morpho on Ethereum Mainnet Market. ref: https://app.morpho.org/ethereum/market/0xbfed072faee09b963949defcdb91094465c34c6c62d798b906274ef3563c9cac/srusd-usdc",
+      "type": "price-feed",
+      "oracle_id": "borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "srUSD / USDC",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "borrow-rates",
+          "marketplace": "Morpho",
+          "network": "ethereum-mainnet",
+          "market_id": "0xbfed072faee09b963949defcdb91094465c34c6c62d798b906274ef3563c9cac",
+          "morpho_core_address": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+        }
+      }
+    },
+    {
+      "id": "102253",
+      "full_name": "WBTC / USDC Morpho Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time WBTC/USDC borrow rate (APR) from Morpho on Ethereum Mainnet Market. ref: https://app.morpho.org/ethereum/market/0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49/wbtc-usdc",
+      "type": "price-feed",
+      "oracle_id": "borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "WBTC / USDC",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "borrow-rates",
+          "marketplace": "Morpho",
+          "network": "ethereum-mainnet",
+          "market_id": "0x3a85e619751152991742810df6ec69ce473daef99e28a64ab2340d7b7ccfee49",
+          "morpho_core_address": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+        }
+      }
+    },
+    {
+      "id": "102254",
+      "full_name": "ETH+ / WETH Morpho Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time ETH+/WETH borrow rate (APR) from Morpho on Ethereum Mainnet Market. ref: https://app.morpho.org/ethereum/market/0x5f8a138ba332398a9116910f4d5e5dcd9b207024c5290ce5bc87bc2dbd8e4a86/eth-weth",
+      "type": "price-feed",
+      "oracle_id": "borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "ETH+ / WETH",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "borrow-rates",
+          "marketplace": "Morpho",
+          "network": "ethereum-mainnet",
+          "market_id": "0x5f8a138ba332398a9116910f4d5e5dcd9b207024c5290ce5bc87bc2dbd8e4a86",
+          "morpho_core_address": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+        }
+      }
+    },
+    {
+      "id": "102255",
+      "full_name": "wstETH / WETH Morpho Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time wstETH/WETH borrow rate (APR) from Morpho on Ethereum Mainnet Market. ref: https://app.morpho.org/ethereum/market/0xb8fc70e82bc5bb53e773626fcc6a23f7eefa036918d7ef216ecfb1950a94a85e/wsteth-weth",
+      "type": "price-feed",
+      "oracle_id": "borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "wstETH / WETH",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "borrow-rates",
+          "marketplace": "Morpho",
+          "network": "ethereum-mainnet",
+          "market_id": "0xb8fc70e82bc5bb53e773626fcc6a23f7eefa036918d7ef216ecfb1950a94a85e",
+          "morpho_core_address": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+        }
+      }
+    },
+    {
+      "id": "102256",
+      "full_name": "weETH / WETH Morpho Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time weETH/WETH borrow rate (APR) from Morpho on Ethereum Mainnet Market. ref: https://app.morpho.org/ethereum/market/0x37e7484d642d90f14451f1910ba4b7b8e4c3ccdd0ec28f8b2bdb35479e472ba7/weeth-weth",
+      "type": "price-feed",
+      "oracle_id": "borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "weETH / WETH",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "borrow-rates",
+          "marketplace": "Morpho",
+          "network": "ethereum-mainnet",
+          "market_id": "0x37e7484d642d90f14451f1910ba4b7b8e4c3ccdd0ec28f8b2bdb35479e472ba7",
+          "morpho_core_address": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+        }
+      }
+    },
+    {
+      "id": "102257",
+      "full_name": "mHYPER / USDC Morpho Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time mHYPER/USDC borrow rate (APR) from Morpho on Ethereum Mainnet Market. ref: https://app.morpho.org/ethereum/market/0x95c28d447950ca6c8bbfd25fc05b80b1fd7a1cdd17a3610b4b3f1ffc8dc2e2ed/mhyper-usdc",
+      "type": "price-feed",
+      "oracle_id": "borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "mHYPER / USDC",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "borrow-rates",
+          "marketplace": "Morpho",
+          "network": "ethereum-mainnet",
+          "market_id": "0x95c28d447950ca6c8bbfd25fc05b80b1fd7a1cdd17a3610b4b3f1ffc8dc2e2ed",
+          "morpho_core_address": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+        }
+      }
+    },
+    {
+      "id": "102258",
+      "full_name": "PT-cUSDO-20NOV2025 / USDC Morpho Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time PT-cUSDO-20NOV2025/USDC borrow rate (APR) from Morpho on Ethereum Mainnet Market. ref: https://app.morpho.org/ethereum/market/0x8a71a66ac828c2b6d4f8accce5859aba0822b502f3833bec4aff09479affffdb/pt-cusdo-20nov2025-usdc",
+      "type": "price-feed",
+      "oracle_id": "borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "PT-cUSDO-20NOV2025 / USDC",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "borrow-rates",
+          "marketplace": "Morpho",
+          "network": "ethereum-mainnet",
+          "market_id": "0x8a71a66ac828c2b6d4f8accce5859aba0822b502f3833bec4aff09479affffdb",
+          "morpho_core_address": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+        }
+      }
+    },
+    {
+      "id": "102259",
+      "full_name": "WBTC / USDT Morpho Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time WBTC/USDT borrow rate (APR) from Morpho on Ethereum Mainnet Market. ref: https://app.morpho.org/ethereum/market/0xa921ef34e2fc7a27ccc50ae7e4b154e16c9799d3387076c421423ef52ac4df99/wbtc-usdt",
+      "type": "price-feed",
+      "oracle_id": "borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "WBTC / USDT",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "borrow-rates",
+          "marketplace": "Morpho",
+          "network": "ethereum-mainnet",
+          "market_id": "0xa921ef34e2fc7a27ccc50ae7e4b154e16c9799d3387076c421423ef52ac4df99",
+          "morpho_core_address": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+        }
+      }
+    },
+    {
+      "id": "102260",
+      "full_name": "wstETH / USDC Morpho Borrow Rate on Ethereum Mainnet",
+      "description": "Real-time wstETH/USDC borrow rate (APR) from Morpho on Ethereum Mainnet Market. ref:  https://app.morpho.org/ethereum/market/0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc/wsteth-usdc",
+      "type": "price-feed",
+      "oracle_id": "borrow-rates",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 30000,
+        "heartbeat_ms": 60000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "wstETH / USDC",
+          "quote": ""
+        },
+        "decimals": 18,
+        "category": "Rates",
+        "market_hours": "",
+        "arguments": {
+          "kind": "borrow-rates",
+          "marketplace": "Morpho",
+          "network": "ethereum-mainnet",
+          "market_id": "0xb323495f7e4148be5643a4ea4a8221eef163e4bccfdedc2a6f4696baacbc86cc",
+          "morpho_core_address": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"
+        }
+      }
+    },
+    {
+      "id": "105000",
+      "full_name": "Ethereum SafeGasPrice",
+      "description": "Current SafeGasPrice (in Gwei) on Ethereum Mainnet",
+      "type": "price-feed",
+      "oracle_id": "eth-gas-info",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 10000,
+        "heartbeat_ms": 30000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "SafeGasPrice",
+          "quote": "Gwei"
+        },
+        "decimals": 8,
+        "category": "",
+        "market_hours": "",
+        "arguments": {
+          "kind": "eth-gas-info",
+          "metric": "SafeGasPrice"
+        }
+      }
+    },
+    {
+      "id": "105001",
+      "full_name": "Ethereum ProposeGasPrice",
+      "description": "Current ProposeGasPrice (in Gwei) on Ethereum Mainnet",
+      "type": "price-feed",
+      "oracle_id": "eth-gas-info",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 10000,
+        "heartbeat_ms": 30000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "ProposeGasPrice",
+          "quote": "Gwei"
+        },
+        "decimals": 8,
+        "category": "",
+        "market_hours": "",
+        "arguments": {
+          "kind": "eth-gas-info",
+          "metric": "ProposeGasPrice"
+        }
+      }
+    },
+    {
+      "id": "105002",
+      "full_name": "Ethereum FastGasPrice",
+      "description": "Current FastGasPrice (in Gwei) on Ethereum Mainnet",
+      "type": "price-feed",
+      "oracle_id": "eth-gas-info",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 10000,
+        "heartbeat_ms": 30000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "FastGasPrice",
+          "quote": "Gwei"
+        },
+        "decimals": 8,
+        "category": "",
+        "market_hours": "",
+        "arguments": {
+          "kind": "eth-gas-info",
+          "metric": "FastGasPrice"
+        }
+      }
+    },
+    {
+      "id": "105003",
+      "full_name": "Ethereum suggestBaseFee",
+      "description": "Current suggestBaseFee (in Gwei) on Ethereum Mainnet",
+      "type": "price-feed",
+      "oracle_id": "eth-gas-info",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 10000,
+        "heartbeat_ms": 30000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "suggestBaseFee",
+          "quote": "Gwei"
+        },
+        "decimals": 8,
+        "category": "",
+        "market_hours": "",
+        "arguments": {
+          "kind": "eth-gas-info",
+          "metric": "suggestBaseFee"
         }
       }
     },

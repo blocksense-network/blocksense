@@ -6,14 +6,14 @@ import { Schema as S } from 'effect';
  * Ref: https://bitgetlimited.github.io/apidoc/en/spot/#get-all-tickers
  *      https://bitgetlimited.github.io/apidoc/en/spot/#get-single-ticker
  */
-const BitgetAssetInfoSchema = S.mutable(
+const _BitgetAssetInfoSchema = S.mutable(
   S.Struct({
     symbol: S.String,
     price: S.Number,
   }),
 );
 
-export type BitgetAssetInfo = typeof BitgetAssetInfoSchema.Type;
+export type BitgetAssetInfo = typeof _BitgetAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from Bitget Exchange.

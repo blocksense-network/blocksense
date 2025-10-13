@@ -1,16 +1,13 @@
+import { ParseResult, Schema as S } from 'effect';
 import { Octokit } from '@octokit/rest';
-import { Schema as S, ParseResult } from 'effect';
 
 import { getEnvString } from '@blocksense/base-utils/env';
-import {
-  ChainLinkFeedInfo,
-  ChainLinkFeedInfoSchema,
-} from './fetchers/chainlink/types';
-import {
-  CMCMarketCapDataRes,
-  CMCMarketCapDataResSchema,
-} from './fetchers/aggregators/cmc';
-import { CryptoProviderData } from './processors/crypto-providers/types';
+
+import type { CMCMarketCapDataRes } from './fetchers/aggregators/cmc';
+import { CMCMarketCapDataResSchema } from './fetchers/aggregators/cmc';
+import type { ChainLinkFeedInfo } from './fetchers/chainlink/types';
+import { ChainLinkFeedInfoSchema } from './fetchers/chainlink/types';
+import type { CryptoProviderData } from './processors/crypto-providers/types';
 
 const OWNER = 'blocksense-network';
 const REPO = 'dfcg-artifacts';

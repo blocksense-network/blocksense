@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { ThirdwebProvider } from 'thirdweb/react';
 
-import { Navbar } from '../components/Navbar';
 import { ConsentManager } from '../components/ConsentManager';
 import { Footer } from '../components/Footer';
+import { Navbar } from '../components/Navbar';
 import { geist, geistMono } from '../src/geist';
+
 import './globals.css';
 
 export const metadata: Metadata = {

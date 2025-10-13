@@ -1,12 +1,7 @@
 'use client';
 
-import React, {
-  createContext,
-  useContext,
-  useState,
-  HTMLAttributes,
-  ReactNode,
-} from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import type { HTMLAttributes, ReactNode } from 'react';
 
 import { cn } from '@blocksense/docs-ui/utils';
 
@@ -70,8 +65,8 @@ type ScrollBarProps = HTMLAttributes<HTMLElement> & {
 export const ScrollBar = ({
   className,
   orientation = 'vertical',
-  scrollPosition = 0,
   scrollAreaId,
+  scrollPosition = 0,
   ...props
 }: ScrollBarProps) => {
   return (

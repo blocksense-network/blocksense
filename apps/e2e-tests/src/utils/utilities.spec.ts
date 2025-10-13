@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
 import {
-  truncate,
-  powerOf10BigInt,
   bigIntToBytesBE,
   bytesToBigIntBE,
+  powerOf10BigInt,
+  truncate,
 } from './utilities';
 
 // bytesToBigIntBE now lives in utilities.ts
@@ -111,7 +112,7 @@ describe('bigIntToBytesBE', () => {
   });
 
   it('round-trips across a variety of values', () => {
-    const values: Array<bigint> = [
+    const values: bigint[] = [
       0n,
       1n,
       42n,

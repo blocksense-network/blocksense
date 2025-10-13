@@ -1,20 +1,17 @@
-import { Octokit } from '@octokit/rest';
-import { RequestError } from '@octokit/request-error';
 import type { Schema as S } from 'effect';
+import { RequestError } from '@octokit/request-error';
+import { Octokit } from '@octokit/rest';
 
+import { mapValuePromises } from '@blocksense/base-utils/array-iter';
 import { getOptionalEnvString } from '@blocksense/base-utils/env';
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { mapValuePromises } from '@blocksense/base-utils/array-iter';
 
-import { FeedsConfig } from '../../data-feeds-config';
-import { DeploymentConfigV1 } from '../../evm-contracts-deployment';
-import {
-  ConfigFileName,
-  configTypes,
-  getConfigFilePath,
-} from '../../read-write-config';
-import { SequencerConfigV1 } from '../../node-config/types';
-import { ChainlinkCompatibilityConfig } from '../../chainlink-compatibility/types';
+import type { ChainlinkCompatibilityConfig } from '../../chainlink-compatibility/types';
+import type { FeedsConfig } from '../../data-feeds-config';
+import type { DeploymentConfigV1 } from '../../evm-contracts-deployment';
+import type { SequencerConfigV1 } from '../../node-config/types';
+import type { ConfigFileName } from '../../read-write-config';
+import { configTypes, getConfigFilePath } from '../../read-write-config';
 
 const OWNER = 'blocksense-network';
 const REPO = 'dfcg-artifacts';

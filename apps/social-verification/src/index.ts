@@ -1,5 +1,5 @@
-import { HttpApiBuilder, HttpServer } from '@effect/platform';
 import { Context, Layer } from 'effect';
+import { HttpApiBuilder, HttpServer } from '@effect/platform';
 
 import { EnvTag, VerifyApiLive } from './endpoints';
 

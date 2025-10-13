@@ -4,7 +4,7 @@ import { parseEther } from 'ethers';
 
 task('fund-ledger', '[UTILS] Fund the ledger account with ETH').setAction(
   async (_, { ethers }) => {
-    const config = await initChain(ethers, 'local');
+    const config = await initChain('local');
 
     console.log('ledgerAccount', config.deployerAddress);
     console.log(

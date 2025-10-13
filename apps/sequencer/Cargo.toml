@@ -9,16 +9,19 @@ edition.workspace = true
 profile = []
 
 [dependencies]
-blocksense-data-feeds = { workspace = true }
-blocksense-feeds-processing = { workspace = true }
 blocksense-anomaly-detection = { workspace = true }
-blocksense-config = { workspace = true }
-blocksense-registry = { workspace = true }
-blocksense-crypto = { workspace = true }
-blocksense-utils = { workspace = true }
-blocksense-feed-registry = { workspace = true }
 blocksense-blockchain-data-model = { workspace = true }
+blocksense-config = { workspace = true }
+blocksense-crypto = { workspace = true }
+blocksense-data-feeds = { workspace = true }
+blocksense-feed-registry = { workspace = true }
+blocksense-feeds-processing = { workspace = true }
+blocksense-gnosis-safe = { workspace = true }
+blocksense-metrics = { workspace = true }
+blocksense-registry = { workspace = true }
+blocksense-utils = { workspace = true }
 
+actix-web = { workspace = true }
 alloy = { workspace = true, features = [
     "sol-types",
     "contract",
@@ -41,45 +44,34 @@ alloy = { workspace = true, features = [
     "transport-ws",
     "pubsub",
 ] }
-
-pprof = { version = "0.11", features = ["flamegraph"] }
-
 alloy-primitives = { workspace = true }
 alloy-u256-literal = { workspace = true }
-
-
-blocksense-metrics = { workspace = true }
-blocksense-gnosis-safe = { workspace = true }
-
-reqwest = { workspace = true }
-# async
-tokio = { workspace = true }
-
-# misc
 anyhow = { workspace = true }
-eyre = { workspace = true }
-actix-web = { workspace = true }
-chrono = { workspace = true }
-serde_json = { workspace = true }
-serde = { workspace = true }
-futures = { workspace = true }
-once_cell = { workspace = true }
-tracing = { workspace = true }
-tracing-subscriber = { workspace = true }
 bytes = { workspace = true }
-futures-util = { workspace = true }
-rand = { workspace = true }
-paste = { workspace = true }
-regex = { workspace = true }
-tempfile = { workspace = true }
-time = { workspace = true }
-uuid = { workspace = true, features = ["v4"] }
-ringbuf = { workspace = true }
+chrono = { workspace = true }
 console-subscriber = { workspace = true }
-rdkafka = { workspace = true, features = ["dynamic-linking"] }
-tokio-stream = { workspace = true }
+eyre = { workspace = true }
+futures = { workspace = true }
+futures-util = { workspace = true }
+once_cell = { workspace = true }
+paste = { workspace = true }
+pprof = { version = "0.11", features = ["flamegraph"] }
 pyroscope = "0.5.8"
 pyroscope_pprofrs = "0.2.10"
+rand = { workspace = true }
+rdkafka = { workspace = true, features = ["dynamic-linking"] }
+regex = { workspace = true }
+reqwest = { workspace = true }
+ringbuf = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tempfile = { workspace = true }
+time = { workspace = true }
+tokio = { workspace = true }
+tokio-stream = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+uuid = { workspace = true, features = ["v4"] }
 
 [dev-dependencies]
 actix-test = { workspace = true }

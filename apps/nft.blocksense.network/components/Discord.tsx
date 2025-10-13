@@ -1,13 +1,15 @@
 'use client';
 
-import { ChangeEvent, useEffect } from 'react';
-
+import { useEffect } from 'react';
+import type { ChangeEvent } from 'react';
 import { isDiscordUserMemberOfGuild } from 'service/client';
+
 import { useMintFormContext } from '../app/contexts/MintFormContext';
+
 import { Input } from './Input';
 
 export const Discord = () => {
-  const { discord, setDiscord, discordStatus, setDiscordStatus, mintLoading } =
+  const { discord, discordStatus, mintLoading, setDiscord, setDiscordStatus } =
     useMintFormContext();
 
   useEffect(() => {

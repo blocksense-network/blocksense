@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'vitest';
+
 import {
   arrayToObject,
   entriesOf,
@@ -100,7 +101,7 @@ describe('`base-utils/array-iter` tests', () => {
 
   describe('fromEntries', () => {
     test('should transform a list of key-value pairs into an object', () => {
-      const entries: [string, number][] = [
+      const entries: Array<[string, number]> = [
         ['a', 1],
         ['b', 2],
       ];

@@ -2,14 +2,15 @@ import { Schema as S } from 'effect';
 
 import {
   cexPriceFeedsArgsSchema,
+  commoditiesPriceFeedsArgsSchema,
+  ethGasInfoArgsSchema,
   ethRpcArgsSchema,
   exSatHoldingsArgsSchema,
+  forexPriceFeedsArgsSchema,
   geckoTerminalArgsSchema,
+  hyperBorrowRatesArgsSchema,
   spoutRwaArgsSchema,
   stockPriceFeedsArgsSchema,
-  hyperBorrowRatesArgsSchema,
-  forexPriceFeedsArgsSchema,
-  commoditiesPriceFeedsArgsSchema,
 } from './oracles';
 /**
  * Schema for the data feed category ( Chainlink compatible ).
@@ -211,6 +212,7 @@ export const NewFeedSchema = S.mutable(
           spoutRwaArgsSchema,
           exSatHoldingsArgsSchema,
           hyperBorrowRatesArgsSchema,
+          ethGasInfoArgsSchema,
         ).annotations({ identifier: 'OracleScriptArguments' }),
 
         compatibility_info: S.UndefinedOr(

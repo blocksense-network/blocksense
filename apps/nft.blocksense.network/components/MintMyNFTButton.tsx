@@ -1,16 +1,17 @@
 'use client';
 
-import { MouseEvent } from 'react';
 import { sendGAEvent } from '@next/third-parties/google';
+import type { MouseEvent } from 'react';
+import { checkParticipant, generateMintSignature } from 'service/client';
 import { useActiveAccount } from 'thirdweb/react';
 
-import { ParticipantPayload } from '@blocksense/social-verification/types';
 import { getTxHashExplorerUrl, parseTxHash } from '@blocksense/base-utils/evm';
-
+import type { ParticipantPayload } from '@blocksense/social-verification/types';
 import { mintNFT } from '@/mint';
 import { clearXHandle } from '@/utils';
-import { checkParticipant, generateMintSignature } from 'service/client';
+
 import { useMintFormContext } from '../app/contexts/MintFormContext';
+
 import { Button } from './Button';
 
 type MintMyNFTButtonProps = {
@@ -22,16 +23,16 @@ type MintMyNFTButtonProps = {
 
 export const MintMyNFTButton = ({ onSuccessAction }: MintMyNFTButtonProps) => {
   const {
+    discord,
+    discordStatus,
+    mintLoading,
+    retweetCode,
+    setAlertMessage,
+    setMintLoading,
+    setRetweetStatus,
     xHandle,
     xStatus,
     xUserId,
-    discord,
-    discordStatus,
-    retweetCode,
-    setRetweetStatus,
-    setAlertMessage,
-    mintLoading,
-    setMintLoading,
   } = useMintFormContext();
   const account = useActiveAccount();
 

@@ -1,24 +1,22 @@
 'use client';
 
 import { Effect } from 'effect';
-
+import type { ParseError } from 'effect/Cron';
 import {
   FetchHttpClient,
   HttpApiClient,
   HttpClient,
   HttpClientRequest,
 } from '@effect/platform';
-
-import { assertNotNull } from '@blocksense/base-utils/assert';
-
-import { verifyApi } from '@blocksense/social-verification/api';
-import {
+import type {
   HttpApiDecodeError,
   Unauthorized,
 } from '@effect/platform/HttpApiError';
-import { HttpClientError } from '@effect/platform/HttpClientError';
-import { ParseError } from 'effect/Cron';
-import { ParticipantPayload } from '@blocksense/social-verification/types';
+import type { HttpClientError } from '@effect/platform/HttpClientError';
+
+import { assertNotNull } from '@blocksense/base-utils/assert';
+import { verifyApi } from '@blocksense/social-verification/api';
+import type { ParticipantPayload } from '@blocksense/social-verification/types';
 
 export function getApiClient() {
   const baseUrl = assertNotNull(

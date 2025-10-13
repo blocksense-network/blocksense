@@ -16,11 +16,11 @@ name = "hdbscan_detector_test"
 path = "bin/hdbscan_detector_test.rs"
 
 [dependencies]
+anyhow = { workspace = true }
+csv = { workspace = true }
+extended-isolation-forest = { workspace = true }
+hdbscan = { workspace = true }
 rand = { workspace = true }
 rand_distr = { workspace = true }
 serde = { workspace = true }
-extended-isolation-forest = { workspace = true }
-hdbscan = { workspace = true }
-csv = { workspace = true }
-anyhow = { workspace = true }
 tracing = { workspace = true, features = ["log"] }

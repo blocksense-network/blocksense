@@ -1,9 +1,9 @@
 'use client';
 
+import { Button } from 'components/Button';
 import { motion } from 'motion/react';
 import Image from 'next/image';
 
-import { Button } from 'components/Button';
 import bgCtaDesktop from '/public/images/bg-cta-desktop.png';
 import bgCtaMobile from '/public/images/bg-cta-mobile.png';
 

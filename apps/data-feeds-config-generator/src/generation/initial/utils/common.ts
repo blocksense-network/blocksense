@@ -2,9 +2,9 @@ import { keccak256 } from 'viem';
 
 import { createPair, pairToString } from '@blocksense/config-types';
 
-import { SimplifiedFeed, SimplifiedFeedWithRank } from '../types';
-import { CMCMarketCapDataRes } from '../../../data-services/fetchers/aggregators/cmc';
+import type { CMCMarketCapDataRes } from '../../../data-services/fetchers/aggregators/cmc';
 import { stableCoins } from '../../../data-services/processors/crypto-providers/constants';
+import type { SimplifiedFeed, SimplifiedFeedWithRank } from '../types';
 
 export function getUniqueDataFeeds(
   dataFeeds: SimplifiedFeed[],

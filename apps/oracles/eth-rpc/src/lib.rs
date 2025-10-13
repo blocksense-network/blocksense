@@ -1,22 +1,24 @@
+mod logging;
+
 use alloy::{
     hex::ToHexExt,
     primitives::{Address, Bytes, U256},
     providers::ProviderBuilder,
     sol,
 };
-use tracing::{info, warn};
 use anyhow::Result;
 use blocksense_sdk::{
     http::http_post_json,
     oracle::{DataFeedResult, DataFeedResultValue, Payload, Settings},
     oracle_component,
 };
-use itertools::zip;
-use prettytable::{format, Cell, Row, Table};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::str::FromStr;
+use tracing::{info, warn};
 use url::Url;
+
+use crate::logging::print_results;
 
 pub type FeedId = u128;
 
@@ -200,9 +202,12 @@ impl Contract {
                     Some(value) => value,
                     None => break,
                 };
-                if let Ok(mut value) =
-                    http_post_json::<RequestEthCall, ResponseEthCall>(rpc_url.as_str(), eth_call, Some(timeout_secs))
-                        .await
+                if let Ok(mut value) = http_post_json::<RequestEthCall, ResponseEthCall>(
+                    rpc_url.as_str(),
+                    eth_call,
+                    Some(timeout_secs),
+                )
+                .await
                 {
                     value.rpc_url = Some(rpc_url_candidate.clone());
                     if value.error.is_none() {
@@ -256,80 +261,6 @@ fn process_results(results: &FetchedDataHashMap, resourses: &[FeedConfig]) -> Re
         payload.values.push(data_feed_result);
     }
     Ok(payload)
-}
-
-fn print_responses(results: &FetchedDataHashMap) {
-    let mut feed_ids = results.keys().cloned().collect::<Vec<FeedId>>();
-    feed_ids.sort();
-
-    let mut table = Table::new();
-    table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
-
-    table.set_titles(Row::new(vec![
-        Cell::new("Feed ID").style_spec("bc"),
-        Cell::new("Label").style_spec("bc"),
-        Cell::new("Method").style_spec("bc"),
-        Cell::new("Raw response").style_spec("bc"),
-        Cell::new("RPC Url").style_spec("bc"),
-        Cell::new("Contract").style_spec("bc"),
-    ]));
-
-    for feed_id in feed_ids {
-        let res = results.get(&feed_id).unwrap();
-        for (resp, contact) in zip(&res.responses, &res.contacts) {
-            let rpc_url = format!("{:?}", resp.rpc_url.clone());
-            let value = format!("{:?}", resp.result_as_f64());
-            table.add_row(Row::new(vec![
-                Cell::new(&feed_id.to_string()).style_spec("r"),
-                Cell::new(&contact.label).style_spec("l"),
-                Cell::new(&contact.method_name).style_spec("r"),
-                Cell::new(&value).style_spec("r"),
-                Cell::new(&rpc_url).style_spec("r"),
-                Cell::new(&contact.address.to_string()).style_spec("r"),
-            ]));
-        }
-    }
-
-    table.printstd();
-}
-
-fn print_payload(payload: &Payload, resourses: &[FeedConfig]) {
-    let mut feed_ids = resourses.iter().map(|x| x.feed_id).collect::<Vec<FeedId>>();
-    feed_ids.sort();
-
-    let mut table = Table::new();
-    table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
-
-    table.set_titles(Row::new(vec![
-        Cell::new("Feed ID").style_spec("bc"),
-        Cell::new("Pair").style_spec("bc"),
-        Cell::new("Value").style_spec("bc"),
-    ]));
-
-    for feed_id in feed_ids {
-        let x = payload
-            .values
-            .iter()
-            .find(|x| x.id.parse::<FeedId>().unwrap() == feed_id)
-            .unwrap();
-        let pair = resourses
-            .iter()
-            .find(|r| r.feed_id == feed_id)
-            .map(|x| format!("{} / {}", x.pair.base, x.pair.quote))
-            .unwrap_or("unknown".to_string());
-        let value = format!("{:?}", &x.value);
-        table.add_row(Row::new(vec![
-            Cell::new(&feed_id.to_string()).style_spec("r"),
-            Cell::new(&pair).style_spec("r"),
-            Cell::new(&value).style_spec("l"),
-        ]));
-    }
-    table.printstd();
-}
-
-fn print_results(results: &FetchedDataHashMap, payload: &Payload, resourses: &[FeedConfig]) {
-    print_responses(results);
-    print_payload(payload, resourses);
 }
 
 #[oracle_component]

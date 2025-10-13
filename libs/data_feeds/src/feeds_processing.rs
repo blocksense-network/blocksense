@@ -43,7 +43,7 @@ impl Eq for VotedFeedUpdateWithProof {}
 // Implement Ord and PartialOrd
 impl PartialOrd for VotedFeedUpdateWithProof {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.update.feed_id.cmp(&other.update.feed_id))
+        Some(self.cmp(other))
     }
 }
 

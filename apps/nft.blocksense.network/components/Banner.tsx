@@ -2,7 +2,7 @@ export const Banner = () => {
   const lastWind =
     '🏴‍☠️ Last wind before we sail! Last chance to mint! Come aboard now or be left dockside watchin’ the tide roll out. ⚓';
 
-  const crewIsBack =
+  const _crewIsBack =
     '🏴‍☠️ The crew’s back on deck and recruitin’ fast! Don’t hesitate, pirate—spots fill quick, and we might need another nap soon.';
 
   return (

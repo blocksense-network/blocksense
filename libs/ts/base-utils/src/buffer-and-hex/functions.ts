@@ -7,15 +7,15 @@
 
 import { Buffer } from 'buffer';
 
-import { ReplaceType } from '../type-level';
-import {
-  byteLength,
+import type { ReplaceType } from '../type-level';
+
+import type {
   HexDataString,
   HexQuantityString,
   HexString,
-  parseHexDataString,
   Without0x,
 } from './types';
+import { byteLength, parseHexDataString } from './types';
 
 /**
  * Replaces all instances of Uint8Array with hex string in the given object.
@@ -149,8 +149,8 @@ export function skip0x<S extends string>(input: S): Without0x<S> {
  * @param str - The string to add the prefix to.
  * @returns The string with the '0x' prefix.
  */
-export function addHexPrefix(str: HexDataString): HexDataString {
-  return (str.startsWith('0x') ? str : '0x' + str) as HexDataString;
+export function addHexPrefix(str: HexString): HexString {
+  return (str.startsWith('0x') ? str : '0x' + str) as HexString;
 }
 
 /**
@@ -167,26 +167,26 @@ export function splitHexStringEqually(
   str: HexDataString,
   partLength: number,
 ): HexDataString[] {
-  str = skip0x(str);
+  const clearStr = skip0x(str);
   if (str.length % 2 !== 0) {
     throw new Error(
-      `Invalid length. Received: string with length ${str.length}. Expected length to be a multiple of 2`,
+      `Invalid length. Received: string with length ${clearStr.length}. Expected length to be a multiple of 2`,
     );
   }
   partLength *= 2;
-  if (str.length % partLength !== 0) {
+  if (clearStr.length % partLength !== 0) {
     throw new Error(
       `Invalid length. Received: string with byte length ${byteLength}. Expected length to be a multiple of ${partLength}`,
     );
   }
   const result: HexDataString[] = [];
   let start = 0;
-  for (let index = partLength; index < str.length; index += partLength) {
-    result.push(('0x' + str.substring(start, index)) as HexDataString);
+  for (let index = partLength; index < clearStr.length; index += partLength) {
+    result.push(('0x' + clearStr.substring(start, index)) as HexDataString);
     start = index;
   }
-  if (str.length) {
-    result.push(('0x' + str.substring(start)) as HexDataString);
+  if (clearStr.length) {
+    result.push(('0x' + clearStr.substring(start)) as HexDataString);
   }
   return result;
 }
@@ -205,21 +205,21 @@ export function splitHexString(
   str: HexDataString,
   ...byteOffsets: number[]
 ): HexDataString[] {
-  str = skip0x(str);
+  let clearStr = skip0x(str);
   const result: HexDataString[] = [];
   for (const offset of byteOffsets) {
-    if (offset > str.length / 2) {
+    if (offset > clearStr.length / 2) {
       throw new Error(
         `Split offset out of range. Offset: ${offset} | Length: ${
-          str.length / 2
+          clearStr.length / 2
         }`,
       );
     }
-    const res = ('0x' + str.slice(0, offset * 2)) as HexDataString;
-    str = str.slice(offset * 2) as HexDataString;
+    const res = ('0x' + clearStr.slice(0, offset * 2)) as HexDataString;
+    clearStr = clearStr.slice(offset * 2) as HexDataString;
     result.push(res);
   }
-  result.push(('0x' + str) as HexDataString);
+  result.push(('0x' + clearStr) as HexDataString);
   return result;
 }
 
@@ -257,10 +257,10 @@ export function toHexData(
  * @returns {HexDataString} The hexadecimal string, padded to the maximum byte length.
  */
 export function padHex(hexStr: HexString, maxByteLength = 0): HexDataString {
-  hexStr = skip0x(hexStr);
-  maxByteLength = Math.max(maxByteLength, Math.ceil(hexStr.length / 2));
-  hexStr = hexStr.padStart(maxByteLength * 2, '0') as HexDataString;
-  return ('0x' + hexStr) as HexDataString;
+  let cleanHexStr = skip0x(hexStr);
+  maxByteLength = Math.max(maxByteLength, Math.ceil(cleanHexStr.length / 2));
+  cleanHexStr = cleanHexStr.padStart(maxByteLength * 2, '0') as HexString;
+  return ('0x' + cleanHexStr) as HexDataString;
 }
 
 /**

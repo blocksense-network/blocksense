@@ -1,10 +1,13 @@
-import { createContext, ReactNode, useEffect, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 
-import {
+import type {
   ColumnDef,
   DataType,
   FilterType,
   SortingType,
+} from './dataTableUtils';
+import {
   applyFacetedFilters,
   filterDataFromSearch,
   getFacetedFilters,
@@ -39,10 +42,10 @@ interface DataTableProviderProps {
 }
 
 export function DataTableProvider({
+  children,
   columns,
   data,
   filterCell = '',
-  children,
 }: DataTableProviderProps) {
   const [sorting, setSorting] = useState<{
     column: string;

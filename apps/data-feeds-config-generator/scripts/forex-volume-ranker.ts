@@ -1,14 +1,11 @@
-import {
-  NewFeed,
-  NewFeedSchema,
-  readConfig,
-  writeConfig,
-} from '@blocksense/config-types';
+import { Config, DateTime, Duration, Effect, Schema as S } from 'effect';
+import { toMillis } from 'effect/Duration';
 import { HttpClient, HttpClientRequest } from '@effect/platform';
 import { NodeHttpClient } from '@effect/platform-node';
 import { runMain } from '@effect/platform-node/NodeRuntime';
-import { Effect, Schema as S, Config, DateTime, Duration } from 'effect';
-import { toMillis } from 'effect/Duration';
+
+import type { NewFeed } from '@blocksense/config-types';
+import { readConfig, writeConfig } from '@blocksense/config-types';
 
 const FmpForexQuote = S.Struct({
   ticker: S.String,
@@ -156,7 +153,7 @@ const program = Effect.gen(function* () {
       Effect.gen(function* () {
         const split = splitPair(quote2.ticker);
         if (!split) return; // skip malformed symbol
-        const { base, quote, pair } = split;
+        const { base, pair, quote } = split;
 
         // Historical endpoint pattern (FMP). Some symbols may not have data or volume.
         // Use historical-chart daily endpoint (includes volume for FX)

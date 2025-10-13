@@ -1,7 +1,8 @@
 import { Schema as S } from 'effect';
 
-import { type ethers as EthersType, Wallet, JsonRpcProvider, id } from 'ethers';
-import type { HardhatEthersHelpers } from '@nomicfoundation/hardhat-ethers/types';
+import { Wallet, JsonRpcProvider, id } from 'ethers';
+import { LedgerSigner } from '@ethers-ext/signer-ledger';
+import HIDTransport from '@ledgerhq/hw-transport-node-hid';
 
 import {
   withTimeout,
@@ -13,6 +14,7 @@ import {
   hexDataString,
   networkName,
   parseHexDataString,
+  EthereumAddress,
 } from '@blocksense/base-utils';
 
 import {
@@ -26,7 +28,8 @@ import type { NetworkConfig } from '../types';
 const sharedPerNetworkKind = {
   deployerAddressIsLedger: asVarSchema(S.BooleanFromString),
   deployerAddress: asVarSchema(ethereumAddress),
-  deployerPrivateKey: hexDataString,
+  deployerHDWalletDerivationPath: S.String,
+  deployerPrivateKey: asVarSchema(hexDataString),
 
   adfsUpgradeableProxySalt: asVarSchema(hexDataString),
 
@@ -54,13 +57,16 @@ const envSchema = {
   perNetworkName: {
     rpcUrl: S.URL,
     feedIds: S.Union(S.Literal('all'), fromCommaSeparatedString(S.BigInt)),
+    // When set to a bigint value, this gas limit will be used for every
+    // deployment transaction instead of calling estimateGas. Useful for
+    // RPC endpoints that have issues with eth_estimateGas. Defaults to 'auto'.
+    txGasLimit: S.Union(S.Literal('auto'), S.BigInt),
 
     ...sharedPerNetworkKind,
   },
 } satisfies DeploymentEnvSchema;
 
 export async function initChain(
-  ethers: typeof EthersType & HardhatEthersHelpers,
   networkName: NetworkName,
 ): Promise<NetworkConfig> {
   const parsedEnv = parseDeploymentEnvConfig(envSchema, networkName);
@@ -75,14 +81,17 @@ export async function initChain(
       ? '0xf8f3965692216a43513fd1ea951d2b3c9d48fac5a96a95a159ce854886f7c1bd'
       : id('upgradeableProxy'),
   );
+
   // Allow the deployer private key to be empty if the deployer is a Ledger.
-  if (
-    parsedEnv.mergedConfig.deployerAddressIsLedger &&
-    !parsedEnv.mergedConfig.deployerPrivateKey
-  ) {
-    parsedEnv.mergedConfig.deployerPrivateKey = parseHexDataString('0x00');
+  if (parsedEnv.mergedConfig.deployerAddressIsLedger) {
+    parsedEnv.mergedConfig.deployerPrivateKey ??= parseHexDataString('0x00');
+  } else {
+    parsedEnv.mergedConfig.deployerHDWalletDerivationPath = '';
   }
+
   parsedEnv.mergedConfig.isSafeOriginalDeployment ??= true;
+
+  parsedEnv.mergedConfig.txGasLimit ??= 'auto';
 
   const { mergedConfig: envCfg } =
     validateAndPrintDeploymentEnvConfig(parsedEnv);
@@ -99,15 +108,34 @@ export async function initChain(
     parsedEnv.mergedConfig.isSafeOriginalDeployment,
   );
 
+  let address: EthereumAddress;
+  let deployer;
+
+  if (envCfg.deployerAddressIsLedger) {
+    const signer = new LedgerSigner(HIDTransport, provider).getSigner(
+      envCfg.deployerHDWalletDerivationPath,
+    );
+    address = parseEthereumAddress(await signer.getAddress());
+    if (address !== envCfg.deployerAddress) {
+      throw new Error(
+        `Deployer address mismatch: expected ${envCfg.deployerAddress}, got ${address}`,
+      );
+    }
+    deployer = signer;
+  } else {
+    address = envCfg.deployerAddress;
+    deployer = new Wallet(envCfg.deployerPrivateKey, provider);
+  }
+
   return {
-    deployerAddress: envCfg.deployerAddress,
+    deployerAddress: address,
     ...(envCfg.deployerAddressIsLedger
       ? {
-          deployer: await ethers.getSigner(envCfg.deployerAddress),
+          deployer: deployer as LedgerSigner,
           deployerIsLedger: true,
         }
       : {
-          deployer: new Wallet(envCfg.deployerPrivateKey, provider),
+          deployer: deployer as Wallet,
           deployerIsLedger: false,
         }),
 
@@ -131,6 +159,7 @@ export async function initChain(
     },
     feedIds: envCfg.feedIds,
     safeAddresses,
+    txGasLimit: envCfg.txGasLimit,
   } satisfies NetworkConfig;
 }
 
@@ -174,28 +203,28 @@ function getSafeAddresses(isOriginalDeployment: boolean) {
 
   return {
     multiSendAddress: parseEthereumAddress(
-      '0xf603AA036D2Fe648F0b8ee51b601e773f4096bf1',
+      '0xd921B42f7cBa1ab24d69b647129450Ba0cFcA797',
     ),
     multiSendCallOnlyAddress: parseEthereumAddress(
-      '0xe11820360fc41fC7703483CA7933997f682477A9',
+      '0x11c811009C6aFd2d1236F6512D5C5DBce6381b8a',
     ),
     createCallAddress: parseEthereumAddress(
-      '0xA0643A04FAb7f11D9dfd79A22a5D35255109E885',
+      '0x5Bd97437eD741972aCc2ac46c3295E92425C9e06',
     ),
     safeSingletonAddress: parseEthereumAddress(
-      '0xe2D17cEeA58B60101a87cA032689fb0d6DC84aEB',
+      '0xdAEcc4b9d2c62C391D135617Ffc6159DF99d576c',
     ),
     safeProxyFactoryAddress: parseEthereumAddress(
-      '0xEF3C826145BD136fcad6e66EdB563DBFB92E9a3E',
+      '0x3f5e53cFdF49F54725Ea694D57607F435fb68c1F',
     ),
     fallbackHandlerAddress: parseEthereumAddress(
-      '0xc2D3f66D9EA20D1e692Be21A82F187ae31d0Ad62',
+      '0x65D58E99Cb6574a5D0938fe20763c958455b0181',
     ),
     signMessageLibAddress: parseEthereumAddress(
-      '0x7a31fad5268d0AbC79CFaD12177747D5d656d4d2',
+      '0x14f03F7C9dC4e3eFdf62EA8E19bEdb0CdCc44F3f',
     ),
     simulateTxAccessorAddress: parseEthereumAddress(
-      '0x68F58CFBF5153128E8F5d9756761F89C3dd18D2E',
+      '0xC6d7F179BB3b8252e30edB5c317637071df0adBE',
     ),
     safeWebAuthnSharedSignerAddress: parseEthereumAddress(
       // https://github.com/safe-global/safe-modules-deployments/blob/v2.2.4/src/assets/safe-passkey-module/v0.2.1/safe-webauthn-shared-signer.json#L6gs

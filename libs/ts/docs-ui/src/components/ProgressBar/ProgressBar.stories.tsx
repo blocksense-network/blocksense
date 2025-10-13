@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Button } from '@blocksense/docs-ui/Button';
+
 import { ProgressBar } from './ProgressBar';
 
 export default {

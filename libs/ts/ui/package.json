@@ -3,14 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "exports": {
+    "./style.css": "./dist/style.css",
     "./Logo": "./src/components/Logo/Logo.tsx",
     "./website/LetsTalkEmail": "./src/components/website/LetsTalkEmail.tsx",
     "./links": "./src/constants/links.ts",
     "./utils/renderEmail": "./src/utils/renderEmail.tsx"
   },
   "scripts": {
+    "build": "yarn build-tailwind",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "build-tailwind": "tailwindcss -i src/styles/globals.css -o dist/style.css"
   },
   "peerDependencies": {
     "next": "*",
@@ -24,6 +27,7 @@
     "@storybook/addon-designs": "^10.0.1",
     "@storybook/addon-docs": "^9.0.14",
     "@storybook/nextjs-vite": "^9.0.15",
+    "@tailwindcss/cli": "^4.1.13",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24.3.1",
     "@types/react": "^19",
@@ -32,7 +36,7 @@
     "eslint": "^9.35.0",
     "eslint-config-next": "15.5.2",
     "eslint-plugin-storybook": "^9.1.4",
-    "next": "^15.0.0",
+    "next": "^15.5.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "storybook": "^9.0.14",

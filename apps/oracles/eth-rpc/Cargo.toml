@@ -1,7 +1,7 @@
 [package]
 name = "eth-rpc"
 authors = ["Yordan Madzhunkov"]
-description = ""
+description = "Oracle script exposing Ethereum RPC-based data feeds, including redemption rates such as YieldNest Restaked Ethereum / Wrapped Ethereum via on-chain contract calls."
 version = "0.1.0"
 edition = "2021"
 
@@ -9,14 +9,15 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-wit-bindgen = "0.16.0"
-blocksense-sdk = { path = "../../../libs/sdk" }
-anyhow = "1.0.82"
-serde_json = "1.0"
-url = "2.5"
-serde = { version = "1.0", features = ["derive"] }
-prettytable-rs = "0.10"
+blocksense-sdk = { workspace = true }
+
 alloy = { workspace = true }
+anyhow = "1.0.82"
 itertools = "0.8"
+prettytable-rs = "0.10"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
+url = "2.5"
+wit-bindgen = "0.16.0"

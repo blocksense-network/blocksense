@@ -13,7 +13,8 @@ Tools for working with the Blocksense registry
 name = "blocksense_registry"
 
 [dependencies]
-blocksense-utils = { path = "../../libs/utils"}
+blocksense-utils = { path = "../../libs/utils" }
+
 anyhow = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }

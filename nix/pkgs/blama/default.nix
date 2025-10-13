@@ -220,20 +220,19 @@ stdenv.mkDerivation {
 
   src = blama-src;
 
-  nativeBuildInputs =
-    [
-      cmake
-      gitMinimal
-      gnused
-      jq
-      moreutils
-    ]
-    ++ lib.optionals cudaSupport [
-      cudaPackages.cudatoolkit
-    ]
-    ++ lib.optionals stdenv.isLinux [
-      autoPatchelfHook
-    ];
+  nativeBuildInputs = [
+    cmake
+    gitMinimal
+    gnused
+    jq
+    moreutils
+  ]
+  ++ lib.optionals cudaSupport [
+    cudaPackages.cudatoolkit
+  ]
+  ++ lib.optionals stdenv.isLinux [
+    autoPatchelfHook
+  ];
 
   buildInputs = [ ];
 

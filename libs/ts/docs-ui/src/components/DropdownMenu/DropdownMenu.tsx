@@ -1,26 +1,24 @@
 'use client';
 
 import React, {
-  useState,
-  useRef,
-  useEffect,
   createContext,
   useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import type {
+  ChangeEvent,
   HTMLAttributes,
+  MouseEvent,
   ReactNode,
   RefObject,
-  MouseEvent,
-  ChangeEvent,
 } from 'react';
 
-import { Icon } from '@blocksense/docs-ui/Icon';
-import {
-  cn,
-  getSideAlignClasses,
-  Align,
-  Side,
-} from '@blocksense/docs-ui/utils';
 import { Checkbox } from '@blocksense/docs-ui/Checkbox';
+import { Icon } from '@blocksense/docs-ui/Icon';
+import type { Align, Side } from '@blocksense/docs-ui/utils';
+import { cn, getSideAlignClasses } from '@blocksense/docs-ui/utils';
 
 interface DropdownContextValue {
   open: boolean;
@@ -88,10 +86,10 @@ export const DropdownMenuTrigger = ({
 };
 
 export const DropdownMenuContent = ({
-  className,
-  children,
-  side = 'bottom',
   align = 'start',
+  children,
+  className,
+  side = 'bottom',
   ...props
 }: HTMLAttributes<HTMLDivElement> & {
   children: ReactNode;
@@ -119,10 +117,10 @@ export const DropdownMenuContent = ({
 };
 
 export const DropdownMenuItem = ({
-  inset,
-  className,
   children,
+  className,
   disabled,
+  inset,
   ...props
 }: HTMLAttributes<HTMLDivElement> & {
   inset?: boolean;
@@ -145,9 +143,9 @@ export const DropdownMenuItem = ({
 };
 
 export const DropdownMenuCheckboxItem = ({
-  className,
-  children,
   checked,
+  children,
+  className,
   onCheckedChange,
   ...props
 }: HTMLAttributes<HTMLDivElement> & {
@@ -188,9 +186,9 @@ export const DropdownMenuCheckboxItem = ({
 };
 
 export const DropdownMenuLabel = ({
-  inset,
-  className,
   children,
+  className,
+  inset,
   ...props
 }: HTMLAttributes<HTMLDivElement> & {
   inset?: boolean;
@@ -226,9 +224,9 @@ export const DropdownMenuShortcut = ({
 };
 
 export const DropdownMenuSubTrigger = ({
+  children,
   className,
   inset,
-  children,
   submenu,
   ...props
 }: HTMLAttributes<HTMLDivElement> & {

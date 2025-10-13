@@ -1,12 +1,11 @@
-import { EventDocItem } from '@blocksense/sol-reflector';
-
-import { Signature } from '@/sol-contracts-components/Signature';
-import { NatSpec } from '@/sol-contracts-components/NatSpec';
-import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { Parameters } from '@/sol-contracts-components/Parameters';
-import { ABIModal } from '@/sol-contracts-components/ABIModal/ABIModal';
-import { ContractAccordion } from '@/components/sol-contracts/ContractAccordion';
+import type { EventDocItem } from '@blocksense/sol-reflector';
 import { getContractElementsNames } from '@/components/ReferenceDocumentation/SourceUnit';
+import { ContractAccordion } from '@/components/sol-contracts/ContractAccordion';
+import { ABIModal } from '@/sol-contracts-components/ABIModal/ABIModal';
+import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
+import { NatSpec } from '@/sol-contracts-components/NatSpec';
+import { Parameters } from '@/sol-contracts-components/Parameters';
+import { Signature } from '@/sol-contracts-components/Signature';
 
 type EventsProps = {
   events?: EventDocItem[];
