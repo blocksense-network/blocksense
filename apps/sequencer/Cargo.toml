@@ -55,7 +55,7 @@ futures = { workspace = true }
 futures-util = { workspace = true }
 once_cell = { workspace = true }
 paste = { workspace = true }
-pprof = { version = "0.11", features = ["flamegraph"] }
+pprof = { version = "0.15", features = ["flamegraph"] }
 pyroscope = "0.5.8"
 pyroscope_pprofrs = "0.2.10"
 rand = { workspace = true }
