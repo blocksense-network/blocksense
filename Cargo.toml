@@ -6,17 +6,15 @@ members = [
   "apps/trigger-oracle",
   "libs/alpaca_core",
   "libs/anomaly_detection",
-  "libs/data_feeds",
-  "libs/data_providers_sdk",
-  "libs/metrics",
-  "libs/registry",
-  "libs/sdk",
-  "libs/utils",
+  "libs/blockchain_data_model",
   "libs/config",
   "libs/crypto",
+  "libs/data_feeds",
   "libs/feed_registry",
-  "libs/blockchain_data_model",
   "libs/feeds_processing",
+  "libs/metrics",
+  "libs/registry",
+  "libs/utils",
 ]
 
 resolver = "2"
@@ -28,46 +26,34 @@ license = "to be decided"
 edition = "2021"
 
 [workspace.dependencies]
-blocksense-utils = { path = "libs/utils" }
 blocksense-anomaly-detection = { path = "libs/anomaly_detection" }
 blocksense-blockchain-data-model = { path = "libs/blockchain_data_model" }
-blocksense-macro = { path = "libs/sdk/macro" }
-blocksense-registry = { path = "libs/registry" }
-blocksense-sdk = { path = "libs/sdk" }
 blocksense-config = { path = "libs/config" }
 blocksense-crypto = { path = "libs/crypto" }
 blocksense-data-feeds = { path = "libs/data_feeds" }
-blocksense-data-providers-sdk = { path = "libs/data_providers_sdk" }
 blocksense-feed-registry = { path = "libs/feed_registry" }
 blocksense-feeds-processing = { path = "libs/feeds_processing" }
 blocksense-gnosis-safe = { path = "libs/gnosis_safe" }
 blocksense-metrics = { path = "libs/metrics" }
+blocksense-registry = { path = "libs/registry" }
+blocksense-utils = { path = "libs/utils" }
 
-anyhow = "1"
-futures = "0.3"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = { version = "1.0", features = ["float_roundtrip"] }
-url = "2.5"
-log = "0.4"
-rand = "0.8"
-reqwest = { version = "0.12", features = ["multipart", "blocking", "json"] }
-tokio = { version = "1.44.2", features = ["full"] }
-tracing = { version = "0.1", features = ["async-await", "log"] }
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-chrono = "0.4.39"
 actix-test = "0.1.5"
 actix-web = "4.6.0"
 alloy = "1.0.9"
 alloy-primitives = "1.1.2"
 alloy-u256-literal = "^0.1"
+anyhow = "1"
 blst = "0.3.12"
 bytes = "1.9.0"
+chrono = "0.4.39"
 console-subscriber = "0.4.0"
 csv = "1.3.0"
 curl = "0.4.47"
 dirs = "6.0.0"
 extended-isolation-forest = "0.2.3"
 eyre = "0.6.12"
+futures = "0.3"
 futures-util = "0.3.30"
 hdbscan = "0.9.0"
 hex = "0.4.3"
@@ -78,23 +64,26 @@ indexmap = "2"
 itertools = "0.14.0"
 json-patch = "4.0.0"
 lazy_static = "1.4.0"
+log = "0.4"
 num = "0.4.3"
 once_cell = "1.20.2"
 outbound-http = { git = "https://github.com/blocksense-network/spin", branch = "blocksense" }
 paste = "1.0.15"
 port_scanner = "0.1.5"
 prettytable-rs = "0.10"
-proc-macro2 = "1"
 prometheus = { package = "prometheus", version = "0.13.4" }
-quote = "1.0"
+rand = "0.8"
 rand_distr = "0.4.3"
 rdkafka = "0.37.0"
 regex = "1.11.1"
+reqwest = { version = "0.12", features = ["multipart", "blocking", "json"] }
 reqwest-middleware = "0.4"
 reqwest-retry = "0.7"
 ringbuf = "0.4.7"
+serde = { version = "1.0", features = ["derive"] }
 serde-this-or-that = "0.5.0"
 serde_derive = "1.0.210"
+serde_json = { version = "1.0", features = ["float_roundtrip"] }
 spin-app = { git = "https://github.com/blocksense-network/spin", branch = "blocksense" }
 spin-core = { git = "https://github.com/blocksense-network/spin", branch = "blocksense" }
 spin-outbound-networking = { git = "https://github.com/blocksense-network/spin", branch = "blocksense" }
@@ -103,14 +92,17 @@ spin-trigger = { git = "https://github.com/blocksense-network/spin", branch = "b
 ssz_rs = "0.9.0"
 strum = "0.26.3"
 strum_macros = "0.26.4"
-syn = "1.0"
 tempfile = "3.13.0"
 terminal = { git = "https://github.com/blocksense-network/spin", branch = "blocksense" }
 thiserror = "2.0.11"
 time = "0.3.36"
+tokio = { version = "1.44.2", features = ["full"] }
 tokio-stream = "0.1.16"
 toml = "0.8.13"
 toml_edit = "0.22.22"
+tracing = { version = "0.1", features = ["async-await", "log"] }
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+url = "2.5"
 uuid = "1.12.1"
 vergen = "9.0.4"
 wasmtime = "22.0.0"

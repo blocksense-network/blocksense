@@ -1,9 +1,8 @@
-import { EnumDocItem } from '@blocksense/sol-reflector';
-
-import { NatSpec } from '@/sol-contracts-components/NatSpec';
-import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
-import { ContractAccordion } from '@/components/sol-contracts/ContractAccordion';
+import type { EnumDocItem } from '@blocksense/sol-reflector';
 import { getContractElementsNames } from '@/components/ReferenceDocumentation/SourceUnit';
+import { ContractAccordion } from '@/components/sol-contracts/ContractAccordion';
+import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
+import { NatSpec } from '@/sol-contracts-components/NatSpec';
 
 type EnumsProps = {
   enums?: EnumDocItem[];

@@ -1,26 +1,25 @@
-import {
+import type {
+  ContractDefinition,
   EnumDefinition,
   ErrorDefinition,
   EventDefinition,
   FunctionDefinition,
-  ModifierDefinition,
-  ParameterList,
-  StructDefinition,
-  VariableDeclaration,
+  ImportDirective,
   Literal,
-  UserDefinedValueTypeDefinition,
-  UsingForDirective,
+  ModifierDefinition,
+  Mutability,
+  ParameterList,
+  PragmaDirective,
   SourceUnit,
   StateMutability,
-  ContractDefinition,
-  ImportDirective,
-  PragmaDirective,
-  Visibility,
-  Mutability,
+  StructDefinition,
   TypeDescriptions,
+  UserDefinedValueTypeDefinition,
+  UsingForDirective,
+  VariableDeclaration,
+  Visibility,
 } from 'solidity-ast';
-import { SolcInput, SolcOutput } from 'solidity-ast/solc';
-
+import type { SolcInput, SolcOutput } from 'solidity-ast/solc';
 import type { AbiStruct } from 'web3-types';
 
 export enum OutputFormat {
@@ -107,7 +106,10 @@ export type ASTNode =
   | WithNatspec<ParameterList>
   | WithNatspec<Literal>;
 
-export type SolReflection = { rawData: ASTNode; fineData: SourceUnitDocItem }[];
+export type SolReflection = Array<{
+  rawData: ASTNode;
+  fineData: SourceUnitDocItem;
+}>;
 
 export type ContractElement =
   | FunctionDocItem
@@ -233,7 +235,7 @@ export class PragmaDocItem {
 
 export type TreeNode<ExtraData> = {
   name: string;
-  children?: TreeNode<ExtraData>[];
+  children?: Array<TreeNode<ExtraData>>;
 } & ExtraData;
 
 export function isLiteral(value: ASTNode): value is Literal {

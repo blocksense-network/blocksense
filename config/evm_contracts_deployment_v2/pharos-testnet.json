@@ -9,7 +9,7 @@
         "salt": "0xac9b16bbc2aef49ecf589250324ab6467a1e372628bdd9a1c6f73ced045a22e1"
       },
       "AggregatedDataFeedStore": {
-        "address": "0x707bb37B703E4cf7C941bd57E90B16334714f887",
+        "address": "0xdcF5645deA66Ca31CB43CB702bF8a80ae6f37E1F",
         "constructorArgs": ["0xF1B62f07bEc1935ADACdeE5d12ccA0E90F9A108B"],
         "salt": "0x71b411ccc58b0bf522c76bab9a977992a03cfbc078d3852ee8ee8b6d5311a477"
       },
@@ -11679,6 +11679,71 @@
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "102153",
+        "base": null,
+        "quote": null
+      },
+      "102201": {
+        "address": "0xb385f49b98b613C3Cadce3d83f6C9760AF3749a1",
+        "constructorArgs": [
+          "WETH Aave Borrow Rate on Ethereum Mainnet",
+          18,
+          "102201",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102201",
+        "base": null,
+        "quote": null
+      },
+      "102202": {
+        "address": "0xFBB42B1b0f61c6A945375C94BB6Cea0F94FBFD00",
+        "constructorArgs": [
+          "weETH Aave Borrow Rate on Ethereum Mainnet",
+          18,
+          "102202",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102202",
+        "base": null,
+        "quote": null
+      },
+      "102203": {
+        "address": "0x34Df73b716bc560aFCA45ba979654c21318d4F92",
+        "constructorArgs": [
+          "USDT Aave Borrow Rate on Ethereum Mainnet",
+          18,
+          "102203",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102203",
+        "base": null,
+        "quote": null
+      },
+      "102204": {
+        "address": "0x3D02e3f7779c480Ec2228C9992a815bA7d3af1ba",
+        "constructorArgs": [
+          "wstETH Aave Borrow Rate on Ethereum Mainnet",
+          18,
+          "102204",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102204",
+        "base": null,
+        "quote": null
+      },
+      "102205": {
+        "address": "0x4D834564DeF9617d8324e047f0e9544e834715E4",
+        "constructorArgs": [
+          "USDC Aave Borrow Rate on Ethereum Mainnet",
+          18,
+          "102205",
+          "0x72F88509C53b939a0613c679a0F4768c0444d247"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102205",
         "base": null,
         "quote": null
       },

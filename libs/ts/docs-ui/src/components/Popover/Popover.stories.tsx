@@ -1,17 +1,19 @@
 import React from 'react';
 
-import { Popover, PopoverTrigger, PopoverContent } from './Popover';
+import { Separator } from '@blocksense/docs-ui';
+
+import { Button } from '../Button';
 import {
   Command,
-  CommandInput,
-  CommandList,
   CommandEmpty,
   CommandGroup,
+  CommandInput,
   CommandItem,
+  CommandList,
   CommandShortcut,
 } from '../Command';
-import { Button } from '../Button';
-import { Separator } from '@blocksense/docs-ui';
+
+import { Popover, PopoverContent, PopoverTrigger } from './Popover';
 
 const CommandContent = () => (
   <Command className="command-story">

@@ -1,13 +1,14 @@
-import Web3 from 'web3';
+import { saveParticipant } from 'service/client';
 import { createThirdwebClient, getContract, sendTransaction } from 'thirdweb';
 import { arbitrum } from 'thirdweb/chains';
-import { Account, smartWallet } from 'thirdweb/wallets';
 import { mintWithSignature } from 'thirdweb/extensions/erc721';
+import type { Account } from 'thirdweb/wallets';
+import { smartWallet } from 'thirdweb/wallets';
+import Web3 from 'web3';
 
-import { ParticipantPayload } from '@blocksense/social-verification/types';
 import { assertNotNull } from '@blocksense/base-utils/assert';
 import { loopWhile } from '@blocksense/base-utils/async';
-import { saveParticipant } from 'service/client';
+import type { ParticipantPayload } from '@blocksense/social-verification/types';
 
 export function getClient() {
   const CLIENT_ID = assertNotNull(process.env['NEXT_PUBLIC_NFT_CLIENT_ID']);
@@ -62,7 +63,7 @@ export const mintNFT = async (
   try {
     setAlertMessage('Adding your NFT to your wallet...');
     await confirmAssetInAccount(account, CONTRACT_ADDRESS, transactionHash);
-  } catch (e) {
+  } catch {
     console.error('Error confirming asset in account');
   }
 
@@ -87,11 +88,11 @@ async function confirmAssetInAccount(
           type: 'ERC721',
           options: {
             address: contractAddress,
-            tokenId: tokenId,
+            tokenId,
           },
         } as any);
         return success;
-      } catch (e) {
+      } catch {
         return false;
       }
     },
@@ -122,7 +123,7 @@ export async function getTokenId(txHash: string): Promise<string> {
       try {
         const receipt = await web3.eth.getTransactionReceipt(txHash);
         return receipt;
-      } catch (e) {
+      } catch {
         return null;
       }
     },
@@ -142,7 +143,9 @@ export async function getTokenId(txHash: string): Promise<string> {
       );
 
       return `${decoded['tokenId']}`;
-    } catch {}
+    } catch {
+      // Not the Transfer event, continue to the next log
+    }
   }
 
   throw new Error('Transfer event with tokenId not found');

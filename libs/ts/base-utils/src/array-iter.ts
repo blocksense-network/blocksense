@@ -1,4 +1,4 @@
-import { Literal, LiteralTuple, NonEmptyTuple } from './type-level';
+import type { Literal, LiteralTuple, NonEmptyTuple } from './type-level';
 
 /**
  * Returns an array of a given object's own enumerable string-keyed property
@@ -32,8 +32,10 @@ export function valuesOf<K extends string, V>(obj: Record<K, V>): V[] {
  * @param {Record<K, V>} obj - The object to get the entries from.
  * @returns {[K, V][]} An array of the object's [key, value] pairs.
  */
-export function entriesOf<K extends string, V>(obj: Record<K, V>): [K, V][] {
-  return Object.entries(obj) as [K, V][];
+export function entriesOf<K extends string, V>(
+  obj: Record<K, V>,
+): Array<[K, V]> {
+  return Object.entries(obj) as Array<[K, V]>;
 }
 
 /**
@@ -45,7 +47,7 @@ export function entriesOf<K extends string, V>(obj: Record<K, V>): [K, V][] {
  * @returns {Record<K, V>} The new object.
  */
 export function fromEntries<K extends string, V>(
-  entries: [K, V][],
+  entries: Array<[K, V]>,
 ): Record<K, V> {
   return Object.fromEntries(entries) as Record<K, V>;
 }

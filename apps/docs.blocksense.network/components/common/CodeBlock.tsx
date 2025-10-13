@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
-import { codeToHtml, ShikiTransformer } from 'shiki';
-import { useTheme } from '@blocksense/nextra-theme-docs';
+import type { ShikiTransformer } from 'shiki';
+import { codeToHtml } from 'shiki';
 
 import { CopyButton } from '@blocksense/docs-ui/CopyButton';
+import { useTheme } from '@blocksense/nextra-theme-docs';
 import { shikiDefaultThemes } from '@/config';
 
 type CodeBlockProps = {
@@ -23,15 +24,15 @@ type CodeBlockProps = {
 };
 
 export const CodeBlock = ({
+  className = '',
   code = '',
+  copy = { hasCopyButton: true, disabled: false },
   lang = 'text',
   themes = shikiDefaultThemes.themes,
-  copy = { hasCopyButton: true, disabled: false },
   transformers = [],
-  className = '',
 }: CodeBlockProps) => {
   const [html, setHtml] = useState('');
-  const { theme, systemTheme } = useTheme();
+  const { systemTheme, theme } = useTheme();
 
   const currentTheme = useMemo(() => {
     if (theme === 'system') {

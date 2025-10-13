@@ -1,7 +1,5 @@
 import React from 'react';
 
-import { FunctionModifierDocItem } from '@blocksense/sol-reflector';
-
 import {
   Table,
   TableBody,
@@ -11,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@blocksense/docs-ui/Table';
+import type { FunctionModifierDocItem } from '@blocksense/sol-reflector';
 import { ContractItemWrapper } from '@/sol-contracts-components/ContractItemWrapper';
 
 type FunctionModifiersProps = {

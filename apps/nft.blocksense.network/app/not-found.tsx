@@ -1,7 +1,6 @@
-import { Metadata } from 'next';
-import Link from 'next/link';
-
 import { Button } from 'components/Button';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 
 export const metadata: Metadata = {
   title: '404 - Not Found',

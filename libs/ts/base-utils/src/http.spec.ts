@@ -1,10 +1,11 @@
+import { Effect, Layer, Schema as S } from 'effect';
+import { ParseError } from 'effect/ParseResult';
 import {
   HttpClient,
   HttpClientError,
   HttpClientRequest,
   HttpClientResponse,
 } from '@effect/platform';
-import { Effect, Layer, Schema as S } from 'effect';
 import {
   afterEach,
   beforeEach,
@@ -13,8 +14,8 @@ import {
   it,
   vi,
 } from '@effect/vitest';
+
 import { fetchAndDecodeJSON, fetchAndDecodeJSONEffect } from './http';
-import { ParseError } from 'effect/ParseResult';
 
 describe('fetchAndDecodeJSON', () => {
   beforeEach(() => {

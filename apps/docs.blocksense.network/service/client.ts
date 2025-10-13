@@ -1,12 +1,12 @@
 'use client';
 
-import { Effect } from 'effect';
 import {
   FetchHttpClient,
   HttpApiClient,
   HttpClient,
   HttpClientRequest,
 } from '@effect/platform';
+import { Effect } from 'effect';
 
 import { assertNotNull } from '@blocksense/base-utils/assert';
 import { verifyApi } from '@blocksense/social-verification/api';

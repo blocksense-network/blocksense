@@ -1,7 +1,8 @@
-import { useRouter } from 'next/navigation';
+import type { useRouter } from 'next/navigation';
 
 import { previewHexString } from '@blocksense/base-utils/buffer-and-hex';
-import { VariableDocItem } from '@blocksense/sol-reflector';
+import { NetworkName } from '@blocksense/base-utils/evm/networks';
+import type { VariableDocItem } from '@blocksense/sol-reflector';
 
 export const filterConstants = (
   variables: VariableDocItem[] = [],
@@ -67,3 +68,7 @@ export const showMsInSeconds = (ms: number): string => {
 export const showPercentage = (value: any): string => {
   return `${value} %`;
 };
+
+export function networkNameToIconName(networkName: NetworkName) {
+  return networkName.split('-')[0];
+}

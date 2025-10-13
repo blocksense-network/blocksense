@@ -1,7 +1,8 @@
 import { Schema as S } from 'effect';
 
-import { type ethers as EthersType, Wallet, JsonRpcProvider, id } from 'ethers';
-import type { HardhatEthersHelpers } from '@nomicfoundation/hardhat-ethers/types';
+import { Wallet, JsonRpcProvider, id } from 'ethers';
+import { LedgerSigner } from '@ethers-ext/signer-ledger';
+import HIDTransport from '@ledgerhq/hw-transport-node-hid';
 
 import {
   withTimeout,
@@ -13,6 +14,7 @@ import {
   hexDataString,
   networkName,
   parseHexDataString,
+  EthereumAddress,
 } from '@blocksense/base-utils';
 
 import {
@@ -26,6 +28,7 @@ import type { NetworkConfig } from '../types';
 const sharedPerNetworkKind = {
   deployerAddressIsLedger: asVarSchema(S.BooleanFromString),
   deployerAddress: asVarSchema(ethereumAddress),
+  deployerHDWalletDerivationPath: S.String,
   deployerPrivateKey: asVarSchema(hexDataString),
 
   adfsUpgradeableProxySalt: asVarSchema(hexDataString),
@@ -54,13 +57,16 @@ const envSchema = {
   perNetworkName: {
     rpcUrl: S.URL,
     feedIds: S.Union(S.Literal('all'), fromCommaSeparatedString(S.BigInt)),
+    // When set to a bigint value, this gas limit will be used for every
+    // deployment transaction instead of calling estimateGas. Useful for
+    // RPC endpoints that have issues with eth_estimateGas. Defaults to 'auto'.
+    txGasLimit: S.Union(S.Literal('auto'), S.BigInt),
 
     ...sharedPerNetworkKind,
   },
 } satisfies DeploymentEnvSchema;
 
 export async function initChain(
-  ethers: typeof EthersType & HardhatEthersHelpers,
   networkName: NetworkName,
 ): Promise<NetworkConfig> {
   const parsedEnv = parseDeploymentEnvConfig(envSchema, networkName);
@@ -75,14 +81,17 @@ export async function initChain(
       ? '0xf8f3965692216a43513fd1ea951d2b3c9d48fac5a96a95a159ce854886f7c1bd'
       : id('upgradeableProxy'),
   );
+
   // Allow the deployer private key to be empty if the deployer is a Ledger.
-  if (
-    parsedEnv.mergedConfig.deployerAddressIsLedger &&
-    !parsedEnv.mergedConfig.deployerPrivateKey
-  ) {
-    parsedEnv.mergedConfig.deployerPrivateKey = parseHexDataString('0x00');
+  if (parsedEnv.mergedConfig.deployerAddressIsLedger) {
+    parsedEnv.mergedConfig.deployerPrivateKey ??= parseHexDataString('0x00');
+  } else {
+    parsedEnv.mergedConfig.deployerHDWalletDerivationPath = '';
   }
+
   parsedEnv.mergedConfig.isSafeOriginalDeployment ??= true;
+
+  parsedEnv.mergedConfig.txGasLimit ??= 'auto';
 
   const { mergedConfig: envCfg } =
     validateAndPrintDeploymentEnvConfig(parsedEnv);
@@ -99,15 +108,34 @@ export async function initChain(
     parsedEnv.mergedConfig.isSafeOriginalDeployment,
   );
 
+  let address: EthereumAddress;
+  let deployer;
+
+  if (envCfg.deployerAddressIsLedger) {
+    const signer = new LedgerSigner(HIDTransport, provider).getSigner(
+      envCfg.deployerHDWalletDerivationPath,
+    );
+    address = parseEthereumAddress(await signer.getAddress());
+    if (address !== envCfg.deployerAddress) {
+      throw new Error(
+        `Deployer address mismatch: expected ${envCfg.deployerAddress}, got ${address}`,
+      );
+    }
+    deployer = signer;
+  } else {
+    address = envCfg.deployerAddress;
+    deployer = new Wallet(envCfg.deployerPrivateKey, provider);
+  }
+
   return {
-    deployerAddress: envCfg.deployerAddress,
+    deployerAddress: address,
     ...(envCfg.deployerAddressIsLedger
       ? {
-          deployer: await ethers.getSigner(envCfg.deployerAddress),
+          deployer: deployer as LedgerSigner,
           deployerIsLedger: true,
         }
       : {
-          deployer: new Wallet(envCfg.deployerPrivateKey, provider),
+          deployer: deployer as Wallet,
           deployerIsLedger: false,
         }),
 
@@ -131,6 +159,7 @@ export async function initChain(
     },
     feedIds: envCfg.feedIds,
     safeAddresses,
+    txGasLimit: envCfg.txGasLimit,
   } satisfies NetworkConfig;
 }
 

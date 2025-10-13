@@ -1,7 +1,7 @@
 import { Schema as S } from 'effect';
 
-import { ethereumAddress } from '@blocksense/base-utils/evm';
 import { keysOf, valuesOf } from '@blocksense/base-utils';
+import { ethereumAddress } from '@blocksense/base-utils/evm';
 
 export const chainlinkNetworkNameToChainId = {
   'avalanche-fuji-testnet': 'avalanche-fuji',

@@ -1,3 +1,6 @@
+import { readFile, writeFile } from 'node:fs/promises';
+import * as prettier from 'prettier';
+
 import { AbiCoder, formatEther, id, ZeroAddress } from 'ethers';
 import { task } from 'hardhat/config';
 
@@ -33,14 +36,14 @@ import { upgradeProxyImplementation } from './deployment-utils/upgrade-proxy-imp
 
 task('deploy', 'Deploy contracts')
   .addParam('networks', 'Network to deploy to')
-  .setAction(async (args, { ethers, artifacts, run }) => {
+  .setAction(async (args, { artifacts }) => {
     const networks = args.networks.split(',');
     const configs: NetworkConfig[] = [];
     for (const network of networks) {
       if (!isNetworkName(network)) {
         throw new Error(`Invalid network: ${network}`);
       }
-      configs.push(await initChain(ethers, network));
+      configs.push(await initChain(network));
     }
 
     const { feeds } = await readConfig('feeds_config_v2');
@@ -319,6 +322,18 @@ async function saveDeployment(
   chainsDeployment: Record<NetworkName, DeploymentConfigV2>,
 ) {
   for (const { networkName } of configs) {
-    await writeEvmDeployment(networkName, chainsDeployment[networkName]);
+    const filePath = await writeEvmDeployment(
+      networkName,
+      chainsDeployment[networkName],
+    );
+
+    const source = await readFile(filePath, 'utf8');
+    const options = await prettier.resolveConfig(filePath);
+    const formatted = await prettier.format(source, {
+      ...options,
+      parser: 'json',
+      filepath: filePath,
+    });
+    await writeFile(filePath, formatted, 'utf8');
   }
 }

@@ -1,7 +1,8 @@
-import { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
+import type { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 
-export const deployedNetworks = [
+export const deployedTestnets = [
   'abstract-testnet',
+  'apechain-curtis',
   'arbitrum-sepolia',
   'aurora-testnet',
   'avalanche-fuji',
@@ -23,6 +24,7 @@ export const deployedNetworks = [
   'fantom-testnet',
   'flare-coston',
   'fraxtal-testnet',
+  'giwa-sepolia',
   'gravity-sepolia',
   'harmony-testnet-shard0',
   'hemi-sepolia',
@@ -71,8 +73,16 @@ export const deployedNetworks = [
   'unichain-sepolia',
   'world-chain-sepolia',
   'zephyr-testnet',
+  'zilliqa-testnet',
   'zksync-sepolia',
 ] satisfies NetworkName[];
+
+export const deployedMainnets = [
+  'arbitrum-mainnet',
+  'somnia-mainnet',
+  'taraxa-mainnet',
+  'unichain-mainnet',
+] as const satisfies NetworkName[];
 
 export type Transaction = {
   from: EthereumAddress;

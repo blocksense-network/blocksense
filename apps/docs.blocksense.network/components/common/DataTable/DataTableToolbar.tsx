@@ -2,21 +2,21 @@
 
 import { useContext } from 'react';
 
-import { Input } from '@blocksense/docs-ui/Input';
 import { Button } from '@blocksense/docs-ui/Button';
 import { ImageWrapper } from '@blocksense/docs-ui/ImageWrapper';
+import { Input } from '@blocksense/docs-ui/Input';
 
 import { DataTableContext } from './DataTableContext';
 import { DataTableFacetedFilter } from './DataTableFacetedFilter';
+import type { FilterType } from './dataTableUtils';
 import { DataTableViewOptions } from './DataTableViewOptions';
-import { FilterType } from './dataTableUtils';
 
 interface DataTableToolbarProps {
   filterCellTitle?: string;
 }
 
 export function DataTableToolbar({ filterCellTitle }: DataTableToolbarProps) {
-  const { searchValue, setSearchValue, facetedFilters, setFacetedFilters } =
+  const { facetedFilters, searchValue, setFacetedFilters, setSearchValue } =
     useContext(DataTableContext);
 
   const isFiltered =

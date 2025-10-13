@@ -1,3 +1,7 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import effectEsLintPlugin from '@effect/eslint-plugin';
 import { fixupPluginRules } from '@eslint/compat';
 import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
@@ -6,9 +10,6 @@ import codegen from 'eslint-plugin-codegen';
 import _import from 'eslint-plugin-import';
 import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import sortDestructureKeys from 'eslint-plugin-sort-destructure-keys';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import effectEsLintPlugin from '@effect/eslint-plugin';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,14 +29,13 @@ export default [
       '.yarn/**',
       '.pnp.cjs',
       '.prettierrc.cjs',
-      'libs/ts/contracts/typechain',
       'libs/aztec_contracts',
-      'libs/base-utils',
-      'libs/ts',
-      'apps/data-feeds-config-generator',
+      'libs/ts/contracts',
+      'libs/ts/contracts/typechain',
+      'libs/ts/esbuild-react-compiler-plugin',
+      'libs/ts/nextra-theme-docs',
+      'libs/ts/sol-reflector',
       'apps/docs.blocksense.network',
-      'apps/nft.blocksense.network',
-      'apps/social-verification',
       'apps/rollup',
       'scripts/',
     ],
@@ -79,25 +79,40 @@ export default [
       'object-shorthand': 'error',
       'prefer-destructuring': 'off',
       'sort-imports': 'off',
-
-      'no-restricted-syntax': [
-        'error',
-        {
-          selector:
-            "CallExpression[callee.property.name='push'] > SpreadElement.arguments",
-          message: 'Do not use spread arguments in Array.push',
-        },
-      ],
-
       'no-unused-vars': 'off',
       'prefer-rest-params': 'off',
       'prefer-spread': 'off',
+
       'import/first': 'error',
       'import/newline-after-import': 'error',
       'import/no-duplicates': 'error',
       'import/no-unresolved': 'off',
       'import/order': 'off',
-      'simple-import-sort/imports': 'off',
+      'simple-import-sort/imports': [
+        'error',
+        {
+          groups: [
+            // 1. Side effect imports
+            ['^\\u0000'],
+            // 2. Node.js built-ins
+            [
+              '^(node:)?(assert|buffer|child_process|cluster|crypto|dgram|dns|domain|events|fs|http|http2|https|inspector|module|net|os|path|perf_hooks|process|punycode|querystring|readline|repl|stream|string_decoder|timers|tls|trace_events|tty|url|util|v8|vm|worker_threads|zlib)(/|$)',
+            ],
+            // 3. External packages (react and effect-related first)
+            ['^react$', '^react-dom$', '^effect', '^@effect/', '^@?\\w'],
+            // 4. Internal monorepo packages (adjust these aliases if needed)
+            ['^@blocksense/', '^@apps/', '^@libs/', '^@/'],
+            // 5. Absolute imports (capitalized or other root based)
+            ['^[A-Z]'],
+            // 6. Parent imports
+            ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
+            // 7. Sibling & index
+            ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
+            // 8. Style imports
+            ['^.+\\.s?css$'],
+          ],
+        },
+      ],
       'sort-destructure-keys/sort-destructure-keys': 'error',
       'deprecation/deprecation': 'off',
 
@@ -132,6 +147,7 @@ export default [
       '@typescript-eslint/no-array-constructor': 'off',
       '@typescript-eslint/no-use-before-define': 'off',
       '@typescript-eslint/no-namespace': 'off',
+      '@typescript-eslint/no-duplicate-enum-values': 'off',
     },
   },
 ];

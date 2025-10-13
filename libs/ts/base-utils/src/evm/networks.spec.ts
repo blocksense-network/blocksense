@@ -6,18 +6,19 @@
  */
 
 import { describe, expect, test } from 'vitest';
+
+import { parseEthereumAddress, parseTxHash } from './hex-types';
 import {
-  isNetworkName,
+  getAddressExplorerUrl,
+  getTxHashExplorerUrl,
   isChainId,
   isNetwork,
-  parseNetworkName,
+  isNetworkName,
+  isTestnet,
   parseChainId,
   parseNetwork,
-  getTxHashExplorerUrl,
-  getAddressExplorerUrl,
-  isTestnet,
+  parseNetworkName,
 } from './networks';
-import { parseEthereumAddress, parseTxHash } from './hex-types';
 
 describe('Network constants tests', () => {
   test(`'isNetworkName' should return true for valid network names`, () => {

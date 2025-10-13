@@ -1,12 +1,16 @@
-import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
 import { entriesOf } from '@blocksense/base-utils/array-iter';
-import { ExchangeAssetsFetcher, AssetInfo } from '../exchange-assets';
-import {
+import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
+
+import type { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
+
+import type {
   KrakenAssetInfo,
   KrakenAssetPairsResp,
+  KrakenPrice,
+} from './types';
+import {
   KrakenAssetPairsRespSchema,
   KrakenAssetRespSchema,
-  KrakenPrice,
   KrakenPriceSchema,
 } from './types';
 
@@ -16,7 +20,7 @@ import {
 export class KrakenAssetsFetcher
   implements ExchangeAssetsFetcher<KrakenAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<KrakenAssetInfo>[]> {
+  async fetchAssets(): Promise<Array<AssetInfo<KrakenAssetInfo>>> {
     const assetsUrl = 'https://api.kraken.com/0/public/Assets';
     const assetsData = await fetchAndDecodeJSON(
       KrakenAssetRespSchema,

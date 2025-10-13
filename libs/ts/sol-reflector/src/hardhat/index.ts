@@ -1,12 +1,13 @@
+import './type-extensions';
+
 import fs from 'fs/promises';
+import { relative } from 'path';
 
 import { extendConfig, task } from 'hardhat/config';
 
-import './type-extensions';
-import { BuildArtifacts } from '../types';
-import { relative } from 'path';
 import { collectAbi } from '../abiCollector';
 import { enableFileTree } from '../contractsFileStructure';
+import type { BuildArtifacts } from '../types';
 import { main } from '..';
 
 extendConfig(config => {
@@ -27,7 +28,7 @@ task('reflect', async (_, hre) => {
     return;
   }
 
-  let latestBuild: BuildArtifacts = JSON.parse(
+  const latestBuild: BuildArtifacts = JSON.parse(
     await fs.readFile(buildInfoPaths[0]!, 'utf8'),
   );
 

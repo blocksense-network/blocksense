@@ -1,19 +1,32 @@
-[package]
-name = "blocksense-sdk"
-version.workspace = true
-authors.workspace = true
-license.workspace = true
-edition.workspace = true
+[workspace]
+resolver = "3"
+members = ["data_providers", "macro", "sdk"]
 
-[dependencies]
-alloy = { workspace = true }
-blocksense-macro = { path = "macro" }
+[workspace.package]
+version = "0.1.1"
+authors = ["The Blocksense team"]
+license = "MIT"
+edition = "2021"
+
+[workspace.dependencies]
+blocksense-data-providers-sdk = { path = "./data_providers" }
+blocksense-macro = { path = "./macro" }
+blocksense-sdk = { path = "./sdk" }
+
+alloy = "1.0.9"
+anyhow = "1"
 async-trait = "0.1"
-anyhow = "1.0.82"
-wit-bindgen = "0.16.0"
-spin-sdk = "3.0.1"
+futures = "0.3"
+itertools = "0.14.0"
+prettytable-rs = "0.10.0"
+proc-macro2 = "1"
+quote = "1"
 reqwest = "0.12"
-url = "2.5"
 serde = { version = "1.0", features = ["derive"] }
-serde_json = { workspace = true }
-futures = { workspace = true }
+serde-this-or-that = "0.5.0"
+serde_json = { version = "1.0", features = ["float_roundtrip"] }
+spin-sdk = "3.0.1"
+syn = { version = "1", features = ["full"] }
+tracing = "0.1"
+url = "2.5"
+wit-bindgen = "0.16.0"

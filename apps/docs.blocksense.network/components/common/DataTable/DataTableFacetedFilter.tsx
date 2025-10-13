@@ -2,7 +2,9 @@
 
 import * as React from 'react';
 
+import { Separator } from '@blocksense/docs-ui';
 import { Button } from '@blocksense/docs-ui/Button';
+import { Checkbox } from '@blocksense/docs-ui/Checkbox';
 import {
   Command,
   CommandEmpty,
@@ -11,14 +13,12 @@ import {
   CommandItem,
   CommandList,
 } from '@blocksense/docs-ui/Command';
+import { ImageWrapper } from '@blocksense/docs-ui/ImageWrapper';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@blocksense/docs-ui/Popover';
-import { ImageWrapper } from '@blocksense/docs-ui/ImageWrapper';
-import { Checkbox } from '@blocksense/docs-ui/Checkbox';
-import { Separator } from '@blocksense/docs-ui';
 
 interface DataTableFacetedFilterProps {
   title: string;
@@ -28,10 +28,10 @@ interface DataTableFacetedFilterProps {
 }
 
 export function DataTableFacetedFilter({
-  title,
   options,
   selectedValues = [],
   setSelectedValuesAction,
+  title,
 }: DataTableFacetedFilterProps) {
   const handleCheckboxChange = (option: string) => {
     if (selectedValues.includes(option)) {

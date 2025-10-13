@@ -1,23 +1,25 @@
-import axios, { AxiosResponse } from 'axios';
+import type { AxiosResponse } from 'axios';
+import axios from 'axios';
+import client from 'prom-client';
 import Web3 from 'web3';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { color as c } from '@blocksense/base-utils/tty';
-import client from 'prom-client';
 
+import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
+import { throwError } from '@blocksense/base-utils/errors';
+import type { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 import {
   getOptionalApiKey,
   getOptionalRpcUrl,
+  isTestnet,
   networkMetadata,
-  NetworkName,
-  parseNetworkName,
-  EthereumAddress,
   parseEthereumAddress,
+  parseNetworkName,
 } from '@blocksense/base-utils/evm';
-import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
-import { throwError } from '@blocksense/base-utils/errors';
+import { color as c } from '@blocksense/base-utils/tty';
 
-import { Transaction, deployedNetworks } from '../types';
+import type { Transaction } from '../types';
+import { deployedMainnets, deployedTestnets } from '../types';
 import { startPrometheusServer } from '../utils';
 
 const networksUseSecondExplorer: NetworkName[] = [
@@ -31,6 +33,7 @@ const networksV2Api: NetworkName[] = [
   'metis-sepolia',
   'mezo-matsnet-testnet',
   'songbird-coston',
+  'flare-coston',
 ];
 
 type Gauges = {
@@ -212,7 +215,7 @@ const fetchTransactionsForNetwork = async (
     } else if (network === 'telos-testnet') {
       response = await axios.get(`${apiUrl}/address/${address}/transactions`);
       rawTransactions = response.data.results || [];
-    } else if (network === 'pharos-testnet') {
+    } else if (network === 'pharos-testnet' || network === 'cyber-testnet') {
       response = await axios.get(`${apiUrl}/address/${address}/transactions`);
       rawTransactions = response.data.data || [];
     } else if (network === 'taraxa-testnet') {
@@ -226,7 +229,7 @@ const fetchTransactionsForNetwork = async (
       );
       rawTransactions = response.data.result.records || [];
     } else if (network === 'cronos-testnet') {
-      let pageCounter = 1; //max 10000 blocks per page
+      let _pageCounter = 1; //max 10000 blocks per page
       let currentBlock = latestBlock;
       do {
         const page = await axios.get(apiUrl, {
@@ -242,7 +245,7 @@ const fetchTransactionsForNetwork = async (
         const txFromPage = page.data.result;
 
         rawTransactions = rawTransactions.concat(txFromPage);
-        pageCounter++;
+        _pageCounter++;
         currentBlock -= 10000n;
       } while (rawTransactions.length < numberOfTransactions);
     } else if (
@@ -288,14 +291,17 @@ const fetchTransactionsForNetwork = async (
           tx.gasUsed ?? tx.gas_used ?? tx.gas ?? tx.gasused ?? tx.gasCost ?? 0,
         );
 
-        let fee = tx.txFee ?? tx.fee ?? tx.transaction_fee;
+        let fee =
+          tx.txFee ?? tx.fee ?? tx.transaction_fee ?? tx.total_transaction_fee;
         fee =
           typeof fee === 'string'
             ? BigInt((Number(fee) * 1000000000000000000).toFixed(0))
             : BigInt(0);
 
+        if (network === 'cyber-testnet') {
+          tx.gas_price = 0;
+        }
         const gasPrice = BigInt(tx.gasPrice ?? tx.gas_price ?? 0);
-
         let timestamp =
           tx.timestamp?.toString() ??
           tx.blockTime?.toString() ??
@@ -388,7 +394,6 @@ const DEFAULT_FIRST_TX_TIME = '';
 const DEFAULT_LAST_TX_TIME = '';
 
 const main = async (): Promise<void> => {
-  const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
   const argv = await yargs(hideBin(process.argv))
     .usage(
       'Usage: $0 --numberOfTransactions <number> [--address <ethereum address>]',
@@ -397,7 +402,7 @@ const main = async (): Promise<void> => {
       alias: 'a',
       describe: 'Ethereum address to fetch transactions for',
       type: 'string',
-      default: sequencerAddress,
+      default: '',
     })
     .option('numberOfTransactions', {
       alias: 'num',
@@ -407,8 +412,7 @@ const main = async (): Promise<void> => {
     })
     .option('network', {
       alias: 'n',
-      describe:
-        'Calculate cost only for this network, not all deployed networks',
+      describe: 'Calculate cost only for this network',
       type: 'string',
       default: '',
     })
@@ -440,11 +444,32 @@ const main = async (): Promise<void> => {
       type: 'number',
       default: 9100,
     })
+    .option('mainnet', {
+      alias: 'm',
+      describe: 'Show mainnet costs',
+      type: 'boolean',
+      default: false,
+    })
     .help()
     .alias('help', 'h')
     .parse();
 
-  const address = parseEthereumAddress(argv.address);
+  const parsedNetwork = argv.network ? parseNetworkName(argv.network) : null;
+  const shouldUseMainnetSequencer =
+    argv.mainnet || (parsedNetwork !== null && !isTestnet(parsedNetwork));
+
+  const sequencerAddress = parseEthereumAddress(
+    getEnvStringNotAssert(
+      shouldUseMainnetSequencer
+        ? 'SEQUENCER_ADDRESS_MAINNET'
+        : 'SEQUENCER_ADDRESS_TESTNET',
+    ),
+  );
+
+  const address: EthereumAddress = argv.address
+    ? parseEthereumAddress(argv.address)
+    : sequencerAddress;
+
   let gauges: Gauges | null = null;
 
   if (argv.prometheus) {
@@ -491,10 +516,14 @@ const main = async (): Promise<void> => {
   );
 
   const networks =
-    argv.network == '' ? deployedNetworks : [parseNetworkName(argv.network)];
+    argv.network == ''
+      ? argv.mainnet
+        ? deployedMainnets
+        : deployedTestnets
+      : [parseNetworkName(argv.network)];
 
   for (const network of networks) {
-    const { transactions, firstTxTime, lastTxTime } =
+    const { firstTxTime, lastTxTime, transactions } =
       await fetchTransactionsForNetwork(
         network,
         address,

@@ -1,20 +1,19 @@
-import {
-  DataFeedStoreContractArtifact,
-  DataFeedStoreContract,
-} from '../contracts/data_feed_store/src/artifacts/DataFeedStore';
-import {
-  AccountWallet,
-  CompleteAddress,
-  ContractDeployer,
-  Fr,
-  PXE,
-  waitForPXE,
-  TxStatus,
-  createPXEClient,
-  getContractInstanceFromDeployParams,
-} from '@aztec/aztec.js';
 import { getInitialTestAccountsWallets } from '@aztec/accounts/testing';
-import { describe, beforeAll, expect, test } from 'vitest';
+import type { AccountWallet, CompleteAddress, PXE } from '@aztec/aztec.js';
+import {
+  ContractDeployer,
+  createPXEClient,
+  Fr,
+  getContractInstanceFromDeployParams,
+  TxStatus,
+  waitForPXE,
+} from '@aztec/aztec.js';
+import { beforeAll, describe, expect, test } from 'vitest';
+
+import {
+  DataFeedStoreContract,
+  DataFeedStoreContractArtifact,
+} from '../contracts/data_feed_store/src/artifacts/DataFeedStore';
 
 const setupSandbox = async () => {
   const { PXE_URL = 'http://localhost:8080' } = process.env;

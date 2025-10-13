@@ -1,10 +1,9 @@
 import * as path from 'path';
 
-import { SourceUnitDocItem } from '@blocksense/sol-reflector';
 import SOL_REFLECTION_JSON from '@blocksense/contracts/docs/fine';
-
-import { SourceUnit } from '@/components/ReferenceDocumentation/SourceUnit';
+import type { SourceUnitDocItem } from '@blocksense/sol-reflector';
 import { Error404 } from '@/components/common/Error404';
+import { SourceUnit } from '@/components/ReferenceDocumentation/SourceUnit';
 
 const solReflection = SOL_REFLECTION_JSON as SourceUnitDocItem[];
 

@@ -18,9 +18,11 @@ export type Literal =
 
 export type KeysOf<T> = Extract<keyof T, string>;
 export type ValuesOf<T> = T[KeysOf<T>];
-export type Entries<T> = {
-  [K in keyof T]: [K, T[K]];
-}[keyof T][];
+export type Entries<T> = Array<
+  {
+    [K in keyof T]: [K, T[K]];
+  }[keyof T]
+>;
 
 export type KeyFromValue<V, T extends Record<PropertyKey, PropertyKey>> = {
   [K in KeysOf<T>]: V extends T[K] ? K : never;

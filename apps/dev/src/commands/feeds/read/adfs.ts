@@ -1,37 +1,17 @@
-import { Command, Options } from '@effect/cli';
 import { Effect, Option, Schema as S } from 'effect';
+import { Command, Options } from '@effect/cli';
 
 import { skip0x } from '@blocksense/base-utils/buffer-and-hex';
 import {
+  type EthereumAddress,
   getAddressExplorerUrl,
   parseEthereumAddress,
-  type EthereumAddress,
 } from '@blocksense/base-utils/evm';
-import { renderTui, drawTable } from '@blocksense/base-utils/tty';
+import { drawTable, renderTui } from '@blocksense/base-utils/tty';
 import { listEvmNetworks, readEvmDeployment } from '@blocksense/config-types';
 import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
 
 import { formatTimestamp } from '../../utils';
-
-export function formatNumericalValue(hexData: `0x${string}`) {
-  const cleanHex = skip0x(hexData);
-  if (cleanHex.length !== 64) {
-    throw new Error(
-      'Unexpected ADFS data length, expected 32 bytes (64 hex characters), got ' +
-        cleanHex.length,
-    );
-  }
-  const valueHex = '0x' + cleanHex.slice(0, 48);
-  const value = BigInt(valueHex);
-  const timestampHex = '0x' + cleanHex.slice(48);
-  const unixTimestamp = BigInt(timestampHex) / 1000n;
-  const formattedTimestamp = formatTimestamp(unixTimestamp);
-  return {
-    rawHex: hexData,
-    value: value.toString(),
-    timestamp: formattedTimestamp,
-  };
-}
 
 export const adfs = Command.make(
   'adfs',
@@ -186,3 +166,23 @@ export const adfs = Command.make(
       );
     }),
 );
+
+export function formatNumericalValue(hexData: `0x${string}`) {
+  const cleanHex = skip0x(hexData);
+  if (cleanHex.length !== 64) {
+    throw new Error(
+      'Unexpected ADFS data length, expected 32 bytes (64 hex characters), got ' +
+        cleanHex.length,
+    );
+  }
+  const valueHex = '0x' + cleanHex.slice(0, 48);
+  const value = BigInt(valueHex);
+  const timestampHex = '0x' + cleanHex.slice(48);
+  const unixTimestamp = BigInt(timestampHex) / 1000n;
+  const formattedTimestamp = formatTimestamp(unixTimestamp);
+  return {
+    rawHex: hexData,
+    value: value.toString(),
+    timestamp: formattedTimestamp,
+  };
+}

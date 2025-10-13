@@ -1,19 +1,16 @@
-import DATA_FEEDS from '@blocksense/data-feeds-config-generator/feeds_config';
-
-import { decodeNewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 import { valuesOf } from '@blocksense/base-utils/array-iter';
-
+import { readAllEvmDeployments } from '@blocksense/config-types';
+import { decodeNewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
+import DATA_FEEDS from '@blocksense/data-feeds-config-generator/feeds_config';
 import { Error404 } from '@/components/common/Error404';
-import { CoreConfigCard } from '@/components/DataFeeds/Cards/CoreConfigCard';
-import { PriceFeedConfigCard } from '@/components/DataFeeds/Cards/PriceFeedConfigCard';
 import { ConsensusConfigCard } from '@/components/DataFeeds/Cards/ConsensusConfigCard';
+import { CoreConfigCard } from '@/components/DataFeeds/Cards/CoreConfigCard';
 import { NetworkAccessCard } from '@/components/DataFeeds/Cards/NetworkAccessCard';
 import { OracleConfigCard } from '@/components/DataFeeds/Cards/OracleConfigCard';
-
+import { PriceFeedConfigCard } from '@/components/DataFeeds/Cards/PriceFeedConfigCard';
 import { prepareDeploymentData } from '@/src/deployed-contracts/utils';
-import { readAllEvmDeployments } from '@blocksense/config-types';
 
-export function generateStaticParams(): { feed: string }[] {
+export function generateStaticParams(): Array<{ feed: string }> {
   const feedsConfig = decodeNewFeedsConfig(DATA_FEEDS);
   return feedsConfig.feeds.map(feed => ({
     feed: String(feed.id),

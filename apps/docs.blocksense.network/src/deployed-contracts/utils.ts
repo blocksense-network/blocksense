@@ -1,4 +1,4 @@
-import { DeploymentConfigV2 } from '@blocksense/config-types';
+import type { DeploymentConfigV2 } from '@blocksense/config-types';
 
 export function prepareDeploymentData(
   deploymentConfig: DeploymentConfigV2[],

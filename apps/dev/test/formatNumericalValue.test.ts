@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
+
 import { formatNumericalValue } from '../src/commands/feeds/read/adfs';
 
 const padHex = (n: bigint, length: number) =>

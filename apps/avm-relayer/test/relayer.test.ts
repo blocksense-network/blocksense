@@ -1,12 +1,12 @@
-import { beforeAll, describe, expect, test, assert } from '@effect/vitest';
 import * as S from 'effect/Schema';
-import {
-  createPXEClient,
-  waitForPXE,
-  type AccountWallet,
-  type PXE,
-} from '@aztec/aztec.js';
+import { assert, beforeAll, describe, expect, test } from '@effect/vitest';
 import { getInitialTestAccountsWallets } from '@aztec/accounts/testing';
+import {
+  type AccountWallet,
+  createPXEClient,
+  type PXE,
+  waitForPXE,
+} from '@aztec/aztec.js';
 
 const pxeUrl = S.is(S.URL)(process.env['PXE_URL'])
   ? process.env['PXE_URL']

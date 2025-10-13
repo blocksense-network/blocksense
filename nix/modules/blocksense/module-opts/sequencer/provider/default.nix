@@ -12,12 +12,6 @@ lib: with lib; {
       description = mdDoc "Is the provider should load round counters from chain when starting or not.";
     };
 
-    should-load-historical-values = mkOption {
-      type = types.bool;
-      default = true;
-      description = mdDoc "Is the provider should load relevant historical values from chain when starting or not.";
-    };
-
     private-key-path = mkOption {
       type = types.path;
       description = mdDoc "The path to the private key.";
@@ -40,7 +34,7 @@ lib: with lib; {
       description = mdDoc "List of publishing criteria for feed per provider customizationo";
     };
 
-    transaction-retries-count-before-give-up = mkOption {
+    transaction-retries-count-limit = mkOption {
       type = types.int;
       default = 5;
       description = mdDoc "The retries count for transactions to be dropped.";

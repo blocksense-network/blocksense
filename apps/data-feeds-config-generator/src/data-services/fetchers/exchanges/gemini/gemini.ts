@@ -1,12 +1,16 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
-import {
+
+import type { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
+
+import type {
   GeminiAssetInfo,
   GeminiSymbolDetailsInfoResp,
-  GeminiSymbolDetailsInfoRespSchema,
   GeminiSymbolsInfoResp,
-  GeminiSymbolsInfoRespSchema,
+} from './types';
+import {
   GeminiPriceSchema,
+  GeminiSymbolDetailsInfoRespSchema,
+  GeminiSymbolsInfoRespSchema,
 } from './types';
 
 /**
@@ -15,8 +19,8 @@ import {
 export class GeminiAssetsFetcher
   implements ExchangeAssetsFetcher<GeminiAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<GeminiAssetInfo>[]> {
-    const result: AssetInfo<GeminiAssetInfo>[] = [];
+  async fetchAssets(): Promise<Array<AssetInfo<GeminiAssetInfo>>> {
+    const result: Array<AssetInfo<GeminiAssetInfo>> = [];
     const assets = await fetchGeminiSymbolsInfo();
     for (const asset of assets) {
       const assetDetails = await fetchGeminiSymbolDetailsInfo(asset);

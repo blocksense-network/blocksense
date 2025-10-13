@@ -1,11 +1,13 @@
-import NextHead from 'next/head';
 import type { Metadata } from 'next';
-import { Layout, Navbar } from '@blocksense/nextra-theme-docs';
-import { Footer } from '@/components/common/Footer';
+import NextHead from 'next/head';
 import { getPageMap } from 'nextra/page-map';
 import type { FC, ReactNode } from 'react';
-import './globals.css';
+
+import { Layout, Navbar } from '@blocksense/nextra-theme-docs';
+import { Footer } from '@/components/common/Footer';
 import { updatePageMapWithContractsRefDoc } from '@/src/pageMap';
+
+import './globals.css';
 
 export const metadata: Metadata = {
   description:

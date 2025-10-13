@@ -5,7 +5,7 @@ type NatSpecItemProps = {
   content?: string;
 };
 
-export const NatSpecItem = ({ title, content = '' }: NatSpecItemProps) =>
+export const NatSpecItem = ({ content = '', title }: NatSpecItemProps) =>
   content && (
     <dd className="mb-4">
       <li>

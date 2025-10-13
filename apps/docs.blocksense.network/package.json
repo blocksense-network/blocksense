@@ -12,6 +12,7 @@
     "ready-dev-go": "yarn build:with-deps && yarn dev",
     "start": "next start",
     "test": "vitest run --typecheck --coverage",
+    "test:network-icons": "vitest run tests/network-icons.spec.ts",
     "ts": "yarn node --import tsx",
     "watch:docs-theme": "nodemon -w ../../libs/docs-theme -e js,jsx,ts,tsx,css --exec 'yarn workspace @blocksense/docs-theme build'"
   },

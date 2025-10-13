@@ -1,22 +1,16 @@
 'use client';
 
 import React, {
-  useState,
-  useRef,
-  useEffect,
   createContext,
   useContext,
-  HTMLAttributes,
-  ReactNode,
-  RefObject,
+  useEffect,
+  useRef,
+  useState,
 } from 'react';
+import type { HTMLAttributes, ReactNode, RefObject } from 'react';
 
-import {
-  cn,
-  getSideAlignClasses,
-  Align,
-  Side,
-} from '@blocksense/docs-ui/utils';
+import type { Align, Side } from '@blocksense/docs-ui/utils';
+import { cn, getSideAlignClasses } from '@blocksense/docs-ui/utils';
 
 interface PopoverContextValue {
   isOpen: boolean;
@@ -93,7 +87,7 @@ export const PopoverTrigger = ({
   className,
   ...props
 }: PopoverTriggerProps) => {
-  const { toggleOpen, isOpen } = useContext(PopoverContext);
+  const { isOpen, toggleOpen } = useContext(PopoverContext);
 
   return (
     <div
@@ -116,10 +110,10 @@ type PopoverContentProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 export const PopoverContent = ({
-  className,
-  children,
-  side = 'bottom',
   align = 'start',
+  children,
+  className,
+  side = 'bottom',
   ...props
 }: PopoverContentProps) => {
   const { isOpen } = useContext(PopoverContext);

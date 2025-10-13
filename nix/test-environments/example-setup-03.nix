@@ -50,12 +50,17 @@ in
         port = anvilInkSepoliaPort;
         chain-id = 99999999999;
         fork-url = "$RPC_URL_INK_SEPOLIA";
+        fork-block-number = 29297247;
+        fork-chain-id = 11155111;
+        state = "${config.devenv.root}/config/generated/process-compose/example-setup-03/anvil/state.json";
+        state-interval = 10;
       };
     };
 
     sequencer = {
       providers = lib.mkForce {
         ink-sepolia = {
+          is-enabled = false;
           url = "http://127.0.0.1:${toString anvilInkSepoliaPort}";
           private-key-path = "${testKeysDir}/sequencer-private-key";
           transaction-gas-limit = 20000000;
@@ -78,14 +83,12 @@ in
               address = upgradeableProxyADFSContractAddressInk;
               creation-byte-code = null;
               deployed-byte-code = null;
-              contract-version = 2;
             }
             {
               name = "multicall";
               address = "0xcA11bde05977b3631167028862bE2a173976CA11";
               creation-byte-code = null;
               deployed-byte-code = null;
-              contract-version = 3;
             }
           ];
         };

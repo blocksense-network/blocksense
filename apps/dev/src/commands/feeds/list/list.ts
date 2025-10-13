@@ -1,13 +1,14 @@
+import { Effect, Option } from 'effect';
+import { Command, Options } from '@effect/cli';
+
 import { getAddressExplorerUrl } from '@blocksense/base-utils/evm';
-import { renderTui, drawTable } from '@blocksense/base-utils/tty';
+import { drawTable, renderTui } from '@blocksense/base-utils/tty';
 import {
   configDir,
-  readConfig,
   listEvmNetworks,
+  readConfig,
   readEvmDeployment,
 } from '@blocksense/config-types';
-import { Command, Options } from '@effect/cli';
-import { Effect, Option } from 'effect';
 
 export const list = Command.make(
   'list',

@@ -9,7 +9,7 @@
         "salt": "0xac9b16bbc2aef49ecf589250324ab6467a1e372628bdd9a1c6f73ced045a22e1"
       },
       "AggregatedDataFeedStore": {
-        "address": "0x6bF1BF2765A1644554CB6060d964FA7ce2FBe6eA",
+        "address": "0x60631C969E93ED719F4bC9cC12A8F39A35A39A9B",
         "constructorArgs": ["0xCCC260a4228420B9Da421aDB477Eb028162CE042"],
         "salt": "0x71b411ccc58b0bf522c76bab9a977992a03cfbc078d3852ee8ee8b6d5311a477"
       },
@@ -9576,6 +9576,19 @@
         "base": null,
         "quote": null
       },
+      "734": {
+        "address": "0xeA422553f4Aa4A72e034fEc9b1B71374a7A18DCB",
+        "constructorArgs": [
+          "MON / USD",
+          18,
+          "734",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "734",
+        "base": null,
+        "quote": null
+      },
       "10000": {
         "address": "0x7Cf0b98229Ba566500cb330E621B321D149Fd04a",
         "constructorArgs": [
@@ -11679,6 +11692,201 @@
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "102153",
+        "base": null,
+        "quote": null
+      },
+      "102201": {
+        "address": "0xbeB366d68f80b9Dd4768EA3C21096d52848c1BD9",
+        "constructorArgs": [
+          "WETH Aave Borrow Rate on Ethereum Mainnet",
+          18,
+          "102201",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102201",
+        "base": null,
+        "quote": null
+      },
+      "102202": {
+        "address": "0x5Df5bd5C9Efb44440bcb698b6611f74698adB438",
+        "constructorArgs": [
+          "weETH Aave Borrow Rate on Ethereum Mainnet",
+          18,
+          "102202",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102202",
+        "base": null,
+        "quote": null
+      },
+      "102203": {
+        "address": "0xa2A65C9812F0f740e9212DbA6e6C909F6af117D9",
+        "constructorArgs": [
+          "USDT Aave Borrow Rate on Ethereum Mainnet",
+          18,
+          "102203",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102203",
+        "base": null,
+        "quote": null
+      },
+      "102204": {
+        "address": "0x769E3e3ac997DEdf34d3D17eF02fa8a529C5F4CA",
+        "constructorArgs": [
+          "wstETH Aave Borrow Rate on Ethereum Mainnet",
+          18,
+          "102204",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102204",
+        "base": null,
+        "quote": null
+      },
+      "102205": {
+        "address": "0x88ef3C73f36BA70bA2b26B40837F1816F5406393",
+        "constructorArgs": [
+          "USDC Aave Borrow Rate on Ethereum Mainnet",
+          18,
+          "102205",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102205",
+        "base": null,
+        "quote": null
+      },
+      "102251": {
+        "address": "0x04c94D2562694EA2562D5A70156ED5335905BD53",
+        "constructorArgs": [
+          "cbBTC / USDC Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102251",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102251",
+        "base": null,
+        "quote": null
+      },
+      "102252": {
+        "address": "0xBdF1A08f2be366A08461e56f64ddF2c66ff97Bf2",
+        "constructorArgs": [
+          "srUSD / USDC Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102252",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102252",
+        "base": null,
+        "quote": null
+      },
+      "102253": {
+        "address": "0x161B0B5C350bA3848D8D7E887aB8De956FA4747b",
+        "constructorArgs": [
+          "WBTC / USDC Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102253",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102253",
+        "base": null,
+        "quote": null
+      },
+      "102254": {
+        "address": "0xf4fC4F18B63d05f25F375a167C1829438dE1fD68",
+        "constructorArgs": [
+          "ETH+ / WETH Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102254",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102254",
+        "base": null,
+        "quote": null
+      },
+      "102255": {
+        "address": "0x8F2a1DB66083943aB61FFc10f912BbF01cEDcb99",
+        "constructorArgs": [
+          "wstETH / WETH Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102255",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102255",
+        "base": null,
+        "quote": null
+      },
+      "102256": {
+        "address": "0x7DdB9DCdC1d937A37120A6fD50092872e6c481C5",
+        "constructorArgs": [
+          "weETH / WETH Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102256",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102256",
+        "base": null,
+        "quote": null
+      },
+      "102257": {
+        "address": "0xd67E54Cc63C76ECbD3bf6fBe5C24cC3Cf3058704",
+        "constructorArgs": [
+          "mHYPER / USDC Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102257",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102257",
+        "base": null,
+        "quote": null
+      },
+      "102258": {
+        "address": "0x4d1690C404e6E528e28B94C547648e52f65c2C42",
+        "constructorArgs": [
+          "PT-cUSDO-20NOV2025 / USDC Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102258",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102258",
+        "base": null,
+        "quote": null
+      },
+      "102259": {
+        "address": "0x94E98BF34B562AEbDD675422682629d92b7B784a",
+        "constructorArgs": [
+          "WBTC / USDT Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102259",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102259",
+        "base": null,
+        "quote": null
+      },
+      "102260": {
+        "address": "0xfa70bAA5D0Cf410377d45206C1398CF148F02755",
+        "constructorArgs": [
+          "wstETH / USDC Morpho Borrow Rate on Ethereum Mainnet",
+          18,
+          "102260",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "102260",
         "base": null,
         "quote": null
       },

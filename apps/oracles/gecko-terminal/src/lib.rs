@@ -1,3 +1,5 @@
+mod logging;
+
 use std::collections::HashMap;
 
 use anyhow::{Context, Result};
@@ -7,11 +9,12 @@ use blocksense_sdk::{
     oracle_component,
 };
 
-use prettytable::{format, Cell, Row, Table};
 use serde::{Deserialize, Serialize};
 use serde_this_or_that::as_f64;
 use std::time::Instant;
 use tracing::{info, warn};
+
+use crate::logging::print_results;
 
 #[derive(Debug, Default, Clone, Deserialize, Serialize)]
 pub struct PoolAttributes {
@@ -221,100 +224,6 @@ fn process_results(reponses: &GeckoTerminalDataForFeed) -> Result<Payload> {
         }
     }
     Ok(payload)
-}
-
-fn print_responses(reponses: &GeckoTerminalDataForFeed) {
-    let mut table = Table::new();
-    table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
-
-    table.set_titles(Row::new(vec![
-        Cell::new("Feed ID").style_spec("bc"),
-        Cell::new("Network").style_spec("bc"),
-        Cell::new("Name").style_spec("bc"),
-        Cell::new("Reverse").style_spec("bc"),
-        Cell::new("Price[USD]").style_spec("bc"),
-        Cell::new("Volume[USD]").style_spec("bc"),
-        Cell::new("Enough volume").style_spec("bc"),
-        Cell::new("Pool").style_spec("bc"),
-    ]));
-    let mut first_row = true;
-    let mut feed_ids = reponses.keys().cloned().collect::<Vec<String>>();
-    feed_ids.sort();
-    for feed_id in feed_ids {
-        if let Some(data) = reponses.get(&feed_id) {
-            if !first_row {
-                table.add_empty_row();
-            } else {
-                first_row = false;
-            }
-            for d in data {
-                let price = d.get_price();
-                let enough_volume = if d.check_volume_usd() {
-                    "Yes".to_string()
-                } else {
-                    "No".to_string()
-                };
-                table.add_row(Row::new(vec![
-                    Cell::new(&d.feed_id).style_spec("r"),
-                    Cell::new(&d.network).style_spec("l"),
-                    Cell::new(&d.attributes.name).style_spec("l"),
-                    Cell::new(&d.reverse.to_string()).style_spec("l"),
-                    Cell::new(&price.to_string()).style_spec("r"),
-                    Cell::new(&d.attributes.volume_usd.h24.to_string()).style_spec("r"),
-                    Cell::new(&enough_volume).style_spec("r"),
-                    Cell::new(&d.pool).style_spec("l"),
-                ]));
-            }
-        }
-    }
-    table.printstd();
-}
-
-fn print_results(
-    resources: &[FeedConfig],
-    responses: &GeckoTerminalDataForFeed,
-    payload: &Payload,
-) {
-    print_responses(responses);
-
-    let mut table = Table::new();
-    table.set_format(*format::consts::FORMAT_NO_LINESEP_WITH_TITLE);
-
-    table.set_titles(Row::new(vec![
-        Cell::new("Feed ID").style_spec("bc"),
-        Cell::new("Name").style_spec("bc"),
-        Cell::new("Value").style_spec("bc"),
-        Cell::new("Used Pools").style_spec("bc"),
-    ]));
-
-    let mut feed_ids = responses.keys().cloned().collect::<Vec<String>>();
-    feed_ids.sort();
-    for feed_id in feed_ids {
-        let name = if let Some(resourse) = resources.iter().find(|x| x.id == feed_id) {
-            format!("{}/{}", resourse.pair.base, resourse.pair.quote)
-        } else {
-            "No name".to_string()
-        };
-        let num_pools = if let Some(feed_id_responses) = responses.get(&feed_id) {
-            feed_id_responses
-                .iter()
-                .filter(|x| x.check_volume_usd())
-                .count()
-                .to_string()
-        } else {
-            "No response".to_string()
-        };
-        if let Some(result) = payload.values.iter().find(|x| x.id == *feed_id) {
-            let value = format!("{:?}", result.value);
-            table.add_row(Row::new(vec![
-                Cell::new(&feed_id.to_string()).style_spec("r"),
-                Cell::new(&name).style_spec("l"),
-                Cell::new(&value).style_spec("r"),
-                Cell::new(&num_pools).style_spec("r"),
-            ]));
-        }
-    }
-    table.printstd();
 }
 
 #[oracle_component]

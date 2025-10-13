@@ -1,12 +1,13 @@
 import { fetchAndDecodeJSON } from '@blocksense/base-utils/http';
-import { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
-import {
+
+import type { AssetInfo, ExchangeAssetsFetcher } from '../exchange-assets';
+
+import type {
   CryptoComAssetInfo,
   CryptoComInfoResp,
-  CryptoComInfoRespSchema,
   CryptoComPrice,
-  CryptoComPriceSchema,
 } from './types';
+import { CryptoComInfoRespSchema, CryptoComPriceSchema } from './types';
 
 /**
  * Class to fetch assets information from CryptoCom Exchange.
@@ -14,7 +15,7 @@ import {
 export class CryptoComAssetsFetcher
   implements ExchangeAssetsFetcher<CryptoComAssetInfo>
 {
-  async fetchAssets(): Promise<AssetInfo<CryptoComAssetInfo>[]> {
+  async fetchAssets(): Promise<Array<AssetInfo<CryptoComAssetInfo>>> {
     const assets = (await fetchCryptoComInfo()).result.data.filter(
       asset => asset.inst_type === 'CCY_PAIR',
     );

@@ -1,6 +1,7 @@
-import type { StorybookConfig } from '@storybook/nextjs-vite';
 import { createRequire } from 'module';
-import { join, dirname } from 'path';
+import { dirname, join } from 'path';
+
+import type { StorybookConfig } from '@storybook/nextjs-vite';
 
 const require = createRequire(import.meta.url);
 /**

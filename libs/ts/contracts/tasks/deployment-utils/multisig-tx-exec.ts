@@ -6,6 +6,7 @@ import { assertNotNull } from '@blocksense/base-utils';
 
 import type { NetworkConfig } from '../types';
 import { adjustVInSignature } from '../utils';
+import { sendTx } from './send-tx';
 
 type Params = {
   transactions: SafeTransactionDataPartial[];
@@ -22,17 +23,6 @@ export async function executeMultisigTransaction({
     transactions,
   });
 
-  if (!config.deployerIsLedger) {
-    console.log('\n[WALLET] Proposing transaction...');
-
-    const txResponse = await safe.executeTransaction(tx);
-    const transaction = await config.provider.getTransaction(txResponse.hash);
-    await transaction?.wait();
-
-    console.log('-> tx hash', txResponse.hash);
-    return txResponse.hash;
-  }
-
   const message = await safe.getTransactionHash(tx);
   const ledger = config.deployer;
   const ledgerAddress = config.deployerAddress;
@@ -40,21 +30,21 @@ export async function executeMultisigTransaction({
   const signature = await adjustVInSignature(signedMessage);
   tx.addSignature(new EthSafeSignature(ledgerAddress, signature));
 
-  console.log('\n[LEDGER] Proposing transaction...');
+  const walletType = config.deployerIsLedger ? 'LEDGER' : 'WALLET';
+  console.log(`\n[${walletType}] Proposing transaction...`);
 
   const safeContract = assertNotNull(
     safe.getContractManager().safeContract,
     'Safe contract not found',
   );
   const data = await safe.getEncodedTransaction(tx);
-  const receipt = await ledger
-    .sendTransaction({
-      to: safeContract.getAddress(),
-      data,
-    })
-    .then(tx => tx.wait(1))
-    .then(receipt => receipt!);
 
-  console.log('-> tx hash', receipt.hash);
-  return receipt.hash;
+  const receipt = await sendTx({
+    config,
+    to: safeContract.getAddress(),
+    data,
+  });
+
+  console.log('-> tx hash', receipt!.hash);
+  return receipt!.hash;
 }

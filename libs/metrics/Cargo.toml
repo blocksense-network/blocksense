@@ -9,8 +9,9 @@ edition.workspace = true
 
 [dependencies]
 blocksense-utils = { workspace = true }
-prometheus = { workspace = true }
+
 actix-web = { workspace = true }
-reqwest = { workspace = true }
 anyhow = { workspace = true }
 lazy_static = { workspace = true }
+prometheus = { workspace = true }
+reqwest = { workspace = true }

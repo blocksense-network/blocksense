@@ -5,14 +5,14 @@ import { Schema as S } from 'effect';
  *
  * Ref: https://www.gate.io/docs/developers/apiv4/en/#spot
  */
-const GateIoAssetInfoSchema = S.mutable(
+const _GateIoAssetInfoSchema = S.mutable(
   S.Struct({
     id: S.String,
     price: S.Number,
   }),
 );
 
-export type GateIoAssetInfo = typeof GateIoAssetInfoSchema.Type;
+export type GateIoAssetInfo = typeof _GateIoAssetInfoSchema.Type;
 
 /**
  * Schema for the relevant information about products received from GateIo Exchange.

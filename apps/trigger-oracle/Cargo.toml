@@ -8,42 +8,39 @@ edition = { workspace = true }
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-blocksense-metrics = { workspace = true }
+blocksense-config = { workspace = true }
+blocksense-crypto = { workspace = true }
 blocksense-data-feeds = { workspace = true }
 blocksense-feed-registry = { workspace = true }
-blocksense-crypto = { workspace = true }
-blocksense-config = { workspace = true }
-blocksense-utils = { workspace = true }
-blocksense-gnosis-safe = { workspace = true }
 blocksense-feeds-processing = { workspace = true }
+blocksense-gnosis-safe = { workspace = true }
+blocksense-metrics = { workspace = true }
+blocksense-utils = { workspace = true }
 
+actix-web = { workspace = true }
 anyhow = { workspace = true }
 clap = { version = "3.1.15", features = ["derive", "env"] }
 futures = { workspace = true }
+futures-util = "0.3.30"
+http = { workspace = true }
+http-body-util = "0.1.3"
+hyper = { workspace = true }
 log = { workspace = true }
+outbound-http = { workspace = true }
+rdkafka = { version = "0.37.0", features = ["dynamic-linking"] }
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-
 spin-app = { workspace = true }
 spin-core = { workspace = true }
-spin-trigger = { workspace = true }
 spin-outbound-networking = { workspace = true }
+spin-trigger = { workspace = true }
 terminal = { workspace = true }
-outbound-http = { workspace = true }
-
-rdkafka = { version = "0.37.0", features = ["dynamic-linking"] }
-futures-util = "0.3.30"
-tokio-stream = "0.1.16"
-
-url = { workspace = true }
 tokio = { workspace = true }
+tokio-stream = "0.1.16"
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
-http = { workspace = true }
-hyper = { workspace = true }
+url = { workspace = true }
 wasmtime = { workspace = true }
 wasmtime-wasi = { workspace = true }
 wasmtime-wasi-http = { workspace = true }
-actix-web = { workspace = true }
-http-body-util = "0.1.3"

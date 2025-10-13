@@ -208,7 +208,9 @@ jobs:
           - project: docs.blocksense.network
             path: apps/docs.blocksense.network/dist
             project_name: blocksense-docs
-            build_command: yarn workspace @blocksense/docs.blocksense.network build:with-deps
+            build_command: |
+              yarn workspace @blocksense/docs.blocksense.network build:with-deps &&
+              yarn workspace @blocksense/docs.blocksense.network test:network-icons
           - project: docs-ui.blocksense.network
             path: libs/ts/docs-ui/storybook-static
             project_name: blocksense-docs-ui

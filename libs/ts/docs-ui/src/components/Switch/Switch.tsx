@@ -1,6 +1,7 @@
 'use client';
 
-import React, { ButtonHTMLAttributes } from 'react';
+import React from 'react';
+import type { ButtonHTMLAttributes } from 'react';
 
 import { cn } from '@blocksense/docs-ui/utils';
 
