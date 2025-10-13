@@ -9576,6 +9576,19 @@
         "base": null,
         "quote": null
       },
+      "734": {
+        "address": "0xeA422553f4Aa4A72e034fEc9b1B71374a7A18DCB",
+        "constructorArgs": [
+          "MON / USD",
+          18,
+          "734",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "734",
+        "base": null,
+        "quote": null
+      },
       "10000": {
         "address": "0x7Cf0b98229Ba566500cb330E621B321D149Fd04a",
         "constructorArgs": [
@@ -11744,6 +11757,58 @@
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "102205",
+        "base": null,
+        "quote": null
+      },
+      "105000": {
+        "address": "0xfA143a4A58Ff719aa8735bBf883a50BD426f6237",
+        "constructorArgs": [
+          "Ethereum SafeGasPrice",
+          8,
+          "105000",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "105000",
+        "base": null,
+        "quote": null
+      },
+      "105001": {
+        "address": "0x9Cc2B0CB2b4BB80f22F5A5154462e6eD46Fa8182",
+        "constructorArgs": [
+          "Ethereum ProposeGasPrice",
+          8,
+          "105001",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "105001",
+        "base": null,
+        "quote": null
+      },
+      "105002": {
+        "address": "0xBfE7D6905295ee72CFd7185d81B452adE959ae24",
+        "constructorArgs": [
+          "Ethereum FastGasPrice",
+          8,
+          "105002",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "105002",
+        "base": null,
+        "quote": null
+      },
+      "105003": {
+        "address": "0xDB56d160C86230d079cDF896925F7FE9542ed140",
+        "constructorArgs": [
+          "Ethereum suggestBaseFee",
+          8,
+          "105003",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "105003",
         "base": null,
         "quote": null
       },
