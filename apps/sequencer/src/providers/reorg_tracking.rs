@@ -11,6 +11,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 use tokio::time::Duration;
+use tokio_stream::StreamExt;
 use tracing::{debug, error, info, trace, warn};
 // TODO: use futures_util::StreamExt;
 
@@ -179,7 +180,7 @@ impl ReorgTracker {
         let providers_mutex = self.providers_mutex.clone();
         tracing::info!("Starting tracker for reorgs in network {net} loop...");
 
-        let mut provider_ws_opt = None;
+        let mut _provider_ws_opt = None;
         let mut sub_opt = None;
 
         if let Some(ws_url) = self.websocket_url.clone() {
@@ -201,47 +202,65 @@ impl ReorgTracker {
                 }
             };
 
-            // TODO: let mut stream = sub.into_stream();
-
-            provider_ws_opt = Some(provider_ws);
+            _provider_ws_opt = Some(provider_ws);
             sub_opt = Some(sub);
-            // while let Some(b) = stream.next().await {
-            //     process_tracker_iteration(
-            //         net.as_str(),
-            //         &providers_mutex,
-            //         rpc_timeout,
-            //         &mut observed_latest_height,
-            //         &mut finalized_height,
-            //         &updates_relayer_send_chan,
-            //         loop_count,
-            //     )
-            //     .await;
-            //     info!("hurray");
-            // }
         }
 
-        // Loop until block generation time is determined
-        let average_block_generation_time: u64 = loop {
-            let poll_period = 60 * 1000;
-            if let Some(t) = self
-                .calculate_block_generation_time_in_network(net.as_str(), &providers_mutex, 100)
-                .await
-            {
-                break t;
-            } else {
-                warn!(
-                "Could not determine block generation time for network: {net}. Will retry in {poll_period}ms (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})",
-                observer_finalized_height = self.observer_finalized_height,
-                observed_latest_height = self.observed_latest_height,
-                loop_count = self.loop_count,
-            )
+        let mut stream_opt = None;
+        let mut average_block_generation_time: u64 = 0;
+
+        match sub_opt {
+            Some(sub) => {
+                stream_opt = Some(sub.into_stream());
             }
-            await_time(poll_period).await;
-        };
+            None => {
+                // Loop until block generation time is determined
+                average_block_generation_time = loop {
+                    let poll_period = 60 * 1000;
+                    if let Some(t) = self
+                        .calculate_block_generation_time_in_network(
+                            net.as_str(),
+                            &providers_mutex,
+                            100,
+                        )
+                        .await
+                    {
+                        break t;
+                    } else {
+                        warn!(
+                        "Could not determine block generation time for network: {net}. Will retry in {poll_period}ms (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})",
+                        observer_finalized_height = self.observer_finalized_height,
+                        observed_latest_height = self.observed_latest_height,
+                        loop_count = self.loop_count,
+                    )
+                    }
+                    await_time(poll_period).await;
+                };
+            }
+        }
 
         loop {
-            // Sleep between polls
-            await_time(average_block_generation_time).await;
+            let block_header_opt = match stream_opt {
+                Some(ref mut stream) => {
+                    match stream.next().await {
+                        Some(block_header) => Some(block_header),
+                        None => {
+                            warn!("Stream disconnected for {net} loop_count: {loop_count}: observer_finalized_height={observer_finalized_height} observed_latest_height={observed_latest_height}!",
+                                observer_finalized_height = self.observer_finalized_height,
+                                observed_latest_height = self.observed_latest_height,
+                                loop_count = self.loop_count,
+                            );
+                            // TODO: implement resubscription
+                            None
+                        }
+                    }
+                }
+                None => {
+                    // Sleep between polls
+                    await_time(average_block_generation_time).await;
+                    None
+                }
+            };
 
             self.loop_count += 1;
             debug!(
@@ -277,9 +296,14 @@ impl ReorgTracker {
                             )
                         };
 
+                        let block_number = match block_header_opt {
+                            Some(block_header) => BlockNumberOrTag::Number(block_header.number),
+                            None => BlockNumberOrTag::Latest,
+                        };
+
                         let latest_block_result = timeout(
                             self.rpc_timeout,
-                            rpc_handle.get_block_by_number(BlockNumberOrTag::Latest),
+                            rpc_handle.get_block_by_number(block_number),
                         )
                         .await;
                         if let Ok(Ok(Some(b))) = latest_block_result {
@@ -645,7 +669,7 @@ impl ReorgTracker {
             net,
             providers_mutex,
             updates_relayer_send_chan,
-            websocket_url
+            websocket_url,
         }
     }
     /// Calculates the average block generation time over the last `num_blocks`
@@ -995,7 +1019,7 @@ mod tests {
                     },
                     providers_clone,
                     feed_updates_send,
-                    None
+                    None,
                 );
                 reorg_tracker.loop_tracking_for_reorg_in_network().await;
             })
