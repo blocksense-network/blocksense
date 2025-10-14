@@ -1824,7 +1824,6 @@ mod tests {
         .await
         .expect("Could not serialize updates!");
 
-        // Note: bye is filtered out:
         assert_eq!(
             serialized_updates.to_bytes().encode_hex(),
             "00000001000303e0070102686901010000000000000000000000000000000000000000000000000000000000000007"
