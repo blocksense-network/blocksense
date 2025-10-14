@@ -4,43 +4,43 @@
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {
-        "address": "0x1A7E4299Ca7eeF299C9780Dc5804E5dBc9db03b8",
-        "constructorArgs": ["0x64996fd7e2b57A1bF2209C7282F027d416D57b3A"],
+        "address": "0xADF5aadbe080819209BF641fDf03748bb495c6f3",
+        "constructorArgs": ["0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De"],
         "salt": "0xac9b16bbc2aef49ecf589250324ab6467a1e372628bdd9a1c6f73ced045a22e1"
       },
       "AggregatedDataFeedStore": {
-        "address": "0xa1E640d4EF84b636bAe8924F5d00100690de5861",
-        "constructorArgs": ["0xC48F828B01EEd886Fb8cA0ab5FCec15A6671be86"],
+        "address": "0x60631C969E93ED719F4bC9cC12A8F39A35A39A9B",
+        "constructorArgs": ["0xCCC260a4228420B9Da421aDB477Eb028162CE042"],
         "salt": "0x71b411ccc58b0bf522c76bab9a977992a03cfbc078d3852ee8ee8b6d5311a477"
       },
       "AccessControl": {
-        "address": "0xC48F828B01EEd886Fb8cA0ab5FCec15A6671be86",
-        "constructorArgs": ["0x64996fd7e2b57A1bF2209C7282F027d416D57b3A"],
+        "address": "0xCCC260a4228420B9Da421aDB477Eb028162CE042",
+        "constructorArgs": ["0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De"],
         "salt": "0x26186f5256760fb01ab0053f874a1674c76a40b87c3031918056ef3ace009aac"
       },
       "CLFeedRegistryAdapter": {
-        "address": "0x835bf79330CF223f4fc3F4ad9303dED6DaB9D866",
+        "address": "0xfc05C4BC7C9D2F131CA8c3571C3f07c47D92738f",
         "constructorArgs": [
-          "0x64996fd7e2b57A1bF2209C7282F027d416D57b3A",
-          "0x1A7E4299Ca7eeF299C9780Dc5804E5dBc9db03b8"
+          "0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xd1adaede68d344519025e2ff574650cd99d3830fe6d274c7a7843cdc00e17938"
       }
     },
     "safe": {
-      "AdminMultisig": "0x64996fd7e2b57A1bF2209C7282F027d416D57b3A",
+      "AdminMultisig": "0x53AdbDAA3EE8725De80Bf97173B1f1A0a48036De",
       "ReporterMultisig": null,
       "OnlySequencerGuard": null,
       "AdminExecutorModule": null
     },
     "CLAggregatorAdapter": {
       "0": {
-        "address": "0x07C1a53A6CdbBD6DCDC6F9A685abe29bd4b78030",
+        "address": "0x68D7d0FEF0637b68F85Ed3Fd6DD5BAf96585be1e",
         "constructorArgs": [
           "BTC / USD",
           8,
           "0",
-          "0x1A7E4299Ca7eeF299C9780Dc5804E5dBc9db03b8"
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "0",
@@ -48,12 +48,12 @@
         "quote": "0x0000000000000000000000000000000000000348"
       },
       "1": {
-        "address": "0x6D8bd86De5d2433C469ae90d86a6A96C21235cF4",
+        "address": "0xDbc0FB0784c314D82CBC00F2C22fEb21C828dBFb",
         "constructorArgs": [
           "BTC / USDT",
           8,
           "1",
-          "0x1A7E4299Ca7eeF299C9780Dc5804E5dBc9db03b8"
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "1",
@@ -61,12 +61,12 @@
         "quote": null
       },
       "3": {
-        "address": "0x8B48dadb73a43899e6b93606a8ed71fa3207FE10",
+        "address": "0x9513c4e2d928B1Dd57e16af568A05CC84D483BF2",
         "constructorArgs": [
           "ETH / USD",
           8,
           "3",
-          "0x1A7E4299Ca7eeF299C9780Dc5804E5dBc9db03b8"
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "3",
@@ -74,12 +74,12 @@
         "quote": "0x0000000000000000000000000000000000000348"
       },
       "9": {
-        "address": "0x9Cc68Dca213E7B4C60f2824F683561DDfa2633C3",
+        "address": "0xd19051A349C8e52EA9839bdB77c2119ec0010042",
         "constructorArgs": [
           "XRP / USD",
           8,
           "9",
-          "0x1A7E4299Ca7eeF299C9780Dc5804E5dBc9db03b8"
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "9",
@@ -87,12 +87,12 @@
         "quote": "0x0000000000000000000000000000000000000348"
       },
       "13": {
-        "address": "0xdD0FE28f795E9642801919e66E7Be372D2E07804",
+        "address": "0x4842B1b7210a089b451ff41D229bD324Fc6CB305",
         "constructorArgs": [
           "BNB / USD",
           8,
           "13",
-          "0x1A7E4299Ca7eeF299C9780Dc5804E5dBc9db03b8"
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "13",
@@ -100,12 +100,12 @@
         "quote": "0x0000000000000000000000000000000000000348"
       },
       "16": {
-        "address": "0x59be7f3bf0C22d2b59d22568006bfbc547389Bf3",
+        "address": "0x8Bf647D737c5e00814252E3cB67b90def047AA56",
         "constructorArgs": [
           "SOL / USD",
           8,
           "16",
-          "0x1A7E4299Ca7eeF299C9780Dc5804E5dBc9db03b8"
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "16",
@@ -113,12 +113,12 @@
         "quote": "0x0000000000000000000000000000000000000348"
       },
       "22": {
-        "address": "0x9756C4880b9B57e27579488D4B80ff9937bDB2FB",
+        "address": "0x2a4D249a23F35eC4f378DC36C2096Be59E43cd44",
         "constructorArgs": [
           "ADA / USD",
           8,
           "22",
-          "0x1A7E4299Ca7eeF299C9780Dc5804E5dBc9db03b8"
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "22",
@@ -126,12 +126,12 @@
         "quote": "0x0000000000000000000000000000000000000348"
       },
       "26": {
-        "address": "0x9E6d95F0137388Fd36D7EEEF544fC08C4C0FE576",
+        "address": "0x8282Ce4cB3C67e83a96b5fdd4238d59ddCB5D269",
         "constructorArgs": [
           "DOGE / USD",
           8,
           "26",
-          "0x1A7E4299Ca7eeF299C9780Dc5804E5dBc9db03b8"
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "26",
@@ -139,12 +139,12 @@
         "quote": "0x0000000000000000000000000000000000000348"
       },
       "29": {
-        "address": "0x4F11c092f97478d4921958bb09c434B282Cd3219",
+        "address": "0xC32F8390A2f7A3E3C511C1c42bA2D916F43cf9A2",
         "constructorArgs": [
           "TRX / USD",
           8,
           "29",
-          "0x1A7E4299Ca7eeF299C9780Dc5804E5dBc9db03b8"
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "29",
@@ -152,17 +152,30 @@
         "quote": "0x0000000000000000000000000000000000000348"
       },
       "86": {
-        "address": "0xb8058EA8646C7477fc131FDE9f17b661D24C5D80",
+        "address": "0xf763f29D143e03e302E65d5Ea0668c28B2f43f73",
         "constructorArgs": [
           "HYPE / USD",
           18,
           "86",
-          "0x1A7E4299Ca7eeF299C9780Dc5804E5dBc9db03b8"
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
         ],
         "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
         "feedId": "86",
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348"
+      },
+      "1000009": {
+        "address": "0x20e16e189BdfFc335a83F3882BD790d64d04f466",
+        "constructorArgs": [
+          "RZR / USD",
+          8,
+          "1000009",
+          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
+        ],
+        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
+        "feedId": "1000009",
+        "base": null,
+        "quote": null
       }
     }
   }
