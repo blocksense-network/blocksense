@@ -286,11 +286,6 @@ fn verify_expected_data_in_contracts(expected_value: f64) {
     );
 
     // Verify expected data is set to contract in ETH1
-    println!("DEBUG: expected_value = {expected_value}");
-    let recvd_val = send_get_request(
-        format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH1/0:{FEED_ID}").as_str(),
-    );
-    println!("DEBUG: recvd_val = {recvd_val}");
     assert!(
         send_get_request(
             format!("127.0.0.1:{SEQUENCER_ADMIN_PORT}/get_key/ETH1/0:{FEED_ID}").as_str()
