@@ -258,6 +258,16 @@ const fetchTransactionsForNetwork = async (
         `${apiUrl}/txs/list?ps=1000&a=${address}&chainId=${chainId}`,
       );
       rawTransactions = response.data.data.records || [];
+    } else if (network === 'core-testnet') {
+      response = await axios.get(
+        `${apiUrl}/accounts/list_of_txs_by_address/${address}?apikey=${apiKey}`,
+      );
+
+      if (response.data.status !== '1') {
+        console.error(c`{red ${network} Error: ${response.data.message}}`);
+        return { transactions: [], firstTxTime: '', lastTxTime: '' };
+      }
+      rawTransactions = response.data.result;
     } else {
       response = await axios.get(apiUrl, {
         params: {

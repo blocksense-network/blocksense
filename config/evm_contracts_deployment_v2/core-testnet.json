@@ -1,6 +1,6 @@
 {
-  "network": "hyperevm-testnet",
-  "chainId": "998",
+  "network": "core-testnet",
+  "chainId": "1114",
   "contracts": {
     "coreContracts": {
       "UpgradeableProxyADFS": {
@@ -150,32 +150,6 @@
         "feedId": "29",
         "base": null,
         "quote": "0x0000000000000000000000000000000000000348"
-      },
-      "86": {
-        "address": "0xf763f29D143e03e302E65d5Ea0668c28B2f43f73",
-        "constructorArgs": [
-          "HYPE / USD",
-          18,
-          "86",
-          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
-        ],
-        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
-        "feedId": "86",
-        "base": null,
-        "quote": "0x0000000000000000000000000000000000000348"
-      },
-      "1000009": {
-        "address": "0x20e16e189BdfFc335a83F3882BD790d64d04f466",
-        "constructorArgs": [
-          "RZR / USD",
-          8,
-          "1000009",
-          "0xADF5aadbe080819209BF641fDf03748bb495c6f3"
-        ],
-        "salt": "0xe124d7cc79a19705865fa21b784ba187cd393559e960c0c071132cb60354d1a3",
-        "feedId": "1000009",
-        "base": null,
-        "quote": null
       }
     }
   }
