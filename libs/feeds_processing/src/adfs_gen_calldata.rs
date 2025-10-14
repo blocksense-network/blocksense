@@ -14,7 +14,7 @@ use once_cell::sync::Lazy;
 pub const MAX_HISTORY_ELEMENTS_PER_FEED: u64 = 8192;
 pub const NUM_FEED_IDS_IN_RB_INDEX_RECORD: u128 = 16;
 
-pub type RoundBufferIndices = HashMap<EncodedFeedId, u64>; // for each key (feed_id) we store its round buffer index
+pub type RingBufferIndices = HashMap<EncodedFeedId, u64>; // for each key (feed_id) we store its ring buffer index
 
 static STRIDES_SIZES: Lazy<HashMap<u8, u32>> = Lazy::new(|| {
     let mut map = HashMap::new(); // TODO: confirm the correct values for the strides we will support
@@ -67,9 +67,9 @@ pub fn calc_row_index(feed_id: FeedId, stride: Stride) -> alloy_primitives::Uint
 pub async fn adfs_serialize_updates(
     net: &str,
     feed_updates: &BatchedAggregatesToSend,
-    rb_indices: Option<&RoundBufferIndices>,
+    rb_indices: Option<&RingBufferIndices>,
     strides_and_decimals: HashMap<EncodedFeedId, FeedStrideAndDecimals>,
-    feeds_rb_indexes: &mut HashMap<EncodedFeedId, u64>, /* The round buffer indices table for the relevant feeds. If the rb_indices are provided,
+    feeds_rb_indexes: &mut HashMap<EncodedFeedId, u64>, /* The ring buffer indices table for the relevant feeds. If the rb_indices are provided,
                                                         this map will be filled with the update count for each feed from it. If the
                                                         rb_indices is None, feeds_rb_indexes will be used as the source of the updates
                                                         count. */
@@ -179,8 +179,8 @@ pub async fn adfs_serialize_updates(
         result.append(&mut result_bytes);
     }
 
-    // In case feed_metrics is none, the feeds_rb_indexes contains all the round indices needed for serialization.
-    // We use them to populate feeds_info map based on which the round indices will be serialized
+    // In case feed_metrics is none, the feeds_rb_indexes contains all the ring buffer indices needed for serialization.
+    // We use them to populate feeds_info map based on which the ring buffer indices will be serialized
     if rb_indices.is_none() {
         for (feed_id, rb_index) in feeds_rb_indexes.iter() {
             if let Some(strides_and_decimals) = strides_and_decimals.get(feed_id) {
@@ -306,7 +306,7 @@ pub mod tests {
         config_init: HashMap<EncodedFeedId, FeedStrideAndDecimals>,
     ) -> (
         BatchedAggregatesToSend,
-        RoundBufferIndices,
+        RingBufferIndices,
         HashMap<EncodedFeedId, FeedStrideAndDecimals>,
     ) {
         let updates = BatchedAggregatesToSend {
@@ -317,9 +317,9 @@ pub mod tests {
                 .collect(),
         };
 
-        let mut rb_indices = RoundBufferIndices::new();
-        for (feed_id, round) in rb_indices_init.iter() {
-            rb_indices.insert(*feed_id, *round);
+        let mut rb_indices = RingBufferIndices::new();
+        for (feed_id, rb_index) in rb_indices_init.iter() {
+            rb_indices.insert(*feed_id, *rb_index);
         }
 
         (updates, rb_indices, config_init)
@@ -340,7 +340,7 @@ pub mod tests {
             (encoded_feed_id_for_stride_zero(4), "4890"),
             (encoded_feed_id_for_stride_zero(5), "5abc"),
         ];
-        let round_counters_init = vec![
+        let rb_indices_init = vec![
             (encoded_feed_id_for_stride_zero(1), 6),
             (encoded_feed_id_for_stride_zero(2), 5),
             (encoded_feed_id_for_stride_zero(3), 4),
@@ -350,7 +350,7 @@ pub mod tests {
 
         let config_init = default_config();
         let (updates, rb_indices, config) =
-            setup_updates_rb_indices_and_config(&updates_init, &round_counters_init, config_init);
+            setup_updates_rb_indices_and_config(&updates_init, &rb_indices_init, config_init);
 
         let expected_result = "000000050102400c0107123432676435730002400501022456000260040102367800028003010248900002a00201025abc010000000000000500040003000200000000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
 
@@ -394,7 +394,7 @@ pub mod tests {
             (encoded_feed_id_for_stride_zero(4), "4890"),
             (encoded_feed_id_for_stride_zero(5), "5abc"),
         ];
-        let round_counters_init = vec![
+        let rb_indices_init = vec![
             (encoded_feed_id_for_stride_zero(1), 6),
             (encoded_feed_id_for_stride_zero(2), 5),
             (encoded_feed_id_for_stride_zero(3), 4),
@@ -404,7 +404,7 @@ pub mod tests {
 
         let config_init = default_config();
         let (updates, mut rb_indices, config) =
-            setup_updates_rb_indices_and_config(&updates_init, &round_counters_init, config_init);
+            setup_updates_rb_indices_and_config(&updates_init, &rb_indices_init, config_init);
         rb_indices.insert(encoded_feed_id_for_stride_zero(6), 5);
 
         let expected_result = "000000050102400c0107123432676435730002400501022456000260040102367800028003010248900002a00201025abc010000000000000500040003000200040000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
@@ -449,7 +449,7 @@ pub mod tests {
             (encoded_feed_id_for_stride_zero(4), "4890"),
             (encoded_feed_id_for_stride_zero(5), "5abc"),
         ];
-        let round_counters_init = vec![
+        let rb_indices_init = vec![
             (encoded_feed_id_for_stride_zero(1), 6),
             (encoded_feed_id_for_stride_zero(2), 5),
             (encoded_feed_id_for_stride_zero(3), 4),
@@ -458,13 +458,13 @@ pub mod tests {
         ];
 
         let config_init = default_config();
-        let (updates, mut round_counters, config) =
-            setup_updates_rb_indices_and_config(&updates_init, &round_counters_init, config_init);
-        round_counters.insert(encoded_feed_id_for_stride_zero(6), 5);
+        let (updates, mut rb_indices, config) =
+            setup_updates_rb_indices_and_config(&updates_init, &rb_indices_init, config_init);
+        rb_indices.insert(encoded_feed_id_for_stride_zero(6), 5);
 
         let expected_result = "000000050102400c0107123432676435730002400501022456000260040102367800028328010248900002a00201025abc010000000000000500040328000200040000000000000000000000000000000000000e80000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000";
 
-        let mut feeds_rounds = HashMap::new();
+        let mut batch_rb_indices = HashMap::new();
 
         // Call as it will be in the sequencer
         assert_eq!(
@@ -473,20 +473,20 @@ pub mod tests {
                 adfs_serialize_updates(
                     net,
                     &updates,
-                    Some(&round_counters),
+                    Some(&rb_indices),
                     config.clone(),
-                    &mut feeds_rounds,
+                    &mut batch_rb_indices,
                 )
                 .await
                 .unwrap()
             )
         );
 
-        // Call as it will be in the reporter (feeds_rounds provided by the sequencer)
+        // Call as it will be in the reporter (rb_indices provided by the sequencer)
         assert_eq!(
             expected_result,
             hex::encode(
-                adfs_serialize_updates(net, &updates, None, config, &mut feeds_rounds,)
+                adfs_serialize_updates(net, &updates, None, config, &mut rb_indices,)
                     .await
                     .unwrap()
             )
