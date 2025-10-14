@@ -70,6 +70,12 @@ stride = 0
 decimals = 8
 data = '{"pair":{"base":"cbBTC","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"kind":"gecko-terminal","settings":[{"min_volume_usd":1000000,"network":"base","pool":"0x70acdf2ad0bf2402c957154f944c19ef4e1cbae1","reverse":false},{"min_volume_usd":1000000,"network":"base","pool":"0x4e962bb3889bf030368f56810a9c96b83cb3e778","reverse":false},{"min_volume_usd":1000000,"network":"base","pool":"0xc211e1f853a898bd1302385ccde55f33a8c4b3f3","reverse":false},{"min_volume_usd":1000000,"network":"base","pool":"0xfbb6eed8e7aa03b138556eedaf5d271a5e1e43ef","reverse":false},{"min_volume_usd":1000000,"network":"base","pool":"0xb94b22332abf5f89877a14cc88f2abc48c34b3df","reverse":false},{"min_volume_usd":1000000,"network":"base","pool":"0x8c7080564b5a792a33ef2fd473fba6364d5495e5","reverse":false}]}}'
 
+[[trigger.oracle.data_feeds]]
+id = "1000009"
+stride = 0
+decimals = 8
+data = '{"pair":{"base":"RZR","quote":"USD"},"decimals":8,"category":"Crypto","market_hours":"Crypto","arguments":{"kind":"gecko-terminal","settings":[{"min_volume_usd":1000,"network":"eth","pool":"0x3f89f8c0e0ffdfae0b97959303831fa893f1cfe0","reverse":false},{"min_volume_usd":1000,"network":"sonic","pool":"0xf0b29acebb577c52a7afbecdcdd9dbfd3b82cf12","reverse":false},{"min_volume_usd":1000,"network":"eth","pool":"0x5124dc4599f9a8715e0c0e68549e8deae8d1a1c80ce605495d795870e4febcb2","reverse":false},{"min_volume_usd":1000,"network":"eth","pool":"0xaa38d5755d313f03390dce8b570fb01cc591dffd","reverse":false},{"min_volume_usd":1000,"network":"sonic","pool":"0x08c5e3b7533ee819a4d1f66e839d0e8f04ae3d0c","reverse":false},{"min_volume_usd":1000,"network":"sonic","pool":"0x36e6765907dd61b50ad33f79574dd1b63339b59c","reverse":false},{"min_volume_usd":1000,"network":"eth","pool":"0xf2d8ad2984aa8050dd1ca1e74b862b165f7a622a","reverse":false},{"min_volume_usd":1000,"network":"sonic","pool":"0xff3a2650c5ffd0745fb93261671e6d3e95f2c082","reverse":false},{"min_volume_usd":1000,"network":"eth","pool":"0xc2fcdd48209dd383b1f2ac120b84b2a75ee18bd3","reverse":false}]}}'
+
 [component.gecko-terminal]
 source = "../target/wasm32-wasip1/release/gecko_terminal.wasm"
 allowed_outbound_hosts = ["https://api.geckoterminal.com"]

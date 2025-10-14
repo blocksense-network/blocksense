@@ -48545,6 +48545,93 @@
       }
     },
     {
+      "id": "1000009",
+      "full_name": "RZR / USD",
+      "description": "Price of Reserve Money (RZR) in USD",
+      "type": "price-feed",
+      "oracle_id": "gecko-terminal",
+      "value_type": "numerical",
+      "stride": 0,
+      "quorum": {
+        "percentage": 75,
+        "aggregation": "median"
+      },
+      "schedule": {
+        "interval_ms": 90000,
+        "heartbeat_ms": 3600000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "pair": {
+          "base": "RZR",
+          "quote": "USD"
+        },
+        "decimals": 8,
+        "category": "Crypto",
+        "market_hours": "Crypto",
+        "arguments": {
+          "kind": "gecko-terminal",
+          "settings": [
+            {
+              "network": "eth",
+              "pool": "0x3f89f8c0e0ffdfae0b97959303831fa893f1cfe0",
+              "reverse": false,
+              "min_volume_usd": 1000
+            },
+            {
+              "network": "sonic",
+              "pool": "0xf0b29acebb577c52a7afbecdcdd9dbfd3b82cf12",
+              "reverse": false,
+              "min_volume_usd": 1000
+            },
+            {
+              "network": "eth",
+              "pool": "0x5124dc4599f9a8715e0c0e68549e8deae8d1a1c80ce605495d795870e4febcb2",
+              "reverse": false,
+              "min_volume_usd": 1000
+            },
+            {
+              "network": "eth",
+              "pool": "0xaa38d5755d313f03390dce8b570fb01cc591dffd",
+              "reverse": false,
+              "min_volume_usd": 1000
+            },
+            {
+              "network": "sonic",
+              "pool": "0x08c5e3b7533ee819a4d1f66e839d0e8f04ae3d0c",
+              "reverse": false,
+              "min_volume_usd": 1000
+            },
+            {
+              "network": "sonic",
+              "pool": "0x36e6765907dd61b50ad33f79574dd1b63339b59c",
+              "reverse": false,
+              "min_volume_usd": 1000
+            },
+            {
+              "network": "eth",
+              "pool": "0xf2d8ad2984aa8050dd1ca1e74b862b165f7a622a",
+              "reverse": false,
+              "min_volume_usd": 1000
+            },
+            {
+              "network": "sonic",
+              "pool": "0xff3a2650c5ffd0745fb93261671e6d3e95f2c082",
+              "reverse": false,
+              "min_volume_usd": 1000
+            },
+            {
+              "network": "eth",
+              "pool": "0xc2fcdd48209dd383b1f2ac120b84b2a75ee18bd3",
+              "reverse": false,
+              "min_volume_usd": 1000
+            }
+          ]
+        }
+      }
+    },
+    {
       "id": "2000000",
       "full_name": "IBIT / USD",
       "description": "Price of iShares Bitcoin Trust ETF ($IBIT) in USD",
