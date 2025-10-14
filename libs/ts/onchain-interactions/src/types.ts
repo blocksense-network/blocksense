@@ -24,6 +24,7 @@ export const deployedTestnets = [
   'expchain-testnet',
   'fantom-testnet',
   'flare-coston',
+  'fluent-testnet',
   'fraxtal-testnet',
   'giwa-sepolia',
   'gravity-sepolia',
