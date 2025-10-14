@@ -13,6 +13,7 @@ export const deployedTestnets = [
   'blast-sepolia',
   'bsc-testnet',
   'celo-alfajores',
+  'core-testnet',
   'citrea-testnet',
   'creator-chain-testnet',
   'cronos-testnet',
