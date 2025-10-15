@@ -24,10 +24,7 @@
     "knip": "knip"
   },
   "dependenciesMeta": {
-    "@openzeppelin/contracts@5.0.2": {
-      "unplugged": true
-    },
-    "next@14.2.5": {
+    "@openzeppelin/contracts@5.1.0": {
       "unplugged": true
     }
   },
@@ -68,8 +65,5 @@
     "ts-node": "^10.9.2",
     "typescript": "5.9.2",
     "wrangler": "^4.15.2"
-  },
-  "resolutions": {
-    "babel-plugin-react-compiler": "patch:babel-plugin-react-compiler@0.0.0-experimental-22c6e49-20241219#./.yarn/patches/babel-plugin-react-compiler@0.0.0-experimental-22c6e49-20241219.patch"
   }
 }

@@ -1664,9 +1664,7 @@ __metadata:
     typescript: "npm:5.9.2"
     wrangler: "npm:^4.15.2"
   dependenciesMeta:
-    "@openzeppelin/contracts@5.0.2":
-      unplugged: true
-    next@14.2.5:
+    "@openzeppelin/contracts@5.1.0":
       unplugged: true
   languageName: unknown
   linkType: soft
@@ -12872,15 +12870,6 @@ __metadata:
   dependencies:
     "@babel/types": "npm:^7.19.0"
   checksum: 10c0/26abefdb378526b530d351721a377aec0ff90a0885b479ec5b395593b4a400c7a590831933ec81ec8072c61a13787cc54448e59ec6677923321e6ed3d17d170a
-  languageName: node
-  linkType: hard
-
-"babel-plugin-react-compiler@patch:babel-plugin-react-compiler@0.0.0-experimental-22c6e49-20241219#./.yarn/patches/babel-plugin-react-compiler@0.0.0-experimental-22c6e49-20241219.patch::locator=%40blocksense%2Fmonorepo%40workspace%3A.":
-  version: 0.0.0-experimental-22c6e49-20241219
-  resolution: "babel-plugin-react-compiler@patch:babel-plugin-react-compiler@npm%3A0.0.0-experimental-22c6e49-20241219#./.yarn/patches/babel-plugin-react-compiler@0.0.0-experimental-22c6e49-20241219.patch::version=0.0.0-experimental-22c6e49-20241219&hash=8a3a80&locator=%40blocksense%2Fmonorepo%40workspace%3A."
-  dependencies:
-    "@babel/types": "npm:^7.19.0"
-  checksum: 10c0/6f90ee1b94ec0549b309050eae56042698322f5aaa7333ca5a996b3f89afa9df6c6b3ba74685979a21373f4d1bd2e853d6ccac7c4e8867e21117d3150b5521f1
   languageName: node
   linkType: hard
 

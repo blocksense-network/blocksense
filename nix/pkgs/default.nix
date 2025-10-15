@@ -19,6 +19,8 @@
 
       version = "dev";
 
+      yarn = pkgs.callPackage ./yarn { };
+
       blocksense-rs = pkgs.callPackage ./blocksense-rs {
         inherit craneLib version;
         inherit (self.lib) filesets;
@@ -65,6 +67,7 @@
         inherit blama;
       };
       legacyPackages = {
+        inherit yarn;
         oracle-scripts = {
           cex-price-feeds = mkOracleScript "cex-price-feeds";
           exsat-holdings = mkOracleScript "exsat-holdings";
