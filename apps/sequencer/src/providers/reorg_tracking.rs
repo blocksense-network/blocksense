@@ -7,10 +7,11 @@ use alloy::{eips::BlockNumberOrTag, providers::Provider};
 use alloy_primitives::B256;
 use blocksense_config::ReorgConfig;
 use blocksense_utils::counter_unbounded_channel::CountedSender;
+use rand::Rng;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
-use tokio::time::Duration;
+use tokio::time::{Duration, Instant};
 use tokio_stream::StreamExt;
 use tracing::{debug, error, info, trace, warn};
 // TODO: use futures_util::StreamExt;
@@ -180,83 +181,187 @@ impl ReorgTracker {
         let providers_mutex = self.providers_mutex.clone();
         tracing::info!("Starting tracker for reorgs in network {net} loop...");
 
+        let websocket_url = self.websocket_url.clone();
+
         let mut _provider_ws_opt = None;
-        let mut sub_opt = None;
-
-        if let Some(ws_url) = self.websocket_url.clone() {
-            info!("Attempting WS connect for {net} to {ws_url}");
-            let provider_ws = match ProviderBuilder::new().connect(&ws_url).await {
-                Ok(p) => p,
-                Err(e) => {
-                    warn!("WS connect failed for {net}: {e:?}");
-                    return;
-                }
-            };
-
-            info!("WS connected for {net}; subscribing to newHeads");
-            let sub = match provider_ws.subscribe_blocks().await {
-                Ok(s) => s,
-                Err(e) => {
-                    warn!("WS subscribe_blocks failed for {net}: {e:?}");
-                    return;
-                }
-            };
-
-            _provider_ws_opt = Some(provider_ws);
-            sub_opt = Some(sub);
-        }
-
         let mut stream_opt = None;
         let mut average_block_generation_time: u64 = 0;
 
-        match sub_opt {
-            Some(sub) => {
-                stream_opt = Some(sub.into_stream());
+        const WS_BACKOFF_SCHEDULE_MS: [u64; 6] = [1_000, 2_000, 5_000, 10_000, 20_000, 30_000];
+        const DEFAULT_POLL_INTERVAL_MS: u64 = 60 * 1000;
+        let mut ws_backoff_idx: usize = 0;
+        let mut next_ws_retry_at: Option<Instant> = None;
+
+        if let Some(ref ws_url) = websocket_url {
+            info!("Attempting WS connect for {net} to {ws_url}");
+            match ProviderBuilder::new().connect(ws_url).await {
+                Ok(provider_ws) => {
+                    info!("WS connected for {net}; subscribing to newHeads");
+                    match provider_ws.subscribe_blocks().await {
+                        Ok(sub) => {
+                            stream_opt = Some(sub.into_stream());
+                            _provider_ws_opt = Some(provider_ws);
+                            ws_backoff_idx = 0;
+                            next_ws_retry_at = None;
+                        }
+                        Err(e) => {
+                            warn!("WS subscribe_blocks failed for {net}: {e:?}");
+                            let base_ms = WS_BACKOFF_SCHEDULE_MS[ws_backoff_idx];
+                            let jittered_ms = Self::jitter_backoff_ms(base_ms);
+                            warn!(
+                                "Will retry WS subscribe for {net} in {jittered_ms}ms after error: {e:?}"
+                            );
+                            next_ws_retry_at =
+                                Some(Instant::now() + Duration::from_millis(jittered_ms));
+                            if ws_backoff_idx < WS_BACKOFF_SCHEDULE_MS.len() - 1 {
+                                ws_backoff_idx += 1;
+                            }
+                        }
+                    }
+                }
+                Err(e) => {
+                    warn!("WS connect failed for {net}: {e:?}");
+                    let base_ms = WS_BACKOFF_SCHEDULE_MS[ws_backoff_idx];
+                    let jittered_ms = Self::jitter_backoff_ms(base_ms);
+                    warn!("Will retry WS connect for {net} in {jittered_ms}ms after error: {e:?}");
+                    next_ws_retry_at = Some(Instant::now() + Duration::from_millis(jittered_ms));
+                    if ws_backoff_idx < WS_BACKOFF_SCHEDULE_MS.len() - 1 {
+                        ws_backoff_idx += 1;
+                    }
+                }
             }
-            None => {
-                // Loop until block generation time is determined
-                average_block_generation_time = loop {
-                    let poll_period = 60 * 1000;
-                    if let Some(t) = self
-                        .calculate_block_generation_time_in_network(
-                            net.as_str(),
-                            &providers_mutex,
-                            100,
-                        )
-                        .await
-                    {
-                        break t;
-                    } else {
-                        warn!(
+        } else {
+            // Loop until block generation time is determined
+            average_block_generation_time = loop {
+                let poll_period = DEFAULT_POLL_INTERVAL_MS;
+                if let Some(t) = self
+                    .calculate_block_generation_time_in_network(net.as_str(), &providers_mutex, 100)
+                    .await
+                {
+                    break t;
+                } else {
+                    warn!(
                         "Could not determine block generation time for network: {net}. Will retry in {poll_period}ms (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})",
                         observer_finalized_height = self.observer_finalized_height,
                         observed_latest_height = self.observed_latest_height,
                         loop_count = self.loop_count,
                     )
-                    }
-                    await_time(poll_period).await;
-                };
-            }
+                }
+                await_time(poll_period).await;
+            };
         }
 
         loop {
-            let block_header_opt = match stream_opt {
-                Some(ref mut stream) => {
-                    match stream.next().await {
-                        Some(block_header) => Some(block_header),
-                        None => {
-                            warn!("Stream disconnected for {net} loop_count: {loop_count}: observer_finalized_height={observer_finalized_height} observed_latest_height={observed_latest_height}!",
-                                observer_finalized_height = self.observer_finalized_height,
-                                observed_latest_height = self.observed_latest_height,
-                                loop_count = self.loop_count,
-                            );
-                            // TODO: implement resubscription
-                            None
+            if stream_opt.is_none() {
+                if let Some(ref ws_url) = websocket_url {
+                    let should_attempt = match next_ws_retry_at {
+                        Some(deadline) => Instant::now() >= deadline,
+                        None => true,
+                    };
+                    if should_attempt {
+                        info!("Attempting WS reconnect for {net} to {ws_url}");
+                        match ProviderBuilder::new().connect(ws_url).await {
+                            Ok(provider_ws) => {
+                                info!("WS reconnected for {net}; subscribing to newHeads");
+                                match provider_ws.subscribe_blocks().await {
+                                    Ok(sub) => {
+                                        stream_opt = Some(sub.into_stream());
+                                        _provider_ws_opt = Some(provider_ws);
+                                        ws_backoff_idx = 0;
+                                        next_ws_retry_at = None;
+                                    }
+                                    Err(e) => {
+                                        warn!("WS subscribe_blocks failed for {net}: {e:?}");
+                                        let base_ms = WS_BACKOFF_SCHEDULE_MS[ws_backoff_idx];
+                                        let jittered_ms = Self::jitter_backoff_ms(base_ms);
+                                        warn!(
+                                            "Will retry WS subscribe for {net} in {jittered_ms}ms after error: {e:?}"
+                                        );
+                                        next_ws_retry_at = Some(
+                                            Instant::now() + Duration::from_millis(jittered_ms),
+                                        );
+                                        if ws_backoff_idx < WS_BACKOFF_SCHEDULE_MS.len() - 1 {
+                                            ws_backoff_idx += 1;
+                                        }
+                                    }
+                                }
+                            }
+                            Err(e) => {
+                                warn!("WS reconnect failed for {net}: {e:?}");
+                                let base_ms = WS_BACKOFF_SCHEDULE_MS[ws_backoff_idx];
+                                let jittered_ms = Self::jitter_backoff_ms(base_ms);
+                                warn!(
+                                    "Will retry WS connect for {net} in {jittered_ms}ms after error: {e:?}"
+                                );
+                                next_ws_retry_at =
+                                    Some(Instant::now() + Duration::from_millis(jittered_ms));
+                                if ws_backoff_idx < WS_BACKOFF_SCHEDULE_MS.len() - 1 {
+                                    ws_backoff_idx += 1;
+                                }
+                            }
                         }
                     }
                 }
+            }
+
+            let block_header_opt = match stream_opt {
+                Some(ref mut stream) => match stream.next().await {
+                    Some(block_header) => Some(block_header),
+                    None => {
+                        warn!(
+                            "Stream disconnected for {net} (loop_count={loop_count}, observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height})",
+                            observer_finalized_height = self.observer_finalized_height,
+                            observed_latest_height = self.observed_latest_height,
+                            loop_count = self.loop_count,
+                        );
+                        stream_opt = None;
+                        _provider_ws_opt = None;
+                        let base_ms = WS_BACKOFF_SCHEDULE_MS[ws_backoff_idx];
+                        let jittered_ms = Self::jitter_backoff_ms(base_ms);
+                        warn!(
+                            "Falling back to polling for {jittered_ms}ms before retrying WS in network {net}"
+                        );
+                        next_ws_retry_at =
+                            Some(Instant::now() + Duration::from_millis(jittered_ms));
+                        if ws_backoff_idx < WS_BACKOFF_SCHEDULE_MS.len() - 1 {
+                            ws_backoff_idx += 1;
+                        }
+                        None
+                    }
+                },
                 None => {
-                    // Sleep between polls
+                    if average_block_generation_time == 0 {
+                        match self
+                            .calculate_block_generation_time_in_network(
+                                net.as_str(),
+                                &providers_mutex,
+                                100,
+                            )
+                            .await
+                        {
+                            Some(t) if t > 0 => {
+                                average_block_generation_time = t;
+                            }
+                            Some(_) => {
+                                average_block_generation_time = DEFAULT_POLL_INTERVAL_MS;
+                                warn!(
+                                    "Average block time reported as 0ms for {net}; using default poll interval {DEFAULT_POLL_INTERVAL_MS}ms (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})",
+                                    observer_finalized_height = self.observer_finalized_height,
+                                    observed_latest_height = self.observed_latest_height,
+                                    loop_count = self.loop_count,
+                                );
+                            }
+                            None => {
+                                average_block_generation_time = DEFAULT_POLL_INTERVAL_MS;
+                                warn!(
+                                    "Could not determine block generation time for network {net}; using default poll interval {DEFAULT_POLL_INTERVAL_MS}ms (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})",
+                                    observer_finalized_height = self.observer_finalized_height,
+                                    observed_latest_height = self.observed_latest_height,
+                                    loop_count = self.loop_count,
+                                );
+                            }
+                        }
+                    }
                     await_time(average_block_generation_time).await;
                     None
                 }
@@ -652,6 +757,20 @@ impl ReorgTracker {
         }
 
         self.observed_latest_height = observed_latest_height;
+    }
+
+    fn jitter_backoff_ms(base_ms: u64) -> u64 {
+        if base_ms == 0 {
+            return 0;
+        }
+        let jitter = base_ms / 10;
+        if jitter == 0 {
+            return base_ms;
+        }
+        let mut rng = rand::thread_rng();
+        let min = base_ms.saturating_sub(jitter);
+        let max = base_ms + jitter;
+        rng.gen_range(min..=max)
     }
 
     pub fn new(
