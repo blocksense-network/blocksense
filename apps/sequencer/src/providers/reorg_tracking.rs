@@ -22,6 +22,69 @@ use blocksense_utils::await_time;
 // Local helpers from eth_send_utils we need to call
 use crate::providers::eth_send_utils::{try_to_sync, BatchOfUpdatesToProcess};
 
+struct ReconnectBackoff {
+    backoff_idx: usize,
+    next_retry_at: Option<Instant>,
+    jittered_ms: u64,
+}
+
+impl ReconnectBackoff {
+    pub fn new() -> ReconnectBackoff {
+        ReconnectBackoff {
+            backoff_idx: 0,
+            next_retry_at: None,
+            jittered_ms: 0,
+        }
+    }
+
+    pub fn get_next_retry_at(&self) -> Option<Instant> {
+        self.next_retry_at
+    }
+
+    pub fn get_next_retry_ms(&self) -> u64 {
+        self.jittered_ms
+    }
+
+    pub fn connection_established(&mut self) {
+        self.backoff_idx = 0;
+        self.next_retry_at = None;
+        self.jittered_ms = 0;
+    }
+
+    fn set_next_retry_at(&mut self) {
+        let base_ms = Self::get_retry_periods_ms()[self.backoff_idx];
+        self.jittered_ms = Self::jitter_backoff_ms(base_ms);
+        self.next_retry_at = Some(Instant::now() + Duration::from_millis(self.jittered_ms));
+    }
+
+    fn get_retry_periods_ms() -> &'static [u64; 9] {
+        &[
+            1_000, 2_000, 5_000, 10_000, 20_000, 40_000, 80_000, 160_000, 320_000,
+        ]
+    }
+
+    fn jitter_backoff_ms(base_ms: u64) -> u64 {
+        if base_ms == 0 {
+            return 0;
+        }
+        let jitter = base_ms / 10;
+        if jitter == 0 {
+            return base_ms;
+        }
+        let mut rng = rand::thread_rng();
+        let min = base_ms.saturating_sub(jitter);
+        let max = base_ms + jitter;
+        rng.gen_range(min..=max)
+    }
+
+    fn inc_retries_count(&mut self) {
+        self.set_next_retry_at();
+        if self.backoff_idx < Self::get_retry_periods_ms().len() - 1 {
+            self.backoff_idx += 1;
+        }
+    }
+}
+
 pub struct ReorgTracker {
     observer_finalized_height: u64,
     observed_latest_height: u64,
@@ -187,10 +250,9 @@ impl ReorgTracker {
         let mut stream_opt = None;
         let mut average_block_generation_time: u64 = 0;
 
-        const WS_BACKOFF_SCHEDULE_MS: [u64; 6] = [1_000, 2_000, 5_000, 10_000, 20_000, 30_000];
         const DEFAULT_POLL_INTERVAL_MS: u64 = 60 * 1000;
-        let mut ws_backoff_idx: usize = 0;
-        let mut next_ws_retry_at: Option<Instant> = None;
+
+        let mut reconnect_backoff_tracker = ReconnectBackoff::new();
 
         if let Some(ref ws_url) = websocket_url {
             info!("Attempting WS connect for {net} to {ws_url}");
@@ -201,33 +263,25 @@ impl ReorgTracker {
                         Ok(sub) => {
                             stream_opt = Some(sub.into_stream());
                             _provider_ws_opt = Some(provider_ws);
-                            ws_backoff_idx = 0;
-                            next_ws_retry_at = None;
+                            reconnect_backoff_tracker.connection_established();
                         }
                         Err(e) => {
                             warn!("WS subscribe_blocks failed for {net}: {e:?}");
-                            let base_ms = WS_BACKOFF_SCHEDULE_MS[ws_backoff_idx];
-                            let jittered_ms = Self::jitter_backoff_ms(base_ms);
+                            reconnect_backoff_tracker.inc_retries_count();
                             warn!(
-                                "Will retry WS subscribe for {net} in {jittered_ms}ms after error: {e:?}"
+                                "Will retry WS subscribe for {net} in {jittered_ms:?}ms after error: {e:?}",
+                                jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
                             );
-                            next_ws_retry_at =
-                                Some(Instant::now() + Duration::from_millis(jittered_ms));
-                            if ws_backoff_idx < WS_BACKOFF_SCHEDULE_MS.len() - 1 {
-                                ws_backoff_idx += 1;
-                            }
                         }
                     }
                 }
                 Err(e) => {
                     warn!("WS connect failed for {net}: {e:?}");
-                    let base_ms = WS_BACKOFF_SCHEDULE_MS[ws_backoff_idx];
-                    let jittered_ms = Self::jitter_backoff_ms(base_ms);
-                    warn!("Will retry WS connect for {net} in {jittered_ms}ms after error: {e:?}");
-                    next_ws_retry_at = Some(Instant::now() + Duration::from_millis(jittered_ms));
-                    if ws_backoff_idx < WS_BACKOFF_SCHEDULE_MS.len() - 1 {
-                        ws_backoff_idx += 1;
-                    }
+                    reconnect_backoff_tracker.inc_retries_count();
+                    warn!(
+                        "Will retry WS connect for {net} in {jittered_ms:?}ms after error: {e:?}",
+                        jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
+                    );
                 }
             }
         } else {
@@ -254,7 +308,7 @@ impl ReorgTracker {
         loop {
             if stream_opt.is_none() {
                 if let Some(ref ws_url) = websocket_url {
-                    let should_attempt = match next_ws_retry_at {
+                    let should_attempt = match reconnect_backoff_tracker.get_next_retry_at() {
                         Some(deadline) => Instant::now() >= deadline,
                         None => true,
                     };
@@ -267,37 +321,25 @@ impl ReorgTracker {
                                     Ok(sub) => {
                                         stream_opt = Some(sub.into_stream());
                                         _provider_ws_opt = Some(provider_ws);
-                                        ws_backoff_idx = 0;
-                                        next_ws_retry_at = None;
+                                        reconnect_backoff_tracker.connection_established();
                                     }
                                     Err(e) => {
                                         warn!("WS subscribe_blocks failed for {net}: {e:?}");
-                                        let base_ms = WS_BACKOFF_SCHEDULE_MS[ws_backoff_idx];
-                                        let jittered_ms = Self::jitter_backoff_ms(base_ms);
+                                        reconnect_backoff_tracker.inc_retries_count();
                                         warn!(
-                                            "Will retry WS subscribe for {net} in {jittered_ms}ms after error: {e:?}"
+                                            "Will retry WS subscribe for {net} in {jittered_ms:?}ms after error: {e:?}",
+                                            jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
                                         );
-                                        next_ws_retry_at = Some(
-                                            Instant::now() + Duration::from_millis(jittered_ms),
-                                        );
-                                        if ws_backoff_idx < WS_BACKOFF_SCHEDULE_MS.len() - 1 {
-                                            ws_backoff_idx += 1;
-                                        }
                                     }
                                 }
                             }
                             Err(e) => {
                                 warn!("WS reconnect failed for {net}: {e:?}");
-                                let base_ms = WS_BACKOFF_SCHEDULE_MS[ws_backoff_idx];
-                                let jittered_ms = Self::jitter_backoff_ms(base_ms);
+                                reconnect_backoff_tracker.inc_retries_count();
                                 warn!(
-                                    "Will retry WS connect for {net} in {jittered_ms}ms after error: {e:?}"
+                                    "Will retry WS connect for {net} in {jittered_ms:?}ms after error: {e:?}",
+                                    jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
                                 );
-                                next_ws_retry_at =
-                                    Some(Instant::now() + Duration::from_millis(jittered_ms));
-                                if ws_backoff_idx < WS_BACKOFF_SCHEDULE_MS.len() - 1 {
-                                    ws_backoff_idx += 1;
-                                }
                             }
                         }
                     }
@@ -316,16 +358,11 @@ impl ReorgTracker {
                         );
                         stream_opt = None;
                         _provider_ws_opt = None;
-                        let base_ms = WS_BACKOFF_SCHEDULE_MS[ws_backoff_idx];
-                        let jittered_ms = Self::jitter_backoff_ms(base_ms);
+                        reconnect_backoff_tracker.inc_retries_count();
                         warn!(
-                            "Falling back to polling for {jittered_ms}ms before retrying WS in network {net}"
+                            "Falling back to polling for {jittered_ms:?}ms before retrying WS in network {net}",
+                            jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
                         );
-                        next_ws_retry_at =
-                            Some(Instant::now() + Duration::from_millis(jittered_ms));
-                        if ws_backoff_idx < WS_BACKOFF_SCHEDULE_MS.len() - 1 {
-                            ws_backoff_idx += 1;
-                        }
                         None
                     }
                 },
@@ -757,20 +794,6 @@ impl ReorgTracker {
         }
 
         self.observed_latest_height = observed_latest_height;
-    }
-
-    fn jitter_backoff_ms(base_ms: u64) -> u64 {
-        if base_ms == 0 {
-            return 0;
-        }
-        let jitter = base_ms / 10;
-        if jitter == 0 {
-            return base_ms;
-        }
-        let mut rng = rand::thread_rng();
-        let min = base_ms.saturating_sub(jitter);
-        let max = base_ms + jitter;
-        rng.gen_range(min..=max)
     }
 
     pub fn new(
