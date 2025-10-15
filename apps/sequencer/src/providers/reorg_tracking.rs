@@ -5,9 +5,10 @@ use alloy::providers::ProviderBuilder;
 use alloy::rpc::types::Block;
 use alloy::transports::ws::WsConnect;
 use alloy::{eips::BlockNumberOrTag, providers::Provider};
-use alloy_primitives::B256;
+use alloy_primitives::{Address, B256};
 use blocksense_config::ReorgConfig;
 use blocksense_utils::counter_unbounded_channel::CountedSender;
+use eyre::Report;
 use rand::Rng;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -22,6 +23,27 @@ use blocksense_utils::await_time;
 
 // Local helpers from eth_send_utils we need to call
 use crate::providers::eth_send_utils::{try_to_sync, BatchOfUpdatesToProcess};
+
+async fn rpc_get_block_by_number(
+    rpc_handle: &ProviderType,
+    block_number: BlockNumberOrTag,
+) -> eyre::Result<Option<Block>> {
+    rpc_handle
+        .get_block_by_number(block_number)
+        .await
+        .map_err(Report::from)
+}
+
+async fn rpc_get_storage_at(
+    rpc_handle: &ProviderType,
+    address: Address,
+    slot: alloy_primitives::U256,
+) -> eyre::Result<alloy_primitives::U256> {
+    rpc_handle
+        .get_storage_at(address, slot)
+        .await
+        .map_err(Report::from)
+}
 
 struct ReconnectBackoff {
     backoff_idx: usize,
@@ -134,7 +156,7 @@ impl ReorgTracker {
             };
             match timeout(
                 rpc_timeout,
-                rpc_handle.get_block_by_number(BlockNumberOrTag::Number(height)),
+                rpc_get_block_by_number(rpc_handle, BlockNumberOrTag::Number(height)),
             )
             .await
             {
@@ -452,7 +474,7 @@ impl ReorgTracker {
 
                         let latest_block_result = timeout(
                             self.rpc_timeout,
-                            rpc_handle.get_block_by_number(BlockNumberOrTag::Latest),
+                            rpc_get_block_by_number(&rpc_handle, BlockNumberOrTag::Latest),
                         )
                         .await;
                         if let Ok(Ok(Some(b))) = latest_block_result {
@@ -475,7 +497,8 @@ impl ReorgTracker {
                                 if let Some(contract_address) = contract.address {
                                     match timeout(
                                         self.rpc_timeout,
-                                        rpc_handle.get_storage_at(
+                                        rpc_get_storage_at(
+                                            &rpc_handle,
                                             contract_address,
                                             alloy_primitives::U256::from(0),
                                         ),
@@ -542,7 +565,7 @@ impl ReorgTracker {
                         // 1) Observe latest finalized block for logging/visibility
                         match timeout(
                             self.rpc_timeout,
-                            rpc_handle.get_block_by_number(BlockNumberOrTag::Finalized),
+                            rpc_get_block_by_number(&rpc_handle, BlockNumberOrTag::Finalized),
                         )
                         .await
                         {
@@ -663,9 +686,10 @@ impl ReorgTracker {
             if let Some(stored_hash) = observed_block_hashes.get(&observed_latest_height) {
                 match timeout(
                     rpc_timeout,
-                    rpc_handle.get_block_by_number(BlockNumberOrTag::Number(
-                        observed_latest_height,
-                    )),
+                    rpc_get_block_by_number(
+                        rpc_handle,
+                        BlockNumberOrTag::Number(observed_latest_height),
+                    ),
                 )
                 .await
                 {
@@ -705,7 +729,10 @@ impl ReorgTracker {
             let first_new_block_height = observed_latest_height + 1;
             if let Ok(Ok(Some(first_new_block))) = timeout(
                 rpc_timeout,
-                rpc_handle.get_block_by_number(BlockNumberOrTag::Number(first_new_block_height)),
+                rpc_get_block_by_number(
+                    rpc_handle,
+                    BlockNumberOrTag::Number(first_new_block_height),
+                ),
             )
             .await
             {
@@ -741,8 +768,10 @@ impl ReorgTracker {
                         for block_height in first_new_block_height + 1..=latest_height {
                             if let Ok(Ok(Some(new_block))) = timeout(
                                 rpc_timeout,
-                                rpc_handle
-                                    .get_block_by_number(BlockNumberOrTag::Number(block_height)),
+                                rpc_get_block_by_number(
+                                    rpc_handle,
+                                    BlockNumberOrTag::Number(block_height),
+                                ),
                             )
                             .await
                             {
@@ -847,7 +876,7 @@ impl ReorgTracker {
 
         let latest_block = match timeout(
             self.rpc_timeout,
-            rpc_handle.get_block_by_number(BlockNumberOrTag::Latest),
+            rpc_get_block_by_number(&rpc_handle, BlockNumberOrTag::Latest),
         )
         .await
         {
@@ -877,7 +906,7 @@ impl ReorgTracker {
         let lookback_height = latest_height - num_blocks;
         let prev_block = match timeout(
             self.rpc_timeout,
-            rpc_handle.get_block_by_number(BlockNumberOrTag::Number(lookback_height)),
+            rpc_get_block_by_number(&rpc_handle, BlockNumberOrTag::Number(lookback_height)),
         )
         .await
         {
@@ -1129,10 +1158,8 @@ mod tests {
             provider.rb_indices.insert(encoded, 7);
 
             // Insert observed hash for genesis (height 0) so the first loop can progress without finalized support
-            if let Ok(Some(genesis)) = provider
-                .provider
-                .get_block_by_number(BlockNumberOrTag::Number(0))
-                .await
+            if let Ok(Some(genesis)) =
+                rpc_get_block_by_number(&provider.provider, BlockNumberOrTag::Number(0)).await
             {
                 provider.insert_observed_block_hash(0, genesis.header.hash);
             }
@@ -1149,9 +1176,7 @@ mod tests {
         // Query current tip height as T0, then snapshot the chain at T0
         let t0_height = {
             let provider = provider_mutex.lock().await;
-            provider
-                .provider
-                .get_block_by_number(BlockNumberOrTag::Latest)
+            rpc_get_block_by_number(&provider.provider, BlockNumberOrTag::Latest)
                 .await
                 .unwrap()
                 .unwrap()
@@ -1201,9 +1226,7 @@ mod tests {
         // Capture current latest height (T1) and the observed hash we stored for it
         let (t1_height, observed_t1_hash) = {
             let provider = provider_mutex.lock().await;
-            let latest = provider
-                .provider
-                .get_block_by_number(BlockNumberOrTag::Latest)
+            let latest = rpc_get_block_by_number(&provider.provider, BlockNumberOrTag::Latest)
                 .await
                 .unwrap()
                 .unwrap();
@@ -1297,9 +1320,7 @@ mod tests {
         // 6) Assert reorg happened (chain hash at T1 changed vs previously observed)
         let chain_t1_hash = {
             let provider = provider_mutex.lock().await;
-            provider
-                .provider
-                .get_block_by_number(BlockNumberOrTag::Number(t1_height))
+            rpc_get_block_by_number(&provider.provider, BlockNumberOrTag::Number(t1_height))
                 .await
                 .unwrap()
                 .unwrap()
