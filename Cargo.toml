@@ -40,7 +40,7 @@ blocksense-utils = { path = "libs/utils" }
 
 actix-test = "0.1.5"
 actix-web = "4.6.0"
-alloy = "1.0.9"
+alloy = { version = "1.0.38", features = ["full"] }
 alloy-primitives = "1.1.2"
 alloy-u256-literal = "^0.1"
 anyhow = "1"
