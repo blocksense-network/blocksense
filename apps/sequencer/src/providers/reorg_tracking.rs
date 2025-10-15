@@ -1,6 +1,7 @@
 use crate::providers::provider::{ProviderType, RpcProvider, SharedRpcProviders};
 use actix_web::rt::time::timeout;
 use alloy::hex;
+use alloy::network::EthereumWallet;
 use alloy::providers::ProviderBuilder;
 use alloy::rpc::types::Block;
 use alloy::transports::ws::WsConnect;
@@ -25,24 +26,40 @@ use blocksense_utils::await_time;
 use crate::providers::eth_send_utils::{try_to_sync, BatchOfUpdatesToProcess};
 
 async fn rpc_get_block_by_number(
-    rpc_handle: &ProviderType,
+    rpc_http: &ProviderType,
+    rpc_ws: Option<&ProviderType>,
     block_number: BlockNumberOrTag,
 ) -> eyre::Result<Option<Block>> {
-    rpc_handle
+    let provider = rpc_ws.unwrap_or(rpc_http);
+    provider
         .get_block_by_number(block_number)
         .await
         .map_err(Report::from)
 }
 
 async fn rpc_get_storage_at(
-    rpc_handle: &ProviderType,
+    rpc_http: &ProviderType,
+    rpc_ws: Option<&ProviderType>,
     address: Address,
     slot: alloy_primitives::U256,
 ) -> eyre::Result<alloy_primitives::U256> {
-    rpc_handle
+    let provider = rpc_ws.unwrap_or(rpc_http);
+    provider
         .get_storage_at(address, slot)
         .await
         .map_err(Report::from)
+}
+
+async fn ws_wallet_for_network(
+    providers_mutex: &SharedRpcProviders,
+    net: &str,
+) -> Option<EthereumWallet> {
+    let provider_arc = {
+        let providers = providers_mutex.read().await;
+        providers.get(net).cloned()
+    }?;
+    let provider = provider_arc.lock().await;
+    Some(EthereumWallet::from(provider.signer.clone()))
 }
 
 struct ReconnectBackoff {
@@ -125,6 +142,7 @@ impl ReorgTracker {
     async fn handle_reorg(
         &mut self,
         rpc_handle: &ProviderType,
+        rpc_ws: Option<&ProviderType>,
         provider_mutex: &Arc<Mutex<RpcProvider>>,
         observed_block_hashes: &HashMap<u64, B256>,
         observed_latest_height: u64,
@@ -156,7 +174,7 @@ impl ReorgTracker {
             };
             match timeout(
                 rpc_timeout,
-                rpc_get_block_by_number(rpc_handle, BlockNumberOrTag::Number(height)),
+                rpc_get_block_by_number(rpc_handle, rpc_ws, BlockNumberOrTag::Number(height)),
             )
             .await
             {
@@ -278,37 +296,43 @@ impl ReorgTracker {
         let mut reconnect_backoff_tracker = ReconnectBackoff::new();
 
         if let Some(ref ws_url) = websocket_url {
-            info!("Attempting WS connect for {net} to {ws_url}");
-            match ProviderBuilder::new()
-                .connect_ws(WsConnect::new(ws_url))
-                .await
-            {
-                Ok(provider_ws) => {
-                    info!("WS connected for {net}; subscribing to newHeads");
-                    match provider_ws.subscribe_blocks().await {
-                        Ok(sub) => {
-                            stream_opt = Some(sub.into_stream());
-                            _provider_ws_opt = Some(provider_ws);
-                            reconnect_backoff_tracker.connection_established();
-                        }
-                        Err(e) => {
-                            warn!("WS subscribe_blocks failed for {net}: {e:?}");
-                            reconnect_backoff_tracker.inc_retries_count();
-                            warn!(
-                                "Will retry WS subscribe for {net} in {jittered_ms:?}ms after error: {e:?}",
-                                jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
-                            );
+            if let Some(ws_wallet) = ws_wallet_for_network(&providers_mutex, net.as_str()).await {
+                info!("Attempting WS connect for {net} to {ws_url}");
+                match ProviderBuilder::new()
+                    .disable_recommended_fillers()
+                    .wallet(ws_wallet)
+                    .connect_ws(WsConnect::new(ws_url))
+                    .await
+                {
+                    Ok(provider_ws) => {
+                        info!("WS connected for {net}; subscribing to newHeads");
+                        match provider_ws.subscribe_blocks().await {
+                            Ok(sub) => {
+                                stream_opt = Some(sub.into_stream());
+                                _provider_ws_opt = Some(provider_ws);
+                                reconnect_backoff_tracker.connection_established();
+                            }
+                            Err(e) => {
+                                warn!("WS subscribe_blocks failed for {net}: {e:?}");
+                                reconnect_backoff_tracker.inc_retries_count();
+                                warn!(
+                                    "Will retry WS subscribe for {net} in {jittered_ms:?}ms after error: {e:?}",
+                                    jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
+                                );
+                            }
                         }
                     }
+                    Err(e) => {
+                        warn!("WS connect failed for {net}: {e:?}");
+                        reconnect_backoff_tracker.inc_retries_count();
+                        warn!(
+                            "Will retry WS connect for {net} in {jittered_ms:?}ms after error: {e:?}",
+                            jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
+                        );
+                    }
                 }
-                Err(e) => {
-                    warn!("WS connect failed for {net}: {e:?}");
-                    reconnect_backoff_tracker.inc_retries_count();
-                    warn!(
-                        "Will retry WS connect for {net} in {jittered_ms:?}ms after error: {e:?}",
-                        jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
-                    );
-                }
+            } else {
+                warn!("No signer available for {net}; skipping WS connect");
             }
         } else {
             // Loop until block generation time is determined
@@ -340,36 +364,49 @@ impl ReorgTracker {
                     };
                     if should_attempt {
                         info!("Attempting WS reconnect for {net} to {ws_url}");
-                        match ProviderBuilder::new()
-                            .connect_ws(WsConnect::new(ws_url))
-                            .await
+                        if let Some(ws_wallet) =
+                            ws_wallet_for_network(&providers_mutex, net.as_str()).await
                         {
-                            Ok(provider_ws) => {
-                                info!("WS reconnected for {net}; subscribing to newHeads");
-                                match provider_ws.subscribe_blocks().await {
-                                    Ok(sub) => {
-                                        stream_opt = Some(sub.into_stream());
-                                        _provider_ws_opt = Some(provider_ws);
-                                        reconnect_backoff_tracker.connection_established();
-                                    }
-                                    Err(e) => {
-                                        warn!("WS subscribe_blocks failed for {net}: {e:?}");
-                                        reconnect_backoff_tracker.inc_retries_count();
-                                        warn!(
-                                            "Will retry WS subscribe for {net} in {jittered_ms:?}ms after error: {e:?}",
-                                            jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
-                                        );
+                            match ProviderBuilder::new()
+                                .disable_recommended_fillers()
+                                .wallet(ws_wallet)
+                                .connect_ws(WsConnect::new(ws_url))
+                                .await
+                            {
+                                Ok(provider_ws) => {
+                                    info!("WS reconnected for {net}; subscribing to newHeads");
+                                    match provider_ws.subscribe_blocks().await {
+                                        Ok(sub) => {
+                                            stream_opt = Some(sub.into_stream());
+                                            _provider_ws_opt = Some(provider_ws);
+                                            reconnect_backoff_tracker.connection_established();
+                                        }
+                                        Err(e) => {
+                                            warn!("WS subscribe_blocks failed for {net}: {e:?}");
+                                            reconnect_backoff_tracker.inc_retries_count();
+                                            warn!(
+                                                "Will retry WS subscribe for {net} in {jittered_ms:?}ms after error: {e:?}",
+                                                jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
+                                            );
+                                        }
                                     }
                                 }
+                                Err(e) => {
+                                    warn!("WS reconnect failed for {net}: {e:?}");
+                                    reconnect_backoff_tracker.inc_retries_count();
+                                    warn!(
+                                        "Will retry WS connect for {net} in {jittered_ms:?}ms after error: {e:?}",
+                                        jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
+                                    );
+                                }
                             }
-                            Err(e) => {
-                                warn!("WS reconnect failed for {net}: {e:?}");
-                                reconnect_backoff_tracker.inc_retries_count();
-                                warn!(
-                                    "Will retry WS connect for {net} in {jittered_ms:?}ms after error: {e:?}",
-                                    jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
-                                );
-                            }
+                        } else {
+                            warn!("No signer available for {net}; skipping WS reconnect attempt");
+                            reconnect_backoff_tracker.inc_retries_count();
+                            warn!(
+                                "Will retry WS connect for {net} in {jittered_ms:?}ms after error: signer unavailable",
+                                jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
+                            );
                         }
                     }
                 }
@@ -472,15 +509,21 @@ impl ReorgTracker {
                             )
                         };
 
+                        let ws_provider = _provider_ws_opt.as_ref();
+
                         let latest_block_result = timeout(
                             self.rpc_timeout,
-                            rpc_get_block_by_number(&rpc_handle, BlockNumberOrTag::Latest),
+                            rpc_get_block_by_number(
+                                &rpc_handle,
+                                ws_provider,
+                                BlockNumberOrTag::Latest,
+                            ),
                         )
                         .await;
                         if let Ok(Ok(Some(b))) = latest_block_result {
                             self.process_new_block(
-                                net.as_str(),
                                 &rpc_handle,
+                                ws_provider,
                                 provider_mutex,
                                 &observed_block_hashes,
                                 provider_metrics,
@@ -499,6 +542,7 @@ impl ReorgTracker {
                                         self.rpc_timeout,
                                         rpc_get_storage_at(
                                             &rpc_handle,
+                                            ws_provider,
                                             contract_address,
                                             alloy_primitives::U256::from(0),
                                         ),
@@ -565,7 +609,11 @@ impl ReorgTracker {
                         // 1) Observe latest finalized block for logging/visibility
                         match timeout(
                             self.rpc_timeout,
-                            rpc_get_block_by_number(&rpc_handle, BlockNumberOrTag::Finalized),
+                            rpc_get_block_by_number(
+                                &rpc_handle,
+                                ws_provider,
+                                BlockNumberOrTag::Finalized,
+                            ),
                         )
                         .await
                         {
@@ -669,13 +717,14 @@ impl ReorgTracker {
 
     async fn process_new_block(
         &mut self,
-        net: &str,
         rpc_handle: &ProviderType,
+        rpc_ws: Option<&ProviderType>,
         provider_mutex: &Arc<Mutex<RpcProvider>>,
         observed_block_hashes: &HashMap<u64, B256>,
         provider_metrics: Arc<tokio::sync::RwLock<ProviderMetrics>>,
         b: Block,
     ) {
+        let net = self.net.clone();
         let latest_height = b.header.inner.number;
         let mut observed_latest_height = self.observed_latest_height;
         let observer_finalized_height = self.observer_finalized_height;
@@ -688,6 +737,7 @@ impl ReorgTracker {
                     rpc_timeout,
                     rpc_get_block_by_number(
                         rpc_handle,
+                        rpc_ws,
                         BlockNumberOrTag::Number(observed_latest_height),
                     ),
                 )
@@ -702,6 +752,7 @@ impl ReorgTracker {
                             let _ = self
                                 .handle_reorg(
                                     rpc_handle,
+                                    rpc_ws,
                                     provider_mutex,
                                     observed_block_hashes,
                                     observed_latest_height,
@@ -731,6 +782,7 @@ impl ReorgTracker {
                 rpc_timeout,
                 rpc_get_block_by_number(
                     rpc_handle,
+                    rpc_ws,
                     BlockNumberOrTag::Number(first_new_block_height),
                 ),
             )
@@ -747,6 +799,7 @@ impl ReorgTracker {
                         let _ = self
                             .handle_reorg(
                                 rpc_handle,
+                                rpc_ws,
                                 provider_mutex,
                                 observed_block_hashes,
                                 observed_latest_height,
@@ -770,6 +823,7 @@ impl ReorgTracker {
                                 rpc_timeout,
                                 rpc_get_block_by_number(
                                     rpc_handle,
+                                    rpc_ws,
                                     BlockNumberOrTag::Number(block_height),
                                 ),
                             )
@@ -820,6 +874,7 @@ impl ReorgTracker {
                     let _ = self
                         .handle_reorg(
                             rpc_handle,
+                            rpc_ws,
                             provider_mutex,
                             observed_block_hashes,
                             observed_latest_height,
@@ -876,7 +931,7 @@ impl ReorgTracker {
 
         let latest_block = match timeout(
             self.rpc_timeout,
-            rpc_get_block_by_number(&rpc_handle, BlockNumberOrTag::Latest),
+            rpc_get_block_by_number(&rpc_handle, None, BlockNumberOrTag::Latest),
         )
         .await
         {
@@ -906,7 +961,7 @@ impl ReorgTracker {
         let lookback_height = latest_height - num_blocks;
         let prev_block = match timeout(
             self.rpc_timeout,
-            rpc_get_block_by_number(&rpc_handle, BlockNumberOrTag::Number(lookback_height)),
+            rpc_get_block_by_number(&rpc_handle, None, BlockNumberOrTag::Number(lookback_height)),
         )
         .await
         {
@@ -1159,7 +1214,7 @@ mod tests {
 
             // Insert observed hash for genesis (height 0) so the first loop can progress without finalized support
             if let Ok(Some(genesis)) =
-                rpc_get_block_by_number(&provider.provider, BlockNumberOrTag::Number(0)).await
+                rpc_get_block_by_number(&provider.provider, None, BlockNumberOrTag::Number(0)).await
             {
                 provider.insert_observed_block_hash(0, genesis.header.hash);
             }
@@ -1176,7 +1231,7 @@ mod tests {
         // Query current tip height as T0, then snapshot the chain at T0
         let t0_height = {
             let provider = provider_mutex.lock().await;
-            rpc_get_block_by_number(&provider.provider, BlockNumberOrTag::Latest)
+            rpc_get_block_by_number(&provider.provider, None, BlockNumberOrTag::Latest)
                 .await
                 .unwrap()
                 .unwrap()
@@ -1226,10 +1281,11 @@ mod tests {
         // Capture current latest height (T1) and the observed hash we stored for it
         let (t1_height, observed_t1_hash) = {
             let provider = provider_mutex.lock().await;
-            let latest = rpc_get_block_by_number(&provider.provider, BlockNumberOrTag::Latest)
-                .await
-                .unwrap()
-                .unwrap();
+            let latest =
+                rpc_get_block_by_number(&provider.provider, None, BlockNumberOrTag::Latest)
+                    .await
+                    .unwrap()
+                    .unwrap();
             let h = latest.header.inner.number;
             let obs = provider.inflight.observed_block_hashes.get(&h).copied();
             (h, obs)
@@ -1320,12 +1376,16 @@ mod tests {
         // 6) Assert reorg happened (chain hash at T1 changed vs previously observed)
         let chain_t1_hash = {
             let provider = provider_mutex.lock().await;
-            rpc_get_block_by_number(&provider.provider, BlockNumberOrTag::Number(t1_height))
-                .await
-                .unwrap()
-                .unwrap()
-                .header
-                .hash
+            rpc_get_block_by_number(
+                &provider.provider,
+                None,
+                BlockNumberOrTag::Number(t1_height),
+            )
+            .await
+            .unwrap()
+            .unwrap()
+            .header
+            .hash
         };
         if let Some(prev_obs) = observed_t1_hash {
             assert_ne!(
