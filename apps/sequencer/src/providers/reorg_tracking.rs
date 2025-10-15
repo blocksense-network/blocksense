@@ -353,9 +353,16 @@ impl ReorgTracker {
                 }
             }
 
-            let block_header_opt = match stream_opt {
+            match stream_opt {
                 Some(ref mut stream) => match stream.next().await {
-                    Some(block_header) => Some(block_header),
+                    Some(block_header) => {
+                        debug!(
+                            "Received {block_header:?} over websocket stream in {net} (loop_count={loop_count}, observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height})",
+                            observer_finalized_height = self.observer_finalized_height,
+                            observed_latest_height = self.observed_latest_height,
+                            loop_count = self.loop_count,
+                        );
+                    }
                     None => {
                         warn!(
                             "Stream disconnected for {net} (loop_count={loop_count}, observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height})",
@@ -370,7 +377,6 @@ impl ReorgTracker {
                             "Falling back to polling for {jittered_ms:?}ms before retrying WS in network {net}",
                             jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
                         );
-                        None
                     }
                 },
                 None => {
@@ -407,9 +413,8 @@ impl ReorgTracker {
                         }
                     }
                     await_time(average_block_generation_time).await;
-                    None
                 }
-            };
+            }
 
             self.loop_count += 1;
             debug!(
@@ -445,14 +450,9 @@ impl ReorgTracker {
                             )
                         };
 
-                        let block_number = match block_header_opt {
-                            Some(block_header) => BlockNumberOrTag::Number(block_header.number),
-                            None => BlockNumberOrTag::Latest,
-                        };
-
                         let latest_block_result = timeout(
                             self.rpc_timeout,
-                            rpc_handle.get_block_by_number(block_number),
+                            rpc_handle.get_block_by_number(BlockNumberOrTag::Latest),
                         )
                         .await;
                         if let Ok(Ok(Some(b))) = latest_block_result {
