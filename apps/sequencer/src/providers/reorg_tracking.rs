@@ -3,6 +3,7 @@ use actix_web::rt::time::timeout;
 use alloy::hex;
 use alloy::providers::ProviderBuilder;
 use alloy::rpc::types::Block;
+use alloy::transports::ws::WsConnect;
 use alloy::{eips::BlockNumberOrTag, providers::Provider};
 use alloy_primitives::B256;
 use blocksense_config::ReorgConfig;
@@ -256,7 +257,10 @@ impl ReorgTracker {
 
         if let Some(ref ws_url) = websocket_url {
             info!("Attempting WS connect for {net} to {ws_url}");
-            match ProviderBuilder::new().connect(ws_url).await {
+            match ProviderBuilder::new()
+                .connect_ws(WsConnect::new(ws_url))
+                .await
+            {
                 Ok(provider_ws) => {
                     info!("WS connected for {net}; subscribing to newHeads");
                     match provider_ws.subscribe_blocks().await {
@@ -314,7 +318,10 @@ impl ReorgTracker {
                     };
                     if should_attempt {
                         info!("Attempting WS reconnect for {net} to {ws_url}");
-                        match ProviderBuilder::new().connect(ws_url).await {
+                        match ProviderBuilder::new()
+                            .connect_ws(WsConnect::new(ws_url))
+                            .await
+                        {
                             Ok(provider_ws) => {
                                 info!("WS reconnected for {net}; subscribing to newHeads");
                                 match provider_ws.subscribe_blocks().await {
@@ -1044,16 +1051,17 @@ mod tests {
         Ok(())
     }
 
-    // End-to-end style test that reproduces a fork and exercises the reorg tracker loop.
-    // It also verifies that a resync of indices is initiated when the on-chain root differs
-    // from the local calldata-merkle frontier (without deploying contracts).
-    #[tokio::test]
-    async fn test_loop_tracking_reorg_detect_and_resync_indices() {
+    async fn run_reorg_detect_and_resync_indices(metrics_prefix: &str, use_websocket: bool) {
         let _ = tracing_subscriber::fmt().with_test_writer().try_init();
 
         // 1) Spin up anvil and build a provider bound to its first funded key
         let anvil = Anvil::new().try_spawn().unwrap();
         let net = "ETH1";
+        let websocket_url = if use_websocket {
+            Some(anvil.ws_endpoint())
+        } else {
+            None
+        };
 
         // Write the anvil key to a temp file that SequencerConfig will use
         let signer = anvil.keys()[0].clone();
@@ -1082,9 +1090,17 @@ mod tests {
         // Ensure we do not auto-load indices during init to keep control in the test
         if let Some(p) = cfg.providers.get_mut(net) {
             p.should_load_rb_indices = false;
+            if let Some(ref ws_url) = websocket_url {
+                p.websocket_url = Some(ws_url.clone());
+            }
         }
 
-        let providers = init_shared_rpc_providers(&cfg, Some("test_reorg_"), &feeds_config).await;
+        let providers = init_shared_rpc_providers(
+            &cfg,
+            Some(["test_reorg_", metrics_prefix].concat().as_str()),
+            &feeds_config,
+        )
+        .await;
         let provider_mutex = providers.read().await.get(net).unwrap().clone();
 
         // Inject a dummy ADFS contract address so the reorg loop's root-check and resync paths are exercised
@@ -1150,6 +1166,7 @@ mod tests {
         let (feed_updates_send, mut feed_updates_recv) = counted_unbounded_channel();
 
         let providers_clone = providers.clone();
+        let websocket_url_clone = websocket_url.clone();
 
         // 4) Start the reorg tracking loop in background
         let loop_handle = tokio::task::Builder::new()
@@ -1161,7 +1178,7 @@ mod tests {
                     },
                     providers_clone,
                     feed_updates_send,
-                    None,
+                    websocket_url_clone,
                 );
                 reorg_tracker.loop_tracking_for_reorg_in_network().await;
             })
@@ -1446,5 +1463,21 @@ mod tests {
 
         // Abort the loop to finish the test
         loop_handle.abort();
+    }
+
+    // End-to-end style test that reproduces a fork and exercises the reorg tracker loop using http polling.
+    // It also verifies that a resync of indices is initiated when the on-chain root differs
+    // from the local calldata-merkle frontier (without deploying contracts).
+    #[tokio::test]
+    async fn test_loop_tracking_reorg_detect_and_resync_indices_http() {
+        run_reorg_detect_and_resync_indices("http_", false).await;
+    }
+
+    // End-to-end style test that reproduces a fork and exercises the reorg tracker loop using websocket.
+    // It also verifies that a resync of indices is initiated when the on-chain root differs
+    // from the local calldata-merkle frontier (without deploying contracts).
+    #[tokio::test]
+    async fn test_loop_tracking_reorg_detect_and_resync_indices_websock() {
+        run_reorg_detect_and_resync_indices("websock_", true).await;
     }
 }
