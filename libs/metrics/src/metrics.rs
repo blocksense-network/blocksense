@@ -176,6 +176,9 @@ pub struct ProviderMetrics {
     pub ws_disconnects_detected: IntCounterVec,
     pub ws_reconnect_attempts: IntCounterVec,
     pub ws_reconnect_successes: IntCounterVec,
+    pub reorg_ws_disconnects_detected: IntCounterVec,
+    pub reorg_ws_reconnect_attempts: IntCounterVec,
+    pub reorg_ws_reconnect_successes: IntCounterVec,
 }
 
 impl ProviderMetrics {
@@ -300,6 +303,21 @@ impl ProviderMetrics {
             ws_reconnect_successes: register_int_counter_vec!(
                 format!("{}ws_reconnect_successes", prefix),
                 "Successful websocket reconnections for the network",
+                &["Network"]
+            )?,
+            reorg_ws_disconnects_detected: register_int_counter_vec!(
+                format!("{}reorg_ws_disconnects_detected", prefix),
+                "Observed websocket disconnections for the reorg tracker",
+                &["Network"]
+            )?,
+            reorg_ws_reconnect_attempts: register_int_counter_vec!(
+                format!("{}reorg_ws_reconnect_attempts", prefix),
+                "Attempted websocket reconnections for the reorg tracker",
+                &["Network"]
+            )?,
+            reorg_ws_reconnect_successes: register_int_counter_vec!(
+                format!("{}reorg_ws_reconnect_successes", prefix),
+                "Successful websocket reconnections for the reorg tracker",
                 &["Network"]
             )?,
         })

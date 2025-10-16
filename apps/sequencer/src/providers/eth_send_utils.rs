@@ -331,12 +331,16 @@ pub async fn create_per_network_reorg_trackers(
         let net_clone = net.clone();
         let sequencer_state_providers_clone = sequencer_state.providers.clone();
         let sequencer_config = sequencer_state.sequencer_config.read().await;
-        let (reorg_tracker_config, websocket_url_opt) =
+        let (reorg_tracker_config, websocket_url_opt, websocket_reconnect_opt) =
             match sequencer_config.providers.get(net.as_str()) {
-                Some(c) => (c.reorg.clone(), c.websocket_url.clone()),
+                Some(c) => (
+                    c.reorg.clone(),
+                    c.websocket_url.clone(),
+                    c.websocket_reconnect.clone(),
+                ),
                 None => {
                     error!("No config for provider for network {net} will set to default!");
-                    (ReorgConfig::default(), None)
+                    (ReorgConfig::default(), None, None)
                 }
             };
         let relayer_send_channel = match sequencer_state
@@ -356,6 +360,7 @@ pub async fn create_per_network_reorg_trackers(
             sequencer_state_providers_clone,
             relayer_send_channel,
             websocket_url_opt,
+            websocket_reconnect_opt,
         );
         collected_futures.push(
             tokio::task::Builder::new()
