@@ -422,7 +422,7 @@ pub async fn validate(
 pub mod tests {
     use blocksense_utils::FeedId;
 
-    use crate::adfs_gen_calldata::RoundBufferIndices;
+    use crate::adfs_gen_calldata::RingBufferIndices;
     use std::collections::HashSet;
 
     use super::*;
@@ -507,7 +507,7 @@ pub mod tests {
                 end_slot_timestamp: 1677654323,
             },
         ];
-        let mut feeds_rb_indices: RoundBufferIndices = HashMap::new();
+        let mut feeds_rb_indices: RingBufferIndices = HashMap::new();
         feeds_rb_indices.insert(EncodedFeedId::new(1, 0), 1000);
         feeds_rb_indices.insert(EncodedFeedId::new(5, 0), 2000);
         feeds_rb_indices.insert(EncodedFeedId::new(11, 0), 3000);
