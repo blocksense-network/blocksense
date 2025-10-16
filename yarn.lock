@@ -1307,6 +1307,40 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@blocksense/adfs-indexer@workspace:apps/adfs-indexer":
+  version: 0.0.0-use.local
+  resolution: "@blocksense/adfs-indexer@workspace:apps/adfs-indexer"
+  dependencies:
+    "@blocksense/base-utils": "workspace:^"
+    "@blocksense/config-types": "workspace:^"
+    "@blocksense/contracts": "workspace:^"
+    "@changesets/changelog-github": "npm:^0.5.1"
+    "@changesets/cli": "npm:^2.29.4"
+    "@effect/cli": "npm:0.69.2"
+    "@effect/cluster": "npm:^0.48.2"
+    "@effect/experimental": "npm:^0.54.6"
+    "@effect/language-service": "npm:^0.38.1"
+    "@effect/platform": "npm:0.90.7"
+    "@effect/platform-node": "npm:0.96.1"
+    "@effect/printer": "npm:^0.45.0"
+    "@effect/printer-ansi": "npm:^0.45.0"
+    "@effect/rpc": "npm:^0.69.2"
+    "@effect/sql": "npm:^0.44.2"
+    "@effect/typeclass": "npm:^0.36.0"
+    "@effect/vitest": "npm:0.25.1"
+    "@types/node": "npm:^24.3.1"
+    "@vitest/coverage-v8": "npm:^3.2.4"
+    effect: "npm:^3.17.13"
+    ethers: "npm:6.13.4"
+    tsup: "npm:^8.5.0"
+    tsx: "npm:^4.20.5"
+    typescript: "npm:5.9.2"
+    vitest: "npm:^3.2.4"
+  bin:
+    adfs-indexer: ./dist/bin.cjs
+  languageName: unknown
+  linkType: soft
+
 "@blocksense/avm-relayer@workspace:apps/avm-relayer":
   version: 0.0.0-use.local
   resolution: "@blocksense/avm-relayer@workspace:apps/avm-relayer"
@@ -17169,6 +17203,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ethers@npm:6.13.4":
+  version: 6.13.4
+  resolution: "ethers@npm:6.13.4"
+  dependencies:
+    "@adraffy/ens-normalize": "npm:1.10.1"
+    "@noble/curves": "npm:1.2.0"
+    "@noble/hashes": "npm:1.3.2"
+    "@types/node": "npm:22.7.5"
+    aes-js: "npm:4.0.0-beta.5"
+    tslib: "npm:2.7.0"
+    ws: "npm:8.17.1"
+  checksum: 10c0/efcf9f39f841e38af68ec23cdbd745432c239c256aac4929842d1af04e55d7be0ff65e462f1cf3e93586f43f7bdcc0098fd56f2f7234f36d73e466521a5766ce
+  languageName: node
+  linkType: hard
+
 "ethers@npm:^6.15.0, ethers@npm:^6.6.0":
   version: 6.15.0
   resolution: "ethers@npm:6.15.0"
@@ -30302,8 +30351,8 @@ __metadata:
   linkType: hard
 
 "viem@npm:^2.27.0":
-  version: 2.38.0
-  resolution: "viem@npm:2.38.0"
+  version: 2.38.2
+  resolution: "viem@npm:2.38.2"
   dependencies:
     "@noble/curves": "npm:1.9.1"
     "@noble/hashes": "npm:1.8.0"
@@ -30318,7 +30367,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10c0/65d13718f6dd8f2de282c147c13700b7c057d855c02641ff1268a57f57963437df1f5bb71fb93e6df547d5e0a880990a9bea497ab2cbc26e89d0bf3e65976f6d
+  checksum: 10c0/148fed3d358391d77301459055ade9e938fa9349e42d8416174a185ba10535921095b2759b88fc52f39a4ebf928e17cdd06646cfc330f4686c3403c5d5306fd0
   languageName: node
   linkType: hard
 
