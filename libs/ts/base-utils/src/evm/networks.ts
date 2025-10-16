@@ -772,7 +772,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://blockscout-testnet.expchain.ai',
-        apiUrl: 'https://blockscout-testnet.gadsgcxobnadfogadsihg.com/api/v2',
+        apiUrl: 'https://blockscout-testnet.gadsgcxobnadfogadsihg.com/api',
       },
     ],
     currency: Currency.tZKJ,
@@ -820,7 +820,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://coston2-explorer.flare.network',
-        apiUrl: 'https://coston2-explorer.flare.network/api/v2',
+        apiUrl: 'https://coston2-explorer.flare.network/api',
       },
     ],
     currency: Currency.C2FLR,
@@ -1255,7 +1255,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://sepolia-explorer.metisdevops.link',
-        apiUrl: 'https://sepolia-explorer-api.metisdevops.link/api/v2',
+        apiUrl: 'https://sepolia-explorer-api.metisdevops.link/api',
       },
     ],
     currency: Currency.sMETIS,
@@ -1267,7 +1267,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://explorer.test.mezo.org',
-        apiUrl: 'https://api.explorer.test.mezo.org/api/v2/',
+        apiUrl: 'https://api.explorer.test.mezo.org/api',
       },
     ],
     currency: Currency.BTC,
@@ -1315,7 +1315,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://explorer-holesky.morphl2.io',
-        apiUrl: 'https://explorer-api-holesky.morphl2.io/api/v2',
+        apiUrl: 'https://explorer-api-holesky.morphl2.io/api',
       },
     ],
     currency: Currency.ETH,
@@ -1685,7 +1685,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://coston-explorer.flare.network',
-        apiUrl: 'https://coston-explorer.flare.network/api/v2',
+        apiUrl: 'https://coston-explorer.flare.network/api',
       },
     ],
     currency: Currency.CFLR,
@@ -1781,7 +1781,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://explorer.hoodi.surge.wtf',
-        apiUrl: 'https://api.explorer.hoodi.surge.wtf/api/v2',
+        apiUrl: 'https://api.explorer.hoodi.surge.wtf/api',
       },
     ],
     currency: Currency.ETH,
