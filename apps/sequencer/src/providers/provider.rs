@@ -1,5 +1,7 @@
 use alloy::providers::Provider;
+use alloy::pubsub::{ConnectionHandle, PubSubConnect};
 use alloy::rpc::types::{TransactionInput, TransactionRequest};
+use alloy::transports::TransportResult;
 use alloy::{
     dyn_abi::DynSolValue,
     hex,
@@ -10,6 +12,7 @@ use alloy::{
         Identity, ProviderBuilder, RootProvider,
     },
     signers::local::PrivateKeySigner,
+    transports::ws::WsConnect,
 };
 use alloy_primitives::{keccak256, B256, U256};
 use alloy_u256_literal::u256;
@@ -23,7 +26,7 @@ use incrementalmerkletree::{frontier::Frontier, Hashable, Level};
 use reqwest::Url; // TODO @ymadzhunkov include URL directly from url crate
 
 use blocksense_config::{
-    AllFeedsConfig, ContractConfig, PublishCriteria, SequencerConfig,
+    AllFeedsConfig, ContractConfig, PublishCriteria, SequencerConfig, WebsocketReconnectConfig,
     ADFS_ACCESS_CONTROL_CONTRACT_NAME, ADFS_CONTRACT_NAME,
 };
 use blocksense_data_feeds::feeds_processing::{
@@ -40,8 +43,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::{fs, mem};
 use tokio::sync::{Mutex, RwLock};
-use tokio::time::error::Elapsed;
-use tokio::time::Duration;
+use tokio::time::{error::Elapsed, sleep, Duration};
 use tracing::{debug, error, info, warn};
 
 use crate::providers::eth_send_utils::{
@@ -106,6 +108,151 @@ impl Hashable for HashValue {
     }
 }
 
+#[derive(Debug, Clone)]
+struct WsReconnectPolicy {
+    initial: Duration,
+    max: Duration,
+    multiplier: f64,
+}
+
+impl WsReconnectPolicy {
+    fn from_config(config: Option<&WebsocketReconnectConfig>) -> Self {
+        let cfg = config.cloned().unwrap_or_default();
+        let initial = Duration::from_millis(cfg.initial_backoff_ms);
+        let max = Duration::from_millis(cfg.max_backoff_ms);
+        let multiplier = cfg.backoff_multiplier;
+
+        // Guard against misconfigured values just in case validation was skipped.
+        let clamped_initial = initial.min(max);
+
+        Self {
+            initial: clamped_initial,
+            max,
+            multiplier,
+        }
+    }
+
+    fn backoff_delay(&self, attempt: u64) -> Duration {
+        if attempt == 0 {
+            return Duration::ZERO;
+        }
+        let exponent = (attempt - 1) as f64;
+        let scaled = self.initial.mul_f64(self.multiplier.powf(exponent));
+        scaled.min(self.max)
+    }
+}
+
+impl Default for WsReconnectPolicy {
+    fn default() -> Self {
+        Self::from_config(None)
+    }
+}
+
+#[derive(Clone)]
+struct ResilientWsConnect {
+    inner: WsConnect,
+    policy: WsReconnectPolicy,
+    metrics: Arc<RwLock<ProviderMetrics>>,
+    network: Arc<String>,
+}
+
+impl ResilientWsConnect {
+    fn new(
+        inner: WsConnect,
+        policy: WsReconnectPolicy,
+        metrics: Arc<RwLock<ProviderMetrics>>,
+        network: &str,
+    ) -> Self {
+        Self {
+            inner,
+            policy,
+            metrics,
+            network: Arc::new(network.to_owned()),
+        }
+    }
+}
+
+impl PubSubConnect for ResilientWsConnect {
+    fn is_local(&self) -> bool {
+        self.inner.is_local()
+    }
+
+    async fn connect(&self) -> TransportResult<ConnectionHandle> {
+        let inner = self.inner.clone();
+        let handle = PubSubConnect::connect(&inner).await?;
+        Ok(handle
+            .with_max_retries(u32::MAX)
+            .with_retry_interval(Duration::from_secs(0)))
+    }
+
+    async fn try_reconnect(&self) -> TransportResult<ConnectionHandle> {
+        let inner = self.inner.clone();
+        let policy = self.policy.clone();
+        let metrics = self.metrics.clone();
+        let network = self.network.clone();
+
+        {
+            let guard = metrics.read().await;
+            guard
+                .ws_disconnects_detected
+                .with_label_values(&[network.as_str()])
+                .inc();
+        }
+
+        warn!(
+            network = network.as_str(),
+            initial_backoff_ms = policy.initial.as_millis(),
+            max_backoff_ms = policy.max.as_millis(),
+            multiplier = policy.multiplier,
+            "WS transport disconnected; starting exponential reconnect attempts"
+        );
+
+        let mut attempt: u64 = 0;
+        loop {
+            attempt = attempt.saturating_add(1);
+            {
+                let guard = metrics.read().await;
+                guard
+                    .ws_reconnect_attempts
+                    .with_label_values(&[network.as_str()])
+                    .inc();
+            }
+
+            match PubSubConnect::connect(&inner).await {
+                Ok(handle) => {
+                    {
+                        let guard = metrics.read().await;
+                        guard
+                            .ws_reconnect_successes
+                            .with_label_values(&[network.as_str()])
+                            .inc();
+                    }
+
+                    info!(
+                        network = network.as_str(),
+                        attempt, "WS transport reconnected after {attempt} attempt(s)"
+                    );
+
+                    return Ok(handle
+                        .with_max_retries(u32::MAX)
+                        .with_retry_interval(Duration::from_secs(0)));
+                }
+                Err(err) => {
+                    let delay = policy.backoff_delay(attempt);
+                    warn!(
+                        network = network.as_str(),
+                        attempt,
+                        backoff_ms = delay.as_millis(),
+                        capped = delay == policy.max,
+                        error = %err,
+                        "WS reconnect attempt failed; will retry"
+                    );
+                    sleep(delay).await;
+                }
+            }
+        }
+    }
+}
 pub struct RpcProvider {
     pub calldata_merkle_tree_frontier: Frontier<HashValue, 32>,
     pub merkle_root_in_contract: Option<HashValue>,
@@ -309,10 +456,30 @@ impl RpcProvider {
         provider_metrics: &Arc<tokio::sync::RwLock<ProviderMetrics>>,
         feeds_config: &AllFeedsConfig,
     ) -> RpcProvider {
-        let provider = ProviderBuilder::new()
-            .disable_recommended_fillers()
-            .wallet(EthereumWallet::from(signer.clone()))
-            .connect_http(rpc_url.clone());
+        let provider = match rpc_url.scheme() {
+            "ws" | "wss" => {
+                let resilient_connect = ResilientWsConnect::new(
+                    WsConnect::new(rpc_url.as_str().to_owned()),
+                    WsReconnectPolicy::from_config(p.websocket_reconnect.as_ref()),
+                    Arc::clone(provider_metrics),
+                    network,
+                );
+
+                ProviderBuilder::new()
+                    .disable_recommended_fillers()
+                    .wallet(EthereumWallet::from(signer.clone()))
+                    .connect_pubsub_with(resilient_connect)
+                    .await
+                    .unwrap_or_else(|err| {
+                        panic!("Failed to connect to provider over websocket {rpc_url}: {err:?}")
+                    })
+            }
+            "http" | "https" => ProviderBuilder::new()
+                .disable_recommended_fillers()
+                .wallet(EthereumWallet::from(signer.clone()))
+                .connect_http(rpc_url.clone()),
+            other => panic!("Unsupported RPC URL scheme `{other}` for network {network}"),
+        };
 
         let impersonated_anvil_account = p
             .impersonated_anvil_account
