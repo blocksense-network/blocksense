@@ -34,6 +34,7 @@ const networksV2Api: NetworkName[] = [
   'mezo-matsnet-testnet',
   'songbird-coston',
   'flare-coston',
+  'surge-testnet',
 ];
 
 type Gauges = {

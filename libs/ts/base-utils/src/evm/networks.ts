@@ -1781,7 +1781,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://explorer.hoodi.surge.wtf',
-        apiUrl: 'https://explorer.hoodi.surge.wtf/api',
+        apiUrl: 'https://api.explorer.hoodi.surge.wtf/api/v2',
       },
     ],
     currency: Currency.ETH,
