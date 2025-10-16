@@ -5,6 +5,7 @@
     ./pkgs
     ./modules
     ./test-environments
+    ./machines
   ];
 
   flake.lib = {
