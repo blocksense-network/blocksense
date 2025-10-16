@@ -66,6 +66,7 @@ export const deployedTestnets = [
   'status-network-sepolia',
   'superposition-testnet',
   'superseed-sepolia',
+  'surge-testnet',
   'swellchain-testnet',
   'tac-spb',
   'tac-turin',
