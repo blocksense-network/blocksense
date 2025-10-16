@@ -1,18 +1,18 @@
 use crate::providers::provider::{RpcProvider, SharedRpcProviders};
 use actix_web::rt::time::timeout;
+use alloy::eips::BlockNumberOrTag;
 use alloy::hex;
-use alloy::providers::ProviderBuilder;
+use alloy::providers::{Provider, ProviderBuilder, RootProvider};
 use alloy::rpc::types::Block;
 use alloy::transports::ws::WsConnect;
-use alloy::{eips::BlockNumberOrTag, providers::Provider};
 use alloy_primitives::{Address, B256};
-use blocksense_config::ReorgConfig;
+use async_trait::async_trait;
+use blocksense_config::{ReorgConfig, WebsocketReconnectConfig};
 use blocksense_utils::counter_unbounded_channel::CountedSender;
-use eyre::Report;
-use rand::Rng;
+use eyre::{eyre, Report};
 use std::collections::HashMap;
 use std::sync::Arc;
-use tokio::sync::Mutex;
+use tokio::sync::{Mutex, RwLock};
 use tokio::time::{Duration, Instant};
 use tokio_stream::StreamExt;
 use tracing::{debug, error, info, trace, warn};
@@ -23,6 +23,7 @@ use blocksense_utils::await_time;
 
 // Local helpers from eth_send_utils we need to call
 use crate::providers::eth_send_utils::{try_to_sync, BatchOfUpdatesToProcess};
+use crate::providers::ws::{ResilientWsConnect, WsReconnectMetrics, WsReconnectPolicy};
 
 async fn rpc_get_block_by_number(
     rpc_http: &dyn Provider,
@@ -49,69 +50,6 @@ async fn rpc_get_storage_at(
         .map_err(Report::from)
 }
 
-struct ReconnectBackoff {
-    backoff_idx: usize,
-    next_retry_at: Option<Instant>,
-    jittered_ms: u64,
-}
-
-impl ReconnectBackoff {
-    pub fn new() -> ReconnectBackoff {
-        ReconnectBackoff {
-            backoff_idx: 0,
-            next_retry_at: None,
-            jittered_ms: 0,
-        }
-    }
-
-    pub fn get_next_retry_at(&self) -> Option<Instant> {
-        self.next_retry_at
-    }
-
-    pub fn get_next_retry_ms(&self) -> u64 {
-        self.jittered_ms
-    }
-
-    pub fn connection_established(&mut self) {
-        self.backoff_idx = 0;
-        self.next_retry_at = None;
-        self.jittered_ms = 0;
-    }
-
-    fn set_next_retry_at(&mut self) {
-        let base_ms = Self::get_retry_periods_ms()[self.backoff_idx];
-        self.jittered_ms = Self::jitter_backoff_ms(base_ms);
-        self.next_retry_at = Some(Instant::now() + Duration::from_millis(self.jittered_ms));
-    }
-
-    fn get_retry_periods_ms() -> &'static [u64; 9] {
-        &[
-            1_000, 2_000, 5_000, 10_000, 20_000, 40_000, 80_000, 160_000, 320_000,
-        ]
-    }
-
-    fn jitter_backoff_ms(base_ms: u64) -> u64 {
-        if base_ms == 0 {
-            return 0;
-        }
-        let jitter = base_ms / 10;
-        if jitter == 0 {
-            return base_ms;
-        }
-        let mut rng = rand::thread_rng();
-        let min = base_ms.saturating_sub(jitter);
-        let max = base_ms + jitter;
-        rng.gen_range(min..=max)
-    }
-
-    fn inc_retries_count(&mut self) {
-        self.set_next_retry_at();
-        if self.backoff_idx < Self::get_retry_periods_ms().len() - 1 {
-            self.backoff_idx += 1;
-        }
-    }
-}
-
 pub struct ReorgTracker {
     observer_finalized_height: u64,
     observed_latest_height: u64,
@@ -121,9 +59,62 @@ pub struct ReorgTracker {
     providers_mutex: SharedRpcProviders,
     updates_relayer_send_chan: CountedSender<BatchOfUpdatesToProcess>,
     websocket_url: Option<String>,
+    websocket_policy: WsReconnectPolicy,
+    websocket_retry_attempt: u64,
+    next_websocket_retry_at: Option<Instant>,
 }
 
 impl ReorgTracker {
+    fn should_attempt_ws(&self) -> bool {
+        self.next_websocket_retry_at
+            .is_none_or(|deadline| Instant::now() >= deadline)
+    }
+
+    fn reset_ws_backoff(&mut self) {
+        self.websocket_retry_attempt = 0;
+        self.next_websocket_retry_at = None;
+    }
+
+    fn schedule_ws_retry(&mut self) -> Duration {
+        self.websocket_retry_attempt = self.websocket_retry_attempt.saturating_add(1);
+        let delay = self
+            .websocket_policy
+            .backoff_delay(self.websocket_retry_attempt);
+        self.next_websocket_retry_at = Some(Instant::now() + delay);
+        delay
+    }
+
+    async fn build_ws_provider(
+        &self,
+        ws_url: &str,
+        providers_mutex: &SharedRpcProviders,
+    ) -> eyre::Result<RootProvider> {
+        let provider_mutex = {
+            let providers = providers_mutex.read().await;
+            providers.get(self.net.as_str()).cloned()
+        }
+        .ok_or_else(|| eyre!("No active provider found for network {}", self.net))?;
+
+        let provider_metrics = {
+            let provider = provider_mutex.lock().await;
+            provider.provider_metrics.clone()
+        };
+
+        let recorder = Arc::new(ReorgWsRecorder::new(provider_metrics, &self.net));
+        let ws_connect = ResilientWsConnect::new(
+            WsConnect::new(ws_url.to_owned()),
+            self.websocket_policy.clone(),
+            recorder,
+            &self.net,
+        );
+
+        ProviderBuilder::new()
+            .disable_recommended_fillers()
+            .connect_pubsub_with(ws_connect)
+            .await
+            .map_err(Report::from)
+    }
+
     // Helper to handle reorg once already detected. Finds fork point and prints
     // discarded observations, mirroring the existing log messages and structure.
     async fn handle_reorg(
@@ -280,39 +271,31 @@ impl ReorgTracker {
 
         const DEFAULT_POLL_INTERVAL_MS: u64 = 60 * 1000;
 
-        let mut reconnect_backoff_tracker = ReconnectBackoff::new();
-
         if let Some(ref ws_url) = websocket_url {
             info!("Attempting WS connect for {net} to {ws_url}");
-            match ProviderBuilder::new()
-                .disable_recommended_fillers()
-                .connect_ws(WsConnect::new(ws_url))
-                .await
-            {
-                Ok(provider_ws) => {
-                    info!("WS connected for {net}; subscribing to newHeads");
-                    match provider_ws.subscribe_blocks().await {
-                        Ok(sub) => {
-                            stream_opt = Some(sub.into_stream());
-                            provider_ws_opt = Some(provider_ws);
-                            reconnect_backoff_tracker.connection_established();
-                        }
-                        Err(e) => {
-                            warn!("WS subscribe_blocks failed for {net}: {e:?}");
-                            reconnect_backoff_tracker.inc_retries_count();
-                            warn!(
-                                "Will retry WS subscribe for {net} in {jittered_ms:?}ms after error: {e:?}",
-                                jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
-                            );
-                        }
+            match self.build_ws_provider(ws_url, &providers_mutex).await {
+                Ok(provider_ws) => match provider_ws.subscribe_blocks().await {
+                    Ok(sub) => {
+                        info!("WS connected for {net}; subscribed to newHeads");
+                        stream_opt = Some(sub.into_stream());
+                        provider_ws_opt = Some(provider_ws);
+                        self.reset_ws_backoff();
                     }
-                }
+                    Err(e) => {
+                        warn!("WS subscribe_blocks failed for {net}: {e:?}");
+                        let delay = self.schedule_ws_retry();
+                        warn!(
+                            "Will retry WS setup for {net} in {delay_ms}ms after subscribe error",
+                            delay_ms = delay.as_millis(),
+                        );
+                    }
+                },
                 Err(e) => {
                     warn!("WS connect failed for {net}: {e:?}");
-                    reconnect_backoff_tracker.inc_retries_count();
+                    let delay = self.schedule_ws_retry();
                     warn!(
-                        "Will retry WS connect for {net} in {jittered_ms:?}ms after error: {e:?}",
-                        jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
+                        "Will retry WS setup for {net} in {delay_ms}ms after connect error",
+                        delay_ms = delay.as_millis(),
                     );
                 }
             }
@@ -340,42 +323,31 @@ impl ReorgTracker {
         loop {
             if stream_opt.is_none() {
                 if let Some(ref ws_url) = websocket_url {
-                    let should_attempt = match reconnect_backoff_tracker.get_next_retry_at() {
-                        Some(deadline) => Instant::now() >= deadline,
-                        None => true,
-                    };
-                    if should_attempt {
+                    if self.should_attempt_ws() {
                         info!("Attempting WS reconnect for {net} to {ws_url}");
-
-                        match ProviderBuilder::new()
-                            .disable_recommended_fillers()
-                            .connect_ws(WsConnect::new(ws_url))
-                            .await
-                        {
-                            Ok(provider_ws) => {
-                                info!("WS reconnected for {net}; subscribing to newHeads");
-                                match provider_ws.subscribe_blocks().await {
-                                    Ok(sub) => {
-                                        stream_opt = Some(sub.into_stream());
-                                        provider_ws_opt = Some(provider_ws);
-                                        reconnect_backoff_tracker.connection_established();
-                                    }
-                                    Err(e) => {
-                                        warn!("WS subscribe_blocks failed for {net}: {e:?}");
-                                        reconnect_backoff_tracker.inc_retries_count();
-                                        warn!(
-                                            "Will retry WS subscribe for {net} in {jittered_ms:?}ms after error: {e:?}",
-                                            jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
-                                        );
-                                    }
+                        match self.build_ws_provider(ws_url, &providers_mutex).await {
+                            Ok(provider_ws) => match provider_ws.subscribe_blocks().await {
+                                Ok(sub) => {
+                                    info!("WS reconnected for {net}; subscribed to newHeads");
+                                    stream_opt = Some(sub.into_stream());
+                                    provider_ws_opt = Some(provider_ws);
+                                    self.reset_ws_backoff();
                                 }
-                            }
+                                Err(e) => {
+                                    warn!("WS subscribe_blocks failed for {net}: {e:?}");
+                                    let delay = self.schedule_ws_retry();
+                                    warn!(
+                                        "Will retry WS setup for {net} in {delay_ms}ms after subscribe error",
+                                        delay_ms = delay.as_millis(),
+                                    );
+                                }
+                            },
                             Err(e) => {
                                 warn!("WS reconnect failed for {net}: {e:?}");
-                                reconnect_backoff_tracker.inc_retries_count();
+                                let delay = self.schedule_ws_retry();
                                 warn!(
-                                    "Will retry WS connect for {net} in {jittered_ms:?}ms after error: {e:?}",
-                                    jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
+                                    "Will retry WS setup for {net} in {delay_ms}ms after connect error",
+                                    delay_ms = delay.as_millis(),
                                 );
                             }
                         }
@@ -402,15 +374,38 @@ impl ReorgTracker {
                         );
                         stream_opt = None;
                         provider_ws_opt = None;
-                        reconnect_backoff_tracker.inc_retries_count();
+                        let delay = self.schedule_ws_retry();
                         warn!(
-                            "Falling back to polling for {jittered_ms:?}ms before retrying WS in network {net}",
-                            jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
+                            "Will retry WS setup for {net} in {delay_ms}ms after stream closed",
+                            delay_ms = delay.as_millis(),
                         );
                     }
                 },
                 None => {
-                    if average_block_generation_time == 0 {
+                    if websocket_url.is_some() {
+                        let delay = match self.next_websocket_retry_at {
+                            Some(deadline) => {
+                                let now = Instant::now();
+                                if deadline > now {
+                                    deadline - now
+                                } else {
+                                    Duration::from_millis(0)
+                                }
+                            }
+                            None => {
+                                let attempt = if self.websocket_retry_attempt == 0 {
+                                    1
+                                } else {
+                                    self.websocket_retry_attempt
+                                };
+                                self.websocket_policy.backoff_delay(attempt)
+                            }
+                        };
+
+                        if !delay.is_zero() {
+                            tokio::time::sleep(delay).await;
+                        }
+                    } else if average_block_generation_time == 0 {
                         match self
                             .calculate_block_generation_time_in_network(
                                 net.as_str(),
@@ -442,7 +437,9 @@ impl ReorgTracker {
                             }
                         }
                     }
-                    await_time(average_block_generation_time).await;
+                    if websocket_url.is_none() {
+                        await_time(average_block_generation_time).await;
+                    }
                 }
             }
 
@@ -866,6 +863,7 @@ impl ReorgTracker {
         providers_mutex: SharedRpcProviders,
         updates_relayer_send_chan: CountedSender<BatchOfUpdatesToProcess>,
         websocket_url: Option<String>,
+        websocket_reconnect: Option<WebsocketReconnectConfig>,
     ) -> ReorgTracker {
         ReorgTracker {
             observer_finalized_height: 0,
@@ -876,6 +874,9 @@ impl ReorgTracker {
             providers_mutex,
             updates_relayer_send_chan,
             websocket_url,
+            websocket_policy: WsReconnectPolicy::from_config(websocket_reconnect.as_ref()),
+            websocket_retry_attempt: 0,
+            next_websocket_retry_at: None,
         }
     }
     /// Calculates the average block generation time over the last `num_blocks`
@@ -968,6 +969,51 @@ impl ReorgTracker {
         Some(total_span_ms / num_blocks)
     }
 }
+
+struct ReorgWsRecorder {
+    metrics: Arc<RwLock<ProviderMetrics>>,
+    network: String,
+}
+
+impl ReorgWsRecorder {
+    fn new(metrics: Arc<RwLock<ProviderMetrics>>, network: &str) -> Self {
+        Self {
+            metrics,
+            network: network.to_owned(),
+        }
+    }
+}
+
+#[async_trait]
+impl WsReconnectMetrics for ReorgWsRecorder {
+    async fn on_disconnect(&self) {
+        self.metrics
+            .read()
+            .await
+            .reorg_ws_disconnects_detected
+            .with_label_values(&[self.network.as_str()])
+            .inc();
+    }
+
+    async fn on_attempt(&self) {
+        self.metrics
+            .read()
+            .await
+            .reorg_ws_reconnect_attempts
+            .with_label_values(&[self.network.as_str()])
+            .inc();
+    }
+
+    async fn on_success(&self) {
+        self.metrics
+            .read()
+            .await
+            .reorg_ws_reconnect_successes
+            .with_label_values(&[self.network.as_str()])
+            .inc();
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -1232,6 +1278,7 @@ mod tests {
                     providers_clone,
                     feed_updates_send,
                     websocket_url_clone,
+                    None,
                 );
                 reorg_tracker.loop_tracking_for_reorg_in_network().await;
             })
