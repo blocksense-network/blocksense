@@ -1,7 +1,6 @@
-use crate::providers::provider::{ProviderType, RpcProvider, SharedRpcProviders};
+use crate::providers::provider::{RpcProvider, SharedRpcProviders};
 use actix_web::rt::time::timeout;
 use alloy::hex;
-use alloy::network::EthereumWallet;
 use alloy::providers::ProviderBuilder;
 use alloy::rpc::types::Block;
 use alloy::transports::ws::WsConnect;
@@ -26,8 +25,8 @@ use blocksense_utils::await_time;
 use crate::providers::eth_send_utils::{try_to_sync, BatchOfUpdatesToProcess};
 
 async fn rpc_get_block_by_number(
-    rpc_http: &ProviderType,
-    rpc_ws: Option<&ProviderType>,
+    rpc_http: &dyn Provider,
+    rpc_ws: Option<&dyn Provider>,
     block_number: BlockNumberOrTag,
 ) -> eyre::Result<Option<Block>> {
     let provider = rpc_ws.unwrap_or(rpc_http);
@@ -38,8 +37,8 @@ async fn rpc_get_block_by_number(
 }
 
 async fn rpc_get_storage_at(
-    rpc_http: &ProviderType,
-    rpc_ws: Option<&ProviderType>,
+    rpc_http: &dyn Provider,
+    rpc_ws: Option<&dyn Provider>,
     address: Address,
     slot: alloy_primitives::U256,
 ) -> eyre::Result<alloy_primitives::U256> {
@@ -48,18 +47,6 @@ async fn rpc_get_storage_at(
         .get_storage_at(address, slot)
         .await
         .map_err(Report::from)
-}
-
-async fn ws_wallet_for_network(
-    providers_mutex: &SharedRpcProviders,
-    net: &str,
-) -> Option<EthereumWallet> {
-    let provider_arc = {
-        let providers = providers_mutex.read().await;
-        providers.get(net).cloned()
-    }?;
-    let provider = provider_arc.lock().await;
-    Some(EthereumWallet::from(provider.signer.clone()))
 }
 
 struct ReconnectBackoff {
@@ -141,8 +128,8 @@ impl ReorgTracker {
     // discarded observations, mirroring the existing log messages and structure.
     async fn handle_reorg(
         &mut self,
-        rpc_handle: &ProviderType,
-        rpc_ws: Option<&ProviderType>,
+        rpc_handle: &dyn Provider,
+        rpc_ws: Option<&dyn Provider>,
         provider_mutex: &Arc<Mutex<RpcProvider>>,
         observed_block_hashes: &HashMap<u64, B256>,
         observed_latest_height: u64,
@@ -287,7 +274,7 @@ impl ReorgTracker {
 
         let websocket_url = self.websocket_url.clone();
 
-        let mut _provider_ws_opt = None;
+        let mut provider_ws_opt = None;
         let mut stream_opt = None;
         let mut average_block_generation_time: u64 = 0;
 
@@ -296,43 +283,38 @@ impl ReorgTracker {
         let mut reconnect_backoff_tracker = ReconnectBackoff::new();
 
         if let Some(ref ws_url) = websocket_url {
-            if let Some(ws_wallet) = ws_wallet_for_network(&providers_mutex, net.as_str()).await {
-                info!("Attempting WS connect for {net} to {ws_url}");
-                match ProviderBuilder::new()
-                    .disable_recommended_fillers()
-                    .wallet(ws_wallet)
-                    .connect_ws(WsConnect::new(ws_url))
-                    .await
-                {
-                    Ok(provider_ws) => {
-                        info!("WS connected for {net}; subscribing to newHeads");
-                        match provider_ws.subscribe_blocks().await {
-                            Ok(sub) => {
-                                stream_opt = Some(sub.into_stream());
-                                _provider_ws_opt = Some(provider_ws);
-                                reconnect_backoff_tracker.connection_established();
-                            }
-                            Err(e) => {
-                                warn!("WS subscribe_blocks failed for {net}: {e:?}");
-                                reconnect_backoff_tracker.inc_retries_count();
-                                warn!(
-                                    "Will retry WS subscribe for {net} in {jittered_ms:?}ms after error: {e:?}",
-                                    jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
-                                );
-                            }
+            info!("Attempting WS connect for {net} to {ws_url}");
+            match ProviderBuilder::new()
+                .disable_recommended_fillers()
+                .connect_ws(WsConnect::new(ws_url))
+                .await
+            {
+                Ok(provider_ws) => {
+                    info!("WS connected for {net}; subscribing to newHeads");
+                    match provider_ws.subscribe_blocks().await {
+                        Ok(sub) => {
+                            stream_opt = Some(sub.into_stream());
+                            provider_ws_opt = Some(provider_ws);
+                            reconnect_backoff_tracker.connection_established();
+                        }
+                        Err(e) => {
+                            warn!("WS subscribe_blocks failed for {net}: {e:?}");
+                            reconnect_backoff_tracker.inc_retries_count();
+                            warn!(
+                                "Will retry WS subscribe for {net} in {jittered_ms:?}ms after error: {e:?}",
+                                jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
+                            );
                         }
                     }
-                    Err(e) => {
-                        warn!("WS connect failed for {net}: {e:?}");
-                        reconnect_backoff_tracker.inc_retries_count();
-                        warn!(
-                            "Will retry WS connect for {net} in {jittered_ms:?}ms after error: {e:?}",
-                            jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
-                        );
-                    }
                 }
-            } else {
-                warn!("No signer available for {net}; skipping WS connect");
+                Err(e) => {
+                    warn!("WS connect failed for {net}: {e:?}");
+                    reconnect_backoff_tracker.inc_retries_count();
+                    warn!(
+                        "Will retry WS connect for {net} in {jittered_ms:?}ms after error: {e:?}",
+                        jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
+                    );
+                }
             }
         } else {
             // Loop until block generation time is determined
@@ -364,49 +346,38 @@ impl ReorgTracker {
                     };
                     if should_attempt {
                         info!("Attempting WS reconnect for {net} to {ws_url}");
-                        if let Some(ws_wallet) =
-                            ws_wallet_for_network(&providers_mutex, net.as_str()).await
+
+                        match ProviderBuilder::new()
+                            .disable_recommended_fillers()
+                            .connect_ws(WsConnect::new(ws_url))
+                            .await
                         {
-                            match ProviderBuilder::new()
-                                .disable_recommended_fillers()
-                                .wallet(ws_wallet)
-                                .connect_ws(WsConnect::new(ws_url))
-                                .await
-                            {
-                                Ok(provider_ws) => {
-                                    info!("WS reconnected for {net}; subscribing to newHeads");
-                                    match provider_ws.subscribe_blocks().await {
-                                        Ok(sub) => {
-                                            stream_opt = Some(sub.into_stream());
-                                            _provider_ws_opt = Some(provider_ws);
-                                            reconnect_backoff_tracker.connection_established();
-                                        }
-                                        Err(e) => {
-                                            warn!("WS subscribe_blocks failed for {net}: {e:?}");
-                                            reconnect_backoff_tracker.inc_retries_count();
-                                            warn!(
-                                                "Will retry WS subscribe for {net} in {jittered_ms:?}ms after error: {e:?}",
-                                                jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
-                                            );
-                                        }
+                            Ok(provider_ws) => {
+                                info!("WS reconnected for {net}; subscribing to newHeads");
+                                match provider_ws.subscribe_blocks().await {
+                                    Ok(sub) => {
+                                        stream_opt = Some(sub.into_stream());
+                                        provider_ws_opt = Some(provider_ws);
+                                        reconnect_backoff_tracker.connection_established();
+                                    }
+                                    Err(e) => {
+                                        warn!("WS subscribe_blocks failed for {net}: {e:?}");
+                                        reconnect_backoff_tracker.inc_retries_count();
+                                        warn!(
+                                            "Will retry WS subscribe for {net} in {jittered_ms:?}ms after error: {e:?}",
+                                            jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
+                                        );
                                     }
                                 }
-                                Err(e) => {
-                                    warn!("WS reconnect failed for {net}: {e:?}");
-                                    reconnect_backoff_tracker.inc_retries_count();
-                                    warn!(
-                                        "Will retry WS connect for {net} in {jittered_ms:?}ms after error: {e:?}",
-                                        jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
-                                    );
-                                }
                             }
-                        } else {
-                            warn!("No signer available for {net}; skipping WS reconnect attempt");
-                            reconnect_backoff_tracker.inc_retries_count();
-                            warn!(
-                                "Will retry WS connect for {net} in {jittered_ms:?}ms after error: signer unavailable",
-                                jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
-                            );
+                            Err(e) => {
+                                warn!("WS reconnect failed for {net}: {e:?}");
+                                reconnect_backoff_tracker.inc_retries_count();
+                                warn!(
+                                    "Will retry WS connect for {net} in {jittered_ms:?}ms after error: {e:?}",
+                                    jittered_ms = reconnect_backoff_tracker.get_next_retry_ms()
+                                );
+                            }
                         }
                     }
                 }
@@ -430,7 +401,7 @@ impl ReorgTracker {
                             loop_count = self.loop_count,
                         );
                         stream_opt = None;
-                        _provider_ws_opt = None;
+                        provider_ws_opt = None;
                         reconnect_backoff_tracker.inc_retries_count();
                         warn!(
                             "Falling back to polling for {jittered_ms:?}ms before retrying WS in network {net}",
@@ -509,7 +480,9 @@ impl ReorgTracker {
                             )
                         };
 
-                        let ws_provider = _provider_ws_opt.as_ref();
+                        let ws_provider = provider_ws_opt
+                            .as_ref()
+                            .map(|provider| provider as &dyn Provider);
 
                         let latest_block_result = timeout(
                             self.rpc_timeout,
@@ -717,8 +690,8 @@ impl ReorgTracker {
 
     async fn process_new_block(
         &mut self,
-        rpc_handle: &ProviderType,
-        rpc_ws: Option<&ProviderType>,
+        rpc_handle: &dyn Provider,
+        rpc_ws: Option<&dyn Provider>,
         provider_mutex: &Arc<Mutex<RpcProvider>>,
         observed_block_hashes: &HashMap<u64, B256>,
         provider_metrics: Arc<tokio::sync::RwLock<ProviderMetrics>>,
@@ -1011,7 +984,7 @@ mod tests {
     use tokio::sync::RwLock;
 
     use crate::providers::eth_send_utils::BatchOfUpdatesToProcess;
-    use crate::providers::provider::init_shared_rpc_providers;
+    use crate::providers::provider::{init_shared_rpc_providers, ProviderType};
 
     async fn mine_self_txs(
         rpc: &ProviderType,
