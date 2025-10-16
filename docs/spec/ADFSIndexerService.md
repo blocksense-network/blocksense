@@ -95,7 +95,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 |  Layers:                                                             |
 |  - ConfigLayer (JSON -> typed config; no hot reload)                 |
 |  - ViemLayer   (HTTP + WS clients, rate-limit aware)                |
-|  - DbLayer     (Postgres/Drizzle pool + migrations)                  |
+|  - DbLayer     (Postgres: Drizzle migrations + Effect SQL runtime)   |
 |  - MetricsLayer(Log/metrics spans → Prom exporter)                   |
 |  - LogLayer    (structured JSON logs)                                |
 |  - TracingLayer(Effect metrics counters → OTLP)                      |
@@ -122,7 +122,7 @@ Index a single proxy-fronted ADFS contract per supported chain, ingest the **Dat
 
 - **ConfigLayer** parses JSON, validates against schema, and exposes typed config.
 - **ViemLayer** builds per-chain `publicClient` (HTTP) and `webSocketClient` handles with fallback selection across configured endpoint arrays and optional rate limits.
-- **DbLayer** uses Drizzle + `pg` pool tuned per deployment; exposes repository methods implementing idempotent UPSERTs and partition helpers.
+- **DbLayer** pairs Drizzle and Effect SQL: Drizzle continues to own schema DSL, migrations, and higher-level ORM helpers, while `@effect/sql` + `@effect/sql-pg` provide runtime pools and query execution inside Effect Layers/Services (structured concurrency, cancellation, resource safety).
 - **MetricsLayer** wraps Effect tracing spans (see <https://effect.website/docs/observability/tracing/>) to emit latency histograms and counters exposed over Prometheus.
 - **LogLayer** provides structured JSON logging (pino-friendly) with correlation IDs.
 - **TracingLayer** registers Effect metrics counters/histograms and exports them to OTLP when `OTEL_EXPORTER_OTLP_ENDPOINT` is configured.
@@ -631,11 +631,11 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 
 ## 13) Delivery Plan & Testing
 
-- **M1 – Skeleton & Config (Week 1)**: Effect scaffolding, config loader, Drizzle migrations (base + partitions), viem clients, Prometheus/JSON logs.
+- **M1 – Skeleton & Config (Week 1)**: Effect scaffolding, config loader, Drizzle migrations (base + partitions) wired into `@effect/sql` + `@effect/sql-pg` runtime access, viem clients, Prometheus/JSON logs.
 - **M2 – Versioning & Live Tail (Week 2)**: VersionManager, decoder profiles, WS tail, per-block writer (pending states).
 - **M3 – Backfill & Finality (Week 3)**: Range scanner, OrderingBuffer, pending→confirmed flips, reorg handling, `feed_latest` maintenance.
 - **M4 – Normalization & Limits (Week 4)**: `feed_updates`, `ring_buffer_updates`, guardrails, anomaly telemetry.
-- **M5 – Hardening & Tests (Week 5)**: unit/integration/reorg/load tests; runbooks; Grafana dashboards.
+- **M5 – Hardening & Tests (Week 5)**: unit/integration/reorg/load tests with `@effect/vitest`; runbooks; Grafana dashboards.
 - **M6 – Launch (Week 6)**: Devnet → testnet → mainnet rollout; SLO baselining; on-call activation.
 
 **Testing strategy:**
@@ -819,8 +819,13 @@ WHERE chain_id = $1
 - Validate `schema_version` in the database at startup and abort if migrations are missing.
 - Foreign keys between partitioned tables are omitted; enforce integrity via unique keys and application logic when inserting into `feed_updates`, `ring_buffer_updates`, and `feed_latest`.
 - Expose Effect services (`ConfigService`, `DbService`, `RpcService`, etc.) via dependency injection for unit tests.
+- `DbService` composes `@effect/sql` transactions with Drizzle-generated schemas so runtime queries stay in Effect while migrations/DDL remain Drizzle-backed.
+- When opting for raw SQL in Effect, attach explicit result schemas (Effect Schema or TypeScript interfaces) to maintain type safety parity with Drizzle’s DSL inference.
 - Prefer viem batch RPC for block + transaction fetching to minimize HTTP round-trips.
-- Drizzle migrations manage enum/type creation and partition DDL; ensure forward-compatible schema evolution (online-safe `ALTER TABLE ... ATTACH PARTITION`).
+- For advanced query builders on top of Effect SQL, favor the first-party Kysely integration; Drizzle-as-builder is possible but currently suffers alias remapping quirks (e.g., `SELECT city AS cityName` returning `city`) per upstream guidance.
+- Drizzle migrations manage enum/type creation and partition DDL; ensure forward-compatible schema evolution (online-safe `ALTER TABLE ... ATTACH PARTITION`) and keep query helpers aligned across both layers.
+- Track `@effect/sql` and `@effect/sql-pg` release notes (high cadence, pre-1.0) to pick up API adjustments promptly; capture notable changes in the runbook/wiki.
+- Collect reference material for the team (Effect API docs, package README, weekly release notes) until the official SQL documentation matures.
 
 ---
 
