@@ -2,6 +2,7 @@ import { Effect } from 'effect';
 import { Command, Options } from '@effect/cli';
 import { ethers } from 'ethers';
 
+import type { NetworkName } from '@blocksense/base-utils/evm';
 import { getRpcUrl } from '@blocksense/base-utils/evm';
 import {
   listEvmNetworks,
@@ -19,39 +20,45 @@ export const watcher = Command.make(
   },
   ({ hasBlockNumber, network }) =>
     Effect.gen(function* () {
-      const rpcUrl = getRpcUrl(network);
-      const provider = new ethers.JsonRpcProvider(rpcUrl, undefined, {
-        polling: true,
-      });
-
-      console.log(`Watching ADFS calldata on ${network} for rpc: ${rpcUrl}`);
-
-      const deploymentData = yield* Effect.tryPromise(() =>
-        readEvmDeployment(network, true),
-      );
-
-      const filter = {
-        address:
-          deploymentData.contracts.coreContracts.UpgradeableProxyADFS.address,
-        topics: [
-          '0xe64378c8d8a289137204264780c7669f3860a703795c6f0574d925d473a4a2a7',
-        ],
-      };
-
-      provider.on(filter, async event => {
-        const tx = await provider.getTransaction(event.transactionHash);
-
-        const { errors } = decodeADFSCalldata({
-          calldata: tx!.data,
-          hasBlockNumber,
-        });
-
-        if (errors.length) {
-          console.log('\ntx hash: ', tx!.hash);
-          console.error('Error parsing calldata:', errors);
-        } else {
-          console.log(`\nCalldata for block ${event.blockNumber} is valid!`);
-        }
-      });
+      console.log(`Starting ADFS watcher for network: ${network}`);
+      yield* Effect.promise(() => watchNetwork(network, hasBlockNumber));
     }),
 );
+
+export const watchNetwork = async (
+  network: NetworkName,
+  hasBlockNumber: boolean,
+) => {
+  const rpcUrl = getRpcUrl(network);
+  const provider = new ethers.JsonRpcProvider(rpcUrl, undefined, {
+    polling: true,
+  });
+
+  console.log(`Watching ADFS calldata on ${network} for rpc: ${rpcUrl}`);
+
+  const deploymentData = await readEvmDeployment(network, true);
+
+  const filter = {
+    address:
+      deploymentData.contracts.coreContracts.UpgradeableProxyADFS.address,
+    topics: [
+      '0xe64378c8d8a289137204264780c7669f3860a703795c6f0574d925d473a4a2a7',
+    ],
+  };
+
+  provider.on(filter, async event => {
+    const tx = await provider.getTransaction(event.transactionHash);
+
+    const { errors } = decodeADFSCalldata({
+      calldata: tx!.data,
+      hasBlockNumber,
+    });
+
+    if (errors.length) {
+      console.log('\ntx hash: ', tx!.hash);
+      console.error('Error parsing calldata:', errors);
+    } else {
+      console.log(`\nCalldata for block ${event.blockNumber} is valid!`);
+    }
+  });
+};
