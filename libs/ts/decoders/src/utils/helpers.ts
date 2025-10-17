@@ -52,11 +52,9 @@ export const expandJsonFields = (
   }
 
   for (const key in inputData) {
-    if (key === mainStructName) {
-      continue;
+    if (key !== mainStructName) {
+      delete inputData[key];
     }
-
-    delete inputData[key];
   }
 
   return inputData;

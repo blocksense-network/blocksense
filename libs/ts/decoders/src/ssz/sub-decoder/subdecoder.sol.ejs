@@ -13,30 +13,28 @@ library <%= unionName %>SSZDecoder {
 
   <%
     function removeBrackets(type) {
-      let arrayDimensions = type.match(/(\[\d*\])+$/);
-      if (!arrayDimensions) {
-        return type;
-      }
-      return type.replace(arrayDimensions[0], '');
+      const arrayDimensions = type.match(/(\[\d*\])+$/);
+      return arrayDimensions ? type.replace(arrayDimensions[0], '') : type;
     }
   %>
 
+  <%
+    function parseType(ut) {
+      let type = ut.type;
+      if(type.includes('tuple')) {
+        type = toUpperFirstLetter(ut.fieldName) + (type.match(/\[(\d*)\]/g) || []).join('');
+      } else if (type.includes('union')) {
+        // Treat union as bytes due to dynamic size
+        type = type.replace('union', 'bytes');
+      }
+      return type;
+    }
+  %>
 
   <%=
   unionTypes.map((ut, i) => {
-    let type = ut.type
-    if(type.includes('tuple')) {
-      type = toUpperFirstLetter(ut.fieldName) + (type.match(/\[(\d*)\]/g) || []).join('');
-    } else if (type.includes('union')) {
-      type = type.replace('union', 'bytes');
-    }
-
-    if (ut.typeName.includes('none')) {
-      return `event ${toUpperFirstLetter(removeBrackets(ut.type))}();`
-    }
-    return `event ${toUpperFirstLetter(removeBrackets(ut.type))}(${type} ${ut.fieldName});`
-    }
-  ).join('\n\n')
+    return `event ${toUpperFirstLetter(removeBrackets(ut.type))}(${ut.typeName.includes('none') ? '' : `${parseType(ut)} ${ut.fieldName}`});`
+  }).join('\n\n')
   %>
 
   <%=
@@ -54,22 +52,14 @@ library <%= unionName %>SSZDecoder {
         return '';
       }
 
-      let type = ut.type
-      if(type.includes('tuple')) {
-        type = toUpperFirstLetter(ut.fieldName) + (type.match(/\[(\d*)\]/g) || []).join('');
-      } else if (type.includes('union')) {
-        type = type.replace('union', 'bytes');
-      }
-
       return `
         function decode${toUpperFirstLetter(removeBrackets(ut.type))} (
           bytes memory data
-        ) internal pure returns (${type} ${ut.typeName.includes('Container') || ut.sszFixedSize === null ? 'memory' : ''} ${ut.fieldName}) {
+        ) internal pure returns (${parseType(ut)} ${ut.typeName.includes('Container') || ut.sszFixedSize === null ? 'memory' : ''} ${ut.fieldName}) {
           assembly (\'memory-safe\') {
             ${lines[i].join('\n')}
           }
         }`
     }).join('\n\n')
   %>
-
 }
