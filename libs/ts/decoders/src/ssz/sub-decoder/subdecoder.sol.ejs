@@ -1,0 +1,65 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.28;
+
+/// @notice Decoder for stored packed tuple data
+library <%= unionName %>SSZDecoder {
+  /// @notice User defined struct
+  /// @dev Using structs avoids hitting the EVM stack limit
+  <%= structs.map((struct) => {
+    return `  struct ${struct.name} {
+      ${struct.fields.map((fields) => `  ${fields.type} ${fields.name};`).join('\n  ')}
+    }`
+  }).join('\n\n') %>
+
+  <%
+    function removeBrackets(type) {
+      const arrayDimensions = type.match(/(\[\d*\])+$/);
+      return arrayDimensions ? type.replace(arrayDimensions[0], '') : type;
+    }
+  %>
+
+  <%
+    function parseType(ut) {
+      let type = ut.type;
+      if(type.includes('tuple')) {
+        type = toUpperFirstLetter(ut.fieldName) + (type.match(/\[(\d*)\]/g) || []).join('');
+      } else if (type.includes('union')) {
+        // Treat union as bytes due to dynamic size
+        type = type.replace('union', 'bytes');
+      }
+      return type;
+    }
+  %>
+
+  <%=
+  unionTypes.map((ut, i) => {
+    return `event ${toUpperFirstLetter(removeBrackets(ut.type))}(${ut.typeName.includes('none') ? '' : `${parseType(ut)} ${ut.fieldName}`});`
+  }).join('\n\n')
+  %>
+
+  <%=
+    unionTypes.map((ut, i) =>
+      `function is${toUpperFirstLetter(removeBrackets(ut.type))}(uint8 selector) internal pure returns (bool) {
+          return selector == ${i};
+      }`
+    ).join('\n\n')
+  %>
+
+  <%-
+    unionTypes.map((ut, i) => {
+      if (ut.typeName.includes('none')){
+        // Skip none
+        return '';
+      }
+
+      return `
+        function decode${toUpperFirstLetter(removeBrackets(ut.type))} (
+          bytes memory data
+        ) internal pure returns (${parseType(ut)} ${ut.typeName.includes('Container') || ut.sszFixedSize === null ? 'memory' : ''} ${ut.fieldName}) {
+          assembly (\'memory-safe\') {
+            ${lines[i].join('\n')}
+          }
+        }`
+    }).join('\n\n')
+  %>
+}

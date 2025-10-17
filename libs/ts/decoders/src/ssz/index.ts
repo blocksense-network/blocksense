@@ -8,44 +8,107 @@ import type { TupleField } from '../utils';
 import { organizeFieldsIntoStructs } from '../utils';
 
 import { generateDecoderLines } from './helpers';
+import { generateSubDecoderLines } from './sub-decoder';
 import type { Schema } from './utils';
-import { sszSchema } from './utils';
+import { sszSchema, toLowerFirstLetter, toUpperFirstLetter } from './utils';
 
 export const generateDecoder = async (
   template: string,
+  subTemplate: string,
   fields: TupleField,
   evmVersion: string = 'cancun',
   start: number = 0,
-) => {
-  const schema: Schema[] = await sszSchema(fields);
+): Promise<string | Record<string, string>> => {
+  const { schema, unionTypes } = await sszSchema(fields);
 
-  const structs = organizeFieldsIntoStructs(fields);
-  const mainStructName =
-    '_' + fields.name.charAt(0).toLowerCase() + fields.name.slice(1);
+  const { structs, unionStructs } = organizeFieldsIntoStructs(fields);
+  const mainStructName = '_' + toLowerFirstLetter(fields.name);
   const isMainStructDynamic = fields.type.endsWith('[]');
   const returnType =
     fields.name + (fields.type.match(/\[(\d*)\]/g) || []).join('');
-  const generatedLines = generateDecoderLines(
+
+  unionTypes.forEach(type => {
+    if (!type.structNames || type.structNames[0] === '') {
+      type.structNames = [mainStructName, ...(type.structNames || []).slice(1)];
+    }
+  });
+
+  const decoderName = 'SSZDecoder';
+  const mainGeneratedLines = generateDecoderLines(
     schema[0],
     mainStructName,
     evmVersion,
     start,
   );
+  let subDecoderGeneratedLines: string[] = [];
+  if (unionTypes) {
+    subDecoderGeneratedLines = generateSubDecoderLines(
+      decoderName,
+      mainStructName,
+      structs,
+      unionTypes as Array<
+        Required<Pick<Schema, 'actualType' | 'fields' | 'structNames'>> & Schema
+      >,
+      returnType,
+    );
+  }
 
   const generatedCode = ejs.render(
     template,
     {
-      lines: generatedLines,
+      decoderName,
+      lines: mainGeneratedLines,
       structs,
       mainStructName,
       isMainStructDynamic,
       returnType,
+      unionTypes,
+      toUpperFirstLetter,
+      subDecoderLines: subDecoderGeneratedLines,
     },
     {
       root: (await fs.realpath(__dirname)) + '/',
     },
   );
 
+  const mainCode = await formatCode(generatedCode);
+  if (!unionTypes.length) {
+    return mainCode;
+  }
+
+  // Multidecoder
+  const code: Record<string, string> = {
+    [toUpperFirstLetter(fields.name)]: mainCode,
+  };
+
+  for (const ut of unionTypes) {
+    const utfLines: string[][] = [];
+    for (const utf of ut.fields || []) {
+      utfLines.push(generateDecoderLines(utf, utf.fieldName!, evmVersion, 1));
+    }
+    const unionName = 'SSZ' + '_' + ut.contractName!;
+    const unionType = ejs.render(
+      subTemplate,
+      {
+        lines: utfLines,
+        structs: unionStructs[ut.contractName!] || [],
+        isMainStructDynamic: false,
+        unionName,
+        unionTypes: ut.fields,
+        toUpperFirstLetter,
+      },
+      {
+        root: (await fs.realpath(__dirname)) + '/',
+      },
+    );
+
+    code[unionName] = await formatCode(unionType);
+  }
+
+  return code;
+};
+
+const formatCode = async (generatedCode: string) => {
   const formattedCode = await prettier.format(generatedCode, {
     parser: 'solidity-parse',
     plugins: [solidityPlugin],

@@ -8,9 +8,11 @@ export const generateDecoderPrimitiveLines = (
   isBytes: boolean,
   start: Offset,
   end: Offset,
+  isMainSchemaContainer: boolean,
   counter?: string,
 ) => {
-  const fieldName = '_' + schema.fieldName;
+  const fieldName =
+    (isMainSchemaContainer || schema.isNested ? '_' : '') + schema.fieldName;
   const fieldSize = schema.fixedSize * 8;
 
   return `
@@ -18,7 +20,7 @@ export const generateDecoderPrimitiveLines = (
     {
       let ${fieldName}_size := div(sub(${end}, ${start}), ${schema.fixedSize})
 
-      let ${fieldName} := mload(0x40)
+      ${isMainSchemaContainer || schema.isNested ? 'let' : ''} ${fieldName} := mload(0x40)
       ${
         counter
           ? `mstore(add(${location}, mul(add(${counter}, 1), 0x20)), ${fieldName})`
