@@ -8,7 +8,7 @@ import {
 } from './helpers';
 import {
   BytesRange,
-  hasFields,
+  isNonUnionContainer,
   isUnion,
   isVector,
   Offset,
@@ -27,7 +27,7 @@ export {
   Offset,
   isVector,
   isUnion,
-  hasFields,
+  isNonUnionContainer as hasFields,
 
   // helpers
   addOffsets,

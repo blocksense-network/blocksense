@@ -8,6 +8,8 @@ import type { TupleField } from '../utils';
 import { organizeFieldsIntoStructs } from '../utils';
 
 import { generateDecoderLines } from './helpers';
+import { generateSubDecoderLines } from './sub-decoder';
+import type { Schema } from './utils';
 import { sszSchema, toLowerFirstLetter, toUpperFirstLetter } from './utils';
 
 export const generateDecoder = async (
@@ -26,24 +28,35 @@ export const generateDecoder = async (
     fields.name + (fields.type.match(/\[(\d*)\]/g) || []).join('');
 
   unionTypes.forEach(type => {
-    if (!type.structNames) {
-      type.structNames = [mainStructName];
-    }
-    if (type.structNames[0] === '') {
-      type.structNames[0] = mainStructName;
+    if (!type.structNames || type.structNames[0] === '') {
+      type.structNames = [mainStructName, ...(type.structNames || []).slice(1)];
     }
   });
 
+  const decoderName = 'SSZDecoder';
   const mainGeneratedLines = generateDecoderLines(
     schema[0],
     mainStructName,
     evmVersion,
     start,
   );
+  let subDecoderGeneratedLines: string[] = [];
+  if (unionTypes) {
+    subDecoderGeneratedLines = generateSubDecoderLines(
+      decoderName,
+      mainStructName,
+      structs,
+      unionTypes as Array<
+        Required<Pick<Schema, 'actualType' | 'fields' | 'structNames'>> & Schema
+      >,
+      returnType,
+    );
+  }
 
   const generatedCode = ejs.render(
     template,
     {
+      decoderName,
       lines: mainGeneratedLines,
       structs,
       mainStructName,
@@ -51,6 +64,7 @@ export const generateDecoder = async (
       returnType,
       unionTypes,
       toUpperFirstLetter,
+      subDecoderLines: subDecoderGeneratedLines,
     },
     {
       root: (await fs.realpath(__dirname)) + '/',
@@ -72,13 +86,12 @@ export const generateDecoder = async (
     for (const utf of ut.fields || []) {
       utfLines.push(generateDecoderLines(utf, utf.fieldName!, evmVersion, 1));
     }
-    const filteredUnionStructs = unionStructs[ut.contractName!] || [];
     const unionName = 'SSZ' + '_' + ut.contractName!;
     const unionType = ejs.render(
       subTemplate,
       {
         lines: utfLines,
-        structs: filteredUnionStructs,
+        structs: unionStructs[ut.contractName!] || [],
         isMainStructDynamic: false,
         unionName,
         unionTypes: ut.fields,

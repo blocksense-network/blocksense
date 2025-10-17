@@ -31,7 +31,7 @@ export type BytesRange = {
 /**
  * Checks if the schema has fields
  */
-export const hasFields = (
+export const isNonUnionContainer = (
   schema: Schema,
 ): schema is Schema & { fields: Schema[] } => {
   return (
