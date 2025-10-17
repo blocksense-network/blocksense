@@ -10,6 +10,5 @@
     "outDir": "dist",
     "rootDir": "."
   },
-  "include": ["**/*.ts", "abis/**/*.json"],
-  "exclude": ["artifacts", "cache", "contracts", "dist"]
+  "include": ["src/**/*.ts", "test/**/*.ts", "typechain/", "hardhat.config.ts"]
 }

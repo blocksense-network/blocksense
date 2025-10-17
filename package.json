@@ -24,7 +24,7 @@
     "knip": "knip"
   },
   "dependenciesMeta": {
-    "@openzeppelin/contracts@5.0.2": {
+    "@openzeppelin/contracts@5.1.0": {
       "unplugged": true
     },
     "next@14.2.5": {
