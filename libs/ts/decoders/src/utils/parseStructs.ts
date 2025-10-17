@@ -3,13 +3,14 @@ import type { ComponentField, Struct, TupleField } from '.';
 export const organizeFieldsIntoStructs = (fields: TupleField) => {
   let structs: Struct[] = [];
   const mainStruct = { name: fields.name, fields: [] };
-  let isInUnion = false;
   const unionStructs: Record<string, Struct[]> = {};
 
   const processField = (
     field: ComponentField[number],
     parentStruct: any,
     structNames: string[],
+    inUnion: boolean = false,
+    unionStructsRef: Record<string, Struct[]> = unionStructs,
   ) => {
     const structs: Struct[] = [];
     if (field.type.includes('tuple')) {
@@ -19,25 +20,30 @@ export const organizeFieldsIntoStructs = (fields: TupleField) => {
       };
       if ('components' in field) {
         field.components.forEach(component => {
-          if (isInUnion) {
-            unionStructs[structNames.join('_')] = processField(
+          if (inUnion) {
+            unionStructsRef[structNames.join('_')] = processField(
               component,
               newStruct,
               [...structNames, field.name],
+              inUnion,
+              unionStructsRef,
             );
           } else {
             structs.push(
-              ...processField(component, newStruct, [
-                ...structNames,
-                field.name,
-              ]),
+              ...processField(
+                component,
+                newStruct,
+                [...structNames, field.name],
+                inUnion,
+                unionStructsRef,
+              ),
             );
           }
         });
       }
 
-      if (isInUnion) {
-        unionStructs[structNames.join('_')] = [newStruct];
+      if (inUnion) {
+        unionStructsRef[structNames.join('_')] = [newStruct];
       } else {
         structs.push(newStruct);
       }
@@ -63,11 +69,17 @@ export const organizeFieldsIntoStructs = (fields: TupleField) => {
       } else {
         parentStruct.fields.push({ name: field.name, type: 'bytes' });
       }
-      isInUnion = true;
+      inUnion = true;
       (field as TupleField).components.forEach(component => {
-        processField(component, { fields: [] }, [...structNames, field.name]);
+        processField(
+          component,
+          { fields: [] },
+          [...structNames, field.name],
+          inUnion,
+          unionStructsRef,
+        );
       });
-      isInUnion = false;
+      inUnion = false;
     } else {
       parentStruct.fields.push({ name: field.name, type: field.type });
     }

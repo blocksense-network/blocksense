@@ -5,7 +5,7 @@ import type { PrimitiveField, TupleField } from '../../utils';
 import { checkPrimitiveField } from '../../utils';
 
 import { toLowerFirstLetter } from './helpers';
-import type { Schema } from './types';
+import type { Schema, UnionSchema } from './types';
 
 const BYTES_LIMIT = 8192;
 const ARRAY_LIMIT = 1024;
@@ -214,16 +214,8 @@ export const encodeSSZData = async (
       schema instanceof ssz.ByteListType
     ) {
       if (ethers.isHexString(values)) {
-        values = values.slice(2);
-        const result = new Uint8Array(values.length / 2);
-        for (let i = 0; i < result.length; i++) {
-          const offset = i * 2;
-          result[i] = parseInt(values.substring(offset, offset + 2), 16);
-        }
-        return result;
-      }
-
-      if (schema instanceof ssz.ByteListType) {
+        return ethers.getBytes(values);
+      } else if (schema instanceof ssz.ByteListType) {
         return ethers.toUtf8Bytes(values);
       }
       return convertNumberEndianness(values, schema.lengthBytes, false);
@@ -252,10 +244,10 @@ export const encodeSSZData = async (
 
 export const sszSchema = async (
   fields: PrimitiveField | TupleField,
-): Promise<{ schema: Schema[]; unionTypes: Schema[] }> => {
+): Promise<{ schema: Schema[]; unionTypes: UnionSchema[] }> => {
   const ssz = await import('@chainsafe/ssz');
 
-  const unionTypes: Schema[] = [];
+  const unionTypes: UnionSchema[] = [];
 
   const extractFieldsFromSchema = (
     fields: Record<string, any> | any[],
@@ -296,7 +288,7 @@ export const sszSchema = async (
               Object.keys(field.jsonKeyToFieldName)[i] ?? field.fieldName,
             );
             f.type =
-              findFieldTypeByName(inputFields, f.fieldName) ?? field.type;
+              findFieldTypeByName(inputFields, f.fieldName) || field.type;
           },
         );
         data.fields = extractFieldsFromSchema(field.fields, inputFields, {
@@ -367,11 +359,10 @@ export const sszSchema = async (
         );
 
         if (!data.fixedSize) {
-          let size = 0;
-          data.fields.forEach((f: Schema) => {
-            size += f.fixedSize;
-          });
-          data.fixedSize = size;
+          data.fixedSize = data.fields.reduce(
+            (size: number, f: Schema) => size + f.fixedSize,
+            0,
+          );
         }
       } else if (field.elementType instanceof ssz.ContainerType) {
         const tuple = field.elementType;
@@ -442,11 +433,12 @@ export const sszSchema = async (
 
         data.contractName = data.structNames.filter(w => w !== '').join('_');
 
+        // Each field is decoded in a separate decoder where the decoding starts from 0 offset
         data.fields.forEach((f: Schema) => {
           f.isFirst = true;
         });
 
-        unionTypes.push(structuredClone(data));
+        unionTypes.push(structuredClone(data) as UnionSchema);
       }
 
       result.push(data);
@@ -463,16 +455,10 @@ export const sszSchema = async (
     fields,
   );
 
-  // Remove duplicates from unionTypes by `fieldName`
-  const seen = new Set<string>();
-  const uniqueUnionTypes: Schema[] = [];
-  for (const ut of unionTypes) {
-    const key = ut.contractName!;
-    if (!seen.has(key)) {
-      seen.add(key);
-      uniqueUnionTypes.push(ut);
-    }
-  }
+  // Remove duplicates from unionTypes by `contractName`
+  const uniqueUnionTypes = Array.from(
+    new Map(unionTypes.map(ut => [ut.contractName, ut])).values(),
+  );
   unionTypes.length = 0;
   unionTypes.push(...uniqueUnionTypes);
 
@@ -486,15 +472,11 @@ export const findUnionNames = (
   fields: TupleField,
   structNames: string[],
 ): TupleField => {
-  let temp = fields;
-  for (const structName of structNames) {
-    if (structName === '') {
-      continue;
-    }
-    temp = temp.components.find(c => c.name === structName) as TupleField;
-  }
-
-  return temp;
+  return structNames.reduce(
+    (acc, name) =>
+      name ? (acc.components.find(c => c.name === name) as TupleField) : acc,
+    fields,
+  );
 };
 
 const findFieldTypeByName = (
@@ -502,9 +484,6 @@ const findFieldTypeByName = (
   name: string,
 ): string => {
   if ('components' in fields) {
-    if (fields.name === name) {
-      return fields.type;
-    }
     for (const component of fields.components) {
       const found = findFieldTypeByName(component, name);
       if (found) {
@@ -521,7 +500,6 @@ const findFieldTypeByName = (
   } else if (fields.name === name) {
     return fields.type;
   }
-
   return '';
 };
 

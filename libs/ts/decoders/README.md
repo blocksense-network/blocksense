@@ -6,8 +6,8 @@ This library provides TypeScript decoders for structured data, supporting templa
 
 ## Features
 
-- **FieldTuple Decoding:** Converts input data into a `FieldTuple` structure, enabling type-safe access and manipulation.
-- **WIT to FieldTuple Conversion:** Rust-based converter collapses WIT (WebAssembly Interface Types) values into partial `FieldTuple`, which can be expanded to full JSON `FieldTuple` fields using `expandJsonFields`.
+- **TupleField Decoding:** Converts input data into a `TupleField` structure, enabling type-safe access and manipulation.
+- **WIT to TupleField Conversion:** Rust-based converter collapses WIT (WebAssembly Interface Types) values into partial `TupleField`, which can be expanded to full JSON `TupleField` fields using `expandJsonFields`.
 - **Multi Decoder (SSZ):** Supports decoding of union SSZ types.
 
 ## Usage
@@ -25,9 +25,9 @@ yarn test # for Cancun optimized `mcopy` decoding
 yarn test:paris # for normal decode
 ```
 
-## WIT to `FieldTuple`
+## WIT to `TupleField`
 
-A Rust converter is available to collapse WIT values into a partial `FieldTuple`. Use `expandJsonFields` to convert the collapsed tuple into a full JSON object.
+A Rust converter is available to collapse WIT values into a partial `TupleField`. Use `expandJsonFields` to convert the collapsed tuple into a full JSON object.
 
 ## Template Multi Decoder (SSZ Only)
 
