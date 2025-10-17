@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-<% const subDecoder = 'SSZDecoder' %>
-<%- unionTypes.map(ut => `import './SSZ_${ut.contractName}${subDecoder}.sol';`).join('\n') %>
+<%- unionTypes.map(ut => `import './SSZ_${ut.contractName}${decoderName}.sol';`).join('\n') %>
 
 /// @notice Decoder for stored packed tuple data
-<%= unionTypes.length ? 'contract' : 'library' %> <%= unionTypes.length ? structs[0].name : '' %>SSZDecoder {
+<%= unionTypes.length ? 'contract' : 'library' %> <%= unionTypes.length ? structs[0].name : '' %><%= decoderName %> {
   /// @notice User defined struct
   /// @dev Using structs avoids hitting the EVM stack limit
   <%= structs.map((struct) => {
@@ -21,98 +20,6 @@ pragma solidity ^0.8.28;
       <%= lines.join('\n') %>
     }
 
-    <% if (unionTypes) { %>
-      <%
-        const selectors = [];
-        unionTypes.forEach(ut => {
-          selectors.push(`${ut.contractName}Selector`)
-        });
-      %>
-
-      <%-
-        (() => {
-          const mainArrayDimensions = (returnType.match(/\[(\d*)\]/g) || []).reverse();
-          let mainLoopCode = '';
-          let mainIndexVars = [];
-
-          for (let d = 0; d < mainArrayDimensions.length; d++) {
-            const currentDimension = mainArrayDimensions[d].match(/\[(\d*)\]/)[1];
-            const idx = `i_${d}`;
-            const idxDimensions = mainIndexVars.map(iv => `[${iv}]`).join('');
-            mainLoopCode += `for (uint256 ${idx}; ${idx} \< ${currentDimension || `${mainStructName}${idxDimensions}.length`}; ${idx}++) {\n`;
-            mainIndexVars.push(idx);
-          }
-
-          let mainStructNameIndexed = `${mainStructName}${mainIndexVars.map(iv => `[${iv}]`).join('')}`;
-
-          function generateSubDecoders(selector, ut, structNames) {
-            const arrayDimensions = (ut.actualType.match(/\[(\d*)\]/g) || []).reverse();
-
-            let loopCode = '';
-            let indexVars = [];
-            for (let d = 0; d < arrayDimensions.length; d++) {
-              const currentDimension = arrayDimensions[d].match(/\[(\d*)\]/)[1];
-              const idx = `j_${d}`;
-              const idxDimensions = indexVars.map(iv => `[${iv}]`).join('');
-              loopCode += `for (uint256 ${idx}; ${idx} \< ${currentDimension || `${structNames}${idxDimensions}.length`}; ${idx}++) {\n`;
-              indexVars.push(idx);
-            }
-            const currData = `${structNames}${indexVars.map(iv => `[${iv}]`).join('')}`
-            loopCode += `uint8 ${selector} = uint8(bytes1(bytes32(${currData})));`;
-
-            for (let d = 0; d < ut.fields.length; d++) {
-              const curr = ut.fields[d];
-
-              let fnTypeArrayDimensions = curr.type.match(/(\[\d*\])+$/);
-              const fnType = toUpperFirstLetter(fnTypeArrayDimensions ? curr.type.replace(fnTypeArrayDimensions[0], '') : curr.type);
-
-              const decoderName = `SSZ_${ut.contractName}${subDecoder}`
-              loopCode += `${d > 0 ? 'else' : ''} if (${decoderName}.is${fnType}(${selector})) {`
-              if (!curr.type.includes('none')) {
-                let type = curr.type;
-                if(type.includes('tuple')) {
-                  type = decoderName + '.' + toUpperFirstLetter(curr.fieldName) + (type.match(/\[(\d*)\]/g) || []).join('');
-                } else if (type.includes('union')) {
-                  type = type.replace('union', 'bytes');
-                }
-
-                loopCode += `${type} ${curr.typeName.includes('Container') || curr.sszFixedSize === null ? 'memory' : ''} ${curr.fieldName} = ${decoderName}.decode${fnType}(${currData});\n`
-              }
-
-              loopCode += `emit ${decoderName}.${fnType}(${curr.fieldName.includes('none') ? '' : curr.fieldName});\n`
-
-              if (curr.type.includes('union')) {
-                loopCode += generateSubDecoders(`${curr.fieldName}Selector`, curr, curr.fieldName)
-              } else {
-                loopCode += '\n// Write logic here\n'
-              }
-              loopCode += '}'
-            }
-
-            for (let d = 0; d < arrayDimensions.length; d++) {
-              loopCode += `}\n`;
-            }
-            return loopCode;
-          }
-
-          mainLoopCode += unionTypes.map((ut, i) => {
-            const selector = selectors[i];
-
-            const struct = (structs.find(str => str.name.toLowerCase() === ut.structNames[ut.structNames.length - 2]) || structs[0])?.fields.find(f => f.name === ut.fieldName);
-            if (!struct) {
-              return '';
-            }
-
-            const structNames = [mainStructNameIndexed, ...ut.structNames.slice(1)].join('.');
-            return generateSubDecoders(selector, ut, structNames);
-          }).join('\n');
-
-          for (let d = 0; d < mainArrayDimensions.length; d++) {
-            mainLoopCode += `}\n`;
-          }
-          return mainLoopCode;
-        })()
-      %>
-    <% } %>
+    <%- subDecoderLines.join('\n') %>
   }
 }

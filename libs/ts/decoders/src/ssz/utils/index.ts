@@ -13,6 +13,8 @@ import {
   isVector,
   Offset,
   Schema,
+  SubUnionSchema,
+  UnionSchema,
 } from './types';
 
 export {
@@ -23,6 +25,8 @@ export {
 
   // types
   Schema,
+  UnionSchema,
+  SubUnionSchema,
   BytesRange,
   Offset,
   isVector,
