@@ -10,6 +10,8 @@
       pkgs,
       inputs',
       self',
+      config,
+      system,
       ...
     }:
     let
@@ -50,6 +52,12 @@
 
       # Blama
       blama = pkgs.callPackage ./blama { blama-src = inputs.blama.outPath; };
+
+      # Onchain Interactions
+      yarn-packages = pkgs.callPackage ./onchain-interactions {
+        inherit (inputs.yarnpnp2nix.lib.${system}) mkYarnPackagesFromManifest;
+      };
+      onchain-interactions = yarn-packages."@blocksense/onchain-interactions@workspace:libs/ts/onchain-interactions";
     in
     {
       apps = {
@@ -65,6 +73,9 @@
         inherit blama;
       };
       legacyPackages = {
+        inherit yarn-packages;
+        inherit onchain-interactions;
+
         oracle-scripts = {
           cex-price-feeds = mkOracleScript "cex-price-feeds";
           exsat-holdings = mkOracleScript "exsat-holdings";
