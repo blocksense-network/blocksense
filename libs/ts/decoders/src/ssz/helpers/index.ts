@@ -1,6 +1,11 @@
 import type { EvmVersion } from '../../utils';
 import type { Offset, Schema } from '../utils/';
-import { getDecoderImplementations, hasFields, isVector } from '../utils/';
+import {
+  getDecoderImplementations,
+  hasFields,
+  isUnion,
+  isVector,
+} from '../utils/';
 import { addOffsets } from '../utils/addOffsets';
 import { handleFieldRanges } from '../utils/container';
 
@@ -31,7 +36,7 @@ export const generateDecoderLines = (
 
     const fieldName = schema.fieldName ? schema.fieldName : name;
 
-    if (hasFields(schema)) {
+    if (hasFields(schema) && !isUnion(schema)) {
       if (schema.typeName.startsWith('Container')) {
         // tuple here
         const ranges = handleFieldRanges(
@@ -77,7 +82,7 @@ export const generateDecoderLines = (
           innerName = location;
         }
 
-        let idx = 0;
+        let slotIndex = 0;
         schema.fields.forEach((subSchema, i) => {
           let newStart = ranges[i].start.value;
           if (!ranges[i].start.isGenerated) {
@@ -112,7 +117,7 @@ export const generateDecoderLines = (
             ...generateDecoderLines(
               subSchema,
               innerName,
-              idx,
+              slotIndex,
               newStart,
               newEnd,
               schema.sszFixedSize,
@@ -120,7 +125,7 @@ export const generateDecoderLines = (
           );
           if (subSchema.typeName !== 'none') {
             // skip none type
-            idx++;
+            slotIndex++;
           }
         });
         lines.push('}\n');

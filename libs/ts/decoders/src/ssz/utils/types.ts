@@ -18,6 +18,16 @@ export type Schema = {
   types: Array<{ type: string; length?: number }>;
 };
 
+export type UnionSchema = Required<
+  Pick<
+    Schema,
+    'actualType' | 'fields' | 'structNames' | 'fieldName' | 'contractName'
+  >
+> &
+  Schema & { type: 'union' } & { fields: SubUnionSchema[] };
+
+export type SubUnionSchema = Required<Pick<Schema, 'fieldName'>> & Schema;
+
 export type Offset = number | string;
 
 export type BytesRange = {
@@ -34,10 +44,7 @@ export type BytesRange = {
 export const hasFields = (
   schema: Schema,
 ): schema is Schema & { fields: Schema[] } => {
-  return (
-    (schema as Schema & { fields: Schema[] }).fields !== undefined &&
-    schema.type !== 'union'
-  );
+  return (schema as Schema & { fields: Schema[] }).fields !== undefined;
 };
 
 /**
