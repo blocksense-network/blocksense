@@ -6,7 +6,7 @@
   "type": "module",
   "module": "esnext",
   "dependencies": {
-    "@aztec/aztec.js": "0.67.1",
+    "@aztec/aztec.js": "2.0.3",
     "tslib": "^2.8.1",
     "vite": "^7.1.4"
   },
