@@ -515,11 +515,11 @@ impl OracleTrigger {
             }
         };
 
-        let futures = urls.iter().cloned().map(|url| {
+        let futures = urls.iter().map(|url| {
             let body = Arc::clone(&serialized);
             async move {
-                let result = client.post_json(&url, body.as_ref()).await;
-                (url, result)
+                let result = client.post_json(url, body.as_ref()).await;
+                (url.clone(), result)
             }
         });
 
@@ -1269,9 +1269,7 @@ mod tests {
             let mut map: HashMap<String, VecDeque<Result<SequencerResponse, String>>> =
                 HashMap::new();
             for (url, response) in responses {
-                map.entry(url.to_string())
-                    .or_insert_with(VecDeque::new)
-                    .push_back(response);
+                map.entry(url.to_string()).or_default().push_back(response);
             }
             Self {
                 responses: Mutex::new(map),
