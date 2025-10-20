@@ -12,7 +12,7 @@ use std::{
     time::Instant,
 };
 
-use http::uri::Scheme;
+use http::{uri::Scheme, StatusCode};
 use hyper::Request;
 use tokio::{
     sync::{
@@ -77,6 +77,40 @@ use blocksense::oracle::oracle_types as oracle;
 pub(crate) type RuntimeData = HttpRuntimeData;
 pub(crate) type _Store = spin_core::Store<RuntimeData>;
 type DataFeedResults = Arc<RwLock<HashMap<EncodedFeedId, VotedFeedUpdate>>>;
+
+#[derive(Clone, Debug)]
+struct SequencerResponse {
+    status: StatusCode,
+    body: String,
+}
+
+#[async_trait]
+trait SequencerHttpClient: Send + Sync {
+    async fn post_json(
+        &self,
+        url: &Url,
+        body: &serde_json::Value,
+    ) -> Result<SequencerResponse, String>;
+}
+
+#[async_trait]
+impl SequencerHttpClient for reqwest::Client {
+    async fn post_json(
+        &self,
+        url: &Url,
+        body: &serde_json::Value,
+    ) -> Result<SequencerResponse, String> {
+        let response = self
+            .post(url.clone())
+            .json(body)
+            .send()
+            .await
+            .map_err(|err| err.to_string())?;
+        let status = response.status();
+        let body = response.text().await.unwrap_or_default();
+        Ok(SequencerResponse { status, body })
+    }
+}
 
 #[derive(Debug, Deserialize)]
 pub struct Params {
@@ -372,6 +406,8 @@ impl TriggerExecutor for OracleTrigger {
             .map(|url| url.join("/post_aggregated_consensus_vote"))
             .collect::<Result<Vec<_>, _>>()?;
 
+        let http_client: Arc<dyn SequencerHttpClient> = Arc::new(reqwest::Client::new());
+
         if let Some(endpoint) = self.kafka_endpoint {
             let (aggregated_consensus_sender, aggregated_consensus_receiver) = unbounded_channel();
             tracing::trace!("Starting secondary signature");
@@ -386,6 +422,7 @@ impl TriggerExecutor for OracleTrigger {
                 feeds_config,
                 data_feed_results.clone(),
                 sequencer_aggregated_consensus_urls.clone(),
+                http_client.clone(),
                 self.second_consensus_secret_key,
                 self.reporter_id,
             )));
@@ -402,6 +439,7 @@ impl TriggerExecutor for OracleTrigger {
             sequencer_post_batch_urls,
             &self.secret_key,
             self.reporter_id,
+            http_client,
         );
         loops.push(manager);
 
@@ -455,6 +493,32 @@ impl OracleTrigger {
                 .ok()
                 .and_then(|feed| EncodedFeedId::try_new(feed, 0)),
         }
+    }
+
+    async fn broadcast_json<C, T>(
+        client: &C,
+        urls: &[Url],
+        body: &T,
+    ) -> Vec<(Url, Result<SequencerResponse, String>)>
+    where
+        C: SequencerHttpClient + ?Sized,
+        T: Serialize + Send + Sync,
+    {
+        let serialized = match serde_json::to_value(body) {
+            Ok(value) => value,
+            Err(err) => {
+                return urls
+                    .iter()
+                    .map(|url| (url.clone(), Err(err.to_string())))
+                    .collect();
+            }
+        };
+        let mut outcomes = Vec::with_capacity(urls.len());
+        for url in urls {
+            let result = client.post_json(url, &serialized).await;
+            outcomes.push((url.clone(), result));
+        }
+        outcomes
     }
 
     fn start_oracle_loop(
@@ -760,6 +824,7 @@ impl OracleTrigger {
         sequencer_post_batch_urls: Vec<Url>,
         secret_key: &str,
         reporter_id: u64,
+        http_client: Arc<dyn SequencerHttpClient>,
     ) -> JoinHandle<TerminationReason> {
         let process_payload_future = Self::process_payload(
             payload_rx,
@@ -767,6 +832,7 @@ impl OracleTrigger {
             sequencer_post_batch_urls,
             secret_key.to_owned(),
             reporter_id,
+            http_client,
         );
 
         spawn(process_payload_future)
@@ -778,6 +844,7 @@ impl OracleTrigger {
         sequencer_urls: Vec<Url>,
         secret_key: String,
         reporter_id: u64,
+        http_client: Arc<dyn SequencerHttpClient>,
     ) -> TerminationReason {
         tracing::trace!("Task sender to sequencer started");
         while let Some((_component_id, payload)) = rx.recv().await {
@@ -818,41 +885,32 @@ impl OracleTrigger {
             //TODO(adikov): Potential better implementation would be to send results to the
             //sequencer every few seconds in which we can gather batches of data feed payloads.
 
-            let client = reqwest::Client::new();
             let mut any_success = false;
-            for sequencer_url in &sequencer_urls {
-                tracing::trace!(
-                    "Sending to url - {}; {} batches",
-                    sequencer_url,
-                    batch_payload.len()
-                );
-                match client
-                    .post(sequencer_url.clone())
-                    .json(&batch_payload)
-                    .send()
-                    .await
-                {
-                    Ok(res) => {
-                        let status = res.status();
-                        let contents = res.text().await.unwrap_or_default();
+            let outcomes =
+                Self::broadcast_json(http_client.as_ref(), &sequencer_urls, &batch_payload).await;
+            for (sequencer_url, outcome) in outcomes {
+                match outcome {
+                    Ok(response) => {
                         tracing::trace!(
-                            "Sequencer {} responded with status={status} and text={contents}",
-                            sequencer_url
+                            "Sequencer {} responded with status={} and text={}",
+                            sequencer_url,
+                            response.status,
+                            response.body
                         );
                         any_success = true;
                     }
-                    Err(e) => {
-                        //TODO(adikov): Add code from the error - e.status()
+                    Err(err) => {
                         REPORTER_FAILED_SEQ_REQUESTS
                             .with_label_values(&["404"])
                             .inc();
 
                         tracing::error!(
-                            "Sequencer request to {} failed with error: {e}",
-                            sequencer_url
+                            "Sequencer request to {} failed with error: {}",
+                            sequencer_url,
+                            err
                         );
                     }
-                };
+                }
             }
 
             if any_success {
@@ -872,6 +930,7 @@ impl OracleTrigger {
         feeds_config: HashMap<EncodedFeedId, FeedStrideAndDecimals>,
         latest_votes: DataFeedResults,
         sequencer_urls: Vec<Url>,
+        http_client: Arc<dyn SequencerHttpClient>,
         second_consensus_secret_key: String,
         reporter_id: u64,
     ) -> TerminationReason {
@@ -927,16 +986,19 @@ impl OracleTrigger {
                 signature,
             };
 
-            let client = reqwest::Client::new();
-            for sequencer in &sequencer_urls {
-                tracing::trace!("Sending to url - {}; {:?} hash", sequencer, &report);
-                match client.post(sequencer.clone()).json(&report).send().await {
-                    Ok(res) => {
-                        let contents = res.text().await.unwrap_or_default();
-                        tracing::trace!("Sequencer {} responded with: {}", sequencer, contents);
+            let outcomes =
+                Self::broadcast_json(http_client.as_ref(), &sequencer_urls, &report).await;
+            for (sequencer, outcome) in outcomes {
+                match outcome {
+                    Ok(response) => {
+                        tracing::trace!(
+                            "Sequencer {} responded with status={} and text={}",
+                            sequencer,
+                            response.status,
+                            response.body
+                        );
                     }
-                    Err(e) => {
-                        //TODO(adikov): Add code from the error - e.status()
+                    Err(err) => {
                         REPORTER_FAILED_SEQ_REQUESTS
                             .with_label_values(&["404"])
                             .inc();
@@ -944,10 +1006,10 @@ impl OracleTrigger {
                         tracing::error!(
                             "Sequencer request to {} failed with error: {}",
                             sequencer,
-                            e
+                            err
                         );
                     }
-                };
+                }
             }
         }
         TerminationReason::SequencerExitRequested
@@ -1178,5 +1240,172 @@ fn update_latest_votes(
                 },
             );
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+    use std::{
+        collections::VecDeque,
+        sync::{Arc, Mutex},
+    };
+    use tokio::sync::mpsc::unbounded_channel;
+
+    #[derive(Default)]
+    struct MockSequencerClient {
+        responses: Mutex<VecDeque<Result<SequencerResponse, String>>>,
+        calls: Mutex<Vec<Url>>,
+    }
+
+    impl MockSequencerClient {
+        fn new(responses: Vec<Result<SequencerResponse, String>>) -> Self {
+            Self {
+                responses: Mutex::new(VecDeque::from(responses)),
+                calls: Mutex::new(Vec::new()),
+            }
+        }
+
+        fn calls(&self) -> Vec<Url> {
+            self.calls.lock().unwrap().clone()
+        }
+    }
+
+    #[async_trait]
+    impl SequencerHttpClient for MockSequencerClient {
+        async fn post_json(
+            &self,
+            url: &Url,
+            _body: &serde_json::Value,
+        ) -> Result<SequencerResponse, String> {
+            self.calls.lock().unwrap().push(url.clone());
+            self.responses
+                .lock()
+                .unwrap()
+                .pop_front()
+                .expect("mock client ran out of responses")
+        }
+    }
+
+    const TEST_SECRET_KEY: &str =
+        "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003";
+
+    #[tokio::test]
+    async fn broadcast_json_hits_all_urls_and_reports_outcomes() {
+        let client = MockSequencerClient::new(vec![
+            Ok(SequencerResponse {
+                status: StatusCode::OK,
+                body: "ok".into(),
+            }),
+            Err("network error".into()),
+        ]);
+        let client = Arc::new(client);
+
+        let urls = vec![
+            Url::parse("http://seq-one.local/post_reports_batch").unwrap(),
+            Url::parse("http://seq-two.local/post_reports_batch").unwrap(),
+        ];
+        let payload = json!({ "hello": "world" });
+
+        let outcomes = OracleTrigger::broadcast_json(client.as_ref(), &urls, &payload).await;
+
+        assert_eq!(client.calls(), urls);
+        assert_eq!(outcomes.len(), 2);
+        assert!(outcomes[0].1.is_ok());
+        assert!(outcomes[1].1.is_err());
+    }
+
+    #[tokio::test]
+    async fn process_payload_updates_votes_when_any_success() {
+        let mock_client = Arc::new(MockSequencerClient::new(vec![
+            Ok(SequencerResponse {
+                status: StatusCode::OK,
+                body: "accepted".into(),
+            }),
+            Err("timeout".into()),
+        ]));
+        let client: Arc<dyn SequencerHttpClient> = mock_client.clone();
+
+        let (tx, rx) = unbounded_channel();
+        let latest_votes: DataFeedResults = Arc::new(RwLock::new(HashMap::new()));
+        let urls = vec![
+            Url::parse("http://seq-one.local/post_reports_batch").unwrap(),
+            Url::parse("http://seq-two.local/post_reports_batch").unwrap(),
+        ];
+
+        let payload = oracle::Payload {
+            values: vec![oracle::DataFeedResult {
+                id: "0:42".to_string(),
+                value: oracle::DataFeedResultValue::Numerical(123.45),
+            }],
+        };
+
+        tx.send(("component".to_string(), payload)).unwrap();
+        drop(tx);
+
+        let result = OracleTrigger::process_payload(
+            rx,
+            latest_votes.clone(),
+            urls.clone(),
+            TEST_SECRET_KEY.to_string(),
+            7,
+            client,
+        )
+        .await;
+
+        assert!(matches!(result, TerminationReason::SequencerExitRequested));
+        let votes = latest_votes.read().await;
+        assert!(votes.contains_key(&EncodedFeedId::new(42, 0)));
+        drop(votes);
+
+        let calls = mock_client.calls();
+        assert_eq!(calls.len(), urls.len());
+        assert_eq!(calls, urls);
+    }
+
+    #[tokio::test]
+    async fn process_payload_skips_vote_update_when_all_fail() {
+        let mock_client = Arc::new(MockSequencerClient::new(vec![
+            Err("fail-1".into()),
+            Err("fail-2".into()),
+        ]));
+        let client: Arc<dyn SequencerHttpClient> = mock_client.clone();
+
+        let (tx, rx) = unbounded_channel();
+        let latest_votes: DataFeedResults = Arc::new(RwLock::new(HashMap::new()));
+        let urls = vec![
+            Url::parse("http://seq-one.local/post_reports_batch").unwrap(),
+            Url::parse("http://seq-two.local/post_reports_batch").unwrap(),
+        ];
+
+        let payload = oracle::Payload {
+            values: vec![oracle::DataFeedResult {
+                id: "0:99".to_string(),
+                value: oracle::DataFeedResultValue::Numerical(55.0),
+            }],
+        };
+
+        tx.send(("component".to_string(), payload)).unwrap();
+        drop(tx);
+
+        let result = OracleTrigger::process_payload(
+            rx,
+            latest_votes.clone(),
+            urls.clone(),
+            TEST_SECRET_KEY.to_string(),
+            11,
+            client,
+        )
+        .await;
+
+        assert!(matches!(result, TerminationReason::SequencerExitRequested));
+        let votes = latest_votes.read().await;
+        assert!(votes.is_empty());
+        drop(votes);
+
+        let calls = mock_client.calls();
+        assert_eq!(calls.len(), urls.len());
+        assert_eq!(calls, urls);
     }
 }
