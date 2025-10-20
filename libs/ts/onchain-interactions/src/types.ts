@@ -34,6 +34,7 @@ export const deployedTestnets = [
   'inevm-testnet',
   'ink-sepolia',
   'kava-testnet',
+  'kite-ai-testnet',
   'kusama-moonbase-alpha',
   'linea-sepolia',
   'lisk-sepolia',
