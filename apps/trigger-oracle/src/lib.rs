@@ -12,6 +12,7 @@ use std::{
     time::Instant,
 };
 
+use futures::future::join_all;
 use http::{uri::Scheme, StatusCode};
 use hyper::Request;
 use tokio::{
@@ -505,7 +506,7 @@ impl OracleTrigger {
         T: Serialize + Send + Sync,
     {
         let serialized = match serde_json::to_value(body) {
-            Ok(value) => value,
+            Ok(value) => Arc::new(value),
             Err(err) => {
                 return urls
                     .iter()
@@ -513,12 +514,16 @@ impl OracleTrigger {
                     .collect();
             }
         };
-        let mut outcomes = Vec::with_capacity(urls.len());
-        for url in urls {
-            let result = client.post_json(url, &serialized).await;
-            outcomes.push((url.clone(), result));
-        }
-        outcomes
+
+        let futures = urls.iter().cloned().map(|url| {
+            let body = Arc::clone(&serialized);
+            async move {
+                let result = client.post_json(&url, body.as_ref()).await;
+                (url, result)
+            }
+        });
+
+        join_all(futures).await
     }
 
     fn start_oracle_loop(
@@ -1248,26 +1253,33 @@ mod tests {
     use super::*;
     use serde_json::json;
     use std::{
-        collections::VecDeque,
+        collections::{HashMap, VecDeque},
         sync::{Arc, Mutex},
     };
     use tokio::sync::mpsc::unbounded_channel;
 
     #[derive(Default)]
     struct MockSequencerClient {
-        responses: Mutex<VecDeque<Result<SequencerResponse, String>>>,
-        calls: Mutex<Vec<Url>>,
+        responses: Mutex<HashMap<String, VecDeque<Result<SequencerResponse, String>>>>,
+        calls: Mutex<Vec<String>>,
     }
 
     impl MockSequencerClient {
-        fn new(responses: Vec<Result<SequencerResponse, String>>) -> Self {
+        fn new(responses: Vec<(Url, Result<SequencerResponse, String>)>) -> Self {
+            let mut map: HashMap<String, VecDeque<Result<SequencerResponse, String>>> =
+                HashMap::new();
+            for (url, response) in responses {
+                map.entry(url.to_string())
+                    .or_insert_with(VecDeque::new)
+                    .push_back(response);
+            }
             Self {
-                responses: Mutex::new(VecDeque::from(responses)),
+                responses: Mutex::new(map),
                 calls: Mutex::new(Vec::new()),
             }
         }
 
-        fn calls(&self) -> Vec<Url> {
+        fn calls(&self) -> Vec<String> {
             self.calls.lock().unwrap().clone()
         }
     }
@@ -1279,12 +1291,13 @@ mod tests {
             url: &Url,
             _body: &serde_json::Value,
         ) -> Result<SequencerResponse, String> {
-            self.calls.lock().unwrap().push(url.clone());
-            self.responses
-                .lock()
-                .unwrap()
-                .pop_front()
-                .expect("mock client ran out of responses")
+            let key = url.to_string();
+            self.calls.lock().unwrap().push(key.clone());
+            let mut responses = self.responses.lock().unwrap();
+            responses
+                .get_mut(&key)
+                .and_then(|queue| queue.pop_front())
+                .unwrap_or_else(|| Err(format!("unexpected request to {key}")))
         }
     }
 
@@ -1294,11 +1307,17 @@ mod tests {
     #[tokio::test]
     async fn broadcast_json_hits_all_urls_and_reports_outcomes() {
         let client = MockSequencerClient::new(vec![
-            Ok(SequencerResponse {
-                status: StatusCode::OK,
-                body: "ok".into(),
-            }),
-            Err("network error".into()),
+            (
+                Url::parse("http://seq-one.local/post_reports_batch").unwrap(),
+                Ok(SequencerResponse {
+                    status: StatusCode::OK,
+                    body: "ok".into(),
+                }),
+            ),
+            (
+                Url::parse("http://seq-two.local/post_reports_batch").unwrap(),
+                Err("network error".into()),
+            ),
         ]);
         let client = Arc::new(client);
 
@@ -1310,20 +1329,41 @@ mod tests {
 
         let outcomes = OracleTrigger::broadcast_json(client.as_ref(), &urls, &payload).await;
 
-        assert_eq!(client.calls(), urls);
+        let mut recorded_calls = client.calls();
+        recorded_calls.sort();
+        let mut expected_calls: Vec<String> = urls.iter().map(|u| u.to_string()).collect();
+        expected_calls.sort();
+        assert_eq!(recorded_calls, expected_calls);
+
         assert_eq!(outcomes.len(), 2);
-        assert!(outcomes[0].1.is_ok());
-        assert!(outcomes[1].1.is_err());
+        let results: HashMap<_, _> = outcomes
+            .into_iter()
+            .map(|(url, result)| (url.to_string(), result.is_ok()))
+            .collect();
+        assert_eq!(
+            results.get("http://seq-one.local/post_reports_batch"),
+            Some(&true)
+        );
+        assert_eq!(
+            results.get("http://seq-two.local/post_reports_batch"),
+            Some(&false)
+        );
     }
 
     #[tokio::test]
     async fn process_payload_updates_votes_when_any_success() {
         let mock_client = Arc::new(MockSequencerClient::new(vec![
-            Ok(SequencerResponse {
-                status: StatusCode::OK,
-                body: "accepted".into(),
-            }),
-            Err("timeout".into()),
+            (
+                Url::parse("http://seq-one.local/post_reports_batch").unwrap(),
+                Ok(SequencerResponse {
+                    status: StatusCode::OK,
+                    body: "accepted".into(),
+                }),
+            ),
+            (
+                Url::parse("http://seq-two.local/post_reports_batch").unwrap(),
+                Err("timeout".into()),
+            ),
         ]));
         let client: Arc<dyn SequencerHttpClient> = mock_client.clone();
 
@@ -1359,16 +1399,24 @@ mod tests {
         assert!(votes.contains_key(&EncodedFeedId::new(42, 0)));
         drop(votes);
 
-        let calls = mock_client.calls();
-        assert_eq!(calls.len(), urls.len());
-        assert_eq!(calls, urls);
+        let mut calls = mock_client.calls();
+        calls.sort();
+        let mut expected_calls: Vec<String> = urls.iter().map(|u| u.to_string()).collect();
+        expected_calls.sort();
+        assert_eq!(calls, expected_calls);
     }
 
     #[tokio::test]
     async fn process_payload_skips_vote_update_when_all_fail() {
         let mock_client = Arc::new(MockSequencerClient::new(vec![
-            Err("fail-1".into()),
-            Err("fail-2".into()),
+            (
+                Url::parse("http://seq-one.local/post_reports_batch").unwrap(),
+                Err("fail-1".into()),
+            ),
+            (
+                Url::parse("http://seq-two.local/post_reports_batch").unwrap(),
+                Err("fail-2".into()),
+            ),
         ]));
         let client: Arc<dyn SequencerHttpClient> = mock_client.clone();
 
@@ -1404,8 +1452,10 @@ mod tests {
         assert!(votes.is_empty());
         drop(votes);
 
-        let calls = mock_client.calls();
-        assert_eq!(calls.len(), urls.len());
-        assert_eq!(calls, urls);
+        let mut calls = mock_client.calls();
+        calls.sort();
+        let mut expected_calls: Vec<String> = urls.iter().map(|u| u.to_string()).collect();
+        expected_calls.sort();
+        assert_eq!(calls, expected_calls);
     }
 }
