@@ -87,6 +87,9 @@ pub struct ReporterInfo {
     /// Sequencer URL
     #[serde(default)]
     pub sequencer: String,
+    /// Sequencer URLs (multiple)
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub sequencers: Vec<String>,
     /// Metrics URL
     #[serde(default)]
     pub metrics_url: String,
