@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { assert, describe, expect, it } from 'vitest';
 
 import { filterAsync, loopWhile, withTimeout } from './async';
 
@@ -39,7 +39,7 @@ describe('async', () => {
       const startTime = Date.now();
       await loopWhile(cond, f, 100);
       const endTime = Date.now();
-      expect(endTime - startTime).toBeGreaterThanOrEqual(300);
+      assert.closeTo(endTime - startTime, 300, 5);
     });
 
     it('throws an error if maxAttempts is reached', async () => {
