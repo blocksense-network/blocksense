@@ -58,6 +58,7 @@ export const deployedTestnets = [
   'rise-testnet',
   'rootstock-testnet',
   'scroll-sepolia',
+  'sei-testnet',
   'shape-sepolia',
   'somnia-testnet',
   'soneium-minato',
