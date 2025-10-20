@@ -119,6 +119,7 @@ const networks = [
   'rootstock-testnet',
   'scroll-mainnet',
   'scroll-sepolia',
+  'sei-testnet',
   'shape-sepolia',
   'somnia-mainnet',
   'somnia-testnet',
@@ -162,10 +163,10 @@ const chainIds = [
   59141, 4202, 994873017, 2030232745, 169, 3441006, 5000, 5003, 698, 6342, 1740,
   59902, 31611, 143, 10143, 2818, 2810, 72080, 8801, 5851, 5611, 10, 11155420,
   7849306, 688688, 9745, 9746, 98866, 98867, 137, 80002, 1101, 2442, 695569,
-  11155931, 57000, 200018, 31, 534352, 534351, 11011, 5031, 50312, 1868, 1946,
-  16, 146, 57054, 14601, 1660990954, 763375, 98985, 5330, 53302, 1924, 239,
-  2391, 2390, 167000, 167009, 5678, 841, 842, 41, 130, 1301, 4801, 1417429182,
-  33101, 324, 300,
+  11155931, 57000, 200018, 31, 534352, 534351, 1328, 11011, 5031, 50312, 1868,
+  1946, 16, 146, 57054, 14601, 1660990954, 763375, 98985, 5330, 53302, 1924,
+  239, 2391, 2390, 167000, 167009, 5678, 841, 842, 41, 130, 1301, 4801,
+  1417429182, 33101, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks).annotations({
@@ -244,6 +245,7 @@ export enum Currency {
   POL = 'POL',
   ROME = 'ROME',
   S = 'S',
+  SEI = 'SEI',
   STT = 'STT',
   sMETIS = 'sMETIS',
   TAC = 'TAC',
@@ -1631,6 +1633,18 @@ export const networkMetadata = {
       },
     ],
     currency: Currency.ETH,
+  },
+  'sei-testnet': {
+    chainId: 1328,
+    isTestnet: true,
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://testnet.seiscan.io',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=1328',
+      },
+    ],
+    currency: Currency.SEI,
   },
   'shape-sepolia': {
     chainId: 11011,
