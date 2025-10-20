@@ -14,6 +14,16 @@ with lib;
       description = "The url of the sequencer.";
     };
 
+    sequencer-urls = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = "Optional list of sequencer URLs to broadcast payloads to.";
+      example = [
+        "http://sequencer-1.blocksense.local:8877"
+        "http://sequencer-2.blocksense.local:8877"
+      ];
+    };
+
     registry-url = mkOption {
       type = types.str;
       default = "http://127.0.0.1:${toString cfg.sequencer.ports.admin}";

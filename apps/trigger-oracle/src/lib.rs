@@ -107,7 +107,7 @@ pub struct CliArgs {
 // The trigger structure with all values processed and ready
 pub struct OracleTrigger {
     engine: TriggerAppEngine<Self>,
-    sequencer: String,
+    sequencers: Vec<String>,
     metrics_url: Option<String>,
     kafka_endpoint: Option<String>,
     secret_key: String,
@@ -128,6 +128,8 @@ struct TriggerMetadataParent {
 struct TriggerMetadata {
     interval_time_in_seconds: Option<u64>,
     sequencer: Option<String>,
+    #[serde(default)]
+    sequencers: Option<Vec<String>>,
     metrics_url: Option<String>,
     kafka_endpoint: Option<String>,
     secret_key: Option<String>,
@@ -223,7 +225,17 @@ impl TriggerExecutor for OracleTrigger {
         let interval_time_in_seconds = metadata
             .interval_time_in_seconds
             .expect("Report time interval not provided");
-        let sequencer = metadata.sequencer.expect("Sequencer URL is not provided");
+
+        let mut sequencers = metadata.sequencers.unwrap_or_default();
+        if sequencers.is_empty() {
+            if let Some(single) = metadata.sequencer {
+                sequencers.push(single);
+            }
+        }
+        if sequencers.is_empty() {
+            panic!("Sequencer URL is not provided");
+        }
+
         let metrics_url = metadata.metrics_url;
         let secret_key = metadata.secret_key.expect("Secret key is not provided");
 
@@ -269,7 +281,7 @@ impl TriggerExecutor for OracleTrigger {
 
         Ok(Self {
             engine,
-            sequencer,
+            sequencers,
             metrics_url,
             kafka_endpoint,
             secret_key,
@@ -307,7 +319,7 @@ impl TriggerExecutor for OracleTrigger {
             })
             .expect("ctrl-c watcher failed to start");
 
-        tracing::info!("Sequencer URL provided: {}", &self.sequencer);
+        tracing::info!("Sequencer URLs provided: {:?}", &self.sequencers);
         let (data_feed_sender, data_feed_receiver) = unbounded_channel();
         let data_feed_results: DataFeedResults = Arc::new(RwLock::new(HashMap::new()));
         let mut feeds_config: HashMap<EncodedFeedId, FeedStrideAndDecimals> = HashMap::new();
@@ -349,8 +361,16 @@ impl TriggerExecutor for OracleTrigger {
             Self::start_orchestrators(components, data_feed_senders, self.metrics_url);
         loops.append(&mut orchestrators);
 
-        let url = Url::parse(&self.sequencer.clone())?;
-        let sequencer_aggregated_consensus_url = url.join("/post_aggregated_consensus_vote")?;
+        let sequencer_base_urls = self
+            .sequencers
+            .iter()
+            .map(|base| Url::parse(base))
+            .collect::<Result<Vec<_>, _>>()?;
+
+        let sequencer_aggregated_consensus_urls = sequencer_base_urls
+            .iter()
+            .map(|url| url.join("/post_aggregated_consensus_vote"))
+            .collect::<Result<Vec<_>, _>>()?;
 
         if let Some(endpoint) = self.kafka_endpoint {
             let (aggregated_consensus_sender, aggregated_consensus_receiver) = unbounded_channel();
@@ -365,18 +385,21 @@ impl TriggerExecutor for OracleTrigger {
                 aggregated_consensus_receiver,
                 feeds_config,
                 data_feed_results.clone(),
-                sequencer_aggregated_consensus_url,
+                sequencer_aggregated_consensus_urls.clone(),
                 self.second_consensus_secret_key,
                 self.reporter_id,
             )));
         }
 
         tracing::trace!("Starting sender to sequencer");
-        let sequencer_post_batch_url = url.join("/post_reports_batch")?;
+        let sequencer_post_batch_urls = sequencer_base_urls
+            .iter()
+            .map(|url| url.join("/post_reports_batch"))
+            .collect::<Result<Vec<_>, _>>()?;
         let manager = Self::start_manager(
             data_feed_receiver,
             data_feed_results,
-            &sequencer_post_batch_url,
+            sequencer_post_batch_urls,
             &self.secret_key,
             self.reporter_id,
         );
@@ -734,14 +757,14 @@ impl OracleTrigger {
     fn start_manager(
         payload_rx: UnboundedReceiver<(String, Payload)>,
         latest_votes: DataFeedResults,
-        sequencer_post_batch_url: &Url,
+        sequencer_post_batch_urls: Vec<Url>,
         secret_key: &str,
         reporter_id: u64,
     ) -> JoinHandle<TerminationReason> {
         let process_payload_future = Self::process_payload(
             payload_rx,
             latest_votes.clone(),
-            sequencer_post_batch_url.to_owned(),
+            sequencer_post_batch_urls,
             secret_key.to_owned(),
             reporter_id,
         );
@@ -752,7 +775,7 @@ impl OracleTrigger {
     async fn process_payload(
         mut rx: UnboundedReceiver<(String, Payload)>,
         latest_votes: DataFeedResults,
-        sequencer_url: Url,
+        sequencer_urls: Vec<Url>,
         secret_key: String,
         reporter_id: u64,
     ) -> TerminationReason {
@@ -795,35 +818,47 @@ impl OracleTrigger {
             //TODO(adikov): Potential better implementation would be to send results to the
             //sequencer every few seconds in which we can gather batches of data feed payloads.
 
-            tracing::trace!(
-                "Sending to url - {}; {} batches",
-                sequencer_url.clone(),
-                batch_payload.len()
-            );
             let client = reqwest::Client::new();
-            match client
-                .post(sequencer_url.clone())
-                .json(&batch_payload)
-                .send()
-                .await
-            {
-                Ok(res) => {
-                    let status = res.status();
-                    let contents = res.text().await.unwrap();
-                    tracing::trace!("Sequencer responded with status={status} and text={contents}",);
+            let mut any_success = false;
+            for sequencer_url in &sequencer_urls {
+                tracing::trace!(
+                    "Sending to url - {}; {} batches",
+                    sequencer_url,
+                    batch_payload.len()
+                );
+                match client
+                    .post(sequencer_url.clone())
+                    .json(&batch_payload)
+                    .send()
+                    .await
+                {
+                    Ok(res) => {
+                        let status = res.status();
+                        let contents = res.text().await.unwrap_or_default();
+                        tracing::trace!(
+                            "Sequencer {} responded with status={status} and text={contents}",
+                            sequencer_url
+                        );
+                        any_success = true;
+                    }
+                    Err(e) => {
+                        //TODO(adikov): Add code from the error - e.status()
+                        REPORTER_FAILED_SEQ_REQUESTS
+                            .with_label_values(&["404"])
+                            .inc();
 
-                    let mut latest_votes = latest_votes.write().await;
-                    update_latest_votes(&mut latest_votes, batch_payload);
-                }
-                Err(e) => {
-                    //TODO(adikov): Add code from the error - e.status()
-                    REPORTER_FAILED_SEQ_REQUESTS
-                        .with_label_values(&["404"])
-                        .inc();
+                        tracing::error!(
+                            "Sequencer request to {} failed with error: {e}",
+                            sequencer_url
+                        );
+                    }
+                };
+            }
 
-                    tracing::error!("Sequencer failed to respond with; err={e}");
-                }
-            };
+            if any_success {
+                let mut latest_votes = latest_votes.write().await;
+                update_latest_votes(&mut latest_votes, batch_payload);
+            }
             tracing::trace!("Sender to sequencer waiting for new payload...");
         }
 
@@ -836,7 +871,7 @@ impl OracleTrigger {
         mut ss_rx: UnboundedReceiver<ConsensusSecondRoundBatch>,
         feeds_config: HashMap<EncodedFeedId, FeedStrideAndDecimals>,
         latest_votes: DataFeedResults,
-        sequencer: Url,
+        sequencer_urls: Vec<Url>,
         second_consensus_secret_key: String,
         reporter_id: u64,
     ) -> TerminationReason {
@@ -892,23 +927,28 @@ impl OracleTrigger {
                 signature,
             };
 
-            tracing::trace!("Sending to url - {}; {:?} hash", sequencer.clone(), &report);
-
             let client = reqwest::Client::new();
-            match client.post(sequencer.clone()).json(&report).send().await {
-                Ok(res) => {
-                    let contents = res.text().await.unwrap();
-                    tracing::trace!("Sequencer responded with: {}", &contents);
-                }
-                Err(e) => {
-                    //TODO(adikov): Add code from the error - e.status()
-                    REPORTER_FAILED_SEQ_REQUESTS
-                        .with_label_values(&["404"])
-                        .inc();
+            for sequencer in &sequencer_urls {
+                tracing::trace!("Sending to url - {}; {:?} hash", sequencer, &report);
+                match client.post(sequencer.clone()).json(&report).send().await {
+                    Ok(res) => {
+                        let contents = res.text().await.unwrap_or_default();
+                        tracing::trace!("Sequencer {} responded with: {}", sequencer, contents);
+                    }
+                    Err(e) => {
+                        //TODO(adikov): Add code from the error - e.status()
+                        REPORTER_FAILED_SEQ_REQUESTS
+                            .with_label_values(&["404"])
+                            .inc();
 
-                    tracing::error!("Sequencer failed to respond with: {}", &e);
-                }
-            };
+                        tracing::error!(
+                            "Sequencer request to {} failed with error: {}",
+                            sequencer,
+                            e
+                        );
+                    }
+                };
+            }
         }
         TerminationReason::SequencerExitRequested
     }

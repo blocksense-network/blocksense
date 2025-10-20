@@ -59,32 +59,60 @@ pub enum ComponentSource {
 // TODO(adikov): Try using the Spin config toml from the spin repository.
 impl From<BlocksenseConfig> for AppManifest {
     fn from(config: BlocksenseConfig) -> Self {
+        let BlocksenseConfig {
+            reporter_info,
+            oracles: oracle_scripts,
+            capabilities: registry_capabilities,
+            data_feeds,
+        } = config;
+
         let mut components: Map<String, Component> = Map::<String, Component>::new();
         let mut trigger_global_configs = Map::new();
         let mut table = toml::Table::new();
         table.insert(
             "interval_time_in_seconds".to_string(),
-            toml::Value::Integer(config.reporter_info.interval_time_in_seconds as i64),
+            toml::Value::Integer(reporter_info.interval_time_in_seconds as i64),
         );
         table.insert(
             "reporter_id".to_string(),
-            toml::Value::Integer(config.reporter_info.reporter_id as i64),
+            toml::Value::Integer(reporter_info.reporter_id as i64),
         );
-        table.insert(
-            "sequencer".to_string(),
-            toml::Value::String(config.reporter_info.sequencer),
-        );
+
+        let mut sequencer_urls = reporter_info.sequencers.clone();
+        if sequencer_urls.is_empty() && !reporter_info.sequencer.is_empty() {
+            sequencer_urls.push(reporter_info.sequencer.clone());
+        }
+        if !sequencer_urls.is_empty() {
+            table.insert(
+                "sequencers".to_string(),
+                toml::Value::Array(
+                    sequencer_urls
+                        .iter()
+                        .cloned()
+                        .map(toml::Value::String)
+                        .collect(),
+                ),
+            );
+        }
+        if !reporter_info.sequencer.is_empty() {
+            table.insert(
+                "sequencer".to_string(),
+                toml::Value::String(reporter_info.sequencer.clone()),
+            );
+        } else if let Some(first) = sequencer_urls.first() {
+            table.insert("sequencer".to_string(), toml::Value::String(first.clone()));
+        }
 
         table.insert(
             "metrics_url".to_string(),
-            toml::Value::String(config.reporter_info.metrics_url),
+            toml::Value::String(reporter_info.metrics_url.clone()),
         );
 
-        if let Some(kafka_endpoint) = config.reporter_info.kafka_endpoint {
+        if let Some(kafka_endpoint) = reporter_info.kafka_endpoint.clone() {
             table.insert("kafka_endpoint".into(), toml::Value::String(kafka_endpoint));
         }
 
-        if let Some(second_consensus_secret_key) = config.reporter_info.second_consensus_secret_key
+        if let Some(second_consensus_secret_key) = reporter_info.second_consensus_secret_key.clone()
         {
             table.insert(
                 "second_consensus_secret_key".into(),
@@ -94,15 +122,15 @@ impl From<BlocksenseConfig> for AppManifest {
 
         table.insert(
             "secret_key".to_string(),
-            toml::Value::String(config.reporter_info.secret_key),
+            toml::Value::String(reporter_info.secret_key.clone()),
         );
         trigger_global_configs.insert("settings".to_string(), table);
 
-        let mut oracles: Vec<Trigger> = vec![];
-        for oracle in config.oracles.iter() {
+        let mut trigger_entries: Vec<Trigger> = vec![];
+        for oracle in &oracle_scripts {
             let mut table = toml::Table::new();
             let mut feeds: Vec<toml::Value> = vec![];
-            for data_feed in config.data_feeds.iter() {
+            for data_feed in data_feeds.iter() {
                 if data_feed.oracle_id != oracle.id {
                     continue;
                 }
@@ -130,8 +158,8 @@ impl From<BlocksenseConfig> for AppManifest {
             }
             table.insert("data_feeds".to_string(), toml::Value::Array(feeds));
 
-            let mut capabilities: Vec<toml::Value> = vec![];
-            for capability in config.capabilities.iter() {
+            let mut capability_entries: Vec<toml::Value> = vec![];
+            for capability in registry_capabilities.iter() {
                 if !oracle.capabilities.contains(&capability.id) {
                     continue;
                 }
@@ -145,15 +173,18 @@ impl From<BlocksenseConfig> for AppManifest {
                     "data".to_string(),
                     toml::Value::String(capability.data.to_string()),
                 );
-                capabilities.push(toml::Value::Table(table));
+                capability_entries.push(toml::Value::Table(table));
             }
-            table.insert("capabilities".to_string(), toml::Value::Array(capabilities));
+            table.insert(
+                "capabilities".to_string(),
+                toml::Value::Array(capability_entries),
+            );
 
-            oracles.push(Trigger {
+            trigger_entries.push(Trigger {
                 component: oracle.id.clone(),
                 interval_time_in_seconds: oracle
                     .interval_time_in_seconds
-                    .unwrap_or(config.reporter_info.interval_time_in_seconds),
+                    .unwrap_or(reporter_info.interval_time_in_seconds),
                 config: table,
             });
 
@@ -168,7 +199,7 @@ impl From<BlocksenseConfig> for AppManifest {
         }
 
         let mut triggers = Map::new();
-        triggers.insert("oracle".to_string(), oracles);
+        triggers.insert("oracle".to_string(), trigger_entries);
 
         AppManifest {
             spin_manifest_version: SPIN_MANIFEST_VERSION,
