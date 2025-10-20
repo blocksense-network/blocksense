@@ -14,20 +14,18 @@ export const watcher = Command.make(
   'watcher',
   {
     network: Options.choice('network', await listEvmNetworks()),
-    hasBlockNumber: Options.boolean('has-block-number').pipe(
-      Options.withDefault(true),
-    ),
+    hasStateAccumulator: Options.boolean('has-state-accumulator'),
   },
-  ({ hasBlockNumber, network }) =>
+  ({ hasStateAccumulator, network }) =>
     Effect.gen(function* () {
       console.log(`Starting ADFS watcher for network: ${network}`);
-      yield* Effect.promise(() => watchNetwork(network, hasBlockNumber));
+      yield* Effect.promise(() => watchNetwork(network, hasStateAccumulator));
     }),
 );
 
 export const watchNetwork = async (
   network: NetworkName,
-  hasBlockNumber: boolean,
+  hasStateAccumulator: boolean,
 ) => {
   const rpcUrl = getRpcUrl(network);
   const provider = new ethers.JsonRpcProvider(rpcUrl, undefined, {
@@ -51,7 +49,7 @@ export const watchNetwork = async (
 
     const { errors } = decodeADFSCalldata({
       calldata: tx!.data,
-      hasBlockNumber,
+      hasBlockNumber: !hasStateAccumulator,
     });
 
     if (errors.length) {
