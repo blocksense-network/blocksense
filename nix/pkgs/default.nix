@@ -50,6 +50,12 @@
 
       # Blama
       blama = pkgs.callPackage ./blama { blama-src = inputs.blama.outPath; };
+
+      # WIT converter
+      wit-converter = pkgs.callPackage ./wit-converter {
+        inherit craneLib version;
+        inherit (self.lib) filesets;
+      };
     in
     {
       apps = {
@@ -63,6 +69,7 @@
       packages = {
         inherit blocksense-rs;
         inherit blama;
+        inherit wit-converter;
       };
       legacyPackages = {
         oracle-scripts = {
