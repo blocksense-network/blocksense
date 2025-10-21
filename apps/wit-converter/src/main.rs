@@ -1,7 +1,8 @@
 use anyhow::{bail, Context, Result};
 use clap::Parser;
 use std::fs;
-use std::path::PathBuf;
+use std::collections::{HashMap, VecDeque};
+use std::path::{Path, PathBuf};
 use wit_parser::{FunctionKind, Resolve, Type, TypeDefKind, WorldItem};
 
 use wit_converter::converter::Converter;
@@ -25,12 +26,101 @@ struct Args {
     /// Function name to extract the payload type from
     #[arg(short, long, default_value = "handle-oracle-request")]
     function: String,
+
+    /// Load only the dependencies (the sibling `deps/` tree) of the given
+    /// WIT package, without loading that package itself. Useful to reuse
+    /// vendored deps like `libs/sdk/wit/blocksense-oracle.wit` while keeping
+    /// your own input as the main package.
+    #[arg(long, value_name = "PATH")]
+    deps_of: Option<PathBuf>,
 }
 
 fn main() -> Result<()> {
     let args = Args::parse();
     // Parse the WIT file
     let mut resolve = Resolve::default();
+
+    // Optionally include deps from an anchor package's `deps/` dir (but not the anchor itself).
+    if let Some(anchor) = args.deps_of.as_deref() {
+        // Resolve the deps/ directory from a file or directory anchor.
+        let deps_dir = if anchor.is_file() {
+            anchor.parent().unwrap_or(Path::new("."))
+        } else {
+            anchor
+        }
+        .join("deps");
+        if deps_dir.is_dir() {
+            // Parse all dependency packages as groups so we can topo-sort them
+            // like Resolve::push_dir would, without adding the anchor package.
+            let mut groups = Vec::new();
+            for entry in fs::read_dir(&deps_dir)
+                .with_context(|| format!("Failed to read deps dir: {}", deps_dir.display()))?
+            {
+                let dep = entry?;
+                let path = dep.path();
+                if dep.file_type()?.is_dir() {
+                    let group = wit_parser::UnresolvedPackageGroup::parse_dir(&path)
+                        .with_context(|| format!("Failed to parse WIT package: {}", path.display()))?;
+                    groups.push(group);
+                } else if path.extension().and_then(|s| s.to_str()) == Some("wit") {
+                    let contents = fs::read_to_string(&path)
+                        .with_context(|| format!("Failed to read WIT file {}", path.display()))?;
+                    let group = wit_parser::UnresolvedPackageGroup::parse(&path, &contents)
+                        .with_context(|| format!("Failed to parse WIT file {}", path.display()))?;
+                    groups.push(group);
+                }
+            }
+
+            // Build name->index map for topo sort
+            let mut name_to_idx: HashMap<wit_parser::PackageName, usize> = HashMap::new();
+            for (i, g) in groups.iter().enumerate() {
+                name_to_idx.insert(g.main.name.clone(), i);
+            }
+
+            // Kahn's topo order on groups by foreign_deps
+            let mut edges: Vec<Vec<usize>> = vec![Vec::new(); groups.len()];
+            let mut indeg: Vec<usize> = vec![0; groups.len()];
+            for (i, g) in groups.iter().enumerate() {
+                for dep_name in g.main.foreign_deps.keys() {
+                    if let Some(&j) = name_to_idx.get(dep_name) {
+                        edges[j].push(i);
+                        indeg[i] += 1;
+                    }
+                }
+            }
+            let mut q = VecDeque::new();
+            for i in 0..groups.len() {
+                if indeg[i] == 0 {
+                    q.push_back(i);
+                }
+            }
+            let mut order = Vec::with_capacity(groups.len());
+            while let Some(i) = q.pop_front() {
+                order.push(i);
+                for &n in &edges[i] {
+                    indeg[n] -= 1;
+                    if indeg[n] == 0 {
+                        q.push_back(n);
+                    }
+                }
+            }
+            if order.len() != groups.len() {
+                // Fallback to insertion order if a cycle is detected.
+                order = (0..groups.len()).collect();
+            }
+
+            for i in order {
+                let g = groups[i].clone();
+                if resolve.package_names.contains_key(&g.main.name) {
+                    continue;
+                }
+                resolve
+                    .push_group(g)
+                    .with_context(|| "Failed to insert dependency package")?;
+            }
+        }
+    }
+
     let pkg = resolve.push_file(&args.input)?;
 
     let world_id = resolve.select_world(&[pkg], Some(&args.world))?;
