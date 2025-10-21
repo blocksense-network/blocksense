@@ -17,4 +17,4 @@ regex = "1.11"
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-wit-parser = "0.238"
+wit-parser = "0.240"
