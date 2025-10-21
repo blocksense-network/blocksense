@@ -79,14 +79,30 @@ describe('Template Multi Decoder', () => {
   async function testDecoder(
     fields: TupleField,
     values: any[],
-    witOptions?: { witFile: string; jsonFile: string },
+    witOptions?: {
+      witFile: string;
+      jsonFile: string;
+      world?: string;
+      function?: string;
+    },
   ) {
     if (witOptions) {
+      const args = [
+        '--input',
+        path.join(__dirname, witOptions.witFile),
+        '--output',
+        path.join(__dirname, witOptions.jsonFile),
+      ];
+      if (witOptions.world) {
+        args.push('--world', witOptions.world);
+      }
+      if (witOptions.function) {
+        args.push('--function', witOptions.function);
+      }
       // WIT to JSON conversion
-      await execPromise(
-        `cargo run --bin wit-converter -- -i ${__dirname}/${witOptions.witFile} -o ${__dirname}/${witOptions.jsonFile}`,
-        { cwd: path.join(__dirname, '../../../../apps/wit-converter') },
-      );
+      await execPromise(`cargo run --bin wit-converter -- ${args.join(' ')}`, {
+        cwd: path.join(__dirname, '../../../../apps/wit-converter'),
+      });
 
       const data = await fs.readFile(
         path.join(__dirname, witOptions.jsonFile),
@@ -94,10 +110,12 @@ describe('Template Multi Decoder', () => {
       );
 
       const jsonData = JSON.parse(data);
-      const witToJsonData = expandJsonFields(fields.name, jsonData)[
-        fields.name
-      ];
+      const witToJsonData = expandJsonFields(
+        jsonData.payloadTypeName,
+        jsonData.types,
+      )[fields.name];
 
+      expect(jsonData.payloadTypeName).to.be.equal(fields.name);
       expect(witToJsonData).to.deep.equal(fields);
     }
 
@@ -165,18 +183,18 @@ describe('Template Multi Decoder', () => {
     for (const contractPath of contractPaths) {
       // Clean up generated contract files
       await fs.rm(contractPath, { force: true });
-
-      // Clean up WIT JSON files if they were created
-      const jsonFiles = await fs.readdir(path.join(__dirname, 'wit'));
-      await Promise.all(
-        jsonFiles
-          .filter(file => file.endsWith('.json'))
-          .map(
-            async file =>
-              await fs.rm(path.join(__dirname, 'wit', file), { force: true }),
-          ),
-      );
     }
+
+    // Clean up WIT JSON files if they were created
+    const jsonFiles = await fs.readdir(path.join(__dirname, 'wit'));
+    await Promise.all(
+      jsonFiles
+        .filter(file => file.endsWith('.json'))
+        .map(
+          async file =>
+            await fs.rm(path.join(__dirname, 'wit', file), { force: true }),
+        ),
+    );
   });
 
   it('[WIT] should test union null value', async () => {
@@ -584,6 +602,81 @@ describe('Template Multi Decoder', () => {
     await testDecoder(fields, values, {
       witFile: 'wit/dynamic-union.wit',
       jsonFile: 'wit/dynamic-union.json',
+    });
+  });
+
+  it('[WIT] should ignore error tuple in WIT world', async () => {
+    const fields: TupleField = {
+      name: 'Test',
+      type: 'tuple',
+      components: [
+        {
+          name: 'union1',
+          type: 'union[]',
+          components: [
+            {
+              name: 'none',
+              type: 'none',
+              size: 0,
+            },
+            {
+              name: 'struct2',
+              type: 'tuple[]',
+              components: [{ name: 'str2', type: 'string[]' }],
+            },
+            {
+              name: 'uint8Var',
+              type: 'uint8',
+              size: 8,
+            },
+          ],
+        },
+      ],
+    };
+
+    const values = [
+      [
+        { selector: 0, value: null },
+        {
+          selector: 1,
+          value: [[['a', 'b', 'c']], [['abc', 'def']]],
+        },
+        {
+          selector: 2,
+          value: 5,
+        },
+      ],
+    ];
+
+    await testDecoder(fields, values, {
+      witFile: 'wit/ignore-error-tuple.wit',
+      jsonFile: 'wit/ignore-error-tuple.json',
+    });
+  });
+
+  it('[WIT] should test with different WIT world and function names', async () => {
+    const fields: TupleField = {
+      name: 'Input',
+      type: 'tuple',
+      components: [
+        {
+          name: 'union',
+          type: 'union',
+          components: [
+            { name: 'none', type: 'none', size: 0 },
+            { name: 'uint8Var', type: 'uint8', size: 8 },
+          ],
+        },
+      ],
+    };
+
+    const values = [{ selector: 0, value: null }];
+
+    await testDecoder(fields, values, {
+      witFile: 'wit/different-names.wit',
+      jsonFile: 'wit/different-names.json',
+      world: 'gaia',
+      function: 'calculate',
     });
   });
 });
