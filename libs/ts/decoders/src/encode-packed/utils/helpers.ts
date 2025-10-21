@@ -6,22 +6,19 @@ import { generateDecoderStringBytes as generateDecoderStringBytesCancun } from '
 
 import type { DecoderImplementations } from './types';
 
-export const checkForDynamicData = (fields: ExpandedFieldOrArray[]) => {
-  let containsDynamicData = false;
-
-  fields.forEach(field => {
+export const checkForDynamicData = (
+  fields: ExpandedFieldOrArray[],
+): boolean => {
+  return fields.some((field: ExpandedFieldOrArray) => {
     if (Array.isArray(field)) {
-      containsDynamicData = containsDynamicData || checkForDynamicData(field);
+      return checkForDynamicData(field);
     } else if (field.isDynamic) {
-      containsDynamicData = true;
-      return;
+      return true;
     } else if ('components' in field) {
-      containsDynamicData =
-        containsDynamicData || checkForDynamicData(field.components!);
+      return checkForDynamicData(field.components!);
     }
+    return false;
   });
-
-  return containsDynamicData;
 };
 
 export const decoderImplementationsMap: Record<
