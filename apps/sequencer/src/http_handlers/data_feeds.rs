@@ -123,12 +123,18 @@ async fn process_report(
 
     // check if the time stamp in the msg is <= current_time_as_ms
     // and check if it is inside the current active slot frame.
-    let (report_relevance, always_publish_heartbeat_ms, feed_name) = {
+    let (report_relevance, always_publish_heartbeat_ms, feed_name, feed_oracle_id) = {
         let feed = feed.read().await;
         let report_relevance = feed.check_report_relevance(current_time_as_ms, msg_timestamp);
         let always_publish_heartbeat_ms = feed.always_publish_heartbeat_ms.unwrap_or(0);
         let feed_name = feed.get_name().clone();
-        (report_relevance, always_publish_heartbeat_ms, feed_name)
+        let feed_oracle_id = feed.get_oracle_id().clone();
+        (
+            report_relevance,
+            always_publish_heartbeat_ms,
+            feed_name,
+            feed_oracle_id,
+        )
     };
 
     match report_relevance {
@@ -146,7 +152,8 @@ async fn process_report(
                         reporter_id,
                         feed_id,
                         feed_name,
-                        always_publish_heartbeat_ms
+                        always_publish_heartbeat_ms,
+                        feed_oracle_id
                     );
                 }
                 VoteStatus::RevoteForSlot(prev_vote) => {
@@ -160,7 +167,8 @@ async fn process_report(
                         reporter_id,
                         feed_id,
                         feed_name,
-                        always_publish_heartbeat_ms
+                        always_publish_heartbeat_ms,
+                        feed_oracle_id
                     );
                 }
             }
@@ -177,7 +185,8 @@ async fn process_report(
                 reporter_id,
                 feed_id,
                 feed_name,
-                always_publish_heartbeat_ms
+                always_publish_heartbeat_ms,
+                feed_oracle_id
             );
         }
         ReportRelevance::NonRelevantInFuture => {
@@ -191,7 +200,8 @@ async fn process_report(
                 reporter_id,
                 feed_id,
                 feed_name,
-                always_publish_heartbeat_ms
+                always_publish_heartbeat_ms,
+                feed_oracle_id
             );
         }
     }
