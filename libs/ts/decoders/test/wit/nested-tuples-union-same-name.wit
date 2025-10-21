@@ -1,6 +1,6 @@
 package blocksense:oracle@2.0.0;
 
-world blocksense-oracle {
+interface oracle-types {
   record test {
     t1: t1,
     t2: t2,
@@ -33,4 +33,9 @@ world blocksense-oracle {
   record tuple2 {
     b: u32,
   }
+}
+
+world blocksense-oracle {
+  use oracle-types.{test};
+  export handle-oracle-request: func() -> result<test>;
 }
