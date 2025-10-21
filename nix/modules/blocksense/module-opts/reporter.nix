@@ -1,4 +1,8 @@
-{ lib, cfg, ... }:
+{
+  lib,
+  cfg,
+  ...
+}:
 with lib;
 {
   options = {
@@ -8,20 +12,15 @@ with lib;
       example = 1;
     };
 
-    sequencer-url = mkOption {
-      type = types.str;
-      default = "http://127.0.0.1:${toString cfg.sequencer.ports.main}";
-      description = "The url of the sequencer.";
-    };
-
     sequencer-urls = mkOption {
-      type = types.listOf types.str;
-      default = [ ];
-      description = "Optional list of sequencer URLs to broadcast payloads to.";
+      type = types.either types.str (types.listOf types.str);
+      default = "http://127.0.0.1:${toString cfg.sequencer.ports.main}";
+      description = "Optional list of sequencer URLs to broadcast payloads to (one or many).";
       example = [
         "http://sequencer-1.blocksense.local:8877"
         "http://sequencer-2.blocksense.local:8877"
       ];
+      apply = toList;
     };
 
     registry-url = mkOption {
