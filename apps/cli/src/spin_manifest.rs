@@ -78,10 +78,7 @@ impl From<BlocksenseConfig> for AppManifest {
             toml::Value::Integer(reporter_info.reporter_id as i64),
         );
 
-        let mut sequencer_urls = reporter_info.sequencers.clone();
-        if sequencer_urls.is_empty() && !reporter_info.sequencer.is_empty() {
-            sequencer_urls.push(reporter_info.sequencer.clone());
-        }
+        let sequencer_urls = reporter_info.sequencers.clone();
         if !sequencer_urls.is_empty() {
             table.insert(
                 "sequencers".to_string(),
@@ -93,14 +90,6 @@ impl From<BlocksenseConfig> for AppManifest {
                         .collect(),
                 ),
             );
-        }
-        if !reporter_info.sequencer.is_empty() {
-            table.insert(
-                "sequencer".to_string(),
-                toml::Value::String(reporter_info.sequencer.clone()),
-            );
-        } else if let Some(first) = sequencer_urls.first() {
-            table.insert("sequencer".to_string(), toml::Value::String(first.clone()));
         }
 
         table.insert(
@@ -228,7 +217,7 @@ mod test {
 {
   "reporter_info": {
     "interval_time_in_seconds": 10,
-    "sequencer": "http://127.0.0.1:8546",
+    "sequencers": ["http://127.0.0.1:8546"],
     "secret_key": "536d1f9d97166eba5ff0efb8cc8dbeb856fb13d2d126ed1efc761e9955014003",
     "reporter_id": 1
   },

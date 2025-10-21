@@ -84,9 +84,6 @@ impl FeedConfig {
 pub struct ReporterInfo {
     /// Time interval in seconds of executing all oracles
     pub interval_time_in_seconds: u64,
-    /// Sequencer URL
-    #[serde(default)]
-    pub sequencer: String,
     /// Sequencer URLs (multiple)
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub sequencers: Vec<String>,
