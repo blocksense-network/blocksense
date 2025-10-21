@@ -21,7 +21,6 @@ let
       interval-time-in-seconds = script-opts.exec-interval;
       capabilities = script-opts.api-keys;
     };
-
 in
 {
   mkReporterConfig =
@@ -31,12 +30,7 @@ in
         inherit (reporter-opts) kafka-endpoint metrics-url;
 
         reporter-id = reporter-opts.id;
-        sequencer = reporter-opts.sequencer-url;
-        sequencers =
-          if reporter-opts.sequencer-urls == [ ] then
-            [ reporter-opts.sequencer-url ]
-          else
-            reporter-opts.sequencer-urls;
+        sequencers = reporter-opts.sequencer-urls;
         registry = reporter-opts.registry-url;
         interval-time-in-seconds = reporter-opts.default-exec-interval;
         secret-key = reporter-opts.secret-key-path;
