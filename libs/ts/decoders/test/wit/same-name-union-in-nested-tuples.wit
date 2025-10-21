@@ -1,6 +1,6 @@
 package blocksense:oracle@2.0.0;
 
-world blocksense-oracle {
+interface oracle-types {
   record main-tuple {
     union1-value: union,
     tuple-value: tuple1,
@@ -14,4 +14,9 @@ world blocksense-oracle {
     none,
     integer(u32),
   }
+}
+
+world blocksense-oracle {
+  use oracle-types.{main-tuple};
+  export handle-oracle-request: func() -> result<main-tuple>;
 }

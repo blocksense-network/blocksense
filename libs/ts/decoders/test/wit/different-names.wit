@@ -1,0 +1,21 @@
+package blocksense:oracle@2.0.0;
+
+interface types {
+  record input {
+    union: union1,
+  }
+
+  variant union1 {
+    none,
+    uint8-var(u8),
+  }
+
+  record error {
+    message: string,
+  }
+}
+
+world gaia {
+  use types.{input, error};
+  export calculate: func() -> result<input, error>;
+}

@@ -1,6 +1,6 @@
 package blocksense:oracle@2.0.0;
 
-world blocksense-oracle {
+interface oracle-types {
   record test {
     union: list<union>,
   }
@@ -15,4 +15,9 @@ world blocksense-oracle {
     str2(list<string>),
     uint8-val(u8),
   }
+}
+
+world blocksense-oracle {
+  use oracle-types.{test};
+  export handle-oracle-request: func() -> result<test>;
 }
