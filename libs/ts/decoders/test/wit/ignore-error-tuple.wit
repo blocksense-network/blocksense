@@ -14,9 +14,13 @@ interface oracle-types {
   record struct2 {
     str2: list<string>,
   }
+
+  record error {
+    message: string,
+  }
 }
 
 world blocksense-oracle {
-  use oracle-types.{test};
-  export handle-oracle-request: func() -> result<test>;
+  use oracle-types.{test, error};
+  export handle-oracle-request: func() -> result<test, error>;
 }
