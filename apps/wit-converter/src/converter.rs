@@ -1,7 +1,7 @@
 use crate::schema::{ComponentFieldEnum, CompositeField, PrimitiveField};
 use anyhow::{bail, Result};
 use std::collections::HashMap;
-use wit_parser::{Resolve, Result_, Type, TypeDefKind, TypeId};
+use wit_parser::{Handle, Resolve, Result_, Type, TypeDefKind, TypeId, FlagsRepr};
 
 /// A context for the conversion process.
 pub struct Converter<'a> {
@@ -144,6 +144,44 @@ impl<'a> Converter<'a> {
                     components,
                 }))
             }
+            // Enums (no payload) — represent as a union of named "none" cases
+            TypeDefKind::Enum(en) => {
+                let components = en
+                    .cases
+                    .iter()
+                    .map(|c| Self::type_or_none(None, Self::convert_name(&c.name, false)))
+                    .collect();
+                Ok(ComponentFieldEnum::Composite(CompositeField {
+                    name: field_name,
+                    r#type: "union".to_string(),
+                    components,
+                }))
+            }
+            // Tuples — ordered unnamed fields
+            TypeDefKind::Tuple(tup) => {
+                let mut components = Vec::with_capacity(tup.types.len());
+                for (i, t) in tup.types.iter().enumerate() {
+                    components.push(self.convert_type(t, format!("item{}", i))?);
+                }
+                Ok(ComponentFieldEnum::Composite(CompositeField {
+                    name: field_name,
+                    r#type: "tuple".to_string(),
+                    components,
+                }))
+            }
+            // Flags — map to a uint of appropriate bit width
+            TypeDefKind::Flags(flags) => {
+                let bits = match flags.repr() {
+                    FlagsRepr::U8 => 8u32,
+                    FlagsRepr::U16 => 16u32,
+                    FlagsRepr::U32(n) => (n as u32) * 32u32,
+                };
+                Ok(ComponentFieldEnum::Primitive(PrimitiveField {
+                    name: field_name,
+                    r#type: format!("uint{}", bits),
+                    size: Some(bits),
+                }))
+            }
             TypeDefKind::Option(ty) => Ok(ComponentFieldEnum::Composite(CompositeField {
                 name: field_name,
                 r#type: "union".to_string(),
@@ -209,14 +247,35 @@ impl<'a> Converter<'a> {
                 }
                 Ok(component)
             }
+            // Handles to resources (own/borrow)
+            TypeDefKind::Handle(handle) => {
+                let ty_str = self.get_handle_type_str(handle);
+                Ok(ComponentFieldEnum::Primitive(PrimitiveField {
+                    name: field_name,
+                    r#type: ty_str,
+                    size: None,
+                }))
+            }
+            // Opaque resource definitions — expose as resource<PascalName>
+            TypeDefKind::Resource => {
+                let res_name = type_def
+                    .name
+                    .as_deref()
+                    .map(|n| Self::convert_name(n, true))
+                    .unwrap_or_else(|| "Resource".to_string());
+                Ok(ComponentFieldEnum::Primitive(PrimitiveField {
+                    name: field_name,
+                    r#type: format!("resource<{}>", res_name),
+                    size: None,
+                }))
+            }
             // NOTE: We *could* translate all the other types to `bytes` or another Ethereum primitive type,
             //       but it's *better* to just flat-out disallow them.
             _ => {
                 let name = type_def.name.as_deref().unwrap_or("anonymous");
                 bail!(
                     "Unsupported type kind '{:?}' for type '{}'",
-                    type_def.kind,
-                    name
+                    type_def.kind, name
                 );
             }
         };
@@ -225,6 +284,22 @@ impl<'a> Converter<'a> {
             self.memo.insert(id, res.clone());
         }
         result
+    }
+
+    fn get_handle_type_str(&self, handle: &Handle) -> String {
+        let res_id = match handle {
+            Handle::Own(id) | Handle::Borrow(id) => id,
+        };
+        let res = &self.resolve.types[*res_id];
+        let res_name = res
+            .name
+            .as_deref()
+            .map(|n| Self::convert_name(n, true))
+            .unwrap_or_else(|| "Resource".to_string());
+        match handle {
+            Handle::Own(_) => format!("own<{}>", res_name),
+            Handle::Borrow(_) => format!("borrow<{}>", res_name),
+        }
     }
 
     /// Helper to get basic info for primitive types, conforming to TS assumptions.
@@ -265,6 +340,18 @@ impl<'a> Converter<'a> {
                         let (inner_name, inner_size) = self.get_unnamed_type_info(inner)?;
                         Ok((format!("{}[{}]", inner_name, len), inner_size))
                     }
+                    TypeDefKind::Enum(_) => Ok(("enum".to_string(), None)),
+                    TypeDefKind::Tuple(t) => Ok((format!("tuple<{}>", t.types.len()), None)),
+                    TypeDefKind::Flags(flags) => {
+                        let bits = match flags.repr() {
+                            FlagsRepr::U8 => 8u32,
+                            FlagsRepr::U16 => 16u32,
+                            FlagsRepr::U32(n) => (n as u32) * 32u32,
+                        };
+                        Ok((format!("uint{}", bits), Some(bits)))
+                    }
+                    TypeDefKind::Handle(h) => Ok((self.get_handle_type_str(h), None)),
+                    TypeDefKind::Resource => Ok(("resource".to_string(), None)),
                     TypeDefKind::Type(t) => self.get_unnamed_type_info(t),
                     _ => Ok(("unsupported".to_string(), None)),
                 }
