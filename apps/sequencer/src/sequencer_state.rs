@@ -23,7 +23,7 @@ use blocksense_utils::counter_unbounded_channel::{
     counted_unbounded_channel, CountedReceiver, CountedSender,
 };
 use blocksense_utils::logging::{init_shared_logging_handle, SharedLoggingHandle};
-use blocksense_utils::FeedId;
+use blocksense_utils::EncodedFeedId;
 use eyre::eyre;
 use futures::stream::FuturesUnordered;
 use rdkafka::producer::FutureProducer;
@@ -44,7 +44,7 @@ pub struct SequencerState {
     pub reporters: SharedReporters,
     pub aggregated_votes_to_block_creator_send: UnboundedSender<VotedFeedUpdateWithProof>,
     pub feeds_metrics: Arc<RwLock<FeedsMetrics>>,
-    pub active_feeds: Arc<RwLock<HashMap<FeedId, FeedConfig>>>,
+    pub active_feeds: Arc<RwLock<HashMap<EncodedFeedId, FeedConfig>>>,
     pub sequencer_config: Arc<RwLock<SequencerConfig>>,
     pub feed_aggregate_history: Arc<RwLock<FeedAggregateHistory>>,
     pub feeds_management_cmd_to_block_creator_send: UnboundedSender<FeedsManagementCmds>,
@@ -90,7 +90,7 @@ impl SequencerState {
         let provider_status = Arc::new(RwLock::new(provider_status));
         let mut history = FeedAggregateHistory::new();
         for feed in &feeds_config.feeds {
-            history.register_feed(feed.id, 100);
+            history.register_feed(EncodedFeedId::new(feed.id, feed.stride), 100);
         }
         SequencerState {
             registry: Arc::new(RwLock::new(new_feeds_meta_data_reg_from_config(
@@ -109,7 +109,7 @@ impl SequencerState {
                 feeds_config
                     .feeds
                     .into_iter()
-                    .map(|feed| (feed.id, feed))
+                    .map(|feed| (EncodedFeedId::new(feed.id, feed.stride), feed))
                     .collect(),
             )),
             sequencer_config: Arc::new(RwLock::new(sequencer_config.clone())),
