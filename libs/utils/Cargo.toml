@@ -13,11 +13,11 @@ console-subscriber = { workspace = true }
 dirs = { workspace = true }
 hex = { workspace = true }
 once_cell = { workspace = true }
+serde = { workspace = true }
+ssz_rs = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true, features = ["async-await", "log"] }
 tracing-subscriber = { workspace = true, features = ["json"] }
-serde = { workspace = true }
-ssz_rs = { workspace = true }
 
 [build-dependencies]
 # All features enabled
