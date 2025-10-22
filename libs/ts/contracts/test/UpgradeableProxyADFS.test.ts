@@ -100,8 +100,9 @@ describe('UpgradeableProxyADFS', function () {
   });
 
   it('Should preserve storage when implementation is changed and call implementation with calldata', async function () {
+    const historyAccumulator = ethers.toBeHex(1234, 32);
     await proxy.proxyCall('setFeeds', sequencer, [feed], {
-      blockNumber: 1,
+      destinationAccumulator: historyAccumulator,
     });
 
     const valueV1 = (await proxy.proxyCall('getValues', sequencer, [feed]))[0];
@@ -130,8 +131,12 @@ describe('UpgradeableProxyADFS', function () {
     };
 
     // set feed at round 2 when upgrading to new implementation
-    const blocknumber = 1234;
-    const callData = newImplementation.encodeDataWrite([newFeed], blocknumber);
+    const newHistoryAccumulator = ethers.toBeHex(12345, 32);
+    const callData = newImplementation.encodeDataWrite(
+      [newFeed],
+      historyAccumulator,
+      newHistoryAccumulator,
+    ).data;
 
     const tx = await proxy.upgradeImplementationAndCall(
       newImplementation,
@@ -146,7 +151,7 @@ describe('UpgradeableProxyADFS', function () {
     await expect(tx)
       .to.emit(proxy.contract, 'Upgraded')
       .withArgs(newImplementation.contract);
-    newImplementation.checkEvent(receipt!, blocknumber);
+    newImplementation.checkEvent(receipt!, newHistoryAccumulator);
 
     // get old value at round 1 and assert that is hasn't changed after upgrade
     const valueV2 = (
@@ -257,6 +262,9 @@ describe('UpgradeableProxyADFS', function () {
 
     let genericProxy: UpgradeableProxyADFSGenericWrapper;
 
+    const historyAccumulator = ethers.toBeHex(1234, 32);
+    const newHistoryAccumulator = ethers.toBeHex(12345, 32);
+
     beforeEach(async function () {
       historicalContractWrappers = [];
       historicalContractGenericWrappers = [];
@@ -294,10 +302,13 @@ describe('UpgradeableProxyADFS', function () {
         [true],
       );
 
-      // store no data first time in ADFS to avoid first sstore of blocknumber
-      await proxy.proxyCall('setFeeds', sequencer, []);
-
-      await genericProxy.proxyCall('setFeeds', sequencer, []);
+      // store no data first time in ADFS to avoid first sstore of history accumulator
+      await proxy.proxyCall('setFeeds', sequencer, [], {
+        destinationAccumulator: historyAccumulator,
+      });
+      await genericProxy.proxyCall('setFeeds', sequencer, [], {
+        destinationAccumulator: historyAccumulator,
+      });
     });
 
     for (let i = 1; i <= 100; i *= 10) {
@@ -309,6 +320,8 @@ describe('UpgradeableProxyADFS', function () {
           [proxy],
           [genericProxy],
           i,
+          historyAccumulator,
+          newHistoryAccumulator,
           {
             index: 1n,
           },
@@ -321,6 +334,8 @@ describe('UpgradeableProxyADFS', function () {
           [proxy],
           [genericProxy],
           i,
+          newHistoryAccumulator,
+          ethers.toBeHex(123456, 32),
           {
             index: 2n,
           },
@@ -335,6 +350,8 @@ describe('UpgradeableProxyADFS', function () {
           [proxy],
           [genericProxy],
           i,
+          historyAccumulator,
+          newHistoryAccumulator,
           {
             skip: 16,
             index: 1n,
@@ -348,6 +365,8 @@ describe('UpgradeableProxyADFS', function () {
           [proxy],
           [genericProxy],
           i,
+          newHistoryAccumulator,
+          ethers.toBeHex(123456, 32),
           {
             skip: 16,
             index: 2n,

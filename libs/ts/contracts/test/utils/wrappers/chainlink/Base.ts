@@ -3,6 +3,7 @@ import { UpgradeableProxyADFSBaseWrapper } from '../adfs/UpgradeableProxyBase';
 import { CLAggregatorAdapter } from '@blocksense/contracts/typechain';
 import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers';
 import { Feed, ReadOp } from '../types';
+import { TransactionResponse } from 'ethers';
 
 export abstract class CLBaseWrapper {
   public contract!: CLAggregatorAdapter;
@@ -14,8 +15,13 @@ export abstract class CLBaseWrapper {
     sequencer: HardhatEthersSigner,
     data: string,
     index: bigint,
-    blockNumber?: number,
-  ): Promise<any> {
+    sourceAccumulator?: string,
+    destinationAccumulator?: string,
+  ): Promise<{
+    tx: TransactionResponse;
+    sourceAccumulator: string;
+    destinationAccumulator: string;
+  }> {
     return this.proxy.proxyCall(
       'setFeeds',
       sequencer,
@@ -28,7 +34,8 @@ export abstract class CLBaseWrapper {
         },
       ],
       {
-        blockNumber,
+        sourceAccumulator,
+        destinationAccumulator,
       },
     );
   }
