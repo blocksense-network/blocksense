@@ -404,6 +404,36 @@ impl TriggerExecutor for OracleTrigger {
 }
 
 impl OracleTrigger {
+    fn format_feed_id(raw_id: &str) -> String {
+        if let Some(encoded) = Self::parse_encoded_feed_id(raw_id) {
+            format!("{}:{}", encoded.get_stride(), encoded.get_id())
+        } else if let Ok(feed) = raw_id.parse::<u128>() {
+            format!("0:{feed}")
+        } else {
+            format!("0:{raw_id}")
+        }
+    }
+
+    fn parse_encoded_feed_id(feed_id: &str) -> Option<EncodedFeedId> {
+        let mut parts = feed_id.split(':');
+        let first = parts.next()?;
+        let second = parts.next();
+
+        match second {
+            Some(feed_part) => {
+                if let (Ok(stride), Ok(feed)) = (first.parse::<u8>(), feed_part.parse::<u128>()) {
+                    EncodedFeedId::try_new(feed, stride)
+                } else {
+                    None
+                }
+            }
+            None => first
+                .parse::<u128>()
+                .ok()
+                .and_then(|feed| EncodedFeedId::try_new(feed, 0)),
+        }
+    }
+
     fn start_oracle_loop(
         engine: Arc<TriggerAppEngine<Self>>,
         signal_receiver: UnboundedReceiver<HashSet<DataFeedSetting>>,
@@ -748,13 +778,14 @@ impl OracleTrigger {
                     }
                 };
 
+                let feed_id = Self::format_feed_id(&id);
                 let signature =
-                    generate_signature(&secret_key, id.as_str(), timestamp, &result).unwrap();
+                    generate_signature(&secret_key, feed_id.as_str(), timestamp, &result).unwrap();
 
                 batch_payload.push(DataFeedPayload {
                     payload_metadata: PayloadMetaData {
                         reporter_id,
-                        feed_id: id,
+                        feed_id,
                         timestamp,
                         signature: JsonSerializableSignature { sig: signature },
                     },
@@ -1087,7 +1118,15 @@ fn update_latest_votes(
     batch: Vec<DataFeedPayload>,
 ) {
     for vote in batch {
-        let encoded_feed_id = vote.payload_metadata.feed_id.parse().unwrap();
+        let Some(encoded_feed_id) =
+            OracleTrigger::parse_encoded_feed_id(&vote.payload_metadata.feed_id)
+        else {
+            tracing::warn!(
+                "Failed to parse feed id '{}' when updating latest votes",
+                vote.payload_metadata.feed_id
+            );
+            continue;
+        };
 
         if let Ok(value) = vote.result {
             _ = latest_votes.insert(
