@@ -32,6 +32,7 @@ export default [
       'libs/aztec_contracts',
       'libs/ts/contracts',
       'libs/ts/contracts/typechain',
+      'libs/ts/decoders',
       'libs/ts/esbuild-react-compiler-plugin',
       'libs/ts/nextra-theme-docs',
       'libs/ts/sol-reflector',
