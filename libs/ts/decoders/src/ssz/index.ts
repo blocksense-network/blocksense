@@ -5,11 +5,15 @@ import * as prettier from 'prettier/standalone';
 import solidityPlugin from 'prettier-plugin-solidity';
 
 import type { EvmVersion, TupleField } from '../utils';
-import { organizeFieldsIntoStructs } from '../utils';
+import {
+  organizeFieldsIntoStructs,
+  toLowerFirstLetter,
+  toUpperFirstLetter,
+} from '../utils';
 
 import { generateDecoderLines } from './helpers';
 import { generateSubDecoderLines } from './sub-decoder';
-import { sszSchema, toLowerFirstLetter, toUpperFirstLetter } from './utils';
+import { sszSchema } from './utils';
 
 export const generateDecoder = async (
   template: string,
