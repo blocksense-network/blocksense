@@ -79,6 +79,10 @@
         "test/**/*.ts"
       ]
     },
+    "libs/ts/decoders": {
+      "entry": ["src/**/*.ts"],
+      "project": ["src/**/*.ts", "test/**/*.ts"]
+    },
     "libs/ts/docs-ui": {
       "project": ["src/**/*.{ts,tsx}"]
     },
