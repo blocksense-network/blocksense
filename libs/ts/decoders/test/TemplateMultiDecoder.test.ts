@@ -11,7 +11,7 @@ import type { DecoderContract } from '../src';
 import { encodeSSZData, generateSSZDecoder } from '../src';
 import { toUpperFirstLetter } from '../src/ssz/utils';
 import type { EvmVersion, PrimitiveField, TupleField } from '../src/utils';
-import { expandJsonFields } from '../src/utils';
+import { toUpperFirstLetter } from '../src/utils';
 
 const execPromise = promisify(exec);
 
