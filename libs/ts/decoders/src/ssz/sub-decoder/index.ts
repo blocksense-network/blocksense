@@ -1,6 +1,6 @@
 import type { Struct } from '../../utils';
+import { toUpperFirstLetter } from '../../utils';
 import type { UnionSchema } from '../utils';
-import { toUpperFirstLetter } from '../utils';
 
 export const generateSubDecoderLines = (
   subDecoder: string,

@@ -1,11 +1,21 @@
 {
   "name": "@blocksense/decoders",
+  "version": "1.0.0",
   "scripts": {
     "clean": "git clean -fdx -e .env",
-    "build": "hardhat compile && yarn build:typecheck",
+    "build": "yarn build:hardhat && yarn build:lib",
+    "build:hardhat": "hardhat compile && yarn build:typecheck",
+    "build:lib": "TS_CONFIG_NAME=tsconfig.lib.json yarn run rollup:build-workspace",
     "test": "hardhat test",
     "test:paris": "EVM_VERSION=paris yarn hardhat test",
     "deploy:local": "hardhat run --network localhost"
+  },
+  "exports": {
+    "./expand-wit-json": {
+      "require": "./dist/cjs/scripts/expand-wit-json.cjs",
+      "import": "./dist/esm/scripts/expand-wit-json.mjs",
+      "types": "./src/scripts/expand-wit-json.ts"
+    }
   },
   "devDependencies": {
     "@blocksense/base-utils": "workspace:*",

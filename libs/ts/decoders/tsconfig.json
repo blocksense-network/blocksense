@@ -7,8 +7,8 @@
     "noImplicitOverride": false,
     "noPropertyAccessFromIndexSignature": false,
     "moduleResolution": "NodeNext",
-    "outDir": "dist",
-    "rootDir": "."
+    "outDir": "dist"
   },
-  "include": ["src/**/*.ts", "test/**/*.ts", "typechain/", "hardhat.config.ts"]
+  "include": ["**/*.ts"],
+  "exclude": ["artifacts", "cache", "contracts", "dist"]
 }

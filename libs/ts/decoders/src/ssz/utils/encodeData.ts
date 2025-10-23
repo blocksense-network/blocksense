@@ -2,9 +2,8 @@ import type { ContainerType } from '@chainsafe/ssz';
 import { ethers } from 'ethers';
 
 import type { PrimitiveField, TupleField } from '../../utils';
-import { checkPrimitiveField } from '../../utils';
+import { checkPrimitiveField, toLowerFirstLetter } from '../../utils';
 
-import { toLowerFirstLetter } from './helpers';
 import type { Schema, UnionSchema } from './types';
 
 const BYTES_LIMIT = 8192;
