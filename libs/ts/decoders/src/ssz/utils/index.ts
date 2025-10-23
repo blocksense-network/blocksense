@@ -1,11 +1,7 @@
 import { addOffsets } from './addOffsets';
 import { handleFieldRanges } from './container';
 import { encodeSSZData, findUnionNames, sszSchema } from './encodeData';
-import {
-  getDecoderImplementations,
-  toLowerFirstLetter,
-  toUpperFirstLetter,
-} from './helpers';
+import { getDecoderImplementations } from './helpers';
 import {
   BytesRange,
   hasFields,
@@ -24,11 +20,11 @@ export {
   findUnionNames,
 
   // types
-  Schema,
-  UnionSchema,
-  SubUnionSchema,
-  BytesRange,
-  Offset,
+  type Schema,
+  type UnionSchema,
+  type SubUnionSchema,
+  type BytesRange,
+  type Offset,
   isVector,
   isUnion,
   hasFields,
@@ -37,6 +33,4 @@ export {
   addOffsets,
   handleFieldRanges,
   getDecoderImplementations,
-  toLowerFirstLetter,
-  toUpperFirstLetter,
 };
