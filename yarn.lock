@@ -1535,7 +1535,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/decoders@workspace:libs/ts/decoders":
+"@blocksense/decoders@workspace:^, @blocksense/decoders@workspace:libs/ts/decoders":
   version: 0.0.0-use.local
   resolution: "@blocksense/decoders@workspace:libs/ts/decoders"
   dependencies:
@@ -1569,6 +1569,7 @@ __metadata:
     "@blocksense/base-utils": "workspace:^"
     "@blocksense/config-types": "workspace:^"
     "@blocksense/contracts": "workspace:^"
+    "@blocksense/decoders": "workspace:^"
     "@changesets/changelog-github": "npm:^0.5.1"
     "@changesets/cli": "npm:^2.29.4"
     "@effect/cli": "npm:0.69.2"
@@ -1585,6 +1586,7 @@ __metadata:
     "@effect/vitest": "npm:0.25.1"
     "@types/node": "npm:^24.3.1"
     "@vitest/coverage-v8": "npm:^3.2.4"
+    chalk: "npm:^5.6.2"
     effect: "npm:^3.17.13"
     ejs: "npm:^3.1.10"
     toml: "npm:^3.0.0"
@@ -13596,6 +13598,13 @@ __metadata:
   version: 5.3.0
   resolution: "chalk@npm:5.3.0"
   checksum: 10c0/8297d436b2c0f95801103ff2ef67268d362021b8210daf8ddbe349695333eb3610a71122172ff3b0272f1ef2cf7cc2c41fdaa4715f52e49ffe04c56340feed09
+  languageName: node
+  linkType: hard
+
+"chalk@npm:^5.6.2":
+  version: 5.6.2
+  resolution: "chalk@npm:5.6.2"
+  checksum: 10c0/99a4b0f0e7991796b1e7e3f52dceb9137cae2a9dfc8fc0784a550dc4c558e15ab32ed70b14b21b52beb2679b4892b41a0aa44249bcb996f01e125d58477c6976
   languageName: node
   linkType: hard
 
