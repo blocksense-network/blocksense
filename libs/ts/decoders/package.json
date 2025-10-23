@@ -15,6 +15,11 @@
       "require": "./dist/cjs/scripts/expand-wit-json.cjs",
       "import": "./dist/esm/scripts/expand-wit-json.mjs",
       "types": "./src/scripts/expand-wit-json.ts"
+    },
+    "./generate-decoders": {
+      "require": "./dist/cjs/scripts/generate-decoders.cjs",
+      "import": "./dist/esm/scripts/generate-decoders.mjs",
+      "types": "./src/scripts/generate-decoders.ts"
     }
   },
   "devDependencies": {
