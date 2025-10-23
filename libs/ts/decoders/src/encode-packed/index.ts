@@ -13,6 +13,7 @@ import {
   checkForDynamicData,
   expandFields,
 } from './utils';
+import { rootDir } from '@blocksense/base-utils';
 
 export const generateDecoder = async (
   template: string,
@@ -45,7 +46,7 @@ export const generateDecoder = async (
       containsDynamicData: checkForDynamicData(expandedFields),
     },
     {
-      root: (await fs.realpath(__dirname)) + '/',
+      root: (await fs.realpath(rootDir)) + '/libs/ts/decoders/',
     },
   );
 
