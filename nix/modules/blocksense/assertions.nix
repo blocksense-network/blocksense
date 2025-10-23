@@ -7,11 +7,14 @@ let
   cfg = config.services.blocksense;
   inherit (lib) mkIf mkMerge;
 
+  all-sequencers = [ cfg.sequencer ] ++ builtins.attrValues cfg.extra-sequencers;
+  any-sequencer-has-kafka = lib.any (
+    sequencer: sequencer.kafka-report-endpoint != null
+  ) all-sequencers;
+
   reporter-assetions = name: reporter-cfg: [
     {
-      assertion =
-        (cfg.sequencer.kafka-report-endpoint != null)
-        -> (reporter-cfg.second-consensus-secret-key-path != null);
+      assertion = any-sequencer-has-kafka -> (reporter-cfg.second-consensus-secret-key-path != null);
       message = ''
         Reporter "${name}" has invalid config.
           Caused by: Second phase consensus requires kafka-endpoint and secp256k1 key present.

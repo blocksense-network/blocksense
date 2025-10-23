@@ -1,6 +1,7 @@
 {
   self',
   cfg,
+  pkgs,
   ...
 }:
 {
@@ -32,6 +33,55 @@ let
     disable_json = true;
     flush_each_line = true;
   };
+
+  mkSequencerConfigDir =
+    name: configFile:
+    let
+      sanitizedName = lib.strings.sanitizeDerivationName name;
+    in
+    pkgs.runCommand "blocksense-${sanitizedName}-sequencer-config-dir" { } ''
+      mkdir -p "$out"
+      ln -s ${configFile} "$out/sequencer_config.json"
+    '';
+
+  primarySequencerProcessName = "blocksense-sequencer";
+
+  extraSequencerDescriptors = lib.mapAttrsToList (
+    name: sequencer:
+    let
+      processName = "${primarySequencerProcessName}-${name}";
+      configFile = cfg.config-files."sequencer_config_${name}".path;
+      configDir = mkSequencerConfigDir processName configFile;
+    in
+    {
+      inherit processName sequencer configDir;
+      logFile = "${cfg.logsDir}/sequencer-${name}.log";
+      isPrimary = false;
+    }
+  ) cfg.extra-sequencers;
+
+  sequencerDescriptors = [
+    {
+      processName = primarySequencerProcessName;
+      inherit (cfg) sequencer;
+      configDir = cfg.config-dir;
+      logFile = "${cfg.logsDir}/sequencer.log";
+      isPrimary = true;
+    }
+  ]
+  ++ extraSequencerDescriptors;
+
+  sequencerProcessNames = builtins.map (descriptor: descriptor.processName) sequencerDescriptors;
+
+  sequencerProcessDependencies = builtins.listToAttrs (
+    builtins.map (
+      processName: lib.nameValuePair processName { condition = "process_healthy"; }
+    ) sequencerProcessNames
+  );
+
+  allSequencerProviders = lib.foldl' (
+    acc: descriptor: acc // descriptor.sequencer.providers
+  ) { } sequencerDescriptors;
 
   anvilInstances = lib.mapAttrs' (
     name:
@@ -71,7 +121,7 @@ let
         "anvil-${name}".condition = "process_healthy";
       };
     };
-  }) cfg.sequencer.providers;
+  }) allSequencerProviders;
 
   reporterInstances = lib.mapAttrs' (
     name:
@@ -103,9 +153,7 @@ let
             "LD_LIBRARY_PATH=${lib.makeLibraryPath self'.legacyPackages.commonLibDeps}"
           ];
 
-          depends_on = {
-            blocksense-sequencer.condition = "process_healthy";
-          };
+          depends_on = sequencerProcessDependencies;
           log_configuration = logsConfig;
           log_location = "${cfg.logsDir}/reporter-${name}.log";
           shutdown.signal = 9;
@@ -113,41 +161,49 @@ let
     }
   ) cfg.reporters;
 
-  sequencerInstance = {
-    blocksense-sequencer.process-compose = {
-      command = ''
-        if [ -z "$FEEDS_CONFIG_DIR" ]; then
-          FEEDS_CONFIG_DIR=${../../../../config}
-        fi
-        ${mkCargoTargetExePath "sequencer"}
-      '';
-      readiness_probe = {
-        exec.command = ''
-          curl -fsSL http://127.0.0.1:${toString cfg.sequencer.ports.admin}/health \
-            -H 'content-type: application/json'
-        '';
-        initial_delay_seconds = 0;
-        period_seconds = 10;
-        timeout_seconds = 30;
-        success_threshold = 1;
-        failure_threshold = 10;
-      };
-      environment = [
-        "SEQUENCER_CONFIG_DIR=${cfg.config-dir}"
-        "SEQUENCER_LOG_LEVEL=${lib.toUpper cfg.sequencer.log-level}"
-        "LD_LIBRARY_PATH=${lib.makeLibraryPath self'.legacyPackages.commonLibDeps}"
-      ];
-      shutdown.signal = 9;
-      depends_on = lib.mapAttrs' (name: value: {
-        name = "anvil-impersonate-and-fund-${name}";
-        value = {
-          condition = "process_completed_successfully";
+  sequencerInstances = lib.listToAttrs (
+    builtins.map (
+      descriptor:
+      let
+        inherit (descriptor) sequencer;
+      in
+      lib.nameValuePair descriptor.processName {
+        process-compose = {
+          command = ''
+            if [ -z "$FEEDS_CONFIG_DIR" ]; then
+              FEEDS_CONFIG_DIR=${../../../../config}
+            fi
+            ${mkCargoTargetExePath "sequencer"}
+          '';
+          readiness_probe = {
+            exec.command = ''
+              curl -fsSL http://127.0.0.1:${toString sequencer.ports.admin}/health \
+                -H 'content-type: application/json'
+            '';
+            initial_delay_seconds = 0;
+            period_seconds = 10;
+            timeout_seconds = 30;
+            success_threshold = 1;
+            failure_threshold = 10;
+          };
+          environment = [
+            "SEQUENCER_CONFIG_DIR=${descriptor.configDir}"
+            "SEQUENCER_LOG_LEVEL=${lib.toUpper sequencer.log-level}"
+            "LD_LIBRARY_PATH=${lib.makeLibraryPath self'.legacyPackages.commonLibDeps}"
+          ];
+          shutdown.signal = 9;
+          depends_on = lib.mapAttrs' (name: value: {
+            name = "anvil-impersonate-and-fund-${name}";
+            value = {
+              condition = "process_completed_successfully";
+            };
+          }) sequencer.providers;
+          log_configuration = logsConfig;
+          log_location = descriptor.logFile;
         };
-      }) cfg.sequencer.providers;
-      log_configuration = logsConfig;
-      log_location = "${cfg.logsDir}/sequencer.log";
-    };
-  };
+      }
+    ) sequencerDescriptors
+  );
 
   blockchainReader = {
     blockchain-reader.process-compose = {
@@ -182,7 +238,6 @@ let
   };
 in
 {
-
   options.services.blocksense.process-compose.use-local-cargo-result = lib.mkEnableOption ''
     Use locally built Cargo artifacts (from $GIT_ROOT/target/release/$executable-name)
     in place of Nix-built derivations to speed up the edit–build–test cycle.
@@ -193,7 +248,7 @@ in
     processes = lib.mkMerge [
       anvilImpersonateAndFundInstances
       reporterInstances
-      sequencerInstance
+      sequencerInstances
       anvilInstances
       (lib.mkIf config.services.kafka.enable blockchainReader)
       (lib.mkIf config.services.kafka.enable aggregateConsensusReader)
