@@ -33,6 +33,16 @@ in
 
   sequencer = import ./sequencer lib;
 
+  extra-sequencers = mkOption {
+    type = types.attrsOf (
+      types.submodule {
+        options = import ./sequencer lib;
+      }
+    );
+    default = { };
+    description = mdDoc "Additional sequencer instances to run alongside the primary `sequencer` option.";
+  };
+
   oracles = mkOption {
     type = types.attrsOf (mkSubmodule ./oracle-script.nix);
     default = { };
