@@ -8,10 +8,10 @@ import type { BaseContract } from 'ethers';
 import hre, { ethers, run } from 'hardhat';
 
 import type { DecoderContract } from '../src';
-import { encodeSSZData, generateSSZDecoder } from '../src';
-import { toUpperFirstLetter } from '../src/ssz/utils';
+import { encodeSSZData } from '../src';
 import type { EvmVersion, PrimitiveField, TupleField } from '../src/utils';
 import { toUpperFirstLetter } from '../src/utils';
+import { expandJsonFields, generateDecoders } from '../src/scripts';
 
 const execPromise = promisify(exec);
 
@@ -19,11 +19,6 @@ describe('Template Multi Decoder', () => {
   const evmVersion = (process.env.EVM_VERSION || 'cancun') as EvmVersion;
   const ssz = {
     contractName: 'SSZDecoder',
-    templatePath: path.join(__dirname, '../src/ssz/decoder.sol.ejs'),
-    subTemplatePath: path.join(
-      __dirname,
-      '../src/ssz/sub-decoder/subdecoder.sol.ejs',
-    ),
     tempFilePath: path.join(__dirname, '../contracts/'),
   };
 
@@ -39,30 +34,15 @@ describe('Template Multi Decoder', () => {
 
   async function generateAndDeployDecoders(fields: TupleField) {
     // Check if `contracts` directory exists, if not create it
-    const contractsDir = path.join(__dirname, '../contracts/');
-    if (!(await fs.stat(contractsDir).catch(() => false))) {
-      await fs.mkdir(contractsDir, { recursive: true });
-    }
-
-    const templateSSZ = await fs.readFile(ssz.templatePath, 'utf-8');
-    const subTemplateSSZ = await fs.readFile(ssz.subTemplatePath, 'utf-8');
-
-    const code = await generateSSZDecoder(
-      templateSSZ,
-      subTemplateSSZ,
-      fields,
+    contractPaths = await generateDecoders(
+      'ssz',
       evmVersion,
+      ssz.tempFilePath,
+      fields,
+      {
+        containsUnion: true,
+      },
     );
-    if (typeof code === 'string') {
-      contractPaths = [ssz.tempFilePath + '.sol'];
-      await fs.writeFile(contractPaths[0], code, 'utf-8');
-    } else {
-      for (const c of Object.keys(code)) {
-        const contractPath = ssz.tempFilePath + c + ssz.contractName + '.sol';
-        contractPaths.push(contractPath);
-        await fs.writeFile(contractPath, code[c], 'utf-8');
-      }
-    }
 
     await run('compile');
 

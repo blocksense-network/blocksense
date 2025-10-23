@@ -6,13 +6,10 @@ import type { BaseContract } from 'ethers';
 import hre, { ethers, run } from 'hardhat';
 
 import type { DecoderContract, TupleField } from '../src';
-import {
-  encodePackedData,
-  encodeSSZData,
-  generateEPDecoder,
-  generateSSZDecoder,
-} from '../src';
-import type { EvmVersion } from '../src/utils';
+import { encodePackedData, encodeSSZData } from '../src';
+import { type EvmVersion } from '../src/utils';
+import { generateDecoders } from '../src/scripts';
+import { rootDir } from '@blocksense/base-utils';
 
 describe('Template Decoder', function () {
   this.timeout(1000000);
@@ -22,13 +19,11 @@ describe('Template Decoder', function () {
 
   const encodePacked = {
     contractName: 'EncodePackedDecoder',
-    templatePath: path.join(__dirname, '../src/encode-packed/decoder.sol.ejs'),
     tempFilePath: path.join(__dirname, '../contracts/EncodePackedDecoder.sol'),
   };
 
   const ssz = {
     contractName: 'SSZDecoder',
-    templatePath: path.join(__dirname, '../src/ssz/decoder.sol.ejs'),
     tempFilePath: path.join(__dirname, '../contracts/SSZDecoder.sol'),
   };
 
@@ -38,22 +33,13 @@ describe('Template Decoder', function () {
 
   async function generateAndDeployDecoders(fields: TupleField) {
     // Check if `contracts` directory exists, if not create it
-    const contractsDir = path.join(__dirname, '../contracts');
-    await fs.mkdir(contractsDir, { recursive: true });
-
-    const templateEP = await fs.readFile(encodePacked.templatePath, 'utf-8');
-    const templateSSZ = await fs.readFile(ssz.templatePath, 'utf-8');
-
-    await fs.writeFile(
-      encodePacked.tempFilePath,
-      await generateEPDecoder(templateEP, fields, evmVersion),
-      'utf-8',
-    );
-    await fs.writeFile(
-      ssz.tempFilePath,
-      (await generateSSZDecoder(templateSSZ, '', fields, evmVersion)) as string,
-      'utf-8',
-    );
+    const contractsPath = path.join(rootDir, '/libs/ts/decoders/contracts');
+    await generateDecoders('encode-packed', evmVersion, contractsPath, fields, {
+      contractName: encodePacked.contractName,
+    });
+    await generateDecoders('ssz', evmVersion, contractsPath, fields, {
+      contractName: ssz.contractName,
+    });
 
     await run('compile');
 
