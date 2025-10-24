@@ -1,0 +1,22 @@
+package blocksense:oracle@2.0.0;
+
+interface oracle-types {
+  record test {
+    union: list<union1>,
+  }
+
+  variant union1 {
+    none,
+    struct2(list<struct2>),
+    uint8-var(u8),
+  }
+
+  record struct2 {
+    str2: list<string>,
+  }
+}
+
+world blocksense-oracle {
+  use oracle-types.{test};
+  export handle-oracle-request: func() -> result<test>;
+}

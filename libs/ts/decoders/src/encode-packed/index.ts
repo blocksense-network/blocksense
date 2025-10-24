@@ -19,7 +19,7 @@ export const generateDecoder = async (
   fields: TupleField,
   evmVersion: EvmVersion = 'cancun',
 ) => {
-  const structs = organizeFieldsIntoStructs(fields);
+  const { structs } = organizeFieldsIntoStructs(fields);
   const expandedFields = calculateFieldShift(expandFields([fields])).flat();
 
   const mainStructName =
