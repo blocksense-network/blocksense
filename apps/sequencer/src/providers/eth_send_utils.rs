@@ -416,15 +416,11 @@ pub async fn eth_batch_send_to_contract(
     let mut provider = provider_mutex.lock().await;
     debug!("Acquired a read/write lock on provider state for network `{net}` block height {block_height}");
 
-    let feeds_to_update_ids: Vec<EncodedFeedId> = updates
-        .updates
-        .iter()
-        .map(|update| update.encoded_feed_id)
-        .collect();
+    let prev_calldata_merkle_tree_root = match &provider.merkle_root_in_contract {
+        Some(stored_hash) => stored_hash.clone(),
+        None => provider.calldata_merkle_tree_frontier.root(),
+    };
 
-    increment_feeds_rb_indices(&feeds_to_update_ids, net.as_str(), &mut provider).await;
-
-    let signer = &provider.signer;
     let contract_address = if let Some(contract) = provider.get_latest_contract() {
         if let Some(contract_address) = contract.address {
             contract_address
@@ -438,6 +434,37 @@ pub async fn eth_batch_send_to_contract(
             "No publishing contract is deployed for network {net}"
         ));
     };
+
+    {
+        let rpc_handle = &provider.provider;
+
+        match rpc_handle
+            .get_storage_at(contract_address, U256::from(0))
+            .await
+        {
+            Ok(root) => {
+                if HashValue(root.into()) != prev_calldata_merkle_tree_root {
+                    warn!("Out of sync detected, trying to sync with latest changes!");
+                    try_to_sync(net.as_str(), &mut provider, &contract_address, None).await;
+                    return Err(eyre!("Out of sync in network {net}"));
+                }
+            }
+            Err(e) => {
+                warn!("Failed to read root from network {net} with contract address {contract_address} : {e}");
+            }
+        }
+    }
+
+    let feeds_to_update_ids: Vec<EncodedFeedId> = updates
+        .updates
+        .iter()
+        .map(|update| update.encoded_feed_id)
+        .collect();
+
+    increment_feeds_rb_indices(&feeds_to_update_ids, net.as_str(), &mut provider).await;
+
+    let signer = &provider.signer;
+
     info!(
         "sending data to address `{}` in network `{}` block height {block_height}",
         contract_address, net
@@ -451,10 +478,6 @@ pub async fn eth_batch_send_to_contract(
     let mut next_calldata_merkle_tree = provider.calldata_merkle_tree_frontier.clone();
     next_calldata_merkle_tree.append(HashValue(latest_call_data_hash));
 
-    let prev_calldata_merkle_tree_root = match &provider.merkle_root_in_contract {
-        Some(stored_hash) => stored_hash.clone(),
-        None => provider.calldata_merkle_tree_frontier.root(),
-    };
     let next_calldata_merkle_tree_root = next_calldata_merkle_tree.root();
 
     // Merkle tree over all call data management for ADFS contracts
