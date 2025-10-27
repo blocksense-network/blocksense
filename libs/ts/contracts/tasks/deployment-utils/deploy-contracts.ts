@@ -57,7 +57,7 @@ export async function deployContracts({
       [artifact.bytecode, encodedArgs],
     );
 
-    const contractAddress = await predictAddress(
+    const contractAddress = predictAddress(
       artifacts,
       config,
       contract.name,

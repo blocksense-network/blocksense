@@ -34,6 +34,7 @@ const networksV2Api: NetworkName[] = [
   'mezo-matsnet-testnet',
   'songbird-coston',
   'flare-coston',
+  'surge-testnet',
 ];
 
 type Gauges = {
@@ -210,7 +211,9 @@ const fetchTransactionsForNetwork = async (
     let response: AxiosResponse<any>;
     let rawTransactions: any[] = [];
     if (networksV2Api.includes(network)) {
-      response = await axios.get(`${apiUrl}/addresses/${address}/transactions`);
+      response = await axios.get(
+        `${apiUrl}/v2/addresses/${address}/transactions`,
+      );
       rawTransactions = response.data.items || [];
     } else if (network === 'telos-testnet') {
       response = await axios.get(`${apiUrl}/address/${address}/transactions`);

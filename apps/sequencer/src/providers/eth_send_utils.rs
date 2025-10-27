@@ -6,6 +6,7 @@ use alloy::{
     providers::{Provider, ProviderBuilder},
     rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
+use alloy_primitives::FixedBytes;
 use blocksense_config::{FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
@@ -24,6 +25,7 @@ use crate::{
     },
     sequencer_state::SequencerState,
 };
+use blocksense_feed_registry::registry::await_time;
 use blocksense_feeds_processing::adfs_gen_calldata::{
     adfs_serialize_updates, get_neighbour_feed_ids, RoundBufferIndices,
 };
@@ -367,7 +369,9 @@ pub async fn eth_batch_send_to_contract(
 
     let mut transaction_retries_count = 0;
     let mut nonce_get_retries_count = 0;
-    const BACKOFF_SECS: u64 = 1;
+    // Per-provider configurable backoffs
+    let retry_backoff_ms = provider_settings.transaction_retry_back_off_ms;
+    let receipt_polling_back_off_period_ms = provider_settings.receipt_polling_back_off_period_ms;
 
     // First get the correct nonce
     let nonce = loop {
@@ -392,7 +396,7 @@ pub async fn eth_batch_send_to_contract(
                     net.as_str(),
                     &mut nonce_get_retries_count,
                     provider_metrics,
-                    BACKOFF_SECS,
+                    retry_backoff_ms,
                 )
                 .await;
                 continue;
@@ -430,7 +434,7 @@ pub async fn eth_batch_send_to_contract(
                     net.as_str(),
                     &mut transaction_retries_count,
                     provider_metrics,
-                    BACKOFF_SECS,
+                    retry_backoff_ms,
                 )
                 .await;
                 continue;
@@ -455,7 +459,7 @@ pub async fn eth_batch_send_to_contract(
                     net.as_str(),
                     &mut transaction_retries_count,
                     provider_metrics,
-                    BACKOFF_SECS,
+                    retry_backoff_ms,
                 )
                 .await;
                 continue;
@@ -482,7 +486,7 @@ pub async fn eth_batch_send_to_contract(
                     net.as_str(),
                     &mut transaction_retries_count,
                     provider_metrics,
-                    BACKOFF_SECS,
+                    retry_backoff_ms,
                 )
                 .await;
                 continue;
@@ -508,7 +512,7 @@ pub async fn eth_batch_send_to_contract(
                     net.as_str(),
                     &mut transaction_retries_count,
                     provider_metrics,
-                    BACKOFF_SECS,
+                    retry_backoff_ms,
                 )
                 .await;
                 continue;
@@ -581,7 +585,7 @@ pub async fn eth_batch_send_to_contract(
                                 net.as_str(),
                                 &mut transaction_retries_count,
                                 provider_metrics,
-                                BACKOFF_SECS,
+                                retry_backoff_ms,
                             )
                             .await;
                             continue;
@@ -594,7 +598,7 @@ pub async fn eth_batch_send_to_contract(
                         net.as_str(),
                         &mut transaction_retries_count,
                         provider_metrics,
-                        BACKOFF_SECS,
+                        retry_backoff_ms,
                     )
                     .await;
                     continue;
@@ -603,83 +607,41 @@ pub async fn eth_batch_send_to_contract(
 
             let tx_hash = *tx_hash_result.tx_hash();
 
-            let tx_receipt = match tx_hash_result
-                .with_timeout(Some(std::time::Duration::from_secs(
-                    transaction_retry_timeout_secs,
-                )))
-                .get_receipt()
-                .await
-            {
-                Ok(v) => {
-                    debug!("Successfully got receipt from RPC in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash} receipt = {v:?}");
-                    inc_metric!(provider_metrics, net, success_get_receipt);
-                    v
-                }
-                Err(err) => {
-                    debug!("Timed out while trying to post tx to RPC and get tx_hash in network `{net}` block height {block_height} and address {sender_address} due to {err} and will try again");
+            info!("Successfully posted tx to RPC and got tx_hash in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash}");
 
-                    match actix_web::rt::time::timeout(
-                        Duration::from_secs(transaction_retry_timeout_secs),
-                        rpc_handle.get_transaction_receipt(tx_hash),
+            let tx_get_receipt_start_time = Instant::now();
+            let tx_receipt = match await_receipt(
+                net.as_str(),
+                rpc_handle,
+                transaction_retry_timeout_secs,
+                &tx_hash,
+                block_height,
+                &sender_address,
+                tx_get_receipt_start_time,
+                receipt_polling_back_off_period_ms,
+            )
+            .await
+            {
+                Ok(receipt) => {
+                    inc_metric!(provider_metrics, net, success_get_receipt);
+                    receipt
+                }
+                Err(e) => {
+                    warn!("await_receipt: {e}");
+                    inc_metric!(provider_metrics, net, failed_get_receipt);
+                    inc_retries_with_backoff(
+                        net.as_str(),
+                        &mut transaction_retries_count,
+                        provider_metrics,
+                        retry_backoff_ms,
                     )
-                    .await
-                    {
-                        Ok(v) => match v {
-                            Ok(v) => match v {
-                                Some(v) => {
-                                    debug!("Successfully got receipt from RPC in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash} receipt = {v:?}");
-                                    inc_metric!(provider_metrics, net, success_get_receipt);
-                                    v
-                                }
-                                None => {
-                                    warn!("Get tx_receipt returned None in network `{net}` block height {block_height}");
-                                    inc_metric!(provider_metrics, net, failed_get_receipt);
-                                    inc_retries_with_backoff(
-                                        net.as_str(),
-                                        &mut transaction_retries_count,
-                                        provider_metrics,
-                                        BACKOFF_SECS,
-                                    )
-                                    .await;
-                                    continue;
-                                }
-                            },
-                            Err(err) => {
-                                warn!("Error getting tx_receipt in network `{net}` block height {block_height}: {err}");
-                                inc_metric!(provider_metrics, net, failed_get_receipt);
-                                inc_retries_with_backoff(
-                                    net.as_str(),
-                                    &mut transaction_retries_count,
-                                    provider_metrics,
-                                    BACKOFF_SECS,
-                                )
-                                .await;
-                                continue;
-                            }
-                        },
-                        Err(e) => {
-                            warn!("Timed out while trying to get receipt for tx_hash={tx_hash} in network `{net}` block height {block_height}: {e}");
-                            inc_metric!(provider_metrics, net, failed_get_receipt);
-                            inc_retries_with_backoff(
-                                net.as_str(),
-                                &mut transaction_retries_count,
-                                provider_metrics,
-                                BACKOFF_SECS,
-                            )
-                            .await;
-                            continue;
-                        }
-                    }
+                    .await;
+                    continue;
                 }
             };
 
-            info!("Successfully posted tx to RPC and got tx_hash in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash}");
-
             tx_receipt
         };
-
-        let tx_result_str = format!("{tx_receipt:?}");
-        debug!("tx_result_str={tx_result_str} in network `{net}` block height {block_height}");
 
         receipt = tx_receipt;
 
@@ -688,8 +650,7 @@ pub async fn eth_batch_send_to_contract(
 
     let transaction_time = tx_time.elapsed().as_millis();
     info!(
-        "Recvd transaction receipt that took {}ms for {transaction_retries_count} retries in network `{}` block height {}: {:?}",
-        transaction_time, net, block_height, receipt
+        "Successfully recvd transaction receipt that took {transaction_time}ms for {transaction_retries_count} retries in network `{net}` block height {block_height} and sender_address {sender_address}: {receipt:?}"
     );
 
     log_gas_used(&net, &receipt, transaction_time, provider_metrics).await;
@@ -699,6 +660,72 @@ pub async fn eth_batch_send_to_contract(
     debug!("Released a read/write lock on provider state in network `{net}` block height {block_height}");
 
     Ok((receipt.status().to_string(), feeds_to_update_ids))
+}
+
+#[allow(clippy::too_many_arguments)]
+async fn await_receipt(
+    net: &str,
+    rpc_handle: &ProviderType,
+    transaction_retry_timeout_secs: u64,
+    tx_hash: &FixedBytes<32>,
+    block_height: u64,
+    sender_address: &Address,
+    start_time_point: Instant,
+    receipt_polling_back_off_period_ms: u64,
+) -> eyre::Result<TransactionReceipt> {
+    use eyre::WrapErr;
+    loop {
+        let req = actix_web::rt::time::timeout(
+            Duration::from_secs(transaction_retry_timeout_secs),
+            async {
+                rpc_handle.raw_request("eth_getTransactionReceipt".into(), (tx_hash,)).await.wrap_err_with(|| {
+                    format!("Get tx_receipt errored out in network `{net}` block height {block_height}")
+                })
+            }
+        )
+        .await
+        .wrap_err_with(|| {
+            format!("Timeout getting tx_receipt in network `{net}` block height {block_height}")
+        })??;
+        let receipt_opt = get_receipt_with_default_type(req).wrap_err_with(|| {
+            format!("Failed to parse tx_receipt in network `{net}` block height {block_height}")
+        })?;
+        if let Some(receipt) = receipt_opt {
+            debug!("Successfully got receipt from RPC in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash} receipt = {receipt:?}");
+            return Ok(receipt);
+        }
+        let total_timeout = Duration::from_secs(transaction_retry_timeout_secs);
+        if start_time_point.elapsed() > total_timeout {
+            eyre::bail!("Get tx_receipt returned None and deadline for getting it elapsed in network `{net}` block height {block_height}");
+        }
+        await_time(receipt_polling_back_off_period_ms).await;
+    }
+}
+
+fn get_receipt_with_default_type(
+    receipt_json: Option<serde_json::Value>,
+) -> eyre::Result<Option<TransactionReceipt>> {
+    match receipt_json {
+        None => Ok(None),
+        Some(mut value) => {
+            // We expect the receipt to be a JSON object; if it’s not, return an error.
+            let receipt_obj = value
+                .as_object_mut()
+                .ok_or_else(|| eyre::eyre!("receipt JSON is not an object"))?;
+
+            // If the "type" key is missing, insert a legacy type ("0x0").
+            if !receipt_obj.contains_key("type") {
+                receipt_obj.insert("type".into(), serde_json::Value::String("0x0".into()));
+            }
+
+            // Now attempt to deserialize into a TransactionReceipt. Unknown fields
+            // are ignored by serde as long as the struct doesn’t use `#[serde(deny_unknown_fields)]`.
+            let receipt: TransactionReceipt =
+                serde_json::from_value(serde_json::Value::Object(receipt_obj.clone()))?;
+
+            Ok(Some(receipt))
+        }
+    }
 }
 
 pub async fn get_gas_limit(
@@ -769,12 +796,12 @@ pub async fn inc_retries_with_backoff(
     net: &str,
     transaction_retries_count: &mut u64,
     provider_metrics: &Arc<RwLock<ProviderMetrics>>,
-    backoff_secs: u64,
+    backoff_ms: u64,
 ) {
     *transaction_retries_count += 1;
     inc_metric!(provider_metrics, net, total_transaction_retries);
     // Wait before sending the next request
-    let time_to_await: Duration = Duration::from_secs(backoff_secs);
+    let time_to_await: Duration = Duration::from_millis(backoff_ms);
     let mut interval = interval(time_to_await);
     interval.tick().await;
     // The first tick completes immediately.
@@ -1235,10 +1262,16 @@ mod tests {
     use blocksense_config::{AllFeedsConfig, PublishCriteria};
     use blocksense_data_feeds::feeds_processing::VotedFeedUpdate;
 
+    use alloy::network::EthereumWallet;
+    use alloy::signers::local::PrivateKeySigner;
     use blocksense_utils::test_env::get_test_private_key_path;
     use rdkafka::message::ToBytes;
     use regex::Regex;
+    use std::fs;
     use std::str::FromStr;
+    // New imports for receipt parsing / provider construction
+    use alloy::primitives::address;
+    use alloy::providers::ProviderBuilder;
 
     fn extract_address(message: &str) -> Option<String> {
         let re = Regex::new(r"0x[a-fA-F0-9]{40}").expect("Invalid regex");
@@ -1333,6 +1366,135 @@ mod tests {
             },
         );
         (rb_indices, strides_and_decimals)
+    }
+
+    #[tokio::test]
+    async fn test_get_receipt_with_default_type_paths() {
+        // Spin up local Anvil and a provider with wallet
+        let provider = ProviderBuilder::new().connect_anvil_with_wallet();
+
+        // Send a simple EIP-1559 tx so we can fetch a real receipt from the node
+        let tx = TransactionRequest {
+            value: Some(U256::from(1u64)),
+            to: Some(address!("d8dA6BF26964aF9D7eEd9e03E53415D37aA96045").into()),
+            chain_id: Some(31337),
+            ..Default::default()
+        };
+
+        let sent = provider.send_transaction(tx).await.unwrap();
+        let tx_hash = *sent.tx_hash();
+
+        // Fetch the raw JSON receipt from the node
+        let receipt_json: Option<serde_json::Value> = provider
+            .raw_request("eth_getTransactionReceipt".into(), (tx_hash,))
+            .await
+            .unwrap();
+        assert!(receipt_json.is_some(), "node should return a receipt JSON");
+
+        // 1) Happy path: parse the object as-is
+        let parsed = get_receipt_with_default_type(receipt_json.clone())
+            .expect("parsing receipt should succeed")
+            .expect("receipt should not be None");
+        assert_eq!(parsed.transaction_hash, tx_hash);
+
+        // 2) Missing `type`: remove it and ensure we still parse (default to legacy)
+        let mut without_type = receipt_json.unwrap();
+        if let Some(obj) = without_type.as_object_mut() {
+            obj.remove("type");
+        } else {
+            panic!("unexpected non-object receipt returned by node");
+        }
+
+        let parsed_defaulted = get_receipt_with_default_type(Some(without_type))
+            .expect("parsing with defaulted type should succeed")
+            .expect("receipt should not be None");
+        assert_eq!(parsed_defaulted.transaction_hash, tx_hash);
+
+        // 3) Non-object value should error
+        let err = get_receipt_with_default_type(Some(serde_json::Value::String("bad".into())));
+        assert!(err.is_err(), "non-object receipt JSON must error");
+
+        // 4) None maps to Ok(None)
+        let none_ok = get_receipt_with_default_type(None).expect("None should parse ok");
+        assert!(none_ok.is_none());
+    }
+
+    #[tokio::test]
+    async fn test_await_receipt_success() {
+        // Build ProviderType-compatible provider (Identity + WalletFiller over HTTP)
+        let anvil = Anvil::new().try_spawn().unwrap();
+
+        let key_path = get_test_private_key_path();
+        let priv_key = fs::read_to_string(key_path).expect("read test key");
+        let signer: PrivateKeySigner = priv_key.trim().parse().unwrap();
+
+        let provider: ProviderType = ProviderBuilder::new()
+            .disable_recommended_fillers()
+            .wallet(EthereumWallet::from(signer.clone()))
+            .connect_http(reqwest::Url::parse(&anvil.endpoint()).unwrap());
+
+        let from = signer.address();
+        let to = from;
+        let tx = TransactionRequest::default()
+            .with_from(from)
+            .with_to(to)
+            .with_value(U256::from(1))
+            .with_gas_limit(10_000_000)
+            .with_max_fee_per_gas(30_000_000_000)
+            .with_max_priority_fee_per_gas(2_000_000_000)
+            .with_nonce(0)
+            .with_chain_id(anvil.chain_id());
+
+        let sent = provider.send_transaction(tx).await.unwrap();
+        let tx_hash = *sent.tx_hash();
+
+        // Call await_receipt with a small backoff; should return quickly
+        let receipt = await_receipt(
+            "anvil",
+            &provider,
+            5, // seconds total timeout and per-RPC timeout
+            &tx_hash,
+            0,
+            &from,
+            Instant::now(),
+            10, // poll backoff ms
+        )
+        .await
+        .expect("await_receipt should return Ok for mined tx");
+
+        assert_eq!(receipt.transaction_hash, tx_hash);
+    }
+
+    #[tokio::test]
+    async fn test_await_receipt_times_out_on_missing_receipt() {
+        let anvil = Anvil::new().try_spawn().unwrap();
+        let key_path = get_test_private_key_path();
+        let priv_key = fs::read_to_string(key_path).expect("read test key");
+        let signer: PrivateKeySigner = priv_key.trim().parse().unwrap();
+        let provider: ProviderType = ProviderBuilder::new()
+            .disable_recommended_fillers()
+            .wallet(EthereumWallet::from(signer.clone()))
+            .connect_http(reqwest::Url::parse(&anvil.endpoint()).unwrap());
+
+        let bogus_tx_hash = FixedBytes::<32>::ZERO;
+        let sender = signer.address();
+
+        let result = await_receipt(
+            "anvil",
+            &provider,
+            1, // 1s timeout
+            &bogus_tx_hash,
+            0,
+            &sender,
+            Instant::now(),
+            50, // backoff ms between polls
+        )
+        .await;
+
+        assert!(
+            result.is_err(),
+            "should error on deadline elapsed with None receipts"
+        );
     }
 
     #[tokio::test]

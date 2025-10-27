@@ -55,6 +55,7 @@ const networks = [
   'fantom-mainnet',
   'fantom-testnet',
   'flare-coston',
+  'fluent-testnet',
   'fraxtal-mainnet',
   'fraxtal-testnet',
   'gameswift-chain-testnet',
@@ -72,6 +73,7 @@ const networks = [
   'ink-sepolia',
   'katana-mainnet',
   'kava-testnet',
+  'kite-ai-testnet',
   'kusama-moonbeam',
   'kusama-moonbase-alpha',
   'kusama-moonriver',
@@ -117,6 +119,7 @@ const networks = [
   'rootstock-testnet',
   'scroll-mainnet',
   'scroll-sepolia',
+  'sei-testnet',
   'shape-sepolia',
   'somnia-mainnet',
   'somnia-testnet',
@@ -127,6 +130,7 @@ const networks = [
   'sonic-blaze',
   'sonic-testnet',
   'status-network-sepolia',
+  'surge-testnet',
   'superposition-testnet',
   'superseed-mainnet',
   'superseed-sepolia',
@@ -153,15 +157,16 @@ const chainIds = [
   99999999999, 1, 11155111, 17000, 560048, 11124, 33111, 1088, 42161, 421614,
   1313161555, 43114, 43113, 123420001114, 8453, 84532, 80094, 80069, 200901,
   200810, 81457, 168587773, 56288, 9728, 288, 28882, 56, 97, 325000, 42220,
-  44787, 5115, 1114, 66665, 338, 111557560, 18880, 839999, 250, 4002, 114, 252,
-  2522, 10888, 91342, 100, 10200, 13505, 1666700000, 743111, 1663, 999, 998,
-  2424, 57073, 763373, 747474, 2221, 1284, 1287, 1285, 59144, 59141, 4202,
-  994873017, 2030232745, 169, 3441006, 5000, 5003, 698, 6342, 1740, 59902,
-  31611, 143, 10143, 2818, 2810, 72080, 8801, 5851, 5611, 10, 11155420, 7849306,
-  688688, 9745, 9746, 98866, 98867, 137, 80002, 1101, 2442, 695569, 11155931,
-  57000, 200018, 31, 534352, 534351, 11011, 5031, 50312, 1868, 1946, 16, 146,
-  57054, 14601, 1660990954, 98985, 5330, 53302, 1924, 239, 2391, 2390, 167000,
-  167009, 5678, 841, 842, 41, 130, 1301, 4801, 1417429182, 33101, 324, 300,
+  44787, 5115, 1114, 66665, 338, 111557560, 18880, 839999, 250, 4002, 114,
+  20994, 252, 2522, 10888, 91342, 100, 10200, 13505, 1666700000, 743111, 1663,
+  999, 998, 2424, 57073, 763373, 747474, 2221, 2368, 1284, 1287, 1285, 59144,
+  59141, 4202, 994873017, 2030232745, 169, 3441006, 5000, 5003, 698, 6342, 1740,
+  59902, 31611, 143, 10143, 2818, 2810, 72080, 8801, 5851, 5611, 10, 11155420,
+  7849306, 688688, 9745, 9746, 98866, 98867, 137, 80002, 1101, 2442, 695569,
+  11155931, 57000, 200018, 31, 534352, 534351, 1328, 11011, 5031, 50312, 1868,
+  1946, 16, 146, 57054, 14601, 1660990954, 763375, 98985, 5330, 53302, 1924,
+  239, 2391, 2390, 167000, 167009, 5678, 841, 842, 41, 130, 1301, 4801,
+  1417429182, 33101, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks).annotations({
@@ -225,6 +230,7 @@ export enum Currency {
   HYPE = 'HYPE',
   INJ = 'INJ',
   KAVA = 'KAVA',
+  KITE = 'KITE',
   LUMIA = 'LUMIA',
   MATIC = 'MATIC',
   METIS = 'METIS',
@@ -239,6 +245,7 @@ export enum Currency {
   POL = 'POL',
   ROME = 'ROME',
   S = 'S',
+  SEI = 'SEI',
   STT = 'STT',
   sMETIS = 'sMETIS',
   TAC = 'TAC',
@@ -769,7 +776,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://blockscout-testnet.expchain.ai',
-        apiUrl: 'https://blockscout-testnet.gadsgcxobnadfogadsihg.com/api/v2',
+        apiUrl: 'https://blockscout-testnet.gadsgcxobnadfogadsihg.com/api',
       },
     ],
     currency: Currency.tZKJ,
@@ -817,10 +824,22 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://coston2-explorer.flare.network',
-        apiUrl: 'https://coston2-explorer.flare.network/api/v2',
+        apiUrl: 'https://coston2-explorer.flare.network/api',
       },
     ],
     currency: Currency.C2FLR,
+  },
+  'fluent-testnet': {
+    chainId: 20994,
+    isTestnet: true,
+    explorers: [
+      {
+        type: 'unknown',
+        webUrl: 'https://testnet.fluentscan.xyz/',
+        apiUrl: 'https://testnet.fluentscan.xyz/api',
+      },
+    ],
+    currency: Currency.ETH,
   },
   'fraxtal-mainnet': {
     chainId: 252,
@@ -1025,6 +1044,18 @@ export const networkMetadata = {
       },
     ],
     currency: Currency.KAVA,
+  },
+  'kite-ai-testnet': {
+    chainId: 2368,
+    isTestnet: true,
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://testnet.kitescan.ai/',
+        apiUrl: 'https://testnet.kitescan.ai/api',
+      },
+    ],
+    currency: Currency.KITE,
   },
   'kusama-moonbeam': {
     chainId: 1284,
@@ -1240,7 +1271,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://sepolia-explorer.metisdevops.link',
-        apiUrl: 'https://sepolia-explorer-api.metisdevops.link/api/v2',
+        apiUrl: 'https://sepolia-explorer-api.metisdevops.link/api',
       },
     ],
     currency: Currency.sMETIS,
@@ -1252,7 +1283,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://explorer.test.mezo.org',
-        apiUrl: 'https://api.explorer.test.mezo.org/api/v2/',
+        apiUrl: 'https://api.explorer.test.mezo.org/api',
       },
     ],
     currency: Currency.BTC,
@@ -1300,7 +1331,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://explorer-holesky.morphl2.io',
-        apiUrl: 'https://explorer-api-holesky.morphl2.io/api/v2',
+        apiUrl: 'https://explorer-api-holesky.morphl2.io/api',
       },
     ],
     currency: Currency.ETH,
@@ -1603,6 +1634,18 @@ export const networkMetadata = {
     ],
     currency: Currency.ETH,
   },
+  'sei-testnet': {
+    chainId: 1328,
+    isTestnet: true,
+    explorers: [
+      {
+        type: 'etherscan',
+        webUrl: 'https://testnet.seiscan.io',
+        apiUrl: 'https://api.etherscan.io/v2/api?chainid=1328',
+      },
+    ],
+    currency: Currency.SEI,
+  },
   'shape-sepolia': {
     chainId: 11011,
     isTestnet: true,
@@ -1670,7 +1713,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://coston-explorer.flare.network',
-        apiUrl: 'https://coston-explorer.flare.network/api/v2',
+        apiUrl: 'https://coston-explorer.flare.network/api',
       },
     ],
     currency: Currency.CFLR,
@@ -1755,6 +1798,18 @@ export const networkMetadata = {
         type: 'blockscout',
         webUrl: 'https://sepolia-explorer.superseed.xyz',
         apiUrl: 'https://sepolia-explorer.superseed.xyz/api',
+      },
+    ],
+    currency: Currency.ETH,
+  },
+  'surge-testnet': {
+    chainId: 763375,
+    isTestnet: true,
+    explorers: [
+      {
+        type: 'blockscout',
+        webUrl: 'https://explorer.hoodi.surge.wtf',
+        apiUrl: 'https://api.explorer.hoodi.surge.wtf/api',
       },
     ],
     currency: Currency.ETH,
