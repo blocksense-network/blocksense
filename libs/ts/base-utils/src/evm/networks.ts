@@ -98,7 +98,6 @@ const networks = [
   'opbnb-testnet',
   'optimism-mainnet',
   'optimism-sepolia',
-  'ozean-poseidon-testnet',
   'pharos-testnet',
   'plasma-mainnet',
   'plasma-testnet',
@@ -156,11 +155,11 @@ const chainIds = [
   100, 10200, 13505, 1666700000, 743111, 999, 998, 2424, 57073, 763373, 747474,
   2221, 2368, 1284, 1287, 1285, 59144, 59141, 4202, 994873017, 2030232745, 169,
   3441006, 5000, 5003, 698, 6342, 1740, 59902, 31611, 143, 10143, 2818, 2810,
-  72080, 8801, 5851, 5611, 10, 11155420, 7849306, 688688, 9745, 9746, 98866,
-  98867, 137, 80002, 1101, 2442, 695569, 11155931, 57000, 200018, 31, 534352,
-  534351, 1328, 11011, 5031, 50312, 1868, 1946, 16, 146, 57054, 14601,
-  1660990954, 763375, 98985, 5330, 53302, 1924, 239, 2391, 167000, 167009, 5678,
-  841, 842, 41, 130, 1301, 4801, 1417429182, 33101, 324, 300,
+  72080, 8801, 5851, 5611, 10, 11155420, 688688, 9745, 9746, 98866, 98867, 137,
+  80002, 1101, 2442, 695569, 11155931, 57000, 200018, 31, 534352, 534351, 1328,
+  11011, 5031, 50312, 1868, 1946, 16, 146, 57054, 14601, 1660990954, 763375,
+  98985, 5330, 53302, 1924, 239, 2391, 167000, 167009, 5678, 841, 842, 41, 130,
+  1301, 4801, 1417429182, 33101, 324, 300,
 ] as const;
 
 export const networkName = S.Literal(...networks).annotations({
@@ -252,7 +251,6 @@ export enum Currency {
   tRBTC = 'tRBTC',
   TSYS = 'TSYS',
   tZKJ = 'tZKJ',
-  USDX = 'USDX',
   xDAI = 'xDAI',
   XPL = 'XPL',
   Z = 'Z',
@@ -1360,18 +1358,6 @@ export const networkMetadata = {
       },
     ],
     currency: Currency.ETH,
-  },
-  'ozean-poseidon-testnet': {
-    chainId: 7849306,
-    isTestnet: true,
-    explorers: [
-      {
-        type: 'unknown',
-        webUrl: 'https://ozean-testnet.explorer.caldera.xyz',
-        apiUrl: 'https://poseidon-testnet.explorer.caldera.xyz/api/v2',
-      },
-    ],
-    currency: Currency.USDX,
   },
   'pharos-testnet': {
     chainId: 688688,
