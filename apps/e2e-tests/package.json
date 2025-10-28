@@ -6,7 +6,8 @@
     "ts": "yarn node --import tsx",
     "test": "vitest run --typecheck --coverage",
     "test:unit": "yarn vitest -w false src/utils",
-    "test:scenarios": "yarn test src/test-scenarios/**/e2e.spec.ts"
+    "test:scenarios": "yarn test src/test-scenarios/**/e2e.spec.ts",
+    "test:wit-scenarios": "yarn test src/test-scenarios/**/wit-e2e.spec.ts"
   },
   "dependencies": {
     "@blocksense/base-utils": "workspace:*",
