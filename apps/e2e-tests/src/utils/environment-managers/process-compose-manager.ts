@@ -7,7 +7,7 @@ import {
   Stream,
   String as EString,
 } from 'effect';
-import { Command } from '@effect/platform';
+import { Command, FileSystem } from '@effect/platform';
 import { NodeContext } from '@effect/platform-node';
 
 import { arrayToObject } from '@blocksense/base-utils/array-iter';
@@ -18,6 +18,17 @@ import { logTestEnvironmentInfo } from '../utilities';
 import { EnvironmentError, EnvironmentManager } from './types';
 
 export const GENERAL_SCENARIO_FEEDS_CONFIG_DIR = `${rootDir}/apps/e2e-tests/src/test-scenarios/general`;
+export function getFeedsConfigForScenario(scenario: string) {
+  return Effect.gen(function* () {
+    const configDir = `${rootDir}/apps/e2e-tests/src/test-scenarios/${scenario}`;
+    const exists = yield* FileSystem.FileSystem.pipe(
+      Effect.flatMap(fs => fs.exists(configDir)),
+      Effect.provide(NodeContext.layer),
+    );
+
+    return exists ? configDir : GENERAL_SCENARIO_FEEDS_CONFIG_DIR;
+  });
+}
 
 export const ProcessComposeLive = Layer.succeed(
   EnvironmentManager,
@@ -56,7 +67,7 @@ export const ProcessComposeLive = Layer.succeed(
   }),
 );
 
-function startEnvironment(testEnvironment: string): Effect.Effect<void, Error> {
+function startEnvironment(testScenario: string): Effect.Effect<void, Error> {
   const runString = <E, R>(
     stream: Stream.Stream<Uint8Array, E, R>,
   ): Effect.Effect<string, E, R> =>
@@ -65,16 +76,19 @@ function startEnvironment(testEnvironment: string): Effect.Effect<void, Error> {
       Stream.runFold(EString.empty, EString.concat),
     );
 
+  const testEnvironment = `e2e-${testScenario}`;
+
   return Effect.gen(function* () {
     yield* logTestEnvironmentInfo('Starting', testEnvironment);
-    yield* Effect.sync(() => {
-      process.env['FEEDS_CONFIG_DIR'] = GENERAL_SCENARIO_FEEDS_CONFIG_DIR;
-    });
+
+    process.env['FEEDS_CONFIG_DIR'] =
+      yield* getFeedsConfigForScenario(testScenario);
+
     const program = Effect.gen(function* () {
       const command = Command.make(
         'just',
         'start-environment',
-        'e2e-general',
+        testEnvironment,
         '0',
         '--detached',
       );

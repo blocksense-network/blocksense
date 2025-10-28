@@ -132,6 +132,16 @@ in
         default-exec-interval = 10;
         secret-key-path = "${testKeysDir}/reporter_secret_key";
         second-consensus-secret-key-path = "${testKeysDir}/reporter_second_consensus_secret_key";
+        api-keys = {
+          ALPHAVANTAGE_API_KEY = "${apiKeysDir}/ALPHAVANTAGE_API_KEY";
+          APCA_API_KEY_ID = "${apiKeysDir}/APCA_API_KEY_ID";
+          APCA_API_SECRET_KEY = "${apiKeysDir}/APCA_API_SECRET_KEY";
+          YAHOO_FINANCE_API_KEY = "${apiKeysDir}/YAHOO_FINANCE_API_KEY";
+          TWELVEDATA_API_KEY = "${apiKeysDir}/TWELVEDATA_API_KEY";
+          FMP_API_KEY = "${apiKeysDir}/FMP_API_KEY";
+          SPOUT_RWA_API_KEY = "${apiKeysDir}/SPOUT_RWA_API_KEY";
+          METALS_API_KEY = "${apiKeysDir}/METALS_API_KEY";
+        };
       };
     };
 
