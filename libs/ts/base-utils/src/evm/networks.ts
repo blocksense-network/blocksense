@@ -136,7 +136,6 @@ const networks = [
   'swellchain-testnet',
   'tac-mainnet',
   'tac-spb',
-  'tac-turin',
   'taiko-mainnet',
   'taiko-hekla',
   'tanssi-demo',
@@ -164,8 +163,8 @@ const chainIds = [
   688688, 9745, 9746, 98866, 98867, 137, 80002, 1101, 2442, 695569, 11155931,
   57000, 200018, 31, 534352, 534351, 1328, 11011, 5031, 50312, 1868, 1946, 16,
   146, 57054, 14601, 1660990954, 763375, 98985, 5330, 53302, 1924, 239, 2391,
-  2390, 167000, 167009, 5678, 841, 842, 41, 130, 1301, 4801, 1417429182, 33101,
-  324, 300,
+  167000, 167009, 5678, 841, 842, 41, 130, 1301, 4801, 1417429182, 33101, 324,
+  300,
 ] as const;
 
 export const networkName = S.Literal(...networks).annotations({
@@ -1837,18 +1836,6 @@ export const networkMetadata = {
         type: 'blockscout',
         webUrl: 'https://spb.explorer.tac.build',
         apiUrl: 'https://spb.explorer.tac.build/api',
-      },
-    ],
-    currency: Currency.TAC,
-  },
-  'tac-turin': {
-    chainId: 2390,
-    isTestnet: true,
-    explorers: [
-      {
-        type: 'blockscout',
-        webUrl: 'https://turin.explorer.tac.build',
-        apiUrl: 'https://turin.explorer.tac.build/api',
       },
     ],
     currency: Currency.TAC,
