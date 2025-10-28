@@ -14,7 +14,7 @@ export async function addDataProviders(
   const dataFeedsWithCryptoResources = await Promise.all(
     filteredFeeds.map(async feed => {
       const providers = getAllProvidersForPair(
-        feed.additional_feed_info.pair,
+        feed.additional_feed_info.pair!,
         providersData,
       );
       return {
@@ -37,5 +37,5 @@ export async function addDataProviders(
 
 // Filter feeds that have a quote
 function filterFeedsWithQuotes(feeds: SimplifiedFeed[]): SimplifiedFeed[] {
-  return feeds.filter(feed => feed.additional_feed_info.pair.quote);
+  return feeds.filter(feed => feed.additional_feed_info.pair!.quote);
 }

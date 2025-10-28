@@ -30,7 +30,7 @@ export async function updateExchangesArgumentConfig(): Promise<NewFeedsConfig> {
   for (const feed of feedsConfig.feeds) {
     const pair = feed.additional_feed_info.pair;
     const initialExchangePrices = getExchangesPriceDataForPair(
-      pair,
+      pair!,
       providersData,
     );
     const outlierExchanges = detectPriceOutliers(
@@ -44,14 +44,14 @@ export async function updateExchangesArgumentConfig(): Promise<NewFeedsConfig> {
 
     normalizedProvidersData = removePriceOutliers(
       providersData,
-      pair,
+      pair!,
       outlierExchanges,
     );
   }
 
   const updatedFeedConfig = feedsConfig.feeds.map(feed => {
     const providers = getAllProvidersForPair(
-      feed.additional_feed_info.pair,
+      feed.additional_feed_info.pair!,
       normalizedProvidersData,
     );
 

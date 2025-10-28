@@ -9,6 +9,7 @@ import {
   forexPriceFeedsArgsSchema,
   geckoTerminalArgsSchema,
   hyperBorrowRatesArgsSchema,
+  sportsArgsSchema,
   spoutRwaArgsSchema,
   stockPriceFeedsArgsSchema,
 } from './oracles';
@@ -29,6 +30,7 @@ export const FeedCategorySchema = S.Union(
   S.Literal('US Treasuries'),
   S.Literal('Tokenized Asset'),
   S.Literal('Rates'),
+  S.Literal('Sports'),
 ).annotations({ identifier: 'FeedCategory' });
 
 /**
@@ -129,7 +131,7 @@ export const decodeFeedsConfig = S.decodeUnknownSync(FeedsConfigSchema);
 /**
  * Schema for the data feed type.
  */
-export const FeedTypeSchema = S.Union(S.Literal('price-feed')).annotations({
+export const FeedTypeSchema = S.Union(S.Literal('price-feed'), S.Literal('sport-feed')).annotations({
   identifier: 'FeedType',
 });
 
@@ -174,9 +176,7 @@ export const NewFeedSchema = S.mutable(
     full_name: S.String,
     description: S.String,
 
-    type: S.Union(S.Literal('price-feed')).annotations({
-      identifier: 'FeedType',
-    }),
+    type: FeedTypeSchema,
     oracle_id: S.String,
 
     value_type: S.Union(
@@ -192,7 +192,11 @@ export const NewFeedSchema = S.mutable(
 
     quorum: S.Struct({
       percentage: S.Number,
-      aggregation: S.Union(S.Literal('median')).annotations({
+      aggregation: S.Union(
+        S.Literal('median'),
+        S.Literal('average'),
+        S.Literal('majority')
+      ).annotations({
         identifier: 'QuorumAggregation',
       }),
     }).annotations({ identifier: 'FeedQuorum' }),
@@ -207,7 +211,7 @@ export const NewFeedSchema = S.mutable(
     // TODO: This field should be optional / different depending on the `type`.
     additional_feed_info: S.mutable(
       S.Struct({
-        pair: PairSchema,
+        pair: S.NullishOr(PairSchema),
         decimals: S.Number,
         category: FeedCategorySchema,
         market_hours: S.NullishOr(MarketHoursSchema),
@@ -222,6 +226,7 @@ export const NewFeedSchema = S.mutable(
           exSatHoldingsArgsSchema,
           hyperBorrowRatesArgsSchema,
           ethGasInfoArgsSchema,
+          sportsArgsSchema,
         ).annotations({ identifier: 'OracleScriptArguments' }),
 
         compatibility_info: S.UndefinedOr(
