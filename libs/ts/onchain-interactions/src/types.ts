@@ -49,6 +49,7 @@ export const deployedTestnets = [
   'ontology-testnet',
   'opbnb-testnet',
   'optimism-sepolia',
+  'pharos-atlantic-testnet',
   'pharos-testnet',
   'plume-testnet',
   'polygon-amoy',
