@@ -147,6 +147,7 @@ build-blocksense:
 [doc('Run a command to clean the repository of untracked files')]
 clean:
   git clean -fdx \
+    -e .jj \
     -e .env \
     -e .direnv \
     -e .vscode \
