@@ -54,7 +54,7 @@ async function getBlocksenseFeedsCompatibility(
       }
       const dataFeedId = dataFeed.id;
 
-      const { base, quote } = dataFeed.additional_feed_info.pair;
+      const { base, quote } = dataFeed.additional_feed_info.pair!;
 
       const baseAddress = isSupportedCurrencySymbol(base)
         ? currencySymbolToDenominationAddress[base]

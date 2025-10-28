@@ -12,7 +12,7 @@ export function getUniqueDataFeeds(
   const seenPairs = new Set<string>();
 
   return dataFeeds.filter(feed => {
-    const pairKey = pairToString(feed.additional_feed_info.pair);
+    const pairKey = pairToString(feed.additional_feed_info.pair!);
 
     if (seenPairs.has(pairKey)) {
       return false;
@@ -27,7 +27,7 @@ export function addStableCoinVariants(
   feeds: SimplifiedFeed[],
 ): SimplifiedFeed[] {
   const stableCoinVariants = feeds.flatMap(feed => {
-    const { base, quote } = feed.additional_feed_info.pair;
+    const { base, quote } = feed.additional_feed_info.pair!;
     if (quote in stableCoins) {
       return stableCoins[quote as keyof typeof stableCoins]
         .map(altStableCoin => createPair(base, altStableCoin))
@@ -65,7 +65,7 @@ export async function addMarketCapRank(
     const asset = cmcMarketCap.find(
       asset =>
         asset.symbol.toLowerCase() ===
-        feed.additional_feed_info.pair.base.toLowerCase(),
+        feed.additional_feed_info.pair!.base.toLowerCase(),
     );
     return {
       ...feed,

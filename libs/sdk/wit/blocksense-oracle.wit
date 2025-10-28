@@ -31,7 +31,7 @@ interface oracle-types {
   }
 
   record payload {
-    values: list<data-feed-result>
+    values: list<data-feed-result>,
   }
 
   variant error {
