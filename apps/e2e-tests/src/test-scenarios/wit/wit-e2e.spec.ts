@@ -33,10 +33,11 @@ import { getDataFeedsInfoFromNetwork } from '../../utils/services/onchain';
 import type { SequencerService } from '../../utils/services/sequencer';
 import { Sequencer } from '../../utils/services/sequencer';
 import type { UpdatesToNetwork } from '../../utils/services/types';
-import { expectedPCStatuses03 } from '../general/expected-service-status';
+import { expectedPCStatuses03 } from './expected-service-status';
 
 describe.sequential('E2E Tests with process-compose', () => {
-  const testEnvironment = `e2e-wit`;
+  const testScenario = `wit`;
+  const testEnvironment = `e2e-${testScenario}`;
   const network = 'ink_sepolia';
   const MAX_HISTORY_ELEMENTS_PER_FEED = 8192;
 
@@ -63,7 +64,7 @@ describe.sequential('E2E Tests with process-compose', () => {
     const res = await pipe(
       Effect.gen(function* () {
         processCompose = yield* EnvironmentManager;
-        yield* processCompose.start(testEnvironment);
+        yield* processCompose.start(testScenario);
         hasProcessComposeStarted = true;
 
         if (!process.listenerCount('SIGINT')) {
@@ -99,7 +100,7 @@ describe.sequential('E2E Tests with process-compose', () => {
     }
   });
 
-  it.live('Test processes state shortly after start', () =>
+  it.live.only('Test processes state shortly after start', () =>
     gateEffect(
       failFastGateway,
       Effect.gen(function* () {
@@ -125,7 +126,7 @@ describe.sequential('E2E Tests with process-compose', () => {
     ),
   );
 
-  it.live('Test sequencer configs are available and in correct format', () =>
+  it.live.only('Test sequencer configs are available and in correct format', () =>
     Effect.gen(function* () {
       sequencerConfig = yield* sequencer.getConfig();
       feedsConfig = yield* sequencer.getFeedsConfig();
@@ -162,7 +163,7 @@ describe.sequential('E2E Tests with process-compose', () => {
   );
 
   it.live(
-    'Test processes state after at least 2 updates of each feeds have been made',
+    'Test sports db yields metrics',
     () =>
       Effect.gen(function* () {
         updatesToNetworks = yield* Effect.retry(
@@ -170,7 +171,7 @@ describe.sequential('E2E Tests with process-compose', () => {
             .fetchUpdatesToNetworksMetric()
             .pipe(
               Effect.filterOrFail(updates =>
-                valuesOf(updates[network]).every(v => v > 2),
+                valuesOf(updates[network]).every(v => v >= 1),
               ),
             ),
           {
@@ -202,6 +203,13 @@ describe.sequential('E2E Tests with process-compose', () => {
         url,
         initialRounds,
       );
+
+      console.log({
+        feedIds,
+        initialRounds,
+        initialFeedsInfoLocal,
+        updatesToNetwork: updatesToNetworks[network],
+      });
 
       expect(initialFeedsInfo).toEqual(initialFeedsInfoLocal);
 

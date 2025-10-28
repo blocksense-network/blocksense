@@ -67,12 +67,46 @@ impl FeedAggregate {
                         .clone();
                     FeedType::Text(result)
                 } else if frequency_map_bytes.len() > 0 {
-                    let result = frequency_map_bytes
+                    let most_frequent = frequency_map_bytes
                         .into_iter()
                         .max_by_key(|&(_, count)| count)
                         .map(|(s, _)| s)
                         .unwrap()
                         .clone();
+
+                    fn prefix_size(stride: u8) -> u8 {
+                        // `2 ^ (n + 1)` divided by 8, rounded up
+                        (stride + 5 + 7) / 8
+                    }
+
+                    fn right_align_truncate(dst: &mut [u8], src: &[u8]) {
+                        let dst_len = dst.len();
+                        let src_len = src.len();
+
+                        let n = std::cmp::min(dst_len, src_len);
+                        dst[dst_len - n..].copy_from_slice(&src[src_len - n..]);
+                    }
+
+                    let prefix_size = prefix_size(4) as usize;
+                    let mut prefix = vec![0; prefix_size];
+
+                    let length = most_frequent.len();
+
+                    // length              | prefix
+                    // (in bytes)          |
+                    // ------------------------------------
+                    // 0x 00 .. 00 12 34   | 0x 00 00 00 00
+
+                    // NOTE: Zip together the pointers to the bytes of the prefix and the length, starting from the "right"
+                    // std::iter::zip(prefix[..].iter_mut().rev(), length.to_le_bytes()).for_each(
+                    //     |(t, s)| {
+                    //         *t = s;
+                    //     },
+                    // );
+                    right_align_truncate(&mut prefix, &length.to_be_bytes());
+
+                    let result = [prefix, most_frequent].concat();
+
                     FeedType::Bytes(result)
                 } else {
                     panic!("No valid types to aggregate in MajorityVoteAggregator!");

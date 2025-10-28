@@ -40,7 +40,7 @@ import { rgSearchPattern } from '../../utils/utilities';
 import { expectedPCStatuses03 } from './expected-service-status';
 
 describe.sequential('E2E Tests with process-compose', () => {
-  const testEnvironment = `e2e-general`;
+  const testScenario = `general`;
   const network = 'ink_sepolia';
   const MAX_HISTORY_ELEMENTS_PER_FEED = 8192;
 
@@ -67,7 +67,7 @@ describe.sequential('E2E Tests with process-compose', () => {
     const res = await pipe(
       Effect.gen(function* () {
         processCompose = yield* EnvironmentManager;
-        yield* processCompose.start(testEnvironment);
+        yield* processCompose.start(testScenario);
         hasProcessComposeStarted = true;
 
         if (!process.listenerCount('SIGINT')) {
@@ -93,7 +93,7 @@ describe.sequential('E2E Tests with process-compose', () => {
     );
 
     if (Exit.isFailure(res)) {
-      throw new Error(`Failed to start test environment: ${testEnvironment}`);
+      throw new Error(`Failed to start test environment: ${testScenario}`);
     }
   });
 
@@ -328,7 +328,7 @@ describe.sequential('E2E Tests with process-compose', () => {
 
   describe.sequential('Reporter behavior based on logs', () => {
     const reporterLogsFile =
-      getProcessComposeLogsFiles(testEnvironment)['reporter-a'];
+      getProcessComposeLogsFiles(testScenario)['reporter-a'];
 
     it.live('Reporter should NOT panic', () =>
       Effect.gen(function* () {

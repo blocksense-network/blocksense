@@ -1,5 +1,5 @@
 import { Effect, Layer, ParseResult, Schema as S } from 'effect';
-import { Command } from '@effect/platform';
+import { Command, FileSystem } from '@effect/platform';
 import { NodeContext } from '@effect/platform-node';
 
 import { arrayToObject } from '@blocksense/base-utils/array-iter';
@@ -10,6 +10,29 @@ import { logTestEnvironmentInfo } from '../utilities';
 import { EnvironmentError, EnvironmentManager } from './types';
 
 export const GENERAL_SCENARIO_FEEDS_CONFIG_DIR = `${rootDir}/apps/e2e-tests/src/test-scenarios/general`;
+export function getFeedsConfigForScenario(scenario: string) {
+  return Effect.gen(function* () {
+    const configDir = `${rootDir}/apps/e2e-tests/src/test-scenarios/${scenario}`;
+    const exists = yield* FileSystem.FileSystem.pipe(
+      Effect.flatMap(fs => fs.exists(configDir)),
+      Effect.provide(NodeContext.layer),
+    );
+
+    return exists ? configDir : GENERAL_SCENARIO_FEEDS_CONFIG_DIR;
+  });
+}
+// export function getFeedsConfigForScenario(scenario: string): Effect.Effect<string, never, never> {
+//   const scenarioFeedsConfigDir = `${rootDir}/apps/e2e-tests/src/test-${scenario}/general`;
+//
+//   return Effect.gen(function*() {
+//     let stat = yield* Effect.tryPromise(() => fs.stat(scenarioFeedsConfigDir)).pipe(
+//       Effect.match({
+//         onSuccess: () => true,
+//         onFailure: () => false
+//       }));
+//     return stat ? scenarioFeedsConfigDir : GENERAL_SCENARIO_FEEDS_CONFIG_DIR;
+//   });
+// }
 
 export const ProcessComposeLive = Layer.succeed(
   EnvironmentManager,
@@ -44,12 +67,15 @@ export const ProcessComposeLive = Layer.succeed(
   }),
 );
 
-function startEnvironment(testEnvironment: string): Effect.Effect<void, Error> {
-  return Effect.gen(function* () {
+function startEnvironment(testScenario: string): Effect.Effect<void, Error> {
+  // NOTE: as per <../../../../../nix/test-environments/default.nix:39>
+  let testEnvironment = `e2e-${testScenario}`;
+
+  return Effect.gen(function*() {
     yield* logTestEnvironmentInfo('Starting', testEnvironment);
-    yield* Effect.sync(() => {
-      process.env['FEEDS_CONFIG_DIR'] = GENERAL_SCENARIO_FEEDS_CONFIG_DIR;
-    });
+
+    process.env['FEEDS_CONFIG_DIR'] = yield* getFeedsConfigForScenario(testScenario);
+
     const command = Command.make(
       'just',
       'start-environment',
@@ -57,10 +83,12 @@ function startEnvironment(testEnvironment: string): Effect.Effect<void, Error> {
       '0',
       '--detached',
     );
+
     const exitCode = yield* command.pipe(
       Command.exitCode,
       Effect.provide(NodeContext.layer),
     );
+
     if (exitCode !== 0) {
       return yield* Effect.fail(
         new Error(`Command failed with exit code ${exitCode}`),
@@ -70,7 +98,7 @@ function startEnvironment(testEnvironment: string): Effect.Effect<void, Error> {
 }
 
 function stopEnvironment(): Effect.Effect<void, Error> {
-  return Effect.gen(function* () {
+  return Effect.gen(function*() {
     yield* logTestEnvironmentInfo('Stopping');
     const command = Command.make('just', 'stop-environment');
     const exitCode = yield* command.pipe(
@@ -112,7 +140,7 @@ export function parseProcessesStatus(): Effect.Effect<
   Record<string, (typeof ProcessComposeStatusSchema.Type)[number]>,
   Error
 > {
-  return Effect.gen(function* () {
+  return Effect.gen(function*() {
     const command = Command.make(
       'process-compose',
       'process',

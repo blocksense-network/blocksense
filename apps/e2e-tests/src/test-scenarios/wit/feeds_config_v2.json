@@ -1,0 +1,32 @@
+{
+  "feeds": [
+    {
+      "id": "0",
+      "full_name": "Liverpool Matches Results",
+      "description": "Results of Liverpool matches",
+      "type": "sport-feed",
+      "oracle_id": "sports-db",
+      "value_type": "bytes",
+      "stride": 4,
+      "quorum": {
+        "percentage": 90,
+        "aggregation": "majority"
+      },
+      "schedule": {
+        "interval_ms": 10000,
+        "heartbeat_ms": 30000,
+        "deviation_percentage": 0.1,
+        "first_report_start_unix_time_ms": 0
+      },
+      "additional_feed_info": {
+        "decimals": 0,
+        "category": "Sports",
+        "arguments": {
+          "kind": "sports-db",
+          "team_id": 133602,
+          "sport_type": "Soccer"
+        }
+      }
+    }
+  ]
+}

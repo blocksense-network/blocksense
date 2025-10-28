@@ -128,3 +128,12 @@ export const ethGasInfoArgsSchema = S.mutable(
     metric: S.String,
   }),
 );
+
+// `sports-db` Oracle related Types
+export const sportsArgsSchema = S.mutable(
+  S.Struct({
+    kind: S.Literal('sports-db'),
+    team_id: S.Int,
+    sport_type: S.Union(S.Literal('Soccer')),
+  }),
+);
