@@ -6,7 +6,7 @@ use alloy::{
     providers::{Provider, ProviderBuilder},
     rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
-use alloy_primitives::FixedBytes;
+use alloy_primitives::{FixedBytes, TxHash};
 use blocksense_config::{FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
@@ -38,7 +38,7 @@ use paste::paste;
 use std::time::Instant;
 use tracing::{debug, error, info, info_span, warn};
 
-use futures_util::stream::FuturesUnordered;
+use futures_util::{stream::FuturesUnordered, StreamExt};
 use std::io::Error;
 use tokio::task::JoinHandle;
 
@@ -274,6 +274,57 @@ pub async fn loop_processing_batch_of_updates(
     }
 }
 
+pub async fn check_tx_hashes_for_inclusion(
+    provider: &ProviderType,
+    tx_hashes: &[TxHash],
+    receipt_polling_back_off_period_ms: u64,
+) -> Option<TxHash> {
+    if tx_hashes.is_empty() {
+        return None;
+    }
+
+    let timeout_duration = Duration::from_millis(receipt_polling_back_off_period_ms);
+    let mut inclusion_checks = FuturesUnordered::new();
+
+    for &tx_hash in tx_hashes {
+        let provider = provider.clone();
+
+        inclusion_checks.push(async move {
+            let request_future = provider
+                .raw_request::<_, Option<serde_json::Value>>("eth_getTransactionReceipt".into(), (tx_hash,));
+            match actix_web::rt::time::timeout(timeout_duration, request_future).await {
+                Ok(Ok(Some(tx_receipt))) => {
+                    info!(
+                        "Received receipt for transaction {tx_hash:?}: {tx_receipt}"
+                    );
+                    Some(tx_hash)
+                },
+                Ok(Ok(None)) => None,
+                Ok(Err(err)) => {
+                    warn!(
+                        "Failed to check inclusion for transaction hash {tx_hash:?}: {err}"
+                    );
+                    None
+                }
+                Err(elapsed) => {
+                    warn!(
+                        "Timeout while checking inclusion for transaction hash {tx_hash:?}: {elapsed}"
+                    );
+                    None
+                }
+            }
+        });
+    }
+
+    while let Some(result) = inclusion_checks.next().await {
+        if let Some(tx_hash) = result {
+            return Some(tx_hash);
+        }
+    }
+
+    None
+}
+
 #[allow(clippy::too_many_arguments)]
 pub async fn eth_batch_send_to_contract(
     net: String,
@@ -405,6 +456,8 @@ pub async fn eth_batch_send_to_contract(
         break nonce;
     };
 
+    let mut generated_transaction_hashes = Vec::new();
+
     loop {
         debug!("loop begin; transaction_retries_count={transaction_retries_count} in network `{net}` block height {block_height} with transaction_retries_count_limit = {transaction_retries_count_limit} and transaction_retry_timeout_secs = {transaction_retry_timeout_secs}");
 
@@ -424,7 +477,18 @@ pub async fn eth_batch_send_to_contract(
         {
             Ok(latest_nonce) => {
                 if latest_nonce > nonce {
-                    //TODO: Check the tx hashes of all posted/retried txs for block inclusion
+                    // Check the tx hashes of all posted/retried txs for block inclusion
+                    if let Some(included_tx_hash) = check_tx_hashes_for_inclusion(
+                        rpc_handle,
+                        generated_transaction_hashes.as_slice(),
+                        receipt_polling_back_off_period_ms,
+                    )
+                    .await
+                    {
+                        info!(
+                            "Detected previously submitted transaction included on-chain: {included_tx_hash:?} in network `{net}` block height {block_height}"
+                        );
+                    }
                     return Ok(("true".to_string(), feeds_to_update_ids));
                 }
             }
@@ -606,6 +670,8 @@ pub async fn eth_batch_send_to_contract(
             };
 
             let tx_hash = *tx_hash_result.tx_hash();
+
+            generated_transaction_hashes.push(tx_hash);
 
             info!("Successfully posted tx to RPC and got tx_hash in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash}");
 
