@@ -33,8 +33,7 @@ let
   impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
   anvilInkSepoliaPort = builtins.elemAt availablePorts 0;
 
-  reporterStateDir = "."; # Reporters start from .devenv/state/blocksense/reporter/<name>
-  apiKeysDir = "${reporterStateDir}/test-keys";
+  apiKeysDir = "${config.devenv.root}/apps/e2e-tests/src/test-scenarios/general/test-keys";
 in
 {
   services.kafka = {
