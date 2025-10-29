@@ -35,6 +35,10 @@ const networksV2Api: NetworkName[] = [
   'songbird-coston',
   'flare-coston',
   'surge-testnet',
+  'aurora-testnet',
+  'zephyr-testnet',
+  'pyrope-testnet',
+  'lumia-beam-testnet',
 ];
 
 type Gauges = {
