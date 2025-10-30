@@ -223,11 +223,12 @@ impl ReorgTracker {
                         "No non_finalized_updates at or above fork height {fork_height} in network {net} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})"
                     );
                 } else {
-                    for h in heights {
+                    for h in &heights {
                         if let Some(batch) = provider.inflight.non_finalized_updates.remove(&h) {
                             let updates_count = batch.updates.updates.len();
                             info!(
-                                "non_finalized_update >= fork: height {h}, batch_block_height {}, updates_count {}, network {} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})",
+                                "non_finalized_update >= fork: height {h} out of total reorged {}, batch_block_height {}, updates_count {}, network {} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})",
+                                heights.len(),
                                 batch.updates.block_height,
                                 updates_count,
                                 batch.net,
