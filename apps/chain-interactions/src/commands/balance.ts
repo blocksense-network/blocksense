@@ -17,11 +17,7 @@ import {
 } from '@blocksense/base-utils/evm';
 import { color as c } from '@blocksense/base-utils/tty';
 
-import {
-  deployedMainnets,
-  deployedTestnets,
-} from '../../../../libs/ts/onchain-interactions/src/types';
-
+import { deployedMainnets, deployedTestnets } from './types';
 import { startPrometheusServer } from './utils';
 
 function filterSmallBalance(balance: string, threshold = 1e-6): number {
