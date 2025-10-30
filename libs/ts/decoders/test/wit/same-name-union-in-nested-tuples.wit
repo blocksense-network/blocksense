@@ -1,0 +1,22 @@
+package blocksense:oracle@2.0.0;
+
+interface oracle-types {
+  record main-tuple {
+    union1-value: union,
+    tuple-value: tuple1,
+  }
+
+  record tuple1 {
+    union2-value: union,
+  }
+
+  variant union {
+    none,
+    integer(u32),
+  }
+}
+
+world blocksense-oracle {
+  use oracle-types.{main-tuple};
+  export handle-oracle-request: func() -> result<main-tuple>;
+}
