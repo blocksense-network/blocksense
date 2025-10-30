@@ -48,6 +48,7 @@ alloy-primitives = { workspace = true }
 alloy-u256-literal = { workspace = true }
 
 anyhow = { workspace = true }
+async-trait = "0.1"
 bridgetree = { git = "https://github.com/zcash/incrementalmerkletree", package = "bridgetree" }
 bytes = { workspace = true }
 chrono = { workspace = true }
