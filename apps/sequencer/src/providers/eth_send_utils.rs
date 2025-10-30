@@ -1450,6 +1450,9 @@ mod tests {
         let sent = provider.send_transaction(tx).await.unwrap();
         let tx_hash = *sent.tx_hash();
 
+        // Wait a bit for the transaction to be processed
+        await_time(1000).await;
+
         // Fetch the raw JSON receipt from the node
         let receipt_json: Option<serde_json::Value> = provider
             .raw_request("eth_getTransactionReceipt".into(), (tx_hash,))
@@ -1513,6 +1516,9 @@ mod tests {
 
         let sent = provider.send_transaction(tx).await.unwrap();
         let tx_hash = *sent.tx_hash();
+
+        // Wait a bit for the transaction to be processed
+        await_time(1000).await;
 
         // Call await_receipt with a small backoff; should return quickly
         let receipt = await_receipt(
