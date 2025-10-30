@@ -193,6 +193,69 @@ pub async fn create_and_collect_relayers_futures(
     }
 }
 
+async fn process_batch_of_updates_cmd(
+    net: &String,
+    relayer_name: &str,
+    feeds_metrics: &Arc<RwLock<FeedsMetrics>>,
+    provider_status: &Arc<RwLock<HashMap<String, ProviderStatus>>>,
+    msgs_in_queue: usize,
+    cmd: BatchOfUpdatesToProcess,
+) {
+    let block_height = cmd.updates.block_height;
+    tracing::info!(
+        "Processing updates for network {relayer_name}, block_height {block_height}, messages in queue = {msgs_in_queue}"
+    );
+    let provider = cmd.provider.clone();
+    let result = eth_batch_send_to_contract(cmd).await;
+
+    let provider_metrics = provider.lock().await.provider_metrics.clone();
+    dec_metric!(provider_metrics, net, num_transactions_in_queue);
+    inc_metric!(provider_metrics, net, total_tx_sent);
+
+    match result {
+        Ok((status, updated_feeds)) => {
+            let mut result_str = String::new();
+            result_str += &format!(
+                "result from network {net} and block height {block_height}: Ok -> status: {status}"
+            );
+            if status == "true" {
+                result_str += &format!(", updated_feeds: {updated_feeds:?}");
+                increment_feeds_rb_metrics(
+                    &updated_feeds,
+                    Some(feeds_metrics.clone()),
+                    net.as_str(),
+                )
+                .await;
+                {
+                    let provider = provider.lock().await;
+                    let provider_metrics = &provider.provider_metrics;
+                    inc_metric!(provider_metrics, net, success_send_tx);
+                }
+                let mut status_map = provider_status.write().await;
+                status_map.insert(net.clone(), ProviderStatus::LastUpdateSucceeded);
+            } else if status == "false" || status == "timeout" {
+                let mut provider = provider.lock().await;
+                result_str +=
+                    &format!(", failed to update feeds: {updated_feeds:?} due to {status}");
+                decrement_feed_rb_indices(&updated_feeds, net.as_str(), &mut provider).await;
+
+                let provider_metrics = &provider.provider_metrics;
+                if status == "timeout" {
+                    inc_metric!(provider_metrics, net, total_timed_out_tx);
+                } else if status == "false" {
+                    inc_metric!(provider_metrics, net, failed_send_tx);
+                }
+                let mut status_map = provider_status.write().await;
+                status_map.insert(net.clone(), ProviderStatus::LastUpdateFailed);
+            }
+            info!({ result_str });
+        }
+        Err(e) => {
+            error!("Got error sending to network {net} and block height {block_height}: {e}");
+        }
+    }
+}
+
 pub async fn loop_processing_batch_of_updates(
     net: String,
     relayer_name: String,
@@ -209,59 +272,15 @@ pub async fn loop_processing_batch_of_updates(
         let msgs_in_queue = chan.len();
         match cmd_opt {
             Some(cmd) => {
-                let block_height = cmd.updates.block_height;
-                tracing::info!("Processing updates for network {relayer_name}, block_height {block_height}, messages in queue = {msgs_in_queue}");
-                let provider = cmd.provider.clone();
-                let result = eth_batch_send_to_contract(cmd).await;
-
-                let provider_metrics = provider.lock().await.provider_metrics.clone();
-                dec_metric!(provider_metrics, net, num_transactions_in_queue);
-                inc_metric!(provider_metrics, net, total_tx_sent);
-
-                match result {
-                    Ok((status, updated_feeds)) => {
-                        let mut result_str = String::new();
-                        result_str += &format!("result from network {net} and block height {block_height}: Ok -> status: {status}");
-                        if status == "true" {
-                            result_str += &format!(", updated_feeds: {updated_feeds:?}");
-                            increment_feeds_rb_metrics(
-                                &updated_feeds,
-                                Some(feeds_metrics.clone()),
-                                net.as_str(),
-                            )
-                            .await;
-                            {
-                                let provider = provider.lock().await;
-                                let provider_metrics = &provider.provider_metrics;
-                                inc_metric!(provider_metrics, net, success_send_tx);
-                            }
-                            let mut status_map = provider_status.write().await;
-                            status_map.insert(net.clone(), ProviderStatus::LastUpdateSucceeded);
-                        } else if status == "false" || status == "timeout" {
-                            let mut provider = provider.lock().await;
-                            result_str += &format!(
-                                ", failed to update feeds: {updated_feeds:?} due to {status}"
-                            );
-                            decrement_feed_rb_indices(&updated_feeds, net.as_str(), &mut provider)
-                                .await;
-
-                            let provider_metrics = &provider.provider_metrics;
-                            if status == "timeout" {
-                                inc_metric!(provider_metrics, net, total_timed_out_tx);
-                            } else if status == "false" {
-                                inc_metric!(provider_metrics, net, failed_send_tx);
-                            }
-                            let mut status_map = provider_status.write().await;
-                            status_map.insert(net.clone(), ProviderStatus::LastUpdateFailed);
-                        }
-                        info!({ result_str });
-                    }
-                    Err(e) => {
-                        error!(
-                        "Got error sending to network {net} and block height {block_height}: {e}"
-                    );
-                    }
-                }
+                process_batch_of_updates_cmd(
+                    &net,
+                    relayer_name.as_str(),
+                    &feeds_metrics,
+                    &provider_status,
+                    msgs_in_queue,
+                    cmd,
+                )
+                .await;
             }
             None => warn!("Relayer {relayer_name} woke up on empty channel"),
         }
