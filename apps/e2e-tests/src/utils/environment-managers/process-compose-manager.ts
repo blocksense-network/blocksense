@@ -1,4 +1,4 @@
-import { Effect, Layer, ParseResult, Schema as S } from 'effect';
+import { Effect, Layer, ParseResult, pipe, Schema as S } from 'effect';
 import { Command } from '@effect/platform';
 import { NodeContext } from '@effect/platform-node';
 
@@ -15,7 +15,11 @@ export const ProcessComposeLive = Layer.succeed(
   EnvironmentManager,
   EnvironmentManager.of({
     start: (environmentName: string) =>
-      startEnvironment(environmentName).pipe(
+      pipe(
+        Effect.gen(function* () {
+          yield* validateEnv();
+          yield* startEnvironment(environmentName);
+        }),
         Effect.mapError(
           error =>
             new EnvironmentError({
@@ -131,4 +135,19 @@ export function parseProcessesStatus(): Effect.Effect<
       'name',
     );
   });
+}
+
+function validateEnv(): Effect.Effect<void, EnvironmentError> {
+  const requiredEnvVars = ['RPC_URL_INK_SEPOLIA', 'RPC_URL_ETHEREUM_SEPOLIA'];
+  const missingEnvVars = requiredEnvVars.filter(v => !process.env[v]);
+
+  return missingEnvVars.length > 0
+    ? Effect.fail(
+        new EnvironmentError({
+          message:
+            'Missing required environment variables: ' +
+            missingEnvVars.join(', '),
+        }),
+      )
+    : Effect.void;
 }

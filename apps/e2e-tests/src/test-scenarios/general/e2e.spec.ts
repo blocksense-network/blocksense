@@ -93,7 +93,9 @@ describe.sequential('E2E Tests with process-compose', () => {
     );
 
     if (Exit.isFailure(res)) {
-      throw new Error(`Failed to start test environment: ${testEnvironment}`);
+      throw new Error(
+        `Failed to start test environment: ${testEnvironment}. Reason: ${res.cause}`,
+      );
     }
   });
 
