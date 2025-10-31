@@ -1,4 +1,4 @@
-use crate::providers::provider::{RpcProvider, SharedRpcProviders};
+use crate::providers::provider::{ProviderStatus, RpcProvider, SharedRpcProviders};
 use actix_web::rt::time::timeout;
 use alloy::eips::BlockNumberOrTag;
 use alloy::hex;
@@ -18,11 +18,16 @@ use tokio_stream::StreamExt;
 use tracing::{debug, error, info, trace, warn};
 // TODO: use futures_util::StreamExt;
 
-use blocksense_metrics::{inc_metric, inc_vec_metric, metrics::ProviderMetrics};
+use blocksense_metrics::{
+    inc_metric, inc_vec_metric,
+    metrics::{FeedsMetrics, ProviderMetrics},
+};
 use blocksense_utils::await_time;
 
 // Local helpers from eth_send_utils we need to call
-use crate::providers::eth_send_utils::{try_to_sync, BatchOfUpdatesToProcess};
+use crate::providers::eth_send_utils::{
+    process_batch_of_updates_cmd, try_to_sync, BatchOfUpdatesToProcess,
+};
 use crate::providers::ws::{ResilientWsConnect, WsReconnectMetrics, WsReconnectPolicy};
 
 async fn rpc_get_block_by_number(
@@ -58,6 +63,9 @@ pub struct ReorgTracker {
     net: String,
     providers_mutex: SharedRpcProviders,
     updates_relayer_send_chan: CountedSender<BatchOfUpdatesToProcess>,
+    feeds_metrics: Arc<RwLock<FeedsMetrics>>,
+    provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>>,
+    relayer_name: String,
     websocket_url: Option<String>,
     websocket_policy: WsReconnectPolicy,
     websocket_retry_attempt: u64,
@@ -235,16 +243,19 @@ impl ReorgTracker {
                             );
                             let msgs_in_queue = updates_relayer_send_chan.len();
                             let block_height = batch.updates.block_height;
-                            let provider_metrics = &provider.provider_metrics;
-                            match updates_relayer_send_chan.send(batch) {
-                                Ok(()) => {
-                                    debug!("Resent updates to relayer for network {net} and block height {block_height}, messages in queue = {msgs_in_queue} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})");
-                                    inc_metric!(provider_metrics, net, num_transactions_in_queue);
-                                }
-                                Err(e) => {
-                                    error!("Error while sending updates to relayer for network {net} and block height {block_height}, messages in queue = {msgs_in_queue}: {e} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})")
-                                }
-                            };
+                            let provider_metrics = provider.provider_metrics.clone();
+                            inc_metric!(provider_metrics, net, num_transactions_in_queue);
+                            debug!("Reprocessing updates for network {net} and block height {block_height}, messages in queue = {msgs_in_queue} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})");
+                            process_batch_of_updates_cmd(
+                                net.as_str(),
+                                self.relayer_name.as_str(),
+                                &self.feeds_metrics,
+                                &self.provider_status,
+                                msgs_in_queue,
+                                batch,
+                                &mut provider,
+                            )
+                            .await;
                         }
                     }
                 }
@@ -858,11 +869,15 @@ impl ReorgTracker {
         self.observed_latest_height = observed_latest_height;
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         net: String,
         config: ReorgConfig,
         providers_mutex: SharedRpcProviders,
         updates_relayer_send_chan: CountedSender<BatchOfUpdatesToProcess>,
+        feeds_metrics: Arc<RwLock<FeedsMetrics>>,
+        provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>>,
+        relayer_name: String,
         websocket_url: Option<String>,
         websocket_reconnect: Option<WebsocketReconnectConfig>,
     ) -> ReorgTracker {
@@ -874,6 +889,9 @@ impl ReorgTracker {
             net,
             providers_mutex,
             updates_relayer_send_chan,
+            feeds_metrics,
+            provider_status,
+            relayer_name,
             websocket_url,
             websocket_policy: WsReconnectPolicy::from_config(websocket_reconnect.as_ref()),
             websocket_retry_attempt: 0,
@@ -1199,12 +1217,21 @@ mod tests {
             }
         }
 
-        let providers = init_shared_rpc_providers(
-            &cfg,
-            Some(["test_reorg_", metrics_prefix].concat().as_str()),
-            &feeds_config,
-        )
-        .await;
+        let metrics_prefix_full = format!("test_reorg_{metrics_prefix}");
+        let providers =
+            init_shared_rpc_providers(&cfg, Some(metrics_prefix_full.as_str()), &feeds_config)
+                .await;
+        let feeds_metrics = Arc::new(RwLock::new(
+            FeedsMetrics::new(metrics_prefix_full.as_str())
+                .expect("Failed to allocate feed metrics"),
+        ));
+        let provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>> =
+            Arc::new(RwLock::new(HashMap::new()));
+        {
+            let mut status_guard = provider_status.write().await;
+            status_guard.insert(net.to_string(), ProviderStatus::AwaitingFirstUpdate);
+        }
+        let relayer_name = format!("relayer_for_network {net}");
         let provider_mutex = providers.read().await.get(net).unwrap().clone();
 
         // Inject a dummy ADFS contract address so the reorg loop's root-check and resync paths are exercised
@@ -1263,10 +1290,13 @@ mod tests {
             .await
             .expect("snapshot should succeed");
 
-        let (feed_updates_send, mut feed_updates_recv) = counted_unbounded_channel();
+        let (feed_updates_send, _feed_updates_recv) = counted_unbounded_channel();
 
         let providers_clone = providers.clone();
         let websocket_url_clone = websocket_url.clone();
+        let feeds_metrics_clone = feeds_metrics.clone();
+        let provider_status_clone = provider_status.clone();
+        let relayer_name_clone = relayer_name.clone();
 
         // 4) Start the reorg tracking loop in background
         let loop_handle = tokio::task::Builder::new()
@@ -1278,6 +1308,9 @@ mod tests {
                     },
                     providers_clone,
                     feed_updates_send,
+                    feeds_metrics_clone,
+                    provider_status_clone,
+                    relayer_name_clone,
                     websocket_url_clone,
                     None,
                 );
@@ -1484,40 +1517,26 @@ mod tests {
             assert!(count > 0, "Expected at least one reorg to be detected");
         }
 
-        // 8) Drain relayer channel and assert only post-fork updates were reintroduced
-        // Expect exactly the two batches for heights T1-1 and T1, none for T0.
-        let mut received_heights = Vec::new();
-        // Allow generous time for messages to arrive to avoid flakiness
-        for _ in 0..20 {
-            if let Ok(Some(batch)) =
-                tokio::time::timeout(std::time::Duration::from_secs(1), feed_updates_recv.recv())
-                    .await
-            {
-                // Decode the marker we embedded via encoded_feed_id = height
-                if let Some(vu) = batch.updates.updates.first() {
-                    received_heights.push(vu.encoded_feed_id.get_id());
-                }
-                if received_heights.len() >= 2 {
-                    break;
-                }
-            } else {
-                break;
+        // 8) Assert post-fork updates were reprocessed while pre-fork update remains in inflight map
+        {
+            let provider = provider_mutex.lock().await;
+            assert!(
+                !provider
+                    .inflight
+                    .non_finalized_updates
+                    .contains_key(&t1_height),
+                "Expected post-fork non-finalized update at T1 to be reprocessed"
+            );
+            if t1_height > 0 {
+                assert!(
+                    !provider
+                        .inflight
+                        .non_finalized_updates
+                        .contains_key(&(t1_height - 1)),
+                    "Expected post-fork non-finalized update at T1-1 to be reprocessed"
+                );
             }
         }
-        received_heights.sort_unstable();
-        let expected: Vec<u128> = if t1_height > 0 {
-            vec![(t1_height - 1) as u128, t1_height as u128]
-        } else {
-            vec![t1_height as u128]
-        };
-        assert_eq!(
-            received_heights, expected,
-            "Expected only post-fork updates to be reintroduced"
-        );
-        assert!(
-            !received_heights.contains(&(t0_height as u128)),
-            "Did not expect pre-fork update to be reintroduced"
-        );
 
         // 9) Assert pre-fork update remains in inflight map
         {

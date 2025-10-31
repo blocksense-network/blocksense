@@ -180,7 +180,7 @@ pub async fn create_and_collect_relayers_futures(
     }
 }
 
-async fn process_batch_of_updates_cmd(
+pub(crate) async fn process_batch_of_updates_cmd(
     net: &str,
     relayer_name: &str,
     feeds_metrics: &Arc<RwLock<FeedsMetrics>>,
@@ -326,7 +326,10 @@ pub async fn create_per_network_reorg_trackers(
     for (net, _p) in providers.iter() {
         let reorg_trackers_name = format!("reorg_tracker for {net}");
         let net_clone = net.clone();
+        let relayer_name = format!("relayer_for_network {net}");
         let sequencer_state_providers_clone = sequencer_state.providers.clone();
+        let feeds_metrics = sequencer_state.feeds_metrics.clone();
+        let provider_status = sequencer_state.provider_status.clone();
         let sequencer_config = sequencer_state.sequencer_config.read().await;
         let (reorg_tracker_config, websocket_url_opt, websocket_reconnect_opt) =
             match sequencer_config.providers.get(net.as_str()) {
@@ -356,6 +359,9 @@ pub async fn create_per_network_reorg_trackers(
             reorg_tracker_config,
             sequencer_state_providers_clone,
             relayer_send_channel,
+            feeds_metrics,
+            provider_status,
+            relayer_name,
             websocket_url_opt,
             websocket_reconnect_opt,
         );
