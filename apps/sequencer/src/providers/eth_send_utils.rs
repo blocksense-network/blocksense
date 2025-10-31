@@ -83,15 +83,12 @@ pub fn filter_allowed_feeds(
 // Will reduce the updates to only the relevant for the network
 pub async fn get_serialized_updates_for_network(
     net: &str,
-    provider_mutex: &Arc<Mutex<RpcProvider>>,
+    provider: &RpcProvider,
     updates: &mut BatchedAggregatesToSend,
     provider_settings: &blocksense_config::Provider,
     feeds_config: Arc<RwLock<HashMap<EncodedFeedId, FeedConfig>>>,
     feeds_rb_indices: &mut HashMap<EncodedFeedId, u64>,
 ) -> Result<Vec<u8>> {
-    debug!("Acquiring a read lock on provider config for `{net}`");
-    let provider = provider_mutex.lock().await;
-    debug!("Acquired a read lock on provider config for `{net}`");
     filter_allowed_feeds(net, updates, &provider_settings.allow_feeds);
     provider.peg_stable_coins_to_value(updates);
     provider.apply_publish_criteria(updates, net);
@@ -100,9 +97,6 @@ pub async fn get_serialized_updates_for_network(
     if updates.updates.is_empty() {
         return Ok(Vec::new());
     }
-
-    drop(provider);
-    debug!("Released a read lock on provider config for `{net}`");
 
     let mut strides_and_decimals = HashMap::new();
     let mut relevant_feed_ids = HashSet::new();
@@ -124,29 +118,22 @@ pub async fn get_serialized_updates_for_network(
         );
     }
 
-    let serialized_updates = {
-        let provider = provider_mutex.lock().await;
-        match adfs_serialize_updates(
-            net,
-            updates,
-            Some(&provider.rb_indices),
-            strides_and_decimals,
-            feeds_rb_indices,
-        )
-        .await
-        {
-            Ok(bytes) => {
-                debug!(
-                    "adfs_serialize_updates result for network {} and block height {} = {}",
-                    net,
-                    updates.block_height,
-                    hex::encode(&bytes)
-                );
-                bytes
-            }
-            Err(e) => bail!("ADFS serialization failed: {e}!"),
-        }
-    };
+    let serialized_updates = adfs_serialize_updates(
+        net,
+        updates,
+        Some(&provider.rb_indices),
+        strides_and_decimals,
+        feeds_rb_indices,
+    )
+    .await
+    .map_err(|e| eyre!("ADFS serialization failed: {e}!"))?;
+
+    debug!(
+        "adfs_serialize_updates result for network {} and block height {} = {}",
+        net,
+        updates.block_height,
+        hex::encode(&serialized_updates)
+    );
 
     Ok(serialized_updates)
 }
@@ -194,59 +181,47 @@ pub async fn create_and_collect_relayers_futures(
 }
 
 async fn process_batch_of_updates_cmd(
-    net: &String,
+    net: &str,
     relayer_name: &str,
     feeds_metrics: &Arc<RwLock<FeedsMetrics>>,
     provider_status: &Arc<RwLock<HashMap<String, ProviderStatus>>>,
     msgs_in_queue: usize,
     cmd: BatchOfUpdatesToProcess,
+    provider: &mut RpcProvider,
 ) {
     let block_height = cmd.updates.block_height;
     tracing::info!(
         "Processing updates for network {relayer_name}, block_height {block_height}, messages in queue = {msgs_in_queue}"
     );
-    let provider = cmd.provider.clone();
-    let result = eth_batch_send_to_contract(cmd).await;
+    let result = eth_batch_send_to_contract(&cmd, provider).await;
 
-    let provider_metrics = provider.lock().await.provider_metrics.clone();
+    let provider_metrics = provider.provider_metrics.clone();
     dec_metric!(provider_metrics, net, num_transactions_in_queue);
     inc_metric!(provider_metrics, net, total_tx_sent);
 
     match result {
         Ok((status, updated_feeds)) => {
-            let mut result_str = String::new();
-            result_str += &format!(
+            let mut result_str = format!(
                 "result from network {net} and block height {block_height}: Ok -> status: {status}"
             );
             if status == "true" {
                 result_str += &format!(", updated_feeds: {updated_feeds:?}");
-                increment_feeds_rb_metrics(
-                    &updated_feeds,
-                    Some(feeds_metrics.clone()),
-                    net.as_str(),
-                )
-                .await;
-                {
-                    let provider = provider.lock().await;
-                    let provider_metrics = &provider.provider_metrics;
-                    inc_metric!(provider_metrics, net, success_send_tx);
-                }
+                increment_feeds_rb_metrics(&updated_feeds, Some(feeds_metrics.clone()), net).await;
+                inc_metric!(provider_metrics, net, success_send_tx);
                 let mut status_map = provider_status.write().await;
-                status_map.insert(net.clone(), ProviderStatus::LastUpdateSucceeded);
+                status_map.insert(cmd.net.clone(), ProviderStatus::LastUpdateSucceeded);
             } else if status == "false" || status == "timeout" {
-                let mut provider = provider.lock().await;
                 result_str +=
                     &format!(", failed to update feeds: {updated_feeds:?} due to {status}");
-                decrement_feed_rb_indices(&updated_feeds, net.as_str(), &mut provider).await;
+                decrement_feed_rb_indices(&updated_feeds, net, provider).await;
 
-                let provider_metrics = &provider.provider_metrics;
                 if status == "timeout" {
                     inc_metric!(provider_metrics, net, total_timed_out_tx);
                 } else if status == "false" {
                     inc_metric!(provider_metrics, net, failed_send_tx);
                 }
                 let mut status_map = provider_status.write().await;
-                status_map.insert(net.clone(), ProviderStatus::LastUpdateFailed);
+                status_map.insert(cmd.net.clone(), ProviderStatus::LastUpdateFailed);
             }
             info!({ result_str });
         }
@@ -272,13 +247,16 @@ pub async fn loop_processing_batch_of_updates(
         let msgs_in_queue = chan.len();
         match cmd_opt {
             Some(cmd) => {
+                let provider_arc = cmd.provider.clone();
+                let mut provider_guard = provider_arc.lock().await;
                 process_batch_of_updates_cmd(
-                    &net,
+                    net.as_str(),
                     relayer_name.as_str(),
                     &feeds_metrics,
                     &provider_status,
                     msgs_in_queue,
                     cmd,
+                    &mut provider_guard,
                 )
                 .await;
             }
@@ -395,10 +373,10 @@ pub async fn create_per_network_reorg_trackers(
 
 #[allow(clippy::too_many_arguments)]
 pub async fn eth_batch_send_to_contract(
-    cmd: BatchOfUpdatesToProcess,
+    cmd: &BatchOfUpdatesToProcess,
+    provider: &mut RpcProvider,
 ) -> Result<(String, Vec<EncodedFeedId>)> {
     let net = cmd.net.clone();
-    let provider_mutex = cmd.provider.clone();
     let provider_settings = cmd.provider_settings.clone();
     let feeds_config = cmd.feeds_config.clone();
     let transaction_retry_timeout_secs = cmd.transaction_retry_timeout_secs;
@@ -408,7 +386,7 @@ pub async fn eth_batch_send_to_contract(
     let mut feeds_rb_indices = HashMap::new();
     let serialized_updates = get_serialized_updates_for_network(
         net.as_str(),
-        &provider_mutex,
+        &*provider,
         &mut updates,
         &provider_settings,
         feeds_config,
@@ -430,10 +408,6 @@ pub async fn eth_batch_send_to_contract(
         "About to post {} updates to smart contract for network `{net}`",
         updates.updates.len()
     );
-
-    debug!("Acquiring a read/write lock on provider state for network `{net}` block height {block_height}");
-    let mut provider = provider_mutex.lock().await;
-    debug!("Acquired a read/write lock on provider state for network `{net}` block height {block_height}");
 
     let prev_calldata_merkle_tree_root = match &provider.merkle_root_in_contract {
         Some(stored_hash) => stored_hash.clone(),
@@ -464,7 +438,7 @@ pub async fn eth_batch_send_to_contract(
             Ok(root) => {
                 if HashValue(root.into()) != prev_calldata_merkle_tree_root {
                     warn!("Out of sync detected, trying to sync with latest changes!");
-                    try_to_sync(net.as_str(), &mut provider, &contract_address, None).await;
+                    try_to_sync(net.as_str(), provider, &contract_address, None).await;
                     return Err(eyre!("Out of sync in network {net}"));
                 }
             }
@@ -480,7 +454,7 @@ pub async fn eth_batch_send_to_contract(
         .map(|update| update.encoded_feed_id)
         .collect();
 
-    increment_feeds_rb_indices(&feeds_to_update_ids, net.as_str(), &mut provider).await;
+    increment_feeds_rb_indices(&feeds_to_update_ids, net.as_str(), provider).await;
 
     let signer = &provider.signer;
 
@@ -622,7 +596,7 @@ pub async fn eth_batch_send_to_contract(
                     //       i.e. only do it when there were no included transactions found
                     try_to_sync(
                         net.as_str(),
-                        &mut provider,
+                        provider,
                         &contract_address,
                         Some(&next_calldata_merkle_tree_root),
                     )
@@ -647,7 +621,7 @@ pub async fn eth_batch_send_to_contract(
 
         let gas_price = match get_gas_price(
             net.as_str(),
-            &provider,
+            provider,
             &updates,
             transaction_retry_timeout_secs,
         )
@@ -674,7 +648,7 @@ pub async fn eth_batch_send_to_contract(
 
         let chain_id = match get_chain_id(
             net.as_str(),
-            &provider,
+            provider,
             &updates,
             transaction_retry_timeout_secs,
         )
@@ -786,7 +760,7 @@ pub async fn eth_batch_send_to_contract(
                             info!("Trying to sync due to tx revert, network {net}, block_height {block_height}, latest_nonce {latest_nonce}, previous_nonce {nonce}, merkle_root in contract {prev_calldata_merkle_tree_root:?}");
                             try_to_sync(
                                 net.as_str(),
-                                &mut provider,
+                                provider,
                                 &contract_address,
                                 Some(&next_calldata_merkle_tree_root),
                             )
@@ -882,7 +856,7 @@ pub async fn eth_batch_send_to_contract(
     log_gas_used(&net, &receipt, transaction_time, provider_metrics).await;
 
     if let Some(b) = inclusion_block {
-        provider.insert_non_finalized_update(b, cmd);
+        provider.insert_non_finalized_update(b, cmd.clone());
         if let Some(h) = inclusion_block_hash {
             provider.insert_observed_block_hash(b, h);
         }
@@ -896,9 +870,6 @@ pub async fn eth_batch_send_to_contract(
         provider.merkle_root_in_contract = None;
         debug!("Successfully updated contract in network `{net}` block height {block_height} Merkle root {root:?}");
     } // TODO: Reread ring buffer indices + latest state hash from contract
-    drop(provider);
-    debug!("Released a read/write lock on provider state in network `{net}` block height {block_height}");
-
     Ok((result, feeds_to_update_ids))
 }
 

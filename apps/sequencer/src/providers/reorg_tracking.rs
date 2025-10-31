@@ -193,16 +193,16 @@ impl ReorgTracker {
                 })
                 .collect();
             warn!(
-            "Diverged blocks observed in network {net}: {} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})",
-            diverged_description.join("; ")
-        );
+                "Diverged blocks observed in network {net}: {} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})",
+                diverged_description.join("; ")
+            );
         }
 
         if let Some((common_height, common_hash)) = first_common {
             info!(
-            "First common ancestor for reorg in network {net} at height {common_height} with hash {} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})",
-            fmt_hash(&common_hash)
-        );
+                "First common ancestor for reorg in network {net} at height {common_height} with hash {} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})",
+                fmt_hash(&common_hash)
+            );
             let fork_height = common_height + 1;
             info!("Fork point for reorg in network {net} is at height {fork_height} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})");
 
@@ -253,8 +253,8 @@ impl ReorgTracker {
             Some(fork_height)
         } else {
             warn!(
-            "Failed to find a common ancestor within stored block hashes for reorg in network {net} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})"
-        );
+                "Failed to find a common ancestor within stored block hashes for reorg in network {net} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})"
+            );
             None
         }
     }

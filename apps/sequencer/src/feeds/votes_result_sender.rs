@@ -249,23 +249,26 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
 
         let mut feeds_rb_indices = HashMap::new();
 
-        let serialized_updates = match get_serialized_updates_for_network(
-            net,
-            provider,
-            &mut updates,
-            &provider_settings,
-            feeds_config,
-            &mut feeds_rb_indices,
-        )
-        .await
-        {
-            Ok(res) => {
-                debug!("Got serialized updates for network {net}");
-                res
-            }
-            Err(e) => {
-                warn!("Could not get serialized updates for network {net} due to: {e}");
-                continue;
+        let serialized_updates = {
+            let provider_guard = provider.lock().await;
+            match get_serialized_updates_for_network(
+                net,
+                &provider_guard,
+                &mut updates,
+                &provider_settings,
+                feeds_config.clone(),
+                &mut feeds_rb_indices,
+            )
+            .await
+            {
+                Ok(res) => {
+                    debug!("Got serialized updates for network {net}");
+                    res
+                }
+                Err(e) => {
+                    warn!("Could not get serialized updates for network {net} due to: {e}");
+                    continue;
+                }
             }
         };
 
@@ -380,9 +383,9 @@ async fn try_send_aggregation_consensus_trigger_to_reporters(
         }
 
         {
-            let mut provider = provider.lock().await;
-            increment_feeds_rb_indices(&updated_feeds_ids, net, &mut provider).await;
-            provider.inc_num_tx_in_progress();
+            let mut provider_guard = provider.lock().await;
+            increment_feeds_rb_indices(&updated_feeds_ids, net, &mut provider_guard).await;
+            provider_guard.inc_num_tx_in_progress();
         }
     }
 }
