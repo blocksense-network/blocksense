@@ -82,6 +82,7 @@ pub fn oracle_component(_attr: TokenStream, item: TokenStream) -> TokenStream {
                         ::blocksense_sdk::oracle::DataFeedResultValue::None => Self::None,
                         ::blocksense_sdk::oracle::DataFeedResultValue::Numerical(value) => Self::Numerical(value),
                         ::blocksense_sdk::oracle::DataFeedResultValue::Text(value) => Self::Text(value),
+                        ::blocksense_sdk::oracle::DataFeedResultValue::Bytes(value) => Self::Bytes(value),
                         ::blocksense_sdk::oracle::DataFeedResultValue::Error(error) => Self::Error(error),
                     }
                 }

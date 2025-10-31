@@ -39,26 +39,44 @@ impl FeedAggregate {
                 let span = info_span!("MajorityVoteAggregator");
                 let _guard = span.enter();
 
-                let mut frequency_map = HashMap::new();
+                let mut frequency_map_text = HashMap::new();
+                let mut frequency_map_bytes = HashMap::new();
 
                 // Count the occurrences of each string
                 for v in values {
                     match v {
-                        FeedType::Text(t) => *frequency_map.entry(t).or_insert(0) += 1,
+                        FeedType::Text(t) => *frequency_map_text.entry(t).or_insert(0) += 1,
+                        FeedType::Bytes(b) => *frequency_map_bytes.entry(b).or_insert(0) += 1,
                         _ => {
-                            error!("Attempting to perform frequency_map on f64!");
+                            error!("Attempting to perform frequency_map on {:?}", v);
                         }
                     }
                 }
 
                 // Find the string with the maximum occurrences
-                let result = frequency_map
-                    .into_iter()
-                    .max_by_key(|&(_, count)| count)
-                    .map(|(s, _)| s)
-                    .expect("Aggregating empty set of values!")
-                    .clone();
-                FeedType::Text(result)
+                if frequency_map_text.len() > 0 {
+                    assert!(
+                        frequency_map_bytes.len() == 0,
+                        "Mixing Text and Bytes in MajorityVoteAggregator is not allowed!"
+                    );
+                    let result = frequency_map_text
+                        .into_iter()
+                        .max_by_key(|&(_, count)| count)
+                        .map(|(s, _)| s)
+                        .unwrap()
+                        .clone();
+                    FeedType::Text(result)
+                } else if frequency_map_bytes.len() > 0 {
+                    let result = frequency_map_bytes
+                        .into_iter()
+                        .max_by_key(|&(_, count)| count)
+                        .map(|(s, _)| s)
+                        .unwrap()
+                        .clone();
+                    FeedType::Bytes(result)
+                } else {
+                    panic!("No valid types to aggregate in MajorityVoteAggregator!");
+                }
             }
             FeedAggregate::MedianAggregator => {
                 let span = info_span!("MedianAggregator");

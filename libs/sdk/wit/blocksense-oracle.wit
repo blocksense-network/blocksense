@@ -21,6 +21,7 @@ interface oracle-types {
     none,
     error(string),
     numerical(f64),
+    bytes(list<u8>),
     text(string),
   }
 

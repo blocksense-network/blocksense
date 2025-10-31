@@ -497,10 +497,10 @@ pub fn test_feed_config(id: FeedId, stride: u8) -> FeedConfig {
                 .as_millis() as u64,
         },
         additional_feed_info: PriceFeedInfo {
-            pair: blocksense_registry::config::AssetPair {
+            pair: Some(blocksense_registry::config::AssetPair {
                 base: "FOXY".to_owned(),
                 quote: "USD".to_owned(),
-            },
+            }),
             decimals: 18,
             category: "Crypto".to_owned(),
             market_hours: Some("Crypto".to_owned()),

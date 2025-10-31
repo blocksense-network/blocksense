@@ -946,6 +946,8 @@ version = "0.1.1"
 dependencies = [
  "anyhow",
  "blocksense-sdk",
+ "ethereum_ssz",
+ "ethereum_ssz_derive",
  "futures",
  "itertools 0.14.0",
  "serde",
@@ -1560,6 +1562,46 @@ dependencies = [
  "tracing-subscriber",
  "url",
  "wit-bindgen",
+]
+
+[[package]]
+name = "ethereum_serde_utils"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3dc1355dbb41fbbd34ec28d4fb2a57d9a70c67ac3c19f6a5ca4d4a176b9e997a"
+dependencies = [
+ "alloy-primitives",
+ "hex",
+ "serde",
+ "serde_derive",
+ "serde_json",
+]
+
+[[package]]
+name = "ethereum_ssz"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0dcddb2554d19cde19b099fadddde576929d7a4d0c1cd3512d1fd95cf174375c"
+dependencies = [
+ "alloy-primitives",
+ "ethereum_serde_utils",
+ "itertools 0.13.0",
+ "serde",
+ "serde_derive",
+ "smallvec 1.15.1",
+ "typenum",
+]
+
+[[package]]
+name = "ethereum_ssz_derive"
+version = "0.9.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a657b6b3b7e153637dc6bdc6566ad9279d9ee11a15b12cfb24a2e04360637e9f"
+dependencies = [
+ "darling",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.104",
 ]
 
 [[package]]
@@ -2304,6 +2346,15 @@ name = "itertools"
 version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b0fd2260e829bddf4cb6ea802289de2f86d6a7a690192fbe91b3f46e0f2c8473"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "413ee7dfc52ee1a4949ceeb7dbc8a33f2d6c088194d9f922fb8318faf1f01186"
 dependencies = [
  "either",
 ]
@@ -3740,6 +3791,24 @@ checksum = "d91ed6c858b01f942cd56b37a94b3e0a1798290327d1236e4d9cf4eaca44d29d"
 dependencies = [
  "base64ct",
  "der",
+]
+
+[[package]]
+name = "sports-db"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "blocksense-data-providers-sdk",
+ "blocksense-sdk",
+ "futures",
+ "serde",
+ "serde-this-or-that",
+ "serde_derive",
+ "serde_json",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+ "wit-bindgen",
 ]
 
 [[package]]

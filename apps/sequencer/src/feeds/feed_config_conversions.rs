@@ -14,10 +14,12 @@ pub fn feed_config_to_block(feed_config: &FeedConfig) -> BlockFeedConfig {
         description: string_to_data_chunk(&feed_config.description),
         _type: string_to_data_chunk(&feed_config.feed_type),
         decimals: feed_config.additional_feed_info.decimals,
-        pair: blocksense_blockchain_data_model::AssetPair {
-            base: string_to_data_chunk(feed_config.additional_feed_info.pair.base.as_str()),
-            quote: string_to_data_chunk(feed_config.additional_feed_info.pair.quote.as_str()),
-        },
+        pair: feed_config.additional_feed_info.pair.as_ref().map(|pair| {
+            blocksense_blockchain_data_model::AssetPair {
+                base: string_to_data_chunk(pair.base.as_str()),
+                quote: string_to_data_chunk(pair.quote.as_str()),
+            }
+        }),
         report_interval_ms: feed_config.schedule.interval_ms,
         first_report_start_time: feed_config.schedule.first_report_start_unix_time_ms,
         resources: json_to_byte_arrays(&feed_config.additional_feed_info.arguments)
@@ -100,10 +102,10 @@ pub fn block_feed_to_feed_config(block_feed: &BlockFeedConfig) -> FeedConfig {
             first_report_start_unix_time_ms: block_feed.first_report_start_time,
         },
         additional_feed_info: PriceFeedInfo {
-            pair: AssetPair {
-                base: data_chunk_to_string(&block_feed.pair.base),
-                quote: data_chunk_to_string(&block_feed.pair.quote),
-            },
+            pair: block_feed.pair.as_ref().map(|pair| AssetPair {
+                base: data_chunk_to_string(&pair.base),
+                quote: data_chunk_to_string(&pair.quote),
+            }),
             decimals: block_feed.decimals,
             category: "".to_string(),
             market_hours: None,

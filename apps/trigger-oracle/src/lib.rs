@@ -768,6 +768,7 @@ impl OracleTrigger {
                 let result = match value {
                     oracle::DataFeedResultValue::Numerical(value) => Ok(FeedType::Numerical(value)),
                     oracle::DataFeedResultValue::Text(value) => Ok(FeedType::Text(value)),
+                    oracle::DataFeedResultValue::Bytes(value) => Ok(FeedType::Bytes(value)),
                     oracle::DataFeedResultValue::Error(error_string) => {
                         Err(FeedError::APIError(error_string))
                     }
