@@ -41,6 +41,7 @@ pub enum DataFeedResultValue {
     None,
     Numerical(f64),
     Text(String),
+    Bytes(Vec<u8>),
     Error(String),
 }
 

@@ -8,6 +8,7 @@ members = [
   "exsat-holdings",
   "forex-price-feeds",
   "gecko-terminal",
+  "sports-db",
   "spout-rwa",
   "stock-price-feeds",
 ]
