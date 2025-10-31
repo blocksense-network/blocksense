@@ -28,6 +28,7 @@
     "@effect/rpc": "^0.69.2",
     "@effect/sql": "^0.44.2",
     "@effect/typeclass": "^0.36.0",
+    "axios": "^1.13.1",
     "effect": "^3.17.13",
     "express": "^5.1.0",
     "prom-client": "^15.1.3",
