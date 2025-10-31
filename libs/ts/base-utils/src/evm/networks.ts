@@ -1937,7 +1937,7 @@ export const networkMetadata = {
       {
         type: 'blockscout',
         webUrl: 'https://zephyr-blockscout.eu-north-2.gateway.fm',
-        apiUrl: 'https://api.zephyr-blockscout.eu-north-2.gateway.fm/api',
+        apiUrl: 'https://zephyr-blockscout.eu-north-2.gateway.fm/api',
       },
     ],
     currency: Currency.Z,
