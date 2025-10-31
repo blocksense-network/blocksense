@@ -16,6 +16,8 @@ blocksense-sdk = { path = "./sdk" }
 alloy = "1.0.9"
 anyhow = "1"
 async-trait = "0.1"
+ethereum_ssz = "0.9.1"
+ethereum_ssz_derive = "0.9.1"
 futures = "0.3"
 itertools = "0.14.0"
 prettytable-rs = "0.10.0"

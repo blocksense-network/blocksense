@@ -25,7 +25,7 @@ pub struct BlockFeedConfig {
     pub description: DataChunk,
     pub _type: DataChunk,
     pub decimals: u8,
-    pub pair: AssetPair,
+    pub pair: Option<AssetPair>,
     pub report_interval_ms: u64,
     pub first_report_start_time: u64,
     pub resources: Resources,

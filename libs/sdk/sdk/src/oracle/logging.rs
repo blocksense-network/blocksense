@@ -1,3 +1,4 @@
+use alloy::hex;
 use prettytable::{format, Cell, Row, Table};
 use tracing::{info, warn};
 
@@ -99,7 +100,10 @@ where
                 .find(|x| x.id == id_str)
                 .and_then(|v| match &v.value {
                     DataFeedResultValue::Numerical(num) => Some(format!("{num:.8}")),
-                    _ => None,
+                    DataFeedResultValue::Bytes(bytes) => Some(format!("0x{}", hex::encode(bytes))),
+                    DataFeedResultValue::Text(text) => Some(text.clone()),
+                    DataFeedResultValue::Error(err) => Some(format!("Error: {}", err)),
+                    DataFeedResultValue::None => None,
                 })
                 .unwrap_or_else(|| {
                     track_missing_price(&id_str, &resource.get_display_name(), &providers)
