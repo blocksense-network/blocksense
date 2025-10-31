@@ -63,6 +63,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
         start,
         "numerical".to_string(),
         "average".to_string(),
+        "oracle".to_string(),
         None,
     );
     let fmd2 = FeedMetaData::new(
@@ -74,6 +75,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
         start,
         "numerical".to_string(),
         "average".to_string(),
+        "oracle".to_string(),
         None,
     );
     let fmd3 = FeedMetaData::new(
@@ -85,6 +87,7 @@ pub fn new_feeds_meta_data_reg_with_test_data() -> FeedMetaDataRegistry {
         start,
         "numerical".to_string(),
         "average".to_string(),
+        "oracle".to_string(),
         None,
     );
 
@@ -112,6 +115,7 @@ pub fn new_feeds_meta_data_reg_from_config(conf: &AllFeedsConfig) -> FeedMetaDat
                 UNIX_EPOCH + Duration::from_millis(feed.schedule.first_report_start_unix_time_ms),
                 feed.value_type.clone(),
                 feed.quorum.aggregation.clone(),
+                feed.oracle_id.clone(),
                 None, // Will be filled once FeedsSlotsManager is started and processors are up and running.
             ),
         );
@@ -664,6 +668,7 @@ mod tests {
             current_system_time,
             "numeric".to_string(),
             "average".to_string(),
+            "the_oracle".to_string(),
             None,
         );
 
