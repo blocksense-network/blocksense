@@ -33,11 +33,10 @@ import { getDataFeedsInfoFromNetwork } from '../../utils/services/onchain';
 import type { SequencerService } from '../../utils/services/sequencer';
 import { Sequencer } from '../../utils/services/sequencer';
 import type { UpdatesToNetwork } from '../../utils/services/types';
-
-import { expectedPCStatuses03 } from './expected-service-status';
+import { expectedPCStatuses03 } from '../general/expected-service-status';
 
 describe.sequential('E2E Tests with process-compose', () => {
-  const testEnvironment = `e2e-general`;
+  const testEnvironment = `e2e-wit`;
   const network = 'ink_sepolia';
   const MAX_HISTORY_ELEMENTS_PER_FEED = 8192;
 
