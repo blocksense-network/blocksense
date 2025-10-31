@@ -8,14 +8,14 @@
   "dependencies": {
     "@aztec/aztec.js": "0.67.1",
     "tslib": "^2.8.1",
-    "vite": "^7.1.4"
+    "vite": "^7.1.12"
   },
   "devDependencies": {
     "@aztec/accounts": "0.67.1",
     "@aztec/builder": "0.67.1",
     "@aztec/noir-contracts.js": "0.67.1",
-    "@babel/preset-typescript": "^7.26.0",
-    "@types/node": "^24.3.1",
+    "@babel/preset-typescript": "^7.28.5",
+    "@types/node": "^24.9.2",
     "typescript": "5.9.2",
     "vitest": "^3.2.4"
   }
