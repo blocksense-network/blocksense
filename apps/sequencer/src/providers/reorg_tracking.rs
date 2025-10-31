@@ -59,6 +59,7 @@ pub struct ReorgTracker {
     observer_finalized_height: u64,
     observed_latest_height: u64,
     loop_count: u64,
+    last_processed_reorg_in_loop_opt: Option<u64>,
     rpc_timeout: Duration,
     net: String,
     providers_mutex: SharedRpcProviders,
@@ -66,7 +67,7 @@ pub struct ReorgTracker {
     feeds_metrics: Arc<RwLock<FeedsMetrics>>,
     provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>>,
     relayer_name: String,
-    websocket_url: Option<String>,
+    websocket_url_opt: Option<String>,
     websocket_policy: WsReconnectPolicy,
     websocket_retry_attempt: u64,
     next_websocket_retry_at: Option<Instant>,
@@ -136,6 +137,15 @@ impl ReorgTracker {
         let net = self.net.clone();
         let observer_finalized_height = self.observer_finalized_height;
         let loop_count = self.loop_count;
+        if self
+            .last_processed_reorg_in_loop_opt
+            .is_some_and(|n| n == loop_count)
+        {
+            // Reorg already handled in this loop
+            return None;
+        }
+        self.last_processed_reorg_in_loop_opt = Some(loop_count);
+
         let rpc_timeout = self.rpc_timeout;
         let updates_relayer_send_chan = self.updates_relayer_send_chan.clone();
 
@@ -232,7 +242,7 @@ impl ReorgTracker {
                     );
                 } else {
                     for h in &heights {
-                        if let Some(batch) = provider.inflight.non_finalized_updates.remove(&h) {
+                        if let Some(batch) = provider.inflight.non_finalized_updates.remove(h) {
                             let updates_count = batch.updates.updates.len();
                             info!(
                                 "non_finalized_update >= fork: height {h} out of total reorged {}, batch_block_height {}, updates_count {}, network {} (observer_finalized_height={observer_finalized_height}, observed_latest_height={observed_latest_height}, loop_count={loop_count})",
@@ -275,7 +285,7 @@ impl ReorgTracker {
         let providers_mutex = self.providers_mutex.clone();
         tracing::info!("Starting tracker for reorgs in network {net} loop...");
 
-        let websocket_url = self.websocket_url.clone();
+        let websocket_url = self.websocket_url_opt.clone();
 
         let mut provider_ws_opt = None;
         let mut stream_opt = None;
@@ -493,28 +503,7 @@ impl ReorgTracker {
                             .as_ref()
                             .map(|provider| provider as &dyn Provider);
 
-                        let latest_block_result = timeout(
-                            self.rpc_timeout,
-                            rpc_get_block_by_number(
-                                &rpc_handle,
-                                ws_provider,
-                                BlockNumberOrTag::Latest,
-                            ),
-                        )
-                        .await;
-                        if let Ok(Ok(Some(b))) = latest_block_result {
-                            self.process_new_block(
-                                &rpc_handle,
-                                ws_provider,
-                                provider_mutex,
-                                &observed_block_hashes,
-                                provider_metrics,
-                                b,
-                            )
-                            .await;
-                        }
-
-                        // 2) Check the on-chain ADFS root; if it differs from our local view,
+                        // 1) Check the on-chain ADFS root; if it differs from our local view,
                         //    set it so subsequent txs use the correct prev-root and flag resync of indices.
                         {
                             let mut provider = provider_mutex.lock().await;
@@ -588,7 +577,28 @@ impl ReorgTracker {
                             }
                         }
 
-                        // 1) Observe latest finalized block for logging/visibility
+                        let latest_block_result = timeout(
+                            self.rpc_timeout,
+                            rpc_get_block_by_number(
+                                &rpc_handle,
+                                ws_provider,
+                                BlockNumberOrTag::Latest,
+                            ),
+                        )
+                        .await;
+                        if let Ok(Ok(Some(block))) = latest_block_result {
+                            self.process_new_block(
+                                &rpc_handle,
+                                ws_provider,
+                                provider_mutex,
+                                &observed_block_hashes,
+                                provider_metrics,
+                                block,
+                            )
+                            .await;
+                        }
+
+                        // 2) Observe latest finalized block for logging/visibility
                         match timeout(
                             self.rpc_timeout,
                             rpc_get_block_by_number(
@@ -878,13 +888,14 @@ impl ReorgTracker {
         feeds_metrics: Arc<RwLock<FeedsMetrics>>,
         provider_status: Arc<RwLock<HashMap<String, ProviderStatus>>>,
         relayer_name: String,
-        websocket_url: Option<String>,
+        websocket_url_opt: Option<String>,
         websocket_reconnect: Option<WebsocketReconnectConfig>,
     ) -> ReorgTracker {
         ReorgTracker {
             observer_finalized_height: 0,
             observed_latest_height: 0,
             loop_count: 0,
+            last_processed_reorg_in_loop_opt: None,
             rpc_timeout: Duration::from_secs(config.rpc_timeout_secs),
             net,
             providers_mutex,
@@ -892,7 +903,7 @@ impl ReorgTracker {
             feeds_metrics,
             provider_status,
             relayer_name,
-            websocket_url,
+            websocket_url_opt,
             websocket_policy: WsReconnectPolicy::from_config(websocket_reconnect.as_ref()),
             websocket_retry_attempt: 0,
             next_websocket_retry_at: None,
@@ -1360,6 +1371,8 @@ mod tests {
             tokio::time::sleep(std::time::Duration::from_millis(200)).await;
         }
 
+        let num_tx_sent_before_reorg;
+
         // Inject non-finalized updates: one before the fork (<= T0), and two after the fork (T1-1, T1)
         {
             let mut provider = provider_mutex.lock().await;
@@ -1402,6 +1415,14 @@ mod tests {
             }
             // Also ensure the feed index map has our key
             provider.rb_indices.insert(enc, 7);
+
+            num_tx_sent_before_reorg = provider
+                .provider_metrics
+                .read()
+                .await
+                .total_tx_sent
+                .with_label_values(&[net])
+                .get();
         }
 
         // 5) Revert to the snapshot (T0) and mine a different branch beyond T1
@@ -1517,6 +1538,8 @@ mod tests {
             assert!(count > 0, "Expected at least one reorg to be detected");
         }
 
+        tokio::time::sleep(std::time::Duration::from_millis(2000)).await;
+
         // 8) Assert post-fork updates were reprocessed while pre-fork update remains in inflight map
         {
             let provider = provider_mutex.lock().await;
@@ -1536,6 +1559,17 @@ mod tests {
                     "Expected post-fork non-finalized update at T1-1 to be reprocessed"
                 );
             }
+            // There are 3 non-finalized updates, 2 of which are reorged
+            assert_eq!(
+                num_tx_sent_before_reorg + 2,
+                provider
+                    .provider_metrics
+                    .read()
+                    .await
+                    .total_tx_sent
+                    .with_label_values(&[net])
+                    .get()
+            );
         }
 
         // 9) Assert pre-fork update remains in inflight map
