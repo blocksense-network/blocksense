@@ -1414,6 +1414,7 @@ __metadata:
   resolution: "@blocksense/chain-interactions@workspace:apps/chain-interactions"
   dependencies:
     "@blocksense/base-utils": "workspace:*"
+    "@blocksense/config-types": "workspace:*"
     "@changesets/changelog-github": "npm:^0.5.1"
     "@changesets/cli": "npm:^2.29.4"
     "@effect/cli": "npm:0.69.2"

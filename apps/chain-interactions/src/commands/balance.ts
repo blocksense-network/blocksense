@@ -16,6 +16,7 @@ import {
   parseNetworkName,
 } from '@blocksense/base-utils/evm';
 import { color as c } from '@blocksense/base-utils/tty';
+import { listEvmNetworks } from '@blocksense/config-types/read-write-config';
 
 import { deployedMainnets, deployedTestnets } from './types';
 import { filterSmallBalance, startPrometheusServer } from './utils';
@@ -26,7 +27,9 @@ export const balance = Command.make(
     addressInput: Options.optional(
       Options.text('address').pipe(withAlias('a')),
     ),
-    network: Options.optional(Options.text('network')).pipe(withAlias('n')),
+    network: Options.optional(
+      Options.choice('network', await listEvmNetworks()).pipe(withAlias('n')),
+    ),
     rpcUrl: Options.optional(
       Options.text('rpc-url').pipe(withSchema(S.URL), withAlias('r')),
     ),
