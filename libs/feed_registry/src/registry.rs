@@ -173,7 +173,7 @@ where
         for value in slice_b {
             updates.push(value);
         }
-        serialize_map.serialize_key(&encoded_feed_id.data)?;
+        serialize_map.serialize_key(&encoded_feed_id.0)?;
         serialize_map.serialize_value(&updates)?;
     }
     serialize_map.end()

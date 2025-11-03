@@ -247,6 +247,11 @@ export type NewFeedsConfig = typeof NewFeedsConfigSchema.Type;
 export const decodeNewFeedsConfig = S.decodeUnknownSync(NewFeedsConfigSchema);
 
 // TODO: (dianielstoyanov) Remove this when rust code treat feedId as string
+
+export const StrideSchema = S.Int.pipe(
+  S.between(0, 31, { message: () => 'Stride must be between 0 and 31' }),
+).annotations({ identifier: 'Stride' });
+
 export const FeedIdSchema = S.Union(S.BigInt, S.BigIntFromNumber).annotations({
   identifier: 'FeedId',
 });

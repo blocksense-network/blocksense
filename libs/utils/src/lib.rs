@@ -6,7 +6,6 @@ pub mod test_env;
 pub mod time;
 
 use ssz_rs::prelude::*;
-use ssz_rs::DeserializeError;
 
 pub type FeedId = u128;
 pub type Stride = u8;
@@ -25,9 +24,17 @@ pub type Stride = u8;
     SimpleSerialize,
     Default,
 )]
-pub struct EncodedFeedId {
-    /// Packed layout: [ stride:8 | feed_id:120 ]
-    pub data: u128,
+#[repr(transparent)]
+#[serde(into = "EncodedFeedIdParts", try_from = "EncodedFeedIdParts")]
+/// Packed layout: [ stride:8 | feed_id:120 ]
+pub struct EncodedFeedId(pub u128);
+
+#[derive(Debug, Clone, Copy, serde::Serialize, serde::Deserialize)]
+struct EncodedFeedIdParts {
+    #[serde(default)]
+    stride: Stride,
+    #[serde(with = "feed_id_serde")]
+    feed_id: FeedId,
 }
 
 impl EncodedFeedId {
@@ -41,16 +48,12 @@ impl EncodedFeedId {
             (feed_id & !Self::FEED_MASK) == 0,
             "feed_id must fit in 120 bits (15 bytes)"
         );
-        Self {
-            data: Self::encode(stride, feed_id),
-        }
+        Self(Self::encode(stride, feed_id))
     }
 
     #[inline]
     pub fn try_new(feed_id: FeedId, stride: Stride) -> Option<Self> {
-        ((feed_id & !Self::FEED_MASK) == 0).then(|| Self {
-            data: Self::encode(stride, feed_id),
-        })
+        ((feed_id & !Self::FEED_MASK) == 0).then(|| Self(Self::encode(stride, feed_id)))
     }
 
     /// Pack (stride, feed_id) into a single u128.
@@ -71,24 +74,107 @@ impl EncodedFeedId {
 
     #[inline]
     pub fn get_id(&self) -> FeedId {
-        self.data & Self::FEED_MASK
+        self.0 & Self::FEED_MASK
     }
 
     #[inline]
     pub fn get_stride(&self) -> Stride {
-        (self.data >> Self::FEED_BITS) as u8
+        (self.0 >> Self::FEED_BITS) as u8
     }
 
     /// Lowercase hex, fixed width 32 nibbles, no `0x` prefix.
     #[inline]
     pub fn to_hex(&self) -> String {
-        format!("{:032x}", self.data)
+        format!("{:032x}", self.0)
     }
 
     /// Lowercase hex with `0x` prefix, fixed width (0x + 32 nibbles).
     #[inline]
     pub fn to_hex_prefixed(&self) -> String {
-        format!("{:#034x}", self.data) // width includes "0x"
+        format!("{:#034x}", self.0) // width includes "0x"
+    }
+}
+
+impl TryFrom<EncodedFeedIdParts> for EncodedFeedId {
+    type Error = String;
+
+    fn try_from(parts: EncodedFeedIdParts) -> Result<Self, Self::Error> {
+        EncodedFeedId::try_new(parts.feed_id, parts.stride)
+            .ok_or_else(|| "feed_id must fit within 120 bits".to_string())
+    }
+}
+
+impl From<EncodedFeedId> for EncodedFeedIdParts {
+    fn from(value: EncodedFeedId) -> Self {
+        let (stride, feed_id) = value.decode();
+        Self { stride, feed_id }
+    }
+}
+
+mod feed_id_serde {
+    use super::*;
+    use serde::{
+        de::{self, Unexpected, Visitor},
+        Deserializer, Serializer,
+    };
+
+    pub fn serialize<S>(feed_id: &FeedId, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        if *feed_id <= u64::MAX as u128 {
+            serializer.serialize_u64(*feed_id as u64)
+        } else {
+            serializer.serialize_str(&feed_id.to_string())
+        }
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<FeedId, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        struct FeedIdVisitor;
+
+        impl<'de> Visitor<'de> for FeedIdVisitor {
+            type Value = FeedId;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                formatter.write_str("a non-negative feed_id as number or string")
+            }
+
+            fn visit_u64<E>(self, value: u64) -> Result<Self::Value, E> {
+                Ok(value as u128)
+            }
+
+            fn visit_i64<E>(self, value: i64) -> Result<Self::Value, E>
+            where
+                E: de::Error,
+            {
+                if value < 0 {
+                    Err(E::invalid_value(Unexpected::Signed(value), &self))
+                } else {
+                    Ok(value as u128)
+                }
+            }
+
+            fn visit_str<E>(self, value: &str) -> Result<Self::Value, E>
+            where
+                E: de::Error,
+            {
+                value
+                    .parse::<FeedId>()
+                    .map_err(|_| E::invalid_value(Unexpected::Str(value), &self))
+            }
+
+            fn visit_string<E>(self, value: String) -> Result<Self::Value, E>
+            where
+                E: de::Error,
+            {
+                self.visit_str(&value)
+            }
+        }
+
+        deserializer.deserialize_any(FeedIdVisitor)
     }
 }
 
@@ -100,16 +186,23 @@ impl fmt::Display for EncodedFeedId {
 }
 
 /// Parse from "stride:feed_id"
+/// Just used for testing, maybe be useful someda.
 impl FromStr for EncodedFeedId {
     type Err = ParseIntError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut parts = s.split(':');
-        let stride_str = parts.next().unwrap_or("");
-        let feed_str = parts.next().unwrap_or("");
-        // You can add extra validation: exactly 2 parts, etc.
-        let stride: u8 = stride_str.parse()?;
-        let feed_id: u128 = feed_str.parse()?;
+
+        let first_part = parts.next().unwrap_or("");
+        let second_part = parts.next();
+
+        let (stride, feed_id) = match second_part {
+            Some(feed_id) => (first_part.parse()?, feed_id.parse()?),
+            None => (0, first_part.parse()?),
+        };
+
+        debug_assert_eq!(parts.next(), None, "One `:` expected at most");
+
         Ok(EncodedFeedId::new(feed_id, stride))
     }
 }
@@ -236,4 +329,26 @@ pub fn get_config_file_path(base_path_from_env: &str, config_file_name: &str) ->
     });
     let config_file_path: PathBuf = config_file_path.as_str().into();
     config_file_path.join(config_file_name)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::str::FromStr;
+
+    #[test]
+    fn from_str_parses_stride_and_feed() {
+        let encoded = EncodedFeedId::from_str("5:12345").expect("valid stride:feed pair");
+
+        assert_eq!(encoded.get_stride(), 5);
+        assert_eq!(encoded.get_id(), 12345);
+    }
+
+    #[test]
+    fn from_str_defaults_stride_to_zero() {
+        let encoded = EncodedFeedId::from_str("987654321").expect("valid feed without stride");
+
+        assert_eq!(encoded.get_stride(), 0);
+        assert_eq!(encoded.get_id(), 987_654_321);
+    }
 }

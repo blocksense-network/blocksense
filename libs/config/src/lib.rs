@@ -155,7 +155,7 @@ impl Validated for ReporterConfig {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct PublishCriteria {
-    #[serde(deserialize_with = "encoded_feed_id_from_str_or_int")]
+    #[serde(flatten)]
     pub encoded_feed_id: EncodedFeedId,
     #[serde(default)]
     pub skip_publish_if_less_then_percentage: f64,
@@ -167,30 +167,6 @@ pub struct PublishCriteria {
     pub peg_tolerance_percentage: f64,
 }
 
-fn encoded_feed_id_from_str_or_int<'de, D>(deserializer: D) -> Result<EncodedFeedId, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    let v = serde_json::Value::deserialize(deserializer)?;
-    match v {
-        serde_json::Value::String(s) => {
-            EncodedFeedId::from_str(&s).map_err(serde::de::Error::custom)
-        }
-        serde_json::Value::Number(n) => {
-            if let Some(u) = n.as_u128() {
-                Ok(EncodedFeedId::from(u))
-            } else {
-                Err(serde::de::Error::custom(
-                    "encoded_feed_id number must be unsigned (fits in u128)",
-                ))
-            }
-        }
-        other => Err(serde::de::Error::custom(format!(
-            "encoded_feed_id must be a string 'stride:id' or a number, got {other:?}"
-        ))),
-    }
-}
-
 impl PublishCriteria {
     pub fn should_peg(&self, value: f64) -> bool {
         self.peg_to_value.is_some_and(|peg_value| {
@@ -198,6 +174,14 @@ impl PublishCriteria {
             let peg_range = (peg_value - tolerance)..(peg_value + tolerance);
             peg_range.contains(&value)
         })
+    }
+
+    pub fn skip_threshold(&self) -> f64 {
+        self.skip_publish_if_less_then_percentage
+    }
+
+    pub fn peg_tolerance_percent(&self) -> f64 {
+        self.peg_tolerance_percentage
     }
 }
 
@@ -727,36 +711,44 @@ mod tests {
             "safe_min_quorum": 1,
             "publishing_criteria": [
                 {
-                    "encoded_feed_id": "0:13",
+                    "stride": 0,
+                    "feed_id": 13,
                     "skip_publish_if_less_then_percentage": 13.2,
                     "always_publish_heartbeat_ms": 50000
                 },
                 {
-                    "encoded_feed_id": "0:15",
+                    "stride": 0,
+                    "feed_id": 15,
                     "skip_publish_if_less_then_percentage": 2.2
                 },
                 {
-                    "encoded_feed_id": "0:8",
+                    "stride": 0,
+                    "feed_id": 8,
                     "always_publish_heartbeat_ms": 12345
                 },
                 {
-                    "encoded_feed_id": "0:2"
+                    "stride": 0,
+                    "feed_id": 2
                 },
                 {
-                    "encoded_feed_id": "0:22",
+                    "stride": 0,
+                    "feed_id": 22,
                     "peg_to_value": 1.995
                 },
                 {
-                    "encoded_feed_id": "0:23",
+                    "stride": 0,
+                    "feed_id": 23,
                     "peg_to_value": 1.00,
                     "peg_tolerance_percentage": 1.3
                 },
                 {
-                    "encoded_feed_id": "0:24",
+                    "stride": 0,
+                    "feed_id": 24,
                     "peg_tolerance_percentage": 4.3
                 },
                 {
-                    "encoded_feed_id": "0:25",
+                    "stride": 0,
+                    "feed_id": 25,
                     "skip_publish_if_less_then_percentage": 1.32,
                     "always_publish_heartbeat_ms": 45000,
                     "peg_to_value": 5.00,
@@ -799,68 +791,84 @@ mod tests {
         {
             let c = &p.publishing_criteria[0];
             assert_eq!(c.encoded_feed_id, EncodedFeedId::new(13, 0));
-            assert_eq!(c.skip_publish_if_less_then_percentage, 13.2f64);
+            assert_eq!(c.encoded_feed_id.get_stride(), 0);
+            assert_eq!(c.encoded_feed_id.get_id(), 13u128);
+            assert_eq!(c.skip_threshold(), 13.2f64);
             assert_eq!(c.always_publish_heartbeat_ms, Some(50_000));
             assert_eq!(p.publishing_criteria[0].peg_to_value, None);
-            assert_eq!(p.publishing_criteria[0].peg_tolerance_percentage, 0.0f64);
+            assert_eq!(p.publishing_criteria[0].peg_tolerance_percent(), 0.0f64);
         }
 
         {
             let c = &p.publishing_criteria[1];
             assert_eq!(c.encoded_feed_id, EncodedFeedId::new(15, 0));
-            assert_eq!(c.skip_publish_if_less_then_percentage, 2.2f64);
+            assert_eq!(c.encoded_feed_id.get_stride(), 0);
+            assert_eq!(c.encoded_feed_id.get_id(), 15u128);
+            assert_eq!(c.skip_threshold(), 2.2f64);
             assert_eq!(c.always_publish_heartbeat_ms, None);
             assert_eq!(c.peg_to_value, None);
-            assert_eq!(c.peg_tolerance_percentage, 0.0f64);
+            assert_eq!(c.peg_tolerance_percent(), 0.0f64);
         }
         {
             let c = &p.publishing_criteria[2];
             assert_eq!(c.encoded_feed_id, EncodedFeedId::new(8, 0));
-            assert_eq!(c.skip_publish_if_less_then_percentage, 0.0f64);
+            assert_eq!(c.encoded_feed_id.get_stride(), 0);
+            assert_eq!(c.encoded_feed_id.get_id(), 8u128);
+            assert_eq!(c.skip_threshold(), 0.0f64);
             assert_eq!(c.always_publish_heartbeat_ms, Some(12_345));
             assert_eq!(c.peg_to_value, None);
-            assert_eq!(c.peg_tolerance_percentage, 0.0f64);
+            assert_eq!(c.peg_tolerance_percent(), 0.0f64);
         }
         {
             let c = &p.publishing_criteria[3];
             assert_eq!(c.encoded_feed_id, EncodedFeedId::new(2, 0));
-            assert_eq!(c.skip_publish_if_less_then_percentage, 0.0f64);
+            assert_eq!(c.encoded_feed_id.get_stride(), 0);
+            assert_eq!(c.encoded_feed_id.get_id(), 2u128);
+            assert_eq!(c.skip_threshold(), 0.0f64);
             assert_eq!(c.always_publish_heartbeat_ms, None);
             assert_eq!(c.peg_to_value, None);
-            assert_eq!(c.peg_tolerance_percentage, 0.0f64);
+            assert_eq!(c.peg_tolerance_percent(), 0.0f64);
         }
         {
             let c = &p.publishing_criteria[4];
             assert_eq!(c.encoded_feed_id, EncodedFeedId::new(22, 0));
-            assert_eq!(c.skip_publish_if_less_then_percentage, 0.0f64);
+            assert_eq!(c.encoded_feed_id.get_stride(), 0);
+            assert_eq!(c.encoded_feed_id.get_id(), 22u128);
+            assert_eq!(c.skip_threshold(), 0.0f64);
             assert_eq!(c.always_publish_heartbeat_ms, None);
             assert_eq!(c.peg_to_value, Some(1.995f64));
-            assert_eq!(c.peg_tolerance_percentage, 0.0f64);
+            assert_eq!(c.peg_tolerance_percent(), 0.0f64);
         }
         {
             let c = &p.publishing_criteria[5];
             assert_eq!(c.encoded_feed_id, EncodedFeedId::new(23, 0));
-            assert_eq!(c.skip_publish_if_less_then_percentage, 0.0f64);
+            assert_eq!(c.encoded_feed_id.get_stride(), 0);
+            assert_eq!(c.encoded_feed_id.get_id(), 23u128);
+            assert_eq!(c.skip_threshold(), 0.0f64);
             assert_eq!(c.always_publish_heartbeat_ms, None);
             assert_eq!(c.peg_to_value, Some(1.0f64));
-            assert_eq!(c.peg_tolerance_percentage, 1.3f64);
+            assert_eq!(c.peg_tolerance_percent(), 1.3f64);
         }
         {
             let c = &p.publishing_criteria[6];
             assert_eq!(c.encoded_feed_id, EncodedFeedId::new(24, 0));
-            assert_eq!(c.skip_publish_if_less_then_percentage, 0.0f64);
+            assert_eq!(c.encoded_feed_id.get_stride(), 0);
+            assert_eq!(c.encoded_feed_id.get_id(), 24u128);
+            assert_eq!(c.skip_threshold(), 0.0f64);
             assert_eq!(c.always_publish_heartbeat_ms, None);
             assert_eq!(c.peg_to_value, None);
-            assert_eq!(c.peg_tolerance_percentage, 4.3f64);
+            assert_eq!(c.peg_tolerance_percent(), 4.3f64);
         }
 
         {
             let c = &p.publishing_criteria[7];
             assert_eq!(c.encoded_feed_id, EncodedFeedId::new(25, 0));
-            assert_eq!(c.skip_publish_if_less_then_percentage, 1.32f64);
+            assert_eq!(c.encoded_feed_id.get_stride(), 0);
+            assert_eq!(c.encoded_feed_id.get_id(), 25u128);
+            assert_eq!(c.skip_threshold(), 1.32f64);
             assert_eq!(c.always_publish_heartbeat_ms, Some(45_000));
             assert_eq!(c.peg_to_value, Some(5.0f64));
-            assert_eq!(c.peg_tolerance_percentage, 1.3f64);
+            assert_eq!(c.peg_tolerance_percent(), 1.3f64);
         }
     }
 

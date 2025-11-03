@@ -1,8 +1,14 @@
 lib: with lib; {
   options = {
-    encoded-feed-id = mkOption {
+    feed-id = mkOption {
       type = types.int;
       description = mdDoc "Feed id";
+    };
+
+    stride = mkOption {
+      type = types.int;
+      default = 0;
+      description = mdDoc "Stride value for the feed";
     };
 
     skip-publish-if-less-then-percentage = mkOption {
