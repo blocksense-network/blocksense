@@ -15,3 +15,7 @@ export const startPrometheusServer = (host: string, port: number): void => {
     );
   });
 };
+
+export function filterSmallBalance(balance: string, threshold = 1e-6): number {
+  return Number(balance) < threshold ? 0 : Number(balance);
+}

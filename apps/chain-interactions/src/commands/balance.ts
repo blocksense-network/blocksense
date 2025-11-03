@@ -18,11 +18,7 @@ import {
 import { color as c } from '@blocksense/base-utils/tty';
 
 import { deployedMainnets, deployedTestnets } from './types';
-import { startPrometheusServer } from './utils';
-
-function filterSmallBalance(balance: string, threshold = 1e-6): number {
-  return Number(balance) < threshold ? 0 : Number(balance);
-}
+import { filterSmallBalance, startPrometheusServer } from './utils';
 
 export const balance = Command.make(
   'balance',
