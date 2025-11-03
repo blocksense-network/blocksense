@@ -2,7 +2,7 @@ import { Schema as S } from 'effect';
 
 import { PortSchema } from '@blocksense/base-utils/schemas';
 
-import { FeedIdSchema } from '../data-feeds-config/types';
+import { FeedIdSchema, StrideSchema } from '../data-feeds-config/types';
 
 // This is a partial schema including only allowed feeds
 // TODO: (danielstoyanov) Expand to whole config schema
@@ -34,6 +34,7 @@ const ReporterSchema = S.Struct({
 
 const PublishingCriteriaSchema = S.Struct({
   feed_id: FeedIdSchema,
+  stride: StrideSchema,
   skip_publish_if_less_then_percentage: S.Number,
   always_publish_heartbeat_ms: S.NullishOr(S.Number),
   peg_to_value: S.NullishOr(S.Number),
