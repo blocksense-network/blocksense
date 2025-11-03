@@ -173,7 +173,7 @@ impl VotedFeedUpdate {
                             None => false,
                         };
                         let is_threshold_crossed =
-                            diff * 100.0f64 >= criteria.skip_publish_if_less_then_percentage * a;
+                            diff * 100.0f64 >= criteria.skip_threshold() * a;
                         debug!("Result for feed_id {feed_id} from {caller_context}: last_published = {last}, candidate_value = {candidate_value}, is_threshold_crossed = {is_threshold_crossed}");
                         if is_threshold_crossed {
                             SkipDecision::DontSkip(DontSkipReason::ThresholdCrossed)
@@ -336,7 +336,7 @@ mod tests {
         let mut history = FeedAggregateHistory::new();
         history.register_feed(EncodedFeedId::new(feed_id, 0), 100);
         let always_publish_criteria = PublishCriteria {
-            encoded_feed_id: EncodedFeedId::new(feed_id, 0),
+            encoded_feed_id,
             skip_publish_if_less_then_percentage: 0.0f64,
             always_publish_heartbeat_ms: None,
             peg_to_value: None,
@@ -344,7 +344,7 @@ mod tests {
         };
 
         let one_percent_threshold = PublishCriteria {
-            encoded_feed_id: EncodedFeedId::new(feed_id, 0),
+            encoded_feed_id,
             skip_publish_if_less_then_percentage: 1.0f64,
             always_publish_heartbeat_ms: None,
             peg_to_value: None,
@@ -352,7 +352,7 @@ mod tests {
         };
 
         let always_publish_every_second = PublishCriteria {
-            encoded_feed_id: EncodedFeedId::new(feed_id, 0),
+            encoded_feed_id,
             skip_publish_if_less_then_percentage: 1000.0f64,
             always_publish_heartbeat_ms: Some(1000_u128),
             peg_to_value: None,

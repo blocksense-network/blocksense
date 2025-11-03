@@ -194,13 +194,13 @@ pub async fn set_log_level(
     Ok(HttpResponse::BadRequest().into())
 }
 
-#[get("/get_feed_report_interval/{feed_id}")]
+#[get("/get_feed_report_interval/{encoded_feed_id}")]
 pub async fn get_feed_report_interval(
     req: HttpRequest,
     sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
     let bad_input = error::ErrorBadRequest("Incorrect input.");
-    let feed_id: String = req.match_info().get("feed_id").ok_or(bad_input)?.parse()?;
+    let feed_id: String = req.match_info().get("encoded_feed_id").ok_or(bad_input)?.parse()?;
 
     let encoded_feed_id: EncodedFeedId = match feed_id.parse() {
         Ok(r) => r,
@@ -240,15 +240,15 @@ pub async fn get_feeds_config(
         .body(feeds_config_pretty))
 }
 
-#[get("/get_feed_config/{feed_id}")]
+#[get("/get_feed_config/{encoded_feed_id}")]
 pub async fn get_feed_config(
     req: HttpRequest,
     sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
     let bad_input = error::ErrorBadRequest("Incorrect input.");
-    let feed_id: String = req.match_info().get("feed_id").ok_or(bad_input)?.parse()?;
+    let encoded_feed_id: String = req.match_info().get("encoded_feed_id").ok_or(bad_input)?.parse()?;
 
-    let encoded_feed_id: EncodedFeedId = match feed_id.parse() {
+    let encoded_feed_id: EncodedFeedId = match encoded_feed_id.parse() {
         Ok(r) => r,
         Err(e) => return Err(error::ErrorBadRequest(e.to_string())),
     };
@@ -470,14 +470,14 @@ pub async fn get_history(sequencer_state: web::Data<SequencerState>) -> HttpResp
     }
 }
 
-#[post("/delete_asset_feed/{feed_id}")]
+#[post("/delete_asset_feed/{encoded_feed_id}")]
 pub async fn delete_asset_feed(
     req: HttpRequest,
     sequencer_state: web::Data<SequencerState>,
 ) -> Result<HttpResponse, Error> {
     let _span = info_span!("delete_asset_feed");
     let bad_input = error::ErrorBadRequest("Incorrect input.");
-    let feed_id: String = req.match_info().get("feed_id").ok_or(bad_input)?.parse()?;
+    let feed_id: String = req.match_info().get("encoded_feed_id").ok_or(bad_input)?.parse()?;
 
     let encoded_feed_id: EncodedFeedId = match feed_id.parse() {
         Ok(r) => r,
