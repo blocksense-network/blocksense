@@ -93,6 +93,47 @@ impl ReorgTracker {
         delay
     }
 
+    async fn try_to_create_ws_stream(
+        &mut self,
+    ) -> Option<(
+        alloy::pubsub::SubscriptionStream<alloy::rpc::types::Header>,
+        RootProvider,
+    )> {
+        let Some(ws_url) = &self.websocket_url_opt else {
+            return None;
+        };
+
+        let net = self.net.clone();
+        info!("Attempting WS connect for {net} to {ws_url}");
+        match self.build_ws_provider(ws_url, &self.providers_mutex).await {
+            Ok(provider_ws) => match provider_ws.subscribe_blocks().await {
+                Ok(sub) => {
+                    info!("WS connected for {net}; subscribed to newHeads");
+                    self.reset_ws_backoff();
+                    Some((sub.into_stream(), provider_ws))
+                }
+                Err(e) => {
+                    warn!("WS subscribe_blocks failed for {net}: {e:?}");
+                    let delay = self.schedule_ws_retry();
+                    warn!(
+                        "Will retry WS setup for {net} in {delay_ms}ms after subscribe error",
+                        delay_ms = delay.as_millis(),
+                    );
+                    None
+                }
+            },
+            Err(e) => {
+                warn!("WS connect failed for {net}: {e:?}");
+                let delay = self.schedule_ws_retry();
+                warn!(
+                    "Will retry WS setup for {net} in {delay_ms}ms after connect error",
+                    delay_ms = delay.as_millis(),
+                );
+                None
+            }
+        }
+    }
+
     async fn build_ws_provider(
         &self,
         ws_url: &str,
@@ -293,33 +334,10 @@ impl ReorgTracker {
 
         const DEFAULT_POLL_INTERVAL_MS: u64 = 60 * 1000;
 
-        if let Some(ref ws_url) = websocket_url {
-            info!("Attempting WS connect for {net} to {ws_url}");
-            match self.build_ws_provider(ws_url, &providers_mutex).await {
-                Ok(provider_ws) => match provider_ws.subscribe_blocks().await {
-                    Ok(sub) => {
-                        info!("WS connected for {net}; subscribed to newHeads");
-                        stream_opt = Some(sub.into_stream());
-                        provider_ws_opt = Some(provider_ws);
-                        self.reset_ws_backoff();
-                    }
-                    Err(e) => {
-                        warn!("WS subscribe_blocks failed for {net}: {e:?}");
-                        let delay = self.schedule_ws_retry();
-                        warn!(
-                            "Will retry WS setup for {net} in {delay_ms}ms after subscribe error",
-                            delay_ms = delay.as_millis(),
-                        );
-                    }
-                },
-                Err(e) => {
-                    warn!("WS connect failed for {net}: {e:?}");
-                    let delay = self.schedule_ws_retry();
-                    warn!(
-                        "Will retry WS setup for {net} in {delay_ms}ms after connect error",
-                        delay_ms = delay.as_millis(),
-                    );
-                }
+        if websocket_url.is_some() {
+            if let Some((stream, provider_ws)) = self.try_to_create_ws_stream().await {
+                stream_opt = Some(stream);
+                provider_ws_opt = Some(provider_ws);
             }
         } else {
             // Loop until block generation time is determined
@@ -343,35 +361,15 @@ impl ReorgTracker {
         }
 
         loop {
+            self.loop_count += 1;
+            self.last_processed_reorg_in_loop_opt = None;
+
             if stream_opt.is_none() {
-                if let Some(ref ws_url) = websocket_url {
+                if websocket_url.is_some() {
                     if self.should_attempt_ws() {
-                        info!("Attempting WS reconnect for {net} to {ws_url}");
-                        match self.build_ws_provider(ws_url, &providers_mutex).await {
-                            Ok(provider_ws) => match provider_ws.subscribe_blocks().await {
-                                Ok(sub) => {
-                                    info!("WS reconnected for {net}; subscribed to newHeads");
-                                    stream_opt = Some(sub.into_stream());
-                                    provider_ws_opt = Some(provider_ws);
-                                    self.reset_ws_backoff();
-                                }
-                                Err(e) => {
-                                    warn!("WS subscribe_blocks failed for {net}: {e:?}");
-                                    let delay = self.schedule_ws_retry();
-                                    warn!(
-                                        "Will retry WS setup for {net} in {delay_ms}ms after subscribe error",
-                                        delay_ms = delay.as_millis(),
-                                    );
-                                }
-                            },
-                            Err(e) => {
-                                warn!("WS reconnect failed for {net}: {e:?}");
-                                let delay = self.schedule_ws_retry();
-                                warn!(
-                                    "Will retry WS setup for {net} in {delay_ms}ms after connect error",
-                                    delay_ms = delay.as_millis(),
-                                );
-                            }
+                        if let Some((stream, provider_ws)) = self.try_to_create_ws_stream().await {
+                            stream_opt = Some(stream);
+                            provider_ws_opt = Some(provider_ws);
                         }
                     }
                 }
@@ -465,7 +463,6 @@ impl ReorgTracker {
                 }
             }
 
-            self.loop_count += 1;
             debug!(
                 "BEGIN loop_tracking_for_reorg_in_network for {net} loop_count: {loop_count}: observer_finalized_height={observer_finalized_height} observed_latest_height={observed_latest_height}!",
                 observer_finalized_height = self.observer_finalized_height,
