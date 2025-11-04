@@ -33,7 +33,7 @@ export const checkPending = Command.make(
       Options.text('rpc-url').pipe(withSchema(S.URL), withAlias('r')),
     ),
     prometheus: Options.boolean('prometheus').pipe(withAlias('p')),
-    host: Options.text('host').pipe(withDefault('localhost'), withAlias('h')),
+    host: Options.text('host').pipe(withDefault('localhost')),
     port: Options.integer('port').pipe(withDefault(9090)),
     mainnet: Options.boolean('mainnet').pipe(withAlias('m')),
   },
