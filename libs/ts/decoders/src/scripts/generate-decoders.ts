@@ -14,6 +14,7 @@ export const generateDecoders = async (
     subTemplatePath?: string;
     contractName?: string;
     containsUnion?: boolean;
+    prefixSize?: number;
   },
 ) => {
   const defaultOptions = {
@@ -44,7 +45,14 @@ export const generateDecoders = async (
   const code =
     type === 'encode-packed'
       ? await generateEPDecoder(template, fields, evmVersion)
-      : await generateSSZDecoder(template, subTemplateSSZ, fields, evmVersion);
+      : await generateSSZDecoder(
+          template,
+          subTemplateSSZ,
+          fields,
+          evmVersion,
+          opts.prefixSize,
+          !!opts.prefixSize,
+        );
 
   if (typeof code === 'string') {
     contractPaths.push(path.join(outputDir, opts.contractName + '.sol'));
