@@ -145,7 +145,8 @@ async fn process_report(
                         reporter_metrics,
                         timely_reports_per_feed,
                         reporter_id,
-                        encoded_feed_id.to_string(),
+                        encoded_feed_id.get_stride(),
+                        encoded_feed_id.get_id(),
                         feed_name,
                         always_publish_heartbeat_ms
                     );
@@ -159,7 +160,8 @@ async fn process_report(
                         reporter_metrics,
                         total_revotes_for_same_slot_per_feed,
                         reporter_id,
-                        encoded_feed_id.to_string(),
+                        encoded_feed_id.get_stride(),
+                        encoded_feed_id.get_id(),
                         feed_name,
                         always_publish_heartbeat_ms
                     );
@@ -176,7 +178,8 @@ async fn process_report(
                 reporter_metrics,
                 late_reports_per_feed,
                 reporter_id,
-                encoded_feed_id.to_string(),
+                encoded_feed_id.get_stride(),
+                encoded_feed_id.get_id(),
                 feed_name,
                 always_publish_heartbeat_ms
             );
@@ -190,7 +193,8 @@ async fn process_report(
                 reporter_metrics,
                 in_future_reports_per_feed,
                 reporter_id,
-                encoded_feed_id.to_string(),
+                encoded_feed_id.get_stride(),
+                encoded_feed_id.get_id(),
                 feed_name,
                 always_publish_heartbeat_ms
             );
