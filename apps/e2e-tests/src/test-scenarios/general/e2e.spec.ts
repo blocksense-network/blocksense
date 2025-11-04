@@ -132,37 +132,40 @@ describe.sequential('E2E Tests with process-compose', () => {
   );
 
   it.live('Test sequencer configs are available and in correct format', () =>
-    Effect.gen(function* () {
-      sequencerConfig = yield* sequencer.getConfig();
-      feedsConfig = yield* sequencer.getFeedsConfig();
-      expect(sequencerConfig).toBeTypeOf('object');
-      expect(feedsConfig).toBeTypeOf('object');
+    gateEffect(
+      failFastGateway,
+      Effect.gen(function* () {
+        sequencerConfig = yield* sequencer.getConfig();
+        feedsConfig = yield* sequencer.getFeedsConfig();
+        expect(sequencerConfig).toBeTypeOf('object');
+        expect(feedsConfig).toBeTypeOf('object');
 
-      contractAddress = parseEthereumAddress(
-        sequencerConfig.providers[network].contracts.find(
-          c => c.name === 'AggregatedDataFeedStore',
-        )?.address,
-      );
+        contractAddress = parseEthereumAddress(
+          sequencerConfig.providers[network].contracts.find(
+            c => c.name === 'AggregatedDataFeedStore',
+          )?.address,
+        );
 
-      const allow_feeds = sequencerConfig.providers[network].allow_feeds;
-      feedIds = allow_feeds?.length
-        ? (allow_feeds as bigint[])
-        : feedsConfig.feeds.map(feed => feed.id);
-    }).pipe(
-      Effect.tap(
-        Effect.gen(function* () {
-          const url = sequencerConfig.providers[network].url;
+        const allow_feeds = sequencerConfig.providers[network].allow_feeds;
+        feedIds = allow_feeds?.length
+          ? (allow_feeds as bigint[])
+          : feedsConfig.feeds.map(feed => feed.id);
+      }).pipe(
+        Effect.tap(
+          Effect.gen(function* () {
+            const url = sequencerConfig.providers[network].url;
 
-          // Fetch the initial round data for the feeds from the local network ( anvil )
-          initialFeedsInfo = yield* getDataFeedsInfoFromNetwork(
-            feedIds,
-            contractAddress,
-            url,
-          );
+            // Fetch the initial round data for the feeds from the local network ( anvil )
+            initialFeedsInfo = yield* getDataFeedsInfoFromNetwork(
+              feedIds,
+              contractAddress,
+              url,
+            );
 
-          // Enable the provider which is disabled by default ( ink_sepolia )
-          yield* sequencer.enableProvider(network);
-        }),
+            // Enable the provider which is disabled by default ( ink_sepolia )
+            yield* sequencer.enableProvider(network);
+          }),
+        ),
       ),
     ),
   );
