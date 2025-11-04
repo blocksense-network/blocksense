@@ -104,19 +104,13 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
         postReportsBatchUrl,
         reporterKey,
         getConfig: () =>
-          Effect.gen(function* () {
-            return yield* fetchAndDecodeJSONEffect(
-              SequencerConfigV2Schema,
-              configUrl,
-            ).pipe(Effect.provide(FetchHttpClient.layer));
-          }),
+          fetchAndDecodeJSONEffect(SequencerConfigV2Schema, configUrl).pipe(
+            Effect.provide(FetchHttpClient.layer),
+          ),
         getFeedsConfig: () =>
-          Effect.gen(function* () {
-            return yield* fetchAndDecodeJSONEffect(
-              NewFeedsConfigSchema,
-              feedsConfigUrl,
-            ).pipe(Effect.provide(FetchHttpClient.layer));
-          }),
+          fetchAndDecodeJSONEffect(NewFeedsConfigSchema, feedsConfigUrl).pipe(
+            Effect.provide(FetchHttpClient.layer),
+          ),
         fetchUpdatesToNetworksMetric: () => {
           return Effect.gen(function* () {
             const metrics = yield* getMetrics(metricsUrl).pipe(

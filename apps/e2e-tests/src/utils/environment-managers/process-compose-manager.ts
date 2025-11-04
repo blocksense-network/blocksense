@@ -76,6 +76,7 @@ function startEnvironment(testScenario: string): Effect.Effect<void, Error> {
       Stream.runFold(EString.empty, EString.concat),
     );
 
+  // NOTE: as per <../../../../../nix/test-environments/default.nix:39>
   const testEnvironment = `e2e-${testScenario}`;
 
   return Effect.gen(function* () {
@@ -136,7 +137,7 @@ export const ProcessComposeStatusSchema = S.mutable(
     S.Struct({
       name: S.String,
       // namespace: S.String,
-      status: S.Literal('Running', 'Completed', 'Pending'),
+      status: S.Literal('Running', 'Completed', 'Skipped', 'Pending'),
       // system_time: S.String,
       // age: S.Number,
       // is_ready: S.String,

@@ -103,9 +103,15 @@ impl FeedAggregate {
                     //         *t = s;
                     //     },
                     // );
-                    right_align_truncate(&mut prefix, &length.to_be_bytes());
+                    right_align_truncate(&mut prefix, &(length + prefix_size).to_be_bytes());
 
-                    let result = [prefix, most_frequent].concat();
+                    let mut result = [prefix, most_frequent].concat();
+
+                    // Calculate max SSZ slots and pad with zeros
+                    let max_ssz_slots = ((result.len() - 2) + 63) / 64;
+                    let target_length = max_ssz_slots * 64 + 2;
+
+                    result.resize(target_length, 0);
 
                     FeedType::Bytes(result)
                 } else {
