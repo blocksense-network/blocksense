@@ -4,7 +4,6 @@ import { withAlias, withDefault, withSchema } from '@effect/cli/Options';
 import client from 'prom-client';
 import Web3 from 'web3';
 
-import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 import type {
   ChainId,
   EthereumAddress,
@@ -23,7 +22,11 @@ import { color as c } from '@blocksense/base-utils/tty';
 import { listEvmNetworks } from '@blocksense/config-types/read-write-config';
 
 import { deployedMainnets, deployedTestnets } from './types';
-import { filterSmallBalance, startPrometheusServer } from './utils';
+import {
+  filterSmallBalance,
+  getDefaultSequencerAddress,
+  startPrometheusServer,
+} from './utils';
 
 export const balance = Command.make(
   'balance',
@@ -50,20 +53,9 @@ export const balance = Command.make(
       const shouldUseMainnetSequencer =
         mainnet || (parsedNetwork !== null && !isTestnet(parsedNetwork));
 
-      const sequencerAddress = yield* Effect.try({
-        try: () =>
-          parseEthereumAddress(
-            getEnvStringNotAssert(
-              shouldUseMainnetSequencer
-                ? 'SEQUENCER_ADDRESS_MAINNET'
-                : 'SEQUENCER_ADDRESS_TESTNET',
-            ),
-          ),
-        catch: e =>
-          new Error(
-            `Invalid Ethereum address ${address}: ${(e as Error)?.message}`,
-          ),
-      });
+      const sequencerAddress = getDefaultSequencerAddress(
+        shouldUseMainnetSequencer,
+      );
 
       let address: EthereumAddress;
       if (Option.isSome(addressInput)) {

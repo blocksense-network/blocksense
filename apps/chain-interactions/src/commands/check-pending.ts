@@ -4,7 +4,6 @@ import { withAlias, withDefault, withSchema } from '@effect/cli/Options';
 import client from 'prom-client';
 import Web3 from 'web3';
 
-import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 import type {
   ChainId,
   EthereumAddress,
@@ -21,7 +20,7 @@ import {
 import { color as c } from '@blocksense/base-utils/tty';
 
 import { deployedMainnets, deployedTestnets } from './types';
-import { startPrometheusServer } from './utils';
+import { getDefaultSequencerAddress, startPrometheusServer } from './utils';
 
 export const checkPending = Command.make(
   'check-pending',
@@ -46,20 +45,9 @@ export const checkPending = Command.make(
       const shouldUseMainnetSequencer =
         mainnet || (parsedNetwork !== null && !isTestnet(parsedNetwork));
 
-      const sequencerAddress = yield* Effect.try({
-        try: () =>
-          parseEthereumAddress(
-            getEnvStringNotAssert(
-              shouldUseMainnetSequencer
-                ? 'SEQUENCER_ADDRESS_MAINNET'
-                : 'SEQUENCER_ADDRESS_TESTNET',
-            ),
-          ),
-        catch: e =>
-          new Error(
-            `Invalid Ethereum address ${address}: ${(e as Error)?.message}`,
-          ),
-      });
+      const sequencerAddress = getDefaultSequencerAddress(
+        shouldUseMainnetSequencer,
+      );
 
       let address: EthereumAddress;
       if (Option.isSome(addressInput)) {

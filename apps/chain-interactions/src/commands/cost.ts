@@ -6,7 +6,6 @@ import axios from 'axios';
 import client from 'prom-client';
 import Web3 from 'web3';
 
-import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 import { throwError } from '@blocksense/base-utils/errors';
 import type { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 import {
@@ -22,7 +21,11 @@ import { listEvmNetworks } from '@blocksense/config-types/read-write-config';
 
 import type { Transaction } from './types';
 import { deployedMainnets, deployedTestnets } from './types';
-import { filterSmallBalance, startPrometheusServer } from './utils';
+import {
+  filterSmallBalance,
+  getDefaultSequencerAddress,
+  startPrometheusServer,
+} from './utils';
 
 const DEFAULT_FIRST_TX_TIME = '';
 const DEFAULT_LAST_TX_TIME = '';
@@ -69,20 +72,9 @@ export const cost = Command.make(
       const shouldUseMainnetSequencer =
         mainnet || (parsedNetwork !== null && !isTestnet(parsedNetwork));
 
-      const sequencerAddress = yield* Effect.try({
-        try: () =>
-          parseEthereumAddress(
-            getEnvStringNotAssert(
-              shouldUseMainnetSequencer
-                ? 'SEQUENCER_ADDRESS_MAINNET'
-                : 'SEQUENCER_ADDRESS_TESTNET',
-            ),
-          ),
-        catch: e =>
-          new Error(
-            `Invalid Ethereum address ${address}: ${(e as Error)?.message}`,
-          ),
-      });
+      const sequencerAddress = getDefaultSequencerAddress(
+        shouldUseMainnetSequencer,
+      );
 
       let address: EthereumAddress;
       if (Option.isSome(addressInput)) {
