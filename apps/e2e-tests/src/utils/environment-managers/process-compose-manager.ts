@@ -1,4 +1,12 @@
-import { Effect, Layer, ParseResult, pipe, Schema as S } from 'effect';
+import {
+  Effect,
+  Layer,
+  ParseResult,
+  pipe,
+  Schema as S,
+  Stream,
+  String as EString,
+} from 'effect';
 import { Command } from '@effect/platform';
 import { NodeContext } from '@effect/platform-node';
 
@@ -49,27 +57,45 @@ export const ProcessComposeLive = Layer.succeed(
 );
 
 function startEnvironment(testEnvironment: string): Effect.Effect<void, Error> {
+  const runString = <E, R>(
+    stream: Stream.Stream<Uint8Array, E, R>,
+  ): Effect.Effect<string, E, R> =>
+    stream.pipe(
+      Stream.decodeText(),
+      Stream.runFold(EString.empty, EString.concat),
+    );
+
   return Effect.gen(function* () {
     yield* logTestEnvironmentInfo('Starting', testEnvironment);
     yield* Effect.sync(() => {
       process.env['FEEDS_CONFIG_DIR'] = GENERAL_SCENARIO_FEEDS_CONFIG_DIR;
     });
-    const command = Command.make(
-      'just',
-      'start-environment',
-      testEnvironment,
-      '0',
-      '--detached',
-    );
-    const exitCode = yield* command.pipe(
-      Command.exitCode,
-      Effect.provide(NodeContext.layer),
-    );
-    if (exitCode !== 0) {
-      return yield* Effect.fail(
-        new Error(`Command failed with exit code ${exitCode}`),
+    const program = Effect.gen(function* () {
+      const command = Command.make(
+        'just',
+        'start-environment',
+        'e2e-general',
+        '0',
+        '--detached',
       );
-    }
+      const [exitCode, stderr] = yield* pipe(
+        Command.start(command),
+        Effect.flatMap(process =>
+          Effect.all([process.exitCode, runString(process.stderr)], {
+            concurrency: 3,
+          }),
+        ),
+      );
+      if (exitCode !== 0) {
+        return yield* Effect.fail(
+          new Error(
+            `Command failed with exit code ${exitCode}. Error: ${stderr}`,
+          ),
+        );
+      }
+    });
+
+    yield* Effect.scoped(program).pipe(Effect.provide(NodeContext.layer));
   });
 }
 
