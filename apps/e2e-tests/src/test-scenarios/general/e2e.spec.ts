@@ -217,7 +217,7 @@ describe.sequential('E2E Tests with process-compose', () => {
       // If some feeds were not updated, we will log a warning
       // and continue with the available feeds
       const updatedFeedIds = keysOf(updatesToNetworks[network]).map(feedId =>
-        BigInt(feedId),
+        BigInt(feedId.split(':')[1]),
       );
       if (updatedFeedIds.length !== feedIds.length) {
         yield* Effect.logWarning('Not all feeds have been updated');
@@ -244,7 +244,7 @@ describe.sequential('E2E Tests with process-compose', () => {
         mapValues(
           initialRounds,
           (feedId, round) =>
-            (round + updatesToNetworks[network][feedId]) %
+            (round + updatesToNetworks[network]['0:' + feedId]) %
             MAX_HISTORY_ELEMENTS_PER_FEED,
         ),
       );
@@ -265,7 +265,8 @@ describe.sequential('E2E Tests with process-compose', () => {
         const historyData = feedAggregateHistory.aggregate_history[id].find(
           // In history data, the indexing of updates starts from 0.
           // Hence, we need to subtract 1 from the number of updates
-          feed => feed.update_number === updatesToNetworks[network][id] - 1,
+          feed =>
+            feed.update_number === updatesToNetworks[network]['0:' + id] - 1,
         );
         const decimals = feedsConfig.feeds.find(f => f.id.toString() === id)!
           .additional_feed_info.decimals;
@@ -279,7 +280,9 @@ describe.sequential('E2E Tests with process-compose', () => {
             (roundAfterUpdates - initialFeedsInfo[id].round)) %
           MAX_HISTORY_ELEMENTS_PER_FEED;
 
-        expect(expectedNumberOfUpdates).toEqual(updatesToNetworks[network][id]);
+        expect(expectedNumberOfUpdates).toEqual(
+          updatesToNetworks[network]['0:' + id],
+        );
       }
     }),
   );
@@ -287,7 +290,7 @@ describe.sequential('E2E Tests with process-compose', () => {
   describe.sequential('Reports results are correctly updated', () => {
     it.live('Posts reports and observes a network update', () =>
       Effect.gen(function* () {
-        const feed_id = feedIds[0].toString();
+        const feed_id = '0:' + feedIds[0].toString();
 
         const numericalResult: FeedResult = { Ok: { Numerical: 3.14159 } }; // Ok → Numerical
         const textResult: FeedResult = { Ok: { Text: 'sensor online' } }; // Ok → Text
