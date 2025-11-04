@@ -42,6 +42,15 @@ where
     s.parse().map_err(serde::de::Error::custom)
 }
 
+fn deserialize_to_le_u64_from_str<'de, D>(deserializer: D) -> Result<u64, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+    let value: u64 = s.parse().map_err(serde::de::Error::custom)?;
+    Ok(value.to_be())
+}
+
 #[derive(Default, Debug, Clone, PartialEq, Deserialize, Encode)]
 #[serde(rename_all = "camelCase")]
 pub struct EventLookupData {
@@ -57,10 +66,16 @@ pub struct EventLookupData {
     #[serde(rename = "strAwayTeam", deserialize_with = "deserialize_utf8_bytes")]
     pub away_team: Vec<u8>,
 
-    #[serde(rename = "intHomeScore", deserialize_with = "deserialize_u64_from_str")]
+    #[serde(
+        rename = "intHomeScore",
+        deserialize_with = "deserialize_to_le_u64_from_str"
+    )]
     pub home_score: u64,
 
-    #[serde(rename = "intAwayScore", deserialize_with = "deserialize_u64_from_str")]
+    #[serde(
+        rename = "intAwayScore",
+        deserialize_with = "deserialize_to_le_u64_from_str"
+    )]
     pub away_score: u64,
 }
 

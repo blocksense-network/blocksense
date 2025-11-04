@@ -1701,6 +1701,7 @@ __metadata:
     parse-prometheus-text-format: "npm:^1.1.1"
     tsx: "npm:^4.20.5"
     typescript: "npm:5.9.2"
+    viem: "npm:^2.38.6"
     vitest: "npm:^3.2.4"
   languageName: unknown
   linkType: soft
@@ -30414,6 +30415,27 @@ __metadata:
     typescript:
       optional: true
   checksum: 10c0/b46e19ffaf85b0e80d168a707d7b295cf58ebefde27cfb8626510dfdf845bcd25c0154a02b488fc545b07397fd880d87543622d2be6973b35ab94012092b512c
+  languageName: node
+  linkType: hard
+
+"viem@npm:^2.38.6":
+  version: 2.38.6
+  resolution: "viem@npm:2.38.6"
+  dependencies:
+    "@noble/curves": "npm:1.9.1"
+    "@noble/hashes": "npm:1.8.0"
+    "@scure/bip32": "npm:1.7.0"
+    "@scure/bip39": "npm:1.6.0"
+    abitype: "npm:1.1.0"
+    isows: "npm:1.0.7"
+    ox: "npm:0.9.6"
+    ws: "npm:8.18.3"
+  peerDependencies:
+    typescript: ">=5.0.4"
+  peerDependenciesMeta:
+    typescript:
+      optional: true
+  checksum: 10c0/9b8571bc9d7dfc414eb72700275ac71b9402cbf4fe3e447501d252cbc43cb7ddf9ce01a16c183fac265d071873d209efc2a459462c724624ef855d941d3447f0
   languageName: node
   linkType: hard
 

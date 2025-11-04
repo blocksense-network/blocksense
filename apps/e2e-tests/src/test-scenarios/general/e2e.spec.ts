@@ -271,8 +271,8 @@ describe.sequential('E2E Tests with process-compose', () => {
         const decimals = feedsConfig.feeds.find(f => f.id.toString() === id)!
           .additional_feed_info.decimals;
 
-        expect(valueAfterUpdates / 10 ** decimals).toBeCloseTo(
-          historyData!.value.Numerical,
+        expect(Number(valueAfterUpdates) / 10 ** decimals).toBeCloseTo(
+          Number(historyData!.value),
         );
 
         const expectedNumberOfUpdates =

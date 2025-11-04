@@ -22,6 +22,7 @@ export const generateDecoder = async (
   fields: TupleField,
   evmVersion: EvmVersion = 'cancun',
   start: number = 0,
+  paddedLen: boolean = false,
 ): Promise<string | Record<string, string>> => {
   const { schema, unionTypes } = await sszSchema(fields);
 
@@ -43,6 +44,7 @@ export const generateDecoder = async (
     mainStructName,
     evmVersion,
     start,
+    paddedLen,
   );
   let subDecoderGeneratedLines: string[] = [];
   if (unionTypes) {

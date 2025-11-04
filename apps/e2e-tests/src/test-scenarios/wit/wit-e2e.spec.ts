@@ -1,13 +1,15 @@
 import { deepStrictEqual } from 'assert';
+import { join } from 'path';
 
 import { Effect, Exit, Layer, pipe, Schedule } from 'effect';
+import { Command, FileSystem } from '@effect/platform';
+import { NodeContext } from '@effect/platform-node';
 import { afterAll, beforeAll, describe, expect, it } from '@effect/vitest';
 
+import { rootDir } from '@blocksense/base-utils';
 import {
   entriesOf,
   fromEntries,
-  keysOf,
-  mapValues,
   valuesOf,
 } from '@blocksense/base-utils/array-iter';
 import {
@@ -32,14 +34,16 @@ import type { FeedsValueAndRound } from '../../utils/services/onchain';
 import { getDataFeedsInfoFromNetwork } from '../../utils/services/onchain';
 import type { SequencerService } from '../../utils/services/sequencer';
 import { Sequencer } from '../../utils/services/sequencer';
-import type { UpdatesToNetwork } from '../../utils/services/types';
+
 import { expectedPCStatuses03 } from './expected-service-status';
+import { createViemClient } from '@blocksense/contracts/viem';
+
+import viem from 'viem';
 
 describe.sequential('E2E Tests with process-compose', () => {
   const testScenario = `wit`;
   const testEnvironment = `e2e-${testScenario}`;
   const network = 'ink_sepolia';
-  const MAX_HISTORY_ELEMENTS_PER_FEED = 8192;
 
   const failFastGateway = createGatewayController();
   installGateway(
@@ -57,10 +61,38 @@ describe.sequential('E2E Tests with process-compose', () => {
   let feedIds: bigint[];
   let contractAddress: EthereumAddress;
 
-  let updatesToNetworks = {} as UpdatesToNetwork;
   let initialFeedsInfo: FeedsValueAndRound;
 
+  let existingFiles: string[] = [];
+
+  const deleteTestFiles = () =>
+    Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem;
+      const allFiles = yield* fs.readDirectory(__dirname);
+      const newFiles = allFiles.filter(file => !existingFiles.includes(file));
+      if (newFiles.length > 0) {
+        console.log(
+          `Cleaning up ${newFiles.length} files created during tests:`,
+        );
+        for (const file of newFiles) {
+          console.log(` - ${file}`);
+          yield* fs.remove(join(__dirname, file), {
+            force: true,
+            recursive: true,
+          });
+        }
+      }
+    });
+
   beforeAll(async () => {
+    // track files created during the tests
+    existingFiles = await Effect.runPromise(
+      FileSystem.FileSystem.pipe(
+        Effect.flatMap(fs => fs.readDirectory(__dirname)),
+        Effect.provide(NodeContext.layer),
+      ),
+    );
+
     const res = await pipe(
       Effect.gen(function* () {
         processCompose = yield* EnvironmentManager;
@@ -73,8 +105,11 @@ describe.sequential('E2E Tests with process-compose', () => {
               Effect.runPromise(
                 processCompose
                   .stop()
-                  .pipe(Effect.catchAll(() => Effect.succeed(undefined))),
-              ).finally(() => {
+                  .pipe(Effect.catchAll(() => Effect.succeed(undefined)))
+                  .pipe(() =>
+                    deleteTestFiles().pipe(Effect.provide(NodeContext.layer)),
+                  ),
+              ).finally(async () => {
                 process.exit(130);
               });
             } else {
@@ -94,13 +129,19 @@ describe.sequential('E2E Tests with process-compose', () => {
     }
   });
 
-  afterAll(() => {
-    if (hasProcessComposeStarted) {
-      return pipe(processCompose.stop(), Effect.runPromise);
-    }
-  });
+  afterAll(() =>
+    Effect.gen(function* () {
+      if (hasProcessComposeStarted) {
+        yield* processCompose.stop();
+      }
 
-  it.live.only('Test processes state shortly after start', () =>
+      yield* deleteTestFiles();
+    })
+      .pipe(Effect.provide(NodeContext.layer))
+      .pipe(Effect.runPromise),
+  );
+
+  it.live('Test processes state shortly after start', () =>
     gateEffect(
       failFastGateway,
       Effect.gen(function* () {
@@ -126,7 +167,7 @@ describe.sequential('E2E Tests with process-compose', () => {
     ),
   );
 
-  it.live.only('Test sequencer configs are available and in correct format', () =>
+  it.live('Test sequencer configs are available and in correct format', () =>
     Effect.gen(function* () {
       sequencerConfig = yield* sequencer.getConfig();
       feedsConfig = yield* sequencer.getFeedsConfig();
@@ -142,7 +183,10 @@ describe.sequential('E2E Tests with process-compose', () => {
       const allow_feeds = sequencerConfig.providers[network].allow_feeds;
       feedIds = allow_feeds?.length
         ? (allow_feeds as bigint[])
-        : feedsConfig.feeds.map(feed => feed.id);
+        : feedsConfig.feeds.map(feed => {
+            const stride = BigInt(feed.stride) << 120n;
+            return stride | feed.id;
+          });
     }).pipe(
       Effect.tap(
         Effect.gen(function* () {
@@ -162,28 +206,25 @@ describe.sequential('E2E Tests with process-compose', () => {
     ),
   );
 
-  it.live(
-    'Test sports db yields metrics',
-    () =>
-      Effect.gen(function* () {
-        updatesToNetworks = yield* Effect.retry(
-          sequencer
-            .fetchUpdatesToNetworksMetric()
-            .pipe(
-              Effect.filterOrFail(updates =>
-                valuesOf(updates[network]).every(v => v >= 1),
-              ),
-            ),
-          {
-            schedule: Schedule.fixed(10000),
-            times: 30,
-          },
-        );
+  it.live('Test sports db yields metrics', () =>
+    Effect.gen(function* () {
+      yield* Effect.retry(
+        sequencer.fetchUpdatesToNetworksMetric().pipe(
+          Effect.filterOrFail(updates =>
+            // TODO: how to look for stride too?
+            valuesOf(updates[network]).every(v => v >= 1),
+          ),
+        ),
+        {
+          schedule: Schedule.fixed(10000),
+          times: 30,
+        },
+      );
 
-        const processes = yield* parseProcessesStatus();
+      const processes = yield* parseProcessesStatus();
 
-        expect(processes).toEqual(expectedPCStatuses03);
-      }),
+      expect(processes).toEqual(expectedPCStatuses03);
+    }),
   );
 
   it.live('Test feeds data is updated on the local network', () =>
@@ -204,81 +245,162 @@ describe.sequential('E2E Tests with process-compose', () => {
         initialRounds,
       );
 
-      console.log({
-        feedIds,
-        initialRounds,
-        initialFeedsInfoLocal,
-        updatesToNetwork: updatesToNetworks[network],
-      });
-
       expect(initialFeedsInfo).toEqual(initialFeedsInfoLocal);
 
-      // If some feeds were not updated, we will log a warning
-      // and continue with the available feeds
-      const updatedFeedIds = keysOf(updatesToNetworks[network]).map(feedId =>
-        BigInt(feedId),
-      );
-      if (updatedFeedIds.length !== feedIds.length) {
-        yield* Effect.logWarning('Not all feeds have been updated');
-        const missingFeeds = feedIds.filter(
-          feedId => !updatedFeedIds.includes(feedId),
-        );
-        yield* Effect.logWarning('Missing updates for feeds:', missingFeeds);
-        yield* Effect.logWarning('Test will continue with available feeds');
+      for (const feedId of feedIds) {
+        const value = initialFeedsInfo[feedId.toString()].value;
+        const stride = feedId >> 120n;
 
-        // Remove missing feeds from the initial rounds info
-        for (const feedId of missingFeeds) {
-          delete initialRounds[feedId.toString()];
+        expect(BigInt((value.length - 2) / 2 / 32)).toEqual(2n ** stride);
+
+        yield* Command.make(
+          'just',
+          'dev',
+          'decoder',
+          'generate-decoder',
+          '--wit-path',
+          'apps/e2e-tests/src/test-scenarios/wit/sports.wit',
+          '--output-dir',
+          'apps/e2e-tests/src/test-scenarios/wit/generated-decoders',
+          '--stride',
+          stride.toString(),
+        ).pipe(Command.string, Effect.provide(NodeContext.layer));
+
+        yield* Command.make(
+          'forge',
+          'build',
+          '--root',
+          rootDir + '/apps/e2e-tests/src/test-scenarios/wit',
+          'generated-decoders',
+        ).pipe(Command.string, Effect.provide(NodeContext.layer));
+
+        const contracts = yield* FileSystem.FileSystem.pipe(
+          Effect.flatMap(fs =>
+            fs
+              .readDirectory(__dirname + '/generated-decoders')
+              .pipe(Effect.map(files => files.map(file => file))),
+          ),
+          Effect.provide(NodeContext.layer),
+        );
+
+        expect(contracts.length).toBeGreaterThan(0);
+
+        for (const contractFile of contracts) {
+          const deployResult = yield* Command.make(
+            'forge',
+            'create',
+            '--rpc-url',
+            'http://localhost:8500',
+            // sequencerConfig.providers[network].url,
+            // 1st account private key from anvil
+            '--private-key',
+            '0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80',
+            '--root',
+            rootDir + '/apps/e2e-tests/src/test-scenarios/wit',
+            `generated-decoders/${contractFile}:${contractFile.replace('.sol', '')}`,
+            '--broadcast',
+          ).pipe(Command.string, Effect.provide(NodeContext.layer));
+
+          // Extract contract address from the deploy result
+          const contractAddressMatch = deployResult.match(
+            /Deployed to:\s*(0x[a-fA-F0-9]{40})/,
+          );
+          if (!contractAddressMatch) {
+            throw new Error(
+              'Failed to extract contract address from deploy result',
+            );
+          }
+
+          const contractAddress = contractAddressMatch[1];
+          expect(contractAddress).toMatch(/^0x[a-fA-F0-9]{40}$/);
+
+          const codeResult = yield* Command.make(
+            'cast',
+            'code',
+            '--rpc-url',
+            'http://localhost:8500',
+            contractAddress,
+          ).pipe(Command.string, Effect.provide(NodeContext.layer));
+
+          expect(codeResult).not.toEqual('0x');
+          expect(codeResult.length).toBeGreaterThan(10);
+
+          const abi = yield* Command.make(
+            'forge',
+            'inspect',
+            '--root',
+            rootDir + '/apps/e2e-tests/src/test-scenarios/wit',
+            'generated-decoders/SSZDecoder.sol',
+            'abi',
+            '--json',
+          )
+            .pipe(Command.string, Effect.provide(NodeContext.layer))
+            .pipe(Effect.map(JSON.parse));
+
+          const viemClient = createViemClient(new URL('http://localhost:8500'));
+
+          const decoded = (yield* Effect.tryPromise(() =>
+            viemClient.readContract({
+              address: contractAddress as EthereumAddress,
+              abi,
+              functionName: 'decode',
+              args: [value],
+            }),
+          )) as {
+            eventName: string;
+            season: string;
+            homeTeam: string;
+            awayTeam: string;
+            homeScore: bigint;
+            awayScore: bigint;
+          };
+
+          const eventId = yield* Effect.tryPromise({
+            try: () =>
+              fetch(
+                'https://www.thesportsdb.com/api/v1/json/123/eventslast.php?id=133602',
+                {
+                  method: 'GET',
+                },
+              ).then(res =>
+                res.json().then(data => data.results[0].idEvent as string),
+              ),
+            catch: () => {
+              throw new Error('Failed to fetch data from TheSportsDB API');
+            },
+          });
+
+          const event = yield* Effect.tryPromise({
+            try: () =>
+              fetch(
+                `https://www.thesportsdb.com/api/v1/json/123/lookupevent.php?id=${eventId}`,
+                {
+                  method: 'GET',
+                },
+              ).then(res =>
+                res.json().then(data => {
+                  return {
+                    name: data.events[0].strEvent,
+                    season: data.events[0].strSeason,
+                    homeTeam: data.events[0].strHomeTeam,
+                    awayTeam: data.events[0].strAwayTeam,
+                    homeScore: data.events[0].intHomeScore,
+                    awayScore: data.events[0].intAwayScore,
+                  };
+                }),
+              ),
+            catch: () => {
+              throw new Error('Failed to fetch data from TheSportsDB API');
+            },
+          });
+
+          expect(decoded.eventName).toEqual(event.name);
+          expect(decoded.season).toEqual(event.season);
+          expect(decoded.homeTeam).toEqual(event.homeTeam);
+          expect(decoded.awayTeam).toEqual(event.awayTeam);
+          expect(BigInt(decoded.homeScore)).toEqual(BigInt(event.homeScore));
+          expect(BigInt(decoded.awayScore)).toEqual(BigInt(event.awayScore));
         }
-      }
-
-      // Get feeds information from the local network ( anvil )
-      // Info is fetched for specific round - the initial round of the feed
-      // + number of updates that happened while the local sequencer was running
-      // modulo the maximum number of history elements per feed
-      const feedInfoAfterUpdates = yield* getDataFeedsInfoFromNetwork(
-        updatedFeedIds,
-        contractAddress,
-        url,
-        mapValues(
-          initialRounds,
-          (feedId, round) =>
-            (round + updatesToNetworks[network][feedId]) %
-            MAX_HISTORY_ELEMENTS_PER_FEED,
-        ),
-      );
-
-      const feedAggregateHistory = yield* sequencer.fetchHistory();
-
-      // Make sure that the feeds info is updated
-      for (const [id, data] of entriesOf(feedInfoAfterUpdates)) {
-        const { round: roundAfterUpdates, value: valueAfterUpdates } = data;
-        // Pegged asset with 10% tolerance should be pegged
-        // Pegged asset with 0.000001% tolerance should not be pegged
-        if (id === '50000') {
-          expect(valueAfterUpdates).toEqual(1 * 10 ** 8);
-          continue;
-        }
-        expect(valueAfterUpdates).not.toEqual(initialFeedsInfo[id].value);
-
-        const historyData = feedAggregateHistory.aggregate_history[id].find(
-          // In history data, the indexing of updates starts from 0.
-          // Hence, we need to subtract 1 from the number of updates
-          feed => feed.update_number === updatesToNetworks[network][id] - 1,
-        );
-        const decimals = feedsConfig.feeds.find(f => f.id.toString() === id)!
-          .additional_feed_info.decimals;
-
-        expect(valueAfterUpdates / 10 ** decimals).toBeCloseTo(
-          historyData!.value.Numerical,
-        );
-
-        const expectedNumberOfUpdates =
-          (MAX_HISTORY_ELEMENTS_PER_FEED +
-            (roundAfterUpdates - initialFeedsInfo[id].round)) %
-          MAX_HISTORY_ELEMENTS_PER_FEED;
-
-        expect(expectedNumberOfUpdates).toEqual(updatesToNetworks[network][id]);
       }
     }),
   );
