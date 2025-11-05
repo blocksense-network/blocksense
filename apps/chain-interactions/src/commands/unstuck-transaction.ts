@@ -1,10 +1,11 @@
 import fs from 'fs/promises';
 import assert from 'node:assert';
 
-import { Effect, Option, Schema as S } from 'effect';
+import { Effect, Either, Option, Schema as S } from 'effect';
 import { Command, Options } from '@effect/cli';
 import { withAlias, withSchema } from '@effect/cli/Options';
-import Web3 from 'web3';
+import type { Web3Account } from 'web3';
+import type Web3 from 'web3';
 
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 import type { EthereumAddress } from '@blocksense/base-utils/evm';
@@ -14,6 +15,8 @@ import {
 } from '@blocksense/base-utils/evm';
 import { color as c } from '@blocksense/base-utils/tty';
 import { listEvmNetworks } from '@blocksense/config-types/read-write-config';
+
+import { getChainId, getNonce, getWeb3 } from './utils';
 
 export const unstuckTransaction = Command.make(
   'unstuck-transaction',
@@ -25,29 +28,24 @@ export const unstuckTransaction = Command.make(
       Options.choice('network', await listEvmNetworks()).pipe(withAlias('n')),
     ),
     rpcUrlInput: Options.optional(
-      Options.text('rpc-url').pipe(withSchema(S.URL), withAlias('r')),
+      Options.text('rpc').pipe(withSchema(S.URL), withAlias('r')),
     ),
     privateKeyPath: Options.text('private-key-path').pipe(withAlias('pkp')),
   },
   ({ addressInput, network, privateKeyPath, rpcUrlInput }) =>
     Effect.gen(function* () {
-      if (!Option.isSome(network) || !Option.isSome(rpcUrlInput)) {
-        console.error(c`{red Need one of --network or --rpc-url}`);
-        return;
-      }
-      let rpcUrl;
-      if (Option.isSome(rpcUrlInput)) {
-        rpcUrl = rpcUrlInput.value;
-      } else {
-        rpcUrl = getOptionalRpcUrl(network.value);
-      }
+      const rpcUrl = Option.getOrElse(rpcUrlInput, () =>
+        getOptionalRpcUrl(
+          Option.getOrElse(network, () => {
+            throw new Error('Need one of --network or --rpc-url');
+          }),
+        ),
+      );
 
-      let address;
-      if (!Option.isSome(addressInput)) {
-        address = getEnvStringNotAssert('SEQUENCER_ADDRESS');
-      } else {
-        address = addressInput.value;
-      }
+      const address = Option.getOrElse(addressInput, () =>
+        getEnvStringNotAssert('SEQUENCER_ADDRESS'),
+      );
+
       let privateKey = yield* Effect.tryPromise({
         try: () => fs.readFile(privateKeyPath, 'utf8'),
         catch: e =>
@@ -57,92 +55,86 @@ export const unstuckTransaction = Command.make(
       });
       privateKey = privateKey.replace(/(\r\n|\n|\r)/gm, '');
 
-      const { account, signer, web3 } = yield* Effect.tryPromise(() =>
-        getWeb3(rpcUrl, address, privateKey),
+      const { account, signer, web3 } = yield* createWeb3Account(
+        rpcUrl,
+        address,
+        privateKey,
       );
 
       console.log(c`{green Successfully connected to Web3.}`);
 
-      let latestNonce = yield* Effect.tryPromise({
-        try: () => web3.eth.getTransactionCount(account, 'latest'),
-        catch: e =>
-          console.error(
-            c`{red Failed to get latest nonce for account ${account} (RPC: ${rpcUrl})}`,
-            (e as Error).message,
-          ),
-      });
-
-      const pendingNonce = yield* Effect.tryPromise({
-        try: () => web3.eth.getTransactionCount(account, 'pending'),
-        catch: e =>
-          console.error(
-            c`{red Failed to get pending nonce for account ${account} (RPC: ${rpcUrl})}`,
-            (e as Error).message,
-          ),
-      });
-
+      const latestNonce = yield* getNonce(account, web3, 'latest');
+      const pendingNonce = yield* getNonce(account, web3, 'pending');
+      if (latestNonce === null || pendingNonce === null) {
+        return;
+      }
       console.log('pendingNonce:', pendingNonce);
       console.log('latestNonce:', latestNonce);
 
-      let counter = 5;
-      while (true) {
-        console.log('Blocks passed without a change:', counter);
-        const currentNonce = yield* Effect.tryPromise({
-          try: () => web3.eth.getTransactionCount(account, 'latest'),
-          catch: e =>
-            console.error(
-              c`{red Failed to get current nonce for account ${account} (RPC: ${rpcUrl})}`,
-              (e as Error).message,
-            ),
-        });
-        console.log('currentNonce: ', currentNonce);
+      const loopState = {
+        counter: 5,
+        latestNonce,
+        shouldContinue: true,
+      };
 
-        if (currentNonce >= pendingNonce) {
-          console.log(
-            'All pending transactions passed, current nonce: ',
-            currentNonce,
-          );
-          process.exit(0);
-        }
-        if (currentNonce > latestNonce) {
-          latestNonce = currentNonce;
-          console.log('latestNonce is now: ', latestNonce);
-          counter = 0;
-        } else {
-          counter++;
-          if (counter > 5) {
-            yield* Effect.tryPromise({
-              try: () => replaceTransaction(web3, signer),
-              catch: e =>
-                console.error(
-                  c`{red Failed to get current nonce for account ${account} (RPC: ${rpcUrl})}`,
-                  (e as Error).message,
-                ),
-            });
-            counter = 0;
-          }
-        }
-        yield* Effect.tryPromise(() => delay(500)); // Poll every 1/2 second
-      }
+      yield* Effect.loop(loopState, {
+        while: state => state.shouldContinue,
+        step: state => state,
+        discard: true,
+        body: state =>
+          Effect.gen(function* () {
+            console.log('Blocks passed without a change:', state.counter);
+            const currentNonce = yield* getNonce(account, web3, 'latest');
+            if (currentNonce === null) {
+              return;
+            }
+            console.log('currentNonce: ', currentNonce);
+
+            if (currentNonce >= pendingNonce) {
+              console.log(
+                'All pending transactions passed, current nonce: ',
+                currentNonce,
+              );
+              state.shouldContinue = false;
+              return;
+            }
+
+            if (currentNonce > state.latestNonce) {
+              state.latestNonce = currentNonce;
+              console.log('latestNonce is now: ', state.latestNonce);
+              state.counter = 0;
+            } else {
+              state.counter++;
+              if (state.counter > 5) {
+                yield* replaceTransaction(web3, signer);
+                state.counter = 0;
+              }
+            }
+
+            yield* Effect.sleep(500); // Poll every 1/2 second
+          }),
+      });
     }),
 );
 
-async function getWeb3(
-  rpcUrl: string | URL,
+const createWeb3Account = (
+  rpcUrl: URL | string,
   account: string,
   privateKey: string,
-): Promise<{
-  web3: Web3;
-  account: EthereumAddress;
-  signer: {
-    address: string;
-    privateKey: string;
-    signTransaction: (txData: any) => Promise<any>;
-  };
-}> {
-  try {
+): Effect.Effect<
+  {
+    web3: Web3;
+    account: EthereumAddress;
+    signer: Web3Account;
+  },
+  Error,
+  never
+> =>
+  Effect.gen(function* () {
     if (!rpcUrl || !account || !privateKey) {
-      throw new Error('rpcUrl, account, and privateKey are required.');
+      return yield* Effect.fail(
+        new Error('rpcUrl, account, and privateKey are required.'),
+      );
     }
 
     const normalizedPrivateKey = privateKey.startsWith('0x')
@@ -150,99 +142,114 @@ async function getWeb3(
       : `0x${privateKey}`;
 
     const parsedAccount = parseEthereumAddress(account);
-    const web3 = new Web3(String(rpcUrl));
+    const web3 = yield* getWeb3(rpcUrl);
+    if (!web3) {
+      return yield* Effect.fail(new Error('Failed to create web3 instance.'));
+    }
     const accountFromKey =
       web3.eth.accounts.privateKeyToAccount(normalizedPrivateKey);
     assert.strictEqual(
       accountFromKey.address.toLowerCase(),
       parsedAccount.toLowerCase(),
       `Provided private key does not match the expected account: '${parsedAccount}'`,
-    );
+    ); //use some Effect way to assert this
 
     web3.eth.accounts.wallet.add(accountFromKey);
 
     return { web3, account: parsedAccount, signer: accountFromKey };
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(c`{red Error in getEthers: ${(error as Error).message}}`);
-    } else {
-      throw new Error(c`{red Unknown error occurred in getEthers.}`);
-    }
-  }
-}
+  });
 
-async function replaceTransaction(
+const replaceTransaction = (
   web3: Web3,
-  signer: {
-    address: string;
-    privateKey: string;
-    signTransaction: (txData: any) => Promise<any>;
-  },
-): Promise<void> {
-  const account = signer.address;
+  signer: Web3Account,
+): Effect.Effect<void, Error, never> =>
+  Effect.gen(function* () {
+    const account = signer.address;
 
-  const nextNonce = await web3.eth.getTransactionCount(account, 'latest');
-  const chainID = await web3.eth.getChainId();
-
-  console.log(c`{blue Resetting nonce for account: '${account}'}`);
-  console.log(c`{blue On chainID: '${chainID}'}`);
-  console.log(c`{blue Latest nonce: ${nextNonce}}`);
-
-  const currentGasPrice = await web3.eth.getGasPrice();
-  let multiplier = 1.4;
-
-  console.log(
-    c`{magenta Sending replacement transaction with higher priority...}`,
-  );
-
-  const txData = {
-    to: account,
-    value: '0',
-    data: '0x',
-    nonce: nextNonce,
-    gas: 21000,
-    gasPrice: Math.floor(Number(currentGasPrice) * multiplier).toString(),
-  };
-
-  console.log(c`{magenta Transaction data:}`, txData);
-
-  while (multiplier <= 10) {
-    try {
-      const signedTx = await web3.eth.accounts.signTransaction(
-        txData,
-        signer.privateKey,
+    const nextNonce = yield* getNonce(
+      parseEthereumAddress(account),
+      web3,
+      'pending',
+    );
+    if (nextNonce === null) {
+      throw new Error(
+        'Failed to fetch next nonce for replacement transaction.',
       );
-      const receipt = await web3.eth.sendSignedTransaction(
-        signedTx.rawTransaction,
-      );
-
-      console.log(c`{green Tx hash:}`, receipt.transactionHash);
-      console.log(c`{green Transaction confirmed}`);
-      break;
-    } catch (error) {
-      if (error instanceof Error && error.message.includes('underpriced')) {
-        // Ignore underpriced error and retry with higher gas price
-      } else {
-        console.error(
-          c`{red Transaction failed at multiplier ${multiplier}:}`,
-          error,
-        );
-      }
-
-      multiplier += 0.3;
-      if (multiplier > 10) {
-        console.error(c`{red Maximum multiplier reached, aborting.}`);
-        break;
-      }
-
-      console.log(
-        c`{yellow Retrying with higher gas price (x${multiplier.toFixed(1)})...}`,
-      );
-      txData.gasPrice = Math.floor(
-        Number(currentGasPrice) * multiplier,
-      ).toString();
     }
-  }
-}
+    const chainID = yield* getChainId(web3);
+    if (chainID === null) {
+      return yield* Effect.fail(new Error('Failed to get chainID'));
+    }
+    console.log(c`{blue Resetting nonce for account: '${account}'}`);
+    console.log(c`{blue On chainID: '${chainID}'}`);
+    console.log(c`{blue Latest nonce: ${nextNonce}}`);
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    const currentGasPrice = yield* Effect.tryPromise({
+      try: () => web3.eth.getGasPrice(),
+      catch: error =>
+        new Error(
+          `Failed to fetch gas price for account ${account}: ${String(error)}`,
+        ),
+    });
+    const multiplier = 1.4;
+
+    console.log(
+      c`{magenta Sending replacement transaction with higher priority...}`,
+    );
+
+    const txData = {
+      to: account,
+      value: '0',
+      data: '0x',
+      nonce: nextNonce,
+      gas: 21000,
+      gasPrice: Math.floor(Number(currentGasPrice) * multiplier).toString(),
+    };
+
+    console.log(c`{magenta Transaction data:}`, txData);
+
+    yield* Effect.loop(multiplier, {
+      while: multiplier => multiplier <= 10,
+      step: multiplier => multiplier + 0.3,
+      discard: true,
+      body: multiplier =>
+        Effect.gen(function* () {
+          const sendResult = yield* Effect.either(
+            Effect.tryPromise(async () => {
+              const signedTx = await web3.eth.accounts.signTransaction(
+                txData,
+                signer.privateKey,
+              );
+              return web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+            }),
+          );
+
+          if (Either.isRight(sendResult)) {
+            const receipt = sendResult.right;
+            console.log(c`{green Tx hash:}`, receipt.transactionHash);
+            console.log(c`{green Transaction confirmed}`);
+            return;
+          }
+
+          const error = sendResult.left;
+          if (error instanceof Error && error.message.includes('underpriced')) {
+            // Ignore underpriced error and retry with higher gas price
+          } else {
+            console.error(
+              c`{red Transaction failed at multiplier ${multiplier}:}`,
+              error,
+            );
+          }
+
+          multiplier += 0.3;
+
+          console.log(
+            c`{yellow Retrying with higher gas price (x${multiplier.toFixed(1)})...}`,
+          );
+          txData.gasPrice = Math.floor(
+            Number(currentGasPrice) * multiplier,
+          ).toString();
+        }),
+    });
+    console.error(c`{red Maximum multiplier reached, aborting.}`);
+  });
