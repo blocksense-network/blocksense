@@ -17,7 +17,6 @@ export const deployedTestnets = [
   'citrea-testnet',
   'cronos-testnet',
   'cyber-testnet',
-  'ethereum-holesky',
   'ethereum-hoodi',
   'ethereum-sepolia',
   'expchain-testnet',
