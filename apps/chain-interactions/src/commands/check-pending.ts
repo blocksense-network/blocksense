@@ -1,26 +1,29 @@
 import { Effect, Option, Schema as S } from 'effect';
 import { Command, Options } from '@effect/cli';
-import { withAlias, withDefault, withSchema } from '@effect/cli/Options';
-import client from 'prom-client';
-import Web3 from 'web3';
-
-import type {
-  ChainId,
-  EthereumAddress,
-  NetworkName,
-} from '@blocksense/base-utils/evm';
 import {
-  getNetworkNameByChainId,
+  withAlias,
+  withDefault,
+  withDescription,
+  withSchema,
+} from '@effect/cli/Options';
+import client from 'prom-client';
+
+import type { NetworkName } from '@blocksense/base-utils/evm';
+import {
   getOptionalRpcUrl,
-  isChainId,
   isTestnet,
   parseEthereumAddress,
-  parseNetworkName,
 } from '@blocksense/base-utils/evm';
 import { color as c } from '@blocksense/base-utils/tty';
+import { listEvmNetworks } from '@blocksense/config-types/read-write-config';
 
-import { deployedMainnets, deployedTestnets } from './types';
-import { getDefaultSequencerAddress, startPrometheusServer } from './utils';
+import {
+  getDefaultSequencerAddress,
+  getNetworks,
+  getNonce,
+  getWeb3,
+  startPrometheusServer,
+} from './utils';
 
 export const checkPending = Command.make(
   'check-pending',
@@ -28,33 +31,35 @@ export const checkPending = Command.make(
     addressInput: Options.optional(
       Options.text('address').pipe(withAlias('a')),
     ),
-    network: Options.optional(Options.text('network')).pipe(withAlias('n')),
+    network: Options.optional(
+      Options.choice('network', await listEvmNetworks()).pipe(withAlias('n')),
+    ),
     rpcUrlInput: Options.optional(
-      Options.text('rpc-url').pipe(withSchema(S.URL), withAlias('r')),
+      Options.text('rpc').pipe(withSchema(S.URL), withAlias('r')),
     ),
     prometheus: Options.boolean('prometheus').pipe(withAlias('p')),
     host: Options.text('host').pipe(withDefault('localhost')),
     port: Options.integer('port').pipe(withDefault(9090)),
-    mainnet: Options.boolean('mainnet').pipe(withAlias('m')),
+    mainnet: Options.boolean('mainnet').pipe(
+      withAlias('m'),
+      withDescription(
+        'Show if there are pending transactions for deployedMainnets',
+      ),
+    ),
   },
   ({ addressInput, host, mainnet, network, port, prometheus, rpcUrlInput }) =>
     Effect.gen(function* () {
-      const parsedNetwork = Option.isSome(network)
-        ? parseNetworkName(network.value)
-        : null;
+      const parsedNetwork = Option.getOrElse(network, () => null);
       const shouldUseMainnetSequencer =
         mainnet || (parsedNetwork !== null && !isTestnet(parsedNetwork));
 
-      const sequencerAddress = getDefaultSequencerAddress(
+      const sequencerAddress = yield* getDefaultSequencerAddress(
         shouldUseMainnetSequencer,
       );
 
-      let address: EthereumAddress;
-      if (Option.isSome(addressInput)) {
-        address = parseEthereumAddress(addressInput.value);
-      } else {
-        address = sequencerAddress;
-      }
+      const address = parseEthereumAddress(
+        Option.getOrElse(addressInput, () => sequencerAddress),
+      );
 
       let pendingGauge: client.Gauge | null = null;
 
@@ -67,85 +72,29 @@ export const checkPending = Command.make(
         });
       }
 
-      let networks;
-      if (mainnet) {
-        networks = deployedMainnets;
-      } else if (Option.isSome(network)) {
-        networks = [parseNetworkName(network.value)];
-      }
-      if (Option.isSome(rpcUrlInput)) {
-        const web3 = new Web3(String(rpcUrlInput.value));
-        const chainId = yield* Effect.tryPromise({
-          try: () => web3.eth.net.getId(),
-          catch: e =>
-            console.error(
-              c`{red Failed to fetch chain ID from (RPC: ${rpcUrlInput.value})}`,
-              (e as Error).message,
-            ),
-        }).pipe(Effect.catchAll(() => Effect.succeed(null)));
-        if (isChainId(Number(chainId))) {
-          const chainIdNum = Number(chainId) as ChainId;
-          const networkName = getNetworkNameByChainId(chainIdNum);
-          networks = [networkName];
-        } else {
-          networks = ['unknown'];
-          console.log(
-            c`{red Could not determine network name from chain ID ${chainId}.}`,
-          );
-        }
-      }
-      if (!networks) {
-        networks = deployedTestnets;
-      }
+      const networks = yield* getNetworks(network, rpcUrlInput, mainnet);
 
-      for (const networkName of networks) {
-        const rpcUrl = Option.isSome(rpcUrlInput)
-          ? rpcUrlInput.value
-          : networkName === 'unknown'
-            ? ''
-            : getOptionalRpcUrl(networkName as NetworkName);
-        if (rpcUrl === '') {
-          console.log(`No rpc url for network ${networkName}. Skipping.`);
+      for (const networkName of networks as Array<'unknown' | NetworkName>) {
+        const rpcUrl = Option.getOrElse(rpcUrlInput, () =>
+          getOptionalRpcUrl(networkName as NetworkName),
+        );
+
+        const web3 = yield* getWeb3(rpcUrl);
+        if (!web3) {
           continue;
         }
-        const web3 = new Web3(String(rpcUrl));
-        const latestNonce = yield* Effect.tryPromise({
-          try: () => web3.eth.getTransactionCount(address, 'latest'),
-          catch: e =>
-            console.error(
-              c`{red Failed to get latest nonce for network ${networkName} (RPC: ${String(rpcUrl)})}`,
-              (e as Error).message,
-            ),
-        }).pipe(Effect.catchAll(() => Effect.succeed(null)));
-
-        const pendingNonce = yield* Effect.tryPromise({
-          try: () => web3.eth.getTransactionCount(address, 'pending'),
-          catch: e =>
-            console.error(
-              c`{red Failed to get pending nonce for network ${networkName} (RPC: ${String(rpcUrl)})}`,
-              (e as Error).message,
-            ),
-        }).pipe(Effect.catchAll(() => Effect.succeed(null)));
-        if (
-          (latestNonce != 0n && !latestNonce) ||
-          (pendingNonce != 0n && !pendingNonce)
-        ) {
+        const latestNonce = yield* getNonce(address, web3, 'latest');
+        const pendingNonce = yield* getNonce(address, web3, 'pending');
+        if (latestNonce === null || pendingNonce === null) {
           continue;
         }
 
         const nonceDifference = Number(pendingNonce - latestNonce);
 
-        if (nonceDifference) {
-          console.log(c`{red Nonce difference found on ${networkName}:}`);
-          console.log(
-            c`{red   Latest: ${latestNonce}, Pending: ${pendingNonce}}`,
-          );
-        } else {
-          console.log(c`{green No Nonce difference found on ${networkName}:}`);
-          console.log(
-            c`{green   Latest: ${latestNonce}, Pending: ${pendingNonce}}`,
-          );
-        }
+        console.log(
+          c`{${nonceDifference ? 'red' : 'green No'} Nonce difference found on ${networkName}:} \n  {${nonceDifference ? 'red' : 'green'}   Latest: ${latestNonce}, Pending: ${pendingNonce}}`,
+        );
+
         if (pendingGauge) {
           pendingGauge.set({ networkName, address }, nonceDifference);
         }

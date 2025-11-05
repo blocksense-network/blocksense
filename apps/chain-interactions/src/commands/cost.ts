@@ -1,12 +1,16 @@
-import { Effect, Option } from 'effect';
+import { Effect, Option, Schema as S } from 'effect';
 import { Command, Options } from '@effect/cli';
-import { withAlias, withDefault } from '@effect/cli/Options';
+import {
+  withAlias,
+  withDefault,
+  withDescription,
+  withSchema,
+} from '@effect/cli/Options';
 import type { AxiosResponse } from 'axios';
 import axios from 'axios';
 import client from 'prom-client';
 import Web3 from 'web3';
 
-import { throwError } from '@blocksense/base-utils/errors';
 import type { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 import {
   getOptionalApiKey,
@@ -14,16 +18,17 @@ import {
   isTestnet,
   networkMetadata,
   parseEthereumAddress,
-  parseNetworkName,
 } from '@blocksense/base-utils/evm';
 import { color as c } from '@blocksense/base-utils/tty';
 import { listEvmNetworks } from '@blocksense/config-types/read-write-config';
 
 import type { Transaction } from './types';
-import { deployedMainnets, deployedTestnets } from './types';
 import {
   filterSmallBalance,
+  getBalance,
   getDefaultSequencerAddress,
+  getNetworks,
+  getWeb3,
   startPrometheusServer,
 } from './utils';
 
@@ -38,10 +43,13 @@ export const cost = Command.make(
     ),
     numberOfTransactions: Options.integer('number-of-transactions').pipe(
       withDefault(1000),
-      withAlias('n'),
+      withAlias('num'),
     ),
     network: Options.optional(
       Options.choice('network', await listEvmNetworks()).pipe(withAlias('n')),
+    ),
+    rpcUrlInput: Options.optional(
+      Options.text('rpc').pipe(withSchema(S.URL), withAlias('r')),
     ),
     firstTxTimeInput: Options.text('first-tx-time').pipe(
       withDefault(DEFAULT_FIRST_TX_TIME),
@@ -52,7 +60,10 @@ export const cost = Command.make(
     prometheus: Options.boolean('prometheus').pipe(withAlias('p')),
     host: Options.text('host').pipe(withDefault('localhost')),
     port: Options.integer('port').pipe(withDefault(9090)),
-    mainnet: Options.boolean('mainnet').pipe(withAlias('m')),
+    mainnet: Options.boolean('mainnet').pipe(
+      withAlias('m'),
+      withDescription('Show cost for deployedMainnets'),
+    ),
   },
   ({
     addressInput,
@@ -64,24 +75,21 @@ export const cost = Command.make(
     numberOfTransactions,
     port,
     prometheus,
+    rpcUrlInput,
   }) =>
     Effect.gen(function* () {
-      const parsedNetwork = Option.isSome(network)
-        ? parseNetworkName(network.value)
-        : null;
+      const parsedNetwork = Option.getOrNull(network);
+
       const shouldUseMainnetSequencer =
         mainnet || (parsedNetwork !== null && !isTestnet(parsedNetwork));
 
-      const sequencerAddress = getDefaultSequencerAddress(
+      const sequencerAddress = yield* getDefaultSequencerAddress(
         shouldUseMainnetSequencer,
       );
 
-      let address: EthereumAddress;
-      if (Option.isSome(addressInput)) {
-        address = parseEthereumAddress(addressInput.value);
-      } else {
-        address = sequencerAddress;
-      }
+      const address = parseEthereumAddress(
+        Option.getOrElse(addressInput, () => sequencerAddress),
+      );
 
       let gauges: Gauges | null = null;
 
@@ -126,38 +134,21 @@ export const cost = Command.make(
           address === sequencerAddress
         })}\n`,
       );
-      const networks =
-        parsedNetwork !== null
-          ? [parsedNetwork]
-          : mainnet
-            ? deployedMainnets
-            : deployedTestnets;
+      const networks = yield* getNetworks(network, rpcUrlInput, mainnet);
 
-      for (const networkName of networks) {
-        const fetchResult = yield* Effect.tryPromise({
-          try: (): Promise<FetchTransactionsResult> =>
-            fetchTransactionsForNetwork(
-              networkName,
-              address,
-              numberOfTransactions,
-              firstTxTimeInput,
-              lastTxTimeInput,
-            ),
-          catch: error => {
-            const err =
-              error instanceof Error ? error : new Error(String(error));
-            console.error(
-              c`{red Failed to fetch transactions for network ${networkName}}`,
-              err.message,
-            );
-            return err;
-          },
-        }).pipe(
-          Effect.catchAll(() =>
-            Effect.succeed<FetchTransactionsResult | null>(null),
-          ),
+      for (const networkName of networks as Array<'unknown' | NetworkName>) {
+        if (networkName === 'unknown') {
+          console.log(c`{red Unknown network. Can't fetch transactions.}`);
+          return;
+        }
+        const fetchResult = yield* fetchTransactionsForNetwork(
+          networkName as NetworkName,
+          address,
+          numberOfTransactions,
+          firstTxTimeInput,
+          lastTxTimeInput,
         );
-        if (!fetchResult) {
+        if (fetchResult.transactions.length < 2) {
           continue;
         }
 
@@ -167,63 +158,30 @@ export const cost = Command.make(
           transactions,
         } = fetchResult;
 
-        if (transactions.length > 1) {
-          const hoursBetweenFirstLastTx = getHourDifference(transactions);
+        const gasCosts = yield* calculateGasCosts(transactions);
 
-          const gasCosts = yield* Effect.try({
-            try: () => calculateGasCosts(hoursBetweenFirstLastTx, transactions),
-            catch: e =>
-              console.error(
-                c`{red Failed to fetch gas costs for network ${networkName}}`,
-                (e as Error).message,
-              ),
-          }).pipe(Effect.catchAll(() => Effect.succeed(null)));
-
-          if (!gasCosts) {
-            continue;
-          }
-
-          const rpcUrl = getOptionalRpcUrl(networkName);
-          let balance: string;
-
-          if (rpcUrl === '') {
-            console.log(
-              c`{red No rpc url for network ${networkName}. Can't get balance - will use 0.}`,
-            );
-            balance = '0';
-          } else {
-            const web3 = new Web3(rpcUrl);
-
-            let balanceWei = yield* Effect.tryPromise({
-              try: () => web3.eth.getBalance(address),
-              catch: e =>
-                console.error(
-                  c`{red Failed to fetch balance from (RPC: ${rpcUrl})}`,
-                  (e as Error).message,
-                ),
-            }).pipe(Effect.catchAll(() => Effect.succeed(null)));
-            if (!balanceWei) {
-              balanceWei = 0n;
-            }
-            balance = web3.utils.fromWei(balanceWei, 'ether');
-          }
-
-          logGasCosts(
-            networkName,
-            address,
-            transactions.length,
-            gasCosts,
-            balance,
-            firstTxTimeResult,
-            lastTxTimeResult,
-            hoursBetweenFirstLastTx,
-            gauges,
-          );
-        } else {
-          console.log(
-            c`{yellow ${networkName}: Less than 2 transactions found for the account.}`,
-          );
+        if (!gasCosts) {
+          continue;
         }
+
+        const rpcUrl = getOptionalRpcUrl(networkName as NetworkName);
+
+        const web3 = yield* getWeb3(rpcUrl);
+        if (!web3) {
+          continue;
+        }
+        const balance = yield* getBalance(address, web3);
+
+        yield* logGasCosts(
+          networkName,
+          address,
+          transactions.length,
+          gasCosts,
+          balance,
+          firstTxTimeResult,
+          lastTxTimeResult,
+          gauges,
+        );
       }
     }),
 );
@@ -262,65 +220,79 @@ type FetchTransactionsResult = {
   lastTxTime: string;
 };
 
-function getHourDifference(transactions: Transaction[]): number {
-  const txsLen = transactions.length;
-  if (txsLen < 2) {
-    throwError('Less then 2 transactions in getHourDifference');
+function getHourDifference(
+  transactions: Transaction[],
+): Effect.Effect<number, never, never> {
+  if (transactions.length < 2) {
+    console.error('Less then 2 transactions in getHourDifference');
+    return Effect.succeed(0);
   }
   const firstTransactionTime = new Date(transactions[0].timestamp);
-  const lastTransactionTime = new Date(transactions[txsLen - 1].timestamp);
+  const lastTransactionTime = new Date(
+    transactions[transactions.length - 1].timestamp,
+  );
 
   const diffMs = firstTransactionTime.getTime() - lastTransactionTime.getTime();
   const diffHours = diffMs / (1000 * 60 * 60);
 
-  return diffHours;
+  return Effect.succeed(diffHours);
 }
 
 const calculateGasCosts = (
-  hoursBetweenFirstLastTx: number,
   transactions: Transaction[],
-): {
-  avgGasPriceGwei: string;
-  cost1h: number;
-  gasUsed1h: number;
-} => {
-  if (transactions.length < 2) {
-    throwError('Less then 2 transactions in calculateGasCosts');
-  }
-  let totalGasCost = BigInt(0);
-  let totalGasPrice = BigInt(0);
-  let totalGasUsed = BigInt(0);
-
-  for (const tx of transactions) {
-    if (tx.fee) {
-      // Bitlayer, Ontology, Pharos
-      totalGasCost += tx.fee;
-    } else if (tx.gasCost) {
-      // Taraxa testnet
-      totalGasCost += tx.gasCost;
-    } else {
-      const txGasCost = tx.gasUsed * tx.gasPrice;
-
-      totalGasCost += txGasCost;
-      totalGasPrice += tx.gasPrice;
-      totalGasUsed += tx.gasUsed;
+): Effect.Effect<
+  {
+    avgGasPriceGwei: string;
+    cost1h: number;
+    gasUsed1h: number;
+    hoursBetweenFirstLastTx: number;
+  } | null,
+  never,
+  never
+> =>
+  Effect.gen(function* () {
+    if (transactions.length < 2) {
+      console.error('Less then 2 transactions in calculateGasCosts');
+      return null;
     }
-  }
 
-  const avgGasPrice = totalGasPrice / BigInt(transactions.length);
-  const avgGasPriceGwei = Web3.utils.fromWei(avgGasPrice.toString(), 'gwei');
-  const totalCostInETH = Web3.utils.fromWei(totalGasCost.toString(), 'ether');
-  const cost1h = Number(totalCostInETH) / hoursBetweenFirstLastTx;
-  const gasUsed1h = Number(totalGasUsed) / hoursBetweenFirstLastTx;
+    const hoursBetweenFirstLastTx = yield* getHourDifference(transactions);
 
-  return {
-    avgGasPriceGwei,
-    cost1h,
-    gasUsed1h,
-  };
-};
+    let totalGasCost = BigInt(0);
+    let totalGasPrice = BigInt(0);
+    let totalGasUsed = BigInt(0);
 
-const logGasCosts = async (
+    for (const tx of transactions) {
+      if (tx.fee) {
+        // Bitlayer, Ontology, Pharos
+        totalGasCost += tx.fee;
+      } else if (tx.gasCost) {
+        // Taraxa testnet
+        totalGasCost += tx.gasCost;
+      } else {
+        const txGasCost = tx.gasUsed * tx.gasPrice;
+
+        totalGasCost += txGasCost;
+        totalGasPrice += tx.gasPrice;
+        totalGasUsed += tx.gasUsed;
+      }
+    }
+
+    const avgGasPrice = totalGasPrice / BigInt(transactions.length);
+    const avgGasPriceGwei = Web3.utils.fromWei(avgGasPrice.toString(), 'gwei');
+    const totalCostInETH = Web3.utils.fromWei(totalGasCost.toString(), 'ether');
+    const cost1h = Number(totalCostInETH) / hoursBetweenFirstLastTx;
+    const gasUsed1h = Number(totalGasUsed) / hoursBetweenFirstLastTx;
+
+    return {
+      avgGasPriceGwei,
+      cost1h,
+      gasUsed1h,
+      hoursBetweenFirstLastTx,
+    };
+  });
+
+const logGasCosts = (
   networkName: NetworkName,
   address: EthereumAddress,
   transactionsCount: number,
@@ -328,17 +300,17 @@ const logGasCosts = async (
     avgGasPriceGwei: string;
     cost1h: number;
     gasUsed1h: number;
+    hoursBetweenFirstLastTx: number;
   },
   balance: string,
   firstTransactionTime: string,
   lastTransactionTime: string,
-  hoursBetweenFirstLast: number,
   gauges: Gauges | null,
-): Promise<void> => {
-  const { currency } = networkMetadata[networkName];
+): Effect.Effect<void, never, never> =>
+  Effect.gen(function* () {
+    const { currency } = networkMetadata[networkName];
 
-  try {
-    console.log(c`\n    {white ${networkName}: Processed ${transactionsCount} transactions sent by ${address} over ${hoursBetweenFirstLast} hours}
+    console.log(c`\n    {white ${networkName}: Processed ${transactionsCount} transactions sent by ${address} over ${gasCosts.hoursBetweenFirstLastTx} hours}
     {blue First transaction timestamp: ${firstTransactionTime}}
     {blue Last transaction timestamp: ${lastTransactionTime}}
     {yellow Average Gas Price: ${gasCosts.avgGasPriceGwei} Gwei}
@@ -348,7 +320,7 @@ const logGasCosts = async (
     {cyan Cost for 24h: ${gasCosts.cost1h * 24} ${currency}}
     `);
 
-    if (balance == null) {
+    if (balance === null || balance === undefined) {
       console.error(c`{red Can't calculate balance for ${networkName}}`);
     } else {
       const daysBalanceWillLast = Number(balance) / (gasCosts.cost1h * 24);
@@ -366,7 +338,7 @@ const logGasCosts = async (
         gauges.cost.set({ networkName, address }, gasCosts.cost1h * 24);
         gauges.balance.set(
           { networkName, address, currency },
-          filterSmallBalance(balance),
+          yield* filterSmallBalance(balance),
         );
         gauges.daysLeft.set({ networkName, address }, daysBalanceWillLast);
         gauges.transactionsCount.set(
@@ -375,118 +347,132 @@ const logGasCosts = async (
         );
         gauges.transactionsPeriod.set(
           { networkName, address },
-          hoursBetweenFirstLast,
+          gasCosts.hoursBetweenFirstLastTx,
         );
       }
     }
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error(
-        c`{red Error logging gas costs: ${(error as Error).message}}`,
-      );
-    } else {
-      console.error(c`{red Unexpected error: ${String(error)}}`);
-    }
-  }
-};
+  });
 
-const fetchTransactionsForNetwork = async (
+const fetchTransactionsForNetwork = (
   network: NetworkName,
   address: EthereumAddress,
   numberOfTransactions: number,
   firstTxTime: string,
   lastTxTime: string,
-): Promise<{
-  transactions: Transaction[];
-  firstTxTime: string;
-  lastTxTime: string;
-}> => {
-  const apiUrl = networksUseSecondExplorer.includes(network)
-    ? networkMetadata[network].explorers[1]?.apiUrl
-    : networkMetadata[network].explorers[0]?.apiUrl;
+): Effect.Effect<FetchTransactionsResult, never, never> => {
+  const emptyResult: FetchTransactionsResult = {
+    transactions: [],
+    firstTxTime: '',
+    lastTxTime: '',
+  };
 
-  const apiKey = getOptionalApiKey(network);
-  if (!apiUrl) {
-    console.log(c`{red Skipping ${network}: Missing API configuration}`);
-    return { transactions: [], firstTxTime: '', lastTxTime: '' };
-  }
+  return Effect.gen(function* () {
+    const apiUrl = networksUseSecondExplorer.includes(network)
+      ? networkMetadata[network].explorers[1]?.apiUrl
+      : networkMetadata[network].explorers[0]?.apiUrl;
 
-  try {
+    if (!apiUrl) {
+      console.log(c`{red Skipping ${network}: Missing API configuration}`);
+      return emptyResult;
+    }
+
     console.log('------------------------------------------------------------');
     console.log(c`{green ${network.toUpperCase()}}`);
     console.log(c`{blue Fetching transactions for ${network}...}`);
-    const rpcUrl = getOptionalRpcUrl(network);
-    const web3 = new Web3(rpcUrl);
-    const latestBlock = await web3.eth.getBlockNumber();
 
+    const web3 = yield* getWeb3(getOptionalRpcUrl(network));
+    if (!web3) {
+      console.error(
+        c`{red Failed to initialize Web3 for network ${network}. Returning empty result.}`,
+      );
+      return emptyResult;
+    }
+
+    const latestBlock = yield* Effect.tryPromise(() =>
+      web3.eth.getBlockNumber(),
+    );
+
+    const axiosGet = (url: string, config?: any) =>
+      Effect.tryPromise(() => axios.get(url, config));
+
+    const apiKey = getOptionalApiKey(network);
     let response: AxiosResponse<any>;
     let rawTransactions: any[] = [];
+
     if (networksV2Api.includes(network)) {
-      response = await axios.get(
+      response = yield* axiosGet(
         `${apiUrl}/v2/addresses/${address}/transactions`,
       );
       rawTransactions = response.data.items || [];
     } else if (network === 'telos-testnet') {
-      response = await axios.get(`${apiUrl}/address/${address}/transactions`);
+      response = yield* axiosGet(`${apiUrl}/address/${address}/transactions`);
       rawTransactions = response.data.results || [];
     } else if (
       network === 'pharos-atlantic-testnet' ||
       network === 'cyber-testnet'
     ) {
-      response = await axios.get(`${apiUrl}/address/${address}/transactions`);
+      response = yield* axiosGet(`${apiUrl}/address/${address}/transactions`);
       rawTransactions = response.data.data || [];
     } else if (network === 'taraxa-testnet') {
-      response = await axios.get(
+      response = yield* axiosGet(
         `${apiUrl}/address/${address}/transactions?limit=100`,
       );
       rawTransactions = response.data.data || [];
     } else if (network === 'ontology-testnet') {
-      response = await axios.get(
+      response = yield* axiosGet(
         `${apiUrl}/addresses/${address}/txs?page_size=20&page_number=1`,
       );
       rawTransactions = response.data.result.records || [];
     } else if (network === 'cronos-testnet') {
-      let _pageCounter = 1; //max 10000 blocks per page
-      let currentBlock = latestBlock;
-      do {
-        const page = await axios.get(apiUrl, {
-          params: {
-            module: 'account',
-            action: 'txlist',
-            address,
-            startblock: Number(currentBlock - 10000n),
-            endblock: Number(currentBlock),
-            apikey: apiKey,
-          },
-        });
-        const txFromPage = page.data.result;
-
-        rawTransactions = rawTransactions.concat(txFromPage);
-        _pageCounter++;
-        currentBlock -= 10000n;
-      } while (rawTransactions.length < numberOfTransactions);
+      const cronosLoopState = {
+        rawTransactions,
+        currentBlock: latestBlock,
+      };
+      yield* Effect.loop(cronosLoopState, {
+        while: state => state.rawTransactions.length < numberOfTransactions,
+        step: state => state,
+        discard: true,
+        body: state =>
+          Effect.gen(function* () {
+            const page = yield* axiosGet(apiUrl, {
+              params: {
+                module: 'account',
+                action: 'txlist',
+                address,
+                startblock: Number(state.currentBlock - 10000n),
+                endblock: Number(state.currentBlock),
+                apikey: apiKey,
+              },
+            });
+            state.rawTransactions = state.rawTransactions.concat(
+              page.data.result,
+            );
+            state.currentBlock -= 10000n;
+          }),
+      });
+      rawTransactions = cronosLoopState.rawTransactions;
     } else if (
       network === 'bitlayer-testnet' ||
       network === 'bitlayer-mainnet'
     ) {
       const chainId =
         network === 'bitlayer-testnet' ? 'BITLAYERTEST' : 'BITLAYER';
-      response = await axios.get(
+      response = yield* axiosGet(
         `${apiUrl}/txs/list?ps=1000&a=${address}&chainId=${chainId}`,
       );
       rawTransactions = response.data.data.records || [];
     } else if (network === 'core-testnet') {
-      response = await axios.get(
+      response = yield* axiosGet(
         `${apiUrl}/accounts/list_of_txs_by_address/${address}?apikey=${apiKey}`,
       );
 
       if (response.data.status !== '1') {
         console.error(c`{red ${network} Error: ${response.data.message}}`);
-        return { transactions: [], firstTxTime: '', lastTxTime: '' };
+        return emptyResult;
       }
       rawTransactions = response.data.result;
     } else {
-      response = await axios.get(apiUrl, {
+      response = yield* axiosGet(apiUrl, {
         params: {
           module: 'account',
           action: 'txlist',
@@ -500,13 +486,12 @@ const fetchTransactionsForNetwork = async (
 
       if (response.data.status !== '1') {
         console.error(c`{red ${network} Error: ${response.data.message}}`);
-        return { transactions: [], firstTxTime: '', lastTxTime: '' };
+        return emptyResult;
       }
       rawTransactions = response.data.result;
     }
 
     if (network === 'polygon-amoy') {
-      // The sort bellow will order the transactions incorrectly if we don't trim them.
       rawTransactions.splice(numberOfTransactions * 2);
     }
     rawTransactions.sort((a, b) => b.nonce - a.nonce);
@@ -565,15 +550,13 @@ const fetchTransactionsForNetwork = async (
         };
       });
 
-    // Filter out self-sent transactions
     transactions = transactions.filter(
-      (tx: any) =>
+      tx =>
         tx.from.toLowerCase() === address.toLowerCase() &&
         tx.to.toLowerCase() !== address.toLowerCase(),
     );
 
-    // Filter out all transactions before firstTxTime
-    if (firstTxTime != DEFAULT_FIRST_TX_TIME) {
+    if (firstTxTime !== DEFAULT_FIRST_TX_TIME) {
       const firstTxTimeAsDate = new Date(firstTxTime);
       transactions = transactions.filter((tx: Transaction) => {
         const txTime = new Date(tx.timestamp);
@@ -581,10 +564,9 @@ const fetchTransactionsForNetwork = async (
       });
     }
 
-    // Filter out all transactions after lastTxTime
-    if (lastTxTime != DEFAULT_LAST_TX_TIME) {
+    if (lastTxTime !== DEFAULT_LAST_TX_TIME) {
       const lastTxTimeAsDate = new Date(lastTxTime);
-      transactions = transactions.filter((tx: any) => {
+      transactions = transactions.filter(tx => {
         const txTime = new Date(tx.timestamp);
         return txTime <= lastTxTimeAsDate;
       });
@@ -609,10 +591,16 @@ const fetchTransactionsForNetwork = async (
       firstTxTime: firstTxTimeRet,
       lastTxTime: lastTxTimeRet,
     };
-  } catch (error: any) {
-    console.error(
-      c`{red Error fetching transactions for ${network}: ${error.message}}`,
-    );
-    return { transactions: [], firstTxTime: '', lastTxTime: '' };
-  }
+  }).pipe(
+    Effect.catchAll(error =>
+      Effect.sync(() => {
+        console.error(
+          c`{red Error fetching transactions for ${network}: ${
+            error instanceof Error ? error.message : String(error)
+          }}`,
+        );
+        return emptyResult;
+      }),
+    ),
+  );
 };

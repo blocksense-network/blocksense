@@ -1,4 +1,4 @@
-import { Option } from 'effect';
+import { Effect, Either, Option } from 'effect';
 import express from 'express';
 import client from 'prom-client';
 import Web3 from 'web3';
@@ -32,79 +32,68 @@ export const startPrometheusServer = (host: string, port: number): void => {
   });
 };
 
-export function filterSmallBalance(balance: string, threshold = 1e-6): number {
-  return Number(balance) < threshold ? 0 : Number(balance);
+export function filterSmallBalance(
+  balance: string,
+  threshold = 1e-6,
+): Effect.Effect<number, never, never> {
+  return Number(balance) < threshold
+    ? Effect.succeed(0)
+    : Effect.succeed(Number(balance));
 }
 
 export function getDefaultSequencerAddress(
   shouldUseMainnetSequencer: boolean,
-): EthereumAddress {
+): Effect.Effect<EthereumAddress, never, never> {
   if (shouldUseMainnetSequencer) {
-    return parseEthereumAddress(
-      getOptionalEnvString(
-        'SEQUENCER_ADDRESS_MAINNET',
-        '0x1F412F1dBab58E41d37ba31115c811B0fBD10904',
+    return Effect.succeed(
+      parseEthereumAddress(
+        getOptionalEnvString(
+          'SEQUENCER_ADDRESS_MAINNET',
+          '0x1F412F1dBab58E41d37ba31115c811B0fBD10904',
+        ),
       ),
     );
-  } else {
-    return parseEthereumAddress(
+  }
+  return Effect.succeed(
+    parseEthereumAddress(
       getOptionalEnvString(
         'SEQUENCER_ADDRESS_TESTNET',
         '0xd756119012CcabBC59910dE0ecEbE406B5b952bE',
       ),
-    );
-  }
+    ),
+  );
 }
 
-export function getNetworks(
+export const getNetworks = (
   network: Option.Option<string>,
   rpcUrlInput: Option.Option<URL>,
   mainnet: boolean,
-): Promise<Array<'unknown' | NetworkName>>;
-export function getNetworks(
-  network: Option.Option<string>,
-  mainnet: boolean,
-): NetworkName[];
-export function getNetworks(
-  network: Option.Option<string>,
-  rpcUrlOrMainnet: Option.Option<URL> | boolean,
-  maybeMainnet?: boolean,
-) {
-  const hasRpcUrlArg = typeof rpcUrlOrMainnet !== 'boolean';
-  const rpcUrlInput = hasRpcUrlArg
-    ? (rpcUrlOrMainnet as Option.Option<URL>)
-    : Option.none<URL>();
-  const mainnet = hasRpcUrlArg
-    ? (maybeMainnet ?? false)
-    : (rpcUrlOrMainnet as boolean);
+): Effect.Effect<Array<'unknown' | NetworkName>, never, never> =>
+  Effect.gen(function* () {
+    let networks: Array<'unknown' | NetworkName> = mainnet
+      ? deployedMainnets
+      : deployedTestnets;
 
-  let networks: Array<'unknown' | NetworkName> | undefined = mainnet
-    ? deployedMainnets
-    : deployedTestnets;
-  if (Option.isSome(network)) {
-    networks = [parseNetworkName(network.value)];
-  }
-
-  if (!hasRpcUrlArg) {
-    return networks;
-  }
-
-  if (Option.isNone(rpcUrlInput)) {
-    return Promise.resolve(networks);
-  }
-
-  return (async () => {
-    let chainId: number | bigint | undefined;
-    try {
-      const web3 = new Web3(String(rpcUrlInput.value));
-      chainId = await web3.eth.net.getId();
-    } catch (e) {
-      console.error(
-        c`{red Failed to fetch chain ID from (RPC: ${rpcUrlInput.value})}`,
-        (e as Error).message,
-      );
+    if (Option.isSome(network)) {
+      networks = [parseNetworkName(network.value)];
+      return networks;
     }
-    if (chainId !== undefined && isChainId(Number(chainId))) {
+
+    if (Option.isNone(rpcUrlInput)) {
+      return networks;
+    }
+
+    const web3 = yield* getWeb3(rpcUrlInput.value);
+    if (web3 === null) {
+      console.error(
+        c`{red Failed to initialize web3 for RPC ${rpcUrlInput.value}. Returning 'unknown'.}`,
+      );
+      return ['unknown'];
+    }
+
+    const chainId = yield* getChainId(web3);
+
+    if (chainId !== 0n && isChainId(Number(chainId))) {
       const chainIdNum = Number(chainId) as ChainId;
       const networkName = getNetworkNameByChainId(chainIdNum);
       return [networkName];
@@ -114,5 +103,76 @@ export function getNetworks(
       c`{red Could not determine network name from chain ID ${String(chainId)}.}`,
     );
     return ['unknown'];
-  })();
-}
+  });
+
+export const getBalance = (
+  address: string,
+  web3: Web3,
+): Effect.Effect<string, never, never> =>
+  Effect.gen(function* () {
+    const balanceWei = yield* Effect.either(
+      Effect.tryPromise(() => web3.eth.getBalance(address)),
+    );
+
+    if (Either.isLeft(balanceWei)) {
+      console.error(
+        `Failed to get balance for address ${address}: ${String(
+          balanceWei.left,
+        )}`,
+      );
+      return '0';
+    }
+
+    return web3.utils.fromWei(balanceWei.right, 'ether');
+  });
+
+export const getNonce = (
+  address: EthereumAddress,
+  web3: Web3,
+  blockNumber: 'latest' | 'pending' = 'latest',
+): Effect.Effect<bigint | null, never, never> =>
+  Effect.gen(function* () {
+    const nonce = yield* Effect.either(
+      Effect.tryPromise(() =>
+        web3.eth.getTransactionCount(address, blockNumber),
+      ),
+    );
+    if (Either.isLeft(nonce)) {
+      console.error(
+        `Failed to get nonce for address ${address}: ${String(nonce.left)}`,
+      );
+      return 0n;
+    }
+
+    return nonce.right;
+  });
+
+export const getWeb3 = (
+  rpcUrl: URL | string,
+): Effect.Effect<Web3 | null, never, never> =>
+  Effect.gen(function* () {
+    const web3 = yield* Effect.either(
+      Effect.try(() => new Web3(String(rpcUrl))),
+    );
+    if (Either.isLeft(web3)) {
+      console.error(
+        `Failed to initialize Web3 from rpc - ${rpcUrl}:  ${String(web3.left)}`,
+      );
+      return null;
+    }
+
+    return web3.right;
+  });
+
+export const getChainId = (web3: Web3): Effect.Effect<bigint, never, never> =>
+  Effect.gen(function* () {
+    const nonce = yield* Effect.either(
+      Effect.tryPromise(() => web3.eth.getChainId()),
+    );
+    if (Either.isLeft(nonce)) {
+      console.error(`Failed to get chainID: ${String(nonce.left)}`);
+      return 0n;
+    }
+
+    return nonce.right;
+  });
