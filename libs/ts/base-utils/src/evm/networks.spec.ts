@@ -24,7 +24,7 @@ describe('Network constants tests', () => {
   test(`'isNetworkName' should return true for valid network names`, () => {
     expect(isNetworkName('ethereum-mainnet')).toBe(true);
     expect(isNetworkName('ethereum-sepolia')).toBe(true);
-    expect(isNetworkName('ethereum-holesky')).toBe(true);
+    expect(isNetworkName('base-mainnet')).toBe(true);
   });
 
   test(`'isNetworkName' should return false for invalid network names`, () => {
@@ -49,7 +49,7 @@ describe('Network constants tests', () => {
   test(`'isChainId' should return true for valid chain IDs`, () => {
     expect(isChainId(1)).toBe(true);
     expect(isChainId(11155111)).toBe(true);
-    expect(isChainId(17000)).toBe(true);
+    expect(isChainId(8453)).toBe(true);
   });
 
   test(`'isChainId' should return false for invalid chain IDs`, () => {
