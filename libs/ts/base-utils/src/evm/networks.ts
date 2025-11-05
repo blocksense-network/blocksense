@@ -18,7 +18,6 @@ const networks = [
   'local',
   'ethereum-mainnet',
   'ethereum-sepolia',
-  'ethereum-holesky',
   'ethereum-hoodi',
   'abstract-testnet',
   'apechain-curtis',
@@ -149,7 +148,7 @@ const networks = [
 ] as const;
 
 const chainIds = [
-  99999999999, 1, 11155111, 17000, 560048, 11124, 33111, 1088, 42161, 421614,
+  99999999999, 1, 11155111, 560048, 11124, 33111, 1088, 42161, 421614,
   1313161555, 43114, 43113, 123420001114, 8453, 84532, 80094, 80069, 200901,
   200810, 81457, 168587773, 56288, 9728, 288, 28882, 56, 97, 42220, 44787, 5115,
   1114, 338, 111557560, 18880, 839999, 250, 4002, 114, 20994, 252, 2522, 91342,
@@ -305,23 +304,6 @@ export const networkMetadata = {
         type: 'blockscout',
         webUrl: 'https://eth-sepolia.blockscout.com',
         apiUrl: 'https://eth-sepolia.blockscout.com/api',
-      },
-    ],
-    currency: Currency.ETH,
-  },
-  'ethereum-holesky': {
-    chainId: 17000,
-    isTestnet: true,
-    explorers: [
-      {
-        type: 'etherscan',
-        webUrl: 'https://holesky.etherscan.io',
-        apiUrl: 'https://api.etherscan.io/v2/api?chainid=17000',
-      },
-      {
-        type: 'blockscout',
-        webUrl: 'https://eth-holesky.blockscout.com',
-        apiUrl: 'https://eth-holesky.blockscout.com/api',
       },
     ],
     currency: Currency.ETH,
