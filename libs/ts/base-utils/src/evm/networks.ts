@@ -1641,9 +1641,9 @@ export const networkMetadata = {
     isTestnet: true,
     explorers: [
       {
-        type: 'etherscan',
-        webUrl: 'https://testnet.sonicscan.org',
-        apiUrl: 'https://api.etherscan.io/v2/api?chainid=57054',
+        type: 'unknown',
+        webUrl: 'https://blaze.soniclabs.com',
+        apiUrl: null,
       },
     ],
     currency: Currency.S,
