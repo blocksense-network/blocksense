@@ -49,7 +49,6 @@ export const deployedTestnets = [
   'opbnb-testnet',
   'optimism-sepolia',
   'pharos-atlantic-testnet',
-  'pharos-testnet',
   'plume-testnet',
   'polygon-amoy',
   'polygon-zkevm-cardona',
