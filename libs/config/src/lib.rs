@@ -219,6 +219,8 @@ pub struct Provider {
 
     #[serde(default)]
     pub contracts: Vec<ContractConfig>,
+    #[serde(default = "default_confirmation_method")]
+    pub confirmation_method: ConfirmationMethod,
 }
 
 fn default_is_enabled() -> bool {
@@ -233,6 +235,24 @@ fn default_receipt_polling_back_off_period_ms() -> u64 {
 fn default_transaction_retry_back_off_ms() -> u64 {
     // Default 1 second (as milliseconds)
     1_000
+}
+
+fn default_confirmation_method() -> ConfirmationMethod {
+    ConfirmationMethod::Receipt
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Copy, PartialEq, Eq)]
+pub enum ConfirmationMethod {
+    #[serde(rename = "receipt", alias = "Receipt")]
+    Receipt,
+    #[serde(
+        rename = "DAG inclusion",
+        alias = "dag_inclusion",
+        alias = "dag inclusion",
+        alias = "Dag inclusion",
+        alias = "DAG Inclusion"
+    )]
+    DagInclusion,
 }
 
 impl Validated for Provider {
@@ -524,6 +544,7 @@ pub fn get_test_config_with_multiple_providers(
                 should_load_rb_indices: false,
                 allow_feeds: None,
                 publishing_criteria: vec![],
+                confirmation_method: default_confirmation_method(),
                 impersonated_anvil_account: None,
                 contracts: vec![
                     // Gnosis safe contract, if present changes the flow, and no direct updates will be made to the ADFS contract.

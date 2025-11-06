@@ -950,6 +950,7 @@ mod tests {
                     impersonated_anvil_account: None,
                     publishing_criteria: vec![],
                     should_load_rb_indices: true,
+                    confirmation_method: blocksense_config::ConfirmationMethod::Receipt,
                     contracts,
                 }
             });

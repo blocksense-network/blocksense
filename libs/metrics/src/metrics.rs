@@ -167,6 +167,8 @@ pub struct ProviderMetrics {
     pub success_get_gas_price: IntCounterVec,
     pub success_get_max_priority_fee_per_gas: IntCounterVec,
     pub success_get_chain_id: IntCounterVec,
+    pub dag_inclusion_success: IntCounterVec,
+    pub dag_inclusion_failure: IntCounterVec,
     pub total_timed_out_tx: IntCounterVec,
     pub total_transaction_retries: IntCounterVec,
     pub total_mismatched_gnosis_safe_nonce: IntCounterVec,
@@ -251,6 +253,16 @@ impl ProviderMetrics {
             success_get_chain_id: register_int_counter_vec!(
                 format!("{}success_get_chain_id", prefix),
                 "Total number of successful get_chain_id req-s for network",
+                &["Network"]
+            )?,
+            dag_inclusion_success: register_int_counter_vec!(
+                format!("{}dag_inclusion_success", prefix),
+                "Total number of successful DAG inclusion waits",
+                &["Network"]
+            )?,
+            dag_inclusion_failure: register_int_counter_vec!(
+                format!("{}dag_inclusion_failure", prefix),
+                "Total number of failed DAG inclusion waits",
                 &["Network"]
             )?,
             total_timed_out_tx: register_int_counter_vec!(
