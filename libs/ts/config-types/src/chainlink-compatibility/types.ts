@@ -9,7 +9,7 @@ export const chainlinkNetworkNameToChainId = {
   'bsc-mainnet': 'bsc-mainnet',
   'bsc-testnet': 'bsc-testnet',
   'celo-mainnet': 'celo-mainnet',
-  'celo-testnet-alfajores': 'celo-alfajores',
+  'celo-testnet-alfajores': null,
   'ethereum-mainnet-andromeda-1': 'metis-andromeda-mainnet',
   'ethereum-mainnet-arbitrum-1': 'arbitrum-mainnet',
   'ethereum-mainnet-base-1': 'base-mainnet',
