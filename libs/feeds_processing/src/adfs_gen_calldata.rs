@@ -105,14 +105,13 @@ pub async fn adfs_serialize_updates(
                 for additional_feed_id in get_neighbour_feed_ids(update.encoded_feed_id) {
                     let rb_index = rc.get(&additional_feed_id).cloned().unwrap_or(0);
 
-
                     let (stride, _digits_in_fraction) = match &strides_and_decimals
                         .get(&additional_feed_id)
                     {
                         Some(f) => (f.stride, f.decimals),
                         None => {
                             error!("Propagating result for unregistered feed! Support left for legacy one shot feeds of 32 bytes size. Decimal default to 18");
-                            (0, 18)
+                            (additional_feed_id.get_stride(), 18)
                         }
                     };
                     feeds_info.insert(additional_feed_id, (stride, rb_index));
@@ -188,7 +187,7 @@ pub async fn adfs_serialize_updates(
             if let Some(strides_and_decimals) = strides_and_decimals.get(feed_id) {
                 feeds_info.insert(*feed_id, (strides_and_decimals.stride, *rb_index));
             } else {
-                feeds_info.insert(*feed_id, (0, 0));
+                feeds_info.insert(*feed_id, (feed_id.get_stride(), *rb_index));
             };
         }
     };
@@ -284,21 +283,16 @@ pub mod tests {
     fn default_config() -> HashMap<EncodedFeedId, FeedStrideAndDecimals> {
         let mut config = HashMap::new();
         for feed_id in 0..16 {
+            // Setup the config so that we have feeds 0, 2 ... 16 to have stride = 0 and the feed with id = 1 to have stride 1
+            let stride = if feed_id == 1 { 1 } else { 0 };
             config.insert(
-                EncodedFeedId::new(feed_id, 0),
+                EncodedFeedId::new(feed_id, stride),
                 FeedStrideAndDecimals {
-                    stride: 0,
+                    stride,
                     decimals: 18,
                 },
             );
         }
-        config.insert(
-            EncodedFeedId::new(1, 0),
-            FeedStrideAndDecimals {
-                stride: 1,
-                decimals: 18,
-            },
-        );
         config
     }
 
@@ -331,19 +325,23 @@ pub mod tests {
         EncodedFeedId::new(feed_id, 0)
     }
 
+    fn encoded_feed_id_for_stride(feed_id: FeedId, stride: u8) -> EncodedFeedId {
+        EncodedFeedId::new(feed_id, stride)
+    }
+
     #[tokio::test]
     async fn test_adfs_serialize() {
         let net = "ETH";
 
         let updates_init = vec![
-            (encoded_feed_id_for_stride_zero(1), "12343267643573"),
+            (encoded_feed_id_for_stride(1, 1), "12343267643573"),
             (encoded_feed_id_for_stride_zero(2), "2456"),
             (encoded_feed_id_for_stride_zero(3), "3678"),
             (encoded_feed_id_for_stride_zero(4), "4890"),
             (encoded_feed_id_for_stride_zero(5), "5abc"),
         ];
         let round_counters_init = vec![
-            (encoded_feed_id_for_stride_zero(1), 6),
+            (encoded_feed_id_for_stride(1, 1), 6),
             (encoded_feed_id_for_stride_zero(2), 5),
             (encoded_feed_id_for_stride_zero(3), 4),
             (encoded_feed_id_for_stride_zero(4), 3),
@@ -390,14 +388,14 @@ pub mod tests {
         let net = "ETH";
 
         let updates_init = vec![
-            (encoded_feed_id_for_stride_zero(1), "12343267643573"),
+            (encoded_feed_id_for_stride(1, 1), "12343267643573"),
             (encoded_feed_id_for_stride_zero(2), "2456"),
             (encoded_feed_id_for_stride_zero(3), "3678"),
             (encoded_feed_id_for_stride_zero(4), "4890"),
             (encoded_feed_id_for_stride_zero(5), "5abc"),
         ];
         let round_counters_init = vec![
-            (encoded_feed_id_for_stride_zero(1), 6),
+            (encoded_feed_id_for_stride(1, 1), 6),
             (encoded_feed_id_for_stride_zero(2), 5),
             (encoded_feed_id_for_stride_zero(3), 4),
             (encoded_feed_id_for_stride_zero(4), 3),
@@ -445,14 +443,14 @@ pub mod tests {
         let net = "ETH";
 
         let updates_init = vec![
-            (encoded_feed_id_for_stride_zero(1), "12343267643573"),
+            (encoded_feed_id_for_stride(1, 1), "12343267643573"),
             (encoded_feed_id_for_stride_zero(2), "2456"),
             (encoded_feed_id_for_stride_zero(3), "3678"),
             (encoded_feed_id_for_stride_zero(4), "4890"),
             (encoded_feed_id_for_stride_zero(5), "5abc"),
         ];
         let round_counters_init = vec![
-            (encoded_feed_id_for_stride_zero(1), 6),
+            (encoded_feed_id_for_stride(1, 1), 6),
             (encoded_feed_id_for_stride_zero(2), 5),
             (encoded_feed_id_for_stride_zero(3), 4),
             (encoded_feed_id_for_stride_zero(4), 9000),
