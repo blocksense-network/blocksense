@@ -975,6 +975,7 @@ mod tests {
                     publishing_criteria: vec![],
                     should_load_rb_indices: true,
                     contracts,
+                    reorg: blocksense_config::ReorgConfig::default(),
                 }
             });
 

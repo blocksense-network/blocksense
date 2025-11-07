@@ -172,6 +172,7 @@ pub struct ProviderMetrics {
     pub total_mismatched_gnosis_safe_nonce: IntCounterVec,
     pub num_transactions_in_queue: IntGaugeVec,
     pub is_enabled: IntGaugeVec,
+    pub observed_reorgs: IntCounterVec,
 }
 
 impl ProviderMetrics {
@@ -276,6 +277,11 @@ impl ProviderMetrics {
             is_enabled: register_int_gauge_vec!(
                 format!("{}is_enabled", prefix),
                 "Whether the network is currently enabled or not",
+                &["Network"]
+            )?,
+            observed_reorgs: register_int_counter_vec!(
+                format!("{}observed_reorgs", prefix),
+                "Total number of observed chain reorganizations for the network",
                 &["Network"]
             )?,
         })

@@ -6,12 +6,11 @@ use alloy::{
     providers::{Provider, ProviderBuilder},
     rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
-
-use alloy_primitives::{keccak256, FixedBytes, TxHash, U256};
-use blocksense_config::{FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
+use alloy_primitives::{keccak256, FixedBytes, TxHash, B256, U256};
+use blocksense_config::{FeedStrideAndDecimals, ReorgConfig, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
-use blocksense_utils::{counter_unbounded_channel::CountedReceiver, EncodedFeedId};
+use blocksense_utils::{await_time, counter_unbounded_channel::CountedReceiver, EncodedFeedId};
 use eyre::{bail, eyre, Result};
 use std::{collections::HashMap, collections::HashSet, mem, sync::Arc};
 use tokio::{
@@ -20,13 +19,15 @@ use tokio::{
 };
 
 use crate::{
-    providers::provider::{
-        parse_eth_address, HashValue, ProviderStatus, ProviderType, ProvidersMetrics, RpcProvider,
-        SharedRpcProviders,
+    providers::{
+        provider::{
+            parse_eth_address, HashValue, LatestRBIndex, ProviderStatus, ProviderType,
+            ProvidersMetrics, RpcProvider, SharedRpcProviders,
+        },
+        reorg_tracking::ReorgTracker,
     },
     sequencer_state::SequencerState,
 };
-use blocksense_feed_registry::registry::await_time;
 use blocksense_feeds_processing::adfs_gen_calldata::{
     adfs_serialize_updates, get_neighbour_feed_ids, RoundBufferIndices,
 };
@@ -150,6 +151,7 @@ pub async fn get_serialized_updates_for_network(
     Ok(serialized_updates)
 }
 
+#[derive(Clone)]
 pub struct BatchOfUpdatesToProcess {
     pub net: String,
     pub provider: Arc<Mutex<RpcProvider>>,
@@ -169,6 +171,7 @@ pub async fn create_and_collect_relayers_futures(
 ) {
     for (net, chan) in relayers_recv_channels.into_iter() {
         let feed_metrics_clone = feeds_metrics.clone();
+        let net_clone = net.clone();
         let provider_status_clone = provider_status.clone();
         let relayer_name = format!("relayer_for_network {net}");
         collected_futures.push(
@@ -176,7 +179,7 @@ pub async fn create_and_collect_relayers_futures(
                 .name(relayer_name.clone().as_str())
                 .spawn(async move {
                     loop_processing_batch_of_updates(
-                        net,
+                        net_clone,
                         relayer_name,
                         feed_metrics_clone,
                         provider_status_clone,
@@ -185,7 +188,7 @@ pub async fn create_and_collect_relayers_futures(
                     .await;
                     Ok(())
                 })
-                .expect("Failed to spawn metrics collector loop!"),
+                .expect("Failed to spawn {net} network relayer loop!"),
         );
     }
 }
@@ -200,7 +203,7 @@ pub async fn loop_processing_batch_of_updates(
     tracing::info!("Starting {relayer_name} loop...");
 
     //TODO: Create a termination reason pattern in the future. At this point networks are not added/removed dynamically in the sequencer,
-    // therefore the loop in iterating over the lifetime of the sequencer.
+    // therefore the loop is iterating over the lifetime of the sequencer.
     loop {
         let cmd_opt = chan.recv().await;
         let msgs_in_queue = chan.len();
@@ -209,17 +212,7 @@ pub async fn loop_processing_batch_of_updates(
                 let block_height = cmd.updates.block_height;
                 tracing::info!("Processing updates for network {relayer_name}, block_height {block_height}, messages in queue = {msgs_in_queue}");
                 let provider = cmd.provider.clone();
-                let result = eth_batch_send_to_contract(
-                    cmd.net,
-                    cmd.provider,
-                    cmd.provider_settings,
-                    cmd.updates,
-                    cmd.feeds_config,
-                    cmd.transaction_retry_timeout_secs,
-                    cmd.transaction_retries_count_limit,
-                    cmd.retry_fee_increment_fraction,
-                )
-                .await;
+                let result = eth_batch_send_to_contract(cmd).await;
 
                 let provider_metrics = provider.lock().await.provider_metrics.clone();
                 dec_metric!(provider_metrics, net, num_transactions_in_queue);
@@ -326,17 +319,66 @@ pub async fn check_tx_hashes_for_inclusion(
     None
 }
 
+pub async fn create_per_network_reorg_trackers(
+    collected_futures: &FuturesUnordered<JoinHandle<Result<(), Error>>>,
+    sequencer_state: Data<SequencerState>,
+) {
+    let providers_mutex = sequencer_state.providers.clone();
+    let providers = providers_mutex.read().await;
+
+    for (net, _p) in providers.iter() {
+        let reorg_trackers_name = format!("reorg_tracker for {net}");
+        let net_clone = net.clone();
+        let sequencer_state_providers_clone = sequencer_state.providers.clone();
+        let sequencer_config = sequencer_state.sequencer_config.read().await;
+        let reorg_tracker_config = match sequencer_config.providers.get(net.as_str()) {
+            Some(c) => c.reorg.clone(),
+            None => {
+                error!("No config for provider for network {net} will set to default!");
+                ReorgConfig::default()
+            }
+        };
+        let relayer_send_channel = match sequencer_state
+            .relayers_send_channels
+            .read()
+            .await
+            .get(net.as_str())
+        {
+            Some(chan) => chan.clone(),
+            None => {
+                panic!("Failed to spawn tracker for reorgs loop in network {net} because no updates sending relayer exists for it!");
+            }
+        };
+        let mut reorg_tracker = ReorgTracker::new(
+            net_clone,
+            reorg_tracker_config,
+            sequencer_state_providers_clone,
+            relayer_send_channel,
+        );
+        collected_futures.push(
+            tokio::task::Builder::new()
+                .name(reorg_trackers_name.clone().as_str())
+                .spawn(async move {
+                    reorg_tracker.loop_tracking_for_reorg_in_network().await;
+                    Ok(())
+                })
+                .expect("Failed to spawn tracker for reorgs loop in network {net}!"),
+        );
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
 pub async fn eth_batch_send_to_contract(
-    net: String,
-    provider_mutex: Arc<Mutex<RpcProvider>>,
-    provider_settings: blocksense_config::Provider,
-    mut updates: BatchedAggregatesToSend,
-    feeds_config: Arc<RwLock<HashMap<EncodedFeedId, FeedConfig>>>,
-    transaction_retry_timeout_secs: u64,
-    transaction_retries_count_limit: u64,
-    retry_fee_increment_fraction: f64,
+    cmd: BatchOfUpdatesToProcess,
 ) -> Result<(String, Vec<EncodedFeedId>)> {
+    let net = cmd.net.clone();
+    let provider_mutex = cmd.provider.clone();
+    let provider_settings = cmd.provider_settings.clone();
+    let feeds_config = cmd.feeds_config.clone();
+    let transaction_retry_timeout_secs = cmd.transaction_retry_timeout_secs;
+    let transaction_retries_count_limit = cmd.transaction_retries_count_limit;
+    let retry_fee_increment_fraction = cmd.retry_fee_increment_fraction;
+    let mut updates = cmd.updates.clone();
     let mut feeds_rb_indices = HashMap::new();
     let serialized_updates = get_serialized_updates_for_network(
         net.as_str(),
@@ -487,6 +529,8 @@ pub async fn eth_batch_send_to_contract(
         break nonce;
     };
 
+    let mut inclusion_block = None;
+    let mut inclusion_block_hash: Option<B256> = None;
     let mut generated_transaction_hashes = Vec::new();
 
     loop {
@@ -521,16 +565,17 @@ pub async fn eth_batch_send_to_contract(
                         );
                     }
 
+                    // If the nonce in the contract increased and the next state root hash is not as we expect,
+                    // another sequencer was able to post updates for the current block height before this one.
+                    // We need to take this into account and reread the round counters of the feeds.
+                    info!("Updates to contract already posted, network {net}, block_height {block_height}, latest_nonce {latest_nonce}, previous_nonce {nonce}, merkle_root in contract {prev_calldata_merkle_tree_root:?}");
                     // TODO: maybe move into an else clause of the `if` above,
                     //       i.e. only do it when there were no included transactions found
                     try_to_sync(
                         net.as_str(),
                         &mut provider,
                         &contract_address,
-                        block_height,
-                        &next_calldata_merkle_tree_root,
-                        latest_nonce,
-                        nonce,
+                        Some(&next_calldata_merkle_tree_root),
                     )
                     .await;
 
@@ -689,14 +734,12 @@ pub async fn eth_batch_send_to_contract(
                     Err(err) => {
                         warn!("Error while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
                         if err.to_string().contains("execution revert") {
+                            info!("Trying to sync due to tx revert, network {net}, block_height {block_height}, latest_nonce {latest_nonce}, previous_nonce {nonce}, merkle_root in contract {prev_calldata_merkle_tree_root:?}");
                             try_to_sync(
                                 net.as_str(),
                                 &mut provider,
                                 &contract_address,
-                                block_height,
-                                &next_calldata_merkle_tree_root,
-                                latest_nonce,
-                                nonce,
+                                Some(&next_calldata_merkle_tree_root),
                             )
                             .await;
                             return Ok(("false".to_string(), feeds_to_update_ids));
@@ -765,6 +808,18 @@ pub async fn eth_batch_send_to_contract(
             tx_receipt
         };
 
+        if let Some(eth_block_number) = tx_receipt.block_number {
+            info!("Transaction was included in block #{}", eth_block_number);
+            inclusion_block = Some(eth_block_number);
+            if let Some(h) = tx_receipt.block_hash {
+                inclusion_block_hash = Some(h);
+            } else {
+                error!("Receipt has no block hash!");
+            }
+        } else {
+            error!("Receipt has no block number!");
+        }
+
         receipt = tx_receipt;
 
         break;
@@ -777,6 +832,12 @@ pub async fn eth_batch_send_to_contract(
 
     log_gas_used(&net, &receipt, transaction_time, provider_metrics).await;
 
+    if let Some(b) = inclusion_block {
+        provider.insert_non_finalized_update(b, cmd);
+        if let Some(h) = inclusion_block_hash {
+            provider.insert_observed_block_hash(b, h);
+        }
+    }
     provider.update_history(&updates.updates);
     let result = receipt.status().to_string();
     if result == "true" {
@@ -888,14 +949,11 @@ pub async fn get_gas_limit(
     }
 }
 
-async fn try_to_sync(
+pub(crate) async fn try_to_sync(
     net: &str,
     provider: &mut RpcProvider,
     contract_address: &Address,
-    block_height: u64,
-    next_calldata_merkle_tree_root: &HashValue,
-    latest_nonce: u64,
-    previous_nonce: u64,
+    next_calldata_merkle_tree_root: Option<&HashValue>,
 ) {
     let rpc_handle = &provider.provider;
     match rpc_handle
@@ -903,13 +961,30 @@ async fn try_to_sync(
         .await
     {
         Ok(root) => {
-            if root != next_calldata_merkle_tree_root.0.into() {
-                // If the nonce in the contract increased and the next state root hash is not as we expect,
-                // another sequencer was able to post updates for the current block height before this one.
-                // We need to take this into account and reread the round counters of the feeds.
-                info!("Updates to contract already posted, network {net}, block_height {block_height}, latest_nonce {latest_nonce}, previous_nonce {previous_nonce}, merkle_root in contract {root}");
+            if next_calldata_merkle_tree_root.is_none_or(|val| root != val.0.into()) {
                 provider.merkle_root_in_contract = Some(HashValue(root.into()));
-                // TODO: Read round counters from contract
+                let keys: Vec<EncodedFeedId> = if provider.rb_indices.is_empty() {
+                    provider.feeds_variants.keys().cloned().collect()
+                } else {
+                    provider.rb_indices.keys().cloned().collect()
+                };
+
+                let mut new_indices = provider.rb_indices.clone();
+                for encoded_feed_id in keys {
+                    match provider.get_latest_rb_index(&encoded_feed_id).await {
+                        Ok(LatestRBIndex {
+                            encoded_feed_id,
+                            index,
+                        }) => {
+                            new_indices.insert(encoded_feed_id, index as u64);
+                        }
+                        Err(e) => {
+                            warn!("Failed to refresh rb index for feed {encoded_feed_id} in network `{net}`: {e:?}");
+                        }
+                    }
+                }
+                provider.rb_indices = new_indices;
+                debug!("Refreshed rb indices from chain for `{net}`");
             }
         }
         Err(e) => {
