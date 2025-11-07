@@ -160,6 +160,14 @@ export const MarketHoursSchema = S.Union(
 
 export type MarketHours = typeof MarketHoursSchema.Type;
 
+export const StrideSchema = S.Int.pipe(
+  S.between(0, 31, { message: () => 'Stride must be between 0 and 31' }),
+).annotations({ identifier: 'Stride' });
+
+export const OptionalStrideSchema = S.optionalWith(StrideSchema, {
+  default: () => 0,
+});
+
 export const NewFeedSchema = S.mutable(
   S.Struct({
     id: S.BigInt,
@@ -179,7 +187,8 @@ export const NewFeedSchema = S.mutable(
       identifier: 'ValueType',
     }),
 
-    stride: S.Int,
+    // NOTE: default is still 0, should we enforce it?
+    stride: OptionalStrideSchema,
 
     quorum: S.Struct({
       percentage: S.Number,
@@ -247,10 +256,6 @@ export type NewFeedsConfig = typeof NewFeedsConfigSchema.Type;
 export const decodeNewFeedsConfig = S.decodeUnknownSync(NewFeedsConfigSchema);
 
 // TODO: (dianielstoyanov) Remove this when rust code treat feedId as string
-
-export const StrideSchema = S.Int.pipe(
-  S.between(0, 31, { message: () => 'Stride must be between 0 and 31' }),
-).annotations({ identifier: 'Stride' });
 
 export const FeedIdSchema = S.Union(S.BigInt, S.BigIntFromNumber).annotations({
   identifier: 'FeedId',
