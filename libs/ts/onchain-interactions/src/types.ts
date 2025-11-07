@@ -19,6 +19,7 @@ export const deployedTestnets = [
   'cyber-testnet',
   'ethereum-hoodi',
   'ethereum-sepolia',
+  'etherlink-shadownet',
   'expchain-testnet',
   'fantom-testnet',
   'flare-coston',
