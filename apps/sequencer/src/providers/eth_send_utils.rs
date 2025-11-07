@@ -7,7 +7,7 @@ use alloy::{
     rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
 use alloy_primitives::{FixedBytes, TxHash};
-use blocksense_config::{FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
+use blocksense_config::{ConfirmationMethod, FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
 use blocksense_utils::{counter_unbounded_channel::CountedReceiver, FeedId};
@@ -19,9 +19,14 @@ use tokio::{
 };
 
 use crate::{
-    providers::provider::{
-        parse_eth_address, ProviderStatus, ProviderType, ProvidersMetrics, RpcProvider,
-        SharedRpcProviders,
+    providers::{
+        dag_inclusion_tracking::{
+            wait_for_dag_inclusion, DagInclusionStatus, DEFAULT_REQUIRED_DAG_DEPTH,
+        },
+        provider::{
+            parse_eth_address, ProviderStatus, ProviderType, ProvidersMetrics, RpcProvider,
+            SharedRpcProviders,
+        },
     },
     sequencer_state::SequencerState,
 };
@@ -397,8 +402,8 @@ pub async fn eth_batch_send_to_contract(
     let rpc_handle = &provider.provider;
 
     let input = Bytes::from(serialized_updates);
-
-    let receipt;
+    let confirmation_method = provider_settings.confirmation_method;
+    let confirmation_outcome;
     let tx_time = Instant::now();
 
     let (sender_address, is_impersonated) = match &provider_settings.impersonated_anvil_account {
@@ -619,7 +624,7 @@ pub async fn eth_batch_send_to_contract(
             debug!("Retrying for {transaction_retries_count}-th time in network `{net}` block height {block_height} tx: {tx:?}");
         }
 
-        let tx_receipt = {
+        let tx_confirmation = {
             let rpc_impersonated_handle;
             let send_transaction_future = if is_impersonated {
                 let rpc_impersonated_url = provider.url();
@@ -675,57 +680,110 @@ pub async fn eth_batch_send_to_contract(
 
             info!("Successfully posted tx to RPC and got tx_hash in network `{net}` block height {block_height} and address {sender_address} tx_hash = {tx_hash}");
 
-            let tx_get_receipt_start_time = Instant::now();
-            let tx_receipt = match await_receipt(
-                net.as_str(),
-                rpc_handle,
-                transaction_retry_timeout_secs,
-                &tx_hash,
-                block_height,
-                &sender_address,
-                tx_get_receipt_start_time,
-                receipt_polling_back_off_period_ms,
-            )
-            .await
-            {
-                Ok(receipt) => {
-                    inc_metric!(provider_metrics, net, success_get_receipt);
-                    receipt
-                }
-                Err(e) => {
-                    warn!("await_receipt: {e}");
-                    inc_metric!(provider_metrics, net, failed_get_receipt);
-                    inc_retries_with_backoff(
+            let confirmation = match confirmation_method {
+                ConfirmationMethod::Receipt => {
+                    let tx_get_receipt_start_time = Instant::now();
+                    match await_receipt(
                         net.as_str(),
-                        &mut transaction_retries_count,
-                        provider_metrics,
-                        retry_backoff_ms,
+                        rpc_handle,
+                        transaction_retry_timeout_secs,
+                        &tx_hash,
+                        block_height,
+                        &sender_address,
+                        tx_get_receipt_start_time,
+                        receipt_polling_back_off_period_ms,
                     )
-                    .await;
-                    continue;
+                    .await
+                    {
+                        Ok(receipt) => {
+                            inc_metric!(provider_metrics, net, success_get_receipt);
+                            ConfirmationOutcome::Receipt(Box::new(receipt))
+                        }
+                        Err(e) => {
+                            warn!("await_receipt: {e}");
+                            inc_metric!(provider_metrics, net, failed_get_receipt);
+                            inc_retries_with_backoff(
+                                net.as_str(),
+                                &mut transaction_retries_count,
+                                provider_metrics,
+                                retry_backoff_ms,
+                            )
+                            .await;
+                            continue;
+                        }
+                    }
+                }
+                ConfirmationMethod::DagInclusion => {
+                    match wait_for_dag_inclusion(&provider, tx_hash, DEFAULT_REQUIRED_DAG_DEPTH)
+                        .await
+                    {
+                        Ok(status) => {
+                            inc_metric!(provider_metrics, net, dag_inclusion_success);
+                            ConfirmationOutcome::Dag(status)
+                        }
+                        Err(e) => {
+                            warn!("wait_for_dag_inclusion failed for tx {tx_hash:?} in `{net}` block height {block_height}: {e}");
+                            inc_metric!(provider_metrics, net, dag_inclusion_failure);
+                            inc_retries_with_backoff(
+                                net.as_str(),
+                                &mut transaction_retries_count,
+                                provider_metrics,
+                                retry_backoff_ms,
+                            )
+                            .await;
+                            continue;
+                        }
+                    }
                 }
             };
 
-            tx_receipt
+            confirmation
         };
 
-        receipt = tx_receipt;
+        confirmation_outcome = tx_confirmation;
 
         break;
     }
 
     let transaction_time = tx_time.elapsed().as_millis();
-    info!(
-        "Successfully recvd transaction receipt that took {transaction_time}ms for {transaction_retries_count} retries in network `{net}` block height {block_height} and sender_address {sender_address}: {receipt:?}"
-    );
-
-    log_gas_used(&net, &receipt, transaction_time, provider_metrics).await;
+    let confirmation_status = match confirmation_outcome {
+        ConfirmationOutcome::Receipt(receipt) => {
+            let receipt = *receipt;
+            info!(
+                "Successfully recvd transaction receipt that took {transaction_time}ms for {transaction_retries_count} retries in network `{net}` block height {block_height} and sender_address {sender_address}: {receipt:?}"
+            );
+            log_gas_used(&net, &receipt, transaction_time, provider_metrics).await;
+            receipt.status().to_string()
+        }
+        ConfirmationOutcome::Dag(status) => {
+            info!(
+                "DAG inclusion confirmed for tx {:?} in network `{net}` block height {block_height} after {:?} (depth={}, dag_block={}, confirmation retries={transaction_retries_count})",
+                status.tx_hash,
+                status.elapsed,
+                status.depth_reached,
+                status.dag_block_hash
+            );
+            let dag_confirmation_time_ms = status.elapsed.as_millis();
+            set_metric!(
+                provider_metrics,
+                net,
+                transaction_confirmation_time,
+                dag_confirmation_time_ms
+            );
+            "true".to_string()
+        }
+    };
 
     provider.update_history(&updates.updates);
     drop(provider);
     debug!("Released a read/write lock on provider state in network `{net}` block height {block_height}");
 
-    Ok((receipt.status().to_string(), feeds_to_update_ids))
+    Ok((confirmation_status, feeds_to_update_ids))
+}
+
+enum ConfirmationOutcome {
+    Receipt(Box<TransactionReceipt>),
+    Dag(DagInclusionStatus),
 }
 
 #[allow(clippy::too_many_arguments)]

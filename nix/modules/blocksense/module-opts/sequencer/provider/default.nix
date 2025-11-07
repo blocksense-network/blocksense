@@ -75,5 +75,14 @@ lib: with lib; {
       default = [ ];
       description = mdDoc "List of contracts of various types";
     };
+
+    confirmation-method = mkOption {
+      type = types.enum [
+        "receipt"
+        "DAG inclusion"
+      ];
+      default = "receipt";
+      description = mdDoc "Confirmation strategy: wait for a receipt or stop after DAG inclusion.";
+    };
   };
 }
