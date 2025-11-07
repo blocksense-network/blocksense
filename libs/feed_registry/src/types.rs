@@ -43,6 +43,7 @@ pub struct FeedMetaData {
     feed_aggregator: FeedAggregate,
     pub value_type: String,
     pub aggregate_type: String,
+    pub oracle_id: String,
     pub processor_cmd_chan: Option<UnboundedSender<FeedsSlotProcessorCmds>>,
 }
 
@@ -66,6 +67,7 @@ impl FeedMetaData {
             feed_aggregator: FeedAggregate::MajorityVoteAggregator,
             value_type: "text".to_string(),
             aggregate_type: "average".to_string(),
+            oracle_id: "N/A".to_string(),
             processor_cmd_chan: None,
         }
     }
@@ -80,6 +82,7 @@ impl FeedMetaData {
         first_report_start_time: SystemTime,
         value_type: String,
         aggregate_type: String,
+        oracle_id: String,
         processor_cmd_chan: Option<UnboundedSender<FeedsSlotProcessorCmds>>,
     ) -> FeedMetaData {
         FeedMetaData {
@@ -94,6 +97,7 @@ impl FeedMetaData {
                 .expect("Could not convert {aggregate_type} to a valid aggregator!"), //TODO(snikolov): This should be resolved based upon the ConsensusMetric enum sent from the reporter or directly based on the feed_id
             value_type,
             aggregate_type,
+            oracle_id,
             processor_cmd_chan,
         }
     }
@@ -108,6 +112,7 @@ impl FeedMetaData {
             UNIX_EPOCH + Duration::from_millis(cfg.schedule.first_report_start_unix_time_ms),
             cfg.value_type.clone(),
             cfg.quorum.aggregation.clone(),
+            cfg.oracle_id.clone(),
             None,
         )
     }
@@ -118,6 +123,9 @@ impl FeedMetaData {
 
     pub fn get_name(&self) -> &String {
         &self.name
+    }
+    pub fn get_oracle_id(&self) -> &String {
+        &self.oracle_id
     }
     pub fn get_report_interval_ms(&self) -> u64 {
         self.report_interval_ms
