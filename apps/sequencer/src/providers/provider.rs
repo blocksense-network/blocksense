@@ -14,7 +14,7 @@ use alloy::{
 use alloy_primitives::{keccak256, B256, U256};
 use alloy_u256_literal::u256;
 use blocksense_feeds_processing::adfs_gen_calldata::{
-    calc_row_index, RoundBufferIndices, MAX_HISTORY_ELEMENTS_PER_FEED,
+    calc_row_index, RingBufferIndices, MAX_HISTORY_ELEMENTS_PER_FEED,
     NUM_FEED_IDS_IN_RB_INDEX_RECORD,
 };
 use blocksense_utils::{EncodedFeedId, FeedId};
@@ -32,7 +32,7 @@ use blocksense_data_feeds::feeds_processing::{
 use blocksense_feed_registry::registry::FeedAggregateHistory;
 use blocksense_feed_registry::types::FeedType;
 use blocksense_metrics::{metrics::ProviderMetrics, process_provider_getter};
-use eyre::{eyre, Result};
+use eyre::{bail, eyre, Result};
 use paste::paste;
 use ringbuf::traits::{Consumer, Observer};
 use serde::{Deserialize, Serialize};
@@ -123,7 +123,7 @@ pub struct RpcProvider {
     pub feeds_variants: HashMap<EncodedFeedId, FeedVariant>,
     pub contracts: Vec<Contract>,
     pub rpc_url: Url,
-    pub rb_indices: RoundBufferIndices,
+    pub rb_indices: RingBufferIndices,
     num_tx_in_progress: u32,
     pub inflight: InflightObservations,
 }
@@ -241,18 +241,18 @@ async fn load_data_from_chain(
         let res = provider.load_rb_indices_from_chain(&feeds_config).await;
         match res {
             Ok(mut rb_indices) => {
-                info!("Loaded round buffer indices from chain {network} = {rb_indices:?}");
+                info!("Loaded ring buffer indices from chain {network} = {rb_indices:?}");
                 for (_id, counter) in rb_indices.iter_mut() {
                     *counter = (*counter + 1) % MAX_HISTORY_ELEMENTS_PER_FEED;
                 }
                 provider.rb_indices = rb_indices;
             }
             Err(err) => {
-                error!("Error when loading round buffer indices for {network} = {err}");
+                error!("Error when loading ring buffer indices for {network} = {err}");
             }
         }
     } else {
-        warn!("Skipping loading round buffer indices from chain {network}");
+        warn!("Skipping loading ring buffer indices from chain {network}");
     }
 }
 
@@ -356,7 +356,7 @@ impl RpcProvider {
             feeds_variants,
             contracts,
             rpc_url,
-            rb_indices: RoundBufferIndices::new(),
+            rb_indices: RingBufferIndices::new(),
             num_tx_in_progress: 0,
             inflight: InflightObservations::new(),
         }
@@ -574,6 +574,7 @@ impl RpcProvider {
         r
     }
 
+    #[cfg(test)]
     pub async fn get_latest_values(
         &self,
         encoded_feed_ids: &[EncodedFeedId],
@@ -584,20 +585,16 @@ impl RpcProvider {
         let mut variants: HashMap<EncodedFeedId, FeedVariant> = HashMap::new();
         for encoded_feed_id in encoded_feed_ids.iter() {
             let Some(variant) = self.feeds_variants.get(encoded_feed_id) else {
-                return Err(eyre!(
-                    "Unknown variant and number of digits for feed with encoded_feed_id = {encoded_feed_id}"
-                ));
+                bail!("Unknown variant and number of digits for feed with encoded_feed_id = {encoded_feed_id}");
             };
             variants.insert(*encoded_feed_id, variant.clone());
         }
 
         for encoded_feed_id in encoded_feed_ids {
             let Some(feed_variant) = variants.get(encoded_feed_id) else {
-                return Err(eyre!(
-                    "Unknown variant and number of digits for feed with id (logical error) = {encoded_feed_id}"
-                ));
+                bail!("Unknown variant and number of digits for feed with id (logical error) = {encoded_feed_id}");
             };
-            // abi.encodePacked(bytes1(0x82), stride, uint120(id))
+            // abi.encodePacked(bytes1(0x83), stride, uint120(id))
             let calldata = DynSolValue::Tuple(vec![
                 DynSolValue::Uint(U256::from(0x83_u8), 8),
                 DynSolValue::Uint(U256::from(feed_variant.stride), 8),
@@ -697,9 +694,7 @@ impl RpcProvider {
             Ok(res) => res,
             Err(e) => {
                 warn!("Timed out on get_tx_retry_params while deploying contract {contract_name} in network `{network}`: {e}!");
-                return Err(eyre!(
-                    "failed to get_tx_retry_params for network `{network}"
-                ));
+                bail!("failed to get_tx_retry_params for network `{network}");
             }
         };
 
@@ -1293,13 +1288,13 @@ mod tests {
         let feed_id = 31;
         let stride = 0;
         let (
-            _sequencer_config,
-            _feeds_config,
+            sequencer_config,
+            feeds_config,
             sequencer_state,
             collected_futures,
             rpc_provider_mutex,
-            _adfs_address,
-            _adfs_deployed_byte_code,
+            adfs_address,
+            adfs_deployed_byte_code,
             _anvil,
         ) = setup_adfs_test_env(network, metrics_prefix, feed_id, stride).await?;
 
@@ -1311,18 +1306,18 @@ mod tests {
 
         {
             let v1 = VotedFeedUpdate {
-                encoded_feed_id: EncodedFeedId::new(feed.id, 0),
+                encoded_feed_id: EncodedFeedId::new(feed.id, stride),
                 value: FeedType::Numerical(103082.01f64),
                 end_slot_timestamp: end_slot_timestamp + interval_ms,
             };
             let v2 = VotedFeedUpdate {
-                encoded_feed_id: EncodedFeedId::new(feed.id, 0),
+                encoded_feed_id: EncodedFeedId::new(feed.id, stride),
                 value: FeedType::Numerical(103012.21f64),
                 end_slot_timestamp: end_slot_timestamp + interval_ms * 2,
             };
 
             let v3 = VotedFeedUpdate {
-                encoded_feed_id: EncodedFeedId::new(feed.id, 0),
+                encoded_feed_id: EncodedFeedId::new(feed.id, stride),
                 value: FeedType::Numerical(104011.78f64),
                 end_slot_timestamp: end_slot_timestamp + interval_ms * 3,
             };
@@ -1352,14 +1347,14 @@ mod tests {
 
         tokio::time::sleep(Duration::from_millis(2000)).await;
 
+        let encoded_feed_id = EncodedFeedId::new(feed_id, stride);
+
         {
             let rpc_provider = rpc_provider_mutex.lock().await;
 
             let block_number = rpc_provider.provider.get_block_number().await.unwrap();
             let block_num_at_time_of_writing_this_test = 3_u64;
             assert!(block_number > block_num_at_time_of_writing_this_test);
-
-            let encoded_feed_id = EncodedFeedId::new(feed_id, 0);
 
             let last_values = rpc_provider.get_latest_values(&[encoded_feed_id]).await;
             info!("last_values = {last_values:?}");
@@ -1375,6 +1370,110 @@ mod tests {
         for x in collected_futures.iter() {
             info!("Aborting future = {:?}", x.id());
             x.abort();
+        }
+        // this simulates a second boot of the sequencer
+        // contracts are already deployed
+        let encoded_feed_id = EncodedFeedId::new(feed_id, stride);
+        let mut sequencer_config2 = sequencer_config.clone();
+        let p_entry = sequencer_config2.providers.entry(network.to_string());
+        p_entry.and_modify(|p| {
+            if let Some(x) = p
+                .contracts
+                .iter_mut()
+                .find(|x| x.name == ADFS_CONTRACT_NAME)
+            {
+                x.address = Some(adfs_address.to_string());
+                x.deployed_byte_code = Some(adfs_deployed_byte_code)
+            }
+            p.publishing_criteria.push(PublishCriteria {
+                encoded_feed_id,
+                skip_publish_if_less_then_percentage: 0.5,
+                always_publish_heartbeat_ms: Some(864000),
+                peg_to_value: None,
+                peg_tolerance_percentage: 0.5,
+            });
+            p.should_load_rb_indices = true;
+        });
+
+        let metrics_prefix2 = "test_reading_adfs_counters_and_values2";
+        let new_rpc_providers =
+            init_shared_rpc_providers(&sequencer_config2, Some(metrics_prefix2), &feeds_config)
+                .await;
+        {
+            let new_rpc_provider = new_rpc_providers
+                .read()
+                .await
+                .get(network)
+                .cloned()
+                .unwrap();
+            let provider = new_rpc_provider.lock().await;
+            let indices = &provider.rb_indices;
+            assert_eq!(Some(3), indices.get(&encoded_feed_id).copied());
+
+            let vec_of_results = provider
+                .get_latest_values(&[encoded_feed_id])
+                .await
+                .unwrap();
+            assert_eq!(vec_of_results.len(), 1);
+            let v = vec_of_results[0].clone().unwrap();
+            assert_eq!(v.num_updates, 2);
+            assert_eq!(v.value, FeedType::Numerical(104011.78f64));
+
+            {
+                let metrics_prefix3 = "test_reading_adfs_counters_and_values3";
+
+                let (sequencer_state, collected_futures) =
+                    create_sequencer_state_and_collected_futures(
+                        sequencer_config2.clone(),
+                        metrics_prefix3,
+                        feeds_config.clone(),
+                    )
+                    .await;
+
+                // publish new update
+                let v4 = VotedFeedUpdate {
+                    encoded_feed_id: EncodedFeedId::new(feed.id, stride),
+                    value: FeedType::Numerical(94011.11f64),
+                    end_slot_timestamp: end_slot_timestamp + interval_ms * 4,
+                };
+                let updates4 = BatchedAggregatesToSend {
+                    block_height: 4,
+                    updates: vec![v4],
+                };
+
+                let p4 = eth_batch_send_to_all_contracts(&sequencer_state, &updates4, None).await;
+
+                assert!(p4.is_ok());
+                tokio::time::sleep(Duration::from_millis(2000)).await;
+
+                let prov = sequencer_state.providers.read().await;
+                let p = prov.get(network).unwrap();
+                let rb_index = p
+                    .lock()
+                    .await
+                    .get_latest_rb_index(&encoded_feed_id)
+                    .await
+                    .unwrap();
+                assert_eq!(rb_index.index, 3);
+
+                let vec_of_results = provider
+                    .get_latest_values(&[encoded_feed_id])
+                    .await
+                    .unwrap();
+
+                assert_eq!(vec_of_results.len(), 1);
+                {
+                    // THIS UPDATE should come from the restarted sequencer_state :)
+                    let v = vec_of_results[0].clone().unwrap();
+                    assert_eq!(v.num_updates, 3);
+                    assert_eq!(v.value, FeedType::Numerical(94011.11f64));
+                }
+                // Wait for all threads to JOIN
+                for x in collected_futures.iter() {
+                    info!("Aborting future = {:?}", x.id());
+                    x.abort();
+                }
+            }
         }
 
         Ok(())
@@ -1534,7 +1633,7 @@ mod tests {
 
                 let prov = sequencer_state.providers.read().await;
                 let p = prov.get(network).unwrap();
-                let round = p
+                let rb_index = p
                     .lock()
                     .await
                     .get_latest_rb_index(&encoded_feed_id)
@@ -1550,10 +1649,10 @@ mod tests {
                     .as_ref()
                     .expect("Expected correct value in contract for feed id {feed_id}");
 
-                // Assert that the value of the round counter in the contract is as expected.
+                // Assert that the value of the rb_index counter in the contract is as expected.
                 // Note: The sequencer tracks the index of the *next* slot to write,
                 // while the contract stores the index of the *last* written value.
-                assert_eq!(round.index, wrapped_val);
+                assert_eq!(rb_index.index, wrapped_val);
 
                 assert_eq!(val.value, new_update);
 

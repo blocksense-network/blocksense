@@ -29,7 +29,7 @@ use crate::{
     sequencer_state::SequencerState,
 };
 use blocksense_feeds_processing::adfs_gen_calldata::{
-    adfs_serialize_updates, get_neighbour_feed_ids, RoundBufferIndices,
+    adfs_serialize_updates, get_neighbour_feed_ids, RingBufferIndices,
 };
 use blocksense_metrics::{
     dec_metric, inc_metric, inc_vec_metric,
@@ -567,7 +567,7 @@ pub async fn eth_batch_send_to_contract(
 
                     // If the nonce in the contract increased and the next state root hash is not as we expect,
                     // another sequencer was able to post updates for the current block height before this one.
-                    // We need to take this into account and reread the round counters of the feeds.
+                    // We need to take this into account and reread the ring buffer indices of the feeds.
                     info!("Updates to contract already posted, network {net}, block_height {block_height}, latest_nonce {latest_nonce}, previous_nonce {nonce}, merkle_root in contract {prev_calldata_merkle_tree_root:?}");
                     // TODO: maybe move into an else clause of the `if` above,
                     //       i.e. only do it when there were no included transactions found
@@ -846,7 +846,7 @@ pub async fn eth_batch_send_to_contract(
         provider.calldata_merkle_tree_frontier = next_calldata_merkle_tree;
         provider.merkle_root_in_contract = None;
         debug!("Successfully updated contract in network `{net}` block height {block_height} Merkle root {root:?}");
-    } // TODO: Reread round counters + latest state hash from contract
+    } // TODO: Reread ring buffer indices + latest state hash from contract
     drop(provider);
     debug!("Released a read/write lock on provider state in network `{net}` block height {block_height}");
 
@@ -1401,14 +1401,14 @@ pub async fn eth_batch_send_to_all_contracts(
 async fn log_rb_indices(
     prefix: &str,
     updated_feeds: &Vec<EncodedFeedId>,
-    rb_indices: &mut RoundBufferIndices,
+    rb_indices: &mut RingBufferIndices,
     net: &str,
 ) {
     let mut debug_string =
         format!("{prefix} for net = {net} and updated_feeds = {updated_feeds:?} ");
     for feed in updated_feeds {
-        let round_index = rb_indices.get(feed).unwrap_or(&0);
-        debug_string.push_str(format!("{feed} = {round_index}; ").as_str());
+        let ring_buffer_index = rb_indices.get(feed).unwrap_or(&0);
+        debug_string.push_str(format!("{feed} = {ring_buffer_index}; ").as_str());
     }
     debug!(debug_string);
 }
@@ -1427,8 +1427,8 @@ pub async fn increment_feeds_rb_indices(
     .await;
 
     for feed in updated_feeds {
-        let round_buffer_index = provider.rb_indices.entry(*feed).or_insert(0);
-        *round_buffer_index += 1;
+        let ring_buffer_index = provider.rb_indices.entry(*feed).or_insert(0);
+        *ring_buffer_index += 1;
     }
 
     log_rb_indices(
@@ -1439,8 +1439,8 @@ pub async fn increment_feeds_rb_indices(
     )
     .await;
 }
-// Since we update the round buffer index when we post the tx and before we
-// receive its receipt if the tx fails we need to decrease the round indices.
+// Since we update the ring buffer index when we post the tx and before we
+// receive its receipt if the tx fails we need to decrease the ring buffer indices.
 pub async fn decrement_feed_rb_indices(
     updated_feeds: &Vec<EncodedFeedId>,
     net: &str,
@@ -1455,9 +1455,9 @@ pub async fn decrement_feed_rb_indices(
     .await;
 
     for feed in updated_feeds {
-        let round_buffer_index = provider.rb_indices.entry(*feed).or_insert(0);
-        if *round_buffer_index > 0 {
-            *round_buffer_index -= 1;
+        let ring_buffer_index = provider.rb_indices.entry(*feed).or_insert(0);
+        if *ring_buffer_index > 0 {
+            *ring_buffer_index -= 1;
         }
     }
 
@@ -1585,7 +1585,7 @@ mod tests {
     ) {
         let key1 = EncodedFeedId::new(0x1F as FeedId, 0);
         let key2 = EncodedFeedId::new(0x0FFF as FeedId, 0);
-        let mut rb_indices = RoundBufferIndices::new();
+        let mut rb_indices = RingBufferIndices::new();
         rb_indices.insert(key1, 7);
         rb_indices.insert(key2, 8);
         let mut strides_and_decimals = HashMap::new();
@@ -1824,7 +1824,6 @@ mod tests {
         .await
         .expect("Could not serialize updates!");
 
-        // Note: bye is filtered out:
         assert_eq!(
             serialized_updates.to_bytes().encode_hex(),
             "00000001000303e0070102686901010000000000000000000000000000000000000000000000000000000000000007"

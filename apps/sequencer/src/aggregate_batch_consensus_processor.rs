@@ -61,7 +61,7 @@ pub async fn aggregation_batch_consensus_loop(
                             let providers = sequencer_state.providers.read().await;
                             let mut provider = providers.get(net.as_str()).unwrap().lock().await;
                             let ids_vec: Vec<_> = t.updated_feeds_ids.iter().copied().collect();
-                            warn!("Tiemed out batch {t:?} while collectiong reporters' signatures for net {net}. Decreasing the round buffer indices for feed_ids: {ids_vec:?}");
+                            warn!("Tiemed out batch {t:?} while collectiong reporters' signatures for net {net}. Decreasing the ring buffer indices for feed_ids: {ids_vec:?}");
                             decrement_feed_rb_indices(&ids_vec, net.as_str(), &mut provider).await
                         }
 

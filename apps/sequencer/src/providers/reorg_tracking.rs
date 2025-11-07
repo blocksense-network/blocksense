@@ -398,7 +398,7 @@ impl ReorgTracker {
                         };
                     };
 
-                    // 3) If we detected divergence, resync round-buffer indices from chain
+                    // 3) If we detected divergence, resync ring buffer indices from chain
                     if need_resync_indices {
                         let mut provider = provider_mutex.lock().await;
                         if let Some(contract) = provider.get_latest_contract() {
