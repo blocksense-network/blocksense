@@ -10,6 +10,7 @@ use alloy::{
         Identity, ProviderBuilder, RootProvider,
     },
     signers::local::PrivateKeySigner,
+    transports::ws::WsConnect,
 };
 use alloy_primitives::{keccak256, B256, U256};
 use alloy_u256_literal::u256;
@@ -40,14 +41,15 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use std::{fs, mem};
 use tokio::sync::{Mutex, RwLock};
-use tokio::time::error::Elapsed;
-use tokio::time::Duration;
+use tokio::time::{error::Elapsed, Duration};
 use tracing::{debug, error, info, warn};
 
 use crate::providers::eth_send_utils::{
     get_gas_limit, get_tx_retry_params, BatchOfUpdatesToProcess, GasFees,
 };
 use crate::providers::inflight_observations::InflightObservations;
+use crate::providers::ws::{ResilientWsConnect, WsReconnectMetrics, WsReconnectPolicy};
+use async_trait::async_trait;
 use std::time::Instant;
 
 pub type ProviderType =
@@ -106,6 +108,49 @@ impl Hashable for HashValue {
     }
 }
 
+struct ProviderWsRecorder {
+    metrics: Arc<RwLock<ProviderMetrics>>,
+    network: String,
+}
+
+impl ProviderWsRecorder {
+    fn new(metrics: Arc<RwLock<ProviderMetrics>>, network: &str) -> Self {
+        Self {
+            metrics,
+            network: network.to_owned(),
+        }
+    }
+}
+
+#[async_trait]
+impl WsReconnectMetrics for ProviderWsRecorder {
+    async fn on_disconnect(&self) {
+        self.metrics
+            .read()
+            .await
+            .ws_disconnects_detected
+            .with_label_values(&[self.network.as_str()])
+            .inc();
+    }
+
+    async fn on_attempt(&self) {
+        self.metrics
+            .read()
+            .await
+            .ws_reconnect_attempts
+            .with_label_values(&[self.network.as_str()])
+            .inc();
+    }
+
+    async fn on_success(&self) {
+        self.metrics
+            .read()
+            .await
+            .ws_reconnect_successes
+            .with_label_values(&[self.network.as_str()])
+            .inc();
+    }
+}
 pub struct RpcProvider {
     pub calldata_merkle_tree_frontier: Frontier<HashValue, 32>,
     pub merkle_root_in_contract: Option<HashValue>,
@@ -309,10 +354,34 @@ impl RpcProvider {
         provider_metrics: &Arc<tokio::sync::RwLock<ProviderMetrics>>,
         feeds_config: &AllFeedsConfig,
     ) -> RpcProvider {
-        let provider = ProviderBuilder::new()
-            .disable_recommended_fillers()
-            .wallet(EthereumWallet::from(signer.clone()))
-            .connect_http(rpc_url.clone());
+        let provider = match rpc_url.scheme() {
+            "ws" | "wss" => {
+                let metrics_recorder = Arc::new(ProviderWsRecorder::new(
+                    Arc::clone(provider_metrics),
+                    network,
+                ));
+                let resilient_connect = ResilientWsConnect::new(
+                    WsConnect::new(rpc_url.as_str().to_owned()),
+                    WsReconnectPolicy::from_config(p.websocket_reconnect.as_ref()),
+                    metrics_recorder,
+                    network,
+                );
+
+                ProviderBuilder::new()
+                    .disable_recommended_fillers()
+                    .wallet(EthereumWallet::from(signer.clone()))
+                    .connect_pubsub_with(resilient_connect)
+                    .await
+                    .unwrap_or_else(|err| {
+                        panic!("Failed to connect to provider over websocket {rpc_url}: {err:?}")
+                    })
+            }
+            "http" | "https" => ProviderBuilder::new()
+                .disable_recommended_fillers()
+                .wallet(EthereumWallet::from(signer.clone()))
+                .connect_http(rpc_url.clone()),
+            other => panic!("Unsupported RPC URL scheme `{other}` for network {network}"),
+        };
 
         let impersonated_anvil_account = p
             .impersonated_anvil_account

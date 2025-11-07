@@ -9189,6 +9189,7 @@ dependencies = [
  "alloy-primitives 1.2.0",
  "alloy-u256-literal",
  "anyhow",
+ "async-trait",
  "blocksense-anomaly-detection",
  "blocksense-blockchain-data-model",
  "blocksense-config",

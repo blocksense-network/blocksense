@@ -204,6 +204,9 @@ pub struct Provider {
     #[serde(default)]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub websocket_url: Option<String>,
+    #[serde(default)]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub websocket_reconnect: Option<WebsocketReconnectConfig>,
     pub transaction_retries_count_limit: u32,
     pub transaction_retry_timeout_secs: u32,
     pub retry_fee_increment_fraction: f64,
@@ -238,6 +241,53 @@ pub struct Provider {
     // Reorg tracking related configuration
     #[serde(default)]
     pub reorg: ReorgConfig,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+pub struct WebsocketReconnectConfig {
+    #[serde(default = "default_ws_initial_backoff_ms")]
+    pub initial_backoff_ms: u64,
+    #[serde(default = "default_ws_backoff_multiplier")]
+    pub backoff_multiplier: f64,
+    #[serde(default = "default_ws_max_backoff_ms")]
+    pub max_backoff_ms: u64,
+}
+
+impl Default for WebsocketReconnectConfig {
+    fn default() -> Self {
+        Self {
+            initial_backoff_ms: default_ws_initial_backoff_ms(),
+            backoff_multiplier: default_ws_backoff_multiplier(),
+            max_backoff_ms: default_ws_max_backoff_ms(),
+        }
+    }
+}
+
+impl WebsocketReconnectConfig {
+    pub fn validate(&self, context: &str) -> anyhow::Result<()> {
+        if self.initial_backoff_ms == 0 {
+            anyhow::bail!("{context}: initial_backoff_ms must be greater than 0");
+        }
+        if !(1.0..=10.0).contains(&self.backoff_multiplier) {
+            anyhow::bail!("{context}: backoff_multiplier must be between 1.0 and 10.0 (inclusive)");
+        }
+        if self.max_backoff_ms < self.initial_backoff_ms {
+            anyhow::bail!("{context}: max_backoff_ms cannot be smaller than initial_backoff_ms");
+        }
+        Ok(())
+    }
+}
+
+const fn default_ws_initial_backoff_ms() -> u64 {
+    3_000
+}
+
+const fn default_ws_backoff_multiplier() -> f64 {
+    2.0
+}
+
+const fn default_ws_max_backoff_ms() -> u64 {
+    5 * 60 * 1_000
 }
 
 fn default_is_enabled() -> bool {
@@ -343,6 +393,10 @@ impl Validated for Provider {
                     ws
                 );
             }
+        }
+        if let Some(reconnect) = &self.websocket_reconnect {
+            let reconnect_ctx = format!("{context}: websocket_reconnect");
+            reconnect.validate(&reconnect_ctx)?;
         }
         Ok(())
     }
@@ -612,6 +666,7 @@ pub fn get_test_config_with_multiple_providers(
                     .to_string(),
                 url: url.to_string(),
                 websocket_url: None,
+                websocket_reconnect: None,
                 transaction_retries_count_limit: 10,
                 transaction_retry_timeout_secs: 24,
                 retry_fee_increment_fraction: 0.1,
