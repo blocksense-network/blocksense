@@ -1,7 +1,7 @@
 use anyhow::{bail, Context, Result};
 use clap::Parser;
-use std::fs;
 use std::collections::{HashMap, VecDeque};
+use std::fs;
 use std::path::{Path, PathBuf};
 use wit_parser::{FunctionKind, Resolve, Type, TypeDefKind, WorldItem};
 
@@ -59,8 +59,9 @@ fn main() -> Result<()> {
                 let dep = entry?;
                 let path = dep.path();
                 if dep.file_type()?.is_dir() {
-                    let group = wit_parser::UnresolvedPackageGroup::parse_dir(&path)
-                        .with_context(|| format!("Failed to parse WIT package: {}", path.display()))?;
+                    let group = wit_parser::UnresolvedPackageGroup::parse_dir(&path).with_context(
+                        || format!("Failed to parse WIT package: {}", path.display()),
+                    )?;
                     groups.push(group);
                 } else if path.extension().and_then(|s| s.to_str()) == Some("wit") {
                     let contents = fs::read_to_string(&path)
@@ -89,8 +90,8 @@ fn main() -> Result<()> {
                 }
             }
             let mut q = VecDeque::new();
-            for i in 0..groups.len() {
-                if indeg[i] == 0 {
+            for (i, &item) in indeg.iter().enumerate().take(groups.len()) {
+                if item == 0 {
                     q.push_back(i);
                 }
             }

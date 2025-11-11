@@ -1,7 +1,7 @@
 use crate::schema::{ComponentFieldEnum, CompositeField, PrimitiveField};
 use anyhow::{bail, Result};
 use std::collections::HashMap;
-use wit_parser::{Handle, Resolve, Result_, Type, TypeDefKind, TypeId, FlagsRepr};
+use wit_parser::{FlagsRepr, Handle, Resolve, Result_, Type, TypeDefKind, TypeId};
 
 /// A context for the conversion process.
 pub struct Converter<'a> {
@@ -275,7 +275,8 @@ impl<'a> Converter<'a> {
                 let name = type_def.name.as_deref().unwrap_or("anonymous");
                 bail!(
                     "Unsupported type kind '{:?}' for type '{}'",
-                    type_def.kind, name
+                    type_def.kind,
+                    name
                 );
             }
         };

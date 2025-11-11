@@ -9,8 +9,8 @@ edition = { workspace = true }
 
 [dependencies]
 anyhow = { workspace = true }
-convert_case = "0.8"
 clap = { version = "4.5", features = ["derive", "env"] }
+convert_case = "0.8"
 futures = { workspace = true }
 log = { workspace = true }
 regex = "1.11"
