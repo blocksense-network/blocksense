@@ -1,23 +1,42 @@
 import { addOffsets } from './addOffsets';
 import { handleFieldRanges } from './container';
-import { encodeSSZData, sszSchema } from './encodeData';
-import { getDecoderImplementations } from './helpers';
-import { BytesRange, hasFields, isVector, Offset, Schema } from './types';
+import { encodeSSZData, findUnionNames, sszSchema } from './encodeData';
+import {
+  getDecoderImplementations,
+  toLowerFirstLetter,
+  toUpperFirstLetter,
+} from './helpers';
+import {
+  BytesRange,
+  hasFields,
+  isUnion,
+  isVector,
+  Offset,
+  Schema,
+  SubUnionSchema,
+  UnionSchema,
+} from './types';
 
 export {
   // encode data
   encodeSSZData,
   sszSchema,
+  findUnionNames,
 
   // types
   Schema,
+  UnionSchema,
+  SubUnionSchema,
   BytesRange,
   Offset,
   isVector,
+  isUnion,
   hasFields,
 
   // helpers
   addOffsets,
   handleFieldRanges,
   getDecoderImplementations,
+  toLowerFirstLetter,
+  toUpperFirstLetter,
 };

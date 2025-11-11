@@ -2,6 +2,7 @@
   pkgs,
   lib,
   inputs',
+  self',
   ...
 }:
 let
@@ -18,6 +19,7 @@ in
     corepack
     pkgs.python3
     inputs'.mcl-blockchain.packages.eradicate2
+    self'.packages.wit-converter
   ]
   ++ lib.optionals pkgs.stdenv.isLinux [
     pkgs.udev

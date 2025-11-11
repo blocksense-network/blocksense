@@ -1,6 +1,11 @@
 import type { EvmVersion } from '../../utils';
 import type { Offset, Schema } from '../utils/';
-import { getDecoderImplementations, hasFields, isVector } from '../utils/';
+import {
+  getDecoderImplementations,
+  hasFields,
+  isUnion,
+  isVector,
+} from '../utils/';
 import { addOffsets } from '../utils/addOffsets';
 import { handleFieldRanges } from '../utils/container';
 
@@ -11,9 +16,12 @@ export const generateDecoderLines = (
   name: string,
   evmVersion: EvmVersion = 'cancun',
   start: number = 0,
+  paddedLen: boolean = false,
 ): string[] => {
   const { generateDecoderPrimitiveLines, generateDecoderStringBytes } =
     getDecoderImplementations(evmVersion);
+
+  const isMainSchemaContainer = schema.typeName.includes('Container');
 
   const generateDecoderLines = (
     schema: Schema,
@@ -28,7 +36,7 @@ export const generateDecoderLines = (
 
     const fieldName = schema.fieldName ? schema.fieldName : name;
 
-    if (hasFields(schema)) {
+    if (hasFields(schema) && !isUnion(schema)) {
       if (schema.typeName.startsWith('Container')) {
         // tuple here
         const ranges = handleFieldRanges(
@@ -73,6 +81,8 @@ export const generateDecoderLines = (
           // main container which is not a Vector or List
           innerName = location;
         }
+
+        let slotIndex = 0;
         schema.fields.forEach((subSchema, i) => {
           let newStart = ranges[i].start.value;
           if (!ranges[i].start.isGenerated) {
@@ -107,18 +117,24 @@ export const generateDecoderLines = (
             ...generateDecoderLines(
               subSchema,
               innerName,
-              i,
+              slotIndex,
               newStart,
               newEnd,
               schema.sszFixedSize,
             ),
           );
+          if (subSchema.typeName !== 'none') {
+            // skip none type
+            slotIndex++;
+          }
         });
         lines.push('}\n');
       } else if (schema.typeName.startsWith('List')) {
         if (
           schema.types[1] &&
-          !['Vector', 'List', 'ByteList'].includes(schema.types[1].type)
+          !['Vector', 'List', 'ByteList', 'Union'].includes(
+            schema.types[1].type,
+          )
         ) {
           // list basic
           const isBytesNum =
@@ -134,6 +150,7 @@ export const generateDecoderLines = (
               isBytesNum,
               start,
               end,
+              isMainSchemaContainer,
               counter,
             ),
           );
@@ -210,7 +227,7 @@ export const generateDecoderLines = (
             `);
         }
       }
-    } else if (schema.sszFixedSize) {
+    } else if (typeof schema.sszFixedSize === 'number') {
       // primitive here
       if (
         schema.typeName.startsWith('ByteVector') &&
@@ -220,20 +237,25 @@ export const generateDecoderLines = (
         // shift to left
         lines.push(`
         // Store ${schema.sszFixedSize * 8} bits of data at slot ${index} of ${location} ${schema.fieldName ? `for ${schema.fieldName}` : ''}
-        mstore(${index ? `add(${location}, ${index * 0x20})` : location},
-        mload(add(data, ${start})))
+        ${
+          isMainSchemaContainer
+            ? `mstore(${index ? `add(${location}, ${index * 0x20})` : location}, mload(add(data, ${start})))`
+            : `${location} := mload(add(data, ${start}))`
+        }
         `);
+      } else if (schema.typeName === 'none') {
+        lines.push('// `none` type, do nothing');
       } else {
         // shift to right
         lines.push(`
               // Store ${schema.sszFixedSize * 8} bits of data at slot ${index} of ${location} ${schema.fieldName ? `for ${schema.fieldName}` : ''}
-              mstore(${index ? `add(${location}, ${index * 0x20})` : location},
+              ${isMainSchemaContainer ? `mstore(${index ? `add(${location}, ${index * 0x20})` : location},` : `${location} := `}
                 ${
                   schema.sszFixedSize < 32
                     ? `shr(${256 - schema.sszFixedSize * 8}, mload(add(data, ${start})))`
                     : `mload(add(data, ${start}))`
                 }
-              )
+              ${isMainSchemaContainer ? ')' : ''}
             `);
       }
     } else {
@@ -245,6 +267,7 @@ export const generateDecoderLines = (
           index,
           start,
           end,
+          isMainSchemaContainer,
           counter,
         ),
       );
@@ -288,7 +311,7 @@ export const generateDecoderLines = (
 
   const lines: string[] = [];
   let length = 'mload(data)'; // default length location
-  if (start) {
+  if (paddedLen) {
     lines.push(
       `let data_length := shr(${256 - start * 8}, mload(add(data, 32)))`,
     );
