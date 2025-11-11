@@ -412,17 +412,14 @@ impl TriggerExecutor for OracleTrigger {
 
 impl OracleTrigger {
     fn format_feed_id(raw_id: &str, default_strides: &HashMap<FeedId, Stride>) -> String {
-        if let Some(encoded) = Self::parse_encoded_feed_id(raw_id) {
+        if let Some(encoded) = Self::parse_encoded_feed_id(raw_id, default_strides) {
             format!("{}:{}", encoded.get_stride(), encoded.get_id())
-        } else if let Ok(feed) = raw_id.parse::<u128>() {
-            let stride = default_strides.get(&feed).copied().unwrap_or(0);
-            format!("{stride}:{feed}")
         } else {
             format!("0:{raw_id}")
         }
     }
 
-    fn parse_encoded_feed_id(feed_id: &str) -> Option<EncodedFeedId> {
+    fn parse_encoded_feed_id(feed_id: &str, default_strides: &HashMap<FeedId, Stride>) -> Option<EncodedFeedId> {
         let mut parts = feed_id.split(':');
         let first = parts.next()?;
         let second = parts.next();
@@ -435,10 +432,13 @@ impl OracleTrigger {
                     None
                 }
             }
-            None => first
-                .parse::<u128>()
-                .ok()
-                .and_then(|feed| EncodedFeedId::try_new(feed, 0)),
+            None => {
+                let feed_id = first
+                    .parse::<u128>()
+                    .ok()?;
+                let stride = default_strides.get(&feed_id).copied().unwrap_or(0);
+                EncodedFeedId::try_new(feed_id, stride)
+            },
         }
     }
 
@@ -1131,7 +1131,8 @@ fn update_latest_votes(
 ) {
     for vote in batch {
         let Some(encoded_feed_id) =
-            OracleTrigger::parse_encoded_feed_id(&vote.payload_metadata.feed_id)
+            OracleTrigger::parse_encoded_feed_id(&vote.payload_metadata.feed_id, &HashMap::new()) // TODO: pass the actual strides from config for second round consensus
+        
         else {
             tracing::warn!(
                 "Failed to parse feed id '{}' when updating latest votes",
