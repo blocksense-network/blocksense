@@ -40,7 +40,8 @@ import { rgSearchPattern } from '../../utils/utilities';
 import { expectedPCStatuses03 } from './expected-service-status';
 
 describe.sequential('E2E Tests with process-compose', () => {
-  const testScenario = `general`;
+  const testScenario = 'general';
+  const testEnvironment = `e2e-${testScenario}`;
   const network = 'ink_sepolia';
   const MAX_HISTORY_ELEMENTS_PER_FEED = 8192;
 
@@ -94,7 +95,7 @@ describe.sequential('E2E Tests with process-compose', () => {
 
     if (Exit.isFailure(res)) {
       throw new Error(
-        `Failed to start test environment: ${testScenario}. Reason: ${res.cause}`,
+        `Failed to start test environment: ${testEnvironment}. Reason: ${res.cause}`,
       );
     }
   });
@@ -253,7 +254,8 @@ describe.sequential('E2E Tests with process-compose', () => {
 
       // Make sure that the feeds info is updated
       for (const [id, data] of entriesOf(feedInfoAfterUpdates)) {
-        const { round: roundAfterUpdates, value: valueAfterUpdates } = data;
+        const { round: roundAfterUpdates, value } = data;
+        const valueAfterUpdates = Number(value.slice(0, 50));
         // Pegged asset with 10% tolerance should be pegged
         // Pegged asset with 0.000001% tolerance should not be pegged
         if (id === '50000') {
@@ -268,11 +270,23 @@ describe.sequential('E2E Tests with process-compose', () => {
           feed =>
             feed.update_number === updatesToNetworks[network]['0:' + id] - 1,
         );
+        console.log('historyData', historyData);
+        console.log('valueAfterUpdates', valueAfterUpdates);
         const decimals = feedsConfig.feeds.find(f => f.id.toString() === id)!
           .additional_feed_info.decimals;
 
+        if (
+          typeof historyData!.value !== 'object' ||
+          !('Numerical' in historyData!.value)
+        ) {
+          return yield* Effect.fail(
+            new Error('Unexpected feed value type in history'),
+          );
+        }
+
+        const historyValue = historyData!.value.Numerical;
         expect(Number(valueAfterUpdates) / 10 ** decimals).toBeCloseTo(
-          Number(historyData!.value),
+          historyValue,
         );
 
         const expectedNumberOfUpdates =
@@ -336,7 +350,7 @@ describe.sequential('E2E Tests with process-compose', () => {
 
   describe.sequential('Reporter behavior based on logs', () => {
     const reporterLogsFile =
-      getProcessComposeLogsFiles(testScenario)['reporter-a'];
+      getProcessComposeLogsFiles(testEnvironment)['reporter-a'];
 
     it.live('Reporter should NOT panic', () =>
       Effect.gen(function* () {
@@ -345,6 +359,7 @@ describe.sequential('E2E Tests with process-compose', () => {
           pattern: 'panic',
           caseInsensitive: true,
         });
+        console.log('result', result);
 
         expect(result).toBeFalsy();
       }),
