@@ -18,6 +18,10 @@ export const UpdatesToNetworkMetric = S.Struct({
   ),
 });
 
+export const Numerical = S.Struct({
+  Numerical: S.Number,
+});
+
 export type UpdatesToNetwork = Record<string, Record<string, number>>;
 
 export const FeedAggregateHistorySchema = S.Struct({
@@ -25,14 +29,13 @@ export const FeedAggregateHistorySchema = S.Struct({
     key: S.String,
     value: S.Array(
       S.Struct({
-        value: hexDataString,
+        value: S.Union(hexDataString, Numerical),
         update_number: S.Number,
         end_slot_timestamp: S.Number,
       }),
     ),
   }),
 });
-
 export type FeedAggregateHistory = typeof FeedAggregateHistorySchema.Type;
 
 export type ReportData = {
