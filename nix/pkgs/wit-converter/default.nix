@@ -2,7 +2,6 @@
   lib,
   craneLib,
   pkg-config,
-  libusb1,
   git,
   openssl,
   rdkafka,
@@ -58,6 +57,9 @@ let
 
   cargoArtifacts = craneLib.buildDepsOnly (sharedAttrs // { name = "wit-converter-cargo-deps"; });
 in
-craneLib.buildPackage (sharedAttrs // {
-  inherit version cargoArtifacts;
-})
+craneLib.buildPackage (
+  sharedAttrs
+  // {
+    inherit version cargoArtifacts;
+  }
+)
