@@ -266,7 +266,7 @@ describe.sequential('E2E Tests with process-compose', () => {
           'apps/e2e-tests/src/test-scenarios/wit/generated-decoders',
           '--stride',
           stride.toString(),
-        ).pipe(Command.string, Effect.provide(NodeContext.layer));
+        ).pipe(Command.string());
 
         yield* Command.make(
           'forge',
@@ -274,7 +274,7 @@ describe.sequential('E2E Tests with process-compose', () => {
           '--root',
           rootDir + '/apps/e2e-tests/src/test-scenarios/wit',
           'generated-decoders',
-        ).pipe(Command.string, Effect.provide(NodeContext.layer));
+        ).pipe(Command.string);
 
         const contracts = yield* FileSystem.FileSystem.pipe(
           Effect.flatMap(fs =>
@@ -282,7 +282,6 @@ describe.sequential('E2E Tests with process-compose', () => {
               .readDirectory(__dirname + '/generated-decoders')
               .pipe(Effect.map(files => files.map(file => file))),
           ),
-          Effect.provide(NodeContext.layer),
         );
 
         expect(contracts.length).toBeGreaterThan(0);
@@ -301,7 +300,7 @@ describe.sequential('E2E Tests with process-compose', () => {
             rootDir + '/apps/e2e-tests/src/test-scenarios/wit',
             `generated-decoders/${contractFile}:${contractFile.replace('.sol', '')}`,
             '--broadcast',
-          ).pipe(Command.string, Effect.provide(NodeContext.layer));
+          ).pipe(Command.string());
 
           // Extract contract address from the deploy result
           const contractAddressMatch = deployResult.match(
@@ -322,7 +321,7 @@ describe.sequential('E2E Tests with process-compose', () => {
             '--rpc-url',
             'http://localhost:8500',
             contractAddress,
-          ).pipe(Command.string, Effect.provide(NodeContext.layer));
+          ).pipe(Command.string);
 
           expect(codeResult).not.toEqual('0x');
           expect(codeResult.length).toBeGreaterThan(10);
@@ -336,7 +335,7 @@ describe.sequential('E2E Tests with process-compose', () => {
             'abi',
             '--json',
           )
-            .pipe(Command.string, Effect.provide(NodeContext.layer))
+            .pipe(Command.string)
             .pipe(Effect.map(JSON.parse));
 
           const viemClient = createViemClient(new URL('http://localhost:8500'));
@@ -404,6 +403,6 @@ describe.sequential('E2E Tests with process-compose', () => {
           expect(BigInt(decoded.awayScore)).toEqual(BigInt(event.awayScore));
         }
       }
-    }),
+    }).pipe(Effect.provide(NodeContext.layer)),
   );
 });
