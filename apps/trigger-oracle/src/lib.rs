@@ -59,7 +59,7 @@ use blocksense_metrics::{
     },
     TextEncoder,
 };
-use blocksense_utils::{time::current_unix_time, EncodedFeedId, FeedId};
+use blocksense_utils::{time::current_unix_time, EncodedFeedId, FeedId, Stride};
 
 use blocksense_gnosis_safe::{
     data_types::{ConsensusSecondRoundBatch, ReporterResponse},
@@ -327,6 +327,12 @@ impl TriggerExecutor for OracleTrigger {
                 );
             }
         }
+        let feed_stride_defaults: Arc<HashMap<FeedId, Stride>> = Arc::new(
+            feeds_config
+                .keys()
+                .map(|encoded_id| (encoded_id.get_id(), encoded_id.get_stride()))
+                .collect(),
+        );
         let mut data_feed_senders = HashMap::new();
         tracing::trace!("Starting oracle scripts");
         let mut loops: Vec<_> = self
@@ -379,6 +385,7 @@ impl TriggerExecutor for OracleTrigger {
             &sequencer_post_batch_url,
             &self.secret_key,
             self.reporter_id,
+            feed_stride_defaults.clone(),
         );
         loops.push(manager);
 
@@ -404,11 +411,12 @@ impl TriggerExecutor for OracleTrigger {
 }
 
 impl OracleTrigger {
-    fn format_feed_id(raw_id: &str) -> String {
+    fn format_feed_id(raw_id: &str, default_strides: &HashMap<FeedId, Stride>) -> String {
         if let Some(encoded) = Self::parse_encoded_feed_id(raw_id) {
             format!("{}:{}", encoded.get_stride(), encoded.get_id())
         } else if let Ok(feed) = raw_id.parse::<u128>() {
-            format!("0:{feed}")
+            let stride = default_strides.get(&feed).copied().unwrap_or(0);
+            format!("{stride}:{feed}")
         } else {
             format!("0:{raw_id}")
         }
@@ -737,6 +745,7 @@ impl OracleTrigger {
         sequencer_post_batch_url: &Url,
         secret_key: &str,
         reporter_id: u64,
+        feed_stride_defaults: Arc<HashMap<FeedId, Stride>>,
     ) -> JoinHandle<TerminationReason> {
         let process_payload_future = Self::process_payload(
             payload_rx,
@@ -744,6 +753,7 @@ impl OracleTrigger {
             sequencer_post_batch_url.to_owned(),
             secret_key.to_owned(),
             reporter_id,
+            feed_stride_defaults,
         );
 
         spawn(process_payload_future)
@@ -755,6 +765,7 @@ impl OracleTrigger {
         sequencer_url: Url,
         secret_key: String,
         reporter_id: u64,
+        feed_stride_defaults: Arc<HashMap<FeedId, Stride>>,
     ) -> TerminationReason {
         tracing::trace!("Task sender to sequencer started");
         while let Some((_component_id, payload)) = rx.recv().await {
@@ -779,7 +790,7 @@ impl OracleTrigger {
                     }
                 };
 
-                let feed_id = Self::format_feed_id(&id);
+                let feed_id = Self::format_feed_id(&id, &feed_stride_defaults);
                 let signature =
                     generate_signature(&secret_key, feed_id.as_str(), timestamp, &result).unwrap();
 
