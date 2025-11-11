@@ -18,6 +18,7 @@ import {
 } from '@blocksense/base-utils/evm';
 import type { NewFeedsConfig } from '@blocksense/config-types/data-feeds-config';
 import type { SequencerConfigV2 } from '@blocksense/config-types/node-config';
+import { createViemClient } from '@blocksense/contracts/viem';
 
 import {
   parseProcessesStatus,
@@ -36,9 +37,6 @@ import type { SequencerService } from '../../utils/services/sequencer';
 import { Sequencer } from '../../utils/services/sequencer';
 
 import { expectedPCStatuses03 } from './expected-service-status';
-import { createViemClient } from '@blocksense/contracts/viem';
-
-import viem from 'viem';
 
 describe.sequential('E2E Tests with process-compose', () => {
   const testScenario = `wit`;
@@ -181,6 +179,8 @@ describe.sequential('E2E Tests with process-compose', () => {
       );
 
       const allow_feeds = sequencerConfig.providers[network].allow_feeds;
+      console.log('\nallow_feeds', allow_feeds);
+      console.log('\nfeedsConfig.feeds', feedsConfig.feeds);
       feedIds = allow_feeds?.length
         ? (allow_feeds as bigint[])
         : feedsConfig.feeds.map(feed => {
@@ -198,6 +198,7 @@ describe.sequential('E2E Tests with process-compose', () => {
             contractAddress,
             url,
           );
+          console.log('\ninitialFeedsInfo', initialFeedsInfo);
 
           // Enable the provider which is disabled by default ( ink_sepolia )
           yield* sequencer.enableProvider(network);
@@ -210,10 +211,11 @@ describe.sequential('E2E Tests with process-compose', () => {
     Effect.gen(function* () {
       yield* Effect.retry(
         sequencer.fetchUpdatesToNetworksMetric().pipe(
-          Effect.filterOrFail(updates =>
+          Effect.filterOrFail(updates => {
+            console.log('\nupdates', updates);
             // TODO: how to look for stride too?
-            valuesOf(updates[network]).every(v => v >= 1),
-          ),
+            return valuesOf(updates[network]).every(v => v >= 1);
+          }),
         ),
         {
           schedule: Schedule.fixed(10000),
