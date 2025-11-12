@@ -5,11 +5,16 @@ import * as prettier from 'prettier/standalone';
 import solidityPlugin from 'prettier-plugin-solidity';
 
 import type { EvmVersion, TupleField } from '../utils';
-import { organizeFieldsIntoStructs } from '../utils';
+import {
+  organizeFieldsIntoStructs,
+  toLowerFirstLetter,
+  toUpperFirstLetter,
+} from '../utils';
 
 import { generateDecoderLines } from './helpers';
 import { generateSubDecoderLines } from './sub-decoder';
-import { sszSchema, toLowerFirstLetter, toUpperFirstLetter } from './utils';
+import { sszSchema } from './utils';
+import { rootDir } from '@blocksense/base-utils';
 
 export const generateDecoder = async (
   template: string,
@@ -64,7 +69,7 @@ export const generateDecoder = async (
       subDecoderLines: subDecoderGeneratedLines,
     },
     {
-      root: (await fs.realpath(__dirname)) + '/',
+      root: (await fs.realpath(rootDir)) + '/libs/ts/decoders',
     },
   );
 
@@ -95,7 +100,7 @@ export const generateDecoder = async (
         toUpperFirstLetter,
       },
       {
-        root: (await fs.realpath(__dirname)) + '/',
+        root: (await fs.realpath(rootDir)) + '/libs/ts/decoders/',
       },
     );
 

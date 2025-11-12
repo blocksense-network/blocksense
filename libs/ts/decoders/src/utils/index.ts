@@ -11,4 +11,8 @@ export type {
 } from './types';
 
 export { organizeFieldsIntoStructs } from './parseStructs';
-export { checkPrimitiveField, expandJsonFields } from './helpers';
+export {
+  checkPrimitiveField,
+  toLowerFirstLetter,
+  toUpperFirstLetter,
+} from './helpers';
