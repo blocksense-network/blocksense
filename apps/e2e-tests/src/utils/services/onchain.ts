@@ -1,11 +1,12 @@
 import { Effect } from 'effect';
 
+import type { HexDataString } from '@blocksense/base-utils';
 import type { EthereumAddress, NetworkName } from '@blocksense/base-utils/evm';
 import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
 
 export type FeedsValueAndRound = Record<
   string,
-  { value: number; round: number }
+  { value: HexDataString; round: number }
 >;
 
 /**
@@ -33,26 +34,36 @@ export function getDataFeedsInfoFromNetwork(
 
     const feedsInfo: FeedsValueAndRound = {};
     for (const feedId of feedIds) {
-      const data = yield* Effect.tryPromise(() =>
+      const data = yield* Effect.tryPromise(() => {
         // If round is provided, fetch data at that specific round
         // Otherwise, fetch the latest data and index
-        roundsInfo !== undefined
-          ? ADFSConsumer.getSingleDataAtIndex(
-              feedId,
-              roundsInfo[feedId.toString()],
-            ).then(res => ({
-              data: res,
-              index: roundsInfo[feedId.toString()],
-            }))
-          : ADFSConsumer.getLatestSingleDataAndIndex(BigInt(feedId)),
-      ).pipe(
+        if (roundsInfo !== undefined) {
+          return (
+            feedId < 1n << 120n
+              ? ADFSConsumer.getSingleDataAtIndex(
+                  feedId,
+                  roundsInfo[feedId.toString()],
+                )
+              : ADFSConsumer.getDataAtIndex(
+                  feedId,
+                  roundsInfo[feedId.toString()],
+                )
+          ).then(res => ({
+            data: res,
+            index: roundsInfo[feedId.toString()],
+          }));
+        }
+        return feedId < 1n << 120n
+          ? ADFSConsumer.getLatestSingleDataAndIndex(BigInt(feedId))
+          : ADFSConsumer.getLatestDataAndIndex(BigInt(feedId));
+      }).pipe(
         Effect.mapError(
           error =>
             new Error(`Failed to fetch data for feed ${feedId}: ${error}`),
         ),
       );
       feedsInfo[feedId.toString()] = {
-        value: Number(data.data.slice(0, 50)),
+        value: data.data,
         round: Number(data.index),
       };
     }

@@ -59,7 +59,7 @@ use blocksense_metrics::{
     },
     TextEncoder,
 };
-use blocksense_utils::{time::current_unix_time, EncodedFeedId, FeedId};
+use blocksense_utils::{time::current_unix_time, EncodedFeedId, FeedId, Stride};
 
 use blocksense_gnosis_safe::{
     data_types::{ConsensusSecondRoundBatch, ReporterResponse},
@@ -327,6 +327,12 @@ impl TriggerExecutor for OracleTrigger {
                 );
             }
         }
+        let feed_stride_defaults: Arc<HashMap<FeedId, Stride>> = Arc::new(
+            feeds_config
+                .keys()
+                .map(|encoded_id| (encoded_id.get_id(), encoded_id.get_stride()))
+                .collect(),
+        );
         let mut data_feed_senders = HashMap::new();
         tracing::trace!("Starting oracle scripts");
         let mut loops: Vec<_> = self
@@ -379,6 +385,7 @@ impl TriggerExecutor for OracleTrigger {
             &sequencer_post_batch_url,
             &self.secret_key,
             self.reporter_id,
+            feed_stride_defaults.clone(),
         );
         loops.push(manager);
 
@@ -404,17 +411,15 @@ impl TriggerExecutor for OracleTrigger {
 }
 
 impl OracleTrigger {
-    fn format_feed_id(raw_id: &str) -> String {
-        if let Some(encoded) = Self::parse_encoded_feed_id(raw_id) {
+    fn format_feed_id(raw_id: &str, default_strides: &HashMap<FeedId, Stride>) -> String {
+        if let Some(encoded) = Self::parse_encoded_feed_id(raw_id, default_strides) {
             format!("{}:{}", encoded.get_stride(), encoded.get_id())
-        } else if let Ok(feed) = raw_id.parse::<u128>() {
-            format!("0:{feed}")
         } else {
             format!("0:{raw_id}")
         }
     }
 
-    fn parse_encoded_feed_id(feed_id: &str) -> Option<EncodedFeedId> {
+    fn parse_encoded_feed_id(feed_id: &str, default_strides: &HashMap<FeedId, Stride>) -> Option<EncodedFeedId> {
         let mut parts = feed_id.split(':');
         let first = parts.next()?;
         let second = parts.next();
@@ -427,10 +432,13 @@ impl OracleTrigger {
                     None
                 }
             }
-            None => first
-                .parse::<u128>()
-                .ok()
-                .and_then(|feed| EncodedFeedId::try_new(feed, 0)),
+            None => {
+                let feed_id = first
+                    .parse::<u128>()
+                    .ok()?;
+                let stride = default_strides.get(&feed_id).copied().unwrap_or(0);
+                EncodedFeedId::try_new(feed_id, stride)
+            },
         }
     }
 
@@ -737,6 +745,7 @@ impl OracleTrigger {
         sequencer_post_batch_url: &Url,
         secret_key: &str,
         reporter_id: u64,
+        feed_stride_defaults: Arc<HashMap<FeedId, Stride>>,
     ) -> JoinHandle<TerminationReason> {
         let process_payload_future = Self::process_payload(
             payload_rx,
@@ -744,6 +753,7 @@ impl OracleTrigger {
             sequencer_post_batch_url.to_owned(),
             secret_key.to_owned(),
             reporter_id,
+            feed_stride_defaults,
         );
 
         spawn(process_payload_future)
@@ -755,6 +765,7 @@ impl OracleTrigger {
         sequencer_url: Url,
         secret_key: String,
         reporter_id: u64,
+        feed_stride_defaults: Arc<HashMap<FeedId, Stride>>,
     ) -> TerminationReason {
         tracing::trace!("Task sender to sequencer started");
         while let Some((_component_id, payload)) = rx.recv().await {
@@ -768,6 +779,7 @@ impl OracleTrigger {
                 let result = match value {
                     oracle::DataFeedResultValue::Numerical(value) => Ok(FeedType::Numerical(value)),
                     oracle::DataFeedResultValue::Text(value) => Ok(FeedType::Text(value)),
+                    oracle::DataFeedResultValue::Bytes(value) => Ok(FeedType::Bytes(value)),
                     oracle::DataFeedResultValue::Error(error_string) => {
                         Err(FeedError::APIError(error_string))
                     }
@@ -778,7 +790,7 @@ impl OracleTrigger {
                     }
                 };
 
-                let feed_id = Self::format_feed_id(&id);
+                let feed_id = Self::format_feed_id(&id, &feed_stride_defaults);
                 let signature =
                     generate_signature(&secret_key, feed_id.as_str(), timestamp, &result).unwrap();
 
@@ -1119,7 +1131,8 @@ fn update_latest_votes(
 ) {
     for vote in batch {
         let Some(encoded_feed_id) =
-            OracleTrigger::parse_encoded_feed_id(&vote.payload_metadata.feed_id)
+            OracleTrigger::parse_encoded_feed_id(&vote.payload_metadata.feed_id, &HashMap::new()) // TODO: pass the actual strides from config for second round consensus
+        
         else {
             tracing::warn!(
                 "Failed to parse feed id '{}' when updating latest votes",

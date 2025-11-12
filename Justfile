@@ -108,6 +108,7 @@ test-ts:
 
 test-e2e:
   yarn workspace @blocksense/e2e-tests run test:scenarios
+  yarn workspace @blocksense/e2e-tests run test:wit-scenarios
 
 [group('Working with oracles')]
 [doc('Build a specific oracle')]

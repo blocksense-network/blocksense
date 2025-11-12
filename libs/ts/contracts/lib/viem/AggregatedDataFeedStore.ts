@@ -3,7 +3,7 @@ import { ContractConsumerBase } from './ContractConsumerBase';
 import { EthereumAddress } from '@blocksense/base-utils/evm';
 import { HexDataString } from '@blocksense/base-utils/buffer-and-hex';
 
-type DataAndIndex = { data: HexDataString | HexDataString[]; index: number };
+type DataAndIndex = { data: HexDataString; index: number };
 
 export class AggregatedDataFeedStoreConsumer extends ContractConsumerBase {
   private selectors = {
@@ -47,13 +47,12 @@ export class AggregatedDataFeedStoreConsumer extends ContractConsumerBase {
     return await this.call(encoded);
   }
 
-  async getLatestData(feedId: bigint): Promise<HexDataString[]> {
+  async getLatestData(feedId: bigint): Promise<HexDataString> {
     const encoded = encodePacked(
       ['bytes1', 'uint128'],
       [this.selectors.getLatestData, feedId],
     );
-    const res = await this.call(encoded);
-    return this.splitInto32bChunks(res);
+    return this.call(encoded);
   }
 
   async getLatestDataSlice(
@@ -80,16 +79,12 @@ export class AggregatedDataFeedStoreConsumer extends ContractConsumerBase {
     return await this.call(encoded);
   }
 
-  async getDataAtIndex(
-    feedId: bigint,
-    index: number,
-  ): Promise<HexDataString[]> {
+  async getDataAtIndex(feedId: bigint, index: number): Promise<HexDataString> {
     const encoded = encodePacked(
       ['bytes1', 'uint128', 'uint16'],
       [this.selectors.getFeedAtIndex, feedId, index],
     );
-    const res = await this.call(encoded);
-    return this.splitInto32bChunks(res);
+    return this.call(encoded);
   }
 
   async getDataSliceAtIndex(
@@ -133,7 +128,7 @@ export class AggregatedDataFeedStoreConsumer extends ContractConsumerBase {
     );
     const res = await this.call(encoded);
     const index = Number(res.slice(0, 66));
-    const data = this.splitInto32bChunks(`0x${res.slice(66)}`);
+    const data = `0x${res.slice(66)}` as HexDataString;
 
     return { data, index };
   }
@@ -149,7 +144,7 @@ export class AggregatedDataFeedStoreConsumer extends ContractConsumerBase {
     );
     const res = await this.call(encoded);
     const index = Number(res.slice(0, 66));
-    const data = this.splitInto32bChunks(`0x${res.slice(66)}`);
+    const data = `0x${res.slice(66)}` as HexDataString;
 
     return { data, index };
   }

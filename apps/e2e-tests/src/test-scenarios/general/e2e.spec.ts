@@ -40,7 +40,8 @@ import { rgSearchPattern } from '../../utils/utilities';
 import { expectedPCStatuses03 } from './expected-service-status';
 
 describe.sequential('E2E Tests with process-compose', () => {
-  const testEnvironment = `e2e-general`;
+  const testScenario = 'general';
+  const testEnvironment = `e2e-${testScenario}`;
   const network = 'ink_sepolia';
   const MAX_HISTORY_ELEMENTS_PER_FEED = 8192;
 
@@ -67,7 +68,7 @@ describe.sequential('E2E Tests with process-compose', () => {
     const res = await pipe(
       Effect.gen(function* () {
         processCompose = yield* EnvironmentManager;
-        yield* processCompose.start(testEnvironment);
+        yield* processCompose.start(testScenario);
         hasProcessComposeStarted = true;
 
         if (!process.listenerCount('SIGINT')) {
@@ -253,7 +254,8 @@ describe.sequential('E2E Tests with process-compose', () => {
 
       // Make sure that the feeds info is updated
       for (const [id, data] of entriesOf(feedInfoAfterUpdates)) {
-        const { round: roundAfterUpdates, value: valueAfterUpdates } = data;
+        const { round: roundAfterUpdates, value } = data;
+        const valueAfterUpdates = Number(value.slice(0, 50));
         // Pegged asset with 10% tolerance should be pegged
         // Pegged asset with 0.000001% tolerance should not be pegged
         if (id === '50000') {
@@ -268,11 +270,22 @@ describe.sequential('E2E Tests with process-compose', () => {
           feed =>
             feed.update_number === updatesToNetworks[network]['0:' + id] - 1,
         );
+
         const decimals = feedsConfig.feeds.find(f => f.id.toString() === id)!
           .additional_feed_info.decimals;
 
-        expect(valueAfterUpdates / 10 ** decimals).toBeCloseTo(
-          historyData!.value.Numerical,
+        if (
+          typeof historyData!.value !== 'object' ||
+          !('Numerical' in historyData!.value)
+        ) {
+          return yield* Effect.fail(
+            new Error('Unexpected feed value type in history'),
+          );
+        }
+
+        const historyValue = historyData!.value.Numerical;
+        expect(Number(valueAfterUpdates) / 10 ** decimals).toBeCloseTo(
+          historyValue,
         );
 
         const expectedNumberOfUpdates =

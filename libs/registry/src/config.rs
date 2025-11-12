@@ -43,7 +43,7 @@ pub struct FeedSchedule {
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq)]
 pub struct PriceFeedInfo {
-    pub pair: AssetPair,
+    pub pair: Option<AssetPair>,
     pub decimals: u8,
     pub category: String,
     pub market_hours: Option<String>,

@@ -613,6 +613,15 @@ pub async fn get_oracle_scripts(
                 ],
                 capabilities: HashSet::new(),
             },
+            OracleScript {
+                id: "sports-db".to_string(),
+                interval_time_in_seconds: None,
+                name: None,
+                description: None,
+                oracle_script_wasm: "sports_db.wasm".to_string(),
+                allowed_outbound_hosts: vec!["https://www.thesportsdb.com".to_string()],
+                capabilities: HashSet::new(),
+            },
         ],
     };
 
