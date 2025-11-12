@@ -116,20 +116,9 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
             const metrics = yield* getMetrics(metricsUrl).pipe(
               Effect.provide(FetchHttpClient.layer),
             );
-            console.log('metrics', metrics);
-            console.log(
-              'metrics',
-              metrics.map(m => m.metrics),
-            );
-            console.log(
-              'metrics',
-              metrics.map(m => m.metrics.map(mt => mt.labels)),
-            );
             const updatesToNetworks = metrics.filter(
               metric => metric.name === 'updates_to_networks',
             )[0];
-
-            console.log('\nupdatesToNetworks', updatesToNetworks);
 
             if (!updatesToNetworks) {
               return yield* Effect.fail(
@@ -142,7 +131,6 @@ export class Sequencer extends Context.Tag('@e2e-tests/Sequencer')<
             const decoded = S.decodeUnknownSync(UpdatesToNetworkMetric)(
               updatesToNetworks,
             );
-            console.log('\ndecoded', decoded);
             return decoded.metrics.reduce((acc: UpdatesToNetwork, item) => {
               const networkName = item.labels.Network;
               const feedId = item.labels.FeedId;

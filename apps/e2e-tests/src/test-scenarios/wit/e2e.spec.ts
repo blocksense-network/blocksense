@@ -69,15 +69,15 @@ describe.sequential('E2E Tests with process-compose', () => {
       const allFiles = yield* fs.readDirectory(__dirname);
       const newFiles = allFiles.filter(file => !existingFiles.includes(file));
       if (newFiles.length > 0) {
-        console.log(
-          `Cleaning up ${newFiles.length} files created during tests:`,
-        );
         for (const file of newFiles) {
-          console.log(` - ${file}`);
           yield* fs.remove(join(__dirname, file), {
             force: true,
             recursive: true,
           });
+          console.log(
+            `Cleaning up ${newFiles.length} files created during tests:`,
+            `${newFiles.map(f => `\n - ${f}`).join('')}`,
+          );
         }
       }
     });
@@ -179,8 +179,6 @@ describe.sequential('E2E Tests with process-compose', () => {
       );
 
       const allow_feeds = sequencerConfig.providers[network].allow_feeds;
-      console.log('\nallow_feeds', allow_feeds);
-      console.log('\nfeedsConfig.feeds', feedsConfig.feeds);
       feedIds = allow_feeds?.length
         ? (allow_feeds as bigint[])
         : feedsConfig.feeds.map(feed => {
@@ -198,7 +196,6 @@ describe.sequential('E2E Tests with process-compose', () => {
             contractAddress,
             url,
           );
-          console.log('\ninitialFeedsInfo', initialFeedsInfo);
 
           // Enable the provider which is disabled by default ( ink_sepolia )
           yield* sequencer.enableProvider(network);
@@ -212,7 +209,6 @@ describe.sequential('E2E Tests with process-compose', () => {
       yield* Effect.retry(
         sequencer.fetchUpdatesToNetworksMetric().pipe(
           Effect.filterOrFail(updates => {
-            console.log('\nupdates', updates);
             // TODO: how to look for stride too?
             return valuesOf(updates[network]).every(v => v >= 1);
           }),
@@ -247,10 +243,20 @@ describe.sequential('E2E Tests with process-compose', () => {
         initialRounds,
       );
 
+      const latestFeedsInfoLocal = yield* getDataFeedsInfoFromNetwork(
+        feedIds,
+        contractAddress,
+        url,
+      );
+
       expect(initialFeedsInfo).toEqual(initialFeedsInfoLocal);
+      expect(initialFeedsInfoLocal[feedIds[0].toString()].round).toEqual(
+        latestFeedsInfoLocal[feedIds[0].toString()].round - 1,
+      );
+      expect(feedIds.length).toEqual(1);
 
       for (const feedId of feedIds) {
-        const value = initialFeedsInfo[feedId.toString()].value;
+        const value = latestFeedsInfoLocal[feedId.toString()].value;
         const stride = feedId >> 120n;
 
         expect(BigInt((value.length - 2) / 2 / 32)).toEqual(2n ** stride);
