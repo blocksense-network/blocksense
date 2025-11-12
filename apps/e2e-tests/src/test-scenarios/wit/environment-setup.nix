@@ -33,8 +33,7 @@ let
   impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
   anvilInkSepoliaPort = builtins.elemAt availablePorts 0;
 
-  reporterStateDir = "."; # Reporters start from .devenv/state/blocksense/reporter/<name>
-  apiKeysDir = "${reporterStateDir}/test-keys";
+  apiKeysDir = "${config.devenv.root}/apps/e2e-tests/src/test-scenarios/wit/test-keys";
 in
 {
   services.kafka = {
@@ -82,14 +81,10 @@ in
           impersonated-anvil-account = impersonationAddress;
           publishing-criteria = [
             {
-              feed-id = 50000; # USDT / USD Pegged
+              feed-id = 0; # Sports DB
+              stride = 4;
               peg-to-value = 1.00;
               peg-tolerance-percentage = 10.0; # 10% tolerance assures that the price will be pegged
-            }
-            {
-              feed-id = 50001; # USDC / USD Pegged
-              peg-to-value = 1.00;
-              peg-tolerance-percentage = 0.000001; # 0.000001% tolerance assures that the price will not be pegged
             }
           ];
           contracts = [
