@@ -270,8 +270,7 @@ describe.sequential('E2E Tests with process-compose', () => {
           feed =>
             feed.update_number === updatesToNetworks[network]['0:' + id] - 1,
         );
-        console.log('historyData', historyData);
-        console.log('valueAfterUpdates', valueAfterUpdates);
+
         const decimals = feedsConfig.feeds.find(f => f.id.toString() === id)!
           .additional_feed_info.decimals;
 
@@ -359,7 +358,6 @@ describe.sequential('E2E Tests with process-compose', () => {
           pattern: 'panic',
           caseInsensitive: true,
         });
-        console.log('result', result);
 
         expect(result).toBeFalsy();
       }),
