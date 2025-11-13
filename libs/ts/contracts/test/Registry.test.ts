@@ -110,10 +110,18 @@ describe('Gas usage comparison between Chainlink and Blocksense registry @fork',
 
     const valueETH = encodeDataAndTimestamp(312343354);
     const valueBTC = encodeDataAndTimestamp(3123434);
+
+    let sourceAccumulator = ethers.toBeHex(0, 32);
     for (const [i, value] of [valueETH, valueBTC].entries()) {
       await aggregatorWrappersV1[i].setFeed(value);
       await aggregatorWrappersV2[i].setFeed(value);
-      await clAdapters[i].setFeed(sequencer, value, 1n);
+      const res = await clAdapters[i].setFeed(
+        sequencer,
+        value,
+        1n,
+        sourceAccumulator,
+      );
+      sourceAccumulator = res.destinationAccumulator;
     }
 
     registryWrapperV1 = new CLRegistryBaseWrapperExp(

@@ -30,6 +30,8 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
   let proxy: UpgradeableProxyADFSWrapper;
   let caller: HardhatEthersSigner;
 
+  let sourceAccumulator: string = ethers.toBeHex(0, 32);
+
   before(async function () {
     if (process.env['FORKING'] !== 'true') {
       this.skip();
@@ -52,7 +54,8 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
     clAdapter = new CLAdapterWrapper();
     await clAdapter.init(data.description, data.decimals, data.id, proxy);
     const value = encodeDataAndTimestamp(312343354, Date.now() - 1234);
-    await clAdapter.setFeed(sequencer, value, 1n);
+    const res = await clAdapter.setFeed(sequencer, value, 1n);
+    sourceAccumulator = res.destinationAccumulator;
 
     const signer = (await ethers.getSigners())[5];
 
@@ -198,28 +201,52 @@ describe('Gas usage comparison between Chainlink and Blocksense @fork', async fu
       await proxyV2.setFeed(value1);
 
       const clAdapterValue1 = encodeDataAndTimestamp(312343);
-      await clAdapter.setFeed(sequencer, clAdapterValue1, 2n);
+      let res = await clAdapter.setFeed(
+        sequencer,
+        clAdapterValue1,
+        2n,
+        sourceAccumulator,
+      );
+      sourceAccumulator = res.destinationAccumulator;
 
       const value2 = encodeData(1312343);
       await proxyV1.setFeed(value2);
       await proxyV2.setFeed(value2);
 
       const clAdapterValue2 = encodeDataAndTimestamp(1312343);
-      await clAdapter.setFeed(sequencer, clAdapterValue2, 3n);
+      res = await clAdapter.setFeed(
+        sequencer,
+        clAdapterValue2,
+        3n,
+        sourceAccumulator,
+      );
+      sourceAccumulator = res.destinationAccumulator;
 
       const value3 = encodeData(13123433);
       await proxyV1.setFeed(value3);
       await proxyV2.setFeed(value3);
 
       const clAdapterValue3 = encodeDataAndTimestamp(13123433);
-      await clAdapter.setFeed(sequencer, clAdapterValue3, 4n);
+      res = await clAdapter.setFeed(
+        sequencer,
+        clAdapterValue3,
+        4n,
+        sourceAccumulator,
+      );
+      sourceAccumulator = res.destinationAccumulator;
 
       const value4 = encodeData(13142343);
       await proxyV1.setFeed(value4);
       await proxyV2.setFeed(value4);
 
       const clAdapterValue4 = encodeDataAndTimestamp(13142343);
-      await clAdapter.setFeed(sequencer, clAdapterValue4, 5n);
+      res = await clAdapter.setFeed(
+        sequencer,
+        clAdapterValue4,
+        5n,
+        sourceAccumulator,
+      );
+      sourceAccumulator = res.destinationAccumulator;
 
       await callAndCompareOracles(
         oracles,
