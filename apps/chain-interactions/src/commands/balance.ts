@@ -79,34 +79,41 @@ export const balance = Command.make(
 
       const networks = yield* getNetworks(network, rpcUrlInput, mainnet);
 
-      for (const networkName of networks as Array<'unknown' | NetworkName>) {
-        const rpcUrl = Option.getOrElse(rpcUrlInput, () =>
-          getOptionalRpcUrl(networkName as NetworkName),
-        );
+      yield* Effect.forEach(
+        networks as Array<'unknown' | NetworkName>,
+        networkName =>
+          Effect.gen(function* () {
+            const rpcUrl = Option.getOrElse(rpcUrlInput, () =>
+              getOptionalRpcUrl(networkName as NetworkName),
+            );
 
-        const web3 = yield* getWeb3(rpcUrl);
-        if (!web3) {
-          continue;
-        }
+            const web3 = yield* getWeb3(rpcUrl);
+            if (!web3) {
+              return;
+            }
 
-        const balance = yield* getBalance(address, web3);
+            const balance = yield* getBalance(address, web3);
 
-        const meta = (
-          networkMetadata as Record<string, { currency?: string } | undefined>
-        )[networkName];
-        const currency = meta?.currency ?? 'ETH';
+            const meta = (
+              networkMetadata as Record<
+                string,
+                { currency?: string } | undefined
+              >
+            )[networkName];
+            const currency = meta?.currency ?? 'ETH';
 
-        console.log(
-          balance === '0'
-            ? c`{grey ${networkName}: ${balance} ${currency}}`
-            : c`{green ${networkName}: ${balance} ${currency}}`,
-        );
-        if (balanceGauge) {
-          balanceGauge.set(
-            { networkName, address, rpcUrl: String(rpcUrl) },
-            yield* filterSmallBalance(balance),
-          );
-        }
-      }
+            console.log(
+              balance === '0'
+                ? c`{grey ${networkName}: ${balance} ${currency}}`
+                : c`{green ${networkName}: ${balance} ${currency}}`,
+            );
+            if (balanceGauge) {
+              balanceGauge.set(
+                { networkName, address, rpcUrl: String(rpcUrl) },
+                yield* filterSmallBalance(balance),
+              );
+            }
+          }),
+      );
     }),
 );

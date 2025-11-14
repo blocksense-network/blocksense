@@ -74,30 +74,34 @@ export const checkPending = Command.make(
 
       const networks = yield* getNetworks(network, rpcUrlInput, mainnet);
 
-      for (const networkName of networks as Array<'unknown' | NetworkName>) {
-        const rpcUrl = Option.getOrElse(rpcUrlInput, () =>
-          getOptionalRpcUrl(networkName as NetworkName),
-        );
+      yield* Effect.forEach(
+        networks as Array<'unknown' | NetworkName>,
+        networkName =>
+          Effect.gen(function* () {
+            const rpcUrl = Option.getOrElse(rpcUrlInput, () =>
+              getOptionalRpcUrl(networkName as NetworkName),
+            );
 
-        const web3 = yield* getWeb3(rpcUrl);
-        if (!web3) {
-          continue;
-        }
-        const latestNonce = yield* getNonce(address, web3, 'latest');
-        const pendingNonce = yield* getNonce(address, web3, 'pending');
-        if (latestNonce === null || pendingNonce === null) {
-          continue;
-        }
+            const web3 = yield* getWeb3(rpcUrl);
+            if (!web3) {
+              return;
+            }
+            const latestNonce = yield* getNonce(address, web3, 'latest');
+            const pendingNonce = yield* getNonce(address, web3, 'pending');
+            if (latestNonce === null || pendingNonce === null) {
+              return;
+            }
 
-        const nonceDifference = Number(pendingNonce - latestNonce);
+            const nonceDifference = Number(pendingNonce - latestNonce);
 
-        console.log(
-          c`{${nonceDifference ? 'red' : 'green No'} Nonce difference found on ${networkName}:} \n  {${nonceDifference ? 'red' : 'green'}   Latest: ${latestNonce}, Pending: ${pendingNonce}}`,
-        );
+            console.log(
+              c`{${nonceDifference ? 'red' : 'green No'} Nonce difference found on ${networkName}:} \n  {${nonceDifference ? 'red' : 'green'}   Latest: ${latestNonce}, Pending: ${pendingNonce}}`,
+            );
 
-        if (pendingGauge) {
-          pendingGauge.set({ networkName, address }, nonceDifference);
-        }
-      }
+            if (pendingGauge) {
+              pendingGauge.set({ networkName, address }, nonceDifference);
+            }
+          }),
+      );
     }),
 );

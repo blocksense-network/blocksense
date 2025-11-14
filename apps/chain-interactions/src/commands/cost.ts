@@ -136,53 +136,57 @@ export const cost = Command.make(
       );
       const networks = yield* getNetworks(network, rpcUrlInput, mainnet);
 
-      for (const networkName of networks as Array<'unknown' | NetworkName>) {
-        if (networkName === 'unknown') {
-          console.log(c`{red Unknown network. Can't fetch transactions.}`);
-          return;
-        }
-        const fetchResult = yield* fetchTransactionsForNetwork(
-          networkName as NetworkName,
-          address,
-          numberOfTransactions,
-          firstTxTimeInput,
-          lastTxTimeInput,
-        );
-        if (fetchResult.transactions.length < 2) {
-          continue;
-        }
+      yield* Effect.forEach(
+        networks as Array<'unknown' | NetworkName>,
+        networkName =>
+          Effect.gen(function* () {
+            if (networkName === 'unknown') {
+              console.log(c`{red Unknown network. Can't fetch transactions.}`);
+              return;
+            }
+            const fetchResult = yield* fetchTransactionsForNetwork(
+              networkName as NetworkName,
+              address,
+              numberOfTransactions,
+              firstTxTimeInput,
+              lastTxTimeInput,
+            );
+            if (fetchResult.transactions.length < 2) {
+              return;
+            }
 
-        const {
-          firstTxTime: firstTxTimeResult,
-          lastTxTime: lastTxTimeResult,
-          transactions,
-        } = fetchResult;
+            const {
+              firstTxTime: firstTxTimeResult,
+              lastTxTime: lastTxTimeResult,
+              transactions,
+            } = fetchResult;
 
-        const gasCosts = yield* calculateGasCosts(transactions);
+            const gasCosts = yield* calculateGasCosts(transactions);
 
-        if (!gasCosts) {
-          continue;
-        }
+            if (!gasCosts) {
+              return;
+            }
 
-        const rpcUrl = getOptionalRpcUrl(networkName as NetworkName);
+            const rpcUrl = getOptionalRpcUrl(networkName as NetworkName);
 
-        const web3 = yield* getWeb3(rpcUrl);
-        if (!web3) {
-          continue;
-        }
-        const balance = yield* getBalance(address, web3);
+            const web3 = yield* getWeb3(rpcUrl);
+            if (!web3) {
+              return;
+            }
+            const balance = yield* getBalance(address, web3);
 
-        yield* logGasCosts(
-          networkName,
-          address,
-          transactions.length,
-          gasCosts,
-          balance,
-          firstTxTimeResult,
-          lastTxTimeResult,
-          gauges,
-        );
-      }
+            yield* logGasCosts(
+              networkName,
+              address,
+              transactions.length,
+              gasCosts,
+              balance,
+              firstTxTimeResult,
+              lastTxTimeResult,
+              gauges,
+            );
+          }),
+      );
     }),
 );
 
