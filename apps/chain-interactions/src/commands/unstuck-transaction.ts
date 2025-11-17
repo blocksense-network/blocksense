@@ -200,42 +200,48 @@ const replaceTransaction = (
 
     console.log(c`{magenta Transaction data:}`, txData);
 
+    const attemptReplacement = (multiplier: number) =>
+      Effect.flatMap(
+        Effect.either(signAndSendTransaction(web3, signer, txData)),
+        sendResult => {
+          if (Either.isRight(sendResult)) {
+            return Effect.sync(() => {
+              console.log(
+                c`{green Tx hash:}`,
+                sendResult.right.transactionHash,
+              );
+              console.log(c`{green Transaction confirmed}`);
+            });
+          }
+
+          return Effect.sync(() => {
+            const error = sendResult.left;
+            if (
+              !(error instanceof Error) ||
+              !error.message.includes('underpriced')
+            ) {
+              console.error(
+                c`{red Transaction failed at multiplier ${multiplier}:}`,
+                error,
+              );
+            }
+
+            const nextMultiplier = multiplier + 0.3;
+            console.log(
+              c`{yellow Retrying with higher gas price (x${nextMultiplier.toFixed(1)})...}`,
+            );
+            txData.gasPrice = Math.floor(
+              Number(currentGasPrice) * nextMultiplier,
+            ).toString();
+          });
+        },
+      );
+
     yield* Effect.loop(multiplier, {
       while: multiplier => multiplier <= 10,
       step: multiplier => multiplier + 0.3,
       discard: true,
-      body: multiplier =>
-        Effect.gen(function* () {
-          const sendResult = yield* Effect.either(
-            signAndSendTransaction(web3, signer, txData),
-          );
-
-          if (Either.isRight(sendResult)) {
-            const receipt = sendResult.right;
-            console.log(c`{green Tx hash:}`, receipt.transactionHash);
-            console.log(c`{green Transaction confirmed}`);
-            return;
-          }
-
-          const error = sendResult.left;
-          if (error instanceof Error && error.message.includes('underpriced')) {
-            // Ignore underpriced error and retry with higher gas price
-          } else {
-            console.error(
-              c`{red Transaction failed at multiplier ${multiplier}:}`,
-              error,
-            );
-          }
-
-          multiplier += 0.3;
-
-          console.log(
-            c`{yellow Retrying with higher gas price (x${multiplier.toFixed(1)})...}`,
-          );
-          txData.gasPrice = Math.floor(
-            Number(currentGasPrice) * multiplier,
-          ).toString();
-        }),
+      body: attemptReplacement,
     });
     console.error(c`{red Maximum multiplier reached, aborting.}`);
   });
