@@ -63,7 +63,7 @@ export const balance = Command.make(
       let balanceGauge: client.Gauge | null = null;
 
       if (prometheus) {
-        startPrometheusServer(host, port);
+        yield* startPrometheusServer(host, port);
         balanceGauge = new client.Gauge({
           name: 'eth_account_balance',
           help: 'Ethereum account balance in native token',

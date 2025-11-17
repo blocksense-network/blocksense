@@ -64,7 +64,7 @@ export const checkPending = Command.make(
       let pendingGauge: client.Gauge | null = null;
 
       if (prometheus) {
-        startPrometheusServer(host, port);
+        yield* startPrometheusServer(host, port);
         pendingGauge = new client.Gauge({
           name: 'eth_account_pending',
           help: 'How many pending transactions this account has',

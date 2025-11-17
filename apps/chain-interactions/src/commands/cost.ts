@@ -94,7 +94,7 @@ export const cost = Command.make(
       let gauges: Gauges | null = null;
 
       if (prometheus) {
-        startPrometheusServer(host, port);
+        yield* startPrometheusServer(host, port);
 
         gauges = {
           gasCost: new client.Gauge({
