@@ -34,31 +34,24 @@ export const unstuckTransaction = Command.make(
   },
   ({ addressInput, network, privateKeyPath, rpcUrlInput }) =>
     Effect.gen(function* () {
-      const rpcUrl = Option.getOrElse(rpcUrlInput, () =>
-        getOptionalRpcUrl(
-          Option.getOrElse(network, () => {
-            throw new Error('Need one of --network or --rpc-url');
-          }),
-        ),
-      );
+      const rpcUrl = yield* (() => {
+        if (Option.isSome(rpcUrlInput)) {
+          return Effect.succeed(rpcUrlInput.value);
+        }
+        if (Option.isSome(network)) {
+          return Effect.succeed(getOptionalRpcUrl(network.value));
+        }
+        return Effect.fail(new Error('Need one of --network or --rpc-url'));
+      })();
 
       const address = Option.getOrElse(addressInput, () =>
         getEnvStringNotAssert('SEQUENCER_ADDRESS'),
       );
 
-      let privateKey = yield* Effect.tryPromise({
-        try: () => fs.readFile(privateKeyPath, 'utf8'),
-        catch: e =>
-          console.error(
-            c`{red Failed to read private key file: }${privateKeyPath}\n${(e as Error).message}`,
-          ),
-      });
-      privateKey = privateKey.replace(/(\r\n|\n|\r)/gm, '');
-
       const { account, signer, web3 } = yield* createWeb3Account(
         rpcUrl,
         address,
-        privateKey,
+        privateKeyPath,
       );
 
       console.log(c`{green Successfully connected to Web3.}`);
@@ -119,8 +112,8 @@ export const unstuckTransaction = Command.make(
 
 const createWeb3Account = (
   rpcUrl: URL | string,
-  account: string,
-  privateKey: string,
+  address: string,
+  privateKeyPath: string,
 ): Effect.Effect<
   {
     web3: Web3;
@@ -131,17 +124,16 @@ const createWeb3Account = (
   never
 > =>
   Effect.gen(function* () {
-    if (!rpcUrl || !account || !privateKey) {
-      return yield* Effect.fail(
-        new Error('rpcUrl, account, and privateKey are required.'),
-      );
-    }
+    let privateKey = yield* Effect.tryPromise(() =>
+      fs.readFile(privateKeyPath, 'utf8'),
+    );
+    privateKey = privateKey.replace(/(\r\n|\n|\r)/gm, '');
 
     const normalizedPrivateKey = privateKey.startsWith('0x')
       ? privateKey
       : `0x${privateKey}`;
 
-    const parsedAccount = parseEthereumAddress(account);
+    const parsedAccount = parseEthereumAddress(address);
     const web3 = yield* getWeb3(rpcUrl);
     if (!web3) {
       return yield* Effect.fail(new Error('Failed to create web3 instance.'));
@@ -152,7 +144,7 @@ const createWeb3Account = (
       accountFromKey.address.toLowerCase(),
       parsedAccount.toLowerCase(),
       `Provided private key does not match the expected account: '${parsedAccount}'`,
-    ); //use some Effect way to assert this
+    );
 
     web3.eth.accounts.wallet.add(accountFromKey);
 
