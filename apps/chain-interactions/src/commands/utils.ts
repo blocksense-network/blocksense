@@ -19,18 +19,54 @@ import { color as c } from '@blocksense/base-utils/tty';
 
 import { deployedMainnets, deployedTestnets } from './types';
 
-export const startPrometheusServer = (host: string, port: number): void => {
-  const app = express();
-  app.get('/metrics', async (_req, res) => {
-    res.set('Content-Type', client.register.contentType);
-    res.end(await client.register.metrics());
+export const startPrometheusServer = (
+  host: string,
+  port: number,
+): Effect.Effect<void, never, never> =>
+  Effect.async<void, never>(resume => {
+    const app = express();
+    app.get('/metrics', async (_req, res) => {
+      res.set('Content-Type', client.register.contentType);
+      res.end(await client.register.metrics());
+    });
+
+    const listen = (currentPort: number, retried: boolean): void => {
+      const server = app.listen(currentPort, host);
+
+      const onListening = (): void => {
+        const address = server.address();
+        const resolvedPort =
+          typeof address === 'object' && address !== null
+            ? address.port
+            : currentPort;
+
+        server.off('error', onError);
+        console.log(
+          c`{blue Prometheus metrics exposed at http://${host}:${resolvedPort}/metrics}`,
+        );
+        resume(Effect.succeed(undefined));
+      };
+
+      const onError = (error: NodeJS.ErrnoException): void => {
+        server.off('listening', onListening);
+
+        if (error.code === 'EADDRINUSE' && !retried) {
+          server.close(() => listen(0, true));
+          return;
+        }
+
+        console.error(
+          c`{red Failed to start Prometheus metrics server: ${error.message}}`,
+        );
+        resume(Effect.succeed(undefined));
+      };
+
+      server.once('listening', onListening);
+      server.once('error', onError);
+    };
+
+    listen(port, false);
   });
-  app.listen(port, host, () => {
-    console.log(
-      c`{blue Prometheus metrics exposed at http://${host}:${port}/metrics}`,
-    );
-  });
-};
 
 export function filterSmallBalance(
   balance: string,
