@@ -16,7 +16,13 @@ import {
 import { color as c } from '@blocksense/base-utils/tty';
 import { listEvmNetworks } from '@blocksense/config-types/read-write-config';
 
-import { getChainId, getNonce, getWeb3 } from './utils';
+import {
+  getChainId,
+  getCurrentGasPrice,
+  getNonce,
+  getWeb3,
+  signAndSendTransaction,
+} from './utils';
 
 export const unstuckTransaction = Command.make(
   'unstuck-transaction',
@@ -176,13 +182,7 @@ const replaceTransaction = (
     console.log(c`{blue On chainID: '${chainID}'}`);
     console.log(c`{blue Latest nonce: ${nextNonce}}`);
 
-    const currentGasPrice = yield* Effect.tryPromise({
-      try: () => web3.eth.getGasPrice(),
-      catch: error =>
-        new Error(
-          `Failed to fetch gas price for account ${account}: ${String(error)}`,
-        ),
-    });
+    const currentGasPrice = yield* getCurrentGasPrice(web3);
     const multiplier = 1.4;
 
     console.log(
@@ -207,13 +207,7 @@ const replaceTransaction = (
       body: multiplier =>
         Effect.gen(function* () {
           const sendResult = yield* Effect.either(
-            Effect.tryPromise(async () => {
-              const signedTx = await web3.eth.accounts.signTransaction(
-                txData,
-                signer.privateKey,
-              );
-              return web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-            }),
+            signAndSendTransaction(web3, signer, txData),
           );
 
           if (Either.isRight(sendResult)) {

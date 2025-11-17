@@ -1,6 +1,7 @@
 import { Effect, Either, Option } from 'effect';
 import express from 'express';
 import client from 'prom-client';
+import type { Web3Account } from 'web3';
 import Web3 from 'web3';
 
 import { getOptionalEnvString } from '@blocksense/base-utils/env';
@@ -211,4 +212,29 @@ export const getChainId = (web3: Web3): Effect.Effect<bigint, never, never> =>
     }
 
     return nonce.right;
+  });
+
+export const getCurrentGasPrice = (
+  web3: Web3,
+): Effect.Effect<bigint, Error, never> =>
+  Effect.tryPromise(() =>
+    web3.eth
+      .getGasPrice()
+      .then(gasPrice =>
+        typeof gasPrice === 'bigint' ? gasPrice : BigInt(gasPrice),
+      ),
+  );
+
+export const signAndSendTransaction = (
+  web3: Web3,
+  signer: Web3Account,
+  txData: Parameters<Web3['eth']['accounts']['signTransaction']>[0],
+) =>
+  Effect.gen(function* () {
+    const signedTx = yield* Effect.tryPromise(() =>
+      web3.eth.accounts.signTransaction(txData, signer.privateKey),
+    );
+    return yield* Effect.tryPromise(() =>
+      web3.eth.sendSignedTransaction(signedTx.rawTransaction),
+    );
   });
