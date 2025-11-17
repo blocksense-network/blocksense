@@ -4,3 +4,4 @@
 /.yarn/plugins/**/*         binary
 /.yarn/releases/*           binary
 /.pnp.*                     binary linguist-generated
+./nix/pkgs/onchain-interactions/yarn-manifest.generated.nix linguist-generated

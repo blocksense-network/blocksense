@@ -1,12 +1,20 @@
 {
   "name": "@blocksense/onchain-interactions",
-  "type": "module",
   "scripts": {
     "ts": "yarn node --import tsx --no-deprecation",
     "get-wallets-balances": "yarn ts src/scripts/balance-script.ts",
     "calculate-cost": "FORCE_COLOR=1 yarn ts src/scripts/cost-calculations.ts \"$@\" | tee cost-calculations.log",
     "unstuck-transaction": "yarn ts src/scripts/unstuck-transaction.ts",
-    "check-pending-tx": "yarn ts src/scripts/check-pending-tx.ts"
+    "check-pending-tx": "yarn ts src/scripts/check-pending-tx.ts",
+    "build": "node build.mjs",
+    "build:tsc": "tsc -p tsconfig.json",
+    "prepublishOnly": "npm run build"
+  },
+  "bin": {
+    "onchain-calculate-cost": "./dist/scripts/cost-calculations.js",
+    "onchain-check-pending-tx": "./dist/scripts/check-pending-tx.js",
+    "onchain-get-wallets-balances": "./dist/scripts/balance-script.js",
+    "onchain-unstuck-transaction": "./dist/scripts/unstuck-transaction.js"
   },
   "dependencies": {
     "@blocksense/base-utils": "workspace:*",
@@ -24,6 +32,8 @@
     "@types/express": "^5",
     "@types/yargs": "^17.0.33",
     "@vitest/coverage-v8": "^3.2.4",
+    "esbuild": "^0.25.0",
     "tsx": "^4.20.5"
-  }
+  },
+  "_originalType": "module"
 }

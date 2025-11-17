@@ -1118,7 +1118,8 @@
         "nixpkgs-unstable": [
           "mcl-blockchain",
           "nixpkgs-unstable"
-        ]
+        ],
+        "yarnpnp2nix": "yarnpnp2nix"
       }
     },
     "rust-analyzer-src": {
@@ -1247,6 +1248,36 @@
       "original": {
         "owner": "nix-community",
         "repo": "nixos-vscode-server",
+        "type": "github"
+      }
+    },
+    "yarnpnp2nix": {
+      "inputs": {
+        "flake-compat": [
+          "mcl-blockchain",
+          "nixos-modules",
+          "flake-compat"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "utils": [
+          "mcl-blockchain",
+          "nixos-modules",
+          "flake-utils"
+        ]
+      },
+      "locked": {
+        "lastModified": 1761655082,
+        "narHash": "sha256-3CBw3GnrH/Wdk45UKTYgI75qnfNc19BTB9uoxk+dXW0=",
+        "owner": "blocksense-network",
+        "repo": "yarnpnp2nix",
+        "rev": "4431aaad87affaeabe6a6718a4292e8fd6396a13",
+        "type": "github"
+      },
+      "original": {
+        "owner": "blocksense-network",
+        "repo": "yarnpnp2nix",
         "type": "github"
       }
     }
