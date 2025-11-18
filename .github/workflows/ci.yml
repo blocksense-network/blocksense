@@ -184,7 +184,7 @@ jobs:
         run: |
           if [[ "${{ github.event_name }}" == "merge_group" ]]; then
             echo 'matrix={"include":[' \
-              '{"runner":["self-hosted","nixos","x86-64-v3"],"system":"x86_64-linux"},' \
+              '{"runner":["self-hosted","nixos","x86-64-v3","bare-metal"],"system":"x86_64-linux"},' \
               '{"runner":"macos-latest-xlarge","system":"aarch64-darwin"}' \
             ']}' >> $GITHUB_OUTPUT
           else
@@ -330,7 +330,7 @@ jobs:
 
   comment_on_pr:
     needs: [deploy_websites]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       pull-requests: write
     steps:
