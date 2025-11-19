@@ -64,9 +64,6 @@ export const unstuckTransaction = Command.make(
 
       const latestNonce = yield* getNonce(account, web3, 'latest');
       const pendingNonce = yield* getNonce(account, web3, 'pending');
-      if (latestNonce === null || pendingNonce === null) {
-        return;
-      }
       console.log('pendingNonce:', pendingNonce);
       console.log('latestNonce:', latestNonce);
 
@@ -84,9 +81,6 @@ export const unstuckTransaction = Command.make(
           Effect.gen(function* () {
             console.log('Blocks passed without a change:', state.counter);
             const currentNonce = yield* getNonce(account, web3, 'latest');
-            if (currentNonce === null) {
-              return;
-            }
             console.log('currentNonce: ', currentNonce);
 
             if (currentNonce >= pendingNonce) {
@@ -141,9 +135,6 @@ const createWeb3Account = (
 
     const parsedAccount = parseEthereumAddress(address);
     const web3 = yield* getWeb3(rpcUrl);
-    if (!web3) {
-      return yield* Effect.fail(new Error('Failed to create web3 instance.'));
-    }
     const accountFromKey =
       web3.eth.accounts.privateKeyToAccount(normalizedPrivateKey);
     assert.strictEqual(
@@ -169,15 +160,7 @@ const replaceTransaction = (
       web3,
       'pending',
     );
-    if (nextNonce === null) {
-      throw new Error(
-        'Failed to fetch next nonce for replacement transaction.',
-      );
-    }
     const chainID = yield* getChainId(web3);
-    if (chainID === null) {
-      return yield* Effect.fail(new Error('Failed to get chainID'));
-    }
     console.log(c`{blue Resetting nonce for account: '${account}'}`);
     console.log(c`{blue On chainID: '${chainID}'}`);
     console.log(c`{blue Latest nonce: ${nextNonce}}`);

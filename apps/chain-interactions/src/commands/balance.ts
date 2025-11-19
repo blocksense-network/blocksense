@@ -88,9 +88,6 @@ export const balance = Command.make(
             );
 
             const web3 = yield* getWeb3(rpcUrl);
-            if (!web3) {
-              return;
-            }
 
             const balance = yield* getBalance(address, web3);
 
@@ -113,7 +110,7 @@ export const balance = Command.make(
                 yield* filterSmallBalance(balance),
               );
             }
-          }),
+          }).pipe(Effect.catchAll(() => Effect.sync(() => {}))),
       );
     }),
 );

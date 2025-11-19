@@ -1,4 +1,4 @@
-import { Effect, Either, Option } from 'effect';
+import { Effect, Option } from 'effect';
 import express from 'express';
 import client from 'prom-client';
 import type { Web3Account } from 'web3';
@@ -105,7 +105,7 @@ export const getNetworks = (
   network: Option.Option<string>,
   rpcUrlInput: Option.Option<URL>,
   mainnet: boolean,
-): Effect.Effect<Array<'unknown' | NetworkName>, never, never> =>
+): Effect.Effect<Array<'unknown' | NetworkName>, Error, never> =>
   Effect.gen(function* () {
     let networks: Array<'unknown' | NetworkName> = mainnet
       ? deployedMainnets
@@ -121,16 +121,10 @@ export const getNetworks = (
     }
 
     const web3 = yield* getWeb3(rpcUrlInput.value);
-    if (web3 === null) {
-      console.error(
-        c`{red Failed to initialize web3 for RPC ${rpcUrlInput.value}. Returning 'unknown'.}`,
-      );
-      return ['unknown'];
-    }
 
     const chainId = yield* getChainId(web3);
 
-    if (chainId !== 0n && isChainId(Number(chainId))) {
+    if (isChainId(Number(chainId))) {
       const chainIdNum = Number(chainId) as ChainId;
       const networkName = getNetworkNameByChainId(chainIdNum);
       return [networkName];
@@ -144,74 +138,71 @@ export const getNetworks = (
 
 export const getBalance = (
   address: string,
-  web3: Web3,
+  rpcOrWeb3: URL | string | Web3,
 ): Effect.Effect<string, never, never> =>
-  Effect.gen(function* () {
-    const balanceWei = yield* Effect.either(
-      Effect.tryPromise(() => web3.eth.getBalance(address)),
-    );
-
-    if (Either.isLeft(balanceWei)) {
-      console.error(
-        `Failed to get balance for address ${address}: ${String(
-          balanceWei.left,
-        )}`,
+  Effect.catchAll(
+    Effect.gen(function* () {
+      const web3 =
+        rpcOrWeb3 instanceof Web3 ? rpcOrWeb3 : yield* getWeb3(rpcOrWeb3);
+      const balanceWei = yield* Effect.tryPromise(() =>
+        web3.eth.getBalance(address),
       );
-      return '0';
-    }
-
-    return web3.utils.fromWei(balanceWei.right, 'ether');
-  });
+      return web3.utils.fromWei(balanceWei, 'ether');
+    }),
+    error =>
+      Effect.sync(() => {
+        console.error(
+          c`{yellow Failed to get balance for address ${address}: \n ${
+            (error as Error)?.message ?? String(error)
+          }. Returning 0}`,
+        );
+        return '0';
+      }),
+  );
 
 export const getNonce = (
   address: EthereumAddress,
   web3: Web3,
   blockNumber: 'latest' | 'pending' = 'latest',
-): Effect.Effect<bigint | null, never, never> =>
-  Effect.gen(function* () {
-    const nonce = yield* Effect.either(
-      Effect.tryPromise(() =>
-        web3.eth.getTransactionCount(address, blockNumber),
-      ),
-    );
-    if (Either.isLeft(nonce)) {
-      console.error(
-        `Failed to get nonce for address ${address}: ${String(nonce.left)}`,
-      );
-      return 0n;
-    }
-
-    return nonce.right;
+): Effect.Effect<bigint, Error, never> =>
+  Effect.tryPromise({
+    try: async () => {
+      const count = await web3.eth.getTransactionCount(address, blockNumber);
+      return count;
+    },
+    catch: error => {
+      const message = `Failed to get nonce for ${address} (${blockNumber}): ${String(error)}`;
+      console.error(c`{red ${message}}`);
+      return new Error(message);
+    },
   });
 
 export const getWeb3 = (
   rpcUrl: URL | string,
-): Effect.Effect<Web3 | null, never, never> =>
-  Effect.gen(function* () {
-    const web3 = yield* Effect.either(
-      Effect.try(() => new Web3(String(rpcUrl))),
-    );
-    if (Either.isLeft(web3)) {
-      console.error(
-        `Failed to initialize Web3 from rpc - ${rpcUrl}:  ${String(web3.left)}`,
-      );
-      return null;
-    }
-
-    return web3.right;
+): Effect.Effect<Web3, Error, never> =>
+  Effect.tryPromise({
+    try: async () => {
+      const web3 = new Web3(String(rpcUrl));
+      await web3.eth.getChainId(); // Test connection
+      return web3;
+    },
+    catch: error => {
+      const message = `Failed to initialize Web3 from rpc - ${rpcUrl}: ${String((error as Error)?.message ?? error)}`;
+      console.error(c`{red ${message}}`);
+      return new Error(message);
+    },
   });
 
-export const getChainId = (web3: Web3): Effect.Effect<bigint, never, never> =>
+export const getChainId = (web3: Web3): Effect.Effect<bigint, Error, never> =>
   Effect.gen(function* () {
-    const nonce = yield* Effect.either(
-      Effect.tryPromise(() => web3.eth.getChainId()),
-    );
-    if (Either.isLeft(nonce)) {
-      console.error(`Failed to get chainID: ${String(nonce.left)}`);
-      return 0n;
-    }
-
-    return nonce.right;
+    const chainId = yield* Effect.tryPromise({
+      try: async () => web3.eth.getChainId(),
+      catch: error => {
+        console.error(`Failed to get chainID: ${String(error)}`);
+        return new Error(`Failed to get chainID: ${String(error)}`);
+      },
+    });
+    return chainId;
   });
 
 export const getCurrentGasPrice = (

@@ -163,17 +163,9 @@ export const cost = Command.make(
 
             const gasCosts = yield* calculateGasCosts(transactions);
 
-            if (!gasCosts) {
-              return;
-            }
-
             const rpcUrl = getOptionalRpcUrl(networkName as NetworkName);
 
-            const web3 = yield* getWeb3(rpcUrl);
-            if (!web3) {
-              return;
-            }
-            const balance = yield* getBalance(address, web3);
+            const balance = yield* getBalance(address, rpcUrl);
 
             yield* logGasCosts(
               networkName,
@@ -185,7 +177,7 @@ export const cost = Command.make(
               lastTxTimeResult,
               gauges,
             );
-          }),
+          }).pipe(Effect.catchAll(() => Effect.sync(() => {}))),
       );
     }),
 );
@@ -250,14 +242,15 @@ const calculateGasCosts = (
     cost1h: number;
     gasUsed1h: number;
     hoursBetweenFirstLastTx: number;
-  } | null,
-  never,
+  },
+  Error,
   never
 > =>
   Effect.gen(function* () {
     if (transactions.length < 2) {
-      console.error('Less then 2 transactions in calculateGasCosts');
-      return null;
+      const message = `Less than 2 transactions in calculateGasCosts`;
+      console.error(c`{red ${message}}`);
+      return yield* Effect.fail(new Error(message));
     }
 
     const hoursBetweenFirstLastTx = yield* getHourDifference(transactions);
@@ -384,20 +377,32 @@ const fetchTransactionsForNetwork = (
     console.log(c`{green ${network.toUpperCase()}}`);
     console.log(c`{blue Fetching transactions for ${network}...}`);
 
-    const web3 = yield* getWeb3(getOptionalRpcUrl(network));
-    if (!web3) {
-      console.error(
-        c`{red Failed to initialize Web3 for network ${network}. Returning empty result.}`,
-      );
-      return emptyResult;
-    }
-
-    const latestBlock = yield* Effect.tryPromise(() =>
-      web3.eth.getBlockNumber(),
+    const latestBlock = yield* Effect.catchAll(
+      Effect.gen(function* () {
+        const web3 = yield* getWeb3(getOptionalRpcUrl(network));
+        return yield* Effect.tryPromise(() => web3.eth.getBlockNumber());
+      }),
+      error =>
+        Effect.sync(() => {
+          console.error(
+            c`{yellow Failed to fetch latest block for ${network}: ${
+              (error as Error)?.message ?? String(error)
+            }. Using fallback of 100000000.}`,
+          );
+          return 100000000n;
+        }),
     );
 
     const axiosGet = (url: string, config?: any) =>
-      Effect.tryPromise(() => axios.get(url, config));
+      Effect.tryPromise({
+        try: () => axios.get(url, config),
+        catch: error =>
+          new Error(
+            `Failed to fetch ${url} for network ${network}: ${
+              (error as Error)?.message ?? String(error)
+            }`,
+          ),
+      });
 
     const apiKey = getOptionalApiKey(network);
     let response: AxiosResponse<any>;

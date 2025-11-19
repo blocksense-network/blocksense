@@ -49,7 +49,7 @@ export const checkPending = Command.make(
   },
   ({ addressInput, host, mainnet, network, port, prometheus, rpcUrlInput }) =>
     Effect.gen(function* () {
-      const parsedNetwork = Option.getOrElse(network, () => null);
+      const parsedNetwork = Option.getOrNull(network);
       const shouldUseMainnetSequencer =
         mainnet || (parsedNetwork !== null && !isTestnet(parsedNetwork));
 
@@ -83,14 +83,9 @@ export const checkPending = Command.make(
             );
 
             const web3 = yield* getWeb3(rpcUrl);
-            if (!web3) {
-              return;
-            }
+
             const latestNonce = yield* getNonce(address, web3, 'latest');
             const pendingNonce = yield* getNonce(address, web3, 'pending');
-            if (latestNonce === null || pendingNonce === null) {
-              return;
-            }
 
             const nonceDifference = Number(pendingNonce - latestNonce);
 
@@ -101,7 +96,7 @@ export const checkPending = Command.make(
             if (pendingGauge) {
               pendingGauge.set({ networkName, address }, nonceDifference);
             }
-          }),
+          }).pipe(Effect.catchAll(() => Effect.sync(() => {}))),
       );
     }),
 );
