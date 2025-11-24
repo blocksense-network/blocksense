@@ -110,7 +110,17 @@ export const balance = Command.make(
                 yield* filterSmallBalance(balance),
               );
             }
-          }).pipe(Effect.catchAll(() => Effect.sync(() => {}))),
+          }).pipe(
+            Effect.catchAll(error =>
+              Effect.sync(() => {
+                console.error(
+                  `Error fetching balance for ${networkName}: ${
+                    error instanceof Error ? error.message : String(error)
+                  }}`,
+                );
+              }),
+            ),
+          ),
       );
     }),
 );

@@ -171,9 +171,9 @@ export const getNonce = (
       return count;
     },
     catch: error => {
-      const message = `Failed to get nonce for ${address} (${blockNumber}): ${String(error)}`;
-      console.error(c`{red ${message}}`);
-      return new Error(message);
+      return new Error(
+        `Failed to get nonce for ${address} (${blockNumber}): ${String(error)}`,
+      );
     },
   });
 
@@ -187,9 +187,9 @@ export const getWeb3 = (
       return web3;
     },
     catch: error => {
-      const message = `Failed to initialize Web3 from rpc - ${rpcUrl}: ${String((error as Error)?.message ?? error)}`;
-      console.error(c`{red ${message}}`);
-      return new Error(message);
+      return new Error(
+        `Failed to initialize Web3 from rpc - ${rpcUrl}: ${String((error as Error)?.message ?? error)}`,
+      );
     },
   });
 
@@ -198,7 +198,6 @@ export const getChainId = (web3: Web3): Effect.Effect<bigint, Error, never> =>
     const chainId = yield* Effect.tryPromise({
       try: async () => web3.eth.getChainId(),
       catch: error => {
-        console.error(`Failed to get chainID: ${String(error)}`);
         return new Error(`Failed to get chainID: ${String(error)}`);
       },
     });

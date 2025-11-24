@@ -177,7 +177,17 @@ export const cost = Command.make(
               lastTxTimeResult,
               gauges,
             );
-          }).pipe(Effect.catchAll(() => Effect.sync(() => {}))),
+          }).pipe(
+            Effect.catchAll(error =>
+              Effect.sync(() => {
+                console.error(
+                  `Error getting cost for ${networkName}: ${
+                    error instanceof Error ? error.message : String(error)
+                  }}`,
+                );
+              }),
+            ),
+          ),
       );
     }),
 );

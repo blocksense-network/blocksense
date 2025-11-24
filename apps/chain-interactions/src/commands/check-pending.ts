@@ -96,7 +96,17 @@ export const checkPending = Command.make(
             if (pendingGauge) {
               pendingGauge.set({ networkName, address }, nonceDifference);
             }
-          }).pipe(Effect.catchAll(() => Effect.sync(() => {}))),
+          }).pipe(
+            Effect.catchAll(error =>
+              Effect.sync(() => {
+                console.error(
+                  `Error getting nonce for ${networkName}: ${
+                    error instanceof Error ? error.message : String(error)
+                  }}`,
+                );
+              }),
+            ),
+          ),
       );
     }),
 );
