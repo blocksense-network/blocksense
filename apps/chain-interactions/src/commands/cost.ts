@@ -225,20 +225,24 @@ type FetchTransactionsResult = {
 
 function getHourDifference(
   transactions: Transaction[],
-): Effect.Effect<number, never, never> {
-  if (transactions.length < 2) {
-    console.error('Less then 2 transactions in getHourDifference');
-    return Effect.succeed(0);
-  }
-  const firstTransactionTime = new Date(transactions[0].timestamp);
-  const lastTransactionTime = new Date(
-    transactions[transactions.length - 1].timestamp,
-  );
+): Effect.Effect<number, Error, never> {
+  return Effect.gen(function* () {
+    if (transactions.length < 2) {
+      return yield* Effect.fail(
+        new Error(`Less than 2 transactions cant get hour difference`),
+      );
+    }
+    const firstTransactionTime = new Date(transactions[0].timestamp);
+    const lastTransactionTime = new Date(
+      transactions[transactions.length - 1].timestamp,
+    );
 
-  const diffMs = firstTransactionTime.getTime() - lastTransactionTime.getTime();
-  const diffHours = diffMs / (1000 * 60 * 60);
+    const diffMs =
+      firstTransactionTime.getTime() - lastTransactionTime.getTime();
+    const diffHours = diffMs / (1000 * 60 * 60);
 
-  return Effect.succeed(diffHours);
+    return diffHours;
+  });
 }
 
 const calculateGasCosts = (
