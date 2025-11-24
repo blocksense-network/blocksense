@@ -151,9 +151,6 @@ export const cost = Command.make(
               firstTxTimeInput,
               lastTxTimeInput,
             );
-            if (fetchResult.transactions.length < 2) {
-              return;
-            }
 
             const {
               firstTxTime: firstTxTimeResult,
@@ -183,7 +180,7 @@ export const cost = Command.make(
                 console.error(
                   `Error getting cost for ${networkName}: ${
                     error instanceof Error ? error.message : String(error)
-                  }}`,
+                  }`,
                 );
               }),
             ),
@@ -257,12 +254,6 @@ const calculateGasCosts = (
   never
 > =>
   Effect.gen(function* () {
-    if (transactions.length < 2) {
-      const message = `Less than 2 transactions in calculateGasCosts`;
-      console.error(c`{red ${message}}`);
-      return yield* Effect.fail(new Error(message));
-    }
-
     const hoursBetweenFirstLastTx = yield* getHourDifference(transactions);
 
     let totalGasCost = BigInt(0);
@@ -366,7 +357,7 @@ const fetchTransactionsForNetwork = (
   numberOfTransactions: number,
   firstTxTime: string,
   lastTxTime: string,
-): Effect.Effect<FetchTransactionsResult, never, never> => {
+): Effect.Effect<FetchTransactionsResult, Error, never> => {
   const emptyResult: FetchTransactionsResult = {
     transactions: [],
     firstTxTime: '',
@@ -602,6 +593,12 @@ const fetchTransactionsForNetwork = (
       lastTxTimeRet = new Date(transactions[0].timestamp).toString();
     }
 
+    if (transactions.length < 2) {
+      return yield* Effect.fail(
+        new Error(`Less than 2 transactions found for ${network}`),
+      );
+    }
+
     console.log(
       c`{green ${network}: Found ${transactions.length} transactions sent by the account to other addresses}`,
     );
@@ -610,16 +607,5 @@ const fetchTransactionsForNetwork = (
       firstTxTime: firstTxTimeRet,
       lastTxTime: lastTxTimeRet,
     };
-  }).pipe(
-    Effect.catchAll(error =>
-      Effect.sync(() => {
-        console.error(
-          c`{red Error fetching transactions for ${network}: ${
-            error instanceof Error ? error.message : String(error)
-          }}`,
-        );
-        return emptyResult;
-      }),
-    ),
-  );
+  });
 };
