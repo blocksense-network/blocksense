@@ -24,6 +24,12 @@ import {
   signAndSendTransaction,
 } from './utils';
 
+// Use this with caution!
+
+// Because we are sending empty transactions to remove the stuck ones,
+// ring buffer data within transactions will not be written to the contract
+// and the history of the feeds will be incomplete.
+// This can be solved once the adfs-indexer is ready and we can get tx data from there.
 export const unstuckTransaction = Command.make(
   'unstuck-transaction',
   {
@@ -68,45 +74,45 @@ export const unstuckTransaction = Command.make(
       console.log('latestNonce:', latestNonce);
 
       const loopState = {
-        counter: 5,
         latestNonce,
-        shouldContinue: true,
+        pendingNonce,
       };
 
       yield* Effect.loop(loopState, {
-        while: state => state.shouldContinue,
+        while: state => state.latestNonce < state.pendingNonce,
         step: state => state,
         discard: true,
         body: state =>
           Effect.gen(function* () {
-            console.log('Blocks passed without a change:', state.counter);
+            yield* replaceTransaction(web3, signer);
             const currentNonce = yield* getNonce(account, web3, 'latest');
-            console.log('currentNonce: ', currentNonce);
-
-            if (currentNonce >= pendingNonce) {
-              console.log(
-                'All pending transactions passed, current nonce: ',
-                currentNonce,
-              );
-              state.shouldContinue = false;
-              return;
-            }
-
+            state.pendingNonce = yield* getNonce(account, web3, 'pending');
+            console.log(
+              'After replacement - pendingNonce:',
+              state.pendingNonce,
+              'currentNonce:',
+              currentNonce,
+            );
             if (currentNonce > state.latestNonce) {
+              console.log('latestNonce is now: ', currentNonce);
               state.latestNonce = currentNonce;
-              console.log('latestNonce is now: ', state.latestNonce);
-              state.counter = 0;
-            } else {
-              state.counter++;
-              if (state.counter > 5) {
-                yield* replaceTransaction(web3, signer);
-                state.counter = 0;
-              }
             }
-
-            yield* Effect.sleep(500); // Poll every 1/2 second
-          }),
+          }).pipe(
+            Effect.catchAll(error =>
+              Effect.sync(() => {
+                console.error(
+                  `Error while trying to replace transaction: ${
+                    error instanceof Error ? error.message : String(error)
+                  }}`,
+                );
+              }),
+            ),
+          ),
       });
+      console.log(
+        'All pending transactions passed, current nonce: ',
+        latestNonce,
+      );
     }),
 );
 
