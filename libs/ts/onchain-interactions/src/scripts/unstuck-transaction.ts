@@ -130,8 +130,6 @@ async function replaceTransaction(
   }
 }
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 const main = async (): Promise<void> => {
   const sequencerAddress = getEnvStringNotAssert('SEQUENCER_ADDRESS');
   const argv = await yargs(hideBin(process.argv))
@@ -172,7 +170,7 @@ const main = async (): Promise<void> => {
       address === sequencerAddress
     })}\n`,
   );
-
+  let latestNonce: bigint = 0n;
   try {
     const { account, signer, web3 } = await getWeb3(
       providerUrl,
@@ -182,38 +180,28 @@ const main = async (): Promise<void> => {
 
     console.log(c`{green Successfully connected to Web3.}`);
 
-    const pendingNonce = await web3.eth.getTransactionCount(account, 'pending');
-    let latestNonce = await web3.eth.getTransactionCount(account, 'latest');
+    let pendingNonce = await web3.eth.getTransactionCount(account, 'pending');
+    latestNonce = await web3.eth.getTransactionCount(account, 'latest');
     console.log('pendingNonce:', pendingNonce);
     console.log('latestNonce:', latestNonce);
 
-    let counter = 5;
-    while (true) {
-      console.log('Blocks passed without a change:', counter);
+    while (latestNonce < pendingNonce) {
+      await replaceTransaction(web3, signer);
       const currentNonce = await web3.eth.getTransactionCount(
         account,
         'latest',
       );
-      console.log('currentNonce: ', currentNonce);
-      if (currentNonce >= pendingNonce) {
-        console.log(
-          'All pending transactions passed, current nonce: ',
-          currentNonce,
-        );
-        process.exit(0);
-      }
+      pendingNonce = await web3.eth.getTransactionCount(account, 'pending');
+      console.log(
+        'After replacement - pendingNonce:',
+        pendingNonce,
+        'currentNonce:',
+        currentNonce,
+      );
       if (currentNonce > latestNonce) {
         latestNonce = currentNonce;
         console.log('latestNonce is now: ', latestNonce);
-        counter = 0;
-      } else {
-        counter++;
-        if (counter > 5) {
-          await replaceTransaction(web3, signer);
-          counter = 0;
-        }
       }
-      await delay(500); // Poll every 1/2 second
     }
   } catch (error) {
     if (error instanceof Error) {
@@ -222,6 +210,7 @@ const main = async (): Promise<void> => {
       console.error(c`{red Unknown error occurred in main.}`);
     }
   }
+  console.log('All pending transactions passed, current nonce: ', latestNonce);
 };
 
 main().catch(err => {
