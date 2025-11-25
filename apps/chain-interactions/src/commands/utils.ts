@@ -1,4 +1,6 @@
 import { Effect, Option } from 'effect';
+import type { AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios from 'axios';
 import express from 'express';
 import client from 'prom-client';
 import type { Web3Account } from 'web3';
@@ -227,4 +229,16 @@ export const signAndSendTransaction = (
     return yield* Effect.tryPromise(() =>
       web3.eth.sendSignedTransaction(signedTx.rawTransaction),
     );
+  });
+
+export const axiosGet = (
+  url: string,
+  config?: AxiosRequestConfig,
+): Effect.Effect<AxiosResponse, Error, never> =>
+  Effect.tryPromise({
+    try: () => axios.get(url, config),
+    catch: error =>
+      new Error(
+        `Failed to fetch ${url} : ${(error as Error)?.message ?? String(error)}`,
+      ),
   });

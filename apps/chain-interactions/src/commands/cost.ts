@@ -7,7 +7,6 @@ import {
   withSchema,
 } from '@effect/cli/Options';
 import type { AxiosResponse } from 'axios';
-import axios from 'axios';
 import client from 'prom-client';
 import Web3 from 'web3';
 
@@ -24,6 +23,7 @@ import { listEvmNetworks } from '@blocksense/config-types/read-write-config';
 
 import type { Transaction } from './types';
 import {
+  axiosGet,
   filterSmallBalance,
   getBalance,
   getDefaultSequencerAddress,
@@ -398,17 +398,6 @@ const fetchTransactionsForNetwork = (
           return 100000000n;
         }),
     );
-
-    const axiosGet = (url: string, config?: any) =>
-      Effect.tryPromise({
-        try: () => axios.get(url, config),
-        catch: error =>
-          new Error(
-            `Failed to fetch ${url} for network ${network}: ${
-              (error as Error)?.message ?? String(error)
-            }`,
-          ),
-      });
 
     const apiKey = getOptionalApiKey(network);
     let response: AxiosResponse<any>;
