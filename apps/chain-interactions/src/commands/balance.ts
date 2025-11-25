@@ -49,6 +49,17 @@ export const balance = Command.make(
   },
   ({ addressInput, host, mainnet, network, port, prometheus, rpcUrlInput }) =>
     Effect.gen(function* () {
+      let balanceGauge: client.Gauge | null = null;
+
+      if (prometheus) {
+        yield* startPrometheusServer(host, port);
+        balanceGauge = new client.Gauge({
+          name: 'eth_account_balance',
+          help: 'Ethereum account balance in native token',
+          labelNames: ['networkName', 'address', 'rpcUrl'],
+        });
+      }
+
       const parsedNetwork = Option.getOrNull(network);
       const shouldUseMainnetSequencer =
         mainnet || (parsedNetwork !== null && !isTestnet(parsedNetwork));
@@ -60,16 +71,6 @@ export const balance = Command.make(
       const address = parseEthereumAddress(
         Option.getOrElse(addressInput, () => sequencerAddress),
       );
-      let balanceGauge: client.Gauge | null = null;
-
-      if (prometheus) {
-        yield* startPrometheusServer(host, port);
-        balanceGauge = new client.Gauge({
-          name: 'eth_account_balance',
-          help: 'Ethereum account balance in native token',
-          labelNames: ['networkName', 'address', 'rpcUrl'],
-        });
-      }
 
       console.log(
         c`{cyan Using Ethereum address: ${address} (sequencer: ${

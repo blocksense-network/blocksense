@@ -49,6 +49,17 @@ export const checkPending = Command.make(
   },
   ({ addressInput, host, mainnet, network, port, prometheus, rpcUrlInput }) =>
     Effect.gen(function* () {
+      let pendingGauge: client.Gauge | null = null;
+
+      if (prometheus) {
+        yield* startPrometheusServer(host, port);
+        pendingGauge = new client.Gauge({
+          name: 'eth_account_pending',
+          help: 'How many pending transactions this account has',
+          labelNames: ['networkName', 'address'],
+        });
+      }
+
       const parsedNetwork = Option.getOrNull(network);
       const shouldUseMainnetSequencer =
         mainnet || (parsedNetwork !== null && !isTestnet(parsedNetwork));
@@ -60,17 +71,6 @@ export const checkPending = Command.make(
       const address = parseEthereumAddress(
         Option.getOrElse(addressInput, () => sequencerAddress),
       );
-
-      let pendingGauge: client.Gauge | null = null;
-
-      if (prometheus) {
-        yield* startPrometheusServer(host, port);
-        pendingGauge = new client.Gauge({
-          name: 'eth_account_pending',
-          help: 'How many pending transactions this account has',
-          labelNames: ['networkName', 'address'],
-        });
-      }
 
       const networks = yield* getNetworks(network, rpcUrlInput, mainnet);
 
