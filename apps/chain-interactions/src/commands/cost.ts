@@ -78,19 +78,6 @@ export const cost = Command.make(
     rpcUrlInput,
   }) =>
     Effect.gen(function* () {
-      const parsedNetwork = Option.getOrNull(network);
-
-      const shouldUseMainnetSequencer =
-        mainnet || (parsedNetwork !== null && !isTestnet(parsedNetwork));
-
-      const sequencerAddress = yield* getDefaultSequencerAddress(
-        shouldUseMainnetSequencer,
-      );
-
-      const address = parseEthereumAddress(
-        Option.getOrElse(addressInput, () => sequencerAddress),
-      );
-
       let gauges: Gauges | null = null;
 
       if (prometheus) {
@@ -129,6 +116,20 @@ export const cost = Command.make(
           }),
         };
       }
+
+      const parsedNetwork = Option.getOrNull(network);
+
+      const shouldUseMainnetSequencer =
+        mainnet || (parsedNetwork !== null && !isTestnet(parsedNetwork));
+
+      const sequencerAddress = yield* getDefaultSequencerAddress(
+        shouldUseMainnetSequencer,
+      );
+
+      const address = parseEthereumAddress(
+        Option.getOrElse(addressInput, () => sequencerAddress),
+      );
+
       console.log(
         c`{cyan Using Ethereum address: ${address} (sequencer: ${
           address === sequencerAddress
