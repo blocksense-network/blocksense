@@ -1,6 +1,3 @@
-import fs from 'fs/promises';
-import assert from 'node:assert';
-
 import { Effect, Either, Option, Schema as S } from 'effect';
 import { Command, Options } from '@effect/cli';
 import { withAlias, withSchema } from '@effect/cli/Options';
@@ -8,17 +5,16 @@ import type { Web3Account } from 'web3';
 import type Web3 from 'web3';
 
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
-import type { EthereumAddress } from '@blocksense/base-utils/evm';
 import { parseEthereumAddress } from '@blocksense/base-utils/evm';
 import { color as c } from '@blocksense/base-utils/tty';
 import { listEvmNetworks } from '@blocksense/config-types/read-write-config';
 
 import {
+  createWeb3Account,
   getChainId,
   getCurrentGasPrice,
   getNonce,
   getRpcFromNetworkOrRpcUrl,
-  getWeb3,
   signAndSendTransaction,
 } from './utils';
 
@@ -106,44 +102,6 @@ export const unstuckTransaction = Command.make(
       );
     }),
 );
-
-const createWeb3Account = (
-  rpcUrl: URL | string,
-  address: string,
-  privateKeyPath: string,
-): Effect.Effect<
-  {
-    web3: Web3;
-    account: EthereumAddress;
-    signer: Web3Account;
-  },
-  Error,
-  never
-> =>
-  Effect.gen(function* () {
-    let privateKey = yield* Effect.tryPromise(() =>
-      fs.readFile(privateKeyPath, 'utf8'),
-    );
-    privateKey = privateKey.replace(/(\r\n|\n|\r)/gm, '');
-
-    const normalizedPrivateKey = privateKey.startsWith('0x')
-      ? privateKey
-      : `0x${privateKey}`;
-
-    const parsedAccount = parseEthereumAddress(address);
-    const web3 = yield* getWeb3(rpcUrl);
-    const accountFromKey =
-      web3.eth.accounts.privateKeyToAccount(normalizedPrivateKey);
-    assert.strictEqual(
-      accountFromKey.address.toLowerCase(),
-      parsedAccount.toLowerCase(),
-      `Provided private key does not match the expected account: '${parsedAccount}'`,
-    );
-
-    web3.eth.accounts.wallet.add(accountFromKey);
-
-    return { web3, account: parsedAccount, signer: accountFromKey };
-  });
 
 const replaceTransaction = (
   web3: Web3,
