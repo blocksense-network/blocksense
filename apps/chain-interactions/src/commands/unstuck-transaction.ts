@@ -9,10 +9,7 @@ import type Web3 from 'web3';
 
 import { getEnvStringNotAssert } from '@blocksense/base-utils/env';
 import type { EthereumAddress } from '@blocksense/base-utils/evm';
-import {
-  getOptionalRpcUrl,
-  parseEthereumAddress,
-} from '@blocksense/base-utils/evm';
+import { parseEthereumAddress } from '@blocksense/base-utils/evm';
 import { color as c } from '@blocksense/base-utils/tty';
 import { listEvmNetworks } from '@blocksense/config-types/read-write-config';
 
@@ -20,6 +17,7 @@ import {
   getChainId,
   getCurrentGasPrice,
   getNonce,
+  getRpcFromNetworkOrRpcUrl,
   getWeb3,
   signAndSendTransaction,
 } from './utils';
@@ -46,15 +44,8 @@ export const unstuckTransaction = Command.make(
   },
   ({ addressInput, network, privateKeyPath, rpcUrlInput }) =>
     Effect.gen(function* () {
-      const rpcUrl = yield* (() => {
-        if (Option.isSome(rpcUrlInput)) {
-          return Effect.succeed(rpcUrlInput.value);
-        }
-        if (Option.isSome(network)) {
-          return Effect.succeed(getOptionalRpcUrl(network.value));
-        }
-        return Effect.fail(new Error('Need one of --network or --rpc-url'));
-      })();
+      const rpcUrl = yield* getRpcFromNetworkOrRpcUrl(network, rpcUrlInput);
+      console.log(c`{green Using RPC URL: ${rpcUrl}}`);
 
       const address = Option.getOrElse(addressInput, () =>
         getEnvStringNotAssert('SEQUENCER_ADDRESS'),

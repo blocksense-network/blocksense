@@ -14,6 +14,7 @@ import type {
 } from '@blocksense/base-utils/evm';
 import {
   getNetworkNameByChainId,
+  getOptionalRpcUrl,
   isChainId,
   parseEthereumAddress,
   parseNetworkName,
@@ -241,4 +242,18 @@ export const axiosGet = (
       new Error(
         `Failed to fetch ${url} : ${(error as Error)?.message ?? String(error)}`,
       ),
+  });
+
+export const getRpcFromNetworkOrRpcUrl = (
+  network: Option.Option<NetworkName>,
+  rpcUrlInput: Option.Option<URL>,
+): Effect.Effect<string, Error, never> =>
+  Effect.gen(function* () {
+    if (Option.isSome(rpcUrlInput)) {
+      return rpcUrlInput.value.toString();
+    }
+    if (Option.isSome(network)) {
+      return getOptionalRpcUrl(network.value);
+    }
+    return yield* Effect.fail(new Error('Need one of --network or --rpc-url'));
   });
