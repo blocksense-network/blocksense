@@ -1,3 +1,6 @@
+import fs from 'fs/promises';
+import assert from 'node:assert';
+
 import { Effect, Option } from 'effect';
 import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
@@ -256,4 +259,43 @@ export const getRpcFromNetworkOrRpcUrl = (
       return getOptionalRpcUrl(network.value);
     }
     return yield* Effect.fail(new Error('Need one of --network or --rpc-url'));
+  });
+
+export const createWeb3Account = (
+  rpcUrl: URL | string,
+  address: string,
+  privateKeyPath: string,
+): Effect.Effect<
+  {
+    web3: Web3;
+    account: EthereumAddress;
+    signer: Web3Account;
+  },
+  Error,
+  never
+> =>
+  Effect.gen(function* () {
+    let privateKey = yield* Effect.tryPromise(() =>
+      fs.readFile(privateKeyPath, 'utf8'),
+    );
+    privateKey = privateKey.replace(/(\r\n|\n|\r)/gm, '');
+
+    const normalizedPrivateKey = privateKey.startsWith('0x')
+      ? privateKey
+      : `0x${privateKey}`;
+
+    const web3 = yield* getWeb3(rpcUrl);
+
+    const parsedAccount = parseEthereumAddress(address);
+    const accountFromKey =
+      web3.eth.accounts.privateKeyToAccount(normalizedPrivateKey);
+    assert.strictEqual(
+      accountFromKey.address.toLowerCase(),
+      parsedAccount.toLowerCase(),
+      `Provided private key does not match the expected account: '${parsedAccount}'`,
+    );
+
+    web3.eth.accounts.wallet.add(accountFromKey);
+
+    return { web3, account: parsedAccount, signer: accountFromKey };
   });
