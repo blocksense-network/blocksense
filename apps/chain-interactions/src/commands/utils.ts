@@ -173,8 +173,7 @@ export const getNonce = (
 ): Effect.Effect<bigint, Error, never> =>
   Effect.tryPromise({
     try: async () => {
-      const count = await web3.eth.getTransactionCount(address, blockNumber);
-      return count;
+      return web3.eth.getTransactionCount(address, blockNumber);
     },
     catch: error => {
       return new Error(
@@ -186,30 +185,21 @@ export const getNonce = (
 export const getWeb3 = (
   rpcUrl: URL | string,
 ): Effect.Effect<Web3, Error, never> =>
-  Effect.tryPromise({
-    try: async () => {
-      const web3 = new Web3(String(rpcUrl));
-      await web3.eth.getChainId(); // Test connection
-      return web3;
-    },
-    catch: error => {
-      return new Error(
-        `Failed to initialize Web3 from rpc - ${rpcUrl}: ${String((error as Error)?.message ?? error)}`,
-      );
-    },
-  });
-
-export const getChainId = (web3: Web3): Effect.Effect<bigint, Error, never> =>
   Effect.gen(function* () {
-    const chainId = yield* Effect.tryPromise({
-      try: async () => web3.eth.getChainId(),
-      catch: error => {
-        return new Error(`Failed to get chainID: ${String(error)}`);
-      },
-    });
-    return chainId;
+    const web3 = new Web3(rpcUrl instanceof URL ? rpcUrl.toString() : rpcUrl);
+
+    // Test the connection by getting the chain ID
+    yield* getChainId(web3);
+
+    return web3;
   });
 
+export const getChainId = (web3: Web3): Effect.Effect<bigint, Error, never> => {
+  return Effect.tryPromise({
+    try: async () => web3.eth.getChainId(),
+    catch: error => new Error(`Failed to get chainID: ${String(error)}`),
+  });
+};
 export const getCurrentGasPrice = (
   web3: Web3,
 ): Effect.Effect<bigint, Error, never> =>
@@ -225,14 +215,22 @@ export const signAndSendTransaction = (
   web3: Web3,
   signer: Web3Account,
   txData: Parameters<Web3['eth']['accounts']['signTransaction']>[0],
-) =>
-  Effect.gen(function* () {
-    const signedTx = yield* Effect.tryPromise(() =>
-      web3.eth.accounts.signTransaction(txData, signer.privateKey),
-    );
-    return yield* Effect.tryPromise(() =>
-      web3.eth.sendSignedTransaction(signedTx.rawTransaction),
-    );
+): Effect.Effect<
+  Awaited<ReturnType<Web3['eth']['sendSignedTransaction']>>,
+  Error,
+  never
+> =>
+  Effect.tryPromise({
+    try: () =>
+      web3.eth.accounts
+        .signTransaction(txData, signer.privateKey)
+        .then(signedTx =>
+          web3.eth.sendSignedTransaction(signedTx.rawTransaction),
+        ),
+    catch: error =>
+      new Error(
+        `Failed to sign/send transaction: ${(error as Error)?.message ?? String(error)}`,
+      ),
   });
 
 export const axiosGet = (
