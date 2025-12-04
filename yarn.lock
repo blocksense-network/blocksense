@@ -1650,7 +1650,7 @@ __metadata:
     cmdk: "npm:1.0.4"
     effect: "npm:^3.17.13"
     fast-glob: "npm:^3.3.2"
-    next: "npm:^15.5.3"
+    next: "npm:^15.5.7"
     nextra: "npm:^4.1.1"
     nodemon: "npm:^3.1.9"
     pagefind: "npm:^1.1.1"
