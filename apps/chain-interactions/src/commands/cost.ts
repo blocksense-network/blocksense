@@ -27,8 +27,8 @@ import {
   filterSmallBalance,
   getBalance,
   getDefaultSequencerAddress,
+  getLatestBlockNumber,
   getNetworks,
-  getWeb3,
   startPrometheusServer,
 } from './utils';
 
@@ -383,21 +383,19 @@ const fetchTransactionsForNetwork = (
     console.log(c`{green ${network.toUpperCase()}}`);
     console.log(c`{blue Fetching transactions for ${network}...}`);
 
-    const latestBlock = yield* Effect.catchAll(
-      Effect.gen(function* () {
-        const web3 = yield* getWeb3(getOptionalRpcUrl(network));
-        return yield* Effect.tryPromise(() => web3.eth.getBlockNumber());
-      }),
-      error =>
-        Effect.sync(() => {
-          console.error(
-            c`{yellow Failed to fetch latest block for ${network}: ${
-              (error as Error)?.message ?? String(error)
-            }. Using fallback of 100000000.}`,
-          );
-          return 100000000n;
-        }),
-    );
+    const rpcUrl = getOptionalRpcUrl(network);
+
+    let latestBlock;
+    try {
+      latestBlock = yield* getLatestBlockNumber(rpcUrl);
+    } catch (error) {
+      console.error(
+        c`{red Failed to get latest block for ${network} using fallback of 100000000.: ${
+          (error as Error)?.message ?? String(error)
+        }}`,
+      );
+      latestBlock = 100000000n;
+    }
 
     const apiKey = getOptionalApiKey(network);
     let response: AxiosResponse<any>;

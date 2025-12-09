@@ -1,7 +1,7 @@
-import fs from 'fs/promises';
 import assert from 'node:assert';
 
 import { Effect, Option } from 'effect';
+import { FileSystem } from '@effect/platform';
 import type { AxiosRequestConfig, AxiosResponse } from 'axios';
 import axios from 'axios';
 import express from 'express';
@@ -75,18 +75,17 @@ export const startPrometheusServer = (
     listen(port, false);
   });
 
-export function filterSmallBalance(
+export const filterSmallBalance = (
   balance: string,
   threshold = 1e-6,
-): Effect.Effect<number, never, never> {
-  return Number(balance) < threshold
+): Effect.Effect<number, never, never> =>
+  Number(balance) < threshold
     ? Effect.succeed(0)
     : Effect.succeed(Number(balance));
-}
 
-export function getDefaultSequencerAddress(
+export const getDefaultSequencerAddress = (
   shouldUseMainnetSequencer: boolean,
-): Effect.Effect<EthereumAddress, never, never> {
+): Effect.Effect<EthereumAddress, never, never> => {
   if (shouldUseMainnetSequencer) {
     return Effect.succeed(
       parseEthereumAddress(
@@ -105,7 +104,7 @@ export function getDefaultSequencerAddress(
       ),
     ),
   );
-}
+};
 
 export const getNetworks = (
   network: Option.Option<string>,
@@ -194,12 +193,12 @@ export const getWeb3 = (
     return web3;
   });
 
-export const getChainId = (web3: Web3): Effect.Effect<bigint, Error, never> => {
-  return Effect.tryPromise({
+export const getChainId = (web3: Web3): Effect.Effect<bigint, Error, never> =>
+  Effect.tryPromise({
     try: async () => web3.eth.getChainId(),
     catch: error => new Error(`Failed to get chainID: ${String(error)}`),
   });
-};
+
 export const getCurrentGasPrice = (
   web3: Web3,
 ): Effect.Effect<bigint, Error, never> =>
@@ -270,12 +269,21 @@ export const createWeb3Account = (
     signer: Web3Account;
   },
   Error,
-  never
+  FileSystem.FileSystem
 > =>
   Effect.gen(function* () {
-    let privateKey = yield* Effect.tryPromise(() =>
-      fs.readFile(privateKeyPath, 'utf8'),
-    );
+    const fs = yield* FileSystem.FileSystem;
+
+    let privateKey = yield* fs
+      .readFileString(privateKeyPath)
+      .pipe(
+        Effect.mapError(
+          error =>
+            new Error(
+              `Failed to read private key from ${privateKeyPath}: ${String(error)}`,
+            ),
+        ),
+      );
     privateKey = privateKey.replace(/(\r\n|\n|\r)/gm, '');
 
     const normalizedPrivateKey = privateKey.startsWith('0x')
@@ -296,4 +304,20 @@ export const createWeb3Account = (
     web3.eth.accounts.wallet.add(accountFromKey);
 
     return { web3, account: parsedAccount, signer: accountFromKey };
+  });
+
+export const getLatestBlockNumber = (
+  rpcUrl: URL | string,
+): Effect.Effect<bigint, Error, never> =>
+  Effect.gen(function* () {
+    const web3 = yield* getWeb3(rpcUrl);
+
+    return yield* Effect.tryPromise({
+      try: async () => {
+        return web3.eth.getBlockNumber();
+      },
+      catch: error => {
+        return new Error(`Failed to get block number: ${String(error)}`);
+      },
+    });
   });
