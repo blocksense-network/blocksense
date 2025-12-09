@@ -168,7 +168,6 @@
   - remove `<RemoteContent>` from `nextra/components`
   - rename `<RemoteContent>` to `MDXRemote` and move to `nextra/mdx-remote`
 - 283320f: document removed theme config options
-
   - `main`
   - `direction`
   - `toc.component`
@@ -210,7 +209,6 @@
   - use JavaScript icon for `cjs` and `mjs`
   - use TypeScript icon for `cts` and `mts`
 - 283320f: export a `style-prefixed.css` file with Tailwind CSS v4 prefixed layers for projects using Tailwind CSS v3
-
   - `@layer utilities` -> `@layer v4-utilities`
   - `@layer base` -> `@layer v4-base`
 
@@ -291,7 +289,6 @@
   ```
 
 - 283320f: - sync with nextra 3.0.15
-
   - bump to Next 15
   - remove importing of `style.css` in themes, you need to import now manually by
 
@@ -510,7 +507,6 @@
 
 - 6d22c8f: export a `style-prefixed.css` file with Tailwind CSS v4 prefixed
   layers for projects using Tailwind CSS v3
-
   - `@layer utilities` -> `@layer v4-utilities`
   - `@layer base` -> `@layer v4-base`
 
@@ -897,7 +893,6 @@
 ### Patch Changes
 
 - 2c8a8ab: - sync with nextra 3.0.15
-
   - bump to Next 15
   - remove importing of `style.css` in themes, you need to import now manually
     by
@@ -975,7 +970,6 @@
   replace `editLink.content` option with `editLink`
 
 - 17e6da5: document removed theme config options
-
   - `main`
   - `direction`
   - `toc.component`
@@ -1146,7 +1140,6 @@
   [INP](https://developers.google.com/search/blog/2023/05/introducing-inp) score
   The mobile hamburger menu would occasionally get flagged for "need
   improvement"
-
   - nextra@3.2.1
 
 ## 3.2.0
@@ -1254,7 +1247,6 @@
   `frontMatter.title` set
 
   now priority for sidebar title is:
-
   1. `title` property from `_meta` file
   1. `frontMatter.sidebarTitle`
   1. `frontMatter.title`
@@ -1274,7 +1266,6 @@
   doesn't.
 
   So changing the mdx link behaviour so on hover the underline disappears.
-
   - nextra@3.0.13
 
 ## 3.0.12
@@ -1408,7 +1399,6 @@
   titles
 - eca7535: - remove `Steps`, `Callout`, `Tabs`, `Tab`, `Cards`, `Card`,
   `FileTree` exports, export them now from `nextra/components`
-
   - remove `useMDXComponents` export, export it now from `nextra/mdx`
   - set by default `sidebar.toggleButton` to true
 
@@ -1427,7 +1417,6 @@
 
 - 198dbcc: use toc with JSX elements for remote content
 - 191e6c4: - use `shikiji` instead of `shiki`
-
   - rename `useSSG` to `useData`
 
 - 6eb3118: rename `primaryHue` and `primarySaturation` theme options to
@@ -1445,7 +1434,6 @@
 - 6ec3241: Add Terraform/Move icon https://github.com/shuding/nextra/pull/2811
   https://github.com/shuding/nextra/pull/2808
 - 5a63701: add icons for following languages:
-
   - GraphQL (`graphql`)
   - C++ (`c++`, `cpp`)
   - C# (`csharp`, `c#`, `cs`)
@@ -1500,7 +1488,6 @@
 - bf963cd: Remove the aria-hidden attribute from scroll-to-top button when it is
   visible
 - 829c417: - fix overflow when clicking on `<details>` with open state
-
   - fix animation on mobile when clicking on `<details>` with open state
 
 - cb24790: fix broken `export default` statement in mdx files
@@ -1548,7 +1535,6 @@
 
 - e95faa1: - fixed `<summary>` lost whitespaces when there is some HTML element
   inside
-
   - fixed hydration errors and `<summary>` was not rendered when `<details>`
     text content follows directly after `<summary>` element
 
@@ -1740,7 +1726,6 @@
 - 2a3e3e7: Fix first list item in `<FileTree>` not within permitted parent
   elements
 - 829c417: - fix overflow when clicking on `<details>` with open state
-
   - fix animation on mobile when clicking on `<details>` with open state
 
 - Updated dependencies [2a3e3e7]
@@ -1852,7 +1837,6 @@
 - 4f0f6b27: Omit `...{:type}` inline code annotations from search index #2922
 - e95faa16: - fixed `<summary />` lost whitespaces when there is some HTML
   element inside
-
   - fixed hydration errors and `<summary />` was not rendered when `<details />`
     text content follows directly after `<summary />` element
 
@@ -1989,7 +1973,6 @@
 ### Minor Changes
 
 - 5a637010: add icons for following languages:
-
   - GraphQL (`graphql`)
   - C++ (`c++`, `cpp`)
   - C# (`csharp`, `c#`, `cs`)
@@ -2023,7 +2006,6 @@
   hide external links from pagination
 
   remove xmlns attribute from icons
-
   - nextra@3.0.0-alpha.14
 
 ## 3.0.0-alpha.13
@@ -2171,7 +2153,6 @@
 - 63ca28be: remove `config.serverSideError`
 - 198dbcca: use toc with JSX elements for remote content
 - 191e6c41: - use `shikiji` instead of `shiki`
-
   - rename `useSSG` to `useData`
 
 - 6eb3118f: rename `primaryHue` and `primarySaturation` theme options to
@@ -2212,7 +2193,6 @@
 - 919fe977: set `"peerDependencies.next": ">=13"`
 - eca75354: - remove `Steps`, `Callout`, `Tabs`, `Tab`, `Cards`, `Card`,
   `FileTree` exports, export them now from `nextra/components`
-
   - remove `useMDXComponents` export, export it now from `nextra/mdx`
   - set by default `sidebar.toggleButton` to true
 
@@ -2308,7 +2288,6 @@
 - ffb6d808: - Fix
   `TypeError: Cannot read properties of null (reading 'classList')` while
   navigating to route that doesn't have toc with `router.push` for example
-
   - Add alias `Tabs.Tab` to `Tab` component
   - Add alias `Cards.Card` to `Card` component
   - should not attach custom heading id as id attribute if parent is `Tabs.Tab`
@@ -2338,13 +2317,11 @@
 ### Minor Changes
 
 - d9820746: - show headings for partial md/mdx in toc
-
   - hide headings in toc when parent `<Tab />` or `<Tabs.Tab />`
 
 - 63271a41: add toc.backToTop option
 - 8962597e: - allow override static image component that was hardcoded to
   `import Image from 'next/image'` now it's plain `<img />`
-
   - support `<details />`/`<summary />` for `.md` files
 
 ### Patch Changes
@@ -2406,7 +2383,6 @@
 - e54b008: - add `@theguild/remark-npm2yarn` package that replaces the code
   block that has `npm2yarn` metadata with `<Tabs />` and `<Tab />` components
   from `nextra/components`.
-
   - `<Tabs />` now has `selectedKey` prop, the chosen tab is saved in the local
     storage, which will be chosen in future page renders.
 
@@ -2422,7 +2398,6 @@
 ### Minor Changes
 
 - 16bbb88: Move below packages to nextra package
-
   - `<Cards />` and `<Card />`
   - `<Tabs />` and `<Tab />`
   - `<Steps />`
