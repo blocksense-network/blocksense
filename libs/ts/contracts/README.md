@@ -84,7 +84,7 @@ The slots between 2\*\*128 and 2\*\*160 - 1 are considered Data feed slots. Here
 
 ### Events
 
-When an update is posted to the contract, an event is emitted - “DataFeedsUpdated(uint256 blockNumber)” (topic: 0xe64378c8d8a289137204264780c7669f3860a703795c6f0574d925d473a4a2a7). Block number is an internal counter for the Blocksense system. Through this event off-chain programs can subscribe to is and trigger on-chain actions when needed.
+When an update is posted to the contract, an event is emitted - “DataFeedsUpdated(bytes32 newHistoryAccumulator)” (topic: 0x6f6892f1e8eab8687f7b5f3c3bc0d046cd783c6059310be0bef4e18eb0662789). History accumulator is an internal hash for the Blocksense system. Through this event off-chain programs can subscribe to is and trigger on-chain actions when needed.
 
 ## Development
 
