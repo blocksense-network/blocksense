@@ -25,8 +25,8 @@
     "react-compiler-webpack": "0.1.2"
   },
   "devDependencies": {
-    "@types/node": "^24.3.1",
-    "tsup": "8.5.0",
+    "@types/node": "^24.10.2",
+    "tsup": "8.5.1",
     "typescript": "5.9.2"
   }
 }
