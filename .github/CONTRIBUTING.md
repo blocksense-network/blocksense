@@ -43,7 +43,6 @@ Please see our [security policy](/.github/SECURITY.md).
 4. If the current tests don't cover your changes, add new ones!
 
 5. [Create a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request) for your changes.
-
    - Clearly explain the problem that you're solving.
 
      Link related issues to inform interested parties and future contributors about your change.
@@ -70,7 +69,6 @@ Please see our [security policy](/.github/SECURITY.md).
 6. Do not expect your pull request to be reviewed immediately.
 
    Following this checklist will make the process smoother for everyone:
-
    - [ ] Fixes an [idea approved](https://github.com/blocksense-network/blocksense/labels/idea%20approved) issue
    - [ ] Add new tests if necessary and make sure all existing pass
    - [ ] Update relevant documentation/readme files
@@ -142,7 +140,6 @@ Before committing, **format your code** using:
   - **Scope:** The part of the project the change affects _(optional)_
   - **Subject:** A brief description of the change
 - **Body** is a long form explanation of the change. It should answer the following questions:
-
   - Why have I made these changes? / Why the change was needed?
   - What you did, what effect have my changes made?
     - Bad example: Change `div` class `a` to `b`
