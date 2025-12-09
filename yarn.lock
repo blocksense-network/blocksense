@@ -1569,7 +1569,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@blocksense/dev@workspace:apps/dev":
+"@blocksense/dev@workspace:*, @blocksense/dev@workspace:apps/dev":
   version: 0.0.0-use.local
   resolution: "@blocksense/dev@workspace:apps/dev"
   dependencies:
@@ -1686,6 +1686,7 @@ __metadata:
     "@blocksense/base-utils": "workspace:*"
     "@blocksense/config-types": "workspace:*"
     "@blocksense/contracts": "workspace:*"
+    "@blocksense/dev": "workspace:*"
     "@chainsafe/bls": "npm:^8.2.0"
     "@effect/cluster": "npm:^0.48.2"
     "@effect/experimental": "npm:^0.54.6"

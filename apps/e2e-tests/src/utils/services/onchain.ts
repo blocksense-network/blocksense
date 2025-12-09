@@ -6,7 +6,7 @@ import { AggregatedDataFeedStoreConsumer } from '@blocksense/contracts/viem';
 
 export type FeedsValueAndRound = Record<
   string,
-  { value: HexDataString; round: number }
+  { value: HexDataString | HexDataString[]; round: number }
 >;
 
 /**

@@ -63,14 +63,16 @@ describe.sequential('E2E Tests with process-compose', () => {
 
   let existingFiles: string[] = [];
 
+  const dirPath = join(rootDir, '/apps/e2e-tests/src/test-scenarios/wit/');
+
   const deleteTestFiles = () =>
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;
-      const allFiles = yield* fs.readDirectory(__dirname);
+      const allFiles = yield* fs.readDirectory(dirPath);
       const newFiles = allFiles.filter(file => !existingFiles.includes(file));
       if (newFiles.length > 0) {
         for (const file of newFiles) {
-          yield* fs.remove(join(__dirname, file), {
+          yield* fs.remove(join(dirPath, file), {
             force: true,
             recursive: true,
           });
@@ -86,7 +88,7 @@ describe.sequential('E2E Tests with process-compose', () => {
     // track files created during the tests
     existingFiles = await Effect.runPromise(
       FileSystem.FileSystem.pipe(
-        Effect.flatMap(fs => fs.readDirectory(__dirname)),
+        Effect.flatMap(fs => fs.readDirectory(dirPath)),
         Effect.provide(NodeContext.layer),
       ),
     );
@@ -258,8 +260,11 @@ describe.sequential('E2E Tests with process-compose', () => {
       for (const feedId of feedIds) {
         const value = latestFeedsInfoLocal[feedId.toString()].value;
         const stride = feedId >> 120n;
+        const joinedValue = Array.isArray(value)
+          ? `0x${value.map(val => val.slice(2)).join('')}`
+          : value;
 
-        expect(BigInt((value.length - 2) / 2 / 32)).toEqual(2n ** stride);
+        expect(BigInt((joinedValue.length - 2) / 2 / 32)).toEqual(2n ** stride);
 
         yield* Command.make(
           'just',
@@ -285,7 +290,7 @@ describe.sequential('E2E Tests with process-compose', () => {
         const contracts = yield* FileSystem.FileSystem.pipe(
           Effect.flatMap(fs =>
             fs
-              .readDirectory(__dirname + '/generated-decoders')
+              .readDirectory(dirPath + 'generated-decoders')
               .pipe(Effect.map(files => files.map(file => file))),
           ),
         );
@@ -351,7 +356,7 @@ describe.sequential('E2E Tests with process-compose', () => {
               address: contractAddress as EthereumAddress,
               abi,
               functionName: 'decode',
-              args: [value],
+              args: [joinedValue],
             }),
           )) as {
             eventName: string;
