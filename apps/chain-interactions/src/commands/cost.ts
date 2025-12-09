@@ -163,7 +163,18 @@ export const cost = Command.make(
 
             const rpcUrl = getOptionalRpcUrl(networkName as NetworkName);
 
-            const balance = yield* getBalance(address, rpcUrl);
+            const balance = yield* getBalance(address, rpcUrl).pipe(
+              Effect.catchAll(error =>
+                Effect.sync(() => {
+                  console.error(
+                    c`{yellow Failed to get balance for ${networkName}: ${
+                      error instanceof Error ? error.message : String(error)
+                    }. Using 0}`,
+                  );
+                  return '0';
+                }),
+              ),
+            );
 
             yield* logGasCosts(
               networkName,

@@ -144,26 +144,19 @@ export const getNetworks = (
 export const getBalance = (
   address: string,
   rpcOrWeb3: URL | string | Web3,
-): Effect.Effect<string, never, never> =>
-  Effect.catchAll(
-    Effect.gen(function* () {
-      const web3 =
-        rpcOrWeb3 instanceof Web3 ? rpcOrWeb3 : yield* getWeb3(rpcOrWeb3);
-      const balanceWei = yield* Effect.tryPromise(() =>
-        web3.eth.getBalance(address),
-      );
-      return web3.utils.fromWei(balanceWei, 'ether');
-    }),
-    error =>
-      Effect.sync(() => {
-        console.error(
-          c`{yellow Failed to get balance for address ${address}: \n ${
-            (error as Error)?.message ?? String(error)
-          }. Returning 0}`,
-        );
-        return '0';
-      }),
-  );
+): Effect.Effect<string, Error, never> =>
+  Effect.gen(function* () {
+    const web3 =
+      rpcOrWeb3 instanceof Web3 ? rpcOrWeb3 : yield* getWeb3(rpcOrWeb3);
+    const balanceWei = yield* Effect.tryPromise({
+      try: async () => web3.eth.getBalance(address),
+      catch: error =>
+        new Error(
+          `Failed to get balance for address ${address}: ${(error as Error)?.message ?? String(error)}`,
+        ),
+    });
+    return web3.utils.fromWei(balanceWei, 'ether');
+  });
 
 export const getNonce = (
   address: EthereumAddress,
