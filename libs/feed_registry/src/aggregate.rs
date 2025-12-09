@@ -54,9 +54,9 @@ impl FeedAggregate {
                 }
 
                 // Find the string with the maximum occurrences
-                if frequency_map_text.len() > 0 {
+                if !frequency_map_text.is_empty() {
                     assert!(
-                        frequency_map_bytes.len() == 0,
+                        frequency_map_bytes.is_empty(),
                         "Mixing Text and Bytes in MajorityVoteAggregator is not allowed!"
                     );
                     let result = frequency_map_text
@@ -66,7 +66,7 @@ impl FeedAggregate {
                         .unwrap()
                         .clone();
                     FeedType::Text(result)
-                } else if frequency_map_bytes.len() > 0 {
+                } else if !frequency_map_bytes.is_empty() {
                     let most_frequent = frequency_map_bytes
                         .into_iter()
                         .max_by_key(|&(_, count)| count)
@@ -76,7 +76,7 @@ impl FeedAggregate {
 
                     fn prefix_size(stride: u8) -> u8 {
                         // `2 ^ (n + 1)` divided by 8, rounded up
-                        (stride + 5 + 7) / 8
+                        (stride + 5).div_ceil(8)
                     }
 
                     fn right_align_truncate(dst: &mut [u8], src: &[u8]) {
@@ -108,7 +108,7 @@ impl FeedAggregate {
                     let mut result = [prefix, most_frequent].concat();
 
                     // Calculate max SSZ slots and pad with zeros
-                    let max_ssz_slots = ((result.len() - 2) + 63) / 64;
+                    let max_ssz_slots = (result.len() - 2).div_ceil(64);
                     let target_length = max_ssz_slots * 64 + 2;
 
                     result.resize(target_length, 0);

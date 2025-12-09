@@ -131,7 +131,10 @@ export const decodeFeedsConfig = S.decodeUnknownSync(FeedsConfigSchema);
 /**
  * Schema for the data feed type.
  */
-export const FeedTypeSchema = S.Union(S.Literal('price-feed'), S.Literal('sport-feed')).annotations({
+export const FeedTypeSchema = S.Union(
+  S.Literal('price-feed'),
+  S.Literal('sport-feed'),
+).annotations({
   identifier: 'FeedType',
 });
 
@@ -195,7 +198,7 @@ export const NewFeedSchema = S.mutable(
       aggregation: S.Union(
         S.Literal('median'),
         S.Literal('average'),
-        S.Literal('majority')
+        S.Literal('majority'),
       ).annotations({
         identifier: 'QuorumAggregation',
       }),
