@@ -7,7 +7,7 @@ import { Effect } from 'effect';
 import { Command, Options } from '@effect/cli';
 import chalk from 'chalk';
 
-import { rootDir } from '@blocksense/base-utils';
+import { rootDir, valuesOf } from '@blocksense/base-utils';
 import { expandJsonFields } from '@blocksense/decoders/expand-wit-json';
 import { generateDecoders } from '@blocksense/decoders/generate-decoders';
 
@@ -57,7 +57,7 @@ export const generateDecoder = Command.make(
       );
 
       const witJson = JSON.parse(res.stdout);
-      const containsUnion = Object.values(witJson.types).some(
+      const containsUnion = valuesOf(witJson.types).some(
         (field: any) => field.type === 'union',
       );
       if (containsUnion && decoderType === 'encode-packed') {
