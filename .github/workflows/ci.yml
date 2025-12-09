@@ -34,7 +34,7 @@ env:
 
 jobs:
   lint:
-    runs-on: [self-hosted, nixos, x86-64-v3]
+    runs-on: [self-hosted, nixos, x86-64-v3, bare-metal]
     steps:
       - uses: actions/checkout@v4
 
@@ -53,7 +53,7 @@ jobs:
         run: nix flake check --impure
 
   build-and-test-ts-libs-and-apps:
-    runs-on: [self-hosted, nixos, x86-64-v3]
+    runs-on: [self-hosted, nixos, x86-64-v3, bare-metal]
 
     steps:
       - uses: actions/checkout@v4
@@ -82,7 +82,7 @@ jobs:
 
   decoders-tests:
     timeout-minutes: 20
-    runs-on: [self-hosted, nixos, x86-64-v3]
+    runs-on: [self-hosted, nixos, x86-64-v3, bare-metal]
 
     steps:
       - uses: actions/checkout@v4
@@ -112,7 +112,7 @@ jobs:
 
   e2e-tests:
     timeout-minutes: 10
-    runs-on: [self-hosted, nixos, x86-64-v3]
+    runs-on: [self-hosted, nixos, x86-64-v3, bare-metal]
 
     steps:
       - uses: actions/checkout@v4
@@ -141,7 +141,7 @@ jobs:
 
   smart-contracts-tests:
     timeout-minutes: 360
-    runs-on: [self-hosted, nixos, x86-64-v3]
+    runs-on: [self-hosted, nixos, x86-64-v3, bare-metal]
 
     steps:
       - uses: actions/checkout@v4
@@ -189,7 +189,7 @@ jobs:
             ']}' >> $GITHUB_OUTPUT
           else
             echo 'matrix={"include":[' \
-              '{"runner":["self-hosted","nixos","x86-64-v3"],"system":"x86_64-linux"}' \
+              '{"runner":["self-hosted","nixos","x86-64-v3","bare-metal"],"system":"x86_64-linux"}' \
             ']}' >> $GITHUB_OUTPUT
           fi
 
@@ -220,7 +220,7 @@ jobs:
 
   rust:
     timeout-minutes: 360
-    runs-on: [self-hosted, nixos, x86-64-v3]
+    runs-on: [self-hosted, nixos, x86-64-v3, bare-metal]
 
     steps:
       - uses: actions/checkout@v4
@@ -247,7 +247,7 @@ jobs:
   deploy_websites:
     name: Deploy ${{ matrix.project }} website
     timeout-minutes: 360
-    runs-on: [self-hosted, nixos, x86-64-v3]
+    runs-on: [self-hosted, nixos, x86-64-v3, bare-metal]
     strategy:
       matrix:
         include:
