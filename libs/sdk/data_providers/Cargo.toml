@@ -12,6 +12,8 @@ name = "blocksense_data_providers_sdk"
 blocksense-sdk = { workspace = true }
 
 anyhow = { workspace = true }
+ethereum_ssz = { workspace = true }
+ethereum_ssz_derive = { workspace = true }
 futures = { workspace = true }
 itertools = { workspace = true }
 serde = { workspace = true }

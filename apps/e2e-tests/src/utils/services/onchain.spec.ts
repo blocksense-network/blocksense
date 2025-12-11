@@ -21,7 +21,6 @@ describe('getDataFeedsInfoFromNetwork', () => {
 
   const data =
     '0x0000000000000000000000000000000000000a3549cbad30000001986c265bf0';
-  const value = 11223987629360;
 
   beforeEach(() => {
     vi.spyOn(AggregatedDataFeedStoreConsumer, 'create').mockReturnValue(
@@ -49,7 +48,7 @@ describe('getDataFeedsInfoFromNetwork', () => {
       );
 
       const expected: FeedsValueAndRound = {
-        '1': { value, round: 42 },
+        '1': { value: data, round: 42 },
       };
 
       expect(result).toEqual(expected);
@@ -74,7 +73,7 @@ describe('getDataFeedsInfoFromNetwork', () => {
       );
 
       const expected: FeedsValueAndRound = {
-        '2': { value, round: 99 },
+        '2': { value: data, round: 99 },
       };
 
       expect(result).toEqual(expected);

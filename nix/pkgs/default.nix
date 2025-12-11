@@ -83,6 +83,7 @@
           commodities-price-feeds = mkOracleScript "commodities-price-feeds";
           spout-rwa = mkOracleScript "spout-rwa";
           eth-gas-info = mkOracleScript "eth-gas-info";
+          sports-db = mkOracleScript "sports-db";
         };
 
         spinPlugins = {

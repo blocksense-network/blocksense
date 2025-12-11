@@ -39,26 +39,84 @@ impl FeedAggregate {
                 let span = info_span!("MajorityVoteAggregator");
                 let _guard = span.enter();
 
-                let mut frequency_map = HashMap::new();
+                let mut frequency_map_text = HashMap::new();
+                let mut frequency_map_bytes = HashMap::new();
 
                 // Count the occurrences of each string
                 for v in values {
                     match v {
-                        FeedType::Text(t) => *frequency_map.entry(t).or_insert(0) += 1,
+                        FeedType::Text(t) => *frequency_map_text.entry(t).or_insert(0) += 1,
+                        FeedType::Bytes(b) => *frequency_map_bytes.entry(b).or_insert(0) += 1,
                         _ => {
-                            error!("Attempting to perform frequency_map on f64!");
+                            error!("Attempting to perform frequency_map on {:?}", v);
                         }
                     }
                 }
 
                 // Find the string with the maximum occurrences
-                let result = frequency_map
-                    .into_iter()
-                    .max_by_key(|&(_, count)| count)
-                    .map(|(s, _)| s)
-                    .expect("Aggregating empty set of values!")
-                    .clone();
-                FeedType::Text(result)
+                if !frequency_map_text.is_empty() {
+                    assert!(
+                        frequency_map_bytes.is_empty(),
+                        "Mixing Text and Bytes in MajorityVoteAggregator is not allowed!"
+                    );
+                    let result = frequency_map_text
+                        .into_iter()
+                        .max_by_key(|&(_, count)| count)
+                        .map(|(s, _)| s)
+                        .unwrap()
+                        .clone();
+                    FeedType::Text(result)
+                } else if !frequency_map_bytes.is_empty() {
+                    let most_frequent = frequency_map_bytes
+                        .into_iter()
+                        .max_by_key(|&(_, count)| count)
+                        .map(|(s, _)| s)
+                        .unwrap()
+                        .clone();
+
+                    fn prefix_size(stride: u8) -> u8 {
+                        // `2 ^ (n + 1)` divided by 8, rounded up
+                        (stride + 5).div_ceil(8)
+                    }
+
+                    fn right_align_truncate(dst: &mut [u8], src: &[u8]) {
+                        let dst_len = dst.len();
+                        let src_len = src.len();
+
+                        let n = std::cmp::min(dst_len, src_len);
+                        dst[dst_len - n..].copy_from_slice(&src[src_len - n..]);
+                    }
+
+                    let prefix_size = prefix_size(4) as usize;
+                    let mut prefix = vec![0; prefix_size];
+
+                    let length = most_frequent.len();
+
+                    // length              | prefix
+                    // (in bytes)          |
+                    // ------------------------------------
+                    // 0x 00 .. 00 12 34   | 0x 00 00 00 00
+
+                    // NOTE: Zip together the pointers to the bytes of the prefix and the length, starting from the "right"
+                    // std::iter::zip(prefix[..].iter_mut().rev(), length.to_le_bytes()).for_each(
+                    //     |(t, s)| {
+                    //         *t = s;
+                    //     },
+                    // );
+                    right_align_truncate(&mut prefix, &(length + prefix_size).to_be_bytes());
+
+                    let mut result = [prefix, most_frequent].concat();
+
+                    // Calculate max SSZ slots and pad with zeros
+                    let max_ssz_slots = (result.len() - 2).div_ceil(64);
+                    let target_length = max_ssz_slots * 64 + 2;
+
+                    result.resize(target_length, 0);
+
+                    FeedType::Bytes(result)
+                } else {
+                    panic!("No valid types to aggregate in MajorityVoteAggregator!");
+                }
             }
             FeedAggregate::MedianAggregator => {
                 let span = info_span!("MedianAggregator");

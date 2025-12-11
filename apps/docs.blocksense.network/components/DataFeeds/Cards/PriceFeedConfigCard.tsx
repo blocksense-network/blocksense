@@ -13,8 +13,8 @@ export const PriceFeedConfigCard = ({ feed }: DataFeedCardProps) => {
     title: 'Price Feed Configuration',
     description: '',
     items: [
-      { label: 'Base', value: feed.additional_feed_info.pair.base },
-      { label: 'Quote', value: feed.additional_feed_info.pair.quote },
+      { label: 'Base', value: feed.additional_feed_info.pair?.base },
+      { label: 'Quote', value: feed.additional_feed_info.pair?.quote },
       { label: 'Decimals', value: feed.additional_feed_info.decimals },
       { label: 'Category', value: feed.additional_feed_info.category },
     ],
