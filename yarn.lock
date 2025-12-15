@@ -1909,7 +1909,7 @@ __metadata:
     eslint: "npm:^9.35.0"
     eslint-config-next: "npm:15.5.2"
     eslint-plugin-storybook: "npm:^9.1.4"
-    next: "npm:^15.5.7"
+    next: "npm:^15.5.9"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     storybook: "npm:^9.0.14"
