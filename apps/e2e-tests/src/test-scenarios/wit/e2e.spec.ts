@@ -35,8 +35,7 @@ import type { FeedsValueAndRound } from '../../utils/services/onchain';
 import { getDataFeedsInfoFromNetwork } from '../../utils/services/onchain';
 import type { SequencerService } from '../../utils/services/sequencer';
 import { Sequencer } from '../../utils/services/sequencer';
-
-import { expectedPCStatuses03 } from './expected-service-status';
+import { expectedPCStatuses03 } from '../general/expected-service-status';
 
 describe.sequential('E2E Tests with process-compose', () => {
   const testScenario = `wit`;

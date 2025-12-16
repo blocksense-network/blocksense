@@ -4,9 +4,6 @@
   ...
 }:
 let
-  # Function to read and parse the JSON file
-  readJson = path: builtins.fromJSON (builtins.readFile path);
-
   readPortsFromFile =
     path:
     let
@@ -25,122 +22,35 @@ let
       ports = if builtins.pathExists filePath then readPortsFromFile filePath else [ ];
     in
     if builtins.length ports > 0 then ports else [ 8547 ];
-  testKeysDir = lib.path.append root "nix/test-environments/test-keys";
-  deploymentV2FilePath = lib.path.append root "config/evm_contracts_deployment_v2/ink-sepolia.json";
-
-  upgradeableProxyADFSContractAddressInk =
-    (readJson deploymentV2FilePath).contracts.coreContracts.UpgradeableProxyADFS.address;
-  impersonationAddress = lib.strings.fileContents "${testKeysDir}/impersonation_address";
   anvilInkSepoliaPort = builtins.elemAt availablePorts 0;
-
-  apiKeysDir = "${config.devenv.root}/apps/e2e-tests/src/test-scenarios/wit/test-keys";
 in
 {
-  services.kafka = {
-    enable = false;
-  };
+  imports = [
+    ../general/environment-setup.nix
+  ];
 
   services.blocksense = {
-    enable = true;
+    logsDir = lib.mkForce "$GIT_ROOT/logs/process-compose/e2e-wit";
 
-    logsDir = "$GIT_ROOT/logs/process-compose/e2e-wit";
-
-    anvil = {
-      ink-sepolia = {
-        port = anvilInkSepoliaPort;
-        chain-id = 99999999999;
-        fork-url = "$RPC_URL_INK_SEPOLIA";
-        fork-block-number = 29297247;
-        fork-chain-id = 11155111;
-        state = "${config.devenv.root}/config/generated/process-compose/e2e-wit/anvil/state.json";
-        state-interval = 10;
-      };
+    anvil.ink-sepolia = {
+      port = anvilInkSepoliaPort;
+      state = lib.mkForce "${config.devenv.root}/config/generated/process-compose/e2e-wit/anvil/state.json";
     };
 
-    sequencer = {
-      id = 1;
-
-      ports = {
-        main = 9856;
-        admin = 5553;
-        metrics = 5551;
-      };
-
-      block-config = {
-        max-feed-updates-to-batch = 300;
-        block-generation-period = 500;
-        genesis-block-timestamp-ms = 0;
-      };
-
-      providers = {
-        ink-sepolia = {
-          is-enabled = false;
-          url = "http://127.0.0.1:${toString anvilInkSepoliaPort}";
-          private-key-path = "${testKeysDir}/sequencer-private-key";
-          transaction-gas-limit = 20000000;
-          impersonated-anvil-account = impersonationAddress;
-          publishing-criteria = [
-            {
-              feed-id = 0; # Sports DB
-              stride = 4;
-              peg-to-value = 1.00;
-              peg-tolerance-percentage = 10.0; # 10% tolerance assures that the price will be pegged
-            }
-          ];
-          contracts = [
-            {
-              name = "AggregatedDataFeedStore";
-              address = upgradeableProxyADFSContractAddressInk;
-              creation-byte-code = null;
-              deployed-byte-code = null;
-            }
-            {
-              name = "multicall";
-              address = "0xcA11bde05977b3631167028862bE2a173976CA11";
-              creation-byte-code = null;
-              deployed-byte-code = null;
-            }
-          ];
-        };
-      };
-
-      kafka-report-endpoint = null;
-
-      whitelisted-reporters = [
+    sequencer.providers.ink-sepolia = {
+      publishing-criteria = lib.mkForce [
         {
-          id = 0;
-          pub-key = "ea30af86b930d539c55677b05b4a5dad9fce1f758ba09d152d19a7d6940f8d8a8a8fb9f90d38a19e988d721cddaee4567d2e";
-          address = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+          feed-id = 0; # Sports DB
+          stride = 4;
+          peg-to-value = 1.00;
+          peg-tolerance-percentage = 10.0; # 10% tolerance assures that the price will be pegged
         }
       ];
-
-      pyroscope-config = {
-        url = "http://localhost:4040";
-      };
-
-      log-level = "info";
     };
 
-    reporters = {
-      a = {
-        id = 0;
-        default-exec-interval = 10;
-        secret-key-path = "${testKeysDir}/reporter_secret_key";
-        second-consensus-secret-key-path = "${testKeysDir}/reporter_second_consensus_secret_key";
-        api-keys = {
-          ALPHAVANTAGE_API_KEY = "${apiKeysDir}/ALPHAVANTAGE_API_KEY";
-          APCA_API_KEY_ID = "${apiKeysDir}/APCA_API_KEY_ID";
-          APCA_API_SECRET_KEY = "${apiKeysDir}/APCA_API_SECRET_KEY";
-          YAHOO_FINANCE_API_KEY = "${apiKeysDir}/YAHOO_FINANCE_API_KEY";
-          TWELVEDATA_API_KEY = "${apiKeysDir}/TWELVEDATA_API_KEY";
-          FMP_API_KEY = "${apiKeysDir}/FMP_API_KEY";
-          SPOUT_RWA_API_KEY = "${apiKeysDir}/SPOUT_RWA_API_KEY";
-          METALS_API_KEY = "${apiKeysDir}/METALS_API_KEY";
-        };
-      };
-    };
+    reporters.a.api-keys = lib.mkForce { };
 
-    oracles = {
+    oracles = lib.mkForce {
       sports-db = {
         exec-interval = 120;
         allowed-outbound-hosts = [

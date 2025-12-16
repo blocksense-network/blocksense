@@ -14,7 +14,7 @@ export const generateDecoders = async (
     subTemplatePath?: string;
     contractName?: string;
     containsUnion?: boolean;
-    prefixSize?: number;
+    stride?: number;
   },
 ) => {
   const defaultOptions = {
@@ -42,6 +42,13 @@ export const generateDecoders = async (
     ? await fs.readFile(opts.subTemplatePath, 'utf-8')
     : '';
 
+  // In how many bytes will the prefix length (size of the data) be stored
+  // 32 * 2^(stride) bytes
+  // e.g. stride 0 -> 32 bytes -> 1 prefix byte
+  //      stride 2 -> 128 bytes -> 1 prefix byte
+  //      stride 3 -> 256 bytes -> 2 prefix bytes
+  const prefixSize = opts.stride ? Math.ceil((opts.stride + 5) / 8) : undefined;
+
   const code =
     type === 'encode-packed'
       ? await generateEPDecoder(template, fields, evmVersion)
@@ -50,8 +57,8 @@ export const generateDecoders = async (
           subTemplateSSZ,
           fields,
           evmVersion,
-          opts.prefixSize,
-          !!opts.prefixSize,
+          prefixSize,
+          !!prefixSize,
         );
 
   if (typeof code === 'string') {
