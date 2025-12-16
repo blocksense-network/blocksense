@@ -1,10 +1,9 @@
-import fs from 'fs/promises';
 import path from 'path';
 
 import { Effect } from 'effect';
 import { Command, Options } from '@effect/cli';
 import { Command as Exec } from '@effect/platform';
-import { NodeContext } from '@effect/platform-node';
+import * as FileSystem from '@effect/platform/FileSystem';
 import chalk from 'chalk';
 
 import { rootDir, valuesOf } from '@blocksense/base-utils';
@@ -44,16 +43,18 @@ export const generateDecoder = Command.make(
     witWorld,
   }) =>
     Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem;
       const witFilePath = path.join(rootDir, witPath);
-      if (!(yield* Effect.tryPromise(() => fs.stat(witFilePath)))) {
+      if (!(yield* fs.stat(witFilePath))) {
         return yield* Effect.fail(`WIT file not found at path: ${witFilePath}`);
       }
 
       // Generate temporary JSON representation from WIT file
       const tempOutputPath = path.join(rootDir, 'tmp/wit-output.json');
-      yield* Effect.tryPromise(() =>
-        fs.mkdir(path.dirname(tempOutputPath), { recursive: true }),
-      );
+
+      yield* fs.makeDirectory(path.dirname(tempOutputPath), {
+        recursive: true,
+      });
 
       const args = [
         '--input',
@@ -69,17 +70,13 @@ export const generateDecoder = Command.make(
       yield* Exec.make('wit-converter', ...args).pipe(
         Exec.workingDirectory(path.join(rootDir, 'apps/wit-converter')),
         Exec.string,
-        Effect.provide(NodeContext.layer),
       );
 
-      const readWitOutput = yield* Effect.tryPromise(() =>
-        fs.readFile(tempOutputPath, 'utf-8'),
+      const witJson = yield* fs.readFileString(tempOutputPath).pipe(
+        Effect.map(json => JSON.parse(json)),
+        // Clean up temporary file
+        Effect.ensuring(fs.remove(tempOutputPath).pipe(Effect.ignore)),
       );
-
-      // Clean up temporary file
-      yield* Effect.tryPromise(() => fs.unlink(tempOutputPath));
-
-      const witJson = JSON.parse(readWitOutput);
 
       const containsUnion = valuesOf(witJson.types).some(
         (field: any) => field.type === 'union',
@@ -93,10 +90,7 @@ export const generateDecoder = Command.make(
       const fields = expandJsonFields(witJson.payloadTypeName, witJson.types);
 
       const outputPath = path.join(rootDir, outputDir);
-      yield* Effect.tryPromise(() => fs.mkdir(outputPath, { recursive: true }));
-
-      // `2 ^ (n + 1)` divided by 8, rounded up
-      const prefixSize = Math.floor((stride + 5 + 7) / 8);
+      yield* fs.makeDirectory(outputPath, { recursive: true });
 
       const contractPaths = yield* Effect.tryPromise(() =>
         generateDecoders(
@@ -104,7 +98,7 @@ export const generateDecoder = Command.make(
           evmVersion,
           outputPath,
           fields[witJson.payloadTypeName],
-          { containsUnion, prefixSize },
+          { containsUnion, stride },
         ),
       );
 
