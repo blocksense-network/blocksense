@@ -15,6 +15,10 @@ path = "bin/extended_isolation_forest_test.rs"
 name = "hdbscan_detector_test"
 path = "bin/hdbscan_detector_test.rs"
 
+[[bin]]
+name = "replay_test"
+path = "bin/replay_test.rs"
+
 [dependencies]
 anyhow = { workspace = true }
 csv = { workspace = true }
