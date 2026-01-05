@@ -37,7 +37,7 @@ spin-outbound-networking = { workspace = true }
 spin-trigger = { workspace = true }
 terminal = { workspace = true }
 tokio = { workspace = true }
-tokio-stream = "0.1.16"
+tokio-stream = "0.1.18"
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 url = { workspace = true }
