@@ -250,7 +250,6 @@ WHERE (fl.block_number, fl.log_index, fl.rb_index)
 ```
 
 - Indexes supporting day-1 queries:
-
   - `feed_latest_point_lookup_idx(chain_id, feed_id, stride)`.
   - `feed_updates_range_q_idx(chain_id, feed_id, stride, block_number, log_index) WHERE status = 'confirmed'` (partial index).
   - `ring_buffer_updates_slot_latest_idx(chain_id, table_index, block_number DESC, log_index DESC) WHERE status = 'confirmed'` (partial index).
@@ -593,37 +592,30 @@ Per-chain `alertsConfig` values supply the expected update cadence: `noEventsSec
 ## 12) Runbooks (Excerpt)
 
 1. **RPC Outage**
-
    - Symptoms: rising `adfs_indexer_rpc_errors_total{chain}`, queue growth, backfill stalls.
    - Actions: switch provider URL, reduce backfill range, restart worker; ensure WS reconnects.
 
 2. **DB Saturation**
-
    - Symptoms: elevated `adfs_indexer_db_latency_ms_bucket{chain}` (p99), queue depth increases.
    - Actions: tune `db.write.batchRows`, scale DB resources, consider per-chain deployment, add missing indices.
 
 3. **Stuck Backfill**
-
    - Symptoms: `adfs_indexer_backfill_progress{chain}` flat for >10 minutes.
    - Actions: inspect RPC rate limits, narrow block ranges, restart targeted backfill.
 
 4. **Unknown Implementation / Version Pause**
-
    - Symptoms: `adfs_indexer_version_paused{chain}` remains 1, alerts firing, ingestion halted for that chain.
    - Actions: inspect `proxy_versions` to identify new implementation; update `implVersionMap`, `versions`, and `topicNames` in config (including optional `bytecodeHash`), redeploy/restart service (no hot-reload) to resume ingestion; verify `adfs_indexer_version_paused{chain}` returns to 0.
 
 5. **Queue Overflow Pause**
-
    - Symptoms: `adfs_indexer_queue_overflow_total{chain}` increments, ingestion auto-paused for that chain, catch-up backfill scheduled from `overflowBackfillWindow`.
    - Actions: confirm RPC health and consumer load, adjust `queue.maxItems` or throughput if necessary, monitor backfill completion, then resume ingestion once backlog clears.
 
 6. **Guardrail Drop (feeds/calldata)**
-
    - Symptoms: `adfs_indexer_guard_dropped_total{chain,reason}` increments, chain auto-paused, backfill scheduled from `guardBackfillWindow`.
    - Actions: inspect offending transactions, adjust guard thresholds if appropriate, confirm auto backfill completion before resuming ingestion; treat as P1.
 
 7. **Stale Advisory Lock**
-
    - Symptoms: `adfs_indexer_lock_age_seconds{chain,lock}` exceeds threshold, and `pg_stat_activity` shows idle holder.
    - Actions: investigate stuck worker, restart if necessary, and use `locks release --chain` admin command (invokes `pg_advisory_unlock`) to free the lock when safe.
 
