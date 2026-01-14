@@ -13,21 +13,17 @@ The `initial-feeds-config` module is responsible for generating the initial data
 The `apps/data-feeds-config-generator/scripts/generate-initial-feeds-config.ts` script orchestrates the entire process of generating the initial feeds configuration. Below is a step-by-step breakdown of the process:
 
 1. **Collect Raw Data from Chainlink**:
-
    - Gather all public information about Chainlink data feeds.
 
 2. **Process Raw Data**:
-
    - **Aggregate Network Information**: Process Chainlink’s raw data into a more suitable format for further processing.
    - **Remove Specific Feeds**: Exclude irrelevant or unsupported feeds.
    - **Transform Raw Data into a Semi-Final Blocksense Format**: Extract only the necessary information and convert it into a semi-final Blocksense config format that can be further processed.
 
 3. **Generate Feed Configuration**:
-
    - The `generateFeedConfig` function is at the heart of the script. It processes the collected raw data, applies necessary transformations, and outputs the final configuration in a format compatible with Blocksense.
 
    Key steps in the function include:
-
    - **Get Chainlink Feeds on Mainnet**: Collect data from Chainlink’s mainnet feeds.
    - **Get Unique Data Feeds**: Filter out duplicates.
    - **Remove Unsupported Feed Types**: Exclude feed types that are not supported by Blocksense.
