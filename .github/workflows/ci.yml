@@ -41,8 +41,6 @@ jobs:
       - name: Install Nix
         uses: metacraft-labs/nixos-modules/.github/install-nix@main
         with:
-          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          cachix-cache: ${{ vars.CACHIX_CACHE }}
           trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
           substituters: ${{ vars.SUBSTITUTERS }}
 
@@ -61,8 +59,6 @@ jobs:
       - name: Install Nix
         uses: metacraft-labs/nixos-modules/.github/install-nix@main
         with:
-          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          cachix-cache: ${{ vars.CACHIX_CACHE }}
           trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
           substituters: ${{ vars.SUBSTITUTERS }}
 
@@ -90,8 +86,6 @@ jobs:
       - name: Install Nix
         uses: metacraft-labs/nixos-modules/.github/install-nix@main
         with:
-          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          cachix-cache: ${{ vars.CACHIX_CACHE }}
           trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
           substituters: ${{ vars.SUBSTITUTERS }}
 
@@ -120,8 +114,6 @@ jobs:
       - name: Install Nix
         uses: metacraft-labs/nixos-modules/.github/install-nix@main
         with:
-          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          cachix-cache: ${{ vars.CACHIX_CACHE }}
           trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
           substituters: ${{ vars.SUBSTITUTERS }}
 
@@ -149,8 +141,6 @@ jobs:
       - name: Install Nix
         uses: metacraft-labs/nixos-modules/.github/install-nix@main
         with:
-          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          cachix-cache: ${{ vars.CACHIX_CACHE }}
           trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
           substituters: ${{ vars.SUBSTITUTERS }}
 
@@ -193,8 +183,8 @@ jobs:
             ']}' >> $GITHUB_OUTPUT
           fi
 
-  build-nix-environments-and-push-to-cachix:
-    name: Build Nix Environments and push to Cachix
+  build-nix-environments-and-push-to-attic:
+    name: Build Nix Environments and push to Attic
     needs: set-runner-system-matrix
     timeout-minutes: 60
     strategy:
@@ -207,16 +197,31 @@ jobs:
       - name: Install Nix
         uses: metacraft-labs/nixos-modules/.github/install-nix@main
         with:
-          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          cachix-cache: ${{ vars.CACHIX_CACHE }}
           trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
           substituters: ${{ vars.SUBSTITUTERS }}
 
-      - name: Build Nix Environments and push to Cachix
+      - name: Build Nix Environments and push to Attic
+        env:
+          ATTIC_TOKEN: ${{ secrets.ATTIC_TOKEN }}
+          ATTIC_ENDPOINT: ${{ vars.ATTIC_ENDPOINT }}
+          ATTIC_CACHE: ${{ vars.ATTIC_CACHE }}
         run: |
-          nix build --impure -L --print-out-paths \
-            .#{spin,spinWrapped,process-compose-environments.hermetic.all,process-compose-environments.with-local-cargo-artifacts.all,devShells.${{ matrix.system }}.default} | \
-          cachix push blocksense
+          set -euo pipefail
+
+          if [[ -z "${ATTIC_TOKEN:-}" || -z "${ATTIC_ENDPOINT:-}" || -z "${ATTIC_CACHE:-}" ]]; then
+            echo "ATTIC_TOKEN, ATTIC_ENDPOINT, and ATTIC_CACHE are required for Attic pushes" >&2
+            exit 1
+          fi
+
+          mapfile -t outputs < <(
+            nix build --impure -L --print-out-paths \
+              .#{spin,spinWrapped,process-compose-environments.hermetic.all,process-compose-environments.with-local-cargo-artifacts.all,devShells.${{ matrix.system }}.default}
+          )
+
+          nix shell nixpkgs#attic-client -c \
+            attic login --set-default ci "$ATTIC_ENDPOINT" "$ATTIC_TOKEN"
+          nix shell nixpkgs#attic-client -c \
+            attic push --jobs 1 --ignore-upstream-cache-filter "$ATTIC_CACHE" "${outputs[@]}"
 
   rust:
     timeout-minutes: 360
@@ -228,8 +233,6 @@ jobs:
       - name: Install Nix
         uses: metacraft-labs/nixos-modules/.github/install-nix@main
         with:
-          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          cachix-cache: ${{ vars.CACHIX_CACHE }}
           trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
           substituters: ${{ vars.SUBSTITUTERS }}
 
@@ -275,8 +278,6 @@ jobs:
       - name: Install Nix
         uses: metacraft-labs/nixos-modules/.github/install-nix@main
         with:
-          cachix-auth-token: ${{ secrets.CACHIX_AUTH_TOKEN }}
-          cachix-cache: ${{ vars.CACHIX_CACHE }}
           trusted-public-keys: ${{ vars.TRUSTED_PUBLIC_KEYS }}
           substituters: ${{ vars.SUBSTITUTERS }}
 
