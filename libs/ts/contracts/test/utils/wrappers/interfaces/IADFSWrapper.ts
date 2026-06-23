@@ -13,12 +13,17 @@ export interface IADFSWrapper extends IBaseWrapper<AggregatedDataFeedStore> {
     sequencer: HardhatEthersSigner,
     feeds: Feed[],
     opts?: {
-      blockNumber?: number;
+      sourceAccumulator?: string;
+      destinationAccumulator?: string;
       txData?: any;
     },
-  ): Promise<TransactionResponse>;
+  ): Promise<{
+    tx: TransactionResponse;
+    sourceAccumulator: string;
+    destinationAccumulator: string;
+  }>;
 
-  checkEvent(receipt: TransactionReceipt, newBlockNumber: number): void;
+  checkEvent(receipt: TransactionReceipt, destinationAccumulator: string): void;
 
   getEventFragment(): EventFragment;
 
