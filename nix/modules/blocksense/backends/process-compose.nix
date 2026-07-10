@@ -138,7 +138,7 @@ let
         "LD_LIBRARY_PATH=${lib.makeLibraryPath self'.legacyPackages.commonLibDeps}"
       ];
       shutdown.signal = 9;
-      depends_on = lib.mapAttrs' (name: value: {
+      depends_on = lib.mapAttrs' (name: _value: {
         name = "anvil-impersonate-and-fund-${name}";
         value = {
           condition = "process_completed_successfully";
