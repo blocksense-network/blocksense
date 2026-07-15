@@ -85,7 +85,16 @@ export async function isTokenValid(): Promise<boolean> {
     await octokit.rest.users.getAuthenticated();
     return true;
   } catch (error) {
-    if (error instanceof RequestError && error.status === 401) {
+    // Octokit can surface a RequestError from a differently-resolved copy of
+    // `@octokit/request-error`, so `instanceof` is unreliable here. Fall back
+    // to the numeric `status` carried on the error so an invalid/expired token
+    // (401) makes us report the token as invalid — and callers skip — rather
+    // than crashing.
+    const status =
+      error instanceof RequestError
+        ? error.status
+        : (error as { status?: number } | null)?.status;
+    if (status === 401) {
       return false;
     }
     throw error;
