@@ -19,7 +19,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DFCG_ARTIFACTS_ACCESS_TOKEN: ${{ secrets.DFCG_ARTIFACTS_ACCESS_TOKEN }}
   CMC_API_KEY: ${{ secrets.CMC_API_KEY }}
   APCA_API_KEY_ID: ${{ secrets.APCA_API_KEY_ID }}
   APCA_API_SECRET_KEY: ${{ secrets.APCA_API_SECRET_KEY }}
@@ -56,6 +55,19 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      # Mint a short-lived, contents:read token for the private
+      # dfcg-artifacts repo via the blocksense-ci-token-provider GitHub
+      # App, replacing the long-lived DFCG_ARTIFACTS_ACCESS_TOKEN PAT.
+      - name: Mint dfcg-artifacts token
+        id: dfcg-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.CI_TOKEN_PROVIDER_APP_ID }}
+          private-key: ${{ secrets.CI_TOKEN_PROVIDER_PRIVATE_KEY }}
+          owner: blocksense-network
+          repositories: dfcg-artifacts
+          permission-contents: read
+
       - name: Install Nix
         uses: metacraft-labs/nixos-modules/.github/install-nix@main
         with:
@@ -75,6 +87,8 @@ jobs:
 
       - name: Test all packages
         run: just test-ts
+        env:
+          DFCG_ARTIFACTS_ACCESS_TOKEN: ${{ steps.dfcg-token.outputs.token }}
 
   decoders-tests:
     timeout-minutes: 20
