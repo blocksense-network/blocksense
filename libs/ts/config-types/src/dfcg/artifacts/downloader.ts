@@ -82,19 +82,26 @@ export async function isTokenValid(): Promise<boolean> {
   const octokit = new Octokit({ auth: GITHUB_TOKEN });
 
   try {
-    await octokit.rest.users.getAuthenticated();
+    // Probe access to the actual artifacts repo rather than `/user`.
+    // A GitHub App installation token (minted by the ci-token-provider
+    // App) is not a user, so `users.getAuthenticated()` returns 403
+    // ("Resource not accessible by integration") even when the token can
+    // read the repo. `repos.get` only needs metadata:read and works for
+    // both App installation tokens and classic PATs — and it checks the
+    // thing we actually care about: can we reach dfcg-artifacts.
+    await octokit.rest.repos.get({ owner: OWNER, repo: REPO });
     return true;
   } catch (error) {
     // Octokit can surface a RequestError from a differently-resolved copy of
     // `@octokit/request-error`, so `instanceof` is unreliable here. Fall back
-    // to the numeric `status` carried on the error so an invalid/expired token
-    // (401) makes us report the token as invalid — and callers skip — rather
-    // than crashing.
+    // to the numeric `status` carried on the error. A missing/expired/
+    // unauthorized token (401/403/404) means we can't read the repo, so the
+    // callers skip rather than crash.
     const status =
       error instanceof RequestError
         ? error.status
         : (error as { status?: number } | null)?.status;
-    if (status === 401) {
+    if (status === 401 || status === 403 || status === 404) {
       return false;
     }
     throw error;
