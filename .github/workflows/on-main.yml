@@ -6,7 +6,6 @@ on:
       - main
 
 env:
-  DFCG_ARTIFACTS_ACCESS_TOKEN: ${{ secrets.DFCG_ARTIFACTS_ACCESS_TOKEN }}
   RPC_URL_ETHEREUM_SEPOLIA: ${{ secrets.RPC_URL_ETHEREUM_SEPOLIA }}
   RPC_URL_INK_SEPOLIA: ${{ secrets.RPC_URL_INK_SEPOLIA }}
   METALS_API_KEY: ${{ secrets.METALS_API_KEY }}
@@ -34,6 +33,19 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      # Mint a short-lived, contents:read token for the private
+      # dfcg-artifacts repo via the blocksense-ci-token-provider GitHub
+      # App, replacing the long-lived DFCG_ARTIFACTS_ACCESS_TOKEN PAT.
+      - name: Mint dfcg-artifacts token
+        id: dfcg-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.CI_TOKEN_PROVIDER_APP_ID }}
+          private-key: ${{ secrets.CI_TOKEN_PROVIDER_PRIVATE_KEY }}
+          owner: blocksense-network
+          repositories: dfcg-artifacts
+          permission-contents: read
+
       - name: Build & activate the Nix Dev Shell
         run: |
           eval "$(nix print-dev-env --accept-flake-config --impure .#devShells.x86_64-linux.js || echo exit 1)"
@@ -44,6 +56,7 @@ jobs:
 
       - name: Build
         env:
+          DFCG_ARTIFACTS_ACCESS_TOKEN: ${{ steps.dfcg-token.outputs.token }}
           NEXT_PUBLIC_VERIFICATION_API_KEY: ${{ secrets.NEXT_PUBLIC_VERIFICATION_API_KEY }}
           NEXT_PUBLIC_VERIFICATION_API_URL: ${{ secrets.NEXT_PUBLIC_VERIFICATION_API_URL }}
         id: build
