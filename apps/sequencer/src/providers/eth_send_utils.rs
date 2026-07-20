@@ -2,11 +2,12 @@ use actix_web::{rt::time::interval, web::Data};
 use alloy::{
     hex,
     network::TransactionBuilder,
-    primitives::{Address, Bytes, U256},
+    primitives::{Address, Bytes},
     providers::{Provider, ProviderBuilder},
     rpc::types::{eth::TransactionRequest, TransactionReceipt},
 };
-use alloy_primitives::{FixedBytes, TxHash};
+
+use alloy_primitives::{keccak256, FixedBytes, TxHash, U256};
 use blocksense_config::{FeedStrideAndDecimals, GNOSIS_SAFE_CONTRACT_NAME};
 use blocksense_data_feeds::feeds_processing::{BatchedAggregatesToSend, VotedFeedUpdate};
 use blocksense_registry::config::FeedConfig;
@@ -20,7 +21,7 @@ use tokio::{
 
 use crate::{
     providers::provider::{
-        parse_eth_address, ProviderStatus, ProviderType, ProvidersMetrics, RpcProvider,
+        parse_eth_address, HashValue, ProviderStatus, ProviderType, ProvidersMetrics, RpcProvider,
         SharedRpcProviders,
     },
     sequencer_state::SequencerState,
@@ -396,7 +397,37 @@ pub async fn eth_batch_send_to_contract(
     let provider_metrics = &provider.provider_metrics;
     let rpc_handle = &provider.provider;
 
-    let input = Bytes::from(serialized_updates);
+    let latest_call_data_hash = keccak256(&serialized_updates);
+
+    let mut next_calldata_merkle_tree = provider.calldata_merkle_tree_frontier.clone();
+    next_calldata_merkle_tree.append(HashValue(latest_call_data_hash));
+
+    let prev_calldata_merkle_tree_root = match &provider.merkle_root_in_contract {
+        Some(stored_hash) => stored_hash.clone(),
+        None => provider.calldata_merkle_tree_frontier.root(),
+    };
+    let next_calldata_merkle_tree_root = next_calldata_merkle_tree.root();
+
+    // Merkle tree over all call data management for ADFS contracts
+    let prev_root_bytes = prev_calldata_merkle_tree_root.0.as_slice();
+    let next_root_bytes = next_calldata_merkle_tree_root.0.as_slice();
+
+    // Compute (with just one allocation) the new input bytes
+    // from the serialized updates with roots
+    let mut serialized_updates_with_roots = Vec::with_capacity(
+        1 + prev_root_bytes.len() + next_root_bytes.len() + serialized_updates.len(),
+    );
+
+    // - Command index (`1` is for writing)
+    serialized_updates_with_roots.push(1);
+    // - Previous merkle root bytes
+    serialized_updates_with_roots.extend_from_slice(prev_root_bytes);
+    // - Next merkle root bytes
+    serialized_updates_with_roots.extend_from_slice(next_root_bytes);
+    // - Original serialized updates
+    serialized_updates_with_roots.extend_from_slice(&serialized_updates);
+
+    let input = Bytes::from(serialized_updates_with_roots);
 
     let receipt;
     let tx_time = Instant::now();
@@ -465,7 +496,7 @@ pub async fn eth_batch_send_to_contract(
             return Ok(("timeout".to_string(), feeds_to_update_ids));
         }
 
-        match get_nonce(
+        let latest_nonce = match get_nonce(
             &net,
             rpc_handle,
             &sender_address,
@@ -489,8 +520,23 @@ pub async fn eth_batch_send_to_contract(
                             "Detected previously submitted transaction included on-chain: {included_tx_hash:?} in network `{net}` block height {block_height}"
                         );
                     }
+
+                    // TODO: maybe move into an else clause of the `if` above,
+                    //       i.e. only do it when there were no included transactions found
+                    try_to_sync(
+                        net.as_str(),
+                        &mut provider,
+                        &contract_address,
+                        block_height,
+                        &next_calldata_merkle_tree_root,
+                        latest_nonce,
+                        nonce,
+                    )
+                    .await;
+
                     return Ok(("true".to_string(), feeds_to_update_ids));
                 }
+                latest_nonce
             }
             Err(err) => {
                 warn!("{err}");
@@ -643,6 +689,16 @@ pub async fn eth_batch_send_to_contract(
                     Err(err) => {
                         warn!("Error while submitting transaction in network `{net}` block height {block_height} and address {sender_address} due to {err}");
                         if err.to_string().contains("execution revert") {
+                            try_to_sync(
+                                net.as_str(),
+                                &mut provider,
+                                &contract_address,
+                                block_height,
+                                &next_calldata_merkle_tree_root,
+                                latest_nonce,
+                                nonce,
+                            )
+                            .await;
                             return Ok(("false".to_string(), feeds_to_update_ids));
                         } else {
                             inc_retries_with_backoff(
@@ -722,10 +778,18 @@ pub async fn eth_batch_send_to_contract(
     log_gas_used(&net, &receipt, transaction_time, provider_metrics).await;
 
     provider.update_history(&updates.updates);
+    let result = receipt.status().to_string();
+    if result == "true" {
+        //Transaction was successfully confirmed therefore we update the latest state hash
+        let root = next_calldata_merkle_tree.root();
+        provider.calldata_merkle_tree_frontier = next_calldata_merkle_tree;
+        provider.merkle_root_in_contract = None;
+        debug!("Successfully updated contract in network `{net}` block height {block_height} Merkle root {root:?}");
+    } // TODO: Reread round counters + latest state hash from contract
     drop(provider);
     debug!("Released a read/write lock on provider state in network `{net}` block height {block_height}");
 
-    Ok((receipt.status().to_string(), feeds_to_update_ids))
+    Ok((result, feeds_to_update_ids))
 }
 
 #[allow(clippy::too_many_arguments)]
@@ -820,6 +884,36 @@ pub async fn get_gas_limit(
         Err(err) => {
             warn!("Timed out while getting gas_limit for network {net} due to {err}");
             default_gas_limit
+        }
+    }
+}
+
+async fn try_to_sync(
+    net: &str,
+    provider: &mut RpcProvider,
+    contract_address: &Address,
+    block_height: u64,
+    next_calldata_merkle_tree_root: &HashValue,
+    latest_nonce: u64,
+    previous_nonce: u64,
+) {
+    let rpc_handle = &provider.provider;
+    match rpc_handle
+        .get_storage_at(*contract_address, U256::from(0))
+        .await
+    {
+        Ok(root) => {
+            if root != next_calldata_merkle_tree_root.0.into() {
+                // If the nonce in the contract increased and the next state root hash is not as we expect,
+                // another sequencer was able to post updates for the current block height before this one.
+                // We need to take this into account and reread the round counters of the feeds.
+                info!("Updates to contract already posted, network {net}, block_height {block_height}, latest_nonce {latest_nonce}, previous_nonce {previous_nonce}, merkle_root in contract {root}");
+                provider.merkle_root_in_contract = Some(HashValue(root.into()));
+                // TODO: Read round counters from contract
+            }
+        }
+        Err(e) => {
+            warn!("Failed to read root from network {net} with contract address {contract_address} : {e}");
         }
     }
 }
@@ -1594,7 +1688,7 @@ mod tests {
         .await
         .expect("Could not serialize updates!");
 
-        assert_eq!(serialized_updates.to_bytes().encode_hex(), "01000000000000000000000002000303e00701026869000401ffe00801036279650101000000000000000000000000000000000000000000000000000000000000000701ff0000000000000000000000000000000000000000000000000000000000000008");
+        assert_eq!(serialized_updates.to_bytes().encode_hex(), "00000002000303e00701026869000401ffe00801036279650101000000000000000000000000000000000000000000000000000000000000000701ff0000000000000000000000000000000000000000000000000000000000000008");
     }
 
     use blocksense_feed_registry::types::FeedType;
@@ -1658,7 +1752,7 @@ mod tests {
         // Note: bye is filtered out:
         assert_eq!(
             serialized_updates.to_bytes().encode_hex(),
-            "01000000000000000000000001000303e0070102686901010000000000000000000000000000000000000000000000000000000000000007"
+            "00000001000303e0070102686901010000000000000000000000000000000000000000000000000000000000000007"
         );
 
         // Berachain
@@ -1689,7 +1783,7 @@ mod tests {
 
         assert_eq!(
             serialized_updates.to_bytes().encode_hex(),
-            "01000000000000000000000001000303e0070102686901010000000000000000000000000000000000000000000000000000000000000007"
+            "00000001000303e0070102686901010000000000000000000000000000000000000000000000000000000000000007"
         );
 
         // Manta
@@ -1719,7 +1813,7 @@ mod tests {
 
         assert_eq!(
             serialized_updates.to_bytes().encode_hex(),
-            "01000000000000000000000001000303e0070102686901010000000000000000000000000000000000000000000000000000000000000007"
+            "00000001000303e0070102686901010000000000000000000000000000000000000000000000000000000000000007"
         );
     }
 
