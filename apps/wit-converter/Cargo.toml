@@ -13,7 +13,7 @@ clap = { version = "4.5", features = ["derive", "env"] }
 convert_case = "0.8"
 futures = { workspace = true }
 log = { workspace = true }
-regex = "1.11"
+regex = "1.12"
 reqwest = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
