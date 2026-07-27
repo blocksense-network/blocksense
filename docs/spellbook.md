@@ -171,7 +171,6 @@ Command Breakdown:
   > ```
 
   Easy to copy examples for crafting the data parameter:
-
   - `getLatestSingleData` operation with stride 0 and id 42
 
     ```javascript

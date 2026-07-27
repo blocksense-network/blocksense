@@ -14,8 +14,6 @@ let
     in
     asInts;
 
-  root = ../../../../..;
-
   availablePorts =
     let
       filePath = "${config.devenv.root}/config/generated/process-compose/e2e-wit/available-ports";
