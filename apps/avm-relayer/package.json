@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@aztec/accounts": "0.87.9",
-    "@aztec/aztec.js": "0.87.9",
+    "@aztec/aztec.js": "2.0.3",
     "@aztec/stdlib": "0.87.9",
     "@effect/cli": "0.69.2",
     "@effect/cluster": "^0.48.2",
