@@ -37,13 +37,13 @@ let
     name:
     {
       port,
-      command,
+      drv,
       ...
     }:
     {
       name = "anvil-${name}";
       value.process-compose = {
-        inherit command;
+        command = lib.getExe drv;
         readiness_probe = {
           exec.command = ''
             curl -fsSL http://127.0.0.1:${toString port}/ \
@@ -190,13 +190,14 @@ in
   '';
 
   config = lib.mkIf cfg.enable {
+    services.kafka.enable = cfg.kafka.enable;
     processes = lib.mkMerge [
       anvilImpersonateAndFundInstances
       reporterInstances
       sequencerInstance
       anvilInstances
-      (lib.mkIf config.services.kafka.enable blockchainReader)
-      (lib.mkIf config.services.kafka.enable aggregateConsensusReader)
+      (lib.mkIf cfg.kafka.enable blockchainReader)
+      (lib.mkIf cfg.kafka.enable aggregateConsensusReader)
       (lib.mkIf cfg.blama.enable blamaInstance)
     ];
   };

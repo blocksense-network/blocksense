@@ -20,13 +20,11 @@ let
   apiKeysDir = "${reporterStateDir}/test-keys";
 in
 {
-  services.kafka = {
-    enable = true;
-  };
   services.blocksense = {
     enable = true;
 
     logsDir = "$GIT_ROOT/logs/process-compose/example-setup-01";
+    kafka.enable = true;
 
     anvil = {
       ethereum-sepolia = {
