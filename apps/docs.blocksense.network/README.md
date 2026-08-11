@@ -64,4 +64,5 @@ yarn test
 
 ### Available Deployments
 
+See the [Maintainers Guide](./MAINTAINERS.md) for details about the deployment process.
 To learn more, see [the root readme](/README.md), section "Supported deployment options".
